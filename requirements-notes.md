@@ -754,3 +754,15 @@ extension: `||` = colspan-left, a lone `^^` cell = rowspan-up. FigDown
 abilities beyond GFM stay as keyword lines (`cell r,c color=…`,
 `cell r highlight`). This retires R17's provisional `^`/`<` markers and
 closes R18's audit item for tables.
+
+**Considered and rejected (2026-07-02): whitespace-as-alignment.**
+Proposal: `|text |` = left, `| text|` = right, `| text |` = center.
+R18 audit: no open standard does this (GFM explicitly trims cell
+whitespace; AsciiDoc/Textile/Org use explicit markers for alignment).
+Rejected because (1) it breaks paste-compat — formatters like Prettier
+pad cells arbitrarily, so pasted tables would get random alignments and
+a formatter pass would silently change the figure (violates D1
+stability); (2) invisible characters carrying semantics is a classic
+failure mode (Makefile tabs) and a hallucination source for LLMs.
+Per-column stays GFM colons; if per-cell alignment is ever needed
+(census: 1.4%), it will be `cell r,c align=left|right|center`.
