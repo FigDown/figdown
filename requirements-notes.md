@@ -513,9 +513,53 @@ files, generate `XXX.svg` alongside, and embed the SVG into the .md file.
   runs: manual CLI, editor-on-save, file watcher, pre-commit hook, or CI
   — candidates to standardize as recommended (non-normative) workflows.
 
+### R15 — Prior-art landscape: adjacent projects exist; the target intersection does not (2026-07-02)
+
+**Trigger**: the user asked "isn't there already a similar project? this need
+seems inevitably a trend". Quick survey (2026-07-02; a full `prior-art.md`
+deep survey is a planned follow-up):
+
+- **D2** (Terrastruct) — the closest neighbor. Modern declarative diagram
+  language, multiple layout engines (dagre/ELK/proprietary TALA),
+  deterministic (same input → same output), some position control
+  (`near`), positioned explicitly as "better than Mermaid".
+- **Mermaid** — the de-facto language LLMs already write (GitHub renders it
+  natively), but minimal layout control; positions cannot be pinned.
+- **PlantUML / blockdiag family / WaveDrom / Graphviz** — broad type
+  coverage collectively (timing, nwdiag, bitfield) but fragmented across
+  languages; hardware docs need several of them combined.
+- **draw.io / Excalidraw** — important precedent: `.drawio.svg` /
+  `.excalidraw.svg` embed the source inside the SVG (= R14's self-carrying
+  artifact). But GUI-first; the "source" is coordinate serialization, not
+  semantically meaningful text for AI.
+- **Academic (DiagrammerGPT etc.)** — LLM plans layout and generates
+  images; goal is generation, not a maintainable knowledge source.
+
+**FigDown differentiators no existing project promises**:
+1. Cross-edit **layout stability** as a spec guarantee (D1 grade 2:
+   local edit → local change) — D2's determinism covers identical input
+   only; adding one node may still reflow everything.
+2. **Pinned params are rigid, auto-layout adapts around them** as a core
+   axiom (D2 has partial ability, not a normative commitment).
+3. **Normative source↔artifact pairing** (SVG↔text sync/staleness
+   detection as part of the standard).
+4. **GUI = text edit** editor contract.
+5. Hardware/network-doc type coverage (bitfield + waveform + topology +
+   lookup chains) in **one** language.
+6. **AI teaching token cost** as a first-class design metric.
+
+### Open question OQ1 — Build on D2 vs. a new language (2026-07-02)
+
+D2 is close enough that R11 (survey before invent) obliges a deep read of
+D2's language, layout engines, and license before deciding whether FigDown
+should be an extension/profile over D2 semantics or a new language.
+Status: **open**.
+
 ## Open questions
 
 <!-- Ambiguities found in the requirements, to confirm with the user -->
+
+- **OQ1**: Build on D2 vs. new language (see R15). Requires deep D2 survey.
 
 ## Decisions
 
