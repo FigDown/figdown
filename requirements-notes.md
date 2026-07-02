@@ -548,6 +548,38 @@ deep survey is a planned follow-up):
    lookup chains) in **one** language.
 6. **AI teaching token cost** as a first-class design metric.
 
+### R16 — Templates: the figure *type* is an application profile (2026-07-02)
+
+**Original**: Return to a "template" concept — the figure categories from
+our census. Each figure type exists to convey different information, so
+**the same keyword may carry different meaning per type**. The type should
+be treated as a template (an application), which is an inherent
+optimization.
+
+**Interpretation**:
+- One core grammar (lexical rules, attribute model, pin/layer semantics),
+  many **templates** = per-figure-type vocabularies and defaults:
+  1. Per-template keyword meaning: `node` in `topology` is a device
+     (icon-ish default), in `flowchart` a step (rect), in `block` a
+     module — the template disambiguates.
+  2. Per-template defaults: R13 upgraded — defaults are chosen from the
+     census statistics *of that bucket* (flowchart defaults `flow down`,
+     block defaults `flow right`, topology defaults undirected edges…).
+  3. Per-template AI teaching unit (R7 maximized): teach the core + only
+     the template in use.
+- **Census buckets = the template list and its priority order**; the
+  classified sample folders become each template's design corpus and
+  acceptance set. "Classification is design."
+- Resolves the node-shape question: `kind` vocabularies are defined per
+  template; `shape=` remains a cross-template presentation override.
+- Syntax surface: the version header declares the template, e.g.
+  `figdown 0.1 block`. Typed blocks (bitfield/table/wave) are templates
+  that can also embed in a scene document (mixed documents, cf. OQ-S5).
+- Guardrail (R11): a new template requires corpus evidence — templates
+  must not metastasize. Mermaid validates the pattern (first word
+  declares the diagram type) but FigDown templates share one core
+  grammar rather than being N separate languages.
+
 ### Open question OQ1 — Build on D2 vs. a new language (2026-07-02)
 
 D2 is close enough that R11 (survey before invent) obliges a deep read of

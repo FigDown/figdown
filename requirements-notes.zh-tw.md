@@ -421,6 +421,34 @@ MD reader/viewer 不支援 mermaid 等。但當 **AI 讀這份文件時，要可
 5. 硬體/網路文件圖型（bitfield+波形+拓撲+查表鏈）**單一語言**全覆蓋。
 6. **AI 教學 token 成本**作為一級設計指標。
 
+### R16 — Template：圖的「種類」即應用樣板（2026-07-02）
+
+**原意**：回歸「template」概念——以我們普查分類出的圖種類為本。每種
+圖想表達的資訊目標不同，所以**相同的 keyword 可以有不同的意義**。
+應該把「種類」視為樣板（一種應用），這是先天優化的好處。
+
+**整理後解讀**：
+- 一套核心文法（詞法、屬性模型、pin/layer 語意），多個 **template**
+  ＝ 按圖型分的詞彙表與預設值：
+  1. 關鍵字按 template 釋義：`node` 在 `topology` 是設備（預設圖示
+     風格）、在 `flowchart` 是步驟（矩形）、在 `block` 是模組——
+     由 template 消歧。
+  2. 預設值按 template 統計：R13 升級——每個 template 的預設值取自
+     普查**該桶**的統計（flowchart 預設 `flow down`、block 預設
+     `flow right`、topology 預設無向邊……）。
+  3. AI 教學單元按 template 切（R7 最大化）：教核心 + 當下使用的
+     template 即可。
+- **普查的桶 = template 清單與優先順序**；classified/ 樣本資料夾
+  直接成為各 template 的設計語料與驗收集。「分類即設計」。
+- 順帶解決 node 形狀問題：`kind` 詞彙表按 template 定義；`shape=`
+  保留為跨 template 的展現層覆蓋。
+- 語法表面：版本頭宣告 template，如 `figdown 0.1 block`。型別區塊
+  （bitfield/table/wave）本身是 template，也可嵌入場景文件
+  （混合文件，見 OQ-S5）。
+- 護欄（R11）：新 template 必須有語料佐證——不得增生。Mermaid
+  驗證過此模式（首字宣告圖型），但 FigDown 的 template 共享同一
+  核心文法，不是 N 個獨立語言。
+
 ### 待議 OQ1 — 站在 D2 之上 vs. 全新語言（2026-07-02）
 
 D2 近到 R11（借鑑優先）要求先深讀 D2 的語言、排版引擎與授權，再決定

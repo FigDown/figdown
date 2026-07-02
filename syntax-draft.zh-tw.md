@@ -30,11 +30,19 @@
 FigDown 文件是 UTF-8 純文字，一行一指令。
 
 ```figdown
-figdown 0.1                     # 版本標頭，必須是第一行
+figdown 0.1 block               # 版本標頭 + TEMPLATE，必須是第一行
 title "L3 Forwarding Datapath"  # 選用
 # 註解以 '#' 開頭；空行忽略
 ...指令...
 ```
+
+**Template（R16）。** 標頭宣告文件的 template——它實例化的圖型：
+`block`｜`topology`｜`flowchart`｜`bitfield`｜`table`｜`wave`
+（初始集合 = 普查的桶，按優先順序）。所有 template 共享這一套核心
+文法；template 決定關鍵字詞彙表（有哪些 `kind`、`node` 是什麼意思）
+與預設值（流向、邊的有向性、單位尺寸）——各自對準該圖型自己的
+普查統計。教 AI 寫某個 template 只需要核心 + 該 template 的詞彙表。
+新 template 必須有語料佐證（R11：不得增生）。
 
 詞法規則：
 

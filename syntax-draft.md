@@ -33,11 +33,21 @@ From the requirements log, the syntax is boxed in by:
 A FigDown document is a UTF-8 text, one directive per line.
 
 ```figdown
-figdown 0.1                     # version header, REQUIRED first line
+figdown 0.1 block               # version header + TEMPLATE, REQUIRED first line
 title "L3 Forwarding Datapath"  # optional
 # comments start with '#'; blank lines are ignored
 ...directives...
 ```
+
+**Templates (R16).** The header names the document's template — the
+figure type it instantiates: `block` | `topology` | `flowchart` |
+`bitfield` | `table` | `wave` (initial set = the census buckets, in
+priority order). All templates share this one core grammar; the template
+selects the keyword vocabulary (which `kind`s exist, what `node` means)
+and the defaults (flow direction, edge directedness, unit sizes) — each
+tuned to that figure type's own census statistics. Teaching an AI to
+author one template needs only the core + that template's sheet. A new
+template requires corpus evidence (R11: no metastasis).
 
 Lexical rules:
 
