@@ -606,3 +606,17 @@ To gather ideas on GitHub, documents use **English as the primary file**:
 `xxx.md` (English) with `xxx.zh-tw.md` (Traditional Chinese) maintained in
 parallel. These notes follow the convention: `requirements-notes.md` (EN,
 this file) + `requirements-notes.zh-tw.md`.
+
+### D4 — Pins are absolute px; first drag freezes the whole layout (2026-07-02)
+
+Born from PoC testing (the user dragged one node and the whole figure
+reflowed). Three rules, now in the syntax draft (§3, OQ-S2 resolved):
+1. `pin at=` uses **absolute canvas px** — canvas-relative fractions were
+   tried and rejected (canvas growth moved every fractional pin,
+   defeating the purpose of pinning).
+2. **Pin-on-first-touch**: the editor materializes *all* node positions
+   into `pin` lines on the user's first drag; afterwards layout is fully
+   manual and the algorithm stands down. Auto-layout also computes ALL
+   nodes (pinned ones hold their slot) so pinning X never reflows Y.
+3. **Edges are always derived** from node borders — they adapt
+   automatically and can never be pinned.

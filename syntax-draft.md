@@ -113,7 +113,7 @@ auto-lays-out deterministically.
 flow right                      # tier 2: overall direction (right|down|left|up)
 rank l2 l3                      # tier 2: these nodes share a rank/row
 zone left ingress               # tier 2: region hint for a group
-pin l3 at=0.8,0.2               # tier 3: absolute position (canvas fraction)
+pin l3 at=420,80                # tier 3: absolute position (canvas px)
 size l3 w=120 h=60              # tier 3: explicit size (px or %)
 ```
 
@@ -130,8 +130,15 @@ Normative rules:
 - **Size adaptation** (R10): explicit `size` → content shrinks to fit
   (font may step down). No explicit size → box grows minimally without
   displacing the global layout.
-- OQ-S2: units for `at=` — canvas fraction (0–1) vs. grid cells.
-  Fraction is the current straw man.
+- **OQ-S2 resolved (2026-07-02): `at=` uses absolute canvas px.**
+  Canvas-relative fractions were tried in the PoC and rejected: when the
+  auto-laid-out extent changes, every fractional pin moves with it —
+  violating the stability rule pins exist to provide. Corollary
+  (**pin-on-first-touch**): the reference editor materializes *all*
+  node positions into `pin` lines on the user's first drag; from then
+  on layout is fully manual and the algorithm stands down. Edges are
+  always derived from node borders — they adapt, and can never be
+  pinned.
 
 ## 4. Typed blocks (census-dominant types)
 
@@ -244,7 +251,7 @@ transient split as in ProtoFlow). Deferred until the static core ships.
 ## 9. Open syntax questions
 
 - OQ-S1: indented block sugar for `group`/typed blocks?
-- OQ-S2: `pin at=` units (canvas fraction vs grid).
+- ~~OQ-S2: `pin at=` units~~ — resolved: absolute canvas px (§3).
 - OQ-S3: table column width/alignment syntax.
 - OQ-S4: `edge` label position hints (ProtoFlow `nudge` heritage)?
 - OQ-S5: multi-figure documents — one `.fd` = one figure (current straw

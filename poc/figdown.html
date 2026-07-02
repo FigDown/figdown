@@ -380,9 +380,10 @@ function renderScene(doc,y0){
   }
   // positions
   const horiz=(doc.flow==='right'||doc.flow==='left');
+  // ALL nodes participate in auto layout (pinned ones hold their slot so
+  // that pinning X never reflows Y); pins override coordinates afterwards.
   const ranksArr=[];
-  for(const n of nodes){ if(pinned(n.id)) continue;
-    (ranksArr[n.rank]=ranksArr[n.rank]||[]).push(n); }
+  for(const n of nodes){ (ranksArr[n.rank]=ranksArr[n.rank]||[]).push(n); }
   const laneSize=[], laneSpan=[];
   ranksArr.forEach((lane,i)=>{
     if(!lane) return;
@@ -401,15 +402,16 @@ function renderScene(doc,y0){
     main+=laneSize[i]+(horiz?GAPX:GAPY);
   });
   if(doc.flow==='left'||doc.flow==='up'){
-    const M=main; for(const n of nodes){ if(pinned(n.id)) continue;
+    const M=main; for(const n of nodes){
       if(horiz) n.x=M-n.x-n.w; else n.y=y0+20+(M-(n.y-y0-20))-n.h; }
   }
-  // canvas extent from auto nodes, then place pinned nodes by fraction
-  let W=0,Hh=0;
-  for(const n of nodes){ if(pinned(n.id))continue; W=Math.max(W,n.x+n.w); Hh=Math.max(Hh,n.y+n.h-y0-20); }
-  if(W===0){W=480;} if(Hh===0){Hh=280;}
+  // pins are ABSOLUTE canvas px (stability: a pinned position never moves,
+  // regardless of what the auto layout does around it)
   for(const n of nodes){ const p=doc.pins[n.id]; if(!p) continue;
-    n.x=p.fx*W; n.y=y0+20+p.fy*Hh; W=Math.max(W,n.x+n.w); Hh=Math.max(Hh,n.y+n.h-y0-20); }
+    n.x=p.fx; n.y=y0+20+p.fy; }
+  let W=0,Hh=0;
+  for(const n of nodes){ W=Math.max(W,n.x+n.w); Hh=Math.max(Hh,n.y+n.h-y0-20); }
+  if(W===0){W=480;} if(Hh===0){Hh=280;}
   // groups
   const gsvg=[];
   for(const g of doc.groups){
@@ -656,7 +658,7 @@ edge sp2 -- lf2
 edge lf1 -- h1
 edge lf2 -- h2
 edge mon -- sp2 style=dotted label="telemetry"
-pin mon at=1.0,0.0`,
+pin mon at=340,0`,
 
 'mixed document':
 `figdown 0.1
@@ -691,18 +693,32 @@ let lastSVG='', lastMeta=null, lastPad={x:0,y:0}, lastDoc=null;
 
 // ---- direct manipulation: every GUI action is a text edit ----
 const SCENE_KW=/^(figdown|title|node|group|edge|layer|flow|rank|zone|pin|size)\b/;
-function setPinLine(id,fx,fy){
+function applyPins(pins){ // pins: array of [id, px, py] — one text update, one refresh
   const lines=$('src').value.split('\n');
-  const pinRe=new RegExp('^\\s*pin\\s+'+id+'\\b');
-  const newLine='pin '+id+' at='+fx+','+fy;
-  let idx=lines.findIndex(l=>pinRe.test(l));
-  if(idx>=0){ lines[idx]=newLine; }
-  else{
-    let last=-1;
-    lines.forEach((l,i)=>{ if(SCENE_KW.test(l.trim())) last=i; });
-    lines.splice(last+1,0,newLine);
+  for(const [id,px,py] of pins){
+    const pinRe=new RegExp('^\\s*pin\\s+'+id+'\\b');
+    const newLine='pin '+id+' at='+px+','+py;
+    const idx=lines.findIndex(l=>pinRe.test(l));
+    if(idx>=0){ lines[idx]=newLine; }
+    else{
+      let last=-1;
+      lines.forEach((l,i)=>{ if(SCENE_KW.test(l.trim())) last=i; });
+      lines.splice(last+1,0,newLine);
+    }
   }
   $('src').value=lines.join('\n'); refresh();
+}
+function unpinnedNodePins(exceptId){ // current positions of all unpinned nodes, as pin entries
+  const svg=$('out').querySelector('svg'); if(!svg||!lastDoc) return [];
+  const lines=$('src').value.split('\n');
+  const out=[];
+  svg.querySelectorAll('[data-node]').forEach(g=>{
+    const id=g.dataset.node;
+    if(id===exceptId) return;
+    if(lines.some(l=>new RegExp('^\\s*pin\\s+'+id+'\\b').test(l))) return;
+    out.push([id, Math.round(+g.dataset.x), Math.round(+g.dataset.y-lastMeta.top)]);
+  });
+  return out;
 }
 function setNodeLabel(id,label){
   const lines=$('src').value.split('\n');
@@ -742,10 +758,15 @@ function installDirectEdit(){
             return;
           }
           select(id); return; }
-        const fx=Math.min(1,Math.max(0,(x0+dx)/lastMeta.W)).toFixed(3);
-        const fy=Math.min(1,Math.max(0,(y0+dy-lastMeta.top)/lastMeta.Hh)).toFixed(3);
-        setPinLine(id,fx,fy);
-        $('status').textContent='drag → wrote "pin '+id+' at='+fx+','+fy+'" (GUI action = text edit)'; };
+        const px=Math.max(0,Math.round(x0+dx));
+        const py=Math.max(0,Math.round(y0+dy-lastMeta.top));
+        // pin-on-first-touch: the first drag freezes EVERY node at its
+        // current position, so nothing else can reflow — then applies the drag
+        const others=unpinnedNodePins(id);
+        applyPins([...others,[id,px,py]]);
+        $('status').textContent='drag → wrote "pin '+id+' at='+px+','+py+'"'+
+          (others.length?' and froze '+others.length+' other node(s) in place (pin-on-first-touch)':'')+
+          ' — GUI action = text edit'; };
       window.addEventListener('pointermove',mv); window.addEventListener('pointerup',up);
     });
     g.addEventListener('dblclick',ev=>{
@@ -812,20 +833,9 @@ function highlightSelection(){
 }
 function pinAll(){
   if(!lastDoc||!lastMeta) return;
-  const svg=$('out').querySelector('svg'); if(!svg) return;
-  const lines=$('src').value.split('\n');
-  const adds=[];
-  svg.querySelectorAll('[data-node]').forEach(g=>{
-    const id=g.dataset.node;
-    if(lines.some(l=>new RegExp('^\\s*pin\\s+'+id+'\\b').test(l))) return;
-    const fx=Math.min(1,Math.max(0,(+g.dataset.x)/lastMeta.W)).toFixed(3);
-    const fy=Math.min(1,Math.max(0,(+g.dataset.y-lastMeta.top)/lastMeta.Hh)).toFixed(3);
-    adds.push('pin '+id+' at='+fx+','+fy);
-  });
+  const adds=unpinnedNodePins(null);
   if(!adds.length){ $('status').textContent='all nodes already pinned'; return; }
-  let last=-1; lines.forEach((l,i)=>{ if(SCENE_KW.test(l.trim())) last=i; });
-  lines.splice(last+1,0,...adds);
-  $('src').value=lines.join('\n'); refresh();
+  applyPins(adds);
   $('status').textContent='froze layout: '+adds.length+' pin line(s) written — future edits now change only what you touch';
 }
 
