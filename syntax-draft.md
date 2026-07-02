@@ -2,10 +2,9 @@
 
 > Status: **pre-standard sketch** for discussion, 2026-07-02. Derived from
 > [requirements-notes.md](requirements-notes.md) (R0–R15, D1–D3). Nothing
-> here is frozen. Type priorities will be finalized from the figure-type
-> census currently running over a 774-document / 12k-image corpus (R12);
-> preliminary numbers already show packet/bit-field layouts, block
-> architecture diagrams and tables dominating (~72% combined).
+> here is frozen. Type priorities follow the completed figure-type census
+> over a 774-document / 12k-image corpus — see [census.md](census.md):
+> the v0.1 scope below covers ~94% of the corpus's classifiable diagrams.
 >
 > 繁體中文版：[syntax-draft.zh-tw.md](syntax-draft.zh-tw.md)
 
@@ -141,7 +140,7 @@ the next top-level directive (sticky-scope, like ProtoFlow steps — no
 `end` keyword). Priority order below follows the preliminary census and
 will be finalized when it completes.
 
-### 4.1 `bitfield` — packet headers / register layouts (census #1, ~27%)
+### 4.1 `bitfield` — packet headers / register layouts (census #2, 23.7% weighted)
 
 Borrow: RFC packet ASCII art semantics, WaveDrom bitfield JSON, Mermaid
 packet-beta.
@@ -163,7 +162,7 @@ wrap                       # explicit row break when a field ends mid-unit
 - Widths in bits; renderer computes bit indices and draws the ruler.
 - `optional` renders the conventional dashed border (per corpus style).
 
-### 4.2 `table` — config/state tables, memory maps (census #3, ~20%)
+### 4.2 `table` — config/state tables, memory maps (census #3, 9.8% weighted)
 
 ```figdown
 table fib "FIB Table" 
@@ -177,7 +176,7 @@ row 0.0.0.0/0   R3  p2 highlight
 - Tables can attach to scene nodes (`table fib ... attach=r1`) — the
   packet-walk scenario (usecases 4) needs this; deferred to v0.2.
 
-### 4.3 `wave` — timing/waveform (census #4, ~8%)
+### 4.3 `wave` — timing/waveform (census #5, 7.2% weighted)
 
 Borrow WaveDrom's proven per-signal character lanes verbatim (R11: do not
 invent):
@@ -195,10 +194,12 @@ cell, `.` continue. Exact lane alphabet: adopt WaveDrom's, subset TBD.
 
 ### 4.4 Priority note
 
-`block-architecture` (census #2, ~25%) needs **no typed block** — it is
-the core scene model (§2) plus `kind`s. That the two biggest categories
-are "core scene" and "bitfield" pins v0.1's implementation scope:
-**core scene + bitfield + table + wave** ≈ 87% of the corpus.
+`block-architecture` (census #1, 24.2% weighted) needs **no typed
+block** — it is the core scene model (§2) plus `kind`s; flowchart
+(8.3%, #4) and topology (5.0%) fold into the same model. Final census
+arithmetic: core scene (37.5%) + bitfield (23.7%) + table (9.8%) +
+wave (7.2%) = **78% of all non-boilerplate figure occurrences, ≈94% of
+classifiable diagrams** ([census.md](census.md)).
 
 ## 5. Presentation attributes (R5)
 

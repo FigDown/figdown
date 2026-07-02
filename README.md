@@ -62,6 +62,9 @@ figure** — never a full re-layout that destroys the reader's mental map.
   [繁體中文](requirements-notes.zh-tw.md)
 - [syntax-draft.md](syntax-draft.md) — syntax draft v0.0 (discussion
   stage), also in [繁體中文](syntax-draft.zh-tw.md)
+- [census.md](census.md) — figure-type census over a real 774-document
+  corpus; the empirical basis for v0.1 scope and priorities, also in
+  [繁體中文](census.zh-tw.md)
 - [poc/figdown.html](poc/figdown.html) — proof-of-concept renderer:
   open in any browser, edit text on the left, get a deterministic SVG
   on the right (core scene + bitfield + table + wave). The exported SVG
