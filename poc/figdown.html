@@ -32,6 +32,11 @@
   svg{max-width:100%;height:auto;display:block}
   footer{margin-top:18px;color:var(--muted);font-size:12px}
   a{color:inherit}
+  details#svgbox{margin-top:14px;border-top:1px solid var(--line);padding-top:8px}
+  details#svgbox summary{font-size:12px;color:var(--muted);cursor:pointer;user-select:none}
+  #svgsrc{font-family:var(--mono);font-size:11.5px;line-height:1.5;background:var(--code);
+    border:1px solid var(--line);border-radius:8px;padding:10px 12px;margin:8px 0 0;
+    max-height:280px;overflow:auto;white-space:pre-wrap;word-break:break-all}
 </style>
 </head>
 <body>
@@ -54,6 +59,10 @@
     <p class="ok" id="okline"></p>
     <pre class="errors" id="errs"></pre>
     <div id="out"></div>
+    <details id="svgbox" open>
+      <summary>Generated SVG source</summary>
+      <pre id="svgsrc"></pre>
+    </details>
   </div>
 </div>
 
@@ -662,6 +671,7 @@ function refresh(){
   if(errs.length){
     eEl.textContent=errs.join('\n');
     ok.textContent=''; out.innerHTML=''; lastSVG='';
+    $('svgsrc').textContent='';
     $('status').textContent=errs.length+' error(s) — nothing rendered (determinism over convenience)';
     return;
   }
@@ -669,6 +679,8 @@ function refresh(){
   const r=render(doc);
   lastSVG=r.svg;
   out.innerHTML=r.svg;
+  // pretty-print for display only (the artifact itself stays single-line deterministic)
+  $('svgsrc').textContent=r.svg.replace(/></g,'>\n<');
   const n=doc.nodes.length, b=doc.blocks.length;
   ok.textContent='OK — '+n+' node(s), '+doc.edges.length+' edge(s), '+b+' typed block(s). Same source → same SVG.';
   $('status').textContent='';
