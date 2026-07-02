@@ -23,4 +23,4 @@ field "Urgent Pointer" 16
 # Row 6: Options (variable, shown as one 32-bit row) — optional
 field "Options (if Data Offset > 5)" 32 optional
 # Row 7: Data payload (variable, shown as one 32-bit row)
-field Data 32 note="Variable-length payload; length inferred from IP datagram"
+field Data * note="Variable-length payload; length inferred from IP datagram"

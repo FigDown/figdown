@@ -12,6 +12,5 @@ field DEI 1 optional color=#dbeafe note="Drop Eligible Indicator"
 field VID 12 optional color=#dbeafe note="VLAN Identifier (0-4094)"
 # EtherType / Length
 field EtherType 16 color=#d1fae5 note="EtherType (>=0x0600) or Length (<0x0600)"
-field "Payload (46-1500 bytes)" 32 note="Data payload; minimum 46 bytes (padded if necessary)"
-wrap
+field "Payload (46-1500 bytes)" * note="Data payload; minimum 46 bytes (padded if necessary)"
 field FCS 32 note="Frame Check Sequence — CRC-32 over DA, SA, tag (if present), EtherType, and Payload"

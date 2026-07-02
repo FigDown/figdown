@@ -31,4 +31,4 @@ field "Destination Address" 32 color=#dbeafe
 field "Options (if IHL > 5)" 32 optional
 
 # Row 7: Payload (variable length; one unit shown as representative row)
-field Payload 32 note="variable length; remainder of datagram after the header"
+field Payload * note="variable length; remainder of datagram after the header"

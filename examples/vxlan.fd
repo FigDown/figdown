@@ -18,4 +18,4 @@ field "Reserved" 8
 
 # ── Payload ───────────────────────────────────────────────────────────────────
 wrap
-field "Inner Ethernet Frame" 32 note="original L2 frame follows"
+field "Inner Ethernet Frame" * note="original L2 frame follows"

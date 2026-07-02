@@ -216,10 +216,11 @@ function parse(text){
         // Compact form (C bit-field convention): field F1:16,F2:8 SYN:1 ...
         // — bare name:width items separated by commas and/or spaces, no
         // per-field options. Classic form: field <name> <width> [options].
-        // Classic form: field <name> <width-in-bits> [optional] [color=] [note=]
+        // Classic form: field <name> <width-in-bits|*> [optional] [color=] [note=]
+        // '*' = variable-length field: fills the remainder of the current row
         const cname=pos[1], cw=pos[2];
-        if(cname!==undefined && /^\d+$/.test(cw||'') && +cw>=1){
-          cur.fields.push({name:cname,w:+cw,optional:pos.includes('optional'),color:opts.color,note:opts.note,line:n});
+        if(cname!==undefined && (/^\d+$/.test(cw||'')&&+cw>=1 || cw==='*')){
+          cur.fields.push({name:cname,w:cw==='*'?'*':+cw,optional:pos.includes('optional'),color:opts.color,note:opts.note,line:n});
           continue;
         }
         // Compact form (C bit-field convention): field a:1, b:2, Long Name:16
@@ -230,12 +231,12 @@ function parse(text){
         const items=rest.split(',').map(s=>s.trim()).filter(Boolean);
         let bad=null; const parsed=[];
         for(const it of items){
-          const m=/^(.+):(\d+)$/.exec(it);
-          if(!m||+m[2]<1){ bad='bad item "'+it+'" (expected name:width)'; break; }
+          const m=/^(.+):(\d+|\*)$/.exec(it);
+          if(!m||(m[2]!=='*'&&+m[2]<1)){ bad='bad item "'+it+'" (expected name:width)'; break; }
           let nm=m[1].trim();
           if(/^".*"$/.test(nm)) nm=nm.slice(1,-1);          // quotes tolerated
-          if(/:\d+(\s|$)/.test(nm)){ bad='"'+it+'" looks like two fields — missing comma?'; break; }
-          parsed.push({name:nm,w:+m[2]});
+          if(/:(\d+|\*)(\s|$)/.test(nm)){ bad='"'+it+'" looks like two fields — missing comma?'; break; }
+          parsed.push({name:nm,w:m[2]==='*'?'*':+m[2]});
         }
         if(bad){ err(n,bad); continue; }
         for(const it of parsed) cur.fields.push({name:it.name,w:it.w,optional:false,line:n});
@@ -582,19 +583,21 @@ function renderBitfield(b,y0){
   let pos=0; // bit cursor
   for(const f of b.fields){
     if(f.wrap){ pos=Math.ceil((pos||1)/b.unit)*b.unit; continue; }
-    let rem=f.w;
+    // '*' = variable-length: fill the remainder of the current row
+    const w0 = f.w==='*' ? (b.unit - (pos % b.unit)) : f.w;
+    let rem = w0;
     while(rem>0){
       const row=Math.floor(pos/b.unit), col=pos%b.unit;
       const span=Math.min(rem, b.unit-col);
       const x=col*cell, yy=y+row*rh;
       const dash=f.optional?' stroke-dasharray="5 3"':'';
       svg.push('<rect x="'+x+'" y="'+yy+'" width="'+(span*cell)+'" height="'+rh+'" fill="'+(f.color||'#fff')+'" stroke="#555"'+dash+'/>');
-      if(span*cell>String(f.name).length*6 || rem===f.w){
+      if(span*cell>String(f.name).length*6 || rem===w0){
         let fs=11; const need=String(f.name).length*6.2;
         if(need>span*cell-6) fs=Math.max(7,11*(span*cell-6)/need);
-        svg.push('<text x="'+(x+span*cell/2)+'" y="'+(yy+rh/2+fs*0.35)+'" font-size="'+fs+'" text-anchor="middle">'+esc(f.name)+(f.w>1&&rem===f.w&&span===f.w?'':'')+'</text>');
+        svg.push('<text x="'+(x+span*cell/2)+'" y="'+(yy+rh/2+fs*0.35)+'" font-size="'+fs+'" text-anchor="middle">'+esc(f.name)+'</text>');
       }
-      if(f.note && rem===f.w)
+      if(f.note && rem===w0)
         svg.push('<title>'+esc(f.note)+'</title>');
       pos+=span; rem-=span;
     }

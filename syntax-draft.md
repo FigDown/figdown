@@ -177,7 +177,10 @@ wrap                       # explicit row break when a field ends mid-unit
 
 - `unit=32` — bits per row (default 32, the common case per census).
 - Widths in bits; renderer computes bit indices and draws the ruler.
-- Two field forms. Classic: `field <name> <width> [optional] [color=]
+- Width is a bit count, or `*` = **variable-length field**: fills the
+  remainder of the current row (the RFC-diagram shape for Payload/Data
+  trailers — avoids fake fixed widths and half-empty rows).
+- Two field forms. Classic: `field <name> <width|*> [optional] [color=]
   [note=]`. Compact (C bit-field convention, for flag runs): `field
   a:1, b:1, Long Name:16` — commas separate items, the name is
   everything before the last colon (spaces allowed, no quotes needed),
