@@ -62,6 +62,10 @@ figure** — never a full re-layout that destroys the reader's mental map.
   [繁體中文](requirements-notes.zh-tw.md)
 - [syntax-draft.md](syntax-draft.md) — syntax draft v0.0 (discussion
   stage), also in [繁體中文](syntax-draft.zh-tw.md)
+- [poc/figdown.html](poc/figdown.html) — proof-of-concept renderer:
+  open in any browser, edit text on the left, get a deterministic SVG
+  on the right (core scene + bitfield + table + wave). The exported SVG
+  embeds its own source and SHA-256.
 
 Prior art feeding this design: **ProtoFlow**, a protocol-animation DSL
 with a single-file engine/editor (to be published separately), where the

@@ -52,6 +52,9 @@ Mermaid 表達不了的圖型（網路拓撲、帶註記的方塊圖、查表鏈
   [requirements-notes.md](requirements-notes.md)
 - [syntax-draft.zh-tw.md](syntax-draft.zh-tw.md) — 語法草案 v0.0
   （討論階段），英文版 [syntax-draft.md](syntax-draft.md)
+- [poc/figdown.html](poc/figdown.html) — 概念驗證渲染器：用任何瀏覽器
+  開啟，左邊改文字、右邊即時得到確定性的 SVG（核心場景 + bitfield +
+  table + wave）。匯出的 SVG 內嵌自身來源與 SHA-256。
 
 本設計的先行實證：**ProtoFlow**——協議動畫 DSL 與其單檔引擎/編輯器
 （將另行公開）——上述公理在那裡首次被端到端驗證。
