@@ -580,6 +580,27 @@ optimization.
   declares the diagram type) but FigDown templates share one core
   grammar rather than being N separate languages.
 
+### R17 — Tables: Markdown mental model + merging/colors; mine the sample folder (2026-07-02)
+
+**Original**: Tables need cell merging (rowspan/colspan). Markdown does
+tables well; our difference is (a) rendering them *as an image*, (b)
+extending beyond what MD can express — merging, colors, and whatever
+other needs **the collected image library** reveals.
+
+**Interpretation**:
+- Clarification: GFM tables actually *cannot* merge cells — that gap is
+  exactly part of FigDown's value. The MD table remains the mental model
+  (R11 borrow), FigDown adds merging + per-cell color + image artifact.
+- Syntax settled in draft §4.2: unquoted `^` = merge up (rowspan),
+  unquoted `<` = merge left (colspan), quoted forms are literals;
+  `cell r,c color=…` for per-cell marks (annotation attaches to an
+  address).
+- **Method (user-directed): mine `classified/table-matrix/` (211 unique
+  samples, 917 weighted) for the table feature list** — multi-level
+  headers, alignment, borders, column widths… The census folders are the
+  requirements source for every template (R16 "classification is
+  design"). TODO: run this survey before freezing the table template.
+
 ### Open question OQ1 — Build on D2 vs. a new language (2026-07-02)
 
 D2 is close enough that R11 (survey before invent) obliges a deep read of

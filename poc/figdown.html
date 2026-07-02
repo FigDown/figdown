@@ -163,7 +163,7 @@ function parse(text){
     } else if(kw==='figdown'){ err(n,'duplicate version header'); continue; }
 
     // typed-block children
-    if(cur && ['field','wrap','cols','row','signal','gap'].includes(kw)){
+    if(cur && ['field','wrap','cols','row','cell','signal','gap'].includes(kw)){
       if(cur.type==='bitfield' && kw==='field'){
         const name=pos[1], w=parseInt(pos[2],10);
         if(!name || !isFinite(w) || w<1){ err(n,'field needs <name> <width-in-bits>'); continue; }
@@ -175,11 +175,20 @@ function parse(text){
         if(pos.length<2){ err(n,'cols needs at least one column name'); continue; }
         cur.cols=pos.slice(1);
       } else if(cur.type==='table' && kw==='row'){
-        const cells=pos.slice(1); let hl=false;
-        if(cells[cells.length-1]==='highlight'){ hl=true; cells.pop(); }
+        // use raw tokens: unquoted ^ / < are span markers, quoted "^" is literal
+        let toks=tk.toks.slice(1), hl=false;
+        if(toks.length && !toks[toks.length-1].q && toks[toks.length-1].v==='highlight'){ hl=true; toks.pop(); }
         if(!cur.cols.length){ err(n,'row before cols'); continue; }
-        if(cells.length!==cur.cols.length){ err(n,'row has '+cells.length+' cells, expected '+cur.cols.length); continue; }
-        cur.rows.push({cells,hl});
+        if(toks.length!==cur.cols.length){ err(n,'row has '+toks.length+' cells, expected '+cur.cols.length); continue; }
+        const cells=toks.map(t=>({v:t.v, m:(!t.q&&t.v==='^')?'up':((!t.q&&t.v==='<')?'left':null)}));
+        if(cells[0].m==='left'){ err(n,'"<" cannot appear in the first column'); continue; }
+        if(cur.rows.length===0 && cells.some(c=>c.m==='up')){ err(n,'"^" cannot appear in the first row'); continue; }
+        cur.rows.push({cells,hl,line:n});
+      } else if(cur.type==='table' && kw==='cell'){
+        const m=/^(\d+),(\d+)$/.exec(pos[1]||'');
+        if(!m||!opts.color){ err(n,'cell needs <row>,<col> color=… (row 0 = header)'); continue; }
+        cur.marks=cur.marks||[];
+        cur.marks.push({r:+m[1],c:+m[2],color:opts.color,line:n});
       } else if(cur.type==='wave' && kw==='signal'){
         const name=pos[1], lane=pos[2];
         if(!name||!lane){ err(n,'signal needs <name> <lane>'); continue; }
@@ -306,6 +315,10 @@ function parse(text){
     if(b.type==='table'&&!b.cols.length) errs.push('Line '+b.line+': table has no cols');
     if(b.type==='bitfield'&&!b.fields.some(f=>!f.wrap)) errs.push('Line '+b.line+': bitfield has no fields');
     if(b.type==='wave'&&!b.signals.length) errs.push('Line '+b.line+': wave has no signals');
+    if(b.type==='table'&&b.marks) for(const mk of b.marks){
+      if(mk.r>b.rows.length||mk.c<1||mk.c>b.cols.length)
+        errs.push('Line '+mk.line+': cell '+mk.r+','+mk.c+' out of range');
+    }
   }
   return {doc,errs};
 }
@@ -520,29 +533,39 @@ function renderBitfield(b,y0){
   return {svg:svg.join(''), y:y+rows*rh+6, w:b.unit*cell+2};
 }
 
-// ---- table ----
+// ---- table (with ^ rowspan / < colspan merging and per-cell marks) ----
 function renderTable(t,y0){
   const rh=26; const svg=[]; let y=y0+18;
   svg.push('<text x="0" y="'+(y-4)+'" font-size="13" font-weight="600">'+esc(t.label)+'</text>');
+  // grid: row 0 = header, rows 1..N = data
+  const grid=[t.cols.map(c=>({v:c,m:null,hdr:true}))]
+    .concat(t.rows.map(r=>r.cells.map(c=>({v:c.v,m:c.m}))));
+  const hlRow=r=>r>0&&t.rows[r-1].hl;
   const widths=t.cols.map((c,i)=>{
     let w=tw(c);
-    for(const r of t.rows) w=Math.max(w,tw(r.cells[i]));
+    for(const r of t.rows) if(!r.cells[i].m) w=Math.max(w,tw(r.cells[i].v));
     return w;
   });
   const totalW=widths.reduce((a,b)=>a+b,0);
-  let yy=y+4;
-  const drawRow=(cells,fill,bold)=>{
-    let x=0;
-    cells.forEach((c,i)=>{
-      svg.push('<rect x="'+x+'" y="'+yy+'" width="'+widths[i]+'" height="'+rh+'" fill="'+fill+'" stroke="#c9c7bf"/>');
-      svg.push('<text x="'+(x+widths[i]/2)+'" y="'+(yy+rh/2+4.3)+'" font-size="12" text-anchor="middle"'+(bold?' font-weight="600"':'')+'>'+esc(c)+'</text>');
-      x+=widths[i];
-    });
-    yy+=rh;
-  };
-  drawRow(t.cols,'#eeede6',true);
-  for(const r of t.rows) drawRow(r.cells, r.hl?'#fef3c7':'#fff', false);
-  return {svg:svg.join(''), y:yy+6, w:totalW+2};
+  const markOf=(r,c)=>(t.marks||[]).find(mk=>mk.r===r&&mk.c===c+1);
+  const yTop=y+4;
+  for(let r=0;r<grid.length;r++){
+    for(let c=0;c<grid[r].length;c++){
+      const cell=grid[r][c];
+      if(cell.m) continue;                    // merged into an anchor cell
+      let cs=1; while(c+cs<grid[r].length && grid[r][c+cs].m==='left') cs++;
+      let rs=1; while(r+rs<grid.length && grid[r+rs][c].m==='up') rs++;
+      const x=widths.slice(0,c).reduce((a,b)=>a+b,0);
+      const wsum=widths.slice(c,c+cs).reduce((a,b)=>a+b,0);
+      const yy=yTop+r*rh, h=rs*rh;
+      const mk=markOf(r,c);
+      const fill=mk?mk.color:(cell.hdr?'#eeede6':(hlRow(r)?'#fef3c7':'#fff'));
+      svg.push('<rect x="'+x+'" y="'+yy+'" width="'+wsum+'" height="'+h+'" fill="'+fill+'" stroke="#c9c7bf"/>');
+      svg.push('<text x="'+(x+wsum/2)+'" y="'+(yy+h/2+4.3)+'" font-size="12" text-anchor="middle"'+(cell.hdr?' font-weight="600"':'')+'>'+esc(cell.v)+'</text>');
+    }
+  }
+  const yEnd=yTop+grid.length*rh;
+  return {svg:svg.join(''), y:yEnd+6, w:totalW+2};
 }
 
 // ---- wave ----
@@ -687,10 +710,11 @@ field RSVD 3
 field "Dest Port" 8
 
 table map "Op encoding"
-cols Op Meaning
-row 0 "From CPU"
-row 1 "To CPU" highlight
-row 2 Mirror`
+cols Op Meaning Notes
+row 0 "From CPU" "DSA v1"
+row 1 "To CPU" ^ highlight
+row 2 Mirror <
+cell 3,1 color=#fee2e2`
 };
 
 const $=id=>document.getElementById(id);

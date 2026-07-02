@@ -173,12 +173,24 @@ wrap                       # 欄位在 unit 中途結束時的顯式換列
 ```figdown
 table fib "FIB Table"
 cols Prefix NextHop Port          # 表頭列，同時定義欄數
-row 10.0.0.0/8  R2  p1
-row 0.0.0.0/0   R3  p2 highlight
+row 10.0.0.0/8  R2   p1
+row 0.0.0.0/0   R3   p2 highlight
+row "^"         "^"  p3           # 引號中的 ^ 是字面字元，不是合併
+row 224.0.0.0/4 ^    <            # ^ 與上方儲存格合併（rowspan）
+                                  # < 與左方儲存格合併（colspan）
+cell 2,3 color=#fee2e2            # 儲存格級標註；第 0 列 = 表頭，欄 1 起算
 ```
 
-- 儲存格以空白分隔；含空白時用引號。
+- 心智模型是 Markdown 表格，補上 GFM 做不到的：**儲存格合併與
+  儲存格級顏色**——並且圖片化。
+- 儲存格以空白分隔；含空白（或要寫字面 `^`/`<`）時用引號。
+- 合併標記：未加引號的 `^` 向上合併（rowspan）；未加引號的 `<`
+  向左合併（colspan）。分別不得出現在第一列/第一欄（行錯誤）。
+- `cell <row>,<col> color=…` 對單一儲存格附掛標註——「標註附著於
+  定址」，讓 `row` 行保持乾淨（`mark`/`leg` 的先例）。
 - OQ-S3：欄寬/對齊覆寫——傾向 `colw 30% auto auto`。
+- 完整特徵清單（多層表頭、對齊、框線……）將以普查 `table-matrix`
+  桶的 211 張樣本驗收（R17）。
 - 表格可附掛場景節點（`table fib ... attach=r1`）——封包走訪場景
   （usecases 4）需要；延到 v0.2。
 

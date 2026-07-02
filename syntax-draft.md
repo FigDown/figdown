@@ -191,14 +191,29 @@ wrap                       # explicit row break when a field ends mid-unit
 ### 4.2 `table` — config/state tables, memory maps (census #3, 9.6% weighted)
 
 ```figdown
-table fib "FIB Table" 
+table fib "FIB Table"
 cols Prefix NextHop Port          # header row, defines column count
-row 10.0.0.0/8  R2  p1
-row 0.0.0.0/0   R3  p2 highlight
+row 10.0.0.0/8  R2   p1
+row 0.0.0.0/0   R3   p2 highlight
+row "^"         "^"  p3           # quoted ^ is a literal caret, not a merge
+row 224.0.0.0/4 ^    <            # ^ merges with the cell above (rowspan),
+                                  # < merges with the cell to the left (colspan)
+cell 2,3 color=#fee2e2            # per-cell mark; row 0 = header, cols 1-based
 ```
 
-- Cell values are whitespace-separated; quote to embed spaces.
+- The mental model is the Markdown table, extended with what GFM cannot
+  do: **cell merging and per-cell color** — and rendered to an image.
+- Cell values are whitespace-separated; quote to embed spaces (or to
+  write a literal `^` / `<`).
+- Merge markers: unquoted `^` extends the cell above (rowspan); unquoted
+  `<` extends the cell to the left (colspan). Illegal in the first
+  row/column respectively (line error).
+- `cell <row>,<col> color=…` attaches a mark to one cell — annotation
+  attaches to an address, keeping `row` lines clean (the `mark`/`leg`
+  precedent).
 - OQ-S3: column alignment/width overrides — likely `colw 30% auto auto`.
+- The full feature list (multi-level headers, alignment, borders…) is to
+  be validated against the 211-sample `table-matrix` census folder (R17).
 - Tables can attach to scene nodes (`table fib ... attach=r1`) — the
   packet-walk scenario (usecases 4) needs this; deferred to v0.2.
 
