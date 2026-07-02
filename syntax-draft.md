@@ -57,6 +57,9 @@ Lexical rules:
 - Colors are CSS hex (`#0d9488`) or CSS named colors.
 - `#` begins a comment only at the start of a line or after whitespace
   (so `color=#0d9488` is never mistaken for a comment).
+- `\n` inside a quoted string is a line break (multi-line labels;
+  Graphviz/Mermaid convention). Quotes also work inside option values:
+  `label="on miss"`.
 - One directive per line. No line continuations. No expressions, loops,
   or macros — ever. (framework axiom)
 
@@ -77,7 +80,9 @@ node sw1 "ToR Switch" kind=switch
 
 - `kind` selects shape/iconography from a closed set per profile
   (`box` default | `decision` | `terminator` | `datastore` | `switch` |
-  `router` | `host` | `port` | …TBD by census).
+  `router` | `host` | `port` | `cloud` | …TBD by census).
+- Nodes accept `style=dashed|dotted` (e.g. bridge-domain boxes in
+  vendor figures).
 - Unknown `kind` = line error (closed vocabulary).
 
 ### 2.2 Containment (groups / nesting)
@@ -103,6 +108,8 @@ edge a <-> b                        # bidirectional
 ```
 
 `->` `--` `<->` follow Mermaid/D2 conventions (AI prior knowledge, R11).
+Endpoint (port) labels use Graphviz's `taillabel=`/`headlabel=` (R18) —
+the ubiquitous `e1/22.2`-style interface tags of network figures.
 
 ### 2.4 Layers (R5)
 

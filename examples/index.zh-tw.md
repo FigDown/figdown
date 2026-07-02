@@ -15,6 +15,18 @@
 
 ![EVPN fabric](evpn-fabric.svg)
 
+### EVPN-VXLAN IRB — 廠商風格的 leaf/VRF/BD 細節 — [來源](srl-evpn-irb.fd)
+對廠商文件圖的語意重建：fabric 雲、leaf 框內含 IP-VRF 徽章與虛線
+bridge domain、連線埠標籤、多行主機說明。全手工釘位（第 3 層排版）。
+
+![EVPN-VXLAN IRB](srl-evpn-irb.svg)
+
+### VXLAN 封裝 — 封裝前後訊框對照 — [來源](vxlan-encap.fd)
+古典訊框 vs VXLAN 訊框（原始 L2 訊框內嵌）、VLAN→VNI 箭頭、
+overhead 與重點對照表。
+
+![VXLAN encapsulation](vxlan-encap.svg)
+
 ## 協議標頭（bitfield template）
 
 ### Ethernet II（+ 選用 802.1Q）— [來源](ethernet-ii.fd)

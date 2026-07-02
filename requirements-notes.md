@@ -688,6 +688,29 @@ tweaking, exporting a new figure — is already valuable on its own.
   headline feature — every exported figure remains editable forever,
   unlike hand-drawn images.
 
+### R22 — Semantic fidelity, not pixel fidelity (2026-07-02)
+
+**Original**: When recreating existing figures we do not need a 100%
+visual replica — what must be expressed clearly is the *topology* and
+the *relationships between components* that the original figure meant
+to convey. That is what text is for: **the substance is the meaning;
+human visual reading is two- or three-dimensional, while a text
+description is one-dimensional.**
+
+**Interpretation**:
+- The acceptance criterion for "can FigDown express figure X" is
+  **semantic completeness** (every component, relationship, and piece
+  of supplementary knowledge is present and unambiguous), not visual
+  replication (icon art, exact curves, decorative bubbles).
+- This is the project's ontology in one sentence: knowledge lives as
+  meaning; text is its 1-D encoding (what AI reads); the figure is its
+  deterministic 2-D projection for human perception (R3's two readers,
+  restated at the level of *dimensionality*).
+- Practical consequence for the gallery (R19): vendor-figure
+  recreations are judged by "did we capture everything the figure
+  says", which the srl-evpn-irb and vxlan-encap examples meet without
+  icon fonts, speech bubbles, or braces.
+
 ### Open question OQ1 — Build on D2 vs. a new language (2026-07-02)
 
 D2 is close enough that R11 (survey before invent) obliges a deep read of

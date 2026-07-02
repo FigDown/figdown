@@ -16,6 +16,19 @@ to it.
 
 ![EVPN fabric](evpn-fabric.svg)
 
+### EVPN-VXLAN IRB — vendor-style leaves with VRF/BD detail  — [source](srl-evpn-irb.fd)
+Semantic recreation of a vendor doc figure: fabric cloud, leaf boxes
+holding IP-VRF badges and dashed bridge domains, port labels on links,
+multi-line host captions. Fully hand-pinned (tier-3 layout).
+
+![EVPN-VXLAN IRB](srl-evpn-irb.svg)
+
+### VXLAN encapsulation — before/after frames  — [source](vxlan-encap.fd)
+Classical frame vs. VXLAN frame (original L2 frame nested), the
+VLAN-to-VNI arrow, and overhead/fact tables.
+
+![VXLAN encapsulation](vxlan-encap.svg)
+
 ## Protocol headers (bitfield template)
 
 ### Ethernet II (+ optional 802.1Q)  — [source](ethernet-ii.fd)

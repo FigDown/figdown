@@ -1,0 +1,62 @@
+figdown 0.1 block
+title "VXLAN Overview — MAC-in-UDP encapsulation"
+
+# ── Classical Ethernet frame ────────────────────────────────────────
+group eth "Classical Ethernet Frame"
+node dmac1 "DMAC\n6B" in=eth color=#bae6fd
+pin  dmac1 at=40,40
+node smac1 "SMAC\n6B" in=eth color=#bae6fd
+pin  smac1 at=125,40
+node dot1q "802.1Q\n4B" in=eth color=#bae6fd stroke=#ea580c
+pin  dot1q at=210,40
+node etype1 "Etype\n2B" in=eth color=#bae6fd
+pin  etype1 at=300,40
+node pay1 "Payload" in=eth color=#9aa2ad text=#ffffff
+size pay1 w=170 h=52
+pin  pay1 at=380,40
+node crc1 "CRC\n4B" in=eth color=#93c5fd
+pin  crc1 at=565,40
+
+# ── VXLAN frame: outer headers + original L2 frame + new CRC ───────
+node omac "Outer\nMAC\n14B" color=#fcd34d
+pin  omac at=0,260
+node oip "Outer\nIP\n20B" color=#fcd34d
+pin  oip at=80,260
+node oudp "UDP\n8B" color=#9aa2ad text=#ffffff
+pin  oudp at=160,260
+node vxh "VXLAN\n8B" color=#fcd34d stroke=#ea580c
+pin  vxh at=235,260
+
+group orig "Original Layer 2 Frame"
+node dmac2 "DMAC\n6B" in=orig color=#bae6fd
+pin  dmac2 at=330,260
+node smac2 "SMAC\n6B" in=orig color=#bae6fd
+pin  smac2 at=415,260
+node etype2 "Etype\n2B" in=orig color=#bae6fd
+pin  etype2 at=500,260
+node pay2 "Payload" in=orig color=#9aa2ad text=#ffffff
+size pay2 w=170 h=60
+pin  pay2 at=580,260
+node crc2 "CRC (new)\n4B" color=#bbf7d0 stroke=#16a34a
+pin  crc2 at=775,260
+
+# the key idea: the 12-bit VLAN becomes a 24-bit VNI in the VXLAN header
+edge dot1q -> vxh label="VNI\n12-bit VLAN → 24-bit VNI" style=dashed color=#ea580c
+
+# ── Supplementary knowledge ─────────────────────────────────────────
+table overhead "Encapsulation overhead (MAC-in-UDP)"
+| Segment    | Size | Notes                          |
+|------------|:----:|--------------------------------|
+| Outer MAC  | 14B  | new Ethernet header            |
+| Outer IP   | 20B  | VTEP-to-VTEP                   |
+| UDP        | 8B   | dst port 4789                  |
+| VXLAN      | 8B   | carries the 24-bit VNI         |
+| Total      | 50B  | added to every original frame  |
+cell 5 highlight
+
+table facts "Why VXLAN"
+| Fact                    | Value                    |
+|-------------------------|--------------------------|
+| VLAN address space      | 12 bits (4K segments)    |
+| VNI address space       | 24 bits (16M segments)   |
+| Encapsulation           | MAC-in-UDP               |

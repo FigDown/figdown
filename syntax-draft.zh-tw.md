@@ -52,6 +52,8 @@ title "L3 Forwarding Datapath"  # 選用
 - 顏色用 CSS hex（`#0d9488`）或 CSS 顏色名。
 - `#` 只有在行首或前面是空白時才開始註解
   （因此 `color=#0d9488` 永遠不會被誤認為註解）。
+- 引號字串內的 `\n` 為換行（多行標籤；Graphviz/Mermaid 慣例）。
+  選項值也可用引號：`label="on miss"`。
 - 一行一指令。不接受續行。永不加入運算式、迴圈、巨集。（框架公理）
 
 ## 2. 核心場景模型（涵蓋方塊架構、拓撲、流程圖）
@@ -71,7 +73,8 @@ node sw1 "ToR Switch" kind=switch
 
 - `kind` 從各 profile 的封閉集合中選擇形狀/圖示
   （預設 `box`｜`decision`｜`terminator`｜`datastore`｜`switch`｜
-  `router`｜`host`｜`port`｜……依普查定案）。
+  `router`｜`host`｜`port`｜`cloud`｜……依普查定案）。
+- 節點接受 `style=dashed|dotted`（如廠商圖中的 bridge-domain 虛線框）。
 - 未知 `kind` = 行錯誤（封閉詞彙）。
 
 ### 2.2 包含（群組/嵌套）
@@ -96,6 +99,8 @@ edge a <-> b                        # 雙向
 ```
 
 `->` `--` `<->` 沿用 Mermaid/D2 慣例（AI 先驗知識，R11）。
+端點（埠）標籤採 Graphviz 的 `taillabel=`/`headlabel=`（R18）——
+網路圖無所不在的 `e1/22.2` 式介面標記。
 
 ### 2.4 圖層（R5）
 

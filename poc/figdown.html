@@ -95,7 +95,7 @@ Closed grammar: unknown lines are errors with line numbers. No LLM, no dependenc
 // ============================================================
 // 1. PARSER — closed, line-oriented grammar (draft v0.0)
 // ============================================================
-const KINDS = ['box','decision','terminator','datastore','process','switch','router','host','port'];
+const KINDS = ['box','decision','terminator','datastore','process','switch','router','host','port','cloud'];
 
 function tokenize(line){
   // split by whitespace, honoring double quotes
@@ -105,12 +105,26 @@ function tokenize(line){
     if(i>=line.length) break;
     if(line[i]==='"'){
       let j=i+1, s='';
-      while(j<line.length && line[j]!=='"'){ s+=line[j]; j++; }
+      while(j<line.length && line[j]!=='"'){
+        if(line[j]==='\\'&&line[j+1]==='n'){ s+='\n'; j+=2; continue; }  // "\n" = line break
+        s+=line[j]; j++;
+      }
       if(j>=line.length) return {error:'unterminated string'};
       toks.push({v:s,q:true}); i=j+1;
     } else {
       let j=i, s='';
-      while(j<line.length && !/\s/.test(line[j])){ s+=line[j]; j++; }
+      while(j<line.length && !/\s/.test(line[j])){
+        if(line[j]==='"'){                        // key="value with spaces"
+          j++;
+          while(j<line.length && line[j]!=='"'){
+            if(line[j]==='\\'&&line[j+1]==='n'){ s+='\n'; j+=2; continue; }
+            s+=line[j]; j++;
+          }
+          if(j>=line.length) return {error:'unterminated string'};
+          j++; continue;
+        }
+        s+=line[j]; j++;
+      }
       toks.push({v:s,q:false}); i=j;
     }
   }
@@ -119,11 +133,12 @@ function tokenize(line){
 // Option keys are a CLOSED set: an unquoted token whose key is not listed
 // here is a positional argument (this lets wave lanes contain '=').
 const OPT_KEYS=new Set(['kind','color','stroke','text','in','layer','label',
-  'style','z','at','w','h','unit','note','labels','numbering']);
+  'style','z','at','w','h','unit','note','labels','numbering',
+  'taillabel','headlabel']);
 function splitOpts(toks){
   const pos=[], opts={};
   for(const t of toks){
-    const m = !t.q && /^([A-Za-z_][A-Za-z0-9_-]*)=(.*)$/.exec(t.v);
+    const m = !t.q && /^([A-Za-z_][A-Za-z0-9_-]*)=([\s\S]*)$/.exec(t.v);
     if(m && OPT_KEYS.has(m[1])) opts[m[1]]=m[2]; else pos.push(t.v);
   }
   return {pos,opts};
@@ -288,8 +303,10 @@ function parse(text){
         const kind=opts.kind||'box';
         if(!KINDS.includes(kind)){ err(n,'unknown kind "'+kind+'"'); break; }
         nodeIds.add(id);
+        const nstyle=opts.style||'solid';
+        if(!['solid','dashed','dotted'].includes(nstyle)){ err(n,'style must be solid|dashed|dotted'); break; }
         doc.nodes.push({id,label:pos[2]||id,kind,color:opts.color,stroke:opts.stroke,
-                        text:opts.text,group:opts['in']||null,layer:opts.layer||'base',line:n});
+                        style:nstyle,text:opts.text,group:opts['in']||null,layer:opts.layer||'base',line:n});
         break;
       }
       case 'group': {
@@ -304,7 +321,8 @@ function parse(text){
         // edge A -> B | A -- B | A <-> B
         const a=pos[1], op=pos[2], b=pos[3];
         if(!a||!b||!['->','--','<->'].includes(op)){ err(n,'edge needs <id> ->|--|<-> <id>'); break; }
-        doc.edges.push({a,b,op,label:opts.label,style:opts.style||'solid',
+        doc.edges.push({a,b,op,label:opts.label,taillabel:opts.taillabel,headlabel:opts.headlabel,
+                        style:opts.style||'solid',
                         color:opts.color,layer:opts.layer||'base',line:n});
         break;
       }
@@ -411,7 +429,20 @@ function findComment(s){
 // ============================================================
 const FONT=13, CH=7.2, PADX=14, NH=36, GAPX=56, GAPY=44;
 function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
-function tw(s){return Math.max(30,String(s).length*CH+2*PADX);}
+function tw(s){
+  const longest=Math.max(...String(s).split('\n').map(l=>l.length));
+  return Math.max(30,longest*CH+2*PADX);
+}
+// multi-line <text>: "\n" in labels becomes centered tspans
+function textEl(x,y,fs,anchor,fill,content,extraAttrs){
+  const lines=String(content).split('\n');
+  const attrs='font-size="'+fs+'" text-anchor="'+anchor+'" fill="'+fill+'"'+(extraAttrs||'');
+  if(lines.length===1)
+    return '<text x="'+x+'" y="'+y+'" '+attrs+'>'+esc(content)+'</text>';
+  const lh=fs*1.3, y0=y-(lines.length-1)*lh/2;
+  return '<text x="'+x+'" y="'+y0+'" '+attrs+'>'+
+    lines.map((l,i)=>'<tspan x="'+x+'" dy="'+(i?lh:0)+'">'+esc(l)+'</tspan>').join('')+'</text>';
+}
 
 function render(doc){
   const parts=[]; let y=0, maxW=0;
@@ -445,7 +476,8 @@ function renderScene(doc,y0){
   const byId={}; nodes.forEach(n=>byId[n.id]=n);
   // sizes
   for(const n of nodes){
-    n.w=tw(n.label); n.h=NH;
+    const nLines=String(n.label).split('\n').length;
+    n.w=tw(n.label); n.h=NH+(nLines-1)*16;
     const s=doc.sizes[n.id]; if(s){ if(s.w)n.w=s.w; if(s.h)n.h=s.h; n.rigid=true; }
     if(n.kind==='decision'){ n.w=Math.max(n.w+20,70); n.h=48; }
   }
@@ -531,33 +563,43 @@ function renderScene(doc,y0){
     const dash=e.style==='dashed'?' stroke-dasharray="6 4"':(e.style==='dotted'?' stroke-dasharray="2 4"':'');
     const m1=e.op==='<->'?' marker-start="url(#arr)"':'', m2=e.op!=='--'?' marker-end="url(#arr)"':'';
     esvg.push('<line x1="'+x1+'" y1="'+yy1+'" x2="'+x2+'" y2="'+yy2+'" stroke="'+col+'" stroke-width="1.6"'+dash+m1+m2+'/>');
+    const halo=' paint-order="stroke" stroke="#fff" stroke-width="3"';
     if(e.label){
       const mx=(x1+x2)/2, my=(yy1+yy2)/2;
-      esvg.push('<text x="'+mx+'" y="'+(my-5)+'" font-size="11" text-anchor="middle" fill="'+col+'" paint-order="stroke" stroke="#fff" stroke-width="3">'+esc(e.label)+'</text>');
+      esvg.push(textEl(mx,my-5,11,'middle',col,e.label,halo));
     }
+    // endpoint (port) labels, Graphviz taillabel/headlabel convention
+    if(e.taillabel)
+      esvg.push(textEl(x1+(x2-x1)*0.18, yy1+(yy2-yy1)*0.18-4, 10,'middle','#555',e.taillabel,halo));
+    if(e.headlabel)
+      esvg.push(textEl(x1+(x2-x1)*0.82, yy1+(yy2-yy1)*0.82-4, 10,'middle','#555',e.headlabel,halo));
   }
   // nodes on top (each wrapped in a draggable, identifiable group)
   const nsvg=[];
   for(const n of nodes){
     nsvg.push('<g data-node="'+n.id+'" data-x="'+n.x+'" data-y="'+n.y+'" style="cursor:move">');
     const fill=n.color||'#fff', stroke=n.stroke||'#8a8880', txt=n.text||'#1d1d1b';
+    const ndash=n.style==='dashed'?' stroke-dasharray="6 4"':(n.style==='dotted'?' stroke-dasharray="2 4"':'');
     if(n.kind==='decision'){
       const cx=n.x+n.w/2, cy=n.y+n.h/2;
-      nsvg.push('<polygon points="'+cx+','+n.y+' '+(n.x+n.w)+','+cy+' '+cx+','+(n.y+n.h)+' '+n.x+','+cy+'" fill="'+fill+'" stroke="'+stroke+'"/>');
+      nsvg.push('<polygon points="'+cx+','+n.y+' '+(n.x+n.w)+','+cy+' '+cx+','+(n.y+n.h)+' '+n.x+','+cy+'" fill="'+fill+'" stroke="'+stroke+'"'+ndash+'/>');
     } else if(n.kind==='terminator'){
-      nsvg.push('<rect x="'+n.x+'" y="'+n.y+'" width="'+n.w+'" height="'+n.h+'" rx="'+(n.h/2)+'" fill="'+fill+'" stroke="'+stroke+'"/>');
+      nsvg.push('<rect x="'+n.x+'" y="'+n.y+'" width="'+n.w+'" height="'+n.h+'" rx="'+(n.h/2)+'" fill="'+fill+'" stroke="'+stroke+'"'+ndash+'/>');
+    } else if(n.kind==='cloud'){
+      nsvg.push('<ellipse cx="'+(n.x+n.w/2)+'" cy="'+(n.y+n.h/2)+'" rx="'+(n.w/2+10)+'" ry="'+(n.h/2+8)+'" fill="'+fill+'" stroke="'+stroke+'"'+ndash+'/>');
     } else if(n.kind==='datastore'){
-      nsvg.push('<rect x="'+n.x+'" y="'+n.y+'" width="'+n.w+'" height="'+n.h+'" rx="3" fill="'+fill+'" stroke="'+stroke+'"/>'
+      nsvg.push('<rect x="'+n.x+'" y="'+n.y+'" width="'+n.w+'" height="'+n.h+'" rx="3" fill="'+fill+'" stroke="'+stroke+'"'+ndash+'/>'
         +'<line x1="'+n.x+'" y1="'+(n.y+7)+'" x2="'+(n.x+n.w)+'" y2="'+(n.y+7)+'" stroke="'+stroke+'"/>');
     } else {
       const r=(n.kind==='switch'||n.kind==='router')?14:8;
-      nsvg.push('<rect x="'+n.x+'" y="'+n.y+'" width="'+n.w+'" height="'+n.h+'" rx="'+r+'" fill="'+fill+'" stroke="'+stroke+'"'+
+      nsvg.push('<rect x="'+n.x+'" y="'+n.y+'" width="'+n.w+'" height="'+n.h+'" rx="'+r+'" fill="'+fill+'" stroke="'+stroke+'"'+ndash+
         (n.kind==='switch'||n.kind==='router'?' stroke-width="1.8"':'')+'/>');
     }
-    // label with shrink-to-fit when size is rigid (R10)
-    let fs=FONT; const need=String(n.label).length*CH;
+    // label with shrink-to-fit when size is rigid (R10); multi-line via "\n"
+    let fs=FONT;
+    const need=Math.max(...String(n.label).split('\n').map(l=>l.length))*CH;
     if(n.rigid && need>n.w-2*8) fs=Math.max(8, FONT*(n.w-16)/need);
-    nsvg.push('<text x="'+(n.x+n.w/2)+'" y="'+(n.y+n.h/2+fs*0.35)+'" font-size="'+fs+'" text-anchor="middle" fill="'+txt+'">'+esc(n.label)+'</text>');
+    nsvg.push(textEl(n.x+n.w/2, n.y+n.h/2+fs*0.35, fs, 'middle', txt, n.label));
     nsvg.push('</g>');
   }
   const yEnd=y0+20+Hh+10;
@@ -828,6 +870,136 @@ table planes "Fabric planes"
 | Underlay        | eBGP              | loopback reachability     |
 | Overlay control | MP-BGP EVPN       | MAC/IP route distribution |
 | Overlay data    | VXLAN (UDP 4789)  | L2-in-L3 encapsulation    |`,
+
+'EVPN-VXLAN IRB (vendor-style, hand-pinned)':
+`figdown 0.1 topology
+title "EVPN-VXLAN IRB — leaves with IP-VRF and bridge domains"
+
+# Complex vendor-style figure: fully hand-laid-out with pins (tier 3).
+# Every node is pinned, so any future edit changes only what it touches.
+
+# ── Overlay cloud + spines ─────────────────────────────────────────
+node cloud "EVPN-VXLAN" kind=cloud color=#cfe8f7 stroke=#7fb8d8
+size cloud w=620 h=110
+pin  cloud at=330,90
+node sp1 "Spine-1" kind=switch color=#9aa2ad text=#ffffff
+pin  sp1 at=480,0
+node sp2 "Spine-2" kind=switch color=#9aa2ad text=#ffffff
+pin  sp2 at=700,0
+
+# ── Leaves: group = leaf box; members = IP-VRF badge + bridge domains
+group leaf2 "SRL LEAF-2"
+node vrf2 "IP-VRF-10\nRD1/RT10\nVNI10" in=leaf2 color=#1e3a8a text=#ffffff
+pin  vrf2 at=170,235
+node bd2  "BD2\nRD41/RT2\nVNI2"   in=leaf2 style=dashed stroke=#1d4ed8
+pin  bd2 at=90,320
+node bd24a "BD24\nRD22/RT24\nVNI24" in=leaf2 style=dashed stroke=#1d4ed8
+pin  bd24a at=250,320
+
+group leaf4 "SRL LEAF-4"
+node vrf4 "IP-VRF-10\nRD1/RT10\nVNI10" in=leaf4 color=#1e3a8a text=#ffffff
+pin  vrf4 at=620,235
+node bd24b "BD24\nRD41/RT24\nVNI24" in=leaf4 style=dashed stroke=#1d4ed8
+pin  bd24b at=540,320
+node bd4  "BD4\nRD42/RT4\nVNI4"  in=leaf4 style=dashed stroke=#1d4ed8
+pin  bd4 at=700,320
+
+group leaf3 "SRL LEAF-3"
+node vrf3 "IP-VRF-10\nRD1/RT10\nVNI10" in=leaf3 color=#1e3a8a text=#ffffff
+pin  vrf3 at=1040,235
+node bd3  "BD3\nRD31/RT3\nVNI3"  in=leaf3 style=dashed stroke=#1d4ed8
+pin  bd3 at=1040,320
+
+# ── Edge devices and hosts ──────────────────────────────────────────
+node ce3 "CE-3\nIP-20.1.1.3/24\nMAC-00:01:03:FF:00:0B" kind=router
+pin  ce3 at=0,430
+node h2  "HOST-2\nIP-101.1.1.2/24\nMAC-00:00:00:00:00:02" kind=host color=#bae6fd
+pin  h2 at=180,500
+node srv "SERVER-1 (ES-1 / LAG-1)\nHOST-12  IP-101.1.1.1/24\nMAC-00:00:64:01:01:01" kind=host
+pin  srv at=390,500
+node h4  "HOST-4\nIP-104.1.1.1/24\nMAC-00:00:00:00:00:04" kind=host color=#bae6fd
+pin  h4 at=660,500
+node h3  "HOST-3\nIP-103.1.1.1/24\nMAC-00:00:00:00:00:03" kind=router
+pin  h3 at=1020,500
+
+# fabric attachment
+edge sp1 -- cloud
+edge sp2 -- cloud
+edge cloud -- vrf2 taillabel="irb0.24\nAnycast-IP .254"
+edge cloud -- vrf4
+edge cloud -- vrf3
+
+# PE-CE and access links, port labels at the endpoints
+edge bd2 -- ce3 label="PE-CE\nBGP IPv4" style=dashed color=#1d4ed8 headlabel="20.1.1.2/24"
+edge bd2   -- h2  taillabel="e1/12.24"
+edge bd24a -- srv taillabel="lag1.24"
+edge bd24b -- srv taillabel="lag1.24"
+edge bd4   -- h4  taillabel="e1/13.4"
+edge bd3   -- h3  taillabel="e1/2.3"`,
+
+'VXLAN encapsulation (frames + tables)':
+`figdown 0.1 block
+title "VXLAN Overview — MAC-in-UDP encapsulation"
+
+# ── Classical Ethernet frame ────────────────────────────────────────
+group eth "Classical Ethernet Frame"
+node dmac1 "DMAC\n6B" in=eth color=#bae6fd
+pin  dmac1 at=40,40
+node smac1 "SMAC\n6B" in=eth color=#bae6fd
+pin  smac1 at=125,40
+node dot1q "802.1Q\n4B" in=eth color=#bae6fd stroke=#ea580c
+pin  dot1q at=210,40
+node etype1 "Etype\n2B" in=eth color=#bae6fd
+pin  etype1 at=300,40
+node pay1 "Payload" in=eth color=#9aa2ad text=#ffffff
+size pay1 w=170 h=52
+pin  pay1 at=380,40
+node crc1 "CRC\n4B" in=eth color=#93c5fd
+pin  crc1 at=565,40
+
+# ── VXLAN frame: outer headers + original L2 frame + new CRC ───────
+node omac "Outer\nMAC\n14B" color=#fcd34d
+pin  omac at=0,260
+node oip "Outer\nIP\n20B" color=#fcd34d
+pin  oip at=80,260
+node oudp "UDP\n8B" color=#9aa2ad text=#ffffff
+pin  oudp at=160,260
+node vxh "VXLAN\n8B" color=#fcd34d stroke=#ea580c
+pin  vxh at=235,260
+
+group orig "Original Layer 2 Frame"
+node dmac2 "DMAC\n6B" in=orig color=#bae6fd
+pin  dmac2 at=330,260
+node smac2 "SMAC\n6B" in=orig color=#bae6fd
+pin  smac2 at=415,260
+node etype2 "Etype\n2B" in=orig color=#bae6fd
+pin  etype2 at=500,260
+node pay2 "Payload" in=orig color=#9aa2ad text=#ffffff
+size pay2 w=170 h=60
+pin  pay2 at=580,260
+node crc2 "CRC (new)\n4B" color=#bbf7d0 stroke=#16a34a
+pin  crc2 at=775,260
+
+# the key idea: the 12-bit VLAN becomes a 24-bit VNI in the VXLAN header
+edge dot1q -> vxh label="VNI\n12-bit VLAN → 24-bit VNI" style=dashed color=#ea580c
+
+# ── Supplementary knowledge ─────────────────────────────────────────
+table overhead "Encapsulation overhead (MAC-in-UDP)"
+| Segment    | Size | Notes                          |
+|------------|:----:|--------------------------------|
+| Outer MAC  | 14B  | new Ethernet header            |
+| Outer IP   | 20B  | VTEP-to-VTEP                   |
+| UDP        | 8B   | dst port 4789                  |
+| VXLAN      | 8B   | carries the 24-bit VNI         |
+| Total      | 50B  | added to every original frame  |
+cell 5 highlight
+
+table facts "Why VXLAN"
+| Fact                    | Value                    |
+|-------------------------|--------------------------|
+| VLAN address space      | 12 bits (4K segments)    |
+| VNI address space       | 24 bits (16M segments)   |
+| Encapsulation           | MAC-in-UDP               |`,
 
 'mixed document':
 `figdown 0.1 block
