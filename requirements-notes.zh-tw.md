@@ -359,6 +359,35 @@ MD reader/viewer 不支援 mermaid 等。但當 **AI 讀這份文件時，要可
 - 推論：預設值本身也是標準的 normative 內容（不同實作必須有相同
   預設，否則同文件不同圖，違反 D1）。
 
+### R14 — Bootstrap 策略：在任何工具支援之前如何可用（2026-07-02）
+
+**原意**：待解決的關鍵問題之一：初期在任何 editor/reader/viewer 都不
+支援的情況下，該如何滿足應用？使用者的想法：在被支援以前，先以
+`XXX.fd` 儲存對應內容，同步生成 `XXX.svg` 嵌入 MD 檔案內。
+
+**整理後解讀**：
+- 提案是一個 **sidecar 慣例**：`XXX.fd`（真相來源）+ `XXX.svg`
+  （生成產物）+ .md 以普通圖片引用嵌入 SVG。這在今天*所有* Markdown
+  viewer 都能用（GitHub、VS Code、Obsidian……），完全不需要生態系
+  配合——bootstrap 問題靠「讀取端不需要認識 FigDown」解決。
+- **待解的弱點**：來源被移出 .md——AI 讀 .md 時只看到圖片連結，
+  看不到文字（弱化 R9 的「單檔雙通道」模型）。候選緩解手段
+  （可並用）：
+  (a) **同名慣例**（normative）：`figure.svg` ⇔ 同目錄 `figure.fd`；
+      教 AI agent「看到 X.svg 就去讀 X.fd」。
+  (b) **自攜來源的 SVG**：renderer 把 FigDown 來源嵌進 SVG 本身
+      （`<metadata>`/`<desc>`），並附來源 hash——產物自帶真相、
+      可偵測過期（直接滿足 R9 的配對/失同步需求）。
+  (c) .md 內嵌 ```figdown 圍欄塊（放在圖旁或取代圖），等 viewer
+      原生渲染的那天——Mermaid 的終局模式。
+- 建議分期：**Stage 0** = sidecar 慣例 + CLI 生成器（今天就全域
+  可用）；**Stage 1** = 圍欄塊由插件渲染（VS Code 擴充、隨採用度
+  成長爭取 GitHub 式原生支援）；sidecar 慣例永久保留，作為最低
+  公分母的 fallback。
+- `.fd` → `.svg` 的生成時機需要定義：手動 CLI、編輯器存檔時、
+  file watcher、pre-commit hook、CI——可標準化為建議（非強制）
+  工作流。
+
 ## 待釐清問題
 
 <!-- 記錄需求中出現的模糊點，待與使用者確認 -->

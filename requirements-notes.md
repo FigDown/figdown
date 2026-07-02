@@ -476,6 +476,43 @@ should correspond to **the highest-volume need** — so the text rarely needs
   (different implementations must share identical defaults, or the same
   document yields different figures, violating D1).
 
+### R14 — Bootstrap strategy: how to be useful before any tool support exists (2026-07-02)
+
+**Original**: One of the key open problems: early on, when no
+editor/reader/viewer supports FigDown, how do we still serve real use?
+The user's idea: before support arrives, store the content as `XXX.fd`
+files, generate `XXX.svg` alongside, and embed the SVG into the .md file.
+
+**Interpretation**:
+- The proposal is a **sidecar convention**: `XXX.fd` (source of truth) +
+  `XXX.svg` (generated artifact) + the .md embeds the SVG via a plain
+  image reference. This works in *every* Markdown viewer today (GitHub,
+  VS Code, Obsidian, …) with zero ecosystem buy-in — the bootstrap
+  problem is solved by not requiring any FigDown awareness on the read
+  side.
+- **Weak point to solve**: it moves the source out of the .md — an AI
+  reading the .md sees only an image link, not the text (weakening R9's
+  dual-channel-in-one-file model). Candidate mitigations (not mutually
+  exclusive):
+  (a) **Same-basename convention**, normative: `figure.svg` ⇔ `figure.fd`
+      in the same directory; AI agents are taught "when you see X.svg,
+      read X.fd".
+  (b) **Self-carrying SVG**: the renderer embeds the FigDown source
+      inside the SVG itself (`<metadata>`/`<desc>`), plus a hash of the
+      source — the artifact carries its own truth, and staleness is
+      detectable (directly satisfies R9's pairing/desync requirement).
+  (c) Inline fenced ```figdown block in the .md next to (or instead of)
+      the image, for the day viewers render it natively — the Mermaid
+      endgame.
+- Suggested staging: **Stage 0** = sidecar convention + CLI generator
+  (works everywhere, today); **Stage 1** = fenced-block rendering via
+  plugins (VS Code extension, GitHub-style native support as adoption
+  grows); the sidecar convention remains valid forever as the
+  lowest-common-denominator fallback.
+- The `.fd` → `.svg` generation step needs a definition of *when* it
+  runs: manual CLI, editor-on-save, file watcher, pre-commit hook, or CI
+  — candidates to standardize as recommended (non-normative) workflows.
+
 ## Open questions
 
 <!-- Ambiguities found in the requirements, to confirm with the user -->
