@@ -163,17 +163,25 @@ function parse(text){
     } else if(kw==='figdown'){ err(n,'duplicate version header'); continue; }
 
     // typed-block children
-    if(cur && ['field','wrap','cols','row','cell','signal','gap'].includes(kw)){
+    if(cur && ['field','wrap','cols','head','row','cell','signal','gap'].includes(kw)){
       if(cur.type==='bitfield' && kw==='field'){
         const name=pos[1], w=parseInt(pos[2],10);
         if(!name || !isFinite(w) || w<1){ err(n,'field needs <name> <width-in-bits>'); continue; }
         cur.fields.push({name,w,optional:pos.includes('optional'),color:opts.color,note:opts.note,line:n});
       } else if(cur.type==='bitfield' && kw==='wrap'){
         cur.fields.push({wrap:true,line:n});
-      } else if(cur.type==='table' && kw==='cols'){
-        if(cur.cols.length){ err(n,'duplicate cols'); continue; }
-        if(pos.length<2){ err(n,'cols needs at least one column name'); continue; }
-        cur.cols=pos.slice(1);
+      } else if(cur.type==='table' && (kw==='cols'||kw==='head')){
+        // head is repeatable (multi-tier headers, merge markers allowed);
+        // cols is the single-tier shorthand
+        const toks=tk.toks.slice(1);
+        if(!toks.length){ err(n,kw+' needs at least one column name'); continue; }
+        const cells=toks.map(t=>({v:t.v, m:(!t.q&&t.v==='^')?'up':((!t.q&&t.v==='<')?'left':null)}));
+        if(cells[0].m==='left'){ err(n,'"<" cannot appear in the first column'); continue; }
+        if(cur.heads.length===0 && cells.some(c=>c.m==='up')){ err(n,'"^" cannot appear in the first header row'); continue; }
+        if(kw==='cols' && cur.heads.length){ err(n,'cols after head (use head for every tier)'); continue; }
+        if(cur.heads.length && cells.length!==cur.cols.length){ err(n,'head has '+cells.length+' cells, expected '+cur.cols.length); continue; }
+        cur.heads.push(cells);
+        if(cur.heads.length===1) cur.cols=cells.map(c=>c.v);
       } else if(cur.type==='table' && kw==='row'){
         // use raw tokens: unquoted ^ / < are span markers, quoted "^" is literal
         let toks=tk.toks.slice(1), hl=false;
@@ -278,7 +286,7 @@ function parse(text){
       case 'table': {
         const id=pos[1];
         if(!id||!ID_RE.test(id)){ err(n,'table needs an id'); break; }
-        cur={type:'table',id,label:pos[2]||id,cols:[],rows:[],line:n};
+        cur={type:'table',id,label:pos[2]||id,cols:[],heads:[],rows:[],line:n};
         doc.blocks.push(cur); break;
       }
       case 'wave': {
@@ -537,17 +545,20 @@ function renderBitfield(b,y0){
 function renderTable(t,y0){
   const rh=26; const svg=[]; let y=y0+18;
   svg.push('<text x="0" y="'+(y-4)+'" font-size="13" font-weight="600">'+esc(t.label)+'</text>');
-  // grid: row 0 = header, rows 1..N = data
-  const grid=[t.cols.map(c=>({v:c,m:null,hdr:true}))]
+  // grid: header tiers (from `head`/`cols` lines) then data rows
+  const H=t.heads.length;
+  const grid=t.heads.map(hr=>hr.map(c=>({v:c.v,m:c.m,hdr:true})))
     .concat(t.rows.map(r=>r.cells.map(c=>({v:c.v,m:c.m}))));
-  const hlRow=r=>r>0&&t.rows[r-1].hl;
+  const hlRow=r=>r>=H&&t.rows[r-H].hl;
   const widths=t.cols.map((c,i)=>{
-    let w=tw(c);
+    let w=30;
+    for(const hr of t.heads) if(!hr[i].m) w=Math.max(w,tw(hr[i].v));
     for(const r of t.rows) if(!r.cells[i].m) w=Math.max(w,tw(r.cells[i].v));
     return w;
   });
   const totalW=widths.reduce((a,b)=>a+b,0);
-  const markOf=(r,c)=>(t.marks||[]).find(mk=>mk.r===r&&mk.c===c+1);
+  // cell marks: r=0 addresses the bottom header tier, r>=1 the data rows
+  const markOf=(r,c)=>(t.marks||[]).find(mk=>(mk.r===0?H-1:H-1+mk.r)===r&&mk.c===c+1);
   const yTop=y+4;
   for(let r=0;r<grid.length;r++){
     for(let c=0;c<grid[r].length;c++){
@@ -659,10 +670,12 @@ field "Sequence Number (optional)" 32 optional`,
 'table (census #3)':
 `figdown 0.1 table
 table fib "FIB (excerpt)"
-cols Prefix "Next Hop" Port VRF
+head Route        <    Forwarding <
+head Prefix "Next Hop" Port VRF
 row 10.0.0.0/8    R2   p1  default
 row 10.1.0.0/16   R4   p2  default highlight
-row 0.0.0.0/0     R3   p2  default`,
+row 0.0.0.0/0     R3   p2  default
+cell 3,2 color=#dbeafe`,
 
 'wave (census #4)':
 `figdown 0.1 wave

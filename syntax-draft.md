@@ -192,7 +192,9 @@ wrap                       # explicit row break when a field ends mid-unit
 
 ```figdown
 table fib "FIB Table"
-cols Prefix NextHop Port          # header row, defines column count
+head Route  <       Forwarding <  # optional extra header tiers (repeatable,
+head Prefix NextHop Port          # merge markers allowed); the first head
+                                  # defines the column count
 row 10.0.0.0/8  R2   p1
 row 0.0.0.0/0   R3   p2 highlight
 row "^"         "^"  p3           # quoted ^ is a literal caret, not a merge
@@ -211,9 +213,19 @@ cell 2,3 color=#fee2e2            # per-cell mark; row 0 = header, cols 1-based
 - `cell <row>,<col> color=…` attaches a mark to one cell — annotation
   attaches to an address, keeping `row` lines clean (the `mark`/`leg`
   precedent).
-- OQ-S3: column alignment/width overrides — likely `colw 30% auto auto`.
-- The full feature list (multi-level headers, alignment, borders…) is to
-  be validated against the 211-sample `table-matrix` census folder (R17).
+- `head` is repeatable for multi-tier headers; `cols` is the single-tier
+  shorthand (using `cols` after `head` is a line error). `cell` row
+  addressing: `0` = the bottom header tier, data rows are 1-based.
+- **Feature set validated against the 212-sample `table-matrix` census
+  folder (R17, 2026-07-02)**: cellcolor 58.5%, merged 41.5%, headercol
+  41.0%, multiheader 34.9% are must-haves (all now in the draft);
+  multitable 20.8% (covered — multiple `table` blocks per document),
+  colwidth 20.3% (OQ-S3), symbol 11.8% (covered — Unicode in cell
+  values), rowhl 12.3% (covered — `highlight`). Evidence-based cuts for
+  v0.1: mixed per-column alignment (1.4%) and rotated text (0.5%).
+  partialborder 17.0% and memmap 14.2% deferred to v0.2 candidates.
+- OQ-S3: column alignment/width overrides — likely `colw 30% auto auto`
+  (backed by 20.3% corpus frequency).
 - Tables can attach to scene nodes (`table fib ... attach=r1`) — the
   packet-walk scenario (usecases 4) needs this; deferred to v0.2.
 

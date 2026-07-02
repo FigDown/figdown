@@ -595,11 +595,19 @@ other needs **the collected image library** reveals.
   unquoted `<` = merge left (colspan), quoted forms are literals;
   `cell r,c color=…` for per-cell marks (annotation attaches to an
   address).
-- **Method (user-directed): mine `classified/table-matrix/` (211 unique
+- **Method (user-directed): mine `classified/table-matrix/` (212 unique
   samples, 917 weighted) for the table feature list** — multi-level
   headers, alignment, borders, column widths… The census folders are the
   requirements source for every template (R16 "classification is
-  design"). TODO: run this survey before freezing the table template.
+  design").
+- **Survey completed (2026-07-02, 5 vision agents, 212 samples)**:
+  cellcolor 58.5% · merged 41.5% · headercol 41.0% · multiheader 34.9% ·
+  multitable 20.8% · colwidth 20.3% · partialborder 17.0% · memmap
+  14.2% · rowhl 12.3% · symbol 11.8% · plain only 6.6% · alignmix 1.4% ·
+  rotated 0.5%. Consequences: multiheader promoted to must-have (now
+  `head` repeatable lines in the draft + PoC); alignmix/rotated cut from
+  v0.1 with evidence; partialborder/memmap parked as v0.2 candidates.
+  Raw data: figdown-samples/results/table-features.*.tsv.
 
 ### Open question OQ1 — Build on D2 vs. a new language (2026-07-02)
 

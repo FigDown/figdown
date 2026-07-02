@@ -463,10 +463,18 @@ MD reader/viewer 不支援 mermaid 等。但當 **AI 讀這份文件時，要可
 - 語法已入草案 §4.2：未加引號的 `^` = 向上合併（rowspan）、`<` =
   向左合併（colspan），加引號為字面字元；`cell r,c color=…` 做
   儲存格級標註（標註附著於定址）。
-- **方法（使用者指示）：從 `classified/table-matrix/`（211 張唯一
+- **方法（使用者指示）：從 `classified/table-matrix/`（212 張唯一
   樣本、加權 917）盤點表格特徵清單**——多層表頭、對齊、框線、
   欄寬……普查資料夾就是每個 template 的需求來源（R16「分類即
-  設計」）。待辦：table template 凍結前先跑這次盤點。
+  設計」）。
+- **盤點已完成（2026-07-02，5 個視覺 agents、212 張樣本）**：
+  cellcolor 58.5%、merged 41.5%、headercol 41.0%、multiheader
+  34.9%、multitable 20.8%、colwidth 20.3%、partialborder 17.0%、
+  memmap 14.2%、rowhl 12.3%、symbol 11.8%、素表僅 6.6%、alignmix
+  1.4%、rotated 0.5%。後果：multiheader 升為 must-have（草案 + PoC
+  已加可重複的 `head` 行）；alignmix/rotated 依證據自 v0.1 砍除；
+  partialborder/memmap 列 v0.2 候選。原始數據：
+  figdown-samples/results/table-features.*.tsv。
 
 ### 待議 OQ1 — 站在 D2 之上 vs. 全新語言（2026-07-02）
 
