@@ -555,6 +555,17 @@ D2's language, layout engines, and license before deciding whether FigDown
 should be an extension/profile over D2 semantics or a new language.
 Status: **open**.
 
+**Finding (2026-07-02): D2 has almost no Markdown-ecosystem penetration.**
+No native rendering on GitHub/GitLab (open community request only); an
+official Obsidian plugin (requires local D2 CLI); VS Code extension serves
+`.d2` files (markdown-preview rendering still a feature request). Two
+consequences: (1) strongly validates R14's write-side-rendering/sidecar
+strategy — even a company-backed, technically superior language cannot get
+read-side viewer adoption, so FigDown must not depend on it; (2) reshapes
+OQ1 — "borrow D2's ecosystem" is not a real argument (there is none to
+borrow); the remaining case for D2 is language design + layout-engine
+reuse, e.g. the D2 CLI as one renderer backend in our pipeline.
+
 ## Open questions
 
 <!-- Ambiguities found in the requirements, to confirm with the user -->

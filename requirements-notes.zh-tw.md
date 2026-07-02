@@ -422,6 +422,15 @@ MD reader/viewer 不支援 mermaid 等。但當 **AI 讀這份文件時，要可
 D2 近到 R11（借鑑優先）要求先深讀 D2 的語言、排版引擎與授權，再決定
 FigDown 是 D2 語意之上的擴充/profile 還是新語言。狀態：**未決**。
 
+**發現（2026-07-02）：D2 在 Markdown 生態幾乎沒有滲透。**
+GitHub/GitLab 不原生渲染（只有懸而未決的社群提案）；Obsidian 有官方
+plugin（需本機裝 D2 CLI）；VS Code 擴充主要服務 `.d2` 檔（markdown
+preview 內渲染仍是 feature request）。兩個推論：(1) 強力驗證 R14 的
+寫入端渲染/sidecar 策略——連有公司撐腰、技術更強的語言都打不進
+讀取端生態，FigDown 絕不能依賴它；(2) 改變 OQ1 的權重——「借 D2
+生態」不成立（無生態可借），剩下的理由是語言設計與排版引擎複用，
+例如把 D2 CLI 當作我們 pipeline 的 renderer 後端之一。
+
 ## 待釐清問題
 
 <!-- 記錄需求中出現的模糊點，待與使用者確認 -->
