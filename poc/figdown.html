@@ -1,0 +1,694 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>FigDown PoC — deterministic text→SVG renderer (draft v0.0)</title>
+<style>
+  :root{
+    --bg:#fcfcfb; --panel:#ffffff; --ink:#1d1d1b; --muted:#6f6e69;
+    --line:#e3e1d9; --hair:#d6d4cc; --code:#f6f5ef; --err:#dc2626;
+    --sans:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;
+    --mono:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);line-height:1.5}
+  .wrap{max-width:1400px;margin:0 auto;padding:22px 20px 50px}
+  header h1{font-size:20px;font-weight:600;margin:0 0 3px;letter-spacing:-.01em}
+  header p{margin:0;color:var(--muted);font-size:13px}
+  .bar{display:flex;align-items:center;gap:9px;margin:14px 0 12px;flex-wrap:wrap}
+  .bar label{font-size:13px;color:var(--muted)}
+  select,button{font:inherit;font-size:13.5px;padding:6px 10px;border:1px solid var(--hair);border-radius:8px;background:var(--panel);color:var(--ink);cursor:pointer}
+  button:hover{border-color:var(--muted)}
+  .main{display:grid;grid-template-columns:minmax(340px,0.9fr) minmax(420px,1.1fr);gap:14px;align-items:start}
+  @media (max-width:980px){ .main{grid-template-columns:1fr} }
+  textarea{width:100%;min-height:520px;font-family:var(--mono);font-size:12.8px;line-height:1.55;
+    padding:12px 14px;border:1px solid var(--line);border-radius:12px;background:var(--panel);color:var(--ink);
+    resize:vertical;white-space:pre;tab-size:4}
+  textarea:focus{outline:2px solid #bfdbfe;outline-offset:-1px}
+  .preview{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:14px;min-height:520px;overflow:auto}
+  .errors{font-family:var(--mono);font-size:12.5px;color:var(--err);white-space:pre-wrap;margin:0}
+  .ok{color:var(--muted);font-size:12px;margin:0 0 8px}
+  svg{max-width:100%;height:auto;display:block}
+  footer{margin-top:18px;color:var(--muted);font-size:12px}
+  a{color:inherit}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+  <h1>FigDown PoC <span style="color:var(--muted);font-weight:400">— deterministic text→SVG, draft v0.0</span></h1>
+  <p>Figures as text — one source, two readers. Edit left, render right. Same source → same SVG, bit-level.</p>
+</header>
+
+<div class="bar">
+  <label>Example</label>
+  <select id="examples"></select>
+  <button id="dl">Download SVG (source embedded)</button>
+  <span id="status" style="font-size:12px;color:var(--muted)"></span>
+</div>
+
+<div class="main">
+  <textarea id="src" spellcheck="false"></textarea>
+  <div class="preview">
+    <p class="ok" id="okline"></p>
+    <pre class="errors" id="errs"></pre>
+    <div id="out"></div>
+  </div>
+</div>
+
+<footer>FigDown draft v0.0 PoC — core scene (node/group/edge/layer, flow/rank/pin/size) + bitfield + table + wave.
+Closed grammar: unknown lines are errors with line numbers. No LLM, no dependencies, no network.</footer>
+</div>
+
+<script>
+'use strict';
+// ============================================================
+// 1. PARSER — closed, line-oriented grammar (draft v0.0)
+// ============================================================
+const KINDS = ['box','decision','terminator','datastore','process','switch','router','host','port'];
+
+function tokenize(line){
+  // split by whitespace, honoring double quotes
+  const toks=[]; let i=0;
+  while(i<line.length){
+    while(i<line.length && /\s/.test(line[i])) i++;
+    if(i>=line.length) break;
+    if(line[i]==='"'){
+      let j=i+1, s='';
+      while(j<line.length && line[j]!=='"'){ s+=line[j]; j++; }
+      if(j>=line.length) return {error:'unterminated string'};
+      toks.push({v:s,q:true}); i=j+1;
+    } else {
+      let j=i, s='';
+      while(j<line.length && !/\s/.test(line[j])){ s+=line[j]; j++; }
+      toks.push({v:s,q:false}); i=j;
+    }
+  }
+  return {toks};
+}
+// Option keys are a CLOSED set: an unquoted token whose key is not listed
+// here is a positional argument (this lets wave lanes contain '=').
+const OPT_KEYS=new Set(['kind','color','stroke','text','in','layer','label',
+  'style','z','at','w','h','unit','note','labels']);
+function splitOpts(toks){
+  const pos=[], opts={};
+  for(const t of toks){
+    const m = !t.q && /^([A-Za-z_][A-Za-z0-9_-]*)=(.*)$/.exec(t.v);
+    if(m && OPT_KEYS.has(m[1])) opts[m[1]]=m[2]; else pos.push(t.v);
+  }
+  return {pos,opts};
+}
+const ID_RE=/^[A-Za-z_][A-Za-z0-9_-]*$/;
+
+function parse(text){
+  const errs=[];
+  const doc={title:'',nodes:[],groups:[],edges:[],layers:[{id:'base',label:'',z:0}],
+             flow:'right',ranks:[],pins:{},sizes:{},blocks:[]};
+  const nodeIds=new Set(), groupIds=new Set(), layerIds=new Set(['base']);
+  let cur=null;             // current typed block (bitfield/table/wave)
+  let sawHeader=false, firstContent=true;
+  const lines=text.split('\n');
+  const err=(n,m)=>errs.push('Line '+n+': '+m);
+
+  for(let li=0; li<lines.length; li++){
+    const n=li+1;
+    let raw=lines[li];
+    const hi=findComment(raw); if(hi>=0) raw=raw.slice(0,hi);
+    if(!raw.trim()) continue;
+    const tk=tokenize(raw.trim());
+    if(tk.error){ err(n,tk.error); continue; }
+    const {pos,opts}=splitOpts(tk.toks);
+    const kw=pos[0];
+
+    if(firstContent){
+      firstContent=false;
+      if(kw==='figdown'){
+        sawHeader=true;
+        if(pos[1]!=='0.1') err(n,'unsupported version "'+(pos[1]||'')+'" (expected 0.1)');
+        continue;
+      } else { err(n,'first line must be "figdown 0.1"'); }
+    } else if(kw==='figdown'){ err(n,'duplicate version header'); continue; }
+
+    // typed-block children
+    if(cur && ['field','wrap','cols','row','signal','gap'].includes(kw)){
+      if(cur.type==='bitfield' && kw==='field'){
+        const name=pos[1], w=parseInt(pos[2],10);
+        if(!name || !isFinite(w) || w<1){ err(n,'field needs <name> <width-in-bits>'); continue; }
+        cur.fields.push({name,w,optional:pos.includes('optional'),color:opts.color,note:opts.note,line:n});
+      } else if(cur.type==='bitfield' && kw==='wrap'){
+        cur.fields.push({wrap:true,line:n});
+      } else if(cur.type==='table' && kw==='cols'){
+        if(cur.cols.length){ err(n,'duplicate cols'); continue; }
+        if(pos.length<2){ err(n,'cols needs at least one column name'); continue; }
+        cur.cols=pos.slice(1);
+      } else if(cur.type==='table' && kw==='row'){
+        const cells=pos.slice(1); let hl=false;
+        if(cells[cells.length-1]==='highlight'){ hl=true; cells.pop(); }
+        if(!cur.cols.length){ err(n,'row before cols'); continue; }
+        if(cells.length!==cur.cols.length){ err(n,'row has '+cells.length+' cells, expected '+cur.cols.length); continue; }
+        cur.rows.push({cells,hl});
+      } else if(cur.type==='wave' && kw==='signal'){
+        const name=pos[1], lane=pos[2];
+        if(!name||!lane){ err(n,'signal needs <name> <lane>'); continue; }
+        if(!/^[01pnx=.\d]+$/.test(lane)){ err(n,'lane may contain only 0 1 p n x = . digits'); continue; }
+        cur.signals.push({name,lane,labels:(opts.labels||'').split(',').filter(Boolean)});
+      } else if(cur.type==='wave' && kw==='gap'){
+        const t=parseInt(pos[1],10);
+        if(!isFinite(t)||t<0){ err(n,'gap needs a tick number'); continue; }
+        cur.gaps.push(t);
+      } else { err(n,'"'+kw+'" not valid inside '+cur.type); }
+      continue;
+    }
+    cur=null; // any other keyword closes the block
+
+    switch(kw){
+      case 'title': doc.title=pos[1]||''; break;
+      case 'layer': {
+        const id=pos[1];
+        if(!id||!ID_RE.test(id)){ err(n,'layer needs an id'); break; }
+        if(layerIds.has(id)){ err(n,'duplicate layer id "'+id+'"'); break; }
+        layerIds.add(id);
+        doc.layers.push({id,label:pos[2]||'',z:opts.z?parseInt(opts.z,10):doc.layers.length});
+        break;
+      }
+      case 'node': {
+        const id=pos[1];
+        if(!id||!ID_RE.test(id)){ err(n,'node needs an id'); break; }
+        if(nodeIds.has(id)||groupIds.has(id)){ err(n,'duplicate id "'+id+'"'); break; }
+        const kind=opts.kind||'box';
+        if(!KINDS.includes(kind)){ err(n,'unknown kind "'+kind+'"'); break; }
+        nodeIds.add(id);
+        doc.nodes.push({id,label:pos[2]||id,kind,color:opts.color,stroke:opts.stroke,
+                        text:opts.text,group:opts['in']||null,layer:opts.layer||'base',line:n});
+        break;
+      }
+      case 'group': {
+        const id=pos[1];
+        if(!id||!ID_RE.test(id)){ err(n,'group needs an id'); break; }
+        if(nodeIds.has(id)||groupIds.has(id)){ err(n,'duplicate id "'+id+'"'); break; }
+        groupIds.add(id);
+        doc.groups.push({id,label:pos[2]||id,color:opts.color,line:n});
+        break;
+      }
+      case 'edge': {
+        // edge A -> B | A -- B | A <-> B
+        const a=pos[1], op=pos[2], b=pos[3];
+        if(!a||!b||!['->','--','<->'].includes(op)){ err(n,'edge needs <id> ->|--|<-> <id>'); break; }
+        doc.edges.push({a,b,op,label:opts.label,style:opts.style||'solid',
+                        color:opts.color,layer:opts.layer||'base',line:n});
+        break;
+      }
+      case 'flow': {
+        if(!['right','down','left','up'].includes(pos[1])){ err(n,'flow needs right|down|left|up'); break; }
+        doc.flow=pos[1]; break;
+      }
+      case 'rank': {
+        const ids=pos.slice(1);
+        if(ids.length<2){ err(n,'rank needs two or more node ids'); break; }
+        doc.ranks.push({ids,line:n}); break;
+      }
+      case 'zone': {
+        if(!['left','right','top','bottom'].includes(pos[1])||!pos[2]){ err(n,'zone needs <left|right|top|bottom> <group-id>'); break; }
+        break; // accepted; PoC does not act on zone yet
+      }
+      case 'pin': {
+        const id=pos[1], at=opts.at;
+        const m=at&&/^(-?[\d.]+),(-?[\d.]+)$/.exec(at);
+        if(!id||!m){ err(n,'pin needs <id> at=<fx>,<fy>'); break; }
+        doc.pins[id]={fx:parseFloat(m[1]),fy:parseFloat(m[2]),line:n};
+        break;
+      }
+      case 'size': {
+        const id=pos[1];
+        if(!id||(!opts.w&&!opts.h)){ err(n,'size needs <id> w=<px> and/or h=<px>'); break; }
+        doc.sizes[id]={w:opts.w?parseFloat(opts.w):null,h:opts.h?parseFloat(opts.h):null,line:n};
+        break;
+      }
+      case 'bitfield': {
+        const id=pos[1];
+        if(!id||!ID_RE.test(id)){ err(n,'bitfield needs an id'); break; }
+        cur={type:'bitfield',id,label:pos[2]||id,unit:opts.unit?parseInt(opts.unit,10):32,fields:[],line:n};
+        if(!isFinite(cur.unit)||cur.unit<1){ err(n,'bad unit'); cur.unit=32; }
+        doc.blocks.push(cur); break;
+      }
+      case 'table': {
+        const id=pos[1];
+        if(!id||!ID_RE.test(id)){ err(n,'table needs an id'); break; }
+        cur={type:'table',id,label:pos[2]||id,cols:[],rows:[],line:n};
+        doc.blocks.push(cur); break;
+      }
+      case 'wave': {
+        const id=pos[1];
+        if(!id||!ID_RE.test(id)){ err(n,'wave needs an id'); break; }
+        cur={type:'wave',id,label:pos[2]||id,signals:[],gaps:[],line:n};
+        doc.blocks.push(cur); break;
+      }
+      case 'page': case 'step': case 'set': case 'pulse':
+        err(n,'"'+kw+'" is reserved for the dynamic profile (not in v0.1)'); break;
+      default:
+        err(n,'unrecognized line (unknown keyword "'+kw+'")');
+    }
+  }
+  if(!sawHeader && text.trim()) { /* already reported on first content line */ }
+
+  // semantic checks
+  for(const nd of doc.nodes){
+    if(nd.group && !groupIds.has(nd.group)) errs.push('Line '+nd.line+': unknown group "'+nd.group+'"');
+    if(nd.layer && !layerIds.has(nd.layer)) errs.push('Line '+nd.line+': unknown layer "'+nd.layer+'"');
+  }
+  for(const e of doc.edges){
+    if(!nodeIds.has(e.a)&&!groupIds.has(e.a)) errs.push('Line '+e.line+': unknown endpoint "'+e.a+'"');
+    if(!nodeIds.has(e.b)&&!groupIds.has(e.b)) errs.push('Line '+e.line+': unknown endpoint "'+e.b+'"');
+    if(e.layer && !layerIds.has(e.layer)) errs.push('Line '+e.line+': unknown layer "'+e.layer+'"');
+  }
+  for(const r of doc.ranks) for(const id of r.ids)
+    if(!nodeIds.has(id)) errs.push('Line '+r.line+': unknown node "'+id+'" in rank');
+  for(const id in doc.pins) if(!nodeIds.has(id)&&!groupIds.has(id))
+    errs.push('Line '+doc.pins[id].line+': pin of unknown id "'+id+'"');
+  for(const id in doc.sizes) if(!nodeIds.has(id)&&!groupIds.has(id))
+    errs.push('Line '+doc.sizes[id].line+': size of unknown id "'+id+'"');
+  for(const b of doc.blocks){
+    if(b.type==='table'&&!b.cols.length) errs.push('Line '+b.line+': table has no cols');
+    if(b.type==='bitfield'&&!b.fields.some(f=>!f.wrap)) errs.push('Line '+b.line+': bitfield has no fields');
+    if(b.type==='wave'&&!b.signals.length) errs.push('Line '+b.line+': wave has no signals');
+  }
+  return {doc,errs};
+}
+function findComment(s){
+  let inq=false;
+  for(let i=0;i<s.length;i++){
+    if(s[i]==='"') inq=!inq;
+    else if(s[i]==='#'&&!inq) return i;
+  }
+  return -1;
+}
+
+// ============================================================
+// 2. LAYOUT + RENDER (deterministic; no randomness, no Date)
+// ============================================================
+const FONT=13, CH=7.2, PADX=14, NH=36, GAPX=56, GAPY=44;
+function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+function tw(s){return Math.max(30,String(s).length*CH+2*PADX);}
+
+function render(doc){
+  const parts=[]; let y=0, maxW=0;
+  if(doc.title){ parts.push('<text x="0" y="16" font-size="15" font-weight="600" font-family="var(--sans)">'+esc(doc.title)+'</text>'); y=30; }
+  if(doc.nodes.length||doc.edges.length){
+    const s=renderScene(doc,y); parts.push(s.svg); y=s.y; maxW=Math.max(maxW,s.w);
+  }
+  for(const b of doc.blocks){
+    let s;
+    if(b.type==='bitfield') s=renderBitfield(b,y);
+    else if(b.type==='table') s=renderTable(b,y);
+    else s=renderWave(b,y);
+    parts.push(s.svg); y=s.y+24; maxW=Math.max(maxW,s.w);
+  }
+  const PADL=18, PADT=6;
+  const W=Math.ceil(maxW)+PADL+8, H=Math.ceil(y)+PADT+4;
+  return {svg:'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 '+W+' '+H+'" width="'+W+'" height="'+H+'" font-family="system-ui,sans-serif">'
+    +'<defs><marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">'
+    +'<path d="M0,0 L10,5 L0,10 z" fill="#555"/></marker>'
+    +'<pattern id="hatch" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">'
+    +'<line x1="0" y1="0" x2="0" y2="6" stroke="#bbb" stroke-width="2"/></pattern></defs>'
+    +'<g transform="translate('+PADL+','+PADT+')">'+parts.join('')+'</g></svg>', w:W, h:H};
+}
+
+// ---- scene ----
+function renderScene(doc,y0){
+  const nodes=doc.nodes.map(n=>({...n}));
+  const byId={}; nodes.forEach(n=>byId[n.id]=n);
+  // sizes
+  for(const n of nodes){
+    n.w=tw(n.label); n.h=NH;
+    const s=doc.sizes[n.id]; if(s){ if(s.w)n.w=s.w; if(s.h)n.h=s.h; n.rigid=true; }
+    if(n.kind==='decision'){ n.w=Math.max(n.w+20,70); n.h=48; }
+  }
+  // ranks: longest-path layering over directed edges among unpinned nodes
+  const pinned=id=>doc.pins[id]!==undefined;
+  const adj={}; nodes.forEach(n=>adj[n.id]=[]);
+  for(const e of doc.edges){
+    // undirected/bidirectional edges still order ranks by document direction
+    if(byId[e.a] && byId[e.b]) adj[e.a].push(e.b);
+  }
+  const rank={}; const state={};
+  function dfs(u){
+    if(state[u]===1) return 0;           // cycle guard: break back edge
+    if(state[u]===2) return rank[u];
+    state[u]=1; let r=0;
+    for(const v of adj[u]) r=Math.max(r, dfs(v)+1);
+    state[u]=2; rank[u]=r; return r;
+  }
+  nodes.forEach(n=>dfs(n.id));
+  // invert (sources rank 0)
+  const maxR=Math.max(0,...nodes.map(n=>rank[n.id]||0));
+  nodes.forEach(n=>n.rank=maxR-(rank[n.id]||0));
+  // rank directives: pull listed nodes to the max of their ranks
+  for(const r of doc.ranks){
+    const rr=Math.max(...r.ids.filter(id=>byId[id]).map(id=>byId[id].rank));
+    r.ids.forEach(id=>{ if(byId[id]) byId[id].rank=rr; });
+  }
+  // positions
+  const horiz=(doc.flow==='right'||doc.flow==='left');
+  const ranksArr=[];
+  for(const n of nodes){ if(pinned(n.id)) continue;
+    (ranksArr[n.rank]=ranksArr[n.rank]||[]).push(n); }
+  const laneSize=[], laneSpan=[];
+  ranksArr.forEach((lane,i)=>{
+    if(!lane) return;
+    laneSize[i]=Math.max(...lane.map(n=>horiz?n.w:n.h));
+    laneSpan[i]=lane.reduce((s,n)=>s+(horiz?n.h:n.w),0)+ (lane.length-1)*(horiz?GAPY:GAPX);
+  });
+  const maxSpan=Math.max(0,...laneSpan.filter(v=>v!==undefined));
+  let main=0;
+  ranksArr.forEach((lane,i)=>{
+    if(!lane) return;
+    let cross=(maxSpan-laneSpan[i])/2;
+    for(const n of lane){
+      if(horiz){ n.x=main; n.y=y0+20+cross; cross+=n.h+GAPY; }
+      else     { n.y=y0+20+main; n.x=cross; cross+=n.w+GAPX; }
+    }
+    main+=laneSize[i]+(horiz?GAPX:GAPY);
+  });
+  if(doc.flow==='left'||doc.flow==='up'){
+    const M=main; for(const n of nodes){ if(pinned(n.id)) continue;
+      if(horiz) n.x=M-n.x-n.w; else n.y=y0+20+(M-(n.y-y0-20))-n.h; }
+  }
+  // canvas extent from auto nodes, then place pinned nodes by fraction
+  let W=0,Hh=0;
+  for(const n of nodes){ if(pinned(n.id))continue; W=Math.max(W,n.x+n.w); Hh=Math.max(Hh,n.y+n.h-y0-20); }
+  if(W===0){W=480;} if(Hh===0){Hh=280;}
+  for(const n of nodes){ const p=doc.pins[n.id]; if(!p) continue;
+    n.x=p.fx*W; n.y=y0+20+p.fy*Hh; W=Math.max(W,n.x+n.w); Hh=Math.max(Hh,n.y+n.h-y0-20); }
+  // groups
+  const gsvg=[];
+  for(const g of doc.groups){
+    const mem=nodes.filter(n=>n.group===g.id);
+    if(!mem.length) continue;
+    const x0=Math.min(...mem.map(n=>n.x))-14, x1=Math.max(...mem.map(n=>n.x+n.w))+14;
+    const yA=Math.min(...mem.map(n=>n.y))-26, yB=Math.max(...mem.map(n=>n.y+n.h))+12;
+    gsvg.push('<rect x="'+x0+'" y="'+yA+'" width="'+(x1-x0)+'" height="'+(yB-yA)+'" rx="10" fill="'+(g.color||'#f6f5ef')+'" stroke="#d6d4cc"/>'
+      +'<text x="'+(x0+10)+'" y="'+(yA+16)+'" font-size="11.5" fill="#6f6e69">'+esc(g.label)+'</text>');
+    W=Math.max(W,x1); Hh=Math.max(Hh,yB-y0-20);
+  }
+  // edges (sorted by layer z, then doc order)
+  const zOf=l=>{const L=doc.layers.find(x=>x.id===l);return L?L.z:0;};
+  const edges=[...doc.edges].sort((p,q)=>zOf(p.layer)-zOf(q.layer));
+  const esvg=[];
+  for(const e of edges){
+    const A=byId[e.a], B=byId[e.b]; if(!A||!B) continue;
+    const ax=A.x+A.w/2, ay=A.y+A.h/2, bx=B.x+B.w/2, by=B.y+B.h/2;
+    const [x1,yy1]=borderPoint(A,bx,by), [x2,yy2]=borderPoint(B,ax,ay);
+    const col=e.color||'#555';
+    const dash=e.style==='dashed'?' stroke-dasharray="6 4"':(e.style==='dotted'?' stroke-dasharray="2 4"':'');
+    const m1=e.op==='<->'?' marker-start="url(#arr)"':'', m2=e.op!=='--'?' marker-end="url(#arr)"':'';
+    esvg.push('<line x1="'+x1+'" y1="'+yy1+'" x2="'+x2+'" y2="'+yy2+'" stroke="'+col+'" stroke-width="1.6"'+dash+m1+m2+'/>');
+    if(e.label){
+      const mx=(x1+x2)/2, my=(yy1+yy2)/2;
+      esvg.push('<text x="'+mx+'" y="'+(my-5)+'" font-size="11" text-anchor="middle" fill="'+col+'" paint-order="stroke" stroke="#fff" stroke-width="3">'+esc(e.label)+'</text>');
+    }
+  }
+  // nodes on top
+  const nsvg=[];
+  for(const n of nodes){
+    const fill=n.color||'#fff', stroke=n.stroke||'#8a8880', txt=n.text||'#1d1d1b';
+    if(n.kind==='decision'){
+      const cx=n.x+n.w/2, cy=n.y+n.h/2;
+      nsvg.push('<polygon points="'+cx+','+n.y+' '+(n.x+n.w)+','+cy+' '+cx+','+(n.y+n.h)+' '+n.x+','+cy+'" fill="'+fill+'" stroke="'+stroke+'"/>');
+    } else if(n.kind==='terminator'){
+      nsvg.push('<rect x="'+n.x+'" y="'+n.y+'" width="'+n.w+'" height="'+n.h+'" rx="'+(n.h/2)+'" fill="'+fill+'" stroke="'+stroke+'"/>');
+    } else if(n.kind==='datastore'){
+      nsvg.push('<rect x="'+n.x+'" y="'+n.y+'" width="'+n.w+'" height="'+n.h+'" rx="3" fill="'+fill+'" stroke="'+stroke+'"/>'
+        +'<line x1="'+n.x+'" y1="'+(n.y+7)+'" x2="'+(n.x+n.w)+'" y2="'+(n.y+7)+'" stroke="'+stroke+'"/>');
+    } else {
+      const r=(n.kind==='switch'||n.kind==='router')?14:8;
+      nsvg.push('<rect x="'+n.x+'" y="'+n.y+'" width="'+n.w+'" height="'+n.h+'" rx="'+r+'" fill="'+fill+'" stroke="'+stroke+'"'+
+        (n.kind==='switch'||n.kind==='router'?' stroke-width="1.8"':'')+'/>');
+    }
+    // label with shrink-to-fit when size is rigid (R10)
+    let fs=FONT; const need=String(n.label).length*CH;
+    if(n.rigid && need>n.w-2*8) fs=Math.max(8, FONT*(n.w-16)/need);
+    nsvg.push('<text x="'+(n.x+n.w/2)+'" y="'+(n.y+n.h/2+fs*0.35)+'" font-size="'+fs+'" text-anchor="middle" fill="'+txt+'">'+esc(n.label)+'</text>');
+  }
+  const yEnd=y0+20+Hh+10;
+  return {svg:gsvg.join('')+esvg.join('')+nsvg.join(''), y:yEnd, w:W+2};
+}
+function borderPoint(n,tx,ty){
+  const cx=n.x+n.w/2, cy=n.y+n.h/2, dx=tx-cx, dy=ty-cy;
+  if(dx===0&&dy===0) return [cx,cy];
+  const sx=(n.w/2)/Math.abs(dx||1e-9), sy=(n.h/2)/Math.abs(dy||1e-9), s=Math.min(sx,sy);
+  return [cx+dx*s, cy+dy*s];
+}
+
+// ---- bitfield ----
+function renderBitfield(b,y0){
+  const cell=Math.max(18,Math.min(28,Math.floor(760/b.unit))), rh=30, ruler=16;
+  const svg=[]; let y=y0+18;
+  svg.push('<text x="0" y="'+(y-4)+'" font-size="13" font-weight="600">'+esc(b.label)+'</text>');
+  // ruler (MSB left)
+  for(let i=0;i<b.unit;i++){
+    const bit=b.unit-1-i;
+    svg.push('<text x="'+(i*cell+cell/2)+'" y="'+(y+11)+'" font-size="8.5" text-anchor="middle" fill="#6f6e69">'+bit+'</text>');
+  }
+  y+=ruler;
+  let pos=0; // bit cursor
+  for(const f of b.fields){
+    if(f.wrap){ pos=Math.ceil((pos||1)/b.unit)*b.unit; continue; }
+    let rem=f.w;
+    while(rem>0){
+      const row=Math.floor(pos/b.unit), col=pos%b.unit;
+      const span=Math.min(rem, b.unit-col);
+      const x=col*cell, yy=y+row*rh;
+      const dash=f.optional?' stroke-dasharray="5 3"':'';
+      svg.push('<rect x="'+x+'" y="'+yy+'" width="'+(span*cell)+'" height="'+rh+'" fill="'+(f.color||'#fff')+'" stroke="#555"'+dash+'/>');
+      if(span*cell>String(f.name).length*6 || rem===f.w){
+        let fs=11; const need=String(f.name).length*6.2;
+        if(need>span*cell-6) fs=Math.max(7,11*(span*cell-6)/need);
+        svg.push('<text x="'+(x+span*cell/2)+'" y="'+(yy+rh/2+fs*0.35)+'" font-size="'+fs+'" text-anchor="middle">'+esc(f.name)+(f.w>1&&rem===f.w&&span===f.w?'':'')+'</text>');
+      }
+      if(f.note && rem===f.w)
+        svg.push('<title>'+esc(f.note)+'</title>');
+      pos+=span; rem-=span;
+    }
+  }
+  const rows=Math.max(1,Math.ceil(pos/b.unit));
+  return {svg:svg.join(''), y:y+rows*rh+6, w:b.unit*cell+2};
+}
+
+// ---- table ----
+function renderTable(t,y0){
+  const rh=26; const svg=[]; let y=y0+18;
+  svg.push('<text x="0" y="'+(y-4)+'" font-size="13" font-weight="600">'+esc(t.label)+'</text>');
+  const widths=t.cols.map((c,i)=>{
+    let w=tw(c);
+    for(const r of t.rows) w=Math.max(w,tw(r.cells[i]));
+    return w;
+  });
+  const totalW=widths.reduce((a,b)=>a+b,0);
+  let yy=y+4;
+  const drawRow=(cells,fill,bold)=>{
+    let x=0;
+    cells.forEach((c,i)=>{
+      svg.push('<rect x="'+x+'" y="'+yy+'" width="'+widths[i]+'" height="'+rh+'" fill="'+fill+'" stroke="#c9c7bf"/>');
+      svg.push('<text x="'+(x+widths[i]/2)+'" y="'+(yy+rh/2+4.3)+'" font-size="12" text-anchor="middle"'+(bold?' font-weight="600"':'')+'>'+esc(c)+'</text>');
+      x+=widths[i];
+    });
+    yy+=rh;
+  };
+  drawRow(t.cols,'#eeede6',true);
+  for(const r of t.rows) drawRow(r.cells, r.hl?'#fef3c7':'#fff', false);
+  return {svg:svg.join(''), y:yy+6, w:totalW+2};
+}
+
+// ---- wave ----
+function renderWave(w,y0){
+  const tickW=26, laneH=30, laneGap=12, nameW=Math.max(...w.signals.map(s=>tw(s.name)),60);
+  const svg=[]; let y=y0+18;
+  svg.push('<text x="0" y="'+(y-4)+'" font-size="13" font-weight="600">'+esc(w.label)+'</text>');
+  const ticks=Math.max(...w.signals.map(s=>s.lane.length));
+  w.signals.forEach((s,si)=>{
+    const top=y+8+si*(laneH+laneGap), bot=top+laneH-8;
+    svg.push('<text x="'+(nameW-10)+'" y="'+(top+(laneH-8)/2+4)+'" font-size="11.5" text-anchor="end" font-family="monospace">'+esc(s.name)+'</text>');
+    let d='', prev=null, li=0, dataIdx=0;
+    for(let i=0;i<s.lane.length;i++){
+      let ch=s.lane[i];
+      if(ch==='.') ch=prev||'0';
+      const x=nameW+i*tickW;
+      if(ch==='p'||ch==='n'){
+        const hiFirst=(ch==='p');
+        const a=hiFirst?top:bot, b=hiFirst?bot:top;
+        d+='M'+x+','+a+' L'+(x+tickW/2)+','+a+' L'+(x+tickW/2)+','+b+' L'+(x+tickW)+','+b+' ';
+        // draw transition edge at tick start
+        if(prev) d+='M'+x+','+top+' L'+x+','+bot+' ';
+      } else if(ch==='0'||ch==='1'){
+        const yy=(ch==='1')?top:bot;
+        const pv=(prev==='1')?top:(prev==='0'?bot:null);
+        if(pv!==null&&pv!==yy) d+='M'+x+','+pv+' L'+x+','+yy+' ';
+        d+='M'+x+','+yy+' L'+(x+tickW)+','+yy+' ';
+      } else if(ch==='x'){
+        svg.push('<rect x="'+x+'" y="'+top+'" width="'+tickW+'" height="'+(bot-top)+'" fill="url(#hatch)" stroke="#999"/>');
+      } else if(/[=\d]/.test(ch)){
+        // merge consecutive identical data chars
+        let j=i; while(j+1<s.lane.length && s.lane[j+1]==='.') j++;
+        const span=j-i+1;
+        svg.push('<rect x="'+x+'" y="'+top+'" width="'+(tickW*span)+'" height="'+(bot-top)+'" fill="#eef6ff" stroke="#7aa7d9"/>');
+        const lbl = ch==='='? (s.labels[dataIdx++]||'') : ch;
+        if(lbl) svg.push('<text x="'+(x+tickW*span/2)+'" y="'+((top+bot)/2+4)+'" font-size="10.5" text-anchor="middle">'+esc(lbl)+'</text>');
+        i=j;
+      }
+      prev=ch;
+    }
+    if(d) svg.push('<path d="'+d+'" fill="none" stroke="#1d4ed8" stroke-width="1.6"/>');
+  });
+  for(const g of w.gaps){
+    const x=nameW+g*tickW;
+    const hTotal=w.signals.length*(laneH+laneGap);
+    svg.push('<path d="M'+x+','+(y+4)+' q4,'+(hTotal/4)+' 0,'+(hTotal/2)+' q-4,'+(hTotal/4)+' 0,'+(hTotal/2)+'" fill="none" stroke="#999" stroke-width="2"/>');
+  }
+  const H=y+8+w.signals.length*(laneH+laneGap);
+  return {svg:svg.join(''), y:H, w:nameW+ticks*tickW+2};
+}
+
+// ============================================================
+// 3. UI + SVG export with embedded source (R14)
+// ============================================================
+const EXAMPLES={
+'block-architecture (census #2)':
+`figdown 0.1
+title "Ingress datapath (excerpt)"
+group ing "Ingress Pipeline"
+node mac "MAC RX" in=ing
+node parser "Parser" in=ing
+node l2 "L2 Lookup" in=ing
+node l3 "L3 Lookup" in=ing color=#d1fae5
+node acl "ACL" in=ing
+node mmu "MMU / Buffer"
+flow right
+edge mac -> parser
+edge parser -> l2
+edge l2 -> l3 label="L3 hit"
+edge l2 -> acl label="miss" style=dashed
+edge l3 -> mmu
+edge acl -> mmu`,
+
+'bitfield (census #1)':
+`figdown 0.1
+bitfield gre "GRE Header (RFC 2784/2890)" unit=32
+field C 1
+field R 1
+field K 1
+field S 1
+field s 1
+field Recur 3
+field Flags 5
+field Ver 3
+field "Protocol Type" 16 color=#dbeafe
+field "Checksum (optional)" 16 optional
+field "Offset (optional)" 16 optional
+field "Key (optional)" 32 optional color=#fef9c3
+field "Sequence Number (optional)" 32 optional`,
+
+'table (census #3)':
+`figdown 0.1
+table fib "FIB (excerpt)"
+cols Prefix "Next Hop" Port VRF
+row 10.0.0.0/8    R2   p1  default
+row 10.1.0.0/16   R4   p2  default highlight
+row 0.0.0.0/0     R3   p2  default`,
+
+'wave (census #4)':
+`figdown 0.1
+wave por "Power-on reset sequencing"
+signal clk    pppppppp
+signal rst_n  00011111
+signal cfg_ok 00000111
+signal data   xxx=..=x labels="CFG,GO"`,
+
+'topology + pin (stability demo)':
+`figdown 0.1
+title "Leaf-spine, monitor pinned top-right"
+node sp1 "Spine-1" kind=switch color=#e0e7ff
+node sp2 "Spine-2" kind=switch color=#e0e7ff
+node lf1 "Leaf-1" kind=switch
+node lf2 "Leaf-2" kind=switch
+node h1 "Host-A" kind=host
+node h2 "Host-B" kind=host
+node mon "Monitor" kind=host color=#fef9c3
+flow down
+rank sp1 sp2
+edge sp1 -- lf1
+edge sp1 -- lf2
+edge sp2 -- lf1
+edge sp2 -- lf2
+edge lf1 -- h1
+edge lf2 -- h2
+edge mon -- sp2 style=dotted label="telemetry"
+pin mon at=1.0,0.0`,
+
+'mixed document':
+`figdown 0.1
+title "CPU tag insertion"
+node cpu "CPU"
+node tagger "Tag Insert" color=#fee2e2
+node port "Egress Port" kind=port
+flow right
+edge cpu -> tagger label="DSA tag"
+edge tagger -> port
+
+bitfield tag "CPU Tag" unit=16
+field Op 2
+field Prio 3
+field RSVD 3
+field "Dest Port" 8
+
+table map "Op encoding"
+cols Op Meaning
+row 0 "From CPU"
+row 1 "To CPU" highlight
+row 2 Mirror`
+};
+
+const $=id=>document.getElementById(id);
+const sel=$('examples');
+Object.keys(EXAMPLES).forEach(k=>{const o=document.createElement('option');o.textContent=k;sel.appendChild(o);});
+sel.onchange=()=>{ $('src').value=EXAMPLES[sel.value]; refresh(); };
+$('src').addEventListener('input',refresh);
+
+let lastSVG='';
+function refresh(){
+  const text=$('src').value;
+  const {doc,errs}=parse(text);
+  const out=$('out'), eEl=$('errs'), ok=$('okline');
+  if(errs.length){
+    eEl.textContent=errs.join('\n');
+    ok.textContent=''; out.innerHTML=''; lastSVG='';
+    $('status').textContent=errs.length+' error(s) — nothing rendered (determinism over convenience)';
+    return;
+  }
+  eEl.textContent='';
+  const r=render(doc);
+  lastSVG=r.svg;
+  out.innerHTML=r.svg;
+  const n=doc.nodes.length, b=doc.blocks.length;
+  ok.textContent='OK — '+n+' node(s), '+doc.edges.length+' edge(s), '+b+' typed block(s). Same source → same SVG.';
+  $('status').textContent='';
+}
+
+$('dl').onclick=async ()=>{
+  if(!lastSVG){ $('status').textContent='fix errors first'; return; }
+  const src=$('src').value;
+  const buf=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(src));
+  const hash=[...new Uint8Array(buf)].map(x=>x.toString(16).padStart(2,'0')).join('');
+  const meta='<metadata id="figdown-source" data-sha256="'+hash+'"><![CDATA[\n'+src.replace(/]]>/g,']]]]><![CDATA[>')+'\n]]></metadata>';
+  const svg=lastSVG.replace(/<\/svg>$/, meta+'</svg>');
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(new Blob([svg],{type:'image/svg+xml'}));
+  a.download='figure.svg'; a.click(); URL.revokeObjectURL(a.href);
+  $('status').textContent='SVG saved — source + SHA-256 embedded (self-carrying artifact, R14)';
+};
+
+$('src').value=EXAMPLES[Object.keys(EXAMPLES)[0]];
+refresh();
+</script>
+</body>
+</html>
