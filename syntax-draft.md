@@ -192,29 +192,35 @@ wrap                       # explicit row break when a field ends mid-unit
 
 ```figdown
 table fib "FIB Table"
-head Route  <       Forwarding <  # optional extra header tiers (repeatable,
-head Prefix NextHop Port          # merge markers allowed); the first head
-                                  # defines the column count
-row 10.0.0.0/8  R2   p1
-row 0.0.0.0/0   R3   p2 highlight
-row "^"         "^"  p3           # quoted ^ is a literal caret, not a merge
-row 224.0.0.0/4 ^    <            # ^ merges with the cell above (rowspan),
-                                  # < merges with the cell to the left (colspan)
-cell 2,3 color=#fee2e2            # per-cell mark; row 0 = header, cols 1-based
+| Route          || Forwarding    ||
+| Prefix | Next Hop | Port | VRF   |
+|--------|:--------:|------|-------|
+| 10.0.0.0/8  | R2  | p1  | default |
+| 10.1.0.0/16 | R4  | p2  | default |
+| ^^          | R3  | p2  | default |
+cell 2 highlight                   # whole-row highlight
+cell 3,2 color=#dbeafe             # per-cell mark; row 0 = bottom header tier
 ```
 
-- The mental model is the Markdown table, extended with what GFM cannot
-  do: **cell merging and per-cell color** — and rendered to an image.
-- Cell values are whitespace-separated; quote to embed spaces (or to
-  write a literal `^` / `<`).
-- Merge markers: unquoted `^` extends the cell above (rowspan); unquoted
-  `<` extends the cell to the left (colspan). Illegal in the first
-  row/column respectively (line error).
-- `cell <row>,<col> color=…` attaches a mark to one cell — annotation
-  attaches to an address, keeping `row` lines clean (the `mark`/`leg`
-  precedent).
-- `head` is repeatable for multi-tier headers; `cols` is the single-tier
-  shorthand (using `cols` after `head` is a line error). `cell` row
+- **Table content is GFM pipe syntax, verbatim** (D5, applying R18: the
+  GFM table is by far the most-used text table format — paste an
+  existing Markdown table and it just works; LLMs emit it with near-zero
+  hallucination). `|` is a registered line-start token, so the closed
+  grammar is preserved.
+- The `|---|` separator row is required (GFM signature); `:` colons give
+  per-column alignment (left/center/right; data defaults to left,
+  headers center). Rows before the separator are header tiers —
+  multiple rows = multi-level headers.
+- **Merging follows markdown-it-multimd-table** (the most-adopted MD
+  span extension, since core GFM has no spans): `||` (nothing between
+  two pipes) extends the cell to its left (colspan); a cell containing
+  exactly `^^` merges with the cell above (rowspan). `\|` is a literal
+  pipe, `\^^` a literal caret pair. Illegal in the first column/row
+  respectively (line error).
+- Comments are not recognized inside pipe rows (cell text is raw).
+- FigDown abilities beyond GFM stay as keyword lines: `cell <r>,<c>
+  color=…` (per-cell mark), `cell <r> highlight` (row highlight) —
+  annotation attaches to an address, keeping rows paste-clean. Row
   addressing: `0` = the bottom header tier, data rows are 1-based.
 - **Feature set validated against the 212-sample `table-matrix` census
   folder (R17, 2026-07-02)**: cellcolor 58.5%, merged 41.5%, headercol

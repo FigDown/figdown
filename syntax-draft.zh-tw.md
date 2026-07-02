@@ -172,26 +172,32 @@ wrap                       # 欄位在 unit 中途結束時的顯式換列
 
 ```figdown
 table fib "FIB Table"
-head Route  <       Forwarding <  # 選用的額外表頭層（可重複、允許合併標記）
-head Prefix NextHop Port          # 第一個 head 定義欄數
-row 10.0.0.0/8  R2   p1
-row 0.0.0.0/0   R3   p2 highlight
-row "^"         "^"  p3           # 引號中的 ^ 是字面字元，不是合併
-row 224.0.0.0/4 ^    <            # ^ 與上方儲存格合併（rowspan）
-                                  # < 與左方儲存格合併（colspan）
-cell 2,3 color=#fee2e2            # 儲存格級標註；第 0 列 = 表頭，欄 1 起算
+| Route          || Forwarding    ||
+| Prefix | Next Hop | Port | VRF   |
+|--------|:--------:|------|-------|
+| 10.0.0.0/8  | R2  | p1  | default |
+| 10.1.0.0/16 | R4  | p2  | default |
+| ^^          | R3  | p2  | default |
+cell 2 highlight                   # 整列高亮
+cell 3,2 color=#dbeafe             # 儲存格級標註；第 0 列 = 最底層表頭
 ```
 
-- 心智模型是 Markdown 表格，補上 GFM 做不到的：**儲存格合併與
-  儲存格級顏色**——並且圖片化。
-- 儲存格以空白分隔；含空白（或要寫字面 `^`/`<`）時用引號。
-- 合併標記：未加引號的 `^` 向上合併（rowspan）；未加引號的 `<`
-  向左合併（colspan）。分別不得出現在第一列/第一欄（行錯誤）。
-- `cell <row>,<col> color=…` 對單一儲存格附掛標註——「標註附著於
-  定址」，讓 `row` 行保持乾淨（`mark`/`leg` 的先例）。
-- `head` 可重複以構成多層表頭；`cols` 是單層簡寫（`head` 之後再用
-  `cols` 為行錯誤）。`cell` 的列定址：`0` = 最底層表頭，資料列
-  1 起算。
+- **表格內容原封使用 GFM 管線語法**（D5，落實 R18：GFM 表格是
+  使用率最高的文字表格格式——現有 Markdown 表格貼上即用；LLM
+  生成它幾乎零幻覺）。`|` 是註冊的行首 token，封閉文法不破。
+- `|---|` 分隔列必須存在（GFM 的招牌）；`:` 冒號給出各欄對齊
+  （左/中/右；資料預設靠左、表頭置中）。分隔列之前的列都是表頭
+  層——多列 = 多層表頭。
+- **合併跟隨 markdown-it-multimd-table**（採用度最高的 MD 合併
+  擴充，因為核心 GFM 沒有 spans）：`||`（兩管線間空無一物）＝
+  左格向右延伸（colspan）；儲存格內容恰為 `^^` ＝ 與上格合併
+  （rowspan）。`\|` 為字面管線、`\^^` 為字面字元。分別不得出現
+  在第一欄/第一列（行錯誤）。
+- 管線列內不辨識註解（儲存格文字為原文）。
+- GFM 之外的 FigDown 能力維持關鍵字行：`cell <r>,<c> color=…`
+  （儲存格標註）、`cell <r> highlight`（整列高亮）——標註附著於
+  定址，讓表格列保持可直接貼上的乾淨。列定址：`0` = 最底層表頭，
+  資料列 1 起算。
 - **特徵集已以普查 `table-matrix` 桶 212 張樣本驗收（R17，
   2026-07-02）**：cellcolor 58.5%、merged 41.5%、headercol 41.0%、
   multiheader 34.9% 為 must-have（皆已入草案）；multitable 20.8%

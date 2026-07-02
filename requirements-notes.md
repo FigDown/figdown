@@ -711,3 +711,18 @@ reflowed). Three rules, now in the syntax draft (§3, OQ-S2 resolved):
    nodes (pinned ones hold their slot) so pinning X never reflows Y.
 3. **Edges are always derived** from node borders — they adapt
    automatically and can never be pinned.
+
+### D5 — Table content is GFM pipe syntax; spans follow multimd-table (2026-07-02)
+
+First full application of R18. The user chose `|` delimiters over
+whitespace-separated cells; table blocks therefore contain **verbatim GFM
+pipe rows** (`|` is a registered line-start token — closed grammar
+preserved; existing Markdown tables paste in unchanged; LLMs emit GFM
+with near-zero hallucination). The required `|---|` separator marks the
+header boundary (multiple rows above it = multi-level headers) and its
+colons give per-column alignment. Since core GFM has no spans, merging
+follows **markdown-it-multimd-table**, the most-adopted MD span
+extension: `||` = colspan-left, a lone `^^` cell = rowspan-up. FigDown
+abilities beyond GFM stay as keyword lines (`cell r,c color=…`,
+`cell r highlight`). This retires R17's provisional `^`/`<` markers and
+closes R18's audit item for tables.
