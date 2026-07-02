@@ -117,7 +117,7 @@ function tokenize(line){
 // Option keys are a CLOSED set: an unquoted token whose key is not listed
 // here is a positional argument (this lets wave lanes contain '=').
 const OPT_KEYS=new Set(['kind','color','stroke','text','in','layer','label',
-  'style','z','at','w','h','unit','note','labels']);
+  'style','z','at','w','h','unit','note','labels','numbering']);
 function splitOpts(toks){
   const pos=[], opts={};
   for(const t of toks){
@@ -260,8 +260,10 @@ function parse(text){
       case 'bitfield': {
         const id=pos[1];
         if(!id||!ID_RE.test(id)){ err(n,'bitfield needs an id'); break; }
-        cur={type:'bitfield',id,label:pos[2]||id,unit:opts.unit?parseInt(opts.unit,10):32,fields:[],line:n};
+        cur={type:'bitfield',id,label:pos[2]||id,unit:opts.unit?parseInt(opts.unit,10):32,
+             numbering:opts.numbering||'lsb0',fields:[],line:n};
         if(!isFinite(cur.unit)||cur.unit<1){ err(n,'bad unit'); cur.unit=32; }
+        if(!['lsb0','msb0'].includes(cur.numbering)) err(n,'numbering must be lsb0 or msb0');
         doc.blocks.push(cur); break;
       }
       case 'table': {
@@ -488,9 +490,9 @@ function renderBitfield(b,y0){
   const cell=Math.max(18,Math.min(28,Math.floor(760/b.unit))), rh=30, ruler=16;
   const svg=[]; let y=y0+18;
   svg.push('<text x="0" y="'+(y-4)+'" font-size="13" font-weight="600">'+esc(b.label)+'</text>');
-  // ruler (MSB left)
+  // ruler: lsb0 (register style, default) = N-1..0; msb0 (RFC style) = 0..N-1
   for(let i=0;i<b.unit;i++){
-    const bit=b.unit-1-i;
+    const bit=(b.numbering==='msb0') ? i : b.unit-1-i;
     svg.push('<text x="'+(i*cell+cell/2)+'" y="'+(y+11)+'" font-size="8.5" text-anchor="middle" fill="#6f6e69">'+bit+'</text>');
   }
   y+=ruler;
@@ -616,7 +618,7 @@ edge acl -> mmu`,
 
 'bitfield (census #1)':
 `figdown 0.1 bitfield
-bitfield gre "GRE Header (RFC 2784/2890)" unit=32
+bitfield gre "GRE Header (RFC 2784/2890)" unit=32 numbering=msb0
 field C 1
 field R 1
 field K 1

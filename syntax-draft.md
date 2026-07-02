@@ -179,6 +179,13 @@ wrap                       # explicit row break when a field ends mid-unit
 
 - `unit=32` — bits per row (default 32, the common case per census).
 - Widths in bits; renderer computes bit indices and draws the ruler.
+- `numbering=lsb0|msb0` — bit-numbering convention. `lsb0` (default):
+  bit 0 is the LSB, ruler runs N-1…0 left-to-right (hardware-register
+  style — the dominant convention in the census's bitfield bucket, per
+  the R16 per-template-defaults rule). `msb0`: bit 0 is the MSB, ruler
+  runs 0…N-1 (IETF RFC style). Field placement order is unaffected —
+  fields always fill left-to-right in declaration order; only the ruler
+  labels change.
 - `optional` renders the conventional dashed border (per corpus style).
 
 ### 4.2 `table` — config/state tables, memory maps (census #3, 9.6% weighted)
