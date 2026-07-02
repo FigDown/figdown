@@ -639,6 +639,34 @@ must be computed by **weighting on popularity / usage rate**.
   table-span extension) — **TODO: check and align if `^^` wins the
   usage count.**
 
+### R19 — Promotion runs on a gallery of meaningful examples (2026-07-02)
+
+**Original**: To promote FigDown effectively we need many PoCs — and
+they must be *meaningful* figures: common protocol headers, protocol
+negotiation processes, classic algorithm and data-structure
+demonstrations. All of these needs must be satisfied.
+
+**Interpretation**: the example gallery is the marketing artifact AND
+the R14 dogfood: each example is a committed `X.fd`+`X.svg` pair, the
+gallery index embeds the SVGs — the repo itself demonstrates "one
+source, two readers". Plan (four waves E1–E4, milestones G1–G4):
+[gallery-plan.md](gallery-plan.md). Consequences: the `sequence`
+template is pulled forward (audience center-of-gravity despite 0.6% in
+our corpus; syntax must mirror Mermaid's per R18), and algorithm demos
+start as static figure sequences (page/frame model, R1) until the
+dynamic profile ships.
+
+### R20 — Math expression syntax in labels (2026-07-02)
+
+**Original**: common mathematical expression syntax must be supported.
+
+**Interpretation**: labels/cells need O(n log n), Σ, subscripts,
+superscripts, fractions for the algorithm/DS gallery. Mainstream (R18):
+LaTeX math in `$…$` (KaTeX/MathJax convention; GitHub MD now renders it
+natively). Open design point: deterministic zero-dependency subset
+(Unicode mapping for super/subscripts, Greek, operators) vs. vendoring
+KaTeX. Start with the subset; let the E3 examples measure real needs.
+
 ### Open question OQ1 — Build on D2 vs. a new language (2026-07-02)
 
 D2 is close enough that R11 (survey before invent) obliges a deep read of
