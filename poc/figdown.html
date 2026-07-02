@@ -303,10 +303,12 @@ function parse(text){
   return {doc,errs};
 }
 function findComment(s){
+  // '#' starts a comment only at line start or after whitespace,
+  // so hex colors like color=#0d9488 survive.
   let inq=false;
   for(let i=0;i<s.length;i++){
     if(s[i]==='"') inq=!inq;
-    else if(s[i]==='#'&&!inq) return i;
+    else if(s[i]==='#'&&!inq&&(i===0||/\s/.test(s[i-1]))) return i;
   }
   return -1;
 }
@@ -419,8 +421,9 @@ function renderScene(doc,y0){
     if(!mem.length) continue;
     const x0=Math.min(...mem.map(n=>n.x))-14, x1=Math.max(...mem.map(n=>n.x+n.w))+14;
     const yA=Math.min(...mem.map(n=>n.y))-26, yB=Math.max(...mem.map(n=>n.y+n.h))+12;
-    gsvg.push('<rect x="'+x0+'" y="'+yA+'" width="'+(x1-x0)+'" height="'+(yB-yA)+'" rx="10" fill="'+(g.color||'#f6f5ef')+'" stroke="#d6d4cc"/>'
-      +'<text x="'+(x0+10)+'" y="'+(yA+16)+'" font-size="11.5" fill="#6f6e69">'+esc(g.label)+'</text>');
+    gsvg.push('<g data-group="'+g.id+'" style="cursor:move">'
+      +'<rect x="'+x0+'" y="'+yA+'" width="'+(x1-x0)+'" height="'+(yB-yA)+'" rx="10" fill="'+(g.color||'#f6f5ef')+'" stroke="#d6d4cc"/>'
+      +'<text x="'+(x0+10)+'" y="'+(yA+16)+'" font-size="11.5" fill="#6f6e69">'+esc(g.label)+'</text></g>');
     W=Math.max(W,x1); Hh=Math.max(Hh,yB-y0-20);
   }
   // edges (sorted by layer z, then doc order)
@@ -735,6 +738,49 @@ function installDirectEdit(){
     const pt=new DOMPoint(ev.clientX,ev.clientY).matrixTransform(svg.getScreenCTM().inverse());
     return {x:pt.x-lastPad.x, y:pt.y-lastPad.y};
   };
+  // group drag: move the container AND all member nodes together
+  svg.querySelectorAll('[data-group]').forEach(gg=>{
+    gg.addEventListener('pointerdown',ev=>{
+      ev.preventDefault(); ev.stopPropagation();
+      const gid=gg.dataset.group, start=toModel(ev);
+      const memberIds=lastDoc.nodes.filter(n=>n.group===gid).map(n=>n.id);
+      const memberGs=memberIds.map(id=>svg.querySelector('[data-node="'+id+'"]')).filter(Boolean);
+      let dx=0,dy=0,moved=false;
+      const mv=e=>{ const p=toModel(e); dx=p.x-start.x; dy=p.y-start.y;
+        if(Math.abs(dx)+Math.abs(dy)>2) moved=true;
+        const t='translate('+dx+','+dy+')';
+        gg.setAttribute('transform',t); memberGs.forEach(m=>m.setAttribute('transform',t)); };
+      const up=()=>{ window.removeEventListener('pointermove',mv); window.removeEventListener('pointerup',up);
+        if(!moved){ gg.removeAttribute('transform'); memberGs.forEach(m=>m.removeAttribute('transform')); return; }
+        // pin EVERY node: members shifted by the delta, everything else frozen where it is
+        const pins=[];
+        svg.querySelectorAll('[data-node]').forEach(m=>{
+          const id=m.dataset.node;
+          const shift=memberIds.includes(id);
+          pins.push([id,
+            Math.max(0,Math.round(+m.dataset.x+(shift?dx:0))),
+            Math.max(0,Math.round(+m.dataset.y+(shift?dy:0)-lastMeta.top))]);
+        });
+        applyPins(pins);
+        $('status').textContent='group drag → moved '+memberIds.length+' member(s), pinned all nodes (GUI action = text edits)'; };
+      window.addEventListener('pointermove',mv); window.addEventListener('pointerup',up);
+    });
+    gg.addEventListener('dblclick',ev=>{
+      ev.preventDefault(); ev.stopPropagation();
+      const gid=gg.dataset.group;
+      const gr=lastDoc.groups.find(x=>x.id===gid);
+      const nv=prompt('Label for group "'+gid+'":', gr?gr.label:'');
+      if(nv!==null && nv!==''){
+        const lines=$('src').value.split('\n');
+        const idx=lines.findIndex(l=>new RegExp('^\\s*group\\s+'+gid+'\\b').test(l));
+        if(idx>=0){
+          lines[idx]=lines[idx].replace(new RegExp('^(\\s*group\\s+'+gid+'\\s+)("[^"]*"|\\S+)?'),(m,p1)=>p1+'"'+nv.replace(/"/g,'')+'"');
+          $('src').value=lines.join('\n'); refresh();
+          $('status').textContent='double-click → rewrote group '+gid+' label (GUI action = text edit)';
+        }
+      }
+    });
+  });
   svg.querySelectorAll('[data-node]').forEach(g=>{
     g.addEventListener('pointerdown',ev=>{
       ev.preventDefault();

@@ -45,6 +45,8 @@ Lexical rules:
 - Strings with spaces are double-quoted; bare words need no quotes.
 - IDs are `[A-Za-z_][A-Za-z0-9_-]*`, unique per document.
 - Colors are CSS hex (`#0d9488`) or CSS named colors.
+- `#` begins a comment only at the start of a line or after whitespace
+  (so `color=#0d9488` is never mistaken for a comment).
 - One directive per line. No line continuations. No expressions, loops,
   or macros — ever. (framework axiom)
 
