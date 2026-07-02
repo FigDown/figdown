@@ -213,9 +213,32 @@ function parse(text){
     // typed-block children
     if(cur && ['field','wrap','cell','signal','gap'].includes(kw)){
       if(cur.type==='bitfield' && kw==='field'){
-        const name=pos[1], w=parseInt(pos[2],10);
-        if(!name || !isFinite(w) || w<1){ err(n,'field needs <name> <width-in-bits>'); continue; }
-        cur.fields.push({name,w,optional:pos.includes('optional'),color:opts.color,note:opts.note,line:n});
+        // Compact form (C bit-field convention): field F1:16,F2:8 SYN:1 ...
+        // — bare name:width items separated by commas and/or spaces, no
+        // per-field options. Classic form: field <name> <width> [options].
+        // Classic form: field <name> <width-in-bits> [optional] [color=] [note=]
+        const cname=pos[1], cw=pos[2];
+        if(cname!==undefined && /^\d+$/.test(cw||'') && +cw>=1){
+          cur.fields.push({name:cname,w:+cw,optional:pos.includes('optional'),color:opts.color,note:opts.note,line:n});
+          continue;
+        }
+        // Compact form (C bit-field convention): field a:1, b:2, Long Name:16
+        // Commas separate items; the name is everything before the last colon
+        // (spaces allowed, no quotes needed); no per-field options here.
+        const rest=raw.trim().replace(/^field\s+/,'');
+        if(!rest.includes(':')){ err(n,'field needs <name> <width-in-bits>, or a name:width list'); continue; }
+        const items=rest.split(',').map(s=>s.trim()).filter(Boolean);
+        let bad=null; const parsed=[];
+        for(const it of items){
+          const m=/^(.+):(\d+)$/.exec(it);
+          if(!m||+m[2]<1){ bad='bad item "'+it+'" (expected name:width)'; break; }
+          let nm=m[1].trim();
+          if(/^".*"$/.test(nm)) nm=nm.slice(1,-1);          // quotes tolerated
+          if(/:\d+(\s|$)/.test(nm)){ bad='"'+it+'" looks like two fields — missing comma?'; break; }
+          parsed.push({name:nm,w:+m[2]});
+        }
+        if(bad){ err(n,bad); continue; }
+        for(const it of parsed) cur.fields.push({name:it.name,w:it.w,optional:false,line:n});
       } else if(cur.type==='bitfield' && kw==='wrap'){
         cur.fields.push({wrap:true,line:n});
       } else if(cur.type==='table' && kw==='cell'){

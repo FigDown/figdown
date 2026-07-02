@@ -148,11 +148,9 @@ size l3 w=120 h=60              # 第 3 層：明確尺寸（px 或 %）
 
 ```figdown
 bitfield gre "GRE Header" unit=32
-field C 1
-field R 1
-field K 1
-field Reserved 9
-field Ver 3
+field C:1, R:1, K:1              # 緊湊形式：逗號分隔的 name:width
+field Reserved 9                 # （C bit-field 慣例；名稱可含空白——
+field Ver 3                      #   "Protocol Type:16" 不需要引號）
 field "Protocol Type" 16 color=#bfdbfe note="rGRE_INT"
 field Checksum 16 optional
 field Offset 16 optional
@@ -161,6 +159,11 @@ wrap                       # 欄位在 unit 中途結束時的顯式換列
 
 - `unit=32`——每列位元數（預設 32，普查中的最常見情況）。
 - 寬度以位元計；renderer 計算位元索引並繪製刻度尺。
+- 兩種欄位形式。傳統：`field <名> <寬> [optional] [color=] [note=]`。
+  緊湊（C bit-field 慣例，適合旗標串）：`field a:1, b:1, Long
+  Name:16`——逗號分隔項目、最後一個冒號之前都是名稱（可含空白、
+  免引號）、不接受逐欄選項。漏打逗號會被攔下（「looks like two
+  fields」）而非誤解析。
 - `numbering=lsb0|msb0`——位元編號慣例。`lsb0`（預設）：bit 0 為
   最低位，尺標由左至右 N-1…0（硬體暫存器風格——依 R16「預設值按
   template 桶統計」，這是本語料 bitfield 桶的主流慣例）。`msb0`：

@@ -166,11 +166,9 @@ packet-beta.
 
 ```figdown
 bitfield gre "GRE Header" unit=32
-field C 1
-field R 1
-field K 1
-field Reserved 9
-field Ver 3
+field C:1, R:1, K:1              # compact form: comma-separated name:width
+field Reserved 9                 # (C bit-field convention; names may contain
+field Ver 3                      #  spaces — "Protocol Type:16" needs no quotes)
 field "Protocol Type" 16 color=#bfdbfe note="rGRE_INT"
 field Checksum 16 optional
 field Offset 16 optional
@@ -179,6 +177,12 @@ wrap                       # explicit row break when a field ends mid-unit
 
 - `unit=32` — bits per row (default 32, the common case per census).
 - Widths in bits; renderer computes bit indices and draws the ruler.
+- Two field forms. Classic: `field <name> <width> [optional] [color=]
+  [note=]`. Compact (C bit-field convention, for flag runs): `field
+  a:1, b:1, Long Name:16` — commas separate items, the name is
+  everything before the last colon (spaces allowed, no quotes needed),
+  no per-field options. A missing comma is caught ("looks like two
+  fields") rather than misparsed.
 - `numbering=lsb0|msb0` — bit-numbering convention. `lsb0` (default):
   bit 0 is the LSB, ruler runs N-1…0 left-to-right (hardware-register
   style — the dominant convention in the census's bitfield bucket, per

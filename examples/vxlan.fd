@@ -6,14 +6,9 @@ figdown 0.1 bitfield
 bitfield vxlan_hdr "VXLAN Header (RFC 7348)" unit=32 numbering=msb0
 
 # ── Word 0: Flags (8 bits) + Reserved (24 bits) ─────────────────────────────
-field R 1
-field R 1
-field R 1
-field R 1
+field R:1, R:1, R:1, R:1
 field I 1 color=#d1fae5 note="VNI valid, MUST be 1"
-field R 1
-field R 1
-field R 1
+field R:1, R:1, R:1
 field "Reserved" 24
 
 # ── Word 1: VNI (24 bits) + Reserved (8 bits) ────────────────────────────────

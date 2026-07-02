@@ -13,12 +13,7 @@ field "Acknowledgment Number" 32
 # Row 4: Data Offset (4) + Reserved (4) + 8 flags + Window (16) = 32 bits
 field "Data Offset" 4
 field Reserved 4
-field CWR 1
-field ECE 1
-field URG 1
-field ACK 1
-field PSH 1
-field RST 1
+field CWR:1, ECE:1, URG:1, ACK:1, PSH:1, RST:1
 field SYN 1 color=#fee2e2
 field FIN 1 color=#fee2e2
 field Window 16
