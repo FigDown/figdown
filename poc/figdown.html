@@ -54,6 +54,7 @@
   <select id="newkind" title="kind for new nodes"><option>box</option><option>switch</option><option>router</option><option>host</option><option>cloud</option><option>decision</option><option>datastore</option></select>
   <button id="addnode" title="insert a node line">+ Node</button>
   <button id="linkmode" title="click two nodes to write an edge line">Link</button>
+  <button id="groupmode" title="drag a box around nodes to write a group line">⬚ Group</button>
   <button id="pinall" title="materialize all auto positions into pin lines">Pin all</button>
   <label>fill <input type="color" id="fillpick" value="#ffffff" disabled></label>
   <button id="raise" disabled title="paint later = move its line down in the text">Raise ↑</button>
@@ -68,7 +69,8 @@
 Direct editing (every action rewrites the text): drag a node → <code>pin</code> line ·
 double-click → rename · click to select, then pick a fill color → <code>color=</code> ·
 Raise/Lower → moves the node's line in the text (line order = paint order = implicit layer) ·
-Link → click two nodes → <code>edge</code> line · Pin all → freeze layout so future edits stay local.</p>
+Link → click two nodes → <code>edge</code> line · ⬚ Group → drag a marquee → <code>group</code> + <code>in=</code> ·
+click a table cell → <code>cell r,c color=</code> · Pin all → freeze layout so future edits stay local.</p>
 
 <div class="main">
   <textarea id="src" spellcheck="false"></textarea>
@@ -697,7 +699,10 @@ function renderTable(t,y0){
       const yy=yTop+r*rh, h=rs*rh;
       const mk=markOf(r,c);
       const fill=mk?mk.color:(cell.hdr?'#eeede6':(hlRow(r)?'#fef3c7':'#fff'));
-      svg.push('<rect x="'+x+'" y="'+yy+'" width="'+wsum+'" height="'+h+'" fill="'+fill+'" stroke="#c9c7bf"/>');
+      // addressable cells carry table-id:row:col (row 0 = bottom header tier)
+      const addrR = r>=H ? (r-H+1) : (r===H-1 ? 0 : null);
+      const addr = addrR===null ? '' : ' data-cell="'+t.id+':'+addrR+':'+(c+1)+'" style="cursor:pointer"';
+      svg.push('<rect x="'+x+'" y="'+yy+'" width="'+wsum+'" height="'+h+'" fill="'+fill+'" stroke="#c9c7bf"'+addr+'/>');
       // alignment: headers centered; data follows GFM colon alignment (default left)
       const al=cell.hdr?'center':(alignOf(c)||'left');
       const tx=al==='center'?x+wsum/2:(al==='right'?x+wsum-7:x+7);
@@ -1159,6 +1164,43 @@ function installDirectEdit(){
       }
     });
   });
+  // table cells: click to color with the current picker value
+  svg.querySelectorAll('[data-cell]').forEach(rc=>{
+    rc.addEventListener('click',ev=>{
+      ev.preventDefault();
+      const [tid,r,c]=rc.dataset.cell.split(':');
+      setCellColor(tid,+r,+c,$('fillpick').value);
+    });
+  });
+  // marquee group creation (armed by the ⬚ Group button)
+  svg.addEventListener('pointerdown',ev=>{
+    if(!groupArm) return;
+    if(ev.target.closest('[data-node],[data-group]')) return;
+    ev.preventDefault();
+    const start=toModel(ev);
+    const NS='http://www.w3.org/2000/svg';
+    const band=document.createElementNS(NS,'rect');
+    band.setAttribute('fill','rgba(37,99,235,.08)');
+    band.setAttribute('stroke','#2563eb'); band.setAttribute('stroke-dasharray','4 3');
+    svg.appendChild(band);
+    let x0=start.x,y0=start.y,x1=x0,y1=y0;
+    const draw=()=>{ band.setAttribute('x',Math.min(x0,x1)+lastPad.x); band.setAttribute('y',Math.min(y0,y1)+lastPad.y);
+      band.setAttribute('width',Math.abs(x1-x0)); band.setAttribute('height',Math.abs(y1-y0)); };
+    const mv=e=>{ const p=toModel(e); x1=p.x; y1=p.y; draw(); };
+    const up=()=>{ window.removeEventListener('pointermove',mv); window.removeEventListener('pointerup',up);
+      band.remove(); groupArm=false; $('groupmode').style.fontWeight='';
+      const [mx0,mx1]=[Math.min(x0,x1),Math.max(x0,x1)], [my0,my1]=[Math.min(y0,y1),Math.max(y0,y1)];
+      const ids=[];
+      svg.querySelectorAll('[data-node]').forEach(g=>{
+        const nd=lastDoc.nodes.find(n=>n.id===g.dataset.node);
+        if(nd&&nd.group) return;                     // one nesting level only
+        const cx=+g.dataset.x, cy=+g.dataset.y;
+        if(cx>=mx0&&cx<=mx1&&cy>=my0&&cy<=my1) ids.push(g.dataset.node);
+      });
+      if(ids.length) createGroup(ids);
+      else $('status').textContent='marquee selected no ungrouped nodes'; };
+    window.addEventListener('pointermove',mv); window.addEventListener('pointerup',up);
+  });
   svg.querySelectorAll('[data-node]').forEach(g=>{
     g.addEventListener('pointerdown',ev=>{
       ev.preventDefault();
@@ -1253,6 +1295,42 @@ function highlightSelection(){
   const sh=g.querySelector('rect,polygon'); if(!sh) return;
   sh.setAttribute('stroke','#2563eb'); sh.setAttribute('stroke-width','2.5');
 }
+// click a table cell -> write/update `cell r,c color=` inside that block
+function setCellColor(tid,r,c,color){
+  const lines=$('src').value.split('\n');
+  const start=lines.findIndex(l=>new RegExp('^\\s*table\\s+'+tid+'\\b').test(l));
+  if(start<0) return;
+  let end=start+1;
+  while(end<lines.length){
+    const t=lines[end].trim();
+    if(t===''||t.startsWith('|')||t.startsWith('#')||/^cell\b/.test(t)){ end++; continue; }
+    break;
+  }
+  const re=new RegExp('^\\s*cell\\s+'+r+','+c+'\\b');
+  const newLine='cell '+r+','+c+' color='+color;
+  let idx=-1;
+  for(let i=start+1;i<end;i++) if(re.test(lines[i])){ idx=i; break; }
+  if(idx>=0) lines[idx]=newLine; else lines.splice(end,0,newLine);
+  $('src').value=lines.join('\n'); refresh();
+  $('status').textContent='cell click → wrote "'+newLine+'" (GUI action = text edit)';
+}
+// marquee -> write a group line + in= on each enclosed node line
+let groupArm=false;
+function createGroup(ids){
+  const lines=$('src').value.split('\n');
+  let i=1; while(lines.some(l=>new RegExp('^\\s*group\\s+g'+i+'\\b').test(l))) i++;
+  const gid='g'+i;
+  let firstIdx=lines.length;
+  for(const id of ids){
+    const idx=nodeLineIdx(lines,id);
+    if(idx<0) continue;
+    if(!/\bin=/.test(lines[idx])) lines[idx]+=' in='+gid;
+    firstIdx=Math.min(firstIdx,idx);
+  }
+  lines.splice(firstIdx,0,'group '+gid+' "Group '+i+'"');
+  $('src').value=lines.join('\n'); refresh();
+  $('status').textContent='marquee → wrote "group '+gid+'" and tagged '+ids.length+' node(s) with in='+gid;
+}
 function pinAll(){
   if(!lastDoc||!lastMeta) return;
   const pins=collectPins({});
@@ -1323,6 +1401,11 @@ $('addnode').onclick=()=>{
   lines.splice(last+1,0,'node n'+i+' "Node '+i+'"'+(kk!=='box'?' kind='+kk:''));
   $('src').value=lines.join('\n'); refresh(); select('n'+i);
   $('status').textContent='+ Node → wrote "node n'+i+'" line — drag it into place';
+};
+$('groupmode').onclick=()=>{
+  groupArm=!groupArm;
+  $('groupmode').style.fontWeight=groupArm?'700':'';
+  $('status').textContent=groupArm?'Group mode: drag a box around the nodes to enclose':'Group mode off';
 };
 $('linkmode').onclick=()=>{
   if(linkArm===null && $('linkmode').style.fontWeight!=='700'){
