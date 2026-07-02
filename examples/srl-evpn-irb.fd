@@ -1,8 +1,9 @@
 figdown 0.1 topology
 title "EVPN-VXLAN IRB — leaves with IP-VRF and bridge domains"
 
-# Complex vendor-style figure: fully hand-laid-out with pins (tier 3).
-# Every node is pinned, so any future edit changes only what it touches.
+# Complex vendor-style figure, fully hand-laid-out (tier 3, D6 two-level
+# coordinates): each group is anchored once; members are group-local, so
+# moving a leaf = editing one pin line.
 
 # ── Overlay cloud + spines ─────────────────────────────────────────
 node cloud "EVPN-VXLAN" kind=cloud color=#cfe8f7 stroke=#7fb8d8
@@ -15,26 +16,29 @@ pin  sp2 at=700,0
 
 # ── Leaves: group = leaf box; members = IP-VRF badge + bridge domains
 group leaf2 "SRL LEAF-2"
+pin  leaf2 at=90,235
 node vrf2 "IP-VRF-10\nRD1/RT10\nVNI10" in=leaf2 color=#1e3a8a text=#ffffff
-pin  vrf2 at=170,235
+pin  vrf2 at=80,0
 node bd2  "BD2\nRD41/RT2\nVNI2"   in=leaf2 style=dashed stroke=#1d4ed8
-pin  bd2 at=90,320
+pin  bd2 at=0,85
 node bd24a "BD24\nRD22/RT24\nVNI24" in=leaf2 style=dashed stroke=#1d4ed8
-pin  bd24a at=250,320
+pin  bd24a at=160,85
 
 group leaf4 "SRL LEAF-4"
+pin  leaf4 at=540,235
 node vrf4 "IP-VRF-10\nRD1/RT10\nVNI10" in=leaf4 color=#1e3a8a text=#ffffff
-pin  vrf4 at=620,235
+pin  vrf4 at=80,0
 node bd24b "BD24\nRD41/RT24\nVNI24" in=leaf4 style=dashed stroke=#1d4ed8
-pin  bd24b at=540,320
+pin  bd24b at=0,85
 node bd4  "BD4\nRD42/RT4\nVNI4"  in=leaf4 style=dashed stroke=#1d4ed8
-pin  bd4 at=700,320
+pin  bd4 at=160,85
 
 group leaf3 "SRL LEAF-3"
+pin  leaf3 at=1040,235
 node vrf3 "IP-VRF-10\nRD1/RT10\nVNI10" in=leaf3 color=#1e3a8a text=#ffffff
-pin  vrf3 at=1040,235
+pin  vrf3 at=0,0
 node bd3  "BD3\nRD31/RT3\nVNI3"  in=leaf3 style=dashed stroke=#1d4ed8
-pin  bd3 at=1040,320
+pin  bd3 at=0,85
 
 # ── Edge devices and hosts ──────────────────────────────────────────
 node ce3 "CE-3\nIP-20.1.1.3/24\nMAC-00:01:03:FF:00:0B" kind=router

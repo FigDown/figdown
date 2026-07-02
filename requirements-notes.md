@@ -804,6 +804,17 @@ reflowed). Three rules, now in the syntax draft (§3, OQ-S2 resolved):
 3. **Edges are always derived** from node borders — they adapt
    automatically and can never be pinned.
 
+### D6 — Two-level pins: group members are group-local (2026-07-02)
+
+User proposal, matching the v2 framework's two-level coordinate system:
+`pin at=` for a node inside a group is relative to the group's local
+origin (top-left of its member space); the group itself is anchored by
+its own `pin` in canvas px (origin derives from auto layout when the
+group is unpinned). Consequences: dragging a group edits ONE line
+(members ride along), text diffs gain locality, and edits inside one
+group can never disturb another. Editor implements it (pin-on-first-
+touch now writes group anchors + group-local member pins).
+
 ### D5 — Table content is GFM pipe syntax; spans follow multimd-table (2026-07-02)
 
 First full application of R18. The user chose `|` delimiters over

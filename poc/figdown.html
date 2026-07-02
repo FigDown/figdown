@@ -51,6 +51,7 @@
 <div class="bar">
   <label>Example</label>
   <select id="examples"></select>
+  <select id="newkind" title="kind for new nodes"><option>box</option><option>switch</option><option>router</option><option>host</option><option>cloud</option><option>decision</option><option>datastore</option></select>
   <button id="addnode" title="insert a node line">+ Node</button>
   <button id="linkmode" title="click two nodes to write an edge line">Link</button>
   <button id="pinall" title="materialize all auto positions into pin lines">Pin all</button>
@@ -532,10 +533,24 @@ function renderScene(doc,y0){
     const M=main; for(const n of nodes){
       if(horiz) n.x=M-n.x-n.w; else n.y=y0+20+(M-(n.y-y0-20))-n.h; }
   }
-  // pins are ABSOLUTE canvas px (stability: a pinned position never moves,
-  // regardless of what the auto layout does around it)
+  // Two-level coordinates (D6): a pinned GROUP anchors its local origin in
+  // canvas px; a pinned MEMBER is group-local (relative to that origin);
+  // ungrouped pins are canvas px. Moving a group = editing one pin line.
+  const gOrigin={};
+  for(const g of doc.groups){
+    const p=doc.pins[g.id];
+    if(p){ gOrigin[g.id]={x:p.fx, y:y0+20+p.fy}; }
+    else{
+      const mem=nodes.filter(n=>n.group===g.id);
+      if(mem.length) gOrigin[g.id]={x:Math.min(...mem.map(n=>n.x)),
+                                    y:Math.min(...mem.map(n=>n.y))};
+    }
+  }
   for(const n of nodes){ const p=doc.pins[n.id]; if(!p) continue;
-    n.x=p.fx; n.y=y0+20+p.fy; }
+    const o=n.group?gOrigin[n.group]:null;
+    if(o){ n.x=o.x+p.fx; n.y=o.y+p.fy; }
+    else { n.x=p.fx; n.y=y0+20+p.fy; }
+  }
   let W=0,Hh=0;
   for(const n of nodes){ W=Math.max(W,n.x+n.w); Hh=Math.max(Hh,n.y+n.h-y0-20); }
   if(W===0){W=480;} if(Hh===0){Hh=280;}
@@ -544,9 +559,10 @@ function renderScene(doc,y0){
   for(const g of doc.groups){
     const mem=nodes.filter(n=>n.group===g.id);
     if(!mem.length) continue;
+    const o=gOrigin[g.id];
     const x0=Math.min(...mem.map(n=>n.x))-14, x1=Math.max(...mem.map(n=>n.x+n.w))+14;
     const yA=Math.min(...mem.map(n=>n.y))-26, yB=Math.max(...mem.map(n=>n.y+n.h))+12;
-    gsvg.push('<g data-group="'+g.id+'" style="cursor:move">'
+    gsvg.push('<g data-group="'+g.id+'" data-gx="'+o.x+'" data-gy="'+o.y+'" style="cursor:move">'
       +'<rect x="'+x0+'" y="'+yA+'" width="'+(x1-x0)+'" height="'+(yB-yA)+'" rx="10" fill="'+(g.color||'#f6f5ef')+'" stroke="#d6d4cc"/>'
       +'<text x="'+(x0+10)+'" y="'+(yA+16)+'" font-size="11.5" fill="#6f6e69">'+esc(g.label)+'</text></g>');
     W=Math.max(W,x1); Hh=Math.max(Hh,yB-y0-20);
@@ -746,6 +762,12 @@ function renderWave(w,y0){
 // 3. UI + SVG export with embedded source (R14)
 // ============================================================
 const EXAMPLES={
+'blank canvas (start drawing!)':
+`figdown 0.1 topology
+title "Untitled"
+# Pick a kind, press "+ Node", drag things around, Link two nodes -
+# every action writes a line below. This text IS your file.`,
+
 'block-architecture (census #2)':
 `figdown 0.1 block
 title "Ingress datapath (excerpt)"
@@ -875,8 +897,9 @@ table planes "Fabric planes"
 `figdown 0.1 topology
 title "EVPN-VXLAN IRB — leaves with IP-VRF and bridge domains"
 
-# Complex vendor-style figure: fully hand-laid-out with pins (tier 3).
-# Every node is pinned, so any future edit changes only what it touches.
+# Complex vendor-style figure, fully hand-laid-out (tier 3, D6 two-level
+# coordinates): each group is anchored once; members are group-local, so
+# moving a leaf = editing one pin line.
 
 # ── Overlay cloud + spines ─────────────────────────────────────────
 node cloud "EVPN-VXLAN" kind=cloud color=#cfe8f7 stroke=#7fb8d8
@@ -889,26 +912,29 @@ pin  sp2 at=700,0
 
 # ── Leaves: group = leaf box; members = IP-VRF badge + bridge domains
 group leaf2 "SRL LEAF-2"
+pin  leaf2 at=90,235
 node vrf2 "IP-VRF-10\\nRD1/RT10\\nVNI10" in=leaf2 color=#1e3a8a text=#ffffff
-pin  vrf2 at=170,235
+pin  vrf2 at=80,0
 node bd2  "BD2\\nRD41/RT2\\nVNI2"   in=leaf2 style=dashed stroke=#1d4ed8
-pin  bd2 at=90,320
+pin  bd2 at=0,85
 node bd24a "BD24\\nRD22/RT24\\nVNI24" in=leaf2 style=dashed stroke=#1d4ed8
-pin  bd24a at=250,320
+pin  bd24a at=160,85
 
 group leaf4 "SRL LEAF-4"
+pin  leaf4 at=540,235
 node vrf4 "IP-VRF-10\\nRD1/RT10\\nVNI10" in=leaf4 color=#1e3a8a text=#ffffff
-pin  vrf4 at=620,235
+pin  vrf4 at=80,0
 node bd24b "BD24\\nRD41/RT24\\nVNI24" in=leaf4 style=dashed stroke=#1d4ed8
-pin  bd24b at=540,320
+pin  bd24b at=0,85
 node bd4  "BD4\\nRD42/RT4\\nVNI4"  in=leaf4 style=dashed stroke=#1d4ed8
-pin  bd4 at=700,320
+pin  bd4 at=160,85
 
 group leaf3 "SRL LEAF-3"
+pin  leaf3 at=1040,235
 node vrf3 "IP-VRF-10\\nRD1/RT10\\nVNI10" in=leaf3 color=#1e3a8a text=#ffffff
-pin  vrf3 at=1040,235
+pin  vrf3 at=0,0
 node bd3  "BD3\\nRD31/RT3\\nVNI3"  in=leaf3 style=dashed stroke=#1d4ed8
-pin  bd3 at=1040,320
+pin  bd3 at=0,85
 
 # ── Edge devices and hosts ──────────────────────────────────────────
 node ce3 "CE-3\\nIP-20.1.1.3/24\\nMAC-00:01:03:FF:00:0B" kind=router
@@ -943,19 +969,20 @@ title "VXLAN Overview — MAC-in-UDP encapsulation"
 
 # ── Classical Ethernet frame ────────────────────────────────────────
 group eth "Classical Ethernet Frame"
+pin  eth at=40,40
 node dmac1 "DMAC\\n6B" in=eth color=#bae6fd
-pin  dmac1 at=40,40
+pin  dmac1 at=0,0
 node smac1 "SMAC\\n6B" in=eth color=#bae6fd
-pin  smac1 at=125,40
+pin  smac1 at=85,0
 node dot1q "802.1Q\\n4B" in=eth color=#bae6fd stroke=#ea580c
-pin  dot1q at=210,40
+pin  dot1q at=170,0
 node etype1 "Etype\\n2B" in=eth color=#bae6fd
-pin  etype1 at=300,40
+pin  etype1 at=260,0
 node pay1 "Payload" in=eth color=#9aa2ad text=#ffffff
 size pay1 w=170 h=52
-pin  pay1 at=380,40
+pin  pay1 at=340,0
 node crc1 "CRC\\n4B" in=eth color=#93c5fd
-pin  crc1 at=565,40
+pin  crc1 at=525,0
 
 # ── VXLAN frame: outer headers + original L2 frame + new CRC ───────
 node omac "Outer\\nMAC\\n14B" color=#fcd34d
@@ -968,15 +995,16 @@ node vxh "VXLAN\\n8B" color=#fcd34d stroke=#ea580c
 pin  vxh at=235,260
 
 group orig "Original Layer 2 Frame"
+pin  orig at=330,260
 node dmac2 "DMAC\\n6B" in=orig color=#bae6fd
-pin  dmac2 at=330,260
+pin  dmac2 at=0,0
 node smac2 "SMAC\\n6B" in=orig color=#bae6fd
-pin  smac2 at=415,260
+pin  smac2 at=85,0
 node etype2 "Etype\\n2B" in=orig color=#bae6fd
-pin  etype2 at=500,260
+pin  etype2 at=170,0
 node pay2 "Payload" in=orig color=#9aa2ad text=#ffffff
 size pay2 w=170 h=60
-pin  pay2 at=580,260
+pin  pay2 at=250,0
 node crc2 "CRC (new)\\n4B" color=#bbf7d0 stroke=#16a34a
 pin  crc2 at=775,260
 
@@ -1052,17 +1080,31 @@ function applyPins(pins){ // pins: array of [id, px, py] — one text update, on
   }
   $('src').value=lines.join('\n'); refresh();
 }
-function unpinnedNodePins(exceptId){ // current positions of all unpinned nodes, as pin entries
+// D6 two-level pins: collect the full pin set for the current picture.
+// overrides = {id:{x,y}} absolute-canvas coords for items being moved
+// (for a group id, the new origin). Group members are written relative
+// to their group's origin, so later group moves edit ONE line.
+function collectPins(overrides){
   const svg=$('out').querySelector('svg'); if(!svg||!lastDoc) return [];
-  const lines=$('src').value.split('\n');
-  const out=[];
+  const pins=[];
+  const originOf={};
+  svg.querySelectorAll('[data-group]').forEach(g=>{
+    originOf[g.dataset.group]={x:+g.dataset.gx, y:+g.dataset.gy};
+  });
+  for(const gid in originOf){
+    const o=(overrides&&overrides[gid])||originOf[gid];
+    originOf[gid]=o;
+    pins.push([gid, Math.round(o.x), Math.round(o.y-lastMeta.top)]);
+  }
   svg.querySelectorAll('[data-node]').forEach(g=>{
     const id=g.dataset.node;
-    if(id===exceptId) return;
-    if(lines.some(l=>new RegExp('^\\s*pin\\s+'+id+'\\b').test(l))) return;
-    out.push([id, Math.round(+g.dataset.x), Math.round(+g.dataset.y-lastMeta.top)]);
+    const abs=(overrides&&overrides[id])||{x:+g.dataset.x, y:+g.dataset.y};
+    const nd=lastDoc.nodes.find(n=>n.id===id);
+    const o=nd&&nd.group?originOf[nd.group]:null;
+    if(o) pins.push([id, Math.round(abs.x-o.x), Math.round(abs.y-o.y)]);
+    else  pins.push([id, Math.round(abs.x), Math.round(abs.y-lastMeta.top)]);
   });
-  return out;
+  return pins;
 }
 function setNodeLabel(id,label){
   const lines=$('src').value.split('\n');
@@ -1093,17 +1135,12 @@ function installDirectEdit(){
         gg.setAttribute('transform',t); memberGs.forEach(m=>m.setAttribute('transform',t)); };
       const up=()=>{ window.removeEventListener('pointermove',mv); window.removeEventListener('pointerup',up);
         if(!moved){ gg.removeAttribute('transform'); memberGs.forEach(m=>m.removeAttribute('transform')); return; }
-        // pin EVERY node: members shifted by the delta, everything else frozen where it is
-        const pins=[];
-        svg.querySelectorAll('[data-node]').forEach(m=>{
-          const id=m.dataset.node;
-          const shift=memberIds.includes(id);
-          pins.push([id,
-            Math.max(0,Math.round(+m.dataset.x+(shift?dx:0))),
-            Math.max(0,Math.round(+m.dataset.y+(shift?dy:0)-lastMeta.top))]);
-        });
-        applyPins(pins);
-        $('status').textContent='group drag → moved '+memberIds.length+' member(s), pinned all nodes (GUI action = text edits)'; };
+        // D6: move the group's ORIGIN; members are (or become) group-local,
+        // so future drags of this group edit a single pin line
+        const overrides={ [gid]: {x:+gg.dataset.gx+dx, y:+gg.dataset.gy+dy} };
+        memberGs.forEach(m=>{ overrides[m.dataset.node]={x:+m.dataset.x+dx, y:+m.dataset.y+dy}; });
+        applyPins(collectPins(overrides));
+        $('status').textContent='group drag → moved origin of "'+gid+'" (members ride along as group-local pins)'; };
       window.addEventListener('pointermove',mv); window.addEventListener('pointerup',up);
     });
     gg.addEventListener('dblclick',ev=>{
@@ -1145,14 +1182,12 @@ function installDirectEdit(){
             return;
           }
           select(id); return; }
-        const px=Math.max(0,Math.round(x0+dx));
-        const py=Math.max(0,Math.round(y0+dy-lastMeta.top));
-        // pin-on-first-touch: the first drag freezes EVERY node at its
-        // current position, so nothing else can reflow — then applies the drag
-        const others=unpinnedNodePins(id);
-        applyPins([...others,[id,px,py]]);
-        $('status').textContent='drag → wrote "pin '+id+' at='+px+','+py+'"'+
-          (others.length?' and froze '+others.length+' other node(s) in place (pin-on-first-touch)':'')+
+        // pin-on-first-touch: the first drag freezes everything (groups get
+        // an origin pin; members become group-local) — then applies the drag
+        applyPins(collectPins({ [id]: {x:x0+dx, y:y0+dy} }));
+        const nd=lastDoc.nodes.find(n=>n.id===id);
+        $('status').textContent='drag → wrote pin for '+id+
+          (nd&&nd.group?' (group-local, relative to "'+nd.group+'")':' (canvas px)')+
           ' — GUI action = text edit'; };
       window.addEventListener('pointermove',mv); window.addEventListener('pointerup',up);
     });
@@ -1220,10 +1255,10 @@ function highlightSelection(){
 }
 function pinAll(){
   if(!lastDoc||!lastMeta) return;
-  const adds=unpinnedNodePins(null);
-  if(!adds.length){ $('status').textContent='all nodes already pinned'; return; }
-  applyPins(adds);
-  $('status').textContent='froze layout: '+adds.length+' pin line(s) written — future edits now change only what you touch';
+  const pins=collectPins({});
+  if(!pins.length){ $('status').textContent='nothing to pin'; return; }
+  applyPins(pins);
+  $('status').textContent='froze layout: '+pins.length+' pin line(s) (groups anchored, members group-local) — future edits stay local';
 }
 
 function refresh(){
@@ -1284,7 +1319,8 @@ $('addnode').onclick=()=>{
   const lines=$('src').value.split('\n');
   let i=1; while(lines.some(l=>new RegExp('^\\s*(node|group)\\s+n'+i+'\\b').test(l))) i++;
   let last=-1; lines.forEach((l,k)=>{ if(SCENE_KW.test(l.trim())) last=k; });
-  lines.splice(last+1,0,'node n'+i+' "Node '+i+'"');
+  const kk=$('newkind').value;
+  lines.splice(last+1,0,'node n'+i+' "Node '+i+'"'+(kk!=='box'?' kind='+kk:''));
   $('src').value=lines.join('\n'); refresh(); select('n'+i);
   $('status').textContent='+ Node → wrote "node n'+i+'" line — drag it into place';
 };

@@ -149,6 +149,10 @@ Normative rules:
 - **Size adaptation** (R10): explicit `size` → content shrinks to fit
   (font may step down). No explicit size → box grows minimally without
   displacing the global layout.
+- **Two-level pins (D6)**: a pinned **group** anchors its local origin
+  in canvas px; a pinned **member** is group-local (relative to that
+  origin). Moving a group is therefore a one-line edit and edits inside
+  one group can never disturb another. Ungrouped pins are canvas px.
 - **OQ-S2 resolved (2026-07-02): `at=` uses absolute canvas px.**
   Canvas-relative fractions were tried in the PoC and rejected: when the
   auto-laid-out extent changes, every fractional pin moves with it —

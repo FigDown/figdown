@@ -3,19 +3,20 @@ title "VXLAN Overview — MAC-in-UDP encapsulation"
 
 # ── Classical Ethernet frame ────────────────────────────────────────
 group eth "Classical Ethernet Frame"
+pin  eth at=40,40
 node dmac1 "DMAC\n6B" in=eth color=#bae6fd
-pin  dmac1 at=40,40
+pin  dmac1 at=0,0
 node smac1 "SMAC\n6B" in=eth color=#bae6fd
-pin  smac1 at=125,40
+pin  smac1 at=85,0
 node dot1q "802.1Q\n4B" in=eth color=#bae6fd stroke=#ea580c
-pin  dot1q at=210,40
+pin  dot1q at=170,0
 node etype1 "Etype\n2B" in=eth color=#bae6fd
-pin  etype1 at=300,40
+pin  etype1 at=260,0
 node pay1 "Payload" in=eth color=#9aa2ad text=#ffffff
 size pay1 w=170 h=52
-pin  pay1 at=380,40
+pin  pay1 at=340,0
 node crc1 "CRC\n4B" in=eth color=#93c5fd
-pin  crc1 at=565,40
+pin  crc1 at=525,0
 
 # ── VXLAN frame: outer headers + original L2 frame + new CRC ───────
 node omac "Outer\nMAC\n14B" color=#fcd34d
@@ -28,15 +29,16 @@ node vxh "VXLAN\n8B" color=#fcd34d stroke=#ea580c
 pin  vxh at=235,260
 
 group orig "Original Layer 2 Frame"
+pin  orig at=330,260
 node dmac2 "DMAC\n6B" in=orig color=#bae6fd
-pin  dmac2 at=330,260
+pin  dmac2 at=0,0
 node smac2 "SMAC\n6B" in=orig color=#bae6fd
-pin  smac2 at=415,260
+pin  smac2 at=85,0
 node etype2 "Etype\n2B" in=orig color=#bae6fd
-pin  etype2 at=500,260
+pin  etype2 at=170,0
 node pay2 "Payload" in=orig color=#9aa2ad text=#ffffff
 size pay2 w=170 h=60
-pin  pay2 at=580,260
+pin  pay2 at=250,0
 node crc2 "CRC (new)\n4B" color=#bbf7d0 stroke=#16a34a
 pin  crc2 at=775,260
 
