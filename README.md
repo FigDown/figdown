@@ -65,6 +65,8 @@ figure** — never a full re-layout that destroys the reader's mental map.
 - [census.md](census.md) — figure-type census over a real 774-document
   corpus; the empirical basis for v0.1 scope and priorities, also in
   [繁體中文](census.zh-tw.md)
+- [examples/index.md](examples/index.md) — the example gallery: real
+  figures as committed `.fd`+`.svg` pairs (protocol headers first)
 - [poc/figdown.html](poc/figdown.html) — proof-of-concept renderer:
   open in any browser, edit text on the left, get a deterministic SVG
   on the right (core scene + bitfield + table + wave). The exported SVG

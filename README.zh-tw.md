@@ -54,6 +54,8 @@ Mermaid 表達不了的圖型（網路拓撲、帶註記的方塊圖、查表鏈
   （討論階段），英文版 [syntax-draft.md](syntax-draft.md)
 - [census.zh-tw.md](census.zh-tw.md) — 對 774 份真實文件語料的圖型
   普查；v0.1 範圍與優先順序的數據依據，英文版 [census.md](census.md)
+- [examples/index.zh-tw.md](examples/index.zh-tw.md) — 範例藝廊：
+  真實圖形以 `.fd`+`.svg` 成對入庫（協議標頭先行）
 - [poc/figdown.html](poc/figdown.html) — 概念驗證渲染器：用任何瀏覽器
   開啟，左邊改文字、右邊即時得到確定性的 SVG（核心場景 + bitfield +
   table + wave）。匯出的 SVG 內嵌自身來源與 SHA-256。
