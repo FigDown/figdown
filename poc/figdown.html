@@ -32,8 +32,10 @@
   svg{max-width:100%;height:auto;display:block}
   footer{margin-top:18px;color:var(--muted);font-size:12px}
   a{color:inherit}
-  details#svgbox{margin-top:14px;border-top:1px solid var(--line);padding-top:8px}
-  details#svgbox summary{font-size:12px;color:var(--muted);cursor:pointer;user-select:none}
+  details#svgbox,details#imgbox{margin-top:14px;border-top:1px solid var(--line);padding-top:8px}
+  details#svgbox summary,details#imgbox summary{font-size:12px;color:var(--muted);cursor:pointer;user-select:none}
+  #imgwrap{margin-top:8px;border:1px dashed var(--hair);border-radius:8px;padding:10px;background:#fff}
+  #svgimg{max-width:100%;display:block}
   #svgsrc{font-family:var(--mono);font-size:11.5px;line-height:1.5;background:var(--code);
     border:1px solid var(--line);border-radius:8px;padding:10px 12px;margin:8px 0 0;
     max-height:280px;overflow:auto;white-space:pre-wrap;word-break:break-all}
@@ -59,7 +61,11 @@
     <p class="ok" id="okline"></p>
     <pre class="errors" id="errs"></pre>
     <div id="out"></div>
-    <details id="svgbox" open>
+    <details id="imgbox" open>
+      <summary>Artifact preview — the .svg file as an image (what a Markdown reader shows)</summary>
+      <div id="imgwrap"><img id="svgimg" alt="SVG artifact preview"></div>
+    </details>
+    <details id="svgbox">
       <summary>Generated SVG source</summary>
       <pre id="svgsrc"></pre>
     </details>
@@ -671,7 +677,7 @@ function refresh(){
   if(errs.length){
     eEl.textContent=errs.join('\n');
     ok.textContent=''; out.innerHTML=''; lastSVG='';
-    $('svgsrc').textContent='';
+    $('svgsrc').textContent=''; $('svgimg').removeAttribute('src');
     $('status').textContent=errs.length+' error(s) — nothing rendered (determinism over convenience)';
     return;
   }
@@ -681,18 +687,30 @@ function refresh(){
   out.innerHTML=r.svg;
   // pretty-print for display only (the artifact itself stays single-line deterministic)
   $('svgsrc').textContent=r.svg.replace(/></g,'>\n<');
+  updateArtifactPreview(text, r.svg);
   const n=doc.nodes.length, b=doc.blocks.length;
   ok.textContent='OK — '+n+' node(s), '+doc.edges.length+' edge(s), '+b+' typed block(s). Same source → same SVG.';
   $('status').textContent='';
 }
 
-$('dl').onclick=async ()=>{
-  if(!lastSVG){ $('status').textContent='fix errors first'; return; }
-  const src=$('src').value;
+async function svgArtifact(src, svg){
+  // the exact bytes the downloaded .svg would contain: source + SHA-256 embedded
   const buf=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(src));
   const hash=[...new Uint8Array(buf)].map(x=>x.toString(16).padStart(2,'0')).join('');
   const meta='<metadata id="figdown-source" data-sha256="'+hash+'"><![CDATA[\n'+src.replace(/]]>/g,']]]]><![CDATA[>')+'\n]]></metadata>';
-  const svg=lastSVG.replace(/<\/svg>$/, meta+'</svg>');
+  return svg.replace(/<\/svg>$/, meta+'</svg>');
+}
+let previewSeq=0;
+async function updateArtifactPreview(src, svg){
+  const seq=++previewSeq;
+  const art=await svgArtifact(src, svg);
+  if(seq!==previewSeq) return;   // a newer edit superseded this one
+  $('svgimg').src='data:image/svg+xml;charset=utf-8,'+encodeURIComponent(art);
+}
+
+$('dl').onclick=async ()=>{
+  if(!lastSVG){ $('status').textContent='fix errors first'; return; }
+  const svg=await svgArtifact($('src').value, lastSVG);
   const a=document.createElement('a');
   a.href=URL.createObjectURL(new Blob([svg],{type:'image/svg+xml'}));
   a.download='figure.svg'; a.click(); URL.revokeObjectURL(a.href);
