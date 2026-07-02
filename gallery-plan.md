@@ -53,6 +53,14 @@ renderer supports a *subset* (super/subscripts, Greek, common operators
 via Unicode) vs. vendoring KaTeX (heavy, but complete). Start with the
 subset; measure what the E3 examples actually need.
 
+## RFC ASCII acceptance suite (R23)
+
+RFC ASCII art is the original "figures as text". A curated set of
+well-known RFC figures (packet layouts, message ladders, the RFC 9293
+TCP state machine, topology sketches) forms an acceptance suite: every
+figure in the list must be expressible in FigDown — with colors,
+determinism, and machine-readable semantics on top.
+
 ## Production workflow
 
 1. Author with AI (per-template authoring sheet) → validate with the PoC

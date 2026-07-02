@@ -711,6 +711,26 @@ description is one-dimensional.**
   says", which the srl-evpn-irb and vxlan-encap examples meet without
   icon fonts, speech bubbles, or braces.
 
+### R23 — RFC ASCII diagrams are a baseline target corpus (2026-07-02)
+
+**Original**: RFCs contain a large number of ASCII-art figures; those
+figures should be listed among our basic targets to solve.
+
+**Interpretation**:
+- RFC ASCII art is the *original* "figures as text" — the proof, running
+  since the 1970s, that engineers accept text-encoded figures. FigDown
+  is its natural successor: same 1-D source philosophy (R22), plus
+  deterministic 2-D rendering, colors, and machine-readable semantics.
+- The RFC figure repertoire maps to templates: packet layouts →
+  `bitfield` (done, msb0), message ladders/sequence charts → the
+  `sequence` template (E2 prerequisite), state machines (e.g. TCP in
+  RFC 9293) → core scene with `kind=state`-ish vocabulary, topologies →
+  `topology`.
+- Gallery consequence (R19): a curated set of well-known RFC ASCII
+  figures becomes an **acceptance suite** — "every figure in this list
+  is expressible in FigDown, better" is a crisp, verifiable promotion
+  claim aimed exactly at the IETF-adjacent audience.
+
 ### Open question OQ1 — Build on D2 vs. a new language (2026-07-02)
 
 D2 is close enough that R11 (survey before invent) obliges a deep read of

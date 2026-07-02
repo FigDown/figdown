@@ -889,48 +889,48 @@ pin  sp2 at=700,0
 
 # ── Leaves: group = leaf box; members = IP-VRF badge + bridge domains
 group leaf2 "SRL LEAF-2"
-node vrf2 "IP-VRF-10\nRD1/RT10\nVNI10" in=leaf2 color=#1e3a8a text=#ffffff
+node vrf2 "IP-VRF-10\\nRD1/RT10\\nVNI10" in=leaf2 color=#1e3a8a text=#ffffff
 pin  vrf2 at=170,235
-node bd2  "BD2\nRD41/RT2\nVNI2"   in=leaf2 style=dashed stroke=#1d4ed8
+node bd2  "BD2\\nRD41/RT2\\nVNI2"   in=leaf2 style=dashed stroke=#1d4ed8
 pin  bd2 at=90,320
-node bd24a "BD24\nRD22/RT24\nVNI24" in=leaf2 style=dashed stroke=#1d4ed8
+node bd24a "BD24\\nRD22/RT24\\nVNI24" in=leaf2 style=dashed stroke=#1d4ed8
 pin  bd24a at=250,320
 
 group leaf4 "SRL LEAF-4"
-node vrf4 "IP-VRF-10\nRD1/RT10\nVNI10" in=leaf4 color=#1e3a8a text=#ffffff
+node vrf4 "IP-VRF-10\\nRD1/RT10\\nVNI10" in=leaf4 color=#1e3a8a text=#ffffff
 pin  vrf4 at=620,235
-node bd24b "BD24\nRD41/RT24\nVNI24" in=leaf4 style=dashed stroke=#1d4ed8
+node bd24b "BD24\\nRD41/RT24\\nVNI24" in=leaf4 style=dashed stroke=#1d4ed8
 pin  bd24b at=540,320
-node bd4  "BD4\nRD42/RT4\nVNI4"  in=leaf4 style=dashed stroke=#1d4ed8
+node bd4  "BD4\\nRD42/RT4\\nVNI4"  in=leaf4 style=dashed stroke=#1d4ed8
 pin  bd4 at=700,320
 
 group leaf3 "SRL LEAF-3"
-node vrf3 "IP-VRF-10\nRD1/RT10\nVNI10" in=leaf3 color=#1e3a8a text=#ffffff
+node vrf3 "IP-VRF-10\\nRD1/RT10\\nVNI10" in=leaf3 color=#1e3a8a text=#ffffff
 pin  vrf3 at=1040,235
-node bd3  "BD3\nRD31/RT3\nVNI3"  in=leaf3 style=dashed stroke=#1d4ed8
+node bd3  "BD3\\nRD31/RT3\\nVNI3"  in=leaf3 style=dashed stroke=#1d4ed8
 pin  bd3 at=1040,320
 
 # ── Edge devices and hosts ──────────────────────────────────────────
-node ce3 "CE-3\nIP-20.1.1.3/24\nMAC-00:01:03:FF:00:0B" kind=router
+node ce3 "CE-3\\nIP-20.1.1.3/24\\nMAC-00:01:03:FF:00:0B" kind=router
 pin  ce3 at=0,430
-node h2  "HOST-2\nIP-101.1.1.2/24\nMAC-00:00:00:00:00:02" kind=host color=#bae6fd
+node h2  "HOST-2\\nIP-101.1.1.2/24\\nMAC-00:00:00:00:00:02" kind=host color=#bae6fd
 pin  h2 at=180,500
-node srv "SERVER-1 (ES-1 / LAG-1)\nHOST-12  IP-101.1.1.1/24\nMAC-00:00:64:01:01:01" kind=host
+node srv "SERVER-1 (ES-1 / LAG-1)\\nHOST-12  IP-101.1.1.1/24\\nMAC-00:00:64:01:01:01" kind=host
 pin  srv at=390,500
-node h4  "HOST-4\nIP-104.1.1.1/24\nMAC-00:00:00:00:00:04" kind=host color=#bae6fd
+node h4  "HOST-4\\nIP-104.1.1.1/24\\nMAC-00:00:00:00:00:04" kind=host color=#bae6fd
 pin  h4 at=660,500
-node h3  "HOST-3\nIP-103.1.1.1/24\nMAC-00:00:00:00:00:03" kind=router
+node h3  "HOST-3\\nIP-103.1.1.1/24\\nMAC-00:00:00:00:00:03" kind=router
 pin  h3 at=1020,500
 
 # fabric attachment
 edge sp1 -- cloud
 edge sp2 -- cloud
-edge cloud -- vrf2 taillabel="irb0.24\nAnycast-IP .254"
+edge cloud -- vrf2 taillabel="irb0.24\\nAnycast-IP .254"
 edge cloud -- vrf4
 edge cloud -- vrf3
 
 # PE-CE and access links, port labels at the endpoints
-edge bd2 -- ce3 label="PE-CE\nBGP IPv4" style=dashed color=#1d4ed8 headlabel="20.1.1.2/24"
+edge bd2 -- ce3 label="PE-CE\\nBGP IPv4" style=dashed color=#1d4ed8 headlabel="20.1.1.2/24"
 edge bd2   -- h2  taillabel="e1/12.24"
 edge bd24a -- srv taillabel="lag1.24"
 edge bd24b -- srv taillabel="lag1.24"
@@ -943,45 +943,45 @@ title "VXLAN Overview — MAC-in-UDP encapsulation"
 
 # ── Classical Ethernet frame ────────────────────────────────────────
 group eth "Classical Ethernet Frame"
-node dmac1 "DMAC\n6B" in=eth color=#bae6fd
+node dmac1 "DMAC\\n6B" in=eth color=#bae6fd
 pin  dmac1 at=40,40
-node smac1 "SMAC\n6B" in=eth color=#bae6fd
+node smac1 "SMAC\\n6B" in=eth color=#bae6fd
 pin  smac1 at=125,40
-node dot1q "802.1Q\n4B" in=eth color=#bae6fd stroke=#ea580c
+node dot1q "802.1Q\\n4B" in=eth color=#bae6fd stroke=#ea580c
 pin  dot1q at=210,40
-node etype1 "Etype\n2B" in=eth color=#bae6fd
+node etype1 "Etype\\n2B" in=eth color=#bae6fd
 pin  etype1 at=300,40
 node pay1 "Payload" in=eth color=#9aa2ad text=#ffffff
 size pay1 w=170 h=52
 pin  pay1 at=380,40
-node crc1 "CRC\n4B" in=eth color=#93c5fd
+node crc1 "CRC\\n4B" in=eth color=#93c5fd
 pin  crc1 at=565,40
 
 # ── VXLAN frame: outer headers + original L2 frame + new CRC ───────
-node omac "Outer\nMAC\n14B" color=#fcd34d
+node omac "Outer\\nMAC\\n14B" color=#fcd34d
 pin  omac at=0,260
-node oip "Outer\nIP\n20B" color=#fcd34d
+node oip "Outer\\nIP\\n20B" color=#fcd34d
 pin  oip at=80,260
-node oudp "UDP\n8B" color=#9aa2ad text=#ffffff
+node oudp "UDP\\n8B" color=#9aa2ad text=#ffffff
 pin  oudp at=160,260
-node vxh "VXLAN\n8B" color=#fcd34d stroke=#ea580c
+node vxh "VXLAN\\n8B" color=#fcd34d stroke=#ea580c
 pin  vxh at=235,260
 
 group orig "Original Layer 2 Frame"
-node dmac2 "DMAC\n6B" in=orig color=#bae6fd
+node dmac2 "DMAC\\n6B" in=orig color=#bae6fd
 pin  dmac2 at=330,260
-node smac2 "SMAC\n6B" in=orig color=#bae6fd
+node smac2 "SMAC\\n6B" in=orig color=#bae6fd
 pin  smac2 at=415,260
-node etype2 "Etype\n2B" in=orig color=#bae6fd
+node etype2 "Etype\\n2B" in=orig color=#bae6fd
 pin  etype2 at=500,260
 node pay2 "Payload" in=orig color=#9aa2ad text=#ffffff
 size pay2 w=170 h=60
 pin  pay2 at=580,260
-node crc2 "CRC (new)\n4B" color=#bbf7d0 stroke=#16a34a
+node crc2 "CRC (new)\\n4B" color=#bbf7d0 stroke=#16a34a
 pin  crc2 at=775,260
 
 # the key idea: the 12-bit VLAN becomes a 24-bit VNI in the VXLAN header
-edge dot1q -> vxh label="VNI\n12-bit VLAN → 24-bit VNI" style=dashed color=#ea580c
+edge dot1q -> vxh label="VNI\\n12-bit VLAN → 24-bit VNI" style=dashed color=#ea580c
 
 # ── Supplementary knowledge ─────────────────────────────────────────
 table overhead "Encapsulation overhead (MAC-in-UDP)"

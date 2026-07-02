@@ -49,6 +49,13 @@ text-anime v2 原型是參考實作。
 以 Unicode 對映）vs. vendor KaTeX（重，但完整）。先做子集，
 以 E3 範例實際用到什麼來量測。
 
+## RFC ASCII 驗收集（R23）
+
+RFC ASCII art 是「figures as text」的始祖。精選一批著名 RFC 圖
+（封包佈局、訊息階梯、RFC 9293 TCP 狀態機、拓撲草圖）作為驗收集：
+清單中每張圖都必須能以 FigDown 表達——並在其上疊加顏色、確定性
+與機器可讀語意。
+
 ## 生產工作流
 
 1. AI 撰寫（按 template 的撰寫指南）→ PoC parser 迴圈驗證 →
