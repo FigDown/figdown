@@ -667,6 +667,27 @@ natively). Open design point: deterministic zero-dependency subset
 (Unicode mapping for super/subscripts, Greek, operators) vs. vendoring
 KaTeX. Start with the subset; let the E3 examples measure real needs.
 
+### R21 — Standalone value: the tool is useful with zero adoption (2026-07-02)
+
+**Original**: Even if the standard is never widely adopted, the
+editor → SVG (download) loop — keeping the `.fd`, reloading it later,
+tweaking, exporting a new figure — is already valuable on its own.
+
+**Interpretation**:
+- FigDown's floor is a **self-contained figure tool**: author in the
+  editor, export an SVG that works in every Markdown viewer, come back
+  any time to tweak. Ecosystem adoption is upside, not a prerequisite —
+  this de-risks the whole project (contrast D2's dependence on viewer
+  support, R15).
+- Because the artifact embeds its own source (R14/D1), the roundtrip
+  needs no sidecar discipline: **drop the SVG itself back into the
+  editor and the source is recovered**, with the SHA-256 verifying
+  integrity (a mismatch warns that the SVG was edited after
+  generation). Implemented in the PoC (Load button + drag-drop).
+- Promotion implication (R19): "your figures are never dead ends" is a
+  headline feature — every exported figure remains editable forever,
+  unlike hand-drawn images.
+
 ### Open question OQ1 — Build on D2 vs. a new language (2026-07-02)
 
 D2 is close enough that R11 (survey before invent) obliges a deep read of

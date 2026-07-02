@@ -7,6 +7,14 @@
 >
 > English version: [index.md](index.md)
 
+## 旗艦範例：拓撲 + 隨附知識
+
+### VXLAN/EVPN Leaf-Spine 架構 — [來源](evpn-fabric.fd)
+單一來源檔：拓撲（含 VXLAN 隧道 overlay 圖層）加上真實設計文件
+會放在旁邊的 VNI 對照表與平面說明表。
+
+![EVPN fabric](evpn-fabric.svg)
+
 ## 協議標頭（bitfield template）
 
 ### Ethernet II（+ 選用 802.1Q）— [來源](ethernet-ii.fd)

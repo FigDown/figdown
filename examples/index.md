@@ -7,6 +7,15 @@
 >
 > 繁體中文版：[index.zh-tw.md](index.zh-tw.md)
 
+## Flagship: topology + supplementary knowledge
+
+### VXLAN/EVPN Leaf-Spine Fabric  — [source](evpn-fabric.fd)
+One source file: the topology (with a VXLAN-tunnel overlay layer) plus
+the VNI mapping and fabric-plane tables that real design docs put next
+to it.
+
+![EVPN fabric](evpn-fabric.svg)
+
 ## Protocol headers (bitfield template)
 
 ### Ethernet II (+ optional 802.1Q)  — [source](ethernet-ii.fd)
