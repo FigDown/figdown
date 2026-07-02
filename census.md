@@ -17,41 +17,40 @@
 - Classification: every unique image was viewed and classified by an AI
   vision pass into a taxonomy formed from the **union of figure types
   supported by Mermaid, PlantUML, D2, Graphviz and WaveDrom**, plus
-  non-diagram buckets (screenshot/photo/other). Coverage: 2,127/2,177
-  (97.7%; the remainder pending a rate-limit window, ~2.3%, cannot move
-  the ranking). A human review pass over the classified folders is the
-  planned next refinement.
+  non-diagram buckets (screenshot/photo/other). Coverage: **2,177/2,177 (100%)**.
+  A human review pass over the classified folders is the planned next
+  refinement.
 
 ## Results
 
-**Unique images (2,127 classified):**
+**Unique images (2,177 classified):**
 
 | Type | Count | Share |
 |---|---:|---:|
-| block-architecture | 685 | 32.2% |
-| packet-bitfield | 386 | 18.1% |
-| other (fragments/decorative/composite) | 326 | 15.3% |
-| table-matrix | 211 | 9.9% |
-| flowchart | 211 | 9.9% |
-| timing-waveform | 139 | 6.5% |
-| topology | 93 | 4.4% |
-| state | 24 | 1.1% |
-| chart | 19 | 0.9% |
-| sequence | 14 | 0.7% |
+| block-architecture | 702 | 32.2% |
+| packet-bitfield | 394 | 18.1% |
+| other (fragments/decorative/composite) | 334 | 15.3% |
+| flowchart | 219 | 10.1% |
+| table-matrix | 212 | 9.7% |
+| timing-waveform | 142 | 6.5% |
+| topology | 95 | 4.4% |
+| state | 25 | 1.1% |
+| chart | 21 | 1.0% |
+| sequence | 14 | 0.6% |
 | screenshot | 12 | 0.6% |
 | mindmap-tree | 6 | 0.3% |
 | class-er | 1 | 0.05% |
 
 **Occurrence-weighted** (each unique multiplied by how often it appears
 across the corpus; the 3 boilerplate template graphics that alone account
-for 2,784 occurrences are excluded; N = 9,378):
+for 2,784 occurrences are excluded; N = 9,558):
 
 | Type | Share |
 |---|---:|
-| block-architecture | 24.2% |
+| block-architecture | 24.3% |
 | packet-bitfield | 23.7% |
-| other | 17.0% |
-| table-matrix | 9.8% |
+| other | 17.1% |
+| table-matrix | 9.6% |
 | flowchart | 8.3% |
 | timing-waveform | 7.2% |
 | topology | 5.0% |
@@ -61,9 +60,9 @@ for 2,784 occurrences are excluded; N = 9,378):
 
 1. **The v0.1 scope is confirmed and quantified.** Core scene
    (block-architecture + topology + flowchart, one box-and-wire model)
-   = 37.5% weighted; adding the three typed blocks — `bitfield` (23.7%),
-   `table` (9.8%), `wave` (7.2%) — brings coverage to **78% of all
-   non-boilerplate figure occurrences, ≈94% of classifiable diagrams**.
+   = 37.6% weighted; adding the three typed blocks — `bitfield` (23.7%),
+   `table` (9.6%), `wave` (7.2%) — brings coverage to **78% of all
+   non-boilerplate figure occurrences, ≈95% of classifiable diagrams**.
 2. **Priority order** (weighted): core scene → bitfield → table → wave.
    The two giants are block-architecture and packet-bitfield, together
    ~48% — both types Mermaid handles poorly or not at all.

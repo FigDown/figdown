@@ -4,7 +4,7 @@
 > [requirements-notes.md](requirements-notes.md) (R0–R15, D1–D3). Nothing
 > here is frozen. Type priorities follow the completed figure-type census
 > over a 774-document / 12k-image corpus — see [census.md](census.md):
-> the v0.1 scope below covers ~94% of the corpus's classifiable diagrams.
+> the v0.1 scope below covers ~95% of the corpus's classifiable diagrams.
 >
 > 繁體中文版：[syntax-draft.zh-tw.md](syntax-draft.zh-tw.md)
 
@@ -137,8 +137,7 @@ Normative rules:
 Three figure families are *not* box-and-wire graphs and get dedicated,
 closed sub-grammars. Each is introduced by its keyword and terminated by
 the next top-level directive (sticky-scope, like ProtoFlow steps — no
-`end` keyword). Priority order below follows the preliminary census and
-will be finalized when it completes.
+`end` keyword). Priority order below is final, per the completed census.
 
 ### 4.1 `bitfield` — packet headers / register layouts (census #2, 23.7% weighted)
 
@@ -162,7 +161,7 @@ wrap                       # explicit row break when a field ends mid-unit
 - Widths in bits; renderer computes bit indices and draws the ruler.
 - `optional` renders the conventional dashed border (per corpus style).
 
-### 4.2 `table` — config/state tables, memory maps (census #3, 9.8% weighted)
+### 4.2 `table` — config/state tables, memory maps (census #3, 9.6% weighted)
 
 ```figdown
 table fib "FIB Table" 
@@ -194,11 +193,11 @@ cell, `.` continue. Exact lane alphabet: adopt WaveDrom's, subset TBD.
 
 ### 4.4 Priority note
 
-`block-architecture` (census #1, 24.2% weighted) needs **no typed
+`block-architecture` (census #1, 24.3% weighted) needs **no typed
 block** — it is the core scene model (§2) plus `kind`s; flowchart
 (8.3%, #4) and topology (5.0%) fold into the same model. Final census
-arithmetic: core scene (37.5%) + bitfield (23.7%) + table (9.8%) +
-wave (7.2%) = **78% of all non-boilerplate figure occurrences, ≈94% of
+arithmetic: core scene (37.6%) + bitfield (23.7%) + table (9.6%) +
+wave (7.2%) = **78% of all non-boilerplate figure occurrences, ≈95% of
 classifiable diagrams** ([census.md](census.md)).
 
 ## 5. Presentation attributes (R5)
