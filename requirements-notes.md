@@ -609,6 +609,36 @@ other needs **the collected image library** reveals.
   v0.1 with evidence; partialborder/memmap parked as v0.2 candidates.
   Raw data: figdown-samples/results/table-features.*.tsv.
 
+### R18 — Follow the mainstream, weighted by adoption (2026-07-02)
+
+**Original**: A standing principle: the syntax should follow the
+mainstream of related standards wherever possible — and "mainstream"
+must be computed by **weighting on popularity / usage rate**.
+
+**Interpretation**:
+- Refines R11's "survey before invent": when several prior conventions
+  exist for the same construct, don't pick arbitrarily — pick the one
+  with the largest adoption (users, repos, renderer support, presence in
+  AI training corpora). Popularity is measured, not assumed.
+- **Primary rationale (user, 2026-07-02): hallucination resistance.**
+  An LLM writing an unfamiliar syntax drifts toward what it already
+  knows — it "autocorrects" invented constructs into the mainstream
+  dialect and hallucinates plausible-but-wrong lines. Aligning with the
+  mainstream means generation runs *with* the model's priors instead of
+  against them: fewer syntax hallucinations, and the write→validate→fix
+  loop converges faster.
+- Secondary rationale chain: adoption → human familiarity (zero
+  relearning) → AI prior knowledge (R7 token savings) → tooling interop.
+- Practical rule for every syntax decision: name the top 2–3 existing
+  conventions, estimate their relative usage, adopt the leader unless it
+  conflicts with a FigDown axiom (then document why).
+- Audit note (apply retroactively): review current choices against this
+  rule — e.g. edge arrows `->`/`--`/`<->` (Mermaid/D2/DOT mainstream ✓),
+  `#` comments (shell/Python/YAML mainstream ✓), table rowspan marker:
+  our `^` vs `^^` used by markdown-it-multimd-table (the most-adopted MD
+  table-span extension) — **TODO: check and align if `^^` wins the
+  usage count.**
+
 ### Open question OQ1 — Build on D2 vs. a new language (2026-07-02)
 
 D2 is close enough that R11 (survey before invent) obliges a deep read of
