@@ -1,0 +1,34 @@
+figdown 0.1 bitfield
+
+# IPv4 Header — RFC 791
+# Each row is 32 bits, MSB-0 numbering (bit 0 at left).
+
+bitfield ipv4 "IPv4 Header (RFC 791)" unit=32 numbering=msb0
+
+# Row 1: Version · IHL · DSCP/ECN · Total Length
+field Version 4
+field IHL 4
+field "DSCP/ECN" 8 note="originally ToS, RFC 2474"
+field "Total Length" 16
+
+# Row 2: Identification · Flags · Fragment Offset
+field Identification 16
+field Flags 3
+field "Fragment Offset" 13
+
+# Row 3: TTL · Protocol · Header Checksum
+field TTL 8
+field Protocol 8
+field "Header Checksum" 16
+
+# Row 4: Source Address (coloured to distinguish address rows)
+field "Source Address" 32 color=#dbeafe
+
+# Row 5: Destination Address
+field "Destination Address" 32 color=#dbeafe
+
+# Row 6: Options (present only when IHL > 5)
+field "Options (if IHL > 5)" 32 optional
+
+# Row 7: Payload (variable length; one unit shown as representative row)
+field Payload 32 note="variable length; remainder of datagram after the header"

@@ -1,0 +1,17 @@
+figdown 0.1 bitfield
+# Ethernet II (DIX) frame header — without preamble/SFD
+# 802.1Q VLAN tag shown as optional fields (dashed border)
+# Bit ruler: RFC-style MSB-first (bit 0 = leftmost)
+bitfield eth "Ethernet II Frame Header" unit=32 numbering=msb0
+field "Destination MAC" 48
+field "Source MAC" 48
+# 802.1Q tag (optional — present only when EtherType = 0x8100)
+field TPID 16 optional color=#dbeafe note="Tag Protocol ID = 0x8100 when 802.1Q tag present"
+field PCP 3 optional color=#dbeafe note="Priority Code Point (IEEE 802.1p QoS)"
+field DEI 1 optional color=#dbeafe note="Drop Eligible Indicator"
+field VID 12 optional color=#dbeafe note="VLAN Identifier (0-4094)"
+# EtherType / Length
+field EtherType 16 color=#d1fae5 note="EtherType (>=0x0600) or Length (<0x0600)"
+field "Payload (46-1500 bytes)" 32 note="Data payload; minimum 46 bytes (padded if necessary)"
+wrap
+field FCS 32 note="Frame Check Sequence — CRC-32 over DA, SA, tag (if present), EtherType, and Payload"

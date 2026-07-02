@@ -1,0 +1,8 @@
+figdown 0.1 bitfield
+# UDP Header — RFC 768
+bitfield udp_header "UDP Header" unit=32 numbering=msb0
+field "Source Port"      16
+field "Destination Port" 16
+field Length             16
+field Checksum           16 note="optional in IPv4, mandatory in IPv6"
+field Data               32 note="variable-length payload; depicted here as one unit row"

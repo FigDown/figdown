@@ -1,0 +1,26 @@
+figdown 0.1 bitfield
+
+# VXLAN Header — RFC 7348, Section 5
+# 8 bytes total (two 32-bit words) plus the inner Ethernet frame.
+
+bitfield vxlan_hdr "VXLAN Header (RFC 7348)" unit=32 numbering=msb0
+
+# ── Word 0: Flags (8 bits) + Reserved (24 bits) ─────────────────────────────
+field R 1
+field R 1
+field R 1
+field R 1
+field I 1 color=#d1fae5 note="VNI valid, MUST be 1"
+field R 1
+field R 1
+field R 1
+field "Reserved" 24
+
+# ── Word 1: VNI (24 bits) + Reserved (8 bits) ────────────────────────────────
+wrap
+field "VNI (VXLAN Network Identifier)" 24 color=#dbeafe
+field "Reserved" 8
+
+# ── Payload ───────────────────────────────────────────────────────────────────
+wrap
+field "Inner Ethernet Frame" 32 note="original L2 frame follows"

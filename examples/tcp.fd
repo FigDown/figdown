@@ -1,0 +1,31 @@
+figdown 0.1 bitfield
+# TCP Header — RFC 9293 §3.1
+title TCP Header
+
+bitfield tcp "TCP Header (RFC 9293)" unit=32 numbering=msb0
+# Row 1: Source Port (16) + Destination Port (16) = 32 bits
+field "Source Port" 16
+field "Destination Port" 16
+# Row 2: Sequence Number = 32 bits
+field "Sequence Number" 32
+# Row 3: Acknowledgment Number = 32 bits
+field "Acknowledgment Number" 32
+# Row 4: Data Offset (4) + Reserved (4) + 8 flags + Window (16) = 32 bits
+field "Data Offset" 4
+field Reserved 4
+field CWR 1
+field ECE 1
+field URG 1
+field ACK 1
+field PSH 1
+field RST 1
+field SYN 1 color=#fee2e2
+field FIN 1 color=#fee2e2
+field Window 16
+# Row 5: Checksum (16) + Urgent Pointer (16) = 32 bits
+field Checksum 16
+field "Urgent Pointer" 16
+# Row 6: Options (variable, shown as one 32-bit row) — optional
+field "Options (if Data Offset > 5)" 32 optional
+# Row 7: Data payload (variable, shown as one 32-bit row)
+field Data 32 note="Variable-length payload; length inferred from IP datagram"
