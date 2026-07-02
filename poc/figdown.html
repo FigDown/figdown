@@ -51,9 +51,21 @@
 <div class="bar">
   <label>Example</label>
   <select id="examples"></select>
+  <button id="addnode" title="insert a node line">+ Node</button>
+  <button id="linkmode" title="click two nodes to write an edge line">Link</button>
+  <button id="pinall" title="materialize all auto positions into pin lines">Pin all</button>
+  <label>fill <input type="color" id="fillpick" value="#ffffff" disabled></label>
+  <button id="raise" disabled title="paint later = move its line down in the text">Raise ↑</button>
+  <button id="lower" disabled title="paint earlier = move its line up in the text">Lower ↓</button>
+  <button id="delnode" disabled>Delete</button>
   <button id="dl">Download SVG (source embedded)</button>
   <span id="status" style="font-size:12px;color:var(--muted)"></span>
 </div>
+<p style="margin:0 0 10px;font-size:12px;color:var(--muted)">
+Direct editing (every action rewrites the text): drag a node → <code>pin</code> line ·
+double-click → rename · click to select, then pick a fill color → <code>color=</code> ·
+Raise/Lower → moves the node's line in the text (line order = paint order = implicit layer) ·
+Link → click two nodes → <code>edge</code> line · Pin all → freeze layout so future edits stay local.</p>
 
 <div class="main">
   <textarea id="src" spellcheck="false"></textarea>
@@ -309,8 +321,10 @@ function tw(s){return Math.max(30,String(s).length*CH+2*PADX);}
 function render(doc){
   const parts=[]; let y=0, maxW=0;
   if(doc.title){ parts.push('<text x="0" y="16" font-size="15" font-weight="600" font-family="var(--sans)">'+esc(doc.title)+'</text>'); y=30; }
+  let sceneMeta=null;
   if(doc.nodes.length||doc.edges.length){
     const s=renderScene(doc,y); parts.push(s.svg); y=s.y; maxW=Math.max(maxW,s.w);
+    sceneMeta=s.meta;
   }
   for(const b of doc.blocks){
     let s;
@@ -326,7 +340,8 @@ function render(doc){
     +'<path d="M0,0 L10,5 L0,10 z" fill="#555"/></marker>'
     +'<pattern id="hatch" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">'
     +'<line x1="0" y1="0" x2="0" y2="6" stroke="#bbb" stroke-width="2"/></pattern></defs>'
-    +'<g transform="translate('+PADL+','+PADT+')">'+parts.join('')+'</g></svg>', w:W, h:H};
+    +'<g transform="translate('+PADL+','+PADT+')">'+parts.join('')+'</g></svg>', w:W, h:H,
+    sceneMeta:sceneMeta, pad:{x:PADL,y:PADT}};
 }
 
 // ---- scene ----
@@ -423,9 +438,10 @@ function renderScene(doc,y0){
       esvg.push('<text x="'+mx+'" y="'+(my-5)+'" font-size="11" text-anchor="middle" fill="'+col+'" paint-order="stroke" stroke="#fff" stroke-width="3">'+esc(e.label)+'</text>');
     }
   }
-  // nodes on top
+  // nodes on top (each wrapped in a draggable, identifiable group)
   const nsvg=[];
   for(const n of nodes){
+    nsvg.push('<g data-node="'+n.id+'" data-x="'+n.x+'" data-y="'+n.y+'" style="cursor:move">');
     const fill=n.color||'#fff', stroke=n.stroke||'#8a8880', txt=n.text||'#1d1d1b';
     if(n.kind==='decision'){
       const cx=n.x+n.w/2, cy=n.y+n.h/2;
@@ -444,9 +460,11 @@ function renderScene(doc,y0){
     let fs=FONT; const need=String(n.label).length*CH;
     if(n.rigid && need>n.w-2*8) fs=Math.max(8, FONT*(n.w-16)/need);
     nsvg.push('<text x="'+(n.x+n.w/2)+'" y="'+(n.y+n.h/2+fs*0.35)+'" font-size="'+fs+'" text-anchor="middle" fill="'+txt+'">'+esc(n.label)+'</text>');
+    nsvg.push('</g>');
   }
   const yEnd=y0+20+Hh+10;
-  return {svg:gsvg.join('')+esvg.join('')+nsvg.join(''), y:yEnd, w:W+2};
+  return {svg:gsvg.join('')+esvg.join('')+nsvg.join(''), y:yEnd, w:W+2,
+          meta:{W:W, top:y0+20, Hh:Hh}};
 }
 function borderPoint(n,tx,ty){
   const cx=n.x+n.w/2, cy=n.y+n.h/2, dx=tx-cx, dy=ty-cy;
@@ -669,7 +687,148 @@ Object.keys(EXAMPLES).forEach(k=>{const o=document.createElement('option');o.tex
 sel.onchange=()=>{ $('src').value=EXAMPLES[sel.value]; refresh(); };
 $('src').addEventListener('input',refresh);
 
-let lastSVG='';
+let lastSVG='', lastMeta=null, lastPad={x:0,y:0}, lastDoc=null;
+
+// ---- direct manipulation: every GUI action is a text edit ----
+const SCENE_KW=/^(figdown|title|node|group|edge|layer|flow|rank|zone|pin|size)\b/;
+function setPinLine(id,fx,fy){
+  const lines=$('src').value.split('\n');
+  const pinRe=new RegExp('^\\s*pin\\s+'+id+'\\b');
+  const newLine='pin '+id+' at='+fx+','+fy;
+  let idx=lines.findIndex(l=>pinRe.test(l));
+  if(idx>=0){ lines[idx]=newLine; }
+  else{
+    let last=-1;
+    lines.forEach((l,i)=>{ if(SCENE_KW.test(l.trim())) last=i; });
+    lines.splice(last+1,0,newLine);
+  }
+  $('src').value=lines.join('\n'); refresh();
+}
+function setNodeLabel(id,label){
+  const lines=$('src').value.split('\n');
+  const re=new RegExp('^(\\s*node\\s+'+id+'\\s+)("[^"]*"|\\S+)?');
+  const idx=lines.findIndex(l=>new RegExp('^\\s*node\\s+'+id+'\\b').test(l));
+  if(idx<0) return;
+  lines[idx]=lines[idx].replace(re,(m,p1)=>p1+'"'+label.replace(/"/g,'')+'"');
+  $('src').value=lines.join('\n'); refresh();
+}
+function installDirectEdit(){
+  const svg=$('out').querySelector('svg');
+  if(!svg||!lastMeta) return;
+  const toModel=ev=>{
+    const pt=new DOMPoint(ev.clientX,ev.clientY).matrixTransform(svg.getScreenCTM().inverse());
+    return {x:pt.x-lastPad.x, y:pt.y-lastPad.y};
+  };
+  svg.querySelectorAll('[data-node]').forEach(g=>{
+    g.addEventListener('pointerdown',ev=>{
+      ev.preventDefault();
+      const id=g.dataset.node, x0=+g.dataset.x, y0=+g.dataset.y, start=toModel(ev);
+      let dx=0,dy=0,moved=false;
+      const mv=e=>{ const p=toModel(e); dx=p.x-start.x; dy=p.y-start.y;
+        if(Math.abs(dx)+Math.abs(dy)>2) moved=true;
+        g.setAttribute('transform','translate('+dx+','+dy+')'); };
+      const up=()=>{ window.removeEventListener('pointermove',mv); window.removeEventListener('pointerup',up);
+        if(!moved){ g.removeAttribute('transform');
+          if(linkArm!==null){
+            if(linkArm===undefined){ linkArm=id; $('status').textContent='Link mode: now click the target node'; return; }
+            if(linkArm!==id){
+              const lines=$('src').value.split('\n');
+              let last=-1; lines.forEach((l,i)=>{ if(SCENE_KW.test(l.trim())) last=i; });
+              lines.splice(last+1,0,'edge '+linkArm+' -> '+id);
+              $('src').value=lines.join('\n'); refresh();
+              $('status').textContent='link → wrote "edge '+linkArm+' -> '+id+'" (GUI action = text edit)';
+            }
+            linkArm=null; $('linkmode').style.fontWeight='';
+            return;
+          }
+          select(id); return; }
+        const fx=Math.min(1,Math.max(0,(x0+dx)/lastMeta.W)).toFixed(3);
+        const fy=Math.min(1,Math.max(0,(y0+dy-lastMeta.top)/lastMeta.Hh)).toFixed(3);
+        setPinLine(id,fx,fy);
+        $('status').textContent='drag → wrote "pin '+id+' at='+fx+','+fy+'" (GUI action = text edit)'; };
+      window.addEventListener('pointermove',mv); window.addEventListener('pointerup',up);
+    });
+    g.addEventListener('dblclick',ev=>{
+      ev.preventDefault();
+      const id=g.dataset.node;
+      const nd=lastDoc.nodes.find(n=>n.id===id);
+      const nv=prompt('Label for node "'+id+'":', nd?nd.label:'');
+      if(nv!==null && nv!==''){ setNodeLabel(id,nv);
+        $('status').textContent='double-click → rewrote node '+id+' label (GUI action = text edit)'; }
+    });
+  });
+}
+let selectedId=null, linkArm=null;
+function nodeLineIdx(lines,id){ return lines.findIndex(l=>new RegExp('^\\s*node\\s+'+id+'\\b').test(l)); }
+function setNodeOption(id,key,val){
+  const lines=$('src').value.split('\n');
+  const idx=nodeLineIdx(lines,id); if(idx<0) return;
+  const re=new RegExp('\\b'+key+'=\\S+');
+  lines[idx]=re.test(lines[idx]) ? lines[idx].replace(re,key+'='+val) : lines[idx]+' '+key+'='+val;
+  $('src').value=lines.join('\n'); refresh();
+}
+function deleteNode(id){
+  const lines=$('src').value.split('\n').filter(l=>{
+    const t=l.trim();
+    if(new RegExp('^(node|pin|size)\\s+'+id+'\\b').test(t)) return false;
+    const em=/^edge\s+(\S+)\s+(->|--|<->)\s+(\S+)/.exec(t);
+    if(em && (em[1]===id||em[3]===id)) return false;
+    const rm=/^rank\s+(.+)$/.exec(t);
+    if(rm && rm[1].trim().split(/\s+/).includes(id)){
+      const rest=rm[1].trim().split(/\s+/).filter(x=>x!==id);
+      return rest.length>=2 ? true : false;  // drop rank line if fewer than 2 remain
+    }
+    return true;
+  });
+  selectedId=null;
+  $('src').value=lines.join('\n'); refresh();
+}
+function moveNodeLine(id,dir){ // dir +1 = later line = painted on top
+  const lines=$('src').value.split('\n');
+  const idx=nodeLineIdx(lines,id); if(idx<0) return;
+  const isNode=l=>/^\s*node\s+/.test(l);
+  let j=idx+dir;
+  while(j>=0&&j<lines.length&&!isNode(lines[j])) j+=dir;
+  if(j<0||j>=lines.length) { $('status').textContent='already at the '+(dir>0?'top':'bottom')+' of paint order'; return; }
+  [lines[idx],lines[j]]=[lines[j],lines[idx]];
+  $('src').value=lines.join('\n'); refresh();
+  $('status').textContent=(dir>0?'raised':'lowered')+' '+id+' — its line moved '+(dir>0?'down':'up')+' in the text (line order = paint order)';
+}
+function select(id){
+  selectedId=id;
+  const has=id!==null && lastDoc && lastDoc.nodes.some(n=>n.id===id);
+  ['fillpick','delnode','raise','lower'].forEach(b=>$(b).disabled=!has);
+  if(has){
+    const nd=lastDoc.nodes.find(n=>n.id===id);
+    if(nd.color&&/^#([0-9a-fA-F]{6})$/.test(nd.color)) $('fillpick').value=nd.color;
+    highlightSelection();
+  }
+}
+function highlightSelection(){
+  const svg=$('out').querySelector('svg'); if(!svg||!selectedId) return;
+  const g=svg.querySelector('[data-node="'+selectedId+'"]'); if(!g) return;
+  const sh=g.querySelector('rect,polygon'); if(!sh) return;
+  sh.setAttribute('stroke','#2563eb'); sh.setAttribute('stroke-width','2.5');
+}
+function pinAll(){
+  if(!lastDoc||!lastMeta) return;
+  const svg=$('out').querySelector('svg'); if(!svg) return;
+  const lines=$('src').value.split('\n');
+  const adds=[];
+  svg.querySelectorAll('[data-node]').forEach(g=>{
+    const id=g.dataset.node;
+    if(lines.some(l=>new RegExp('^\\s*pin\\s+'+id+'\\b').test(l))) return;
+    const fx=Math.min(1,Math.max(0,(+g.dataset.x)/lastMeta.W)).toFixed(3);
+    const fy=Math.min(1,Math.max(0,(+g.dataset.y-lastMeta.top)/lastMeta.Hh)).toFixed(3);
+    adds.push('pin '+id+' at='+fx+','+fy);
+  });
+  if(!adds.length){ $('status').textContent='all nodes already pinned'; return; }
+  let last=-1; lines.forEach((l,i)=>{ if(SCENE_KW.test(l.trim())) last=i; });
+  lines.splice(last+1,0,...adds);
+  $('src').value=lines.join('\n'); refresh();
+  $('status').textContent='froze layout: '+adds.length+' pin line(s) written — future edits now change only what you touch';
+}
+
 function refresh(){
   const text=$('src').value;
   const {doc,errs}=parse(text);
@@ -683,8 +842,10 @@ function refresh(){
   }
   eEl.textContent='';
   const r=render(doc);
-  lastSVG=r.svg;
+  lastSVG=r.svg; lastMeta=r.sceneMeta; lastPad=r.pad; lastDoc=doc;
   out.innerHTML=r.svg;
+  installDirectEdit();
+  select(selectedId);
   // pretty-print for display only (the artifact itself stays single-line deterministic)
   $('svgsrc').textContent=r.svg.replace(/></g,'>\n<');
   updateArtifactPreview(text, r.svg);
@@ -715,6 +876,26 @@ $('dl').onclick=async ()=>{
   a.href=URL.createObjectURL(new Blob([svg],{type:'image/svg+xml'}));
   a.download='figure.svg'; a.click(); URL.revokeObjectURL(a.href);
   $('status').textContent='SVG saved — source + SHA-256 embedded (self-carrying artifact, R14)';
+};
+
+$('pinall').onclick=pinAll;
+$('fillpick').oninput=()=>{ if(selectedId) setNodeOption(selectedId,'color',$('fillpick').value); };
+$('delnode').onclick=()=>{ if(selectedId) deleteNode(selectedId); };
+$('raise').onclick=()=>{ if(selectedId) moveNodeLine(selectedId,+1); };
+$('lower').onclick=()=>{ if(selectedId) moveNodeLine(selectedId,-1); };
+$('addnode').onclick=()=>{
+  const lines=$('src').value.split('\n');
+  let i=1; while(lines.some(l=>new RegExp('^\\s*(node|group)\\s+n'+i+'\\b').test(l))) i++;
+  let last=-1; lines.forEach((l,k)=>{ if(SCENE_KW.test(l.trim())) last=k; });
+  lines.splice(last+1,0,'node n'+i+' "Node '+i+'"');
+  $('src').value=lines.join('\n'); refresh(); select('n'+i);
+  $('status').textContent='+ Node → wrote "node n'+i+'" line — drag it into place';
+};
+$('linkmode').onclick=()=>{
+  if(linkArm===null && $('linkmode').style.fontWeight!=='700'){
+    $('linkmode').style.fontWeight='700'; linkArm=undefined;
+    $('status').textContent='Link mode: click the source node';
+  } else { linkArm=null; $('linkmode').style.fontWeight=''; $('status').textContent='Link mode off'; }
 };
 
 $('src').value=EXAMPLES[Object.keys(EXAMPLES)[0]];

@@ -100,8 +100,9 @@ edge r1 -> r2 layer=overlay color=#dc2626
 ```
 
 Layers are author-facing organizational units; `z` order among layers is
-explicit, document order within a layer is paint order. Default layer is
-`base` (z=0).
+explicit, document order within a layer is paint order — **a later line
+paints on top (closer to the viewer)**, so line order itself is the
+implicit z within a layer. Default layer is `base` (z=0).
 
 ## 3. Layout control — the three tiers (R5, R8)
 
