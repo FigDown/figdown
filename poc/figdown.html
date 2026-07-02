@@ -153,8 +153,13 @@ function parse(text){
       if(kw==='figdown'){
         sawHeader=true;
         if(pos[1]!=='0.1') err(n,'unsupported version "'+(pos[1]||'')+'" (expected 0.1)');
+        if(pos[2]!==undefined){
+          const TEMPLATES=['block','topology','flowchart','bitfield','table','wave'];
+          if(!TEMPLATES.includes(pos[2])) err(n,'unknown template "'+pos[2]+'" (block|topology|flowchart|bitfield|table|wave)');
+          else doc.template=pos[2];
+        }
         continue;
-      } else { err(n,'first line must be "figdown 0.1"'); }
+      } else { err(n,'first line must be "figdown 0.1 [template]"'); }
     } else if(kw==='figdown'){ err(n,'duplicate version header'); continue; }
 
     // typed-block children
@@ -592,7 +597,7 @@ function renderWave(w,y0){
 // ============================================================
 const EXAMPLES={
 'block-architecture (census #2)':
-`figdown 0.1
+`figdown 0.1 block
 title "Ingress datapath (excerpt)"
 group ing "Ingress Pipeline"
 node mac "MAC RX" in=ing
@@ -610,7 +615,7 @@ edge l3 -> mmu
 edge acl -> mmu`,
 
 'bitfield (census #1)':
-`figdown 0.1
+`figdown 0.1 bitfield
 bitfield gre "GRE Header (RFC 2784/2890)" unit=32
 field C 1
 field R 1
@@ -627,7 +632,7 @@ field "Key (optional)" 32 optional color=#fef9c3
 field "Sequence Number (optional)" 32 optional`,
 
 'table (census #3)':
-`figdown 0.1
+`figdown 0.1 table
 table fib "FIB (excerpt)"
 cols Prefix "Next Hop" Port VRF
 row 10.0.0.0/8    R2   p1  default
@@ -635,7 +640,7 @@ row 10.1.0.0/16   R4   p2  default highlight
 row 0.0.0.0/0     R3   p2  default`,
 
 'wave (census #4)':
-`figdown 0.1
+`figdown 0.1 wave
 wave por "Power-on reset sequencing"
 signal clk    pppppppp
 signal rst_n  00011111
@@ -643,7 +648,7 @@ signal cfg_ok 00000111
 signal data   xxx=..=x labels="CFG,GO"`,
 
 'topology + pin (stability demo)':
-`figdown 0.1
+`figdown 0.1 topology
 title "Leaf-spine, monitor pinned top-right"
 node sp1 "Spine-1" kind=switch color=#e0e7ff
 node sp2 "Spine-2" kind=switch color=#e0e7ff
@@ -664,7 +669,7 @@ edge mon -- sp2 style=dotted label="telemetry"
 pin mon at=340,0`,
 
 'mixed document':
-`figdown 0.1
+`figdown 0.1 block
 title "CPU tag insertion"
 node cpu "CPU"
 node tagger "Tag Insert" color=#fee2e2
