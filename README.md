@@ -58,8 +58,10 @@ figure** — never a full re-layout that destroys the reader's mental map.
 **Requirements & design phase.** Nothing to install yet. Current documents:
 
 - [requirements-notes.md](requirements-notes.md) — the requirements log
-  (R0–R13) and decisions (D1–D3), also in
+  (R0–R15) and decisions (D1–D3), also in
   [繁體中文](requirements-notes.zh-tw.md)
+- [syntax-draft.md](syntax-draft.md) — syntax draft v0.0 (discussion
+  stage), also in [繁體中文](syntax-draft.zh-tw.md)
 
 Prior art feeding this design: **ProtoFlow**, a protocol-animation DSL
 with a single-file engine/editor (to be published separately), where the

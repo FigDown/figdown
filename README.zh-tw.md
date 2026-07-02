@@ -48,8 +48,10 @@ Mermaid 表達不了的圖型（網路拓撲、帶註記的方塊圖、查表鏈
 **需求與設計階段。** 目前還沒有可安裝的東西。現有文件：
 
 - [requirements-notes.zh-tw.md](requirements-notes.zh-tw.md) —
-  需求記錄（R0–R13）與決議（D1–D3），英文版
+  需求記錄（R0–R15）與決議（D1–D3），英文版
   [requirements-notes.md](requirements-notes.md)
+- [syntax-draft.zh-tw.md](syntax-draft.zh-tw.md) — 語法草案 v0.0
+  （討論階段），英文版 [syntax-draft.md](syntax-draft.md)
 
 本設計的先行實證：**ProtoFlow**——協議動畫 DSL 與其單檔引擎/編輯器
 （將另行公開）——上述公理在那裡首次被端到端驗證。
