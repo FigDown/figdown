@@ -70,7 +70,8 @@ Direct editing (every action rewrites the text): drag a node → <code>pin</code
 double-click → rename · click to select, then pick a fill color → <code>color=</code> ·
 Raise/Lower → moves the node's line in the text (line order = paint order = implicit layer) ·
 Link → click two nodes → <code>edge</code> line · ⬚ Group → drag a marquee → <code>group</code> + <code>in=</code> ·
-click a table cell → <code>cell r,c color=</code> · Pin all → freeze layout so future edits stay local.</p>
+click a table cell → <code>cell r,c color=</code> · drag a threshold line → rewrites its <code>at=%</code> ·
+Pin all → freeze layout so future edits stay local.</p>
 
 <div class="main">
   <textarea id="src" spellcheck="false"></textarea>
@@ -686,7 +687,9 @@ function renderScene(doc,y0){
       nsvg.push('<rect x="'+n.x+'" y="'+n.y+'" width="'+n.w+'" height="'+n.h+'" rx="3" fill="'+fill+'" stroke="'+stroke+'"'+ndash+'/>'
         +'<line x1="'+n.x+'" y1="'+(n.y+7)+'" x2="'+(n.x+n.w)+'" y2="'+(n.y+7)+'" stroke="'+stroke+'"/>');
     } else {
-      nsvg.push('<rect x="'+n.x+'" y="'+n.y+'" width="'+n.w+'" height="'+n.h+'" rx="8" fill="'+fill+'" stroke="'+stroke+'"'+ndash+'/>');
+      // box = right-angle rectangle (the mainstream default: Mermaid/
+      // Graphviz rects, hardware block diagrams); use shape=rounded for corners
+      nsvg.push('<rect x="'+n.x+'" y="'+n.y+'" width="'+n.w+'" height="'+n.h+'" fill="'+fill+'" stroke="'+stroke+'"'+ndash+'/>');
     }
     // zone bands on this node (percent of the node box, bottom = 0%)
     for(const f of doc.fills){
@@ -727,8 +730,10 @@ function renderScene(doc,y0){
     const B=gBox[gl.group]; if(!B) continue;
     const ly=B.yB-(B.yB-B.yA)*gl.pct/100;
     const col=gl.color||'#ef4444';
-    tsvg.push('<line x1="'+B.x0+'" y1="'+ly+'" x2="'+B.x1+'" y2="'+ly+'" stroke="'+col+'" stroke-width="'+(gl.pct>=100?4:2)+'" stroke-dasharray="7 4"/>');
-    tsvg.push(textEl(B.x1+8, ly+4, 11, 'start', col, gl.label,' paint-order="stroke" stroke="#fff" stroke-width="3"'));
+    tsvg.push('<g data-gline="'+gl.line+'" data-gtop="'+B.yA+'" data-gbot="'+B.yB+'" style="cursor:ns-resize">'
+      +'<line x1="'+B.x0+'" y1="'+ly+'" x2="'+B.x1+'" y2="'+ly+'" stroke="'+col+'" stroke-width="'+(gl.pct>=100?4:2)+'" stroke-dasharray="7 4"/>'
+      +'<line x1="'+B.x0+'" y1="'+ly+'" x2="'+B.x1+'" y2="'+ly+'" stroke="transparent" stroke-width="12"/>'
+      +textEl(B.x1+8, ly+4, 11, 'start', col, gl.label,' paint-order="stroke" stroke="#fff" stroke-width="3"')+'</g>');
     W=Math.max(W, B.x1+8+tw(gl.label)); Hh=Math.max(Hh, B.yB-y0-20);
   }
   const yEnd=y0+20+Hh+10;
@@ -1343,6 +1348,26 @@ function installDirectEdit(){
       if(ids.length) createGroup(ids);
       else $('status').textContent='marquee selected no ungrouped nodes'; };
     window.addEventListener('pointermove',mv); window.addEventListener('pointerup',up);
+  });
+  // threshold lines: vertical drag rewrites the at=% on that source line
+  svg.querySelectorAll('[data-gline]').forEach(gL=>{
+    gL.addEventListener('pointerdown',ev=>{
+      ev.preventDefault(); ev.stopPropagation();
+      const srcLine=+gL.dataset.gline, top=+gL.dataset.gtop, bot=+gL.dataset.gbot;
+      const start=toModel(ev); let dy=0;
+      const mv=e=>{ dy=toModel(e).y-start.y; gL.setAttribute('transform','translate(0,'+dy+')'); };
+      const up=()=>{ window.removeEventListener('pointermove',mv); window.removeEventListener('pointerup',up);
+        const lines=$('src').value.split('\n');
+        const cur=/at=(\d+(?:\.\d+)?)%?/.exec(lines[srcLine-1]||'');
+        if(!cur){ gL.removeAttribute('transform'); return; }
+        const ly0=bot-(bot-top)*(+cur[1])/100;
+        let pct=Math.round((bot-(ly0+dy))/(bot-top)*100);
+        pct=Math.max(0,Math.min(100,pct));
+        lines[srcLine-1]=lines[srcLine-1].replace(/at=\d+(?:\.\d+)?%?/,'at='+pct+'%');
+        $('src').value=lines.join('\n'); refresh();
+        $('status').textContent='line drag → rewrote at='+pct+'% (GUI action = text edit)'; };
+      window.addEventListener('pointermove',mv); window.addEventListener('pointerup',up);
+    });
   });
   svg.querySelectorAll('[data-node]').forEach(g=>{
     g.addEventListener('pointerdown',ev=>{
