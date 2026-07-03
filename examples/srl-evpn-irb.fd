@@ -45,7 +45,7 @@ node ce3 "CE-3\nIP-20.1.1.3/24\nMAC-00:01:03:FF:00:0B" kind=router
 pin  ce3 at=0,430
 node h2  "HOST-2\nIP-101.1.1.2/24\nMAC-00:00:00:00:00:02" kind=host color=#bae6fd
 pin  h2 at=180,500
-node srv "SERVER-1 (ES-1 / LAG-1)\nHOST-12  IP-101.1.1.1/24\nMAC-00:00:64:01:01:01" kind=host
+node srv "SERVER-1\nHOST-12  IP-101.1.1.1/24\nMAC-00:00:64:01:01:01" kind=host
 pin  srv at=390,500
 node h4  "HOST-4\nIP-104.1.1.1/24\nMAC-00:00:00:00:00:04" kind=host color=#bae6fd
 pin  h4 at=660,500
@@ -64,5 +64,11 @@ edge bd2 -- ce3 label="PE-CE\nBGP IPv4" style=dashed color=#1d4ed8 headlabel="20
 edge bd2   -- h2  taillabel="e1/12.24"
 edge bd24a -- srv taillabel="lag1.24"
 edge bd24b -- srv taillabel="lag1.24"
+
+# multi-homing annotation: a dashed transparent ellipse straddling the
+# two LAG member links (drawn after the edges, so it sits on top)
+node lag1 "ES-1 / LAG-1" kind=cloud color=transparent stroke=#0ea5e9 style=dashed text=#0369a1
+size lag1 w=170 h=44
+pin  lag1 at=375,420
 edge bd4   -- h4  taillabel="e1/13.4"
 edge bd3   -- h3  taillabel="e1/2.3"
