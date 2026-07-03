@@ -785,12 +785,16 @@ examples only and are deliberately NOT committed to the repo.)
   measured `memmap` at 14.2% of tables, so the class has corpus
   evidence.
 - Verified expressible **today** with pinned/sized boxes (local demo,
-  not committed) — but that is coordinate work. Per R24 the right shape
-  is a semantics-first typed block, sketch:
-  `partition <id> "<label>"` / `cap "<label>"` /
-  `column <id> "<label>"` / `region <id> "<label>" <percent> [color=]`
-  — the engine derives all heights from the declared proportions; a
-  human never computes a pixel.
+  not committed) — but that is coordinate work, and it over-models: the
+  user's correction is that the figure's true structure is **N adjacent
+  boxes plus horizontal marker LINES** — the colored zone is merely the
+  fill below a threshold line, not separate boxes. Per R24, threshold
+  lines are first-class (they ARE the hardware semantics: hi/lo
+  thresholds, caps); regions derive from lines. Revised sketch:
+  `partition <id> "<label>"` / `column <id> "<label>"` (×N) /
+  `line <id> "<label>" at=<percent> [color=] [fill=below|above]`
+  — two `line` directives reproduce the reference figure; a human never
+  computes a pixel and never draws a region box.
 - Status: **candidate for the template set** (R16 gate: corpus evidence
   exists; design when scheduled).
 
