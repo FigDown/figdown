@@ -795,6 +795,14 @@ examples only and are deliberately NOT committed to the repo.)
   `line <id> "<label>" at=<percent> [color=] [fill=below|above]`
   — two `line` directives reproduce the reference figure; a human never
   computes a pixel and never draws a region box.
+- Rendering note (user question, resolved): "four boxes" vs "one box +
+  three divider lines" are the same picture — the engine renders one
+  outer frame with N−1 internal dividers (as real figures do). The
+  SYNTAX stays single-spelling (R18: two spellings of one meaning feed
+  hallucination): labeled figures declare `column` per column; an
+  anonymous even split gets the distinct shorthand `columns <N>` —
+  different semantics (unlabeled equal split), not an alternate
+  spelling.
 - Status: **candidate for the template set** (R16 gate: corpus evidence
   exists; design when scheduled).
 
