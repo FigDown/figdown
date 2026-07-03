@@ -1121,6 +1121,7 @@ let lastSVG='', lastMeta=null, lastPad={x:0,y:0}, lastDoc=null;
 
 // ---- direct manipulation: every GUI action is a text edit ----
 const SCENE_KW=/^(figdown|title|node|group|edge|layer|flow|rank|zone|pin|size)\b/;
+const LAYOUT_MARK='# --- layout (materialized by the editor; delete freely, structure above is complete) ---';
 function applyPins(pins){ // pins: array of [id, px, py] — one text update, one refresh
   const lines=$('src').value.split('\n');
   for(const [id,px,py] of pins){
@@ -1129,9 +1130,11 @@ function applyPins(pins){ // pins: array of [id, px, py] — one text update, on
     const idx=lines.findIndex(l=>pinRe.test(l));
     if(idx>=0){ lines[idx]=newLine; }
     else{
-      let last=-1;
-      lines.forEach((l,i)=>{ if(SCENE_KW.test(l.trim())) last=i; });
-      lines.splice(last+1,0,newLine);
+      // structure stays on top; materialized layout lives in a trailing
+      // section, so an AI reader gets the full meaning before any pins (R25)
+      let mark=lines.findIndex(l=>l.trim()===LAYOUT_MARK);
+      if(mark<0){ lines.push(LAYOUT_MARK); mark=lines.length-1; }
+      lines.push(newLine);
     }
   }
   $('src').value=lines.join('\n'); refresh();

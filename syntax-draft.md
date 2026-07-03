@@ -169,6 +169,11 @@ Normative rules:
   in canvas px; a pinned **member** is group-local (relative to that
   origin). Moving a group is therefore a one-line edit and edits inside
   one group can never disturb another. Ungrouped pins are canvas px.
+- **Semantic-completeness invariant (R25)**: stripping every `pin` and
+  `size` line from a document MUST leave one that still parses, still
+  renders under auto layout, and expresses the identical structure and
+  relationships. Editors conventionally materialize layout into a
+  trailing `# layout` section so the structure reads first.
 - **OQ-S2 resolved (2026-07-02): `at=` uses absolute canvas px.**
   Canvas-relative fractions were tried in the PoC and rejected: when the
   auto-laid-out extent changes, every fractional pin moves with it —

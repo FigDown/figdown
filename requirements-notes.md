@@ -749,6 +749,28 @@ convention by hand.** Candidates that should follow the same path:
 numbered step callouts (packet walkthroughs), redundancy pairs,
 broadcast domains.
 
+### R25 — GUI-drawn figures must yield structure-first text (2026-07-02)
+
+**Original**: The goal — when a human draws a figure through the UI
+(editor), the text behind it must directly and clearly express the
+**structure** and the **relationships among all components** in the
+figure. This is one of the necessary purposes.
+
+**Interpretation**:
+- The editor's write-back quality bar: drawing must never produce
+  "coordinate soup". Structure (node/edge/group/bundle) is captured at
+  the highest semantic level available (R24); coordinates are only a
+  layout annex.
+- **Text stratification**: editor-materialized `pin`/`size` lines live
+  in a trailing `# layout` section — structure declarations first, the
+  annex last, so an AI reader gets the complete meaning before (or
+  without) any layout lines. Implemented in the PoC.
+- **Semantic-completeness invariant (normative, testable)**: deleting
+  every `pin`/`size` line MUST leave a document that still parses,
+  still renders (auto layout), and expresses the *identical* structure
+  and relationships. Added to the test suite; all 9 gallery examples
+  pass.
+
 ### Open question OQ1 — Build on D2 vs. a new language (2026-07-02)
 
 D2 is close enough that R11 (survey before invent) obliges a deep read of
