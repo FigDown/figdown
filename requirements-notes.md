@@ -887,6 +887,24 @@ authoring must always start from the meaning to be expressed.
   example was corrected from per-column fills ×4 to one group-level
   fill accordingly).
 
+### R30 — Frequency buys brevity (2026-07-03)
+
+**Original**: The spirit of our parameters: the more common/mainstream
+the usage, the LESS you should have to write.
+
+**Interpretation**: R13 (defaults = the common case) generalized from
+default *values* to syntax *length* — a design law with a gradient:
+- zero characters: the statistical default (no declaration at all)
+- one short token: the common explicit case (`fill 15%`)
+- one longer token: the rare explicit case (`fill 15-35%`)
+- key=value: optional deviations only (`dir=down`, `color=`)
+- **never** make the common case pay syntax for a rare capability
+  (the retired `from=`/`to=` pair was exactly that tax).
+Existing instances confirmed by this law: compact `field a:1, b:2`,
+`columns N`, `numbering=lsb0` default, GFM rows pasted unchanged.
+Review rule for every new parameter: rank its use cases by expected
+frequency, then assign spellings shortest-first.
+
 ### Open question OQ1 — Build on D2 vs. a new language (2026-07-02)
 
 D2 is close enough that R11 (survey before invent) obliges a deep read of
