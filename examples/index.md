@@ -5,9 +5,26 @@
 > Each SVG embeds its own source and a SHA-256 of it — open one in a
 > text editor to see the "one source, two readers" idea in action.
 >
+> Sections mirror the template families, ordered by their share in the
+> figure-type census ([census.md](../census.md)).
+>
 > 繁體中文版：[index.zh-tw.md](index.zh-tw.md)
 
-## Flagship: topology + supplementary knowledge
+## Block & architecture (census #1)
+
+### VXLAN encapsulation — before/after frames  — [source](vxlan-encap.fd)
+Classical frame vs. VXLAN frame (original L2 frame nested), the
+VLAN-to-VNI arrow, and overhead/fact tables.
+
+![VXLAN encapsulation](vxlan-encap.svg)
+
+### Partition map — pool with global thresholds  — [source](partition-map.fd)
+The same block constructs plus `line`/`fill` markers cover buffer
+quotas, memory maps, and watermark charts.
+
+![Partition map](partition-map.svg)
+
+## Topology (with semantic annotations)
 
 ### VXLAN/EVPN Leaf-Spine Fabric  — [source](evpn-fabric.fd)
 One source file: the topology (with a VXLAN-tunnel overlay layer) plus
@@ -19,17 +36,11 @@ to it.
 ### EVPN-VXLAN IRB — vendor-style leaves with VRF/BD detail  — [source](srl-evpn-irb.fd)
 Semantic recreation of a vendor doc figure: fabric cloud, leaf boxes
 holding IP-VRF badges and dashed bridge domains, port labels on links,
-multi-line host captions. Fully hand-pinned (tier-3 layout).
+a `bundle` multi-homing ring, multi-line host captions.
 
 ![EVPN-VXLAN IRB](srl-evpn-irb.svg)
 
-### VXLAN encapsulation — before/after frames  — [source](vxlan-encap.fd)
-Classical frame vs. VXLAN frame (original L2 frame nested), the
-VLAN-to-VNI arrow, and overhead/fact tables.
-
-![VXLAN encapsulation](vxlan-encap.svg)
-
-## Protocol headers (bitfield template)
+## Protocol headers (bitfield, census #2)
 
 ### Ethernet II (+ optional 802.1Q)  — [source](ethernet-ii.fd)
 ![Ethernet II frame header](ethernet-ii.svg)
@@ -46,13 +57,7 @@ VLAN-to-VNI arrow, and overhead/fact tables.
 ### VXLAN — RFC 7348  — [source](vxlan.fd)
 ![VXLAN header](vxlan.svg)
 
-## Partition & threshold maps
-
-One generic shape — a pool of columns plus global `line`/`fill`
-markers — covers buffer quotas, memory maps, and watermark charts.
-
-### Partition map — [source](partition-map.fd)
-![Partition map](partition-map.svg)
+## Tables & data (census #3)
 
 ### Queue-occupancy heatmap  — [source](queue-heatmap.fd)
 A data matrix as a table with per-cell marks — the readable 2-D answer

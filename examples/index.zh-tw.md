@@ -5,9 +5,26 @@
 > SHA-256——用文字編輯器打開任何一個，就能看到「一份來源、兩種
 > 讀者」的實際樣貌。
 >
+> 分區對應 template 家族，依圖型普查佔比排序
+> （[census.zh-tw.md](../census.zh-tw.md)）。
+>
 > English version: [index.md](index.md)
 
-## 旗艦範例：拓撲 + 隨附知識
+## 方塊與架構（普查第 1）
+
+### VXLAN 封裝 — 封裝前後訊框對照 — [來源](vxlan-encap.fd)
+古典訊框 vs VXLAN 訊框（原始 L2 訊框內嵌）、VLAN→VNI 箭頭、
+overhead 與重點對照表。
+
+![VXLAN encapsulation](vxlan-encap.svg)
+
+### 分割圖 — 資源池與全域門檻 — [來源](partition-map.fd)
+同樣的 block 構件加上 `line`/`fill` 標記，即涵蓋緩衝配額、
+記憶體映射、水位圖。
+
+![Partition map](partition-map.svg)
+
+## 拓撲（含語意註記）
 
 ### VXLAN/EVPN Leaf-Spine 架構 — [來源](evpn-fabric.fd)
 單一來源檔：拓撲（含 VXLAN 隧道 overlay 圖層）加上真實設計文件
@@ -17,17 +34,11 @@
 
 ### EVPN-VXLAN IRB — 廠商風格的 leaf/VRF/BD 細節 — [來源](srl-evpn-irb.fd)
 對廠商文件圖的語意重建：fabric 雲、leaf 框內含 IP-VRF 徽章與虛線
-bridge domain、連線埠標籤、多行主機說明。全手工釘位（第 3 層排版）。
+bridge domain、連線埠標籤、`bundle` 多歸屬圈、多行主機說明。
 
 ![EVPN-VXLAN IRB](srl-evpn-irb.svg)
 
-### VXLAN 封裝 — 封裝前後訊框對照 — [來源](vxlan-encap.fd)
-古典訊框 vs VXLAN 訊框（原始 L2 訊框內嵌）、VLAN→VNI 箭頭、
-overhead 與重點對照表。
-
-![VXLAN encapsulation](vxlan-encap.svg)
-
-## 協議標頭（bitfield template）
+## 協議標頭（bitfield，普查第 2）
 
 ### Ethernet II（+ 選用 802.1Q）— [來源](ethernet-ii.fd)
 ![Ethernet II frame header](ethernet-ii.svg)
@@ -44,13 +55,7 @@ overhead 與重點對照表。
 ### VXLAN — RFC 7348 — [來源](vxlan.fd)
 ![VXLAN header](vxlan.svg)
 
-## 分割與門檻圖
-
-一個通用形態——欄位池 + 全域 `line`/`fill` 標記——涵蓋緩衝配額、
-記憶體映射、水位圖等實例。
-
-### 分割圖 — [來源](partition-map.fd)
-![Partition map](partition-map.svg)
+## 表格與數據（普查第 3）
 
 ### 佇列佔用熱圖 — [來源](queue-heatmap.fd)
 數據矩陣以表格 + 儲存格標記呈現——3D 長條圖的可讀二維解。
