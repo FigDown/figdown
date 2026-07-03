@@ -137,7 +137,7 @@ function tokenize(line){
 // Option keys are a CLOSED set: an unquoted token whose key is not listed
 // here is a positional argument (this lets wave lanes contain '=').
 const OPT_KEYS=new Set(['kind','shape','color','stroke','text','in','layer','label',
-  'style','z','at','w','h','unit','note','labels','numbering','fill','from','to','gap',
+  'style','z','at','w','h','unit','note','labels','numbering','fill','from','to','gap','dir',
   'taillabel','headlabel']);
 function splitOpts(toks){
   const pos=[], opts={};
@@ -383,7 +383,9 @@ function parse(text){
         if(!mf||!mt){ err(n,'fill needs from=<0..100>% and to=<0..100>%'); break; }
         const from=+mf[1], to=+mt[1];
         if(from<0||to>100||from>=to){ err(n,'fill needs 0 <= from < to <= 100'); break; }
-        doc.fills.push({target:opts['in'],from,to,color:opts.color||'#e5e7eb',line:n});
+        const fdir=opts.dir||'up';
+        if(!['up','down','left','right'].includes(fdir)){ err(n,'dir must be up|down|left|right'); break; }
+        doc.fills.push({target:opts['in'],from,to,dir:fdir,color:opts.color||'#e5e7eb',line:n});
         break;
       }
       case 'zone': {
@@ -639,11 +641,20 @@ function renderScene(doc,y0){
       +'<text x="'+(x0+10)+'" y="'+(yA+16)+'" font-size="11.5" fill="#6f6e69">'+esc(g.label)+'</text></g>');
     W=Math.max(W,x1); Hh=Math.max(Hh,yB-y0-20);
   }
-  // zone bands on groups: above the group background, below the nodes
+  // zone bands on groups: above the group background, below the nodes.
+  // dir picks the measuring axis and its 0% edge: up=bottom, down=top,
+  // right=left edge, left=right edge.
+  const bandRect=(f,x0,yA,x1,yB)=>{
+    const w=x1-x0, h=yB-yA;
+    if(f.dir==='up')    return [x0, yB-h*f.to/100, w, h*(f.to-f.from)/100];
+    if(f.dir==='down')  return [x0, yA+h*f.from/100, w, h*(f.to-f.from)/100];
+    if(f.dir==='right') return [x0+w*f.from/100, yA, w*(f.to-f.from)/100, h];
+    return [x1-w*f.to/100, yA, w*(f.to-f.from)/100, h];   // left
+  };
   for(const f of doc.fills){
     const B=gBox[f.target]; if(!B) continue;
-    const y1=B.yB-(B.yB-B.yA)*f.to/100, y2=B.yB-(B.yB-B.yA)*f.from/100;
-    gsvg.push('<rect x="'+B.x0+'" y="'+y1+'" width="'+(B.x1-B.x0)+'" height="'+(y2-y1)+'" fill="'+f.color+'" opacity="0.9"/>');
+    const [bx,by,bw,bh]=bandRect(f,B.x0,B.yA,B.x1,B.yB);
+    gsvg.push('<rect x="'+bx+'" y="'+by+'" width="'+bw+'" height="'+bh+'" fill="'+f.color+'" opacity="0.9"/>');
   }
   // edges (sorted by layer z, then doc order)
   const zOf=l=>{const L=doc.layers.find(x=>x.id===l);return L?L.z:0;};
@@ -691,11 +702,11 @@ function renderScene(doc,y0){
       // Graphviz rects, hardware block diagrams); use shape=rounded for corners
       nsvg.push('<rect x="'+n.x+'" y="'+n.y+'" width="'+n.w+'" height="'+n.h+'" fill="'+fill+'" stroke="'+stroke+'"'+ndash+'/>');
     }
-    // zone bands on this node (percent of the node box, bottom = 0%)
+    // zone bands on this node (dir: up=bottom-based, down, left, right)
     for(const f of doc.fills){
       if(f.target!==n.id) continue;
-      const y1=n.y+n.h*(1-f.to/100), y2=n.y+n.h*(1-f.from/100);
-      nsvg.push('<rect x="'+n.x+'" y="'+y1+'" width="'+n.w+'" height="'+(y2-y1)+'" fill="'+f.color+'" opacity="0.9"/>');
+      const [bx,by,bw,bh]=bandRect(f,n.x,n.y,n.x+n.w,n.y+n.h);
+      nsvg.push('<rect x="'+bx+'" y="'+by+'" width="'+bw+'" height="'+bh+'" fill="'+f.color+'" opacity="0.9"/>');
     }
     // label with shrink-to-fit when size is rigid (R10); multi-line via "\n"
     let fs=FONT;

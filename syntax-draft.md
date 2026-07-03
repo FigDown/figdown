@@ -154,7 +154,10 @@ fill in=buf from=0% to=15% color=#a3c93a
   references a line. Covers thresholds, waterlines, caps, future chart
   markers (R28: this one directive replaced a would-be template).
 - `fill` is a **range band**: `from`/`to` percentages, stackable, on a
-  group **or** a single node. Line and fill are decoupled concepts.
+  group **or** a single node. `dir=up|down|left|right` picks the
+  measuring axis and its 0% edge (default `up`: 0% at the bottom —
+  the waterline convention; `right` gives progress-bar style bands).
+  Line and fill are decoupled concepts.
 - **Scope follows the meaning (R29)**: attach to the *group* when the
   semantics are global ("one threshold config referenced by all
   columns" — the example above); attach to a *node* when the semantics
