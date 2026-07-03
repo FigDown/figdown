@@ -771,6 +771,29 @@ figure. This is one of the necessary purposes.
   and relationships. Added to the test suite; all 9 gallery examples
   pass.
 
+### R26 — Template candidate: `partition` (resource/quota maps) (2026-07-02)
+
+**Original**: e.g. per-port / per-queue utilization figures — the
+standard must express them clearly. (User-supplied reference photos are
+examples only and are deliberately NOT committed to the repo.)
+
+**Interpretation**:
+- Figure class: a total resource split into labeled regions whose
+  **proportions carry the meaning** (shared vs reserved quotas, caps and
+  thresholds as marker lines, per-column sub-partitions). Buffer/quota
+  partitions and memory maps are the same family — the census already
+  measured `memmap` at 14.2% of tables, so the class has corpus
+  evidence.
+- Verified expressible **today** with pinned/sized boxes (local demo,
+  not committed) — but that is coordinate work. Per R24 the right shape
+  is a semantics-first typed block, sketch:
+  `partition <id> "<label>"` / `cap "<label>"` /
+  `column <id> "<label>"` / `region <id> "<label>" <percent> [color=]`
+  — the engine derives all heights from the declared proportions; a
+  human never computes a pixel.
+- Status: **candidate for the template set** (R16 gate: corpus evidence
+  exists; design when scheduled).
+
 ### Open question OQ1 — Build on D2 vs. a new language (2026-07-02)
 
 D2 is close enough that R11 (survey before invent) obliges a deep read of
