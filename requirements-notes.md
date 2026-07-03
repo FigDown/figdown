@@ -856,6 +856,13 @@ references it.)
   vocabulary.
 - Corollary: **ids exist only for reference** — directives nothing can
   refer to (guide lines) take no id.
+- **Template bar finalized (user, 2026-07-03): a standard must not
+  lightly open a new template type.** Two tests, BOTH required:
+  (1) corpus frequency (R16) and (2) irreducibility — the figure family
+  cannot be decomposed into core constructs. The partition episode is
+  the case study: it had corpus evidence (memmap 14.2%) yet was still
+  decomposable, so no template. The surviving typed blocks (bitfield /
+  table / wave) all pass irreducibility: none is a box-and-wire graph.
 
 ### R29 — Scope follows the meaning; examples start from the intent (2026-07-03)
 
