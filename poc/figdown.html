@@ -136,7 +136,7 @@ function tokenize(line){
 // Option keys are a CLOSED set: an unquoted token whose key is not listed
 // here is a positional argument (this lets wave lanes contain '=').
 const OPT_KEYS=new Set(['kind','shape','color','stroke','text','in','layer','label',
-  'style','z','at','w','h','unit','note','labels','numbering','fill',
+  'style','z','at','w','h','unit','note','labels','numbering','fill','from','to',
   'taillabel','headlabel']);
 function splitOpts(toks){
   const pos=[], opts={};
@@ -151,7 +151,7 @@ const ID_RE=/^[A-Za-z_][A-Za-z0-9_-]*$/;
 function parse(text){
   const errs=[];
   const doc={title:'',nodes:[],groups:[],edges:[],layers:[{id:'base',label:'',z:0}],
-             flow:'right',ranks:[],pins:{},sizes:{},blocks:[],trunks:[],glines:[]};
+             flow:'right',ranks:[],pins:{},sizes:{},blocks:[],trunks:[],glines:[],fills:[]};
   const nodeIds=new Set(), groupIds=new Set(), layerIds=new Set(['base']);
   let cur=null;             // current typed block (bitfield/table/wave)
   let sawHeader=false, firstContent=true;
@@ -365,8 +365,19 @@ function parse(text){
         if(!opts['in']){ err(n,'line needs in=<group-id>'); break; }
         const m=/^(\d+(?:\.\d+)?)%?$/.exec(opts.at||'');
         if(!m||+m[1]<0||+m[1]>100){ err(n,'line needs at=<0..100>%'); break; }
-        if(opts.fill!==undefined&&!['below','above'].includes(opts.fill)){ err(n,'fill must be below or above'); break; }
-        doc.glines.push({label:glabel,group:opts['in'],pct:+m[1],color:opts.color,fill:opts.fill,line:n});
+        if(opts.fill!==undefined){ err(n,'line is a pure marker — use the fill directive for zones'); break; }
+        doc.glines.push({label:glabel,group:opts['in'],pct:+m[1],color:opts.color,line:n});
+        break;
+      }
+      case 'fill': {
+        // zone band: fill in=<node|group> from=<pct> to=<pct> [color=]
+        if(!opts['in']){ err(n,'fill needs in=<node-or-group-id>'); break; }
+        const pf=/^(\d+(?:\.\d+)?)%?$/;
+        const mf=pf.exec(opts.from||''), mt=pf.exec(opts.to||'');
+        if(!mf||!mt){ err(n,'fill needs from=<0..100>% and to=<0..100>%'); break; }
+        const from=+mf[1], to=+mt[1];
+        if(from<0||to>100||from>=to){ err(n,'fill needs 0 <= from < to <= 100'); break; }
+        doc.fills.push({target:opts['in'],from,to,color:opts.color||'#e5e7eb',line:n});
         break;
       }
       case 'zone': {
@@ -429,6 +440,9 @@ function parse(text){
     if(!nodeIds.has(id)) errs.push('Line '+r.line+': unknown node "'+id+'" in rank');
   for(const gl of doc.glines)
     if(!groupIds.has(gl.group)) errs.push('Line '+gl.line+': unknown group "'+gl.group+'" for line');
+  for(const f of doc.fills)
+    if(!groupIds.has(f.target)&&!nodeIds.has(f.target))
+      errs.push('Line '+f.line+': unknown target "'+f.target+'" for fill');
   for(const t of doc.trunks) for(const [a,b] of t.pairs){
     if(!nodeIds.has(a)||!nodeIds.has(b)){ errs.push('Line '+t.line+': unknown endpoint in "'+a+'--'+b+'"'); continue; }
     if(!doc.edges.some(e=>(e.a===a&&e.b===b)||(e.a===b&&e.b===a)))
@@ -609,12 +623,11 @@ function renderScene(doc,y0){
       +'<text x="'+(x0+10)+'" y="'+(yA+16)+'" font-size="11.5" fill="#6f6e69">'+esc(g.label)+'</text></g>');
     W=Math.max(W,x1); Hh=Math.max(Hh,yB-y0-20);
   }
-  // guide-line zone fills: above the group background, below the nodes
-  for(const gl of doc.glines){
-    const B=gBox[gl.group]; if(!B||!gl.fill) continue;
-    const ly=B.yB-(B.yB-B.yA)*gl.pct/100;
-    const [zy,zh]=gl.fill==='below'?[ly,B.yB-ly]:[B.yA,ly-B.yA];
-    gsvg.push('<rect x="'+B.x0+'" y="'+zy+'" width="'+(B.x1-B.x0)+'" height="'+zh+'" fill="'+(gl.color||'#a3c93a')+'" opacity="0.9"/>');
+  // zone bands on groups: above the group background, below the nodes
+  for(const f of doc.fills){
+    const B=gBox[f.target]; if(!B) continue;
+    const y1=B.yB-(B.yB-B.yA)*f.to/100, y2=B.yB-(B.yB-B.yA)*f.from/100;
+    gsvg.push('<rect x="'+B.x0+'" y="'+y1+'" width="'+(B.x1-B.x0)+'" height="'+(y2-y1)+'" fill="'+f.color+'" opacity="0.9"/>');
   }
   // edges (sorted by layer z, then doc order)
   const zOf=l=>{const L=doc.layers.find(x=>x.id===l);return L?L.z:0;};
@@ -660,6 +673,12 @@ function renderScene(doc,y0){
     } else {
       nsvg.push('<rect x="'+n.x+'" y="'+n.y+'" width="'+n.w+'" height="'+n.h+'" rx="8" fill="'+fill+'" stroke="'+stroke+'"'+ndash+'/>');
     }
+    // zone bands on this node (percent of the node box, bottom = 0%)
+    for(const f of doc.fills){
+      if(f.target!==n.id) continue;
+      const y1=n.y+n.h*(1-f.to/100), y2=n.y+n.h*(1-f.from/100);
+      nsvg.push('<rect x="'+n.x+'" y="'+y1+'" width="'+n.w+'" height="'+(y2-y1)+'" fill="'+f.color+'" opacity="0.9"/>');
+    }
     // label with shrink-to-fit when size is rigid (R10); multi-line via "\n"
     let fs=FONT;
     const need=Math.max(...String(n.label).split('\n').map(l=>l.length))*CH;
@@ -693,7 +712,7 @@ function renderScene(doc,y0){
     const B=gBox[gl.group]; if(!B) continue;
     const ly=B.yB-(B.yB-B.yA)*gl.pct/100;
     const col=gl.color||'#ef4444';
-    tsvg.push('<line x1="'+B.x0+'" y1="'+ly+'" x2="'+B.x1+'" y2="'+ly+'" stroke="'+col+'" stroke-width="'+(gl.pct>=100?4:2)+'"'+(gl.fill?'':' stroke-dasharray="7 4"')+'/>');
+    tsvg.push('<line x1="'+B.x0+'" y1="'+ly+'" x2="'+B.x1+'" y2="'+ly+'" stroke="'+col+'" stroke-width="'+(gl.pct>=100?4:2)+'" stroke-dasharray="7 4"/>');
     tsvg.push(textEl(B.x1+8, ly+4, 11, 'start', col, gl.label,' paint-order="stroke" stroke="#fff" stroke-width="3"'));
     W=Math.max(W, B.x1+8+tw(gl.label)); Hh=Math.max(Hh, B.yB-y0-20);
   }
@@ -1120,8 +1139,11 @@ table facts "Why VXLAN"
 `figdown 0.1 block
 title "Egress buffer partition — shared pool with per-queue reservations"
 
-# The classic switch-QoS quota picture, built from GENERIC constructs:
-# a group of transparent columns + two guide lines. No special template.
+# MEANING FIRST: this figure says "two GLOBAL thresholds, configured once,
+# referenced by all four groups" — so the lines AND the fill attach to the
+# container (group-level scope). Per-node scope exists in the language for
+# figures whose semantics really are per-column; the writer chooses the
+# scope that matches the meaning.
 group buf "Packet buffer (pages)"
 node g0 "Group 0" in=buf color=transparent
 node g1 "Group 1" in=buf color=transparent
@@ -1135,7 +1157,8 @@ size g2 w=120 h=190
 size g3 w=120 h=190
 
 line "Max cap"                 in=buf at=80%
-line "Reserved {port, queue}"  in=buf at=15% color=#a3c93a fill=below`,
+line "Reserved {port, queue}"  in=buf at=15%
+fill in=buf from=0% to=15% color=#a3c93a`,
 
 'mixed document':
 `figdown 0.1 block

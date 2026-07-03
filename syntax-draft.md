@@ -139,19 +139,26 @@ must reference existing edges (line error otherwise). This is the
 semantics-first rule (R24): name the *meaning* and the engine owns the
 drawing convention.
 
-### 2.6 Guide lines: `line` (generic threshold/marker)
+### 2.6 Guide lines and zone fills: `line`, `fill` (generic markers)
 
 ```figdown
 line "Max cap"                in=buf at=80%
-line "Reserved {port, queue}" in=buf at=15% color=#a3c93a fill=below
+line "Reserved {port, queue}" in=buf at=15%
+fill in=buf from=0% to=15% color=#a3c93a
 ```
 
-A horizontal guide line across a group's box at a percentage of its
-height; `fill=below|above` derives a colored zone. This ONE generic
-directive (no id — nothing references a line) covers quota/partition
-figures (columns = transparent nodes in the group), waterlines,
-hi/lo thresholds, and future chart markers. R28: it replaced a whole
-would-be `partition` template (4 keywords → 1).
+- `line` is a **pure marker**: a horizontal guide across the target's
+  box at a percentage of its height (bottom = 0%). No id — nothing
+  references a line. Covers thresholds, waterlines, caps, future chart
+  markers (R28: this one directive replaced a would-be template).
+- `fill` is a **range band**: `from`/`to` percentages, stackable, on a
+  group **or** a single node. Line and fill are decoupled concepts.
+- **Scope follows the meaning (R29)**: attach to the *group* when the
+  semantics are global ("one threshold config referenced by all
+  columns" — the example above); attach to a *node* when the semantics
+  are genuinely per-element (`fill in=g2 from=15% to=35%` — e.g. one
+  column's occupancy watermark). The writer chooses the scope that
+  states their intent; the renderer treats both identically.
 
 ## 3. Layout control — the three tiers (R5, R8)
 

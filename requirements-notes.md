@@ -857,6 +857,25 @@ references it.)
 - Corollary: **ids exist only for reference** — directives nothing can
   refer to (guide lines) take no id.
 
+### R29 — Scope follows the meaning; examples start from the intent (2026-07-03)
+
+**Original**: Semantics must be made explicit first, and the
+user/writer decides how to express them. The reference example's
+meaning was "two GLOBAL thresholds configured once, referenced by all
+four groups" — so a per-column expression misstates it. Example
+authoring must always start from the meaning to be expressed.
+
+**Interpretation**:
+- `line`/`fill` (and future annotations) offer scope by target:
+  group-level = global semantics, node-level = per-element semantics.
+  The language provides both; **the writer picks the scope that states
+  the intent** — the renderer may draw them identically, but the text
+  reads differently to an AI, and that difference IS the knowledge.
+- Example-authoring rule: identify the figure's intended meaning first,
+  then choose constructs whose reading matches it (the buffer-partition
+  example was corrected from per-column fills ×4 to one group-level
+  fill accordingly).
+
 ### Open question OQ1 — Build on D2 vs. a new language (2026-07-02)
 
 D2 is close enough that R11 (survey before invent) obliges a deep read of
