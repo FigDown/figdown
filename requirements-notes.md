@@ -802,7 +802,10 @@ examples only and are deliberately NOT committed to the repo.)
   hallucination): labeled figures declare `column` per column; an
   anonymous even split gets the distinct shorthand `columns <N>` —
   different semantics (unlabeled equal split), not an alternate
-  spelling.
+  spelling. **User ruling (2026-07-02): both forms are supported; for
+  figures like the reference example — where every column has an
+  identity — the per-column labeled form is the better choice** (the
+  column names ARE the knowledge; R25).
 - Status: **candidate for the template set** (R16 gate: corpus evidence
   exists; design when scheduled).
 
