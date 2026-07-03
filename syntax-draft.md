@@ -96,7 +96,9 @@ group vtep1 "VTEP-1"; node vm1 "VM" in=vtep1   # one level of nesting OK
 ```
 
 Flat `in=` reference keeps the grammar line-oriented (no indentation
-semantics, no `end` blocks). OQ-S1: whether to also allow an indented
+semantics, no `end` blocks). Groups accept `gap=<px>` — member spacing
+(presentation, R5); `gap=0` packs members flush, giving the classic
+one-frame-with-dividers look. OQ-S1: whether to also allow an indented
 block form as sugar.
 
 ### 2.3 Edges

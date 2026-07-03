@@ -136,7 +136,7 @@ function tokenize(line){
 // Option keys are a CLOSED set: an unquoted token whose key is not listed
 // here is a positional argument (this lets wave lanes contain '=').
 const OPT_KEYS=new Set(['kind','shape','color','stroke','text','in','layer','label',
-  'style','z','at','w','h','unit','note','labels','numbering','fill','from','to',
+  'style','z','at','w','h','unit','note','labels','numbering','fill','from','to','gap',
   'taillabel','headlabel']);
 function splitOpts(toks){
   const pos=[], opts={};
@@ -318,7 +318,12 @@ function parse(text){
         if(!id||!ID_RE.test(id)){ err(n,'group needs an id'); break; }
         if(nodeIds.has(id)||groupIds.has(id)){ err(n,'duplicate id "'+id+'"'); break; }
         groupIds.add(id);
-        doc.groups.push({id,label:pos[2]||id,color:opts.color,line:n});
+        let ggap;
+        if(opts.gap!==undefined){
+          ggap=parseFloat(opts.gap);
+          if(!isFinite(ggap)||ggap<0){ err(n,'gap must be a non-negative number'); break; }
+        }
+        doc.groups.push({id,label:pos[2]||id,color:opts.color,gap:ggap,line:n});
         break;
       }
       case 'edge': {
@@ -567,21 +572,31 @@ function renderScene(doc,y0){
   // that pinning X never reflows Y); pins override coordinates afterwards.
   const ranksArr=[];
   for(const n of nodes){ (ranksArr[n.rank]=ranksArr[n.rank]||[]).push(n); }
+  const gapOf=(a,b)=>{  // spacing between adjacent lane members
+    if(a.group&&a.group===b.group){
+      const g=doc.groups.find(x=>x.id===a.group);
+      if(g&&g.gap!==undefined) return g.gap;
+    }
+    return horiz?GAPY:GAPX;
+  };
   const laneSize=[], laneSpan=[];
   ranksArr.forEach((lane,i)=>{
     if(!lane) return;
     laneSize[i]=Math.max(...lane.map(n=>horiz?n.w:n.h));
-    laneSpan[i]=lane.reduce((s,n)=>s+(horiz?n.h:n.w),0)+ (lane.length-1)*(horiz?GAPY:GAPX);
+    let span=0;
+    lane.forEach((n,k)=>{ span+=(horiz?n.h:n.w); if(k<lane.length-1) span+=gapOf(n,lane[k+1]); });
+    laneSpan[i]=span;
   });
   const maxSpan=Math.max(0,...laneSpan.filter(v=>v!==undefined));
   let main=0;
   ranksArr.forEach((lane,i)=>{
     if(!lane) return;
     let cross=(maxSpan-laneSpan[i])/2;
-    for(const n of lane){
-      if(horiz){ n.x=main; n.y=y0+20+cross; cross+=n.h+GAPY; }
-      else     { n.y=y0+20+main; n.x=cross; cross+=n.w+GAPX; }
-    }
+    lane.forEach((n,k)=>{
+      const sp=k<lane.length-1?gapOf(n,lane[k+1]):0;
+      if(horiz){ n.x=main; n.y=y0+20+cross; cross+=n.h+sp; }
+      else     { n.y=y0+20+main; n.x=cross; cross+=n.w+sp; }
+    });
     main+=laneSize[i]+(horiz?GAPX:GAPY);
   });
   if(doc.flow==='left'||doc.flow==='up'){
@@ -1144,7 +1159,7 @@ title "Egress buffer partition — shared pool with per-queue reservations"
 # container (group-level scope). Per-node scope exists in the language for
 # figures whose semantics really are per-column; the writer chooses the
 # scope that matches the meaning.
-group buf "Packet buffer (pages)"
+group buf "Packet buffer (pages)" gap=0
 node g0 "Group 0" in=buf color=transparent
 node g1 "Group 1" in=buf color=transparent
 node g2 "Group 2" in=buf color=transparent

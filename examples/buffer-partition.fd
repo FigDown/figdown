@@ -6,7 +6,7 @@ title "Egress buffer partition — shared pool with per-queue reservations"
 # container (group-level scope). Per-node scope exists in the language for
 # figures whose semantics really are per-column; the writer chooses the
 # scope that matches the meaning.
-group buf "Packet buffer (pages)"
+group buf "Packet buffer (pages)" gap=0
 node g0 "Group 0" in=buf color=transparent
 node g1 "Group 1" in=buf color=transparent
 node g2 "Group 2" in=buf color=transparent
