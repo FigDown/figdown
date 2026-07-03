@@ -41,8 +41,8 @@ title "L3 Forwarding Datapath"  # optional
 
 **Templates (R16).** The header names the document's template — the
 figure type it instantiates: `block` | `topology` | `flowchart` |
-`bitfield` | `table` | `wave` | `partition` (census buckets in priority
-order, plus the R26-evidenced partition). All templates share this one core grammar; the template
+`bitfield` | `table` | `wave` (initial set = the census buckets, in
+priority order). All templates share this one core grammar; the template
 selects the keyword vocabulary (which `kind`s exist, what `node` means)
 and the defaults (flow direction, edge directedness, unit sizes) — each
 tuned to that figure type's own census statistics. Teaching an AI to
@@ -138,6 +138,20 @@ involved, and the ring follows the nodes wherever they move. Members
 must reference existing edges (line error otherwise). This is the
 semantics-first rule (R24): name the *meaning* and the engine owns the
 drawing convention.
+
+### 2.6 Guide lines: `line` (generic threshold/marker)
+
+```figdown
+line "Max cap"                in=buf at=80%
+line "Reserved {port, queue}" in=buf at=15% color=#a3c93a fill=below
+```
+
+A horizontal guide line across a group's box at a percentage of its
+height; `fill=below|above` derives a colored zone. This ONE generic
+directive (no id — nothing references a line) covers quota/partition
+figures (columns = transparent nodes in the group), waterlines,
+hi/lo thresholds, and future chart markers. R28: it replaced a whole
+would-be `partition` template (4 keywords → 1).
 
 ## 3. Layout control — the three tiers (R5, R8)
 
@@ -290,22 +304,7 @@ gap 4                       # visual break marker at tick 4
 One char = one tick: `p` clock, `0/1` levels, `x` undefined, `=` data
 cell, `.` continue. Exact lane alphabet: adopt WaveDrom's, subset TBD.
 
-### 4.4 `partition` — resource/quota maps (R26; memmap family, 14.2% of tables)
-
-```figdown
-partition buf "Packet buffer (pages)"
-column g0 "Group 0"
-column g1 "Group 1"                # or `columns 4` for an anonymous even split
-line cap "Max cap"                at=100%
-line res "Reserved {port, queue}" at=25% color=#a3c93a fill=below
-```
-
-- Structure = N columns + horizontal threshold **lines**; colored zones
-  derive from `fill=below|above`. Rendering is one outer frame with
-  N−1 internal dividers. Lines are the semantics (caps, hi/lo
-  thresholds); nobody draws region boxes or computes a pixel.
-
-### 4.5 Priority note
+### 4.4 Priority note
 
 `block-architecture` (census #1, 24.3% weighted) needs **no typed
 block** — it is the core scene model (§2) plus `kind`s; flowchart

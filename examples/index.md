@@ -47,8 +47,9 @@ VLAN-to-VNI arrow, and overhead/fact tables.
 ![VXLAN header](vxlan.svg)
 
 ### Buffer partition — shared pool + reservations  — [source](buffer-partition.fd)
-The `partition` template: columns + threshold lines; zones derive from
-the lines (`fill=below`). Seven lines of text, zero coordinates.
+Generic constructs only: a group of transparent column nodes + two
+`line` guide directives (`fill=below` derives the zone). No special
+template needed (R28).
 
 ![Buffer partition](buffer-partition.svg)
 

@@ -45,8 +45,8 @@ overhead 與重點對照表。
 ![VXLAN header](vxlan.svg)
 
 ### 緩衝分割 — 共享池 + 保留量 — [來源](buffer-partition.fd)
-`partition` template：欄 + 門檻線；著色區由線推導（`fill=below`）。
-七行文字、零座標。
+純通用構件：群組內的透明欄位節點 + 兩個 `line` 導引線指令
+（`fill=below` 推導著色區）。不需要任何專屬 template（R28）。
 
 ![Buffer partition](buffer-partition.svg)
 

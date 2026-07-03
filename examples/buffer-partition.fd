@@ -1,12 +1,19 @@
-figdown 0.1 partition
+figdown 0.1 block
 title "Egress buffer partition — shared pool with per-queue reservations"
 
-# The classic switch-QoS quota picture: one resource, N groups,
-# threshold LINES as first-class semantics (the zones derive from them).
-partition buf "Packet buffer (pages)"
-column g0 "Group 0"
-column g1 "Group 1"
-column g2 "Group 2"
-column g3 "Group 3"
-line cap "Max cap"                 at=100%
-line res "Reserved {port, queue}"  at=25% color=#a3c93a fill=below
+# The classic switch-QoS quota picture, built from GENERIC constructs:
+# a group of transparent columns + two guide lines. No special template.
+group buf "Packet buffer (pages)"
+node g0 "Group 0" in=buf color=transparent
+node g1 "Group 1" in=buf color=transparent
+node g2 "Group 2" in=buf color=transparent
+node g3 "Group 3" in=buf color=transparent
+flow down
+rank g0 g1 g2 g3
+size g0 w=120 h=190
+size g1 w=120 h=190
+size g2 w=120 h=190
+size g3 w=120 h=190
+
+line "Max cap"                 in=buf at=80%
+line "Reserved {port, queue}"  in=buf at=15% color=#a3c93a fill=below

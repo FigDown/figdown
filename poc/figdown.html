@@ -151,7 +151,7 @@ const ID_RE=/^[A-Za-z_][A-Za-z0-9_-]*$/;
 function parse(text){
   const errs=[];
   const doc={title:'',nodes:[],groups:[],edges:[],layers:[{id:'base',label:'',z:0}],
-             flow:'right',ranks:[],pins:{},sizes:{},blocks:[],trunks:[]};
+             flow:'right',ranks:[],pins:{},sizes:{},blocks:[],trunks:[],glines:[]};
   const nodeIds=new Set(), groupIds=new Set(), layerIds=new Set(['base']);
   let cur=null;             // current typed block (bitfield/table/wave)
   let sawHeader=false, firstContent=true;
@@ -222,8 +222,8 @@ function parse(text){
         sawHeader=true;
         if(pos[1]!=='0.1') err(n,'unsupported version "'+(pos[1]||'')+'" (expected 0.1)');
         if(pos[2]!==undefined){
-          const TEMPLATES=['block','topology','flowchart','bitfield','table','wave','partition'];
-          if(!TEMPLATES.includes(pos[2])) err(n,'unknown template "'+pos[2]+'" (block|topology|flowchart|bitfield|table|wave|partition)');
+          const TEMPLATES=['block','topology','flowchart','bitfield','table','wave'];
+          if(!TEMPLATES.includes(pos[2])) err(n,'unknown template "'+pos[2]+'" (block|topology|flowchart|bitfield|table|wave)');
           else doc.template=pos[2];
         }
         continue;
@@ -231,7 +231,7 @@ function parse(text){
     } else if(kw==='figdown'){ err(n,'duplicate version header'); continue; }
 
     // typed-block children
-    if(cur && ['field','wrap','cell','signal','gap','column','columns','line'].includes(kw)){
+    if(cur && ['field','wrap','cell','signal','gap'].includes(kw)){
       if(cur.type==='bitfield' && kw==='field'){
         // Compact form (C bit-field convention): field F1:16,F2:8 SYN:1 ...
         // — bare name:width items separated by commas and/or spaces, no
@@ -284,25 +284,6 @@ function parse(text){
         const t=parseInt(pos[1],10);
         if(!isFinite(t)||t<0){ err(n,'gap needs a tick number'); continue; }
         cur.gaps.push(t);
-      } else if(cur.type==='partition' && kw==='column'){
-        const id=pos[1];
-        if(!id||!ID_RE.test(id)){ err(n,'column needs an id'); continue; }
-        if(cur.anon){ err(n,'column after columns N (pick one form)'); continue; }
-        cur.cols.push({id,label:pos[2]||id});
-      } else if(cur.type==='partition' && kw==='columns'){
-        const N=parseInt(pos[1],10);
-        if(!isFinite(N)||N<1){ err(n,'columns needs a count'); continue; }
-        if(cur.cols.length){ err(n,'columns N after column lines (pick one form)'); continue; }
-        cur.anon=N;
-      } else if(cur.type==='partition' && kw==='line'){
-        const id=pos[1];
-        if(!id||!ID_RE.test(id)){ err(n,'line needs an id'); continue; }
-        let llabel=id;
-        if(tk.toks[2]&&tk.toks[2].q) llabel=pos[2];
-        const m=/^(\d+(?:\.\d+)?)%?$/.exec(opts.at||'');
-        if(!m||+m[1]<0||+m[1]>100){ err(n,'line needs at=<0..100>%'); continue; }
-        if(opts.fill!==undefined&&!['below','above'].includes(opts.fill)){ err(n,'fill must be below or above'); continue; }
-        cur.lines.push({id,label:llabel,pct:+m[1],color:opts.color,fill:opts.fill,line:n});
       } else { err(n,'"'+kw+'" not valid inside '+cur.type); }
       continue;
     }
@@ -376,6 +357,18 @@ function parse(text){
         doc.trunks.push({id,label:tlabel,pairs,color:opts.color,line:n});
         break;
       }
+      case 'line': {
+        // generic horizontal guide/threshold line across a group's box:
+        // line "<label>" in=<group> at=<0..100>% [color=] [fill=below|above]
+        const glabel=(tk.toks[1]&&tk.toks[1].q)?pos[1]:null;
+        if(glabel===null){ err(n,'line needs a quoted "<label>" first'); break; }
+        if(!opts['in']){ err(n,'line needs in=<group-id>'); break; }
+        const m=/^(\d+(?:\.\d+)?)%?$/.exec(opts.at||'');
+        if(!m||+m[1]<0||+m[1]>100){ err(n,'line needs at=<0..100>%'); break; }
+        if(opts.fill!==undefined&&!['below','above'].includes(opts.fill)){ err(n,'fill must be below or above'); break; }
+        doc.glines.push({label:glabel,group:opts['in'],pct:+m[1],color:opts.color,fill:opts.fill,line:n});
+        break;
+      }
       case 'zone': {
         if(!['left','right','top','bottom'].includes(pos[1])||!pos[2]){ err(n,'zone needs <left|right|top|bottom> <group-id>'); break; }
         break; // accepted; PoC does not act on zone yet
@@ -414,12 +407,6 @@ function parse(text){
         cur={type:'wave',id,label:pos[2]||id,signals:[],gaps:[],line:n};
         doc.blocks.push(cur); break;
       }
-      case 'partition': {
-        const id=pos[1];
-        if(!id||!ID_RE.test(id)){ err(n,'partition needs an id'); break; }
-        cur={type:'partition',id,label:pos[2]||id,cols:[],anon:0,lines:[],line:n};
-        doc.blocks.push(cur); break;
-      }
       case 'page': case 'step': case 'set': case 'pulse':
         err(n,'"'+kw+'" is reserved for the dynamic profile (not in v0.1)'); break;
       default:
@@ -440,6 +427,8 @@ function parse(text){
   }
   for(const r of doc.ranks) for(const id of r.ids)
     if(!nodeIds.has(id)) errs.push('Line '+r.line+': unknown node "'+id+'" in rank');
+  for(const gl of doc.glines)
+    if(!groupIds.has(gl.group)) errs.push('Line '+gl.line+': unknown group "'+gl.group+'" for line');
   for(const t of doc.trunks) for(const [a,b] of t.pairs){
     if(!nodeIds.has(a)||!nodeIds.has(b)){ errs.push('Line '+t.line+': unknown endpoint in "'+a+'--'+b+'"'); continue; }
     if(!doc.edges.some(e=>(e.a===a&&e.b===b)||(e.a===b&&e.b===a)))
@@ -454,7 +443,6 @@ function parse(text){
     if(b.type==='table'&&b.heads.length&&!b.sep) errs.push('Line '+b.line+': table has no |---| separator row');
     if(b.type==='bitfield'&&!b.fields.some(f=>!f.wrap)) errs.push('Line '+b.line+': bitfield has no fields');
     if(b.type==='wave'&&!b.signals.length) errs.push('Line '+b.line+': wave has no signals');
-    if(b.type==='partition'&&!b.cols.length&&!b.anon) errs.push('Line '+b.line+': partition has no columns');
     if(b.type==='table'&&b.marks) for(const mk of b.marks){
       if(mk.r>b.rows.length||mk.c<1||mk.c>b.cols.length)
         errs.push('Line '+mk.line+': cell '+mk.r+','+mk.c+' out of range');
@@ -509,7 +497,6 @@ function render(doc){
     let s;
     if(b.type==='bitfield') s=renderBitfield(b,y);
     else if(b.type==='table') s=renderTable(b,y);
-    else if(b.type==='partition') s=renderPartition(b,y);
     else s=renderWave(b,y);
     parts.push(s.svg); y=s.y+24; maxW=Math.max(maxW,s.w);
   }
@@ -609,17 +596,25 @@ function renderScene(doc,y0){
   for(const n of nodes){ W=Math.max(W,n.x+n.w); Hh=Math.max(Hh,n.y+n.h-y0-20); }
   if(W===0){W=480;} if(Hh===0){Hh=280;}
   // groups
-  const gsvg=[];
+  const gsvg=[]; const gBox={};
   for(const g of doc.groups){
     const mem=nodes.filter(n=>n.group===g.id);
     if(!mem.length) continue;
     const o=gOrigin[g.id];
     const x0=Math.min(...mem.map(n=>n.x))-14, x1=Math.max(...mem.map(n=>n.x+n.w))+14;
     const yA=Math.min(...mem.map(n=>n.y))-26, yB=Math.max(...mem.map(n=>n.y+n.h))+12;
+    gBox[g.id]={x0,x1,yA,yB};
     gsvg.push('<g data-group="'+g.id+'" data-gx="'+o.x+'" data-gy="'+o.y+'" style="cursor:move">'
       +'<rect x="'+x0+'" y="'+yA+'" width="'+(x1-x0)+'" height="'+(yB-yA)+'" rx="10" fill="'+(g.color||'#f6f5ef')+'" stroke="#d6d4cc"/>'
       +'<text x="'+(x0+10)+'" y="'+(yA+16)+'" font-size="11.5" fill="#6f6e69">'+esc(g.label)+'</text></g>');
     W=Math.max(W,x1); Hh=Math.max(Hh,yB-y0-20);
+  }
+  // guide-line zone fills: above the group background, below the nodes
+  for(const gl of doc.glines){
+    const B=gBox[gl.group]; if(!B||!gl.fill) continue;
+    const ly=B.yB-(B.yB-B.yA)*gl.pct/100;
+    const [zy,zh]=gl.fill==='below'?[ly,B.yB-ly]:[B.yA,ly-B.yA];
+    gsvg.push('<rect x="'+B.x0+'" y="'+zy+'" width="'+(B.x1-B.x0)+'" height="'+zh+'" fill="'+(gl.color||'#a3c93a')+'" opacity="0.9"/>');
   }
   // edges (sorted by layer z, then doc order)
   const zOf=l=>{const L=doc.layers.find(x=>x.id===l);return L?L.z:0;};
@@ -692,6 +687,15 @@ function renderScene(doc,y0){
     tsvg.push('<ellipse cx="'+cx+'" cy="'+cy+'" rx="'+rx+'" ry="'+ry+'" fill="transparent" stroke="'+col+'" stroke-dasharray="6 4" stroke-width="1.6"/>');
     tsvg.push(textEl(cx, cy+4, 11.5, 'middle', col, t.label,' paint-order="stroke" stroke="#fff" stroke-width="3"'));
     W=Math.max(W,cx+rx); Hh=Math.max(Hh,cy+ry-y0-20);
+  }
+  // guide lines + labels (top layer)
+  for(const gl of doc.glines){
+    const B=gBox[gl.group]; if(!B) continue;
+    const ly=B.yB-(B.yB-B.yA)*gl.pct/100;
+    const col=gl.color||'#ef4444';
+    tsvg.push('<line x1="'+B.x0+'" y1="'+ly+'" x2="'+B.x1+'" y2="'+ly+'" stroke="'+col+'" stroke-width="'+(gl.pct>=100?4:2)+'"'+(gl.fill?'':' stroke-dasharray="7 4"')+'/>');
+    tsvg.push(textEl(B.x1+8, ly+4, 11, 'start', col, gl.label,' paint-order="stroke" stroke="#fff" stroke-width="3"'));
+    W=Math.max(W, B.x1+8+tw(gl.label)); Hh=Math.max(Hh, B.yB-y0-20);
   }
   const yEnd=y0+20+Hh+10;
   return {svg:gsvg.join('')+esvg.join('')+nsvg.join('')+tsvg.join(''), y:yEnd, w:W+2,
@@ -785,41 +789,6 @@ function renderTable(t,y0){
   }
   const yEnd=yTop+grid.length*rh;
   return {svg:svg.join(''), y:yEnd+6, w:totalW+2};
-}
-
-// ---- partition (R26): N columns + threshold lines; zones derive from lines ----
-function renderPartition(b,y0){
-  const svg=[]; let y=y0+18;
-  svg.push('<text x="0" y="'+(y-4)+'" font-size="13" font-weight="600">'+esc(b.label)+'</text>');
-  const cols = b.cols.length ? b.cols : Array.from({length:b.anon},()=>({label:''}));
-  const colW = Math.max(120, ...cols.map(c=>tw(c.label)+16));
-  const H=210, W=cols.length*colW;
-  const yTop=y+6, yBot=yTop+H;
-  const lineY=pct=>yTop+H*(1-pct/100);
-  // zone fills first (they sit behind everything)
-  for(const L of b.lines){
-    if(!L.fill) continue;
-    const ly=lineY(L.pct);
-    const [zy,zh]=L.fill==='below'?[ly,yBot-ly]:[yTop,ly-yTop];
-    svg.push('<rect x="0" y="'+zy+'" width="'+W+'" height="'+zh+'" fill="'+(L.color||'#a3c93a')+'"/>');
-  }
-  // one outer frame + N-1 internal dividers (the canonical rendering)
-  svg.push('<rect x="0" y="'+yTop+'" width="'+W+'" height="'+H+'" fill="none" stroke="#555" stroke-width="1.5"/>');
-  for(let i=1;i<cols.length;i++)
-    svg.push('<line x1="'+(i*colW)+'" y1="'+yTop+'" x2="'+(i*colW)+'" y2="'+yBot+'" stroke="#555"/>');
-  // column labels (upper area)
-  cols.forEach((c,i)=>{
-    if(c.label) svg.push(textEl(i*colW+colW/2, yTop+H*0.42, 12.5, 'middle', '#1d1d1b', c.label));
-  });
-  // threshold lines + labels (drawn on top)
-  for(const L of b.lines){
-    const ly=lineY(L.pct);
-    const col=L.color||'#ef4444';
-    svg.push('<line x1="0" y1="'+ly+'" x2="'+W+'" y2="'+ly+'" stroke="'+col+'" stroke-width="'+(L.pct>=100?5:2)+'"'+(L.fill?'':' stroke-dasharray="7 4"')+'/>');
-    svg.push(textEl(W+8, ly+4, 11, 'start', col, L.label,' paint-order="stroke" stroke="#fff" stroke-width="3"'));
-  }
-  const labelW=Math.max(0,...b.lines.map(L=>tw(L.label)));
-  return {svg:svg.join(''), y:yBot+8, w:W+labelW+14};
 }
 
 // ---- wave ----
@@ -1147,19 +1116,26 @@ table facts "Why VXLAN"
 | VNI address space       | 24 bits (16M segments)   |
 | Encapsulation           | MAC-in-UDP               |`,
 
-'buffer partition (columns + threshold lines)':
-`figdown 0.1 partition
+'buffer partition (generic group + guide lines)':
+`figdown 0.1 block
 title "Egress buffer partition — shared pool with per-queue reservations"
 
-# The classic switch-QoS quota picture: one resource, N groups,
-# threshold LINES as first-class semantics (the zones derive from them).
-partition buf "Packet buffer (pages)"
-column g0 "Group 0"
-column g1 "Group 1"
-column g2 "Group 2"
-column g3 "Group 3"
-line cap "Max cap"                 at=100%
-line res "Reserved {port, queue}"  at=25% color=#a3c93a fill=below`,
+# The classic switch-QoS quota picture, built from GENERIC constructs:
+# a group of transparent columns + two guide lines. No special template.
+group buf "Packet buffer (pages)"
+node g0 "Group 0" in=buf color=transparent
+node g1 "Group 1" in=buf color=transparent
+node g2 "Group 2" in=buf color=transparent
+node g3 "Group 3" in=buf color=transparent
+flow down
+rank g0 g1 g2 g3
+size g0 w=120 h=190
+size g1 w=120 h=190
+size g2 w=120 h=190
+size g3 w=120 h=190
+
+line "Max cap"                 in=buf at=80%
+line "Reserved {port, queue}"  in=buf at=15% color=#a3c93a fill=below`,
 
 'mixed document':
 `figdown 0.1 block

@@ -806,9 +806,10 @@ examples only and are deliberately NOT committed to the repo.)
   figures like the reference example — where every column has an
   identity — the per-column labeled form is the better choice** (the
   column names ARE the knowledge; R25).
-- Status: **implemented in the PoC (2026-07-03)** — parser + renderer +
-  gallery example (generic vocabulary only; the reference photos and
-  their terms remain uncommitted).
+- Status: **superseded (2026-07-03, R28)** — the dedicated template was
+  removed the day after it landed: the figure decomposes into generic
+  constructs (group + transparent column nodes + the new generic `line`
+  guide directive). Gallery example rebuilt accordingly.
 
 ### R27 — 3D / isometric figures: feasible, chart-family, low priority (2026-07-02)
 
@@ -832,6 +833,29 @@ threshold plane. Photo not committed.)
   over-threshold cells marked; verified locally.
 - Status: chart-family candidate, parked until census-priority work is
   done.
+
+### R28 — Generality gate: no new vocabulary when generic constructs express it (2026-07-03)
+
+**Original**: Keyword naming matters and must be generic; be cautious
+with new templates — if a figure can be *expressed* with generic
+drawing constructs, do not create new ones; niche usage patterns are
+pure baggage. (Also: the line's required id was bad — nothing
+references it.)
+
+**Interpretation**:
+- Standing gate, sharpening R11/R16: before any new template or
+  keyword, decompose the figure into existing constructs; only the
+  genuinely irreducible remainder may become new surface — and it must
+  be named for its GENERIC meaning, not the motivating example.
+- Applied immediately: the `partition` template (partition/column/
+  columns/line = 4 keywords) was removed one day after landing. The
+  irreducible remainder was exactly one concept — a horizontal guide/
+  threshold line across a container — now the generic `line` directive
+  (reusable for waterlines, hi/lo thresholds, chart markers). Columns
+  are transparent nodes in a group; the quota figure costs zero special
+  vocabulary.
+- Corollary: **ids exist only for reference** — directives nothing can
+  refer to (guide lines) take no id.
 
 ### Open question OQ1 — Build on D2 vs. a new language (2026-07-02)
 
