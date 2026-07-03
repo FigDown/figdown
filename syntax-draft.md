@@ -317,7 +317,19 @@ gap 4                       # visual break marker at tick 4
 One char = one tick: `p` clock, `0/1` levels, `x` undefined, `=` data
 cell, `.` continue. Exact lane alphabet: adopt WaveDrom's, subset TBD.
 
-### 4.4 Priority note
+### 4.4 `plot` — charts from table data (chart family, minimal)
+
+```figdown
+plot hm level=40        # hm is a table id: rows→X, columns→Y, cells→Z
+```
+
+The table IS the data (R28 — no second data syntax); `plot` maps it to
+a chart. First kind: `bars3d`, a deterministic isometric projection
+(fixed occlusion order, no real 3D needed) with an optional translucent
+`level` threshold plane — the 3-D sibling of §2.6's guide lines.
+Chart family is census-minor (~1%), so it grows strictly on demand.
+
+### 4.5 Priority note
 
 `block-architecture` (census #1, 24.3% weighted) needs **no typed
 block** — it is the core scene model (§2) plus `kind`s; flowchart

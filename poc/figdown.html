@@ -137,7 +137,7 @@ function tokenize(line){
 // Option keys are a CLOSED set: an unquoted token whose key is not listed
 // here is a positional argument (this lets wave lanes contain '=').
 const OPT_KEYS=new Set(['kind','shape','color','stroke','text','in','layer','label',
-  'style','z','at','w','h','unit','note','labels','numbering','fill','from','to','gap','dir',
+  'style','z','at','w','h','unit','note','labels','numbering','fill','from','to','gap','dir','level',
   'taillabel','headlabel']);
 function splitOpts(toks){
   const pos=[], opts={};
@@ -375,6 +375,21 @@ function parse(text){
         doc.glines.push({label:glabel,group:opts['in'],pct:+m[1],color:opts.color,line:n});
         break;
       }
+      case 'plot': {
+        // chart family: plot <table-id> [kind=bars3d] [level=<value>]
+        // rows -> X, columns -> Y, numeric cells -> Z (the table IS the data)
+        const tid=pos[1];
+        if(!tid||!ID_RE.test(tid)){ err(n,'plot needs a table id'); break; }
+        const pkind=opts.kind||'bars3d';
+        if(pkind!=='bars3d'){ err(n,'unknown plot kind "'+pkind+'" (bars3d)'); break; }
+        let plevel=null;
+        if(opts.level!==undefined){
+          plevel=parseFloat(opts.level);
+          if(!isFinite(plevel)||plevel<0){ err(n,'level must be a non-negative number'); break; }
+        }
+        doc.blocks.push({type:'plot',id:'plot_'+doc.blocks.length,tid,kind:pkind,level:plevel,line:n});
+        break;
+      }
       case 'fill': {
         // zone band: fill <pct>% | <a>-<b>%  in=<node|group> [dir=] [color=]
         // "fill 15%" = 0..15; "fill 15-35%" = the range in one token
@@ -467,6 +482,15 @@ function parse(text){
     if(b.type==='table'&&b.heads.length&&!b.sep) errs.push('Line '+b.line+': table has no |---| separator row');
     if(b.type==='bitfield'&&!b.fields.some(f=>!f.wrap)) errs.push('Line '+b.line+': bitfield has no fields');
     if(b.type==='wave'&&!b.signals.length) errs.push('Line '+b.line+': wave has no signals');
+    if(b.type==='plot'){
+      const t=doc.blocks.find(x=>x.type==='table'&&x.id===b.tid);
+      if(!t) errs.push('Line '+b.line+': plot references unknown table "'+b.tid+'"');
+      else{
+        for(const r of t.rows) for(let c=1;c<r.cells.length;c++)
+          if(!r.cells[c].m && !/^-?\d+(?:\.\d+)?$/.test(r.cells[c].v))
+            { errs.push('Line '+b.line+': plot data must be numeric (row value "'+r.cells[c].v+'")'); break; }
+      }
+    }
     if(b.type==='table'&&b.marks) for(const mk of b.marks){
       if(mk.r>b.rows.length||mk.c<1||mk.c>b.cols.length)
         errs.push('Line '+mk.line+': cell '+mk.r+','+mk.c+' out of range');
@@ -521,6 +545,7 @@ function render(doc){
     let s;
     if(b.type==='bitfield') s=renderBitfield(b,y);
     else if(b.type==='table') s=renderTable(b,y);
+    else if(b.type==='plot') s=renderPlot(b,y,doc);
     else s=renderWave(b,y);
     parts.push(s.svg); y=s.y+24; maxW=Math.max(maxW,s.w);
   }
@@ -841,6 +866,61 @@ function renderTable(t,y0){
   }
   const yEnd=yTop+grid.length*rh;
   return {svg:svg.join(''), y:yEnd+6, w:totalW+2};
+}
+
+// ---- plot bars3d: deterministic isometric projection of a table ----
+function shade(hex,f){
+  const v=parseInt(hex.slice(1),16);
+  const c=x=>Math.round(Math.max(0,Math.min(255,x))).toString(16).padStart(2,'0');
+  return '#'+c(((v>>16)&255)*f)+c(((v>>8)&255)*f)+c((v&255)*f);
+}
+const PLOT_PALETTE=['#3b82f6','#22c55e','#f59e0b','#ef4444','#a855f7','#14b8a6','#eab308','#64748b'];
+function renderPlot(b,y0,doc){
+  const t=doc.blocks.find(x=>x.type==='table'&&x.id===b.tid);
+  const rows=t.rows.map(r=>r.cells.slice(1).map(c=>parseFloat(c.v)||0));
+  const rLab=t.rows.map(r=>r.cells[0].v), cLab=t.cols.slice(1);
+  const R=rows.length, C=cLab.length;
+  const zmax=Math.max(b.level||0, ...rows.flat(), 1);
+  const W2=20,H2=10,ZS=130/zmax,BAR=0.72;
+  const ox=R*W2+8, oy=y0+18+ZS*zmax+6;
+  const P=(r,c,z)=>[ox+(c-r)*W2, oy+(c+r)*H2-z*ZS];
+  const svg=[];
+  svg.push('<text x="0" y="'+(y0+14)+'" font-size="13" font-weight="600">'+esc(t.label)+' — bars3d</text>');
+  // floor grid edges
+  const F=[P(0,0,0),P(R,0,0),P(R,C,0),P(0,C,0)];
+  svg.push('<polygon points="'+F.map(p=>p.join(',')).join(' ')+'" fill="#f6f5ef" stroke="#d6d4cc"/>');
+  // bars, far to near
+  const order=[];
+  for(let r=0;r<R;r++)for(let c=0;c<C;c++)order.push([r,c]);
+  order.sort((a,b2)=>(a[0]+a[1])-(b2[0]+b2[1]));
+  for(const [r,c] of order){
+    const h=rows[r][c]; if(h<=0) continue;
+    const col=PLOT_PALETTE[c%PLOT_PALETTE.length];
+    const i0=r+(1-BAR)/2, i1=r+(1+BAR)/2, j0=c+(1-BAR)/2, j1=c+(1+BAR)/2;
+    const A=P(i0,j0,h),Bp=P(i1,j0,h),Cp=P(i1,j1,h),D=P(i0,j1,h);
+    const B0=P(i1,j0,0),C0=P(i1,j1,0),D0=P(i0,j1,0);
+    svg.push('<polygon points="'+[Bp,Cp,C0,B0].map(p=>p.join(',')).join(' ')+'" fill="'+shade(col,0.72)+'"/>');
+    svg.push('<polygon points="'+[Cp,D,D0,C0].map(p=>p.join(',')).join(' ')+'" fill="'+shade(col,0.55)+'"/>');
+    svg.push('<polygon points="'+[A,Bp,Cp,D].map(p=>p.join(',')).join(' ')+'" fill="'+col+'"/>');
+  }
+  // threshold plane (translucent, drawn over bars like the convention)
+  if(b.level!==null&&b.level!==undefined){
+    const L=[P(0,0,b.level),P(R,0,b.level),P(R,C,b.level),P(0,C,b.level)];
+    svg.push('<polygon points="'+L.map(p=>p.join(',')).join(' ')+'" fill="#ef4444" opacity="0.18" stroke="#ef4444" stroke-dasharray="6 4"/>');
+    svg.push(textEl(L[3][0]+8, L[3][1]+4, 11, 'start', '#ef4444', 'level '+b.level,' paint-order="stroke" stroke="#fff" stroke-width="3"'));
+  }
+  // axis labels
+  rLab.forEach((l,r)=>{ const p=P(r+0.5,-0.15,0); svg.push(textEl(p[0]-4,p[1]+10,10,'end','#6f6e69',l)); });
+  cLab.forEach((l,c)=>{ const p=P(R+0.15,c+0.5,0); svg.push(textEl(p[0]+4,p[1]+10,10,'start','#6f6e69',l)); });
+  // z ruler at the right-back corner
+  const zr=P(0,C,0);
+  svg.push('<line x1="'+(zr[0]+14)+'" y1="'+zr[1]+'" x2="'+(zr[0]+14)+'" y2="'+(zr[1]-zmax*ZS)+'" stroke="#8a8880"/>');
+  for(const z of [0, Math.round(zmax/2), Math.round(zmax)]){
+    svg.push('<line x1="'+(zr[0]+11)+'" y1="'+(zr[1]-z*ZS)+'" x2="'+(zr[0]+17)+'" y2="'+(zr[1]-z*ZS)+'" stroke="#8a8880"/>');
+    svg.push(textEl(zr[0]+21, zr[1]-z*ZS+3.5, 9.5, 'start', '#6f6e69', String(z)));
+  }
+  const w=P(R,C,0)[0]+70, hgt=P(R,C,0)[1]+24-y0;
+  return {svg:svg.join(''), y:y0+hgt, w:w};
 }
 
 // ---- wave ----
@@ -1191,6 +1271,32 @@ size g3 w=120 h=190
 line "Max cap"                 in=pool at=80%
 line "Reserved"  in=pool at=15%
 fill 15% in=pool color=#a3c93a`,
+
+'table data -> heatmap + bars3d plot':
+`figdown 0.1 table
+title "Per-(port, queue) occupancy — one table, two projections"
+
+table hm "Queue occupancy counters"
+| Port\\Q | Q0 | Q1 | Q2 | Q3 | Q4 | Q5 |
+|--------|:--:|:--:|:--:|:--:|:--:|:--:|
+| P0     | 12 | 55 | 31 |  8 | 72 | 19 |
+| P1     | 44 | 90 | 22 | 61 | 15 | 38 |
+| P2     |  5 | 27 | 83 | 47 | 33 | 96 |
+| P3     | 68 | 14 | 40 | 29 | 51 |  7 |
+# heatmap marks: light red = over 40, strong red = over 80
+cell 1,3 color=#fecaca
+cell 1,6 color=#fca5a5
+cell 2,2 color=#fecaca
+cell 2,3 color=#fca5a5
+cell 2,5 color=#fecaca
+cell 3,4 color=#fca5a5
+cell 3,5 color=#fecaca
+cell 3,7 color=#fca5a5
+cell 4,2 color=#fecaca
+cell 4,6 color=#fecaca
+
+# the same table data, plotted on X-Y-Z axes (rows=X, columns=Y, values=Z)
+plot hm level=40`,
 
 'mixed document':
 `figdown 0.1 block

@@ -831,8 +831,10 @@ threshold plane. Photo not committed.)
 - **Available today**: the same knowledge reads well (arguably better —
   no occlusion) as a heatmap = table + per-cell colors with
   over-threshold cells marked; verified locally.
-- Status: chart-family candidate, parked until census-priority work is
-  done.
+- Status: **minimal implementation pulled forward (2026-07-03)** on the
+  user's repeat request: `plot <table-id> [level=]` — the table is the
+  data, bars3d is a deterministic isometric projection, the level plane
+  reuses the threshold-line semantics in 3-D.
 
 ### R28 — Generality gate: no new vocabulary when generic constructs express it (2026-07-03)
 

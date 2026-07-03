@@ -58,7 +58,8 @@ bridge domain、連線埠標籤、`bundle` 多歸屬圈、多行主機說明。
 ## 表格與數據（普查第 3）
 
 ### 佇列佔用熱圖 — [來源](queue-heatmap.fd)
-數據矩陣以表格 + 儲存格標記呈現——3D 長條圖的可讀二維解。
+一份表格、兩種投影：熱圖（儲存格標記）與 `plot` bars3d 圖
+（含門檻平面）——列→X、欄→Y、值→Z。
 
 ![Queue heatmap](queue-heatmap.svg)
 

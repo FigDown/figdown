@@ -60,8 +60,8 @@ a `bundle` multi-homing ring, multi-line host captions.
 ## Tables & data (census #3)
 
 ### Queue-occupancy heatmap  — [source](queue-heatmap.fd)
-A data matrix as a table with per-cell marks — the readable 2-D answer
-to 3-D bar charts.
+One table, two projections: a heatmap (per-cell marks) and a `plot`
+bars3d chart with a threshold plane — rows→X, columns→Y, values→Z.
 
 ![Queue heatmap](queue-heatmap.svg)
 

@@ -1,5 +1,5 @@
 figdown 0.1 table
-title "Per-(port, queue) occupancy — cells over the reservation level (40) marked"
+title "Per-(port, queue) occupancy — one table, two projections"
 
 table hm "Queue occupancy counters"
 | Port\Q | Q0 | Q1 | Q2 | Q3 | Q4 | Q5 |
@@ -19,3 +19,6 @@ cell 3,5 color=#fecaca
 cell 3,7 color=#fca5a5
 cell 4,2 color=#fecaca
 cell 4,6 color=#fecaca
+
+# the same table data, plotted on X-Y-Z axes (rows=X, columns=Y, values=Z)
+plot hm level=40
