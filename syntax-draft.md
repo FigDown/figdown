@@ -123,6 +123,19 @@ explicit, document order within a layer is paint order — **a later line
 paints on top (closer to the viewer)**, so line order itself is the
 implicit z within a layer. Default layer is `base` (z=0).
 
+### 2.5 Semantic annotations: `trunk` (topology vocabulary)
+
+```figdown
+trunk es1 "ES-1 / LAG-1" bd24a--srv, bd24b--srv color=#0ea5e9
+```
+
+Declares that the listed links form one logical bundle (LAG / Ethernet
+Segment). The renderer **derives** the conventional dashed ellipse
+around the member links — no coordinates involved, and the ring follows
+the nodes wherever they move. Members must reference existing edges
+(line error otherwise). This is the semantics-first rule (R24): name
+the *meaning* and the engine owns the drawing convention.
+
 ## 3. Layout control — the three tiers (R5, R8)
 
 Everything in this section is **optional**; with none of it, the renderer

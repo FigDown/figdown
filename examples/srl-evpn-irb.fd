@@ -65,10 +65,9 @@ edge bd2   -- h2  taillabel="e1/12.24"
 edge bd24a -- srv taillabel="lag1.24"
 edge bd24b -- srv taillabel="lag1.24"
 
-# multi-homing annotation: a dashed transparent ellipse straddling the
-# two LAG member links (drawn after the edges, so it sits on top)
-node lag1 "ES-1 / LAG-1" kind=cloud color=transparent stroke=#0ea5e9 style=dashed text=#0369a1
-size lag1 w=170 h=44
-pin  lag1 at=375,420
+# multi-homing: declare the SEMANTICS (these links form one bundle) and
+# the renderer derives the dashed ring — it follows the nodes wherever
+# they move; no coordinates involved
+trunk es1 "ES-1 / LAG-1" bd24a--srv, bd24b--srv color=#0ea5e9
 edge bd4   -- h4  taillabel="e1/13.4"
 edge bd3   -- h3  taillabel="e1/2.3"

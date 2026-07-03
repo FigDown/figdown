@@ -113,6 +113,17 @@ edge r1 -> r2 layer=overlay color=#dc2626
 繪製順序——**行號越大越晚繪製、越靠近使用者（top）**，行序本身
 就是同層內的隱含 z。預設圖層為 `base`（z=0）。
 
+### 2.5 語意註記：`trunk`（topology 詞彙）
+
+```figdown
+trunk es1 "ES-1 / LAG-1" bd24a--srv, bd24b--srv color=#0ea5e9
+```
+
+宣告所列鏈路構成一個邏輯捆綁（LAG / Ethernet Segment）。renderer
+**自動推導**慣例的虛線橢圓圈住成員鏈路——不涉及任何座標，節點
+拖到哪、圈圈跟到哪。成員必須引用既存的 edge（否則行錯誤）。這是
+「語意優先」規則（R24）：作者說出*意義*，繪圖慣例歸引擎。
+
 ## 3. 排版控制——三層級（R5、R8）
 
 本節全部**選用**；一項都不寫時，renderer 確定性地全自動排版。

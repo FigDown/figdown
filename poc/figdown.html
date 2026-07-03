@@ -151,7 +151,7 @@ const ID_RE=/^[A-Za-z_][A-Za-z0-9_-]*$/;
 function parse(text){
   const errs=[];
   const doc={title:'',nodes:[],groups:[],edges:[],layers:[{id:'base',label:'',z:0}],
-             flow:'right',ranks:[],pins:{},sizes:{},blocks:[]};
+             flow:'right',ranks:[],pins:{},sizes:{},blocks:[],trunks:[]};
   const nodeIds=new Set(), groupIds=new Set(), layerIds=new Set(['base']);
   let cur=null;             // current typed block (bitfield/table/wave)
   let sawHeader=false, firstContent=true;
@@ -338,6 +338,24 @@ function parse(text){
         if(ids.length<2){ err(n,'rank needs two or more node ids'); break; }
         doc.ranks.push({ids,line:n}); break;
       }
+      case 'trunk': {
+        // semantic link bundle (LAG / Ethernet Segment): the renderer draws
+        // the dashed ellipse around the member links automatically
+        const id=pos[1];
+        if(!id||!ID_RE.test(id)){ err(n,'trunk needs an id'); break; }
+        let rest=pos.slice(2), tlabel=id;
+        if(tk.toks[2]&&tk.toks[2].q){ tlabel=pos[2]; rest=pos.slice(3); }
+        const pairs=[]; let badp=null;
+        for(const t of rest){
+          const m=/^([A-Za-z_][A-Za-z0-9_-]*)--([A-Za-z_][A-Za-z0-9_-]*),?$/.exec(t);
+          if(!m){ badp='bad member "'+t+'" (expected A--B)'; break; }
+          pairs.push([m[1],m[2]]);
+        }
+        if(badp){ err(n,badp); break; }
+        if(!pairs.length){ err(n,'trunk needs at least one member link A--B'); break; }
+        doc.trunks.push({id,label:tlabel,pairs,color:opts.color,line:n});
+        break;
+      }
       case 'zone': {
         if(!['left','right','top','bottom'].includes(pos[1])||!pos[2]){ err(n,'zone needs <left|right|top|bottom> <group-id>'); break; }
         break; // accepted; PoC does not act on zone yet
@@ -396,6 +414,11 @@ function parse(text){
   }
   for(const r of doc.ranks) for(const id of r.ids)
     if(!nodeIds.has(id)) errs.push('Line '+r.line+': unknown node "'+id+'" in rank');
+  for(const t of doc.trunks) for(const [a,b] of t.pairs){
+    if(!nodeIds.has(a)||!nodeIds.has(b)){ errs.push('Line '+t.line+': unknown endpoint in "'+a+'--'+b+'"'); continue; }
+    if(!doc.edges.some(e=>(e.a===a&&e.b===b)||(e.a===b&&e.b===a)))
+      errs.push('Line '+t.line+': no edge between "'+a+'" and "'+b+'" for trunk member');
+  }
   for(const id in doc.pins) if(!nodeIds.has(id)&&!groupIds.has(id))
     errs.push('Line '+doc.pins[id].line+': pin of unknown id "'+id+'"');
   for(const id in doc.sizes) if(!nodeIds.has(id)&&!groupIds.has(id))
@@ -620,8 +643,29 @@ function renderScene(doc,y0){
     nsvg.push(textEl(n.x+n.w/2, n.y+n.h/2+fs*0.35, fs, 'middle', txt, n.label));
     nsvg.push('</g>');
   }
+  // trunk rings (semantic LAG/ES bundles): the ellipse is DERIVED from the
+  // member links' midpoints — drag a node and the ring follows
+  const tsvg=[];
+  for(const t of doc.trunks){
+    const mids=[];
+    for(const [a,b] of t.pairs){
+      const A=byId[a], B=byId[b]; if(!A||!B) continue;
+      const [x1,yy1]=borderPoint(A,B.x+B.w/2,B.y+B.h/2);
+      const [x2,yy2]=borderPoint(B,A.x+A.w/2,A.y+A.h/2);
+      mids.push([(x1+x2)/2,(yy1+yy2)/2]);
+    }
+    if(!mids.length) continue;
+    const cx=mids.reduce((s,m)=>s+m[0],0)/mids.length;
+    const cy=mids.reduce((s,m)=>s+m[1],0)/mids.length;
+    const rx=Math.max(46, Math.max(...mids.map(m=>Math.abs(m[0]-cx)))+38);
+    const ry=Math.max(26, Math.max(...mids.map(m=>Math.abs(m[1]-cy)))+22);
+    const col=t.color||'#64748b';
+    tsvg.push('<ellipse cx="'+cx+'" cy="'+cy+'" rx="'+rx+'" ry="'+ry+'" fill="transparent" stroke="'+col+'" stroke-dasharray="6 4" stroke-width="1.6"/>');
+    tsvg.push(textEl(cx, cy+4, 11.5, 'middle', col, t.label,' paint-order="stroke" stroke="#fff" stroke-width="3"'));
+    W=Math.max(W,cx+rx); Hh=Math.max(Hh,cy+ry-y0-20);
+  }
   const yEnd=y0+20+Hh+10;
-  return {svg:gsvg.join('')+esvg.join('')+nsvg.join(''), y:yEnd, w:W+2,
+  return {svg:gsvg.join('')+esvg.join('')+nsvg.join('')+tsvg.join(''), y:yEnd, w:W+2,
           meta:{W:W, top:y0+20, Hh:Hh}};
 }
 function borderPoint(n,tx,ty){

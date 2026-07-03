@@ -731,6 +731,24 @@ figures should be listed among our basic targets to solve.
   is expressible in FigDown, better" is a crisp, verifiable promotion
   claim aimed exactly at the IETF-adjacent audience.
 
+### R24 — Semantics-first annotations: the `trunk` precedent (2026-07-02)
+
+**Original**: For topology needs like the LAG ellipse, shouldn't
+declaring the *semantics* ("these links are a trunk") make the renderer
+draw the ring automatically? That is the real essence of the original
+figure's meaning.
+
+**Interpretation**: Confirmed and implemented. The hand-pinned
+annotation ellipse (a presentation-level idiom) is replaced by
+`trunk <id> "<label>" A--B, A--C`: the author names the meaning, the
+engine owns the drawing convention, and the derived ring follows the
+nodes with zero coordinates. This generalizes the nudge precedent into
+a standing rule: **when a recurring visual convention encodes a domain
+concept, give the concept a directive; never ask authors to draw the
+convention by hand.** Candidates that should follow the same path:
+numbered step callouts (packet walkthroughs), redundancy pairs,
+broadcast domains.
+
 ### Open question OQ1 — Build on D2 vs. a new language (2026-07-02)
 
 D2 is close enough that R11 (survey before invent) obliges a deep read of
