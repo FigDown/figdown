@@ -809,6 +809,29 @@ examples only and are deliberately NOT committed to the repo.)
 - Status: **candidate for the template set** (R16 gate: corpus evidence
   exists; design when scheduled).
 
+### R27 — 3D / isometric figures: feasible, chart-family, low priority (2026-07-02)
+
+**Original**: Can this kind of 3D (45°) figure be done? (Reference: a
+3D bar chart of per-port/per-queue counter values with a translucent
+threshold plane. Photo not committed.)
+
+**Interpretation**:
+- **Technically feasible and deterministic**: isometric projection is
+  plain 2D math (each bar = three parallelogram faces + a fixed
+  occlusion order); SVG needs no real 3D. Not a blocker.
+- **Ontology (R22)**: the figure's substance is *data* (a value matrix
+  + a threshold), not structure. The .fd form would be a data block +
+  threshold declaration; "isometric" is merely a render style
+  parameter. This belongs to the `chart` template family — census
+  weight ~1%, so low priority (R12).
+- The threshold plane is R26's threshold line in 3D — same semantics,
+  different projection.
+- **Available today**: the same knowledge reads well (arguably better —
+  no occlusion) as a heatmap = table + per-cell colors with
+  over-threshold cells marked; verified locally.
+- Status: chart-family candidate, parked until census-priority work is
+  done.
+
 ### Open question OQ1 — Build on D2 vs. a new language (2026-07-02)
 
 D2 is close enough that R11 (survey before invent) obliges a deep read of
