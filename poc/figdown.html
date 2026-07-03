@@ -51,7 +51,7 @@
 <div class="bar">
   <label>Example</label>
   <select id="examples"></select>
-  <select id="newkind" title="kind for new nodes"><option>box</option><option>switch</option><option>router</option><option>host</option><option>cloud</option><option>decision</option><option>datastore</option></select>
+  <select id="newkind" title="shape for new nodes"><option>box</option><option>rounded</option><option>circle</option><option>ellipse</option><option>cloud</option><option>diamond</option><option>cylinder</option></select>
   <button id="addnode" title="insert a node line">+ Node</button>
   <button id="linkmode" title="click two nodes to write an edge line">Link</button>
   <button id="groupmode" title="drag a box around nodes to write a group line">⬚ Group</button>
@@ -98,7 +98,7 @@ Closed grammar: unknown lines are errors with line numbers. No LLM, no dependenc
 // ============================================================
 // 1. PARSER — closed, line-oriented grammar (draft v0.0)
 // ============================================================
-const KINDS = ['box','decision','terminator','datastore','process','switch','router','host','port','cloud'];
+const SHAPES = ['box','rounded','circle','ellipse','cloud','diamond','cylinder'];
 
 function tokenize(line){
   // split by whitespace, honoring double quotes
@@ -135,7 +135,7 @@ function tokenize(line){
 }
 // Option keys are a CLOSED set: an unquoted token whose key is not listed
 // here is a positional argument (this lets wave lanes contain '=').
-const OPT_KEYS=new Set(['kind','color','stroke','text','in','layer','label',
+const OPT_KEYS=new Set(['kind','shape','color','stroke','text','in','layer','label',
   'style','z','at','w','h','unit','note','labels','numbering',
   'taillabel','headlabel']);
 function splitOpts(toks){
@@ -303,12 +303,13 @@ function parse(text){
         const id=pos[1];
         if(!id||!ID_RE.test(id)){ err(n,'node needs an id'); break; }
         if(nodeIds.has(id)||groupIds.has(id)){ err(n,'duplicate id "'+id+'"'); break; }
-        const kind=opts.kind||'box';
-        if(!KINDS.includes(kind)){ err(n,'unknown kind "'+kind+'"'); break; }
+        if(opts.kind!==undefined){ err(n,'kind= has been renamed: use shape= (geometric; the label text carries the device semantics)'); break; }
+        const shape=opts.shape||'box';
+        if(!SHAPES.includes(shape)){ err(n,'unknown shape "'+shape+'" ('+SHAPES.join('|')+')'); break; }
         nodeIds.add(id);
         const nstyle=opts.style||'solid';
         if(!['solid','dashed','dotted'].includes(nstyle)){ err(n,'style must be solid|dashed|dotted'); break; }
-        doc.nodes.push({id,label:pos[2]||id,kind,color:opts.color,stroke:opts.stroke,
+        doc.nodes.push({id,label:pos[2]||id,shape,color:opts.color,stroke:opts.stroke,
                         style:nstyle,text:opts.text,group:opts['in']||null,layer:opts.layer||'base',line:n});
         break;
       }
@@ -338,11 +339,11 @@ function parse(text){
         if(ids.length<2){ err(n,'rank needs two or more node ids'); break; }
         doc.ranks.push({ids,line:n}); break;
       }
-      case 'trunk': {
+      case 'bundle': {
         // semantic link bundle (LAG / Ethernet Segment): the renderer draws
         // the dashed ellipse around the member links automatically
         const id=pos[1];
-        if(!id||!ID_RE.test(id)){ err(n,'trunk needs an id'); break; }
+        if(!id||!ID_RE.test(id)){ err(n,'bundle needs an id'); break; }
         let rest=pos.slice(2), tlabel=id;
         if(tk.toks[2]&&tk.toks[2].q){ tlabel=pos[2]; rest=pos.slice(3); }
         const pairs=[]; let badp=null;
@@ -352,7 +353,7 @@ function parse(text){
           pairs.push([m[1],m[2]]);
         }
         if(badp){ err(n,badp); break; }
-        if(!pairs.length){ err(n,'trunk needs at least one member link A--B'); break; }
+        if(!pairs.length){ err(n,'bundle needs at least one member link A--B'); break; }
         doc.trunks.push({id,label:tlabel,pairs,color:opts.color,line:n});
         break;
       }
@@ -417,7 +418,7 @@ function parse(text){
   for(const t of doc.trunks) for(const [a,b] of t.pairs){
     if(!nodeIds.has(a)||!nodeIds.has(b)){ errs.push('Line '+t.line+': unknown endpoint in "'+a+'--'+b+'"'); continue; }
     if(!doc.edges.some(e=>(e.a===a&&e.b===b)||(e.a===b&&e.b===a)))
-      errs.push('Line '+t.line+': no edge between "'+a+'" and "'+b+'" for trunk member');
+      errs.push('Line '+t.line+': no edge between "'+a+'" and "'+b+'" for bundle member');
   }
   for(const id in doc.pins) if(!nodeIds.has(id)&&!groupIds.has(id))
     errs.push('Line '+doc.pins[id].line+': pin of unknown id "'+id+'"');
@@ -505,7 +506,8 @@ function renderScene(doc,y0){
     const nLines=String(n.label).split('\n').length;
     n.w=tw(n.label); n.h=NH+(nLines-1)*16;
     const s=doc.sizes[n.id]; if(s){ if(s.w)n.w=s.w; if(s.h)n.h=s.h; n.rigid=true; }
-    if(n.kind==='decision'){ n.w=Math.max(n.w+20,70); n.h=48; }
+    if(n.shape==='diamond'){ n.w=Math.max(n.w+20,70); n.h=Math.max(n.h,48); }
+    if(n.shape==='circle'){ n.w=n.h=Math.max(n.w,n.h); }
   }
   // ranks: longest-path layering over directed edges among unpinned nodes
   const pinned=id=>doc.pins[id]!==undefined;
@@ -621,20 +623,20 @@ function renderScene(doc,y0){
     nsvg.push('<g data-node="'+n.id+'" data-x="'+n.x+'" data-y="'+n.y+'" style="cursor:move">');
     const fill=n.color||'#fff', stroke=n.stroke||'#8a8880', txt=n.text||'#1d1d1b';
     const ndash=n.style==='dashed'?' stroke-dasharray="6 4"':(n.style==='dotted'?' stroke-dasharray="2 4"':'');
-    if(n.kind==='decision'){
+    if(n.shape==='diamond'){
       const cx=n.x+n.w/2, cy=n.y+n.h/2;
       nsvg.push('<polygon points="'+cx+','+n.y+' '+(n.x+n.w)+','+cy+' '+cx+','+(n.y+n.h)+' '+n.x+','+cy+'" fill="'+fill+'" stroke="'+stroke+'"'+ndash+'/>');
-    } else if(n.kind==='terminator'){
-      nsvg.push('<rect x="'+n.x+'" y="'+n.y+'" width="'+n.w+'" height="'+n.h+'" rx="'+(n.h/2)+'" fill="'+fill+'" stroke="'+stroke+'"'+ndash+'/>');
-    } else if(n.kind==='cloud'){
+    } else if(n.shape==='rounded'){
+      nsvg.push('<rect x="'+n.x+'" y="'+n.y+'" width="'+n.w+'" height="'+n.h+'" rx="'+Math.min(14,n.h/2)+'" fill="'+fill+'" stroke="'+stroke+'"'+ndash+' stroke-width="1.8"/>');
+    } else if(n.shape==='cloud'){
       nsvg.push('<ellipse cx="'+(n.x+n.w/2)+'" cy="'+(n.y+n.h/2)+'" rx="'+(n.w/2+10)+'" ry="'+(n.h/2+8)+'" fill="'+fill+'" stroke="'+stroke+'"'+ndash+'/>');
-    } else if(n.kind==='datastore'){
+    } else if(n.shape==='ellipse'||n.shape==='circle'){
+      nsvg.push('<ellipse cx="'+(n.x+n.w/2)+'" cy="'+(n.y+n.h/2)+'" rx="'+(n.w/2)+'" ry="'+(n.shape==='circle'?n.w/2:n.h/2)+'" fill="'+fill+'" stroke="'+stroke+'"'+ndash+'/>');
+    } else if(n.shape==='cylinder'){
       nsvg.push('<rect x="'+n.x+'" y="'+n.y+'" width="'+n.w+'" height="'+n.h+'" rx="3" fill="'+fill+'" stroke="'+stroke+'"'+ndash+'/>'
         +'<line x1="'+n.x+'" y1="'+(n.y+7)+'" x2="'+(n.x+n.w)+'" y2="'+(n.y+7)+'" stroke="'+stroke+'"/>');
     } else {
-      const r=(n.kind==='switch'||n.kind==='router')?14:8;
-      nsvg.push('<rect x="'+n.x+'" y="'+n.y+'" width="'+n.w+'" height="'+n.h+'" rx="'+r+'" fill="'+fill+'" stroke="'+stroke+'"'+ndash+
-        (n.kind==='switch'||n.kind==='router'?' stroke-width="1.8"':'')+'/>');
+      nsvg.push('<rect x="'+n.x+'" y="'+n.y+'" width="'+n.w+'" height="'+n.h+'" rx="8" fill="'+fill+'" stroke="'+stroke+'"'+ndash+'/>');
     }
     // label with shrink-to-fit when size is rigid (R10); multi-line via "\n"
     let fs=FONT;
@@ -875,13 +877,13 @@ signal data   xxx=..=x labels="CFG,GO"`,
 'topology + pin (stability demo)':
 `figdown 0.1 topology
 title "Leaf-spine, monitor pinned top-right"
-node sp1 "Spine-1" kind=switch color=#e0e7ff
-node sp2 "Spine-2" kind=switch color=#e0e7ff
-node lf1 "Leaf-1" kind=switch
-node lf2 "Leaf-2" kind=switch
-node h1 "Host-A" kind=host
-node h2 "Host-B" kind=host
-node mon "Monitor" kind=host color=#fef9c3
+node sp1 "Spine-1" shape=rounded color=#e0e7ff
+node sp2 "Spine-2" shape=rounded color=#e0e7ff
+node lf1 "Leaf-1" shape=rounded
+node lf2 "Leaf-2" shape=rounded
+node h1 "Host-A"
+node h2 "Host-B"
+node mon "Monitor" color=#fef9c3
 flow down
 rank sp1 sp2
 edge sp1 -- lf1
@@ -898,14 +900,14 @@ pin mon at=340,0`,
 title "VXLAN/EVPN Leaf-Spine Fabric — topology with plane notes"
 
 # ── Topology ────────────────────────────────────────────────────────
-node sp1 "Spine-1" kind=switch color=#e0e7ff
-node sp2 "Spine-2" kind=switch color=#e0e7ff
-node lf1 "Leaf-1 (VTEP)" kind=switch
-node lf2 "Leaf-2 (VTEP)" kind=switch
-node lf3 "Leaf-3 (VTEP)" kind=switch
-node h1 "VM-A (VLAN 10)" kind=host
-node h2 "VM-B (VLAN 10)" kind=host
-node h3 "VM-C (VLAN 20)" kind=host
+node sp1 "Spine-1" shape=rounded color=#e0e7ff
+node sp2 "Spine-2" shape=rounded color=#e0e7ff
+node lf1 "Leaf-1 (VTEP)" shape=rounded
+node lf2 "Leaf-2 (VTEP)" shape=rounded
+node lf3 "Leaf-3 (VTEP)" shape=rounded
+node h1 "VM-A (VLAN 10)"
+node h2 "VM-B (VLAN 10)"
+node h3 "VM-C (VLAN 20)"
 flow down
 rank sp1 sp2
 rank lf1 lf2 lf3
@@ -951,12 +953,12 @@ title "EVPN-VXLAN IRB — leaves with IP-VRF and bridge domains"
 # moving a leaf = editing one pin line.
 
 # ── Overlay cloud + spines ─────────────────────────────────────────
-node cloud "EVPN-VXLAN" kind=cloud color=#cfe8f7 stroke=#7fb8d8
+node cloud "EVPN-VXLAN" shape=cloud color=#cfe8f7 stroke=#7fb8d8
 size cloud w=620 h=110
 pin  cloud at=330,90
-node sp1 "Spine-1" kind=switch color=#9aa2ad text=#ffffff
+node sp1 "Spine-1" shape=rounded color=#9aa2ad text=#ffffff
 pin  sp1 at=480,0
-node sp2 "Spine-2" kind=switch color=#9aa2ad text=#ffffff
+node sp2 "Spine-2" shape=rounded color=#9aa2ad text=#ffffff
 pin  sp2 at=700,0
 
 # ── Leaves: group = leaf box; members = IP-VRF badge + bridge domains
@@ -986,15 +988,15 @@ node bd3  "BD3\\nRD31/RT3\\nVNI3"  in=leaf3 style=dashed stroke=#1d4ed8
 pin  bd3 at=0,85
 
 # ── Edge devices and hosts ──────────────────────────────────────────
-node ce3 "CE-3\\nIP-20.1.1.3/24\\nMAC-00:01:03:FF:00:0B" kind=router
+node ce3 "CE-3\\nIP-20.1.1.3/24\\nMAC-00:01:03:FF:00:0B" shape=rounded
 pin  ce3 at=0,430
-node h2  "HOST-2\\nIP-101.1.1.2/24\\nMAC-00:00:00:00:00:02" kind=host color=#bae6fd
+node h2  "HOST-2\\nIP-101.1.1.2/24\\nMAC-00:00:00:00:00:02" color=#bae6fd
 pin  h2 at=180,500
-node srv "SERVER-1 (ES-1 / LAG-1)\\nHOST-12  IP-101.1.1.1/24\\nMAC-00:00:64:01:01:01" kind=host
+node srv "SERVER-1\\nHOST-12  IP-101.1.1.1/24\\nMAC-00:00:64:01:01:01"
 pin  srv at=390,500
-node h4  "HOST-4\\nIP-104.1.1.1/24\\nMAC-00:00:00:00:00:04" kind=host color=#bae6fd
+node h4  "HOST-4\\nIP-104.1.1.1/24\\nMAC-00:00:00:00:00:04" color=#bae6fd
 pin  h4 at=660,500
-node h3  "HOST-3\\nIP-103.1.1.1/24\\nMAC-00:00:00:00:00:03" kind=router
+node h3  "HOST-3\\nIP-103.1.1.1/24\\nMAC-00:00:00:00:00:03" shape=rounded
 pin  h3 at=1020,500
 
 # fabric attachment
@@ -1009,6 +1011,11 @@ edge bd2 -- ce3 label="PE-CE\\nBGP IPv4" style=dashed color=#1d4ed8 headlabel="2
 edge bd2   -- h2  taillabel="e1/12.24"
 edge bd24a -- srv taillabel="lag1.24"
 edge bd24b -- srv taillabel="lag1.24"
+
+# multi-homing: declare the SEMANTICS (these links form one bundle) and
+# the renderer derives the dashed ring — it follows the nodes wherever
+# they move; no coordinates involved
+bundle es1 "ES-1 / LAG-1" bd24a--srv, bd24b--srv color=#0ea5e9
 edge bd4   -- h4  taillabel="e1/13.4"
 edge bd3   -- h3  taillabel="e1/2.3"`,
 
@@ -1083,7 +1090,7 @@ table facts "Why VXLAN"
 title "CPU tag insertion"
 node cpu "CPU"
 node tagger "Tag Insert" color=#fee2e2
-node port "Egress Port" kind=port
+node port "Egress Port"
 flow right
 edge cpu -> tagger label="DSA tag"
 edge tagger -> port
@@ -1442,7 +1449,7 @@ $('addnode').onclick=()=>{
   let i=1; while(lines.some(l=>new RegExp('^\\s*(node|group)\\s+n'+i+'\\b').test(l))) i++;
   let last=-1; lines.forEach((l,k)=>{ if(SCENE_KW.test(l.trim())) last=k; });
   const kk=$('newkind').value;
-  lines.splice(last+1,0,'node n'+i+' "Node '+i+'"'+(kk!=='box'?' kind='+kk:''));
+  lines.splice(last+1,0,'node n'+i+' "Node '+i+'"'+(kk!=='box'?' shape='+kk:''));
   $('src').value=lines.join('\n'); refresh(); select('n'+i);
   $('status').textContent='+ Node → wrote "node n'+i+'" line — drag it into place';
 };

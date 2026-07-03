@@ -822,6 +822,19 @@ reflowed). Three rules, now in the syntax draft (§3, OQ-S2 resolved):
 3. **Edges are always derived** from node borders — they adapt
    automatically and can never be pinned.
 
+### D7 — Shapes are geometric; semantics live in the label; `bundle` (2026-07-02)
+
+Two user rulings. (1) The topology vocabulary must **not** bind domain
+nouns (router/gateway/host/switch…) — an endless list. Nodes carry a
+purely geometric `shape=` (box|rounded|circle|ellipse|cloud|diamond|
+cylinder, closed) and the label text says what the device is (R22: the
+meaning lives in the text; R11: no vocabulary metastasis). `kind=` is
+retired with a pointed error message. Flowchart shapes unify under the
+same axis (decision→diamond, terminator→rounded, datastore→cylinder).
+(2) The link-bundle directive is renamed `trunk`→**`bundle`** — the
+neutral umbrella term (LAG/ES/port-channel/…); `trunk` is ambiguous
+(VLAN trunking).
+
 ### D6 — Two-level pins: group members are group-local (2026-07-02)
 
 User proposal, matching the v2 framework's two-level coordinate system:

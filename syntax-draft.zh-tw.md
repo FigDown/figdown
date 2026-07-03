@@ -66,16 +66,16 @@ kind 與線條樣式。因此共用同一核心模型（「為何不能是原語
 
 ```figdown
 node parser "Packet Parser"
-node l3 "L3 Lookup" kind=process color=#0d9488
-node q1 "CRC ok?" kind=decision
-node sw1 "ToR Switch" kind=switch
+node l3 "L3 Lookup" color=#0d9488
+node q1 "CRC ok?" shape=diamond
+node sw1 "ToR Switch" shape=rounded
 ```
 
-- `kind` 從各 profile 的封閉集合中選擇形狀/圖示
-  （預設 `box`｜`decision`｜`terminator`｜`datastore`｜`switch`｜
-  `router`｜`host`｜`port`｜`cloud`｜……依普查定案）。
+- `shape=` 為**純幾何**（D7）：`box`（預設）｜`rounded`｜`circle`｜
+  `ellipse`｜`cloud`｜`diamond`｜`cylinder`。語言刻意**不綁任何領域
+  名詞**（router/host/gateway……會無限增生）——裝置*是什麼*由標籤
+  文字自己說（R22：語意在文字裡）。未知 shape = 行錯誤。
 - 節點接受 `style=dashed|dotted`（如廠商圖中的 bridge-domain 虛線框）。
-- 未知 `kind` = 行錯誤（封閉詞彙）。
 
 ### 2.2 包含（群組/嵌套）
 
@@ -113,16 +113,18 @@ edge r1 -> r2 layer=overlay color=#dc2626
 繪製順序——**行號越大越晚繪製、越靠近使用者（top）**，行序本身
 就是同層內的隱含 z。預設圖層為 `base`（z=0）。
 
-### 2.5 語意註記：`trunk`（topology 詞彙）
+### 2.5 語意註記：`bundle`（topology 詞彙）
 
 ```figdown
-trunk es1 "ES-1 / LAG-1" bd24a--srv, bd24b--srv color=#0ea5e9
+bundle es1 "ES-1 / LAG-1" bd24a--srv, bd24b--srv color=#0ea5e9
 ```
 
-宣告所列鏈路構成一個邏輯捆綁（LAG / Ethernet Segment）。renderer
-**自動推導**慣例的虛線橢圓圈住成員鏈路——不涉及任何座標，節點
-拖到哪、圈圈跟到哪。成員必須引用既存的 edge（否則行錯誤）。這是
-「語意優先」規則（R24）：作者說出*意義*，繪圖慣例歸引擎。
+宣告所列鏈路構成**一個邏輯捆綁**——中性的統稱（LAG、Ethernet
+Segment、port-channel、跨機箱 trunk……由標籤說明是哪一種）。
+renderer **自動推導**慣例的虛線橢圓圈住成員鏈路——不涉及任何
+座標，節點拖到哪、圈圈跟到哪。成員必須引用既存的 edge（否則行
+錯誤）。這是「語意優先」規則（R24）：作者說出*意義*，繪圖慣例
+歸引擎。
 
 ## 3. 排版控制——三層級（R5、R8）
 

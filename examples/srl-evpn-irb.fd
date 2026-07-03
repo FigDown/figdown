@@ -6,12 +6,12 @@ title "EVPN-VXLAN IRB — leaves with IP-VRF and bridge domains"
 # moving a leaf = editing one pin line.
 
 # ── Overlay cloud + spines ─────────────────────────────────────────
-node cloud "EVPN-VXLAN" kind=cloud color=#cfe8f7 stroke=#7fb8d8
+node cloud "EVPN-VXLAN" shape=cloud color=#cfe8f7 stroke=#7fb8d8
 size cloud w=620 h=110
 pin  cloud at=330,90
-node sp1 "Spine-1" kind=switch color=#9aa2ad text=#ffffff
+node sp1 "Spine-1" shape=rounded color=#9aa2ad text=#ffffff
 pin  sp1 at=480,0
-node sp2 "Spine-2" kind=switch color=#9aa2ad text=#ffffff
+node sp2 "Spine-2" shape=rounded color=#9aa2ad text=#ffffff
 pin  sp2 at=700,0
 
 # ── Leaves: group = leaf box; members = IP-VRF badge + bridge domains
@@ -41,15 +41,15 @@ node bd3  "BD3\nRD31/RT3\nVNI3"  in=leaf3 style=dashed stroke=#1d4ed8
 pin  bd3 at=0,85
 
 # ── Edge devices and hosts ──────────────────────────────────────────
-node ce3 "CE-3\nIP-20.1.1.3/24\nMAC-00:01:03:FF:00:0B" kind=router
+node ce3 "CE-3\nIP-20.1.1.3/24\nMAC-00:01:03:FF:00:0B" shape=rounded
 pin  ce3 at=0,430
-node h2  "HOST-2\nIP-101.1.1.2/24\nMAC-00:00:00:00:00:02" kind=host color=#bae6fd
+node h2  "HOST-2\nIP-101.1.1.2/24\nMAC-00:00:00:00:00:02" color=#bae6fd
 pin  h2 at=180,500
-node srv "SERVER-1\nHOST-12  IP-101.1.1.1/24\nMAC-00:00:64:01:01:01" kind=host
+node srv "SERVER-1\nHOST-12  IP-101.1.1.1/24\nMAC-00:00:64:01:01:01"
 pin  srv at=390,500
-node h4  "HOST-4\nIP-104.1.1.1/24\nMAC-00:00:00:00:00:04" kind=host color=#bae6fd
+node h4  "HOST-4\nIP-104.1.1.1/24\nMAC-00:00:00:00:00:04" color=#bae6fd
 pin  h4 at=660,500
-node h3  "HOST-3\nIP-103.1.1.1/24\nMAC-00:00:00:00:00:03" kind=router
+node h3  "HOST-3\nIP-103.1.1.1/24\nMAC-00:00:00:00:00:03" shape=rounded
 pin  h3 at=1020,500
 
 # fabric attachment
@@ -68,6 +68,6 @@ edge bd24b -- srv taillabel="lag1.24"
 # multi-homing: declare the SEMANTICS (these links form one bundle) and
 # the renderer derives the dashed ring — it follows the nodes wherever
 # they move; no coordinates involved
-trunk es1 "ES-1 / LAG-1" bd24a--srv, bd24b--srv color=#0ea5e9
+bundle es1 "ES-1 / LAG-1" bd24a--srv, bd24b--srv color=#0ea5e9
 edge bd4   -- h4  taillabel="e1/13.4"
 edge bd3   -- h3  taillabel="e1/2.3"

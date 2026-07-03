@@ -73,17 +73,18 @@ share one core model (the "why can't it be primitive + styling" rule).
 
 ```figdown
 node parser "Packet Parser"
-node l3 "L3 Lookup" kind=process color=#0d9488
-node q1 "CRC ok?" kind=decision
-node sw1 "ToR Switch" kind=switch
+node l3 "L3 Lookup" color=#0d9488
+node q1 "CRC ok?" shape=diamond
+node sw1 "ToR Switch" shape=rounded
 ```
 
-- `kind` selects shape/iconography from a closed set per profile
-  (`box` default | `decision` | `terminator` | `datastore` | `switch` |
-  `router` | `host` | `port` | `cloud` | …TBD by census).
+- `shape=` is **purely geometric** (D7): `box` (default) | `rounded` |
+  `circle` | `ellipse` | `cloud` | `diamond` | `cylinder`. The language
+  deliberately binds **no domain nouns** (router/host/gateway…) — an
+  endless vocabulary; what a device *is* belongs in its label text
+  (R22: the meaning lives in the text). Unknown shape = line error.
 - Nodes accept `style=dashed|dotted` (e.g. bridge-domain boxes in
   vendor figures).
-- Unknown `kind` = line error (closed vocabulary).
 
 ### 2.2 Containment (groups / nesting)
 
@@ -123,18 +124,20 @@ explicit, document order within a layer is paint order — **a later line
 paints on top (closer to the viewer)**, so line order itself is the
 implicit z within a layer. Default layer is `base` (z=0).
 
-### 2.5 Semantic annotations: `trunk` (topology vocabulary)
+### 2.5 Semantic annotations: `bundle` (topology vocabulary)
 
 ```figdown
-trunk es1 "ES-1 / LAG-1" bd24a--srv, bd24b--srv color=#0ea5e9
+bundle es1 "ES-1 / LAG-1" bd24a--srv, bd24b--srv color=#0ea5e9
 ```
 
-Declares that the listed links form one logical bundle (LAG / Ethernet
-Segment). The renderer **derives** the conventional dashed ellipse
-around the member links — no coordinates involved, and the ring follows
-the nodes wherever they move. Members must reference existing edges
-(line error otherwise). This is the semantics-first rule (R24): name
-the *meaning* and the engine owns the drawing convention.
+Declares that the listed links form **one logical bundle** — the neutral
+umbrella term (LAG, Ethernet Segment, port-channel, multi-chassis
+trunk…; the label says which). The renderer **derives** the
+conventional dashed ellipse around the member links — no coordinates
+involved, and the ring follows the nodes wherever they move. Members
+must reference existing edges (line error otherwise). This is the
+semantics-first rule (R24): name the *meaning* and the engine owns the
+drawing convention.
 
 ## 3. Layout control — the three tiers (R5, R8)
 

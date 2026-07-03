@@ -649,6 +649,17 @@ LLM 代轉僅為初期過渡方案。語法設計必須保證可機械渲染
    使 Y 重排。
 3. **edge 永遠是衍生物**——由節點邊框自動重算、自動適應，不可釘。
 
+### D7 — 形狀歸幾何、語意歸標籤；`bundle`（2026-07-02）
+
+兩項使用者裁決。(1) topology 詞彙**不得**綁定領域名詞（router/
+gateway/host/switch……會無限增生）。節點只帶純幾何的 `shape=`
+（box｜rounded｜circle｜ellipse｜cloud｜diamond｜cylinder，封閉），
+裝置是什麼由標籤文字自己說（R22：語意在文字裡；R11：詞彙不得
+增生）。`kind=` 退役並給出指路錯誤訊息。流程圖形狀併入同一軸
+（decision→diamond、terminator→rounded、datastore→cylinder）。
+(2) 鏈路捆綁指令 `trunk` 改名 **`bundle`**——中性統稱（LAG/ES/
+port-channel/……）；`trunk` 在 VLAN 語境有歧義。
+
 ### D6 — 兩層釘點：群組成員採群組局部座標（2026-07-02）
 
 使用者提案，與 v2 框架的兩層座標系一致：群組內節點的 `pin at=`

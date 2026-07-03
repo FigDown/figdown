@@ -14,7 +14,7 @@ const ENGINE = path.join(ROOT, 'poc', 'figdown.html');
 
 function loadEngine() {
   const h = fs.readFileSync(ENGINE, 'utf8');
-  const start = h.indexOf('const KINDS');
+  const start = h.indexOf('const SHAPES');
   const end = h.indexOf('// 3. UI');
   if (start < 0 || end < 0) throw new Error('cannot locate engine in poc/figdown.html');
   const factory = new Function(h.slice(start, end) + '\nreturn {parse, render};');

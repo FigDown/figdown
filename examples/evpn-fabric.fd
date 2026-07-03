@@ -2,14 +2,14 @@ figdown 0.1 topology
 title "VXLAN/EVPN Leaf-Spine Fabric — topology with plane notes"
 
 # ── Topology ────────────────────────────────────────────────────────
-node sp1 "Spine-1" kind=switch color=#e0e7ff
-node sp2 "Spine-2" kind=switch color=#e0e7ff
-node lf1 "Leaf-1 (VTEP)" kind=switch
-node lf2 "Leaf-2 (VTEP)" kind=switch
-node lf3 "Leaf-3 (VTEP)" kind=switch
-node h1 "VM-A (VLAN 10)" kind=host
-node h2 "VM-B (VLAN 10)" kind=host
-node h3 "VM-C (VLAN 20)" kind=host
+node sp1 "Spine-1" shape=rounded color=#e0e7ff
+node sp2 "Spine-2" shape=rounded color=#e0e7ff
+node lf1 "Leaf-1 (VTEP)" shape=rounded
+node lf2 "Leaf-2 (VTEP)" shape=rounded
+node lf3 "Leaf-3 (VTEP)" shape=rounded
+node h1 "VM-A (VLAN 10)"
+node h2 "VM-B (VLAN 10)"
+node h3 "VM-C (VLAN 20)"
 flow down
 rank sp1 sp2
 rank lf1 lf2 lf3
