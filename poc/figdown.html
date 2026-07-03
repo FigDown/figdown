@@ -376,13 +376,15 @@ function parse(text){
         break;
       }
       case 'fill': {
-        // zone band: fill in=<node|group> from=<pct> to=<pct> [color=]
+        // zone band: fill <pct>% | <a>-<b>%  in=<node|group> [dir=] [color=]
+        // "fill 15%" = 0..15; "fill 15-35%" = the range in one token
+        if(opts.from!==undefined||opts.to!==undefined){ err(n,'from=/to= retired — write the range positionally: fill 15% or fill 15-35%'); break; }
         if(!opts['in']){ err(n,'fill needs in=<node-or-group-id>'); break; }
-        const pf=/^(\d+(?:\.\d+)?)%?$/;
-        const mf=pf.exec(opts.from||''), mt=pf.exec(opts.to||'');
-        if(!mf||!mt){ err(n,'fill needs from=<0..100>% and to=<0..100>%'); break; }
-        const from=+mf[1], to=+mt[1];
-        if(from<0||to>100||from>=to){ err(n,'fill needs 0 <= from < to <= 100'); break; }
+        const m=/^(\d+(?:\.\d+)?)%?(?:-(\d+(?:\.\d+)?)%?)?$/.exec(pos[1]||'');
+        if(!m){ err(n,'fill needs a range: <pct>% or <a>-<b>%'); break; }
+        const from=m[2]!==undefined?+m[1]:0;
+        const to=m[2]!==undefined?+m[2]:+m[1];
+        if(from<0||to>100||from>=to){ err(n,'fill range needs 0 <= from < to <= 100'); break; }
         const fdir=opts.dir||'up';
         if(!['up','down','left','right'].includes(fdir)){ err(n,'dir must be up|down|left|right'); break; }
         doc.fills.push({target:opts['in'],from,to,dir:fdir,color:opts.color||'#e5e7eb',line:n});
@@ -1188,7 +1190,7 @@ size g3 w=120 h=190
 
 line "Max cap"                 in=pool at=80%
 line "Reserved"  in=pool at=15%
-fill in=pool from=0% to=15% color=#a3c93a`,
+fill 15% in=pool color=#a3c93a`,
 
 'mixed document':
 `figdown 0.1 block

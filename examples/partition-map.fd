@@ -19,4 +19,4 @@ size g3 w=120 h=190
 
 line "Max cap"                 in=pool at=80%
 line "Reserved"  in=pool at=15%
-fill in=pool from=0% to=15% color=#a3c93a
+fill 15% in=pool color=#a3c93a

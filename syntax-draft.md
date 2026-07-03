@@ -146,15 +146,16 @@ drawing convention.
 ```figdown
 line "Max cap"                in=buf at=80%
 line "Reserved {port, queue}" in=buf at=15%
-fill in=buf from=0% to=15% color=#a3c93a
+fill 15% in=buf color=#a3c93a
 ```
 
 - `line` is a **pure marker**: a horizontal guide across the target's
   box at a percentage of its height (bottom = 0%). No id — nothing
   references a line. Covers thresholds, waterlines, caps, future chart
   markers (R28: this one directive replaced a would-be template).
-- `fill` is a **range band**: `from`/`to` percentages, stackable, on a
-  group **or** a single node. `dir=up|down|left|right` picks the
+- `fill` is a **range band** written positionally: `fill 15%` = 0–15%
+  (the common case needs one number); `fill 15-35%` = an explicit range
+  in one token. Stackable, on a group **or** a single node. `dir=up|down|left|right` picks the
   measuring axis and its 0% edge (default `up`: 0% at the bottom —
   the waterline convention; `right` gives progress-bar style bands).
   Line and fill are decoupled concepts.
