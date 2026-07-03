@@ -44,6 +44,14 @@ overhead 與重點對照表。
 ### VXLAN — RFC 7348 — [來源](vxlan.fd)
 ![VXLAN header](vxlan.svg)
 
+## 純屬好玩
+
+### 彩虹圈圈 — [來源](rainbow.fd)
+一個 `layer` 指令都沒用：行序就是圖層。七個同心 `cloud` 節點，
+後寫的行蓋在上面。
+
+![Rainbow rings](rainbow.svg)
+
 ---
 
 後續梯次見[藝廊規劃](../gallery-plan.zh-tw.md)：完整標頭集（E1）、

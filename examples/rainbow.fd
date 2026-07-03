@@ -1,0 +1,30 @@
+figdown 0.1 block
+title "Rainbow rings — line order is the layer"
+
+# Seven concentric ellipses. Earlier lines paint first (bottom), later
+# lines paint on top — the ring effect needs no layer directives at all.
+
+node red    " " kind=cloud color=#ef4444 stroke=#ef4444
+size red    w=560 h=560
+pin  red    at=20,20
+node orange " " kind=cloud color=#f97316 stroke=#f97316
+size orange w=480 h=480
+pin  orange at=60,60
+node yellow " " kind=cloud color=#facc15 stroke=#facc15
+size yellow w=400 h=400
+pin  yellow at=100,100
+node green  " " kind=cloud color=#22c55e stroke=#22c55e
+size green  w=320 h=320
+pin  green  at=140,140
+node blue   " " kind=cloud color=#3b82f6 stroke=#3b82f6
+size blue   w=240 h=240
+pin  blue   at=180,180
+node indigo " " kind=cloud color=#6366f1 stroke=#6366f1
+size indigo w=160 h=160
+pin  indigo at=220,220
+node violet " " kind=cloud color=#a855f7 stroke=#a855f7
+size violet w=80 h=80
+pin  violet at=260,260
+node core   "FigDown" kind=cloud color=#ffffff stroke=#ffffff
+size core   w=20 h=20
+pin  core   at=290,290

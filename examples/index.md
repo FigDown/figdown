@@ -46,6 +46,14 @@ VLAN-to-VNI arrow, and overhead/fact tables.
 ### VXLAN — RFC 7348  — [source](vxlan.fd)
 ![VXLAN header](vxlan.svg)
 
+## Just for fun
+
+### Rainbow rings — [source](rainbow.fd)
+No `layer` directives at all: line order is the layer. Seven concentric
+`cloud` nodes; later lines paint on top.
+
+![Rainbow rings](rainbow.svg)
+
 ---
 
 More waves per the [gallery plan](../gallery-plan.md): the full header
