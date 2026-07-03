@@ -46,6 +46,18 @@ VLAN-to-VNI arrow, and overhead/fact tables.
 ### VXLAN — RFC 7348  — [source](vxlan.fd)
 ![VXLAN header](vxlan.svg)
 
+### Buffer partition — shared pool + reservations  — [source](buffer-partition.fd)
+The `partition` template: columns + threshold lines; zones derive from
+the lines (`fill=below`). Seven lines of text, zero coordinates.
+
+![Buffer partition](buffer-partition.svg)
+
+### Queue-occupancy heatmap  — [source](queue-heatmap.fd)
+A data matrix as a table with per-cell marks — the readable 2-D answer
+to 3-D bar charts.
+
+![Queue heatmap](queue-heatmap.svg)
+
 ## Just for fun
 
 ### Rainbow rings — [source](rainbow.fd)

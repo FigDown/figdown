@@ -44,6 +44,17 @@ overhead 與重點對照表。
 ### VXLAN — RFC 7348 — [來源](vxlan.fd)
 ![VXLAN header](vxlan.svg)
 
+### 緩衝分割 — 共享池 + 保留量 — [來源](buffer-partition.fd)
+`partition` template：欄 + 門檻線；著色區由線推導（`fill=below`）。
+七行文字、零座標。
+
+![Buffer partition](buffer-partition.svg)
+
+### 佇列佔用熱圖 — [來源](queue-heatmap.fd)
+數據矩陣以表格 + 儲存格標記呈現——3D 長條圖的可讀二維解。
+
+![Queue heatmap](queue-heatmap.svg)
+
 ## 純屬好玩
 
 ### 彩虹圈圈 — [來源](rainbow.fd)

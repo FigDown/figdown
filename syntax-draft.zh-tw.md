@@ -37,8 +37,8 @@ title "L3 Forwarding Datapath"  # 選用
 ```
 
 **Template（R16）。** 標頭宣告文件的 template——它實例化的圖型：
-`block`｜`topology`｜`flowchart`｜`bitfield`｜`table`｜`wave`
-（初始集合 = 普查的桶，按優先順序）。所有 template 共享這一套核心
+`block`｜`topology`｜`flowchart`｜`bitfield`｜`table`｜`wave`｜`partition`
+（普查桶按優先序，外加 R26 佐證的 partition）。所有 template 共享這一套核心
 文法；template 決定關鍵字詞彙表（有哪些 `kind`、`node` 是什麼意思）
 與預設值（流向、邊的有向性、單位尺寸）——各自對準該圖型自己的
 普查統計。教 AI 寫某個 template 只需要核心 + 該 template 的詞彙表。
@@ -257,7 +257,21 @@ gap 4                       # 在第 4 tick 處的視覺斷點
 一字元 = 一 tick：`p` 時脈、`0/1` 準位、`x` 未定、`=` 資料格、
 `.` 延續。軌道字母表：採 WaveDrom 的，子集待定。
 
-### 4.4 優先順序備註
+### 4.4 `partition` — 資源/配額圖（R26；memmap 同族，佔表格 14.2%）
+
+```figdown
+partition buf "Packet buffer (pages)"
+column g0 "Group 0"
+column g1 "Group 1"                # 或用 `columns 4` 表達匿名均分
+line cap "Max cap"                at=100%
+line res "Reserved {port, queue}" at=25% color=#a3c93a fill=below
+```
+
+- 結構 = N 欄 + 橫向門檻**線**；著色區由 `fill=below|above` 推導。
+  渲染為一個外框 + N−1 條內部分隔線。線就是語意（cap、hi/lo
+  threshold）；沒有人畫區域框、沒有人算像素。
+
+### 4.5 優先順序備註
 
 `block-architecture`（普查第 1，加權 24.3%）**不需要型別區塊**——它
 就是核心場景模型（§2）加上各種 `kind`；flowchart（8.3%，第 4）與

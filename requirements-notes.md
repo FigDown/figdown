@@ -806,8 +806,9 @@ examples only and are deliberately NOT committed to the repo.)
   figures like the reference example — where every column has an
   identity — the per-column labeled form is the better choice** (the
   column names ARE the knowledge; R25).
-- Status: **candidate for the template set** (R16 gate: corpus evidence
-  exists; design when scheduled).
+- Status: **implemented in the PoC (2026-07-03)** — parser + renderer +
+  gallery example (generic vocabulary only; the reference photos and
+  their terms remain uncommitted).
 
 ### R27 — 3D / isometric figures: feasible, chart-family, low priority (2026-07-02)
 

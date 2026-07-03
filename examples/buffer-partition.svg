@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 707 306" width="707" height="306" font-family="system-ui,sans-serif"><defs><marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#555"/></marker><pattern id="hatch" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><line x1="0" y1="0" x2="0" y2="6" stroke="#bbb" stroke-width="2"/></pattern></defs><g transform="translate(18,6)"><text x="0" y="16" font-size="15" font-weight="600" font-family="var(--sans)">Egress buffer partition — shared pool with per-queue reservations</text><text x="0" y="44" font-size="13" font-weight="600">Packet buffer (pages)</text><rect x="0" y="211.5" width="480" height="52.5" fill="#a3c93a"/><rect x="0" y="54" width="480" height="210" fill="none" stroke="#555" stroke-width="1.5"/><line x1="120" y1="54" x2="120" y2="264" stroke="#555"/><line x1="240" y1="54" x2="240" y2="264" stroke="#555"/><line x1="360" y1="54" x2="360" y2="264" stroke="#555"/><text x="60" y="142.2" font-size="12.5" text-anchor="middle" fill="#1d1d1b">Group 0</text><text x="180" y="142.2" font-size="12.5" text-anchor="middle" fill="#1d1d1b">Group 1</text><text x="300" y="142.2" font-size="12.5" text-anchor="middle" fill="#1d1d1b">Group 2</text><text x="420" y="142.2" font-size="12.5" text-anchor="middle" fill="#1d1d1b">Group 3</text><line x1="0" y1="54" x2="480" y2="54" stroke="#ef4444" stroke-width="5" stroke-dasharray="7 4"/><text x="488" y="58" font-size="11" text-anchor="start" fill="#ef4444" paint-order="stroke" stroke="#fff" stroke-width="3">Max cap</text><line x1="0" y1="211.5" x2="480" y2="211.5" stroke="#a3c93a" stroke-width="2"/><text x="488" y="215.5" font-size="11" text-anchor="start" fill="#a3c93a" paint-order="stroke" stroke="#fff" stroke-width="3">Reserved {port, queue}</text></g><metadata id="figdown-source" data-sha256="9a7231c7aa5c0403127a77f6ab2e050dd24fd391032edb398ac7963cb4716285"><![CDATA[
+figdown 0.1 partition
+title "Egress buffer partition — shared pool with per-queue reservations"
+
+# The classic switch-QoS quota picture: one resource, N groups,
+# threshold LINES as first-class semantics (the zones derive from them).
+partition buf "Packet buffer (pages)"
+column g0 "Group 0"
+column g1 "Group 1"
+column g2 "Group 2"
+column g3 "Group 3"
+line cap "Max cap"                 at=100%
+line res "Reserved {port, queue}"  at=25% color=#a3c93a fill=below
+
+]]></metadata></svg>

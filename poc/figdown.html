@@ -136,7 +136,7 @@ function tokenize(line){
 // Option keys are a CLOSED set: an unquoted token whose key is not listed
 // here is a positional argument (this lets wave lanes contain '=').
 const OPT_KEYS=new Set(['kind','shape','color','stroke','text','in','layer','label',
-  'style','z','at','w','h','unit','note','labels','numbering',
+  'style','z','at','w','h','unit','note','labels','numbering','fill',
   'taillabel','headlabel']);
 function splitOpts(toks){
   const pos=[], opts={};
@@ -180,7 +180,7 @@ function parse(text){
         else acc+=inner[i];
       }
       segs.push(acc);
-      const isSep=segs.every(x=>/^\s*:?-{3,}:?\s*$/.test(x)) && segs.length>0;
+      const isSep=segs.every(x=>/^\s*:?-+:?\s*$/.test(x)) && segs.length>0;  // GFM: 1+ hyphens
       if(isSep){
         if(cur.sep){ err(n,'duplicate separator row'); continue; }
         if(!cur.heads.length){ err(n,'separator row before any header row'); continue; }
@@ -222,8 +222,8 @@ function parse(text){
         sawHeader=true;
         if(pos[1]!=='0.1') err(n,'unsupported version "'+(pos[1]||'')+'" (expected 0.1)');
         if(pos[2]!==undefined){
-          const TEMPLATES=['block','topology','flowchart','bitfield','table','wave'];
-          if(!TEMPLATES.includes(pos[2])) err(n,'unknown template "'+pos[2]+'" (block|topology|flowchart|bitfield|table|wave)');
+          const TEMPLATES=['block','topology','flowchart','bitfield','table','wave','partition'];
+          if(!TEMPLATES.includes(pos[2])) err(n,'unknown template "'+pos[2]+'" (block|topology|flowchart|bitfield|table|wave|partition)');
           else doc.template=pos[2];
         }
         continue;
@@ -231,7 +231,7 @@ function parse(text){
     } else if(kw==='figdown'){ err(n,'duplicate version header'); continue; }
 
     // typed-block children
-    if(cur && ['field','wrap','cell','signal','gap'].includes(kw)){
+    if(cur && ['field','wrap','cell','signal','gap','column','columns','line'].includes(kw)){
       if(cur.type==='bitfield' && kw==='field'){
         // Compact form (C bit-field convention): field F1:16,F2:8 SYN:1 ...
         // — bare name:width items separated by commas and/or spaces, no
@@ -284,6 +284,25 @@ function parse(text){
         const t=parseInt(pos[1],10);
         if(!isFinite(t)||t<0){ err(n,'gap needs a tick number'); continue; }
         cur.gaps.push(t);
+      } else if(cur.type==='partition' && kw==='column'){
+        const id=pos[1];
+        if(!id||!ID_RE.test(id)){ err(n,'column needs an id'); continue; }
+        if(cur.anon){ err(n,'column after columns N (pick one form)'); continue; }
+        cur.cols.push({id,label:pos[2]||id});
+      } else if(cur.type==='partition' && kw==='columns'){
+        const N=parseInt(pos[1],10);
+        if(!isFinite(N)||N<1){ err(n,'columns needs a count'); continue; }
+        if(cur.cols.length){ err(n,'columns N after column lines (pick one form)'); continue; }
+        cur.anon=N;
+      } else if(cur.type==='partition' && kw==='line'){
+        const id=pos[1];
+        if(!id||!ID_RE.test(id)){ err(n,'line needs an id'); continue; }
+        let llabel=id;
+        if(tk.toks[2]&&tk.toks[2].q) llabel=pos[2];
+        const m=/^(\d+(?:\.\d+)?)%?$/.exec(opts.at||'');
+        if(!m||+m[1]<0||+m[1]>100){ err(n,'line needs at=<0..100>%'); continue; }
+        if(opts.fill!==undefined&&!['below','above'].includes(opts.fill)){ err(n,'fill must be below or above'); continue; }
+        cur.lines.push({id,label:llabel,pct:+m[1],color:opts.color,fill:opts.fill,line:n});
       } else { err(n,'"'+kw+'" not valid inside '+cur.type); }
       continue;
     }
@@ -395,6 +414,12 @@ function parse(text){
         cur={type:'wave',id,label:pos[2]||id,signals:[],gaps:[],line:n};
         doc.blocks.push(cur); break;
       }
+      case 'partition': {
+        const id=pos[1];
+        if(!id||!ID_RE.test(id)){ err(n,'partition needs an id'); break; }
+        cur={type:'partition',id,label:pos[2]||id,cols:[],anon:0,lines:[],line:n};
+        doc.blocks.push(cur); break;
+      }
       case 'page': case 'step': case 'set': case 'pulse':
         err(n,'"'+kw+'" is reserved for the dynamic profile (not in v0.1)'); break;
       default:
@@ -429,6 +454,7 @@ function parse(text){
     if(b.type==='table'&&b.heads.length&&!b.sep) errs.push('Line '+b.line+': table has no |---| separator row');
     if(b.type==='bitfield'&&!b.fields.some(f=>!f.wrap)) errs.push('Line '+b.line+': bitfield has no fields');
     if(b.type==='wave'&&!b.signals.length) errs.push('Line '+b.line+': wave has no signals');
+    if(b.type==='partition'&&!b.cols.length&&!b.anon) errs.push('Line '+b.line+': partition has no columns');
     if(b.type==='table'&&b.marks) for(const mk of b.marks){
       if(mk.r>b.rows.length||mk.c<1||mk.c>b.cols.length)
         errs.push('Line '+mk.line+': cell '+mk.r+','+mk.c+' out of range');
@@ -483,6 +509,7 @@ function render(doc){
     let s;
     if(b.type==='bitfield') s=renderBitfield(b,y);
     else if(b.type==='table') s=renderTable(b,y);
+    else if(b.type==='partition') s=renderPartition(b,y);
     else s=renderWave(b,y);
     parts.push(s.svg); y=s.y+24; maxW=Math.max(maxW,s.w);
   }
@@ -758,6 +785,41 @@ function renderTable(t,y0){
   }
   const yEnd=yTop+grid.length*rh;
   return {svg:svg.join(''), y:yEnd+6, w:totalW+2};
+}
+
+// ---- partition (R26): N columns + threshold lines; zones derive from lines ----
+function renderPartition(b,y0){
+  const svg=[]; let y=y0+18;
+  svg.push('<text x="0" y="'+(y-4)+'" font-size="13" font-weight="600">'+esc(b.label)+'</text>');
+  const cols = b.cols.length ? b.cols : Array.from({length:b.anon},()=>({label:''}));
+  const colW = Math.max(120, ...cols.map(c=>tw(c.label)+16));
+  const H=210, W=cols.length*colW;
+  const yTop=y+6, yBot=yTop+H;
+  const lineY=pct=>yTop+H*(1-pct/100);
+  // zone fills first (they sit behind everything)
+  for(const L of b.lines){
+    if(!L.fill) continue;
+    const ly=lineY(L.pct);
+    const [zy,zh]=L.fill==='below'?[ly,yBot-ly]:[yTop,ly-yTop];
+    svg.push('<rect x="0" y="'+zy+'" width="'+W+'" height="'+zh+'" fill="'+(L.color||'#a3c93a')+'"/>');
+  }
+  // one outer frame + N-1 internal dividers (the canonical rendering)
+  svg.push('<rect x="0" y="'+yTop+'" width="'+W+'" height="'+H+'" fill="none" stroke="#555" stroke-width="1.5"/>');
+  for(let i=1;i<cols.length;i++)
+    svg.push('<line x1="'+(i*colW)+'" y1="'+yTop+'" x2="'+(i*colW)+'" y2="'+yBot+'" stroke="#555"/>');
+  // column labels (upper area)
+  cols.forEach((c,i)=>{
+    if(c.label) svg.push(textEl(i*colW+colW/2, yTop+H*0.42, 12.5, 'middle', '#1d1d1b', c.label));
+  });
+  // threshold lines + labels (drawn on top)
+  for(const L of b.lines){
+    const ly=lineY(L.pct);
+    const col=L.color||'#ef4444';
+    svg.push('<line x1="0" y1="'+ly+'" x2="'+W+'" y2="'+ly+'" stroke="'+col+'" stroke-width="'+(L.pct>=100?5:2)+'"'+(L.fill?'':' stroke-dasharray="7 4"')+'/>');
+    svg.push(textEl(W+8, ly+4, 11, 'start', col, L.label,' paint-order="stroke" stroke="#fff" stroke-width="3"'));
+  }
+  const labelW=Math.max(0,...b.lines.map(L=>tw(L.label)));
+  return {svg:svg.join(''), y:yBot+8, w:W+labelW+14};
 }
 
 // ---- wave ----
@@ -1084,6 +1146,20 @@ table facts "Why VXLAN"
 | VLAN address space      | 12 bits (4K segments)    |
 | VNI address space       | 24 bits (16M segments)   |
 | Encapsulation           | MAC-in-UDP               |`,
+
+'buffer partition (columns + threshold lines)':
+`figdown 0.1 partition
+title "Egress buffer partition — shared pool with per-queue reservations"
+
+# The classic switch-QoS quota picture: one resource, N groups,
+# threshold LINES as first-class semantics (the zones derive from them).
+partition buf "Packet buffer (pages)"
+column g0 "Group 0"
+column g1 "Group 1"
+column g2 "Group 2"
+column g3 "Group 3"
+line cap "Max cap"                 at=100%
+line res "Reserved {port, queue}"  at=25% color=#a3c93a fill=below`,
 
 'mixed document':
 `figdown 0.1 block
