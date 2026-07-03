@@ -1150,20 +1150,19 @@ table facts "Why VXLAN"
 | VNI address space       | 24 bits (16M segments)   |
 | Encapsulation           | MAC-in-UDP               |`,
 
-'buffer partition (generic group + guide lines)':
+'partition map (pool + global thresholds)':
 `figdown 0.1 block
-title "Egress buffer partition — shared pool with per-queue reservations"
+title "Partition map — a resource pool with global thresholds"
 
-# MEANING FIRST: this figure says "two GLOBAL thresholds, configured once,
-# referenced by all four groups" — so the lines AND the fill attach to the
-# container (group-level scope). Per-node scope exists in the language for
-# figures whose semantics really are per-column; the writer chooses the
-# scope that matches the meaning.
-group buf "Packet buffer (pages)" gap=0
-node g0 "Group 0" in=buf color=transparent
-node g1 "Group 1" in=buf color=transparent
-node g2 "Group 2" in=buf color=transparent
-node g3 "Group 3" in=buf color=transparent
+# The GENERIC partition-and-threshold map: one pool, N groups, global
+# threshold lines shared by all (group-level scope; per-node scope exists
+# for figures whose semantics are per-column). Instances of this category:
+# buffer quotas, memory maps, watermark/level charts.
+group pool "Resource pool (units)" gap=0
+node g0 "Group 0" in=pool color=transparent
+node g1 "Group 1" in=pool color=transparent
+node g2 "Group 2" in=pool color=transparent
+node g3 "Group 3" in=pool color=transparent
 flow down
 rank g0 g1 g2 g3
 size g0 w=120 h=190
@@ -1171,9 +1170,9 @@ size g1 w=120 h=190
 size g2 w=120 h=190
 size g3 w=120 h=190
 
-line "Max cap"                 in=buf at=80%
-line "Reserved {port, queue}"  in=buf at=15%
-fill in=buf from=0% to=15% color=#a3c93a`,
+line "Max cap"                 in=pool at=80%
+line "Reserved"  in=pool at=15%
+fill in=pool from=0% to=15% color=#a3c93a`,
 
 'mixed document':
 `figdown 0.1 block

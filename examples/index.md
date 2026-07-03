@@ -46,12 +46,13 @@ VLAN-to-VNI arrow, and overhead/fact tables.
 ### VXLAN — RFC 7348  — [source](vxlan.fd)
 ![VXLAN header](vxlan.svg)
 
-### Buffer partition — shared pool + reservations  — [source](buffer-partition.fd)
-Generic constructs only: a group of transparent column nodes + two
-`line` guide directives (`fill=below` derives the zone). No special
-template needed (R28).
+## Partition & threshold maps
 
-![Buffer partition](buffer-partition.svg)
+One generic shape — a pool of columns plus global `line`/`fill`
+markers — covers buffer quotas, memory maps, and watermark charts.
+
+### Partition map — [source](partition-map.fd)
+![Partition map](partition-map.svg)
 
 ### Queue-occupancy heatmap  — [source](queue-heatmap.fd)
 A data matrix as a table with per-cell marks — the readable 2-D answer

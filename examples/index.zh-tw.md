@@ -44,11 +44,13 @@ overhead 與重點對照表。
 ### VXLAN — RFC 7348 — [來源](vxlan.fd)
 ![VXLAN header](vxlan.svg)
 
-### 緩衝分割 — 共享池 + 保留量 — [來源](buffer-partition.fd)
-純通用構件：群組內的透明欄位節點 + 兩個 `line` 導引線指令
-（`fill=below` 推導著色區）。不需要任何專屬 template（R28）。
+## 分割與門檻圖
 
-![Buffer partition](buffer-partition.svg)
+一個通用形態——欄位池 + 全域 `line`/`fill` 標記——涵蓋緩衝配額、
+記憶體映射、水位圖等實例。
+
+### 分割圖 — [來源](partition-map.fd)
+![Partition map](partition-map.svg)
 
 ### 佇列佔用熱圖 — [來源](queue-heatmap.fd)
 數據矩陣以表格 + 儲存格標記呈現——3D 長條圖的可讀二維解。

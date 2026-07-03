@@ -1,0 +1,22 @@
+figdown 0.1 block
+title "Partition map — a resource pool with global thresholds"
+
+# The GENERIC partition-and-threshold map: one pool, N groups, global
+# threshold lines shared by all (group-level scope; per-node scope exists
+# for figures whose semantics are per-column). Instances of this category:
+# buffer quotas, memory maps, watermark/level charts.
+group pool "Resource pool (units)" gap=0
+node g0 "Group 0" in=pool color=transparent
+node g1 "Group 1" in=pool color=transparent
+node g2 "Group 2" in=pool color=transparent
+node g3 "Group 3" in=pool color=transparent
+flow down
+rank g0 g1 g2 g3
+size g0 w=120 h=190
+size g1 w=120 h=190
+size g2 w=120 h=190
+size g3 w=120 h=190
+
+line "Max cap"                 in=pool at=80%
+line "Reserved"  in=pool at=15%
+fill in=pool from=0% to=15% color=#a3c93a
