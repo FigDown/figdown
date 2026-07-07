@@ -9,6 +9,9 @@
 > （[census.zh-tw.md](../census.zh-tw.md)）。
 >
 > English version: [index.md](index.md)
+>
+> 另見[結構模式庫](patterns/index.zh-tw.md)——蒸餾自真實 774 份
+> 文件語料的通用骨架。
 
 ## 方塊與架構（普查第 1）
 

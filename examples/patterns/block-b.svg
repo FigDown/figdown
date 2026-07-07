@@ -1,0 +1,44 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 390 346" width="390" height="346" font-family="system-ui,sans-serif"><defs><marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#555"/></marker><pattern id="hatch" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><line x1="0" y1="0" x2="0" y2="6" stroke="#bbb" stroke-width="2"/></pattern></defs><g transform="translate(18,6)"><text x="0" y="16" font-size="15" font-weight="600" font-family="var(--sans)">Nested containment with cross-tier feedback edges</text><g data-group="outer" data-gx="0" data-gy="170" style="cursor:move"><rect x="-14" y="144" width="99.2" height="74" rx="10" fill="#f6f5ef" stroke="#d6d4cc"/><text x="-4" y="160" font-size="11.5" fill="#6f6e69">Subsystem A</text></g><g data-group="inner" data-gx="276" data-gy="50" style="cursor:move"><rect x="262" y="24" width="99.19999999999999" height="154" rx="10" fill="#f6f5ef" stroke="#d6d4cc"/><text x="272" y="40" font-size="11.5" fill="#6f6e69">Store Group</text></g><g data-group="procs" data-gx="127.2" data-gy="90" style="cursor:move"><rect x="113.2" y="64" width="120.8" height="234" rx="10" fill="#f6f5ef" stroke="#d6d4cc"/><text x="123.2" y="80" font-size="11.5" fill="#6f6e69">Process Tier</text></g><line x1="66.65" y1="170" x2="142.54999999999998" y2="126" stroke="#555" stroke-width="1.6" marker-end="url(#arr)"/><text x="104.6" y="143" font-size="11" text-anchor="middle" fill="#555" paint-order="stroke" stroke="#fff" stroke-width="3">ref</text><line x1="71.2" y1="172.52173913043478" x2="276" y2="83.47826086956522" stroke="#555" stroke-width="1.6" marker-end="url(#arr)"/><text x="173.6" y="123" font-size="11" text-anchor="middle" fill="#555" paint-order="stroke" stroke="#fff" stroke-width="3">ptr</text><line x1="220" y1="121.44927536231884" x2="276" y2="137.68115942028984" stroke="#555" stroke-width="1.6" stroke-dasharray="6 4" marker-end="url(#arr)"/><text x="248" y="124.56521739130434" font-size="11" text-anchor="middle" fill="#555" paint-order="stroke" stroke="#fff" stroke-width="3">feedback</text><line x1="173.6" y1="250" x2="173.6" y2="206" stroke="#555" stroke-width="1.6" marker-end="url(#arr)"/><line x1="127.19999999999999" y1="188" x2="71.2" y2="188" stroke="#555" stroke-width="1.6" stroke-dasharray="6 4" marker-end="url(#arr)"/><text x="99.19999999999999" y="183" font-size="11" text-anchor="middle" fill="#555" paint-order="stroke" stroke="#fff" stroke-width="3">interrupt</text><line x1="142.54999999999998" y1="250" x2="66.65" y2="206" stroke="#555" stroke-width="1.6" marker-end="url(#arr)"/><text x="104.6" y="223" font-size="11" text-anchor="middle" fill="#555" paint-order="stroke" stroke="#fff" stroke-width="3">up-path</text><g data-node="unit-a" data-x="276" data-y="50" style="cursor:move"><rect x="276" y="50" width="71.2" height="36" fill="#fff" stroke="#8a8880"/><text x="311.6" y="72.55" font-size="13" text-anchor="middle" fill="#1d1d1b">Unit A</text></g><g data-node="unit-b" data-x="276" data-y="130" style="cursor:move"><rect x="276" y="130" width="71.2" height="36" fill="#fff" stroke="#8a8880"/><text x="311.6" y="152.55" font-size="13" text-anchor="middle" fill="#1d1d1b">Unit B</text></g><g data-node="unit-c" data-x="0" data-y="170" style="cursor:move"><rect x="0" y="170" width="71.2" height="36" fill="#fff" stroke="#8a8880"/><text x="35.6" y="192.55" font-size="13" text-anchor="middle" fill="#1d1d1b">Unit C</text></g><g data-node="in-port" data-x="276" data-y="210" style="cursor:move"><rect x="276" y="210" width="42.4" height="36" rx="14" fill="#fff" stroke="#8a8880" stroke-width="1.8"/><text x="297.2" y="232.55" font-size="13" text-anchor="middle" fill="#1d1d1b">in</text></g><g data-node="out-port" data-x="276" data-y="290" style="cursor:move"><rect x="276" y="290" width="49.6" height="36" rx="14" fill="#fff" stroke="#8a8880" stroke-width="1.8"/><text x="300.8" y="312.55" font-size="13" text-anchor="middle" fill="#1d1d1b">out</text></g><g data-node="proc-x" data-x="127.2" data-y="90" style="cursor:move"><rect x="127.2" y="90" width="92.8" height="36" fill="#bfdbfe" stroke="#8a8880"/><text x="173.6" y="112.55" font-size="13" text-anchor="middle" fill="#1d1d1b">Process X</text></g><g data-node="intr" data-x="127.2" data-y="170" style="cursor:move"><rect x="127.2" y="170" width="92.8" height="36" rx="14" fill="#fca5a5" stroke="#8a8880" stroke-width="1.8"/><text x="173.6" y="192.55" font-size="13" text-anchor="middle" fill="#1d1d1b">Interrupt</text></g><g data-node="proc-y" data-x="127.2" data-y="250" style="cursor:move"><rect x="127.2" y="250" width="92.8" height="36" fill="#bfdbfe" stroke="#8a8880"/><text x="173.6" y="272.55" font-size="13" text-anchor="middle" fill="#1d1d1b">Process Y</text></g></g><metadata id="figdown-source" data-sha256="31ec5aa0aec1afc1bb0c6aa94098ac44105e90cb28826147320b239ac605d0ac"><![CDATA[
+figdown 0.1 block
+title "Nested containment with cross-tier feedback edges"
+
+# Outer region holds an inner sub-group (two sibling stores) and a
+# state table.  A separate process tier sits below.  Colored feedback
+# edges cross both tiers in opposite directions, capturing the pattern:
+#   outer group { inner group { unit A, unit B }, unit C }
+#   process tier { process X, process Y, interrupt node }
+#   edge C -> process X  (down-path)
+#   edge process X -> unit B  (feedback, up-path)
+#   edge process Y -> interrupt  (cross-process trigger)
+#   edge interrupt -> unit C  (feedback, up-path, dashed)
+
+group outer "Subsystem A"
+
+group inner "Store Group" in=outer
+node unit-a "Unit A" in=inner
+node unit-b "Unit B" in=inner
+
+node unit-c "Unit C" in=outer
+
+node in-port  "in"  shape=rounded
+node out-port "out" shape=rounded
+
+group procs "Process Tier"
+node proc-x "Process X" in=procs color=#bfdbfe
+node intr   "Interrupt"  in=procs color=#fca5a5 shape=rounded
+node proc-y "Process Y"  in=procs color=#bfdbfe
+
+flow right
+rank unit-a unit-b
+rank proc-x intr proc-y
+
+edge in-port  -> outer
+edge outer    -> out-port
+edge unit-c   -> proc-x   label="ref"
+edge unit-c   -> unit-a   label="ptr"
+edge proc-x   -> unit-b   label="feedback" style=dashed
+edge proc-y   -> intr
+edge intr     -> unit-c   label="interrupt" style=dashed
+edge proc-y   -> unit-c   label="up-path"
+
+]]></metadata></svg>

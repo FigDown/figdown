@@ -1,0 +1,37 @@
+figdown 0.1 block
+title "Parallel-row fan-in to collector"
+
+# Three independent rows of staged blocks; each row flows right and
+# converges into a single collector.  Captures the structural pattern:
+#   N rows × M stages  →  fan-in  →  1 collector
+
+group row1 "Lane 1"
+node r1s1 "Stage 1" in=row1
+node r1s2 "Stage 2" in=row1
+node r1s3 "Stage 3" in=row1
+
+group row2 "Lane 2"
+node r2s1 "Stage 1" in=row2
+node r2s2 "Stage 2" in=row2
+node r2s3 "Stage 3" in=row2
+
+group row3 "Lane 3"
+node r3s1 "Stage 1" in=row3
+node r3s2 "Stage 2" in=row3
+node r3s3 "Stage 3" in=row3
+
+node collector "Collector" shape=ellipse
+
+flow right
+rank r1s1 r2s1 r3s1
+
+edge r1s1 -> r1s2
+edge r1s2 -> r1s3
+edge r2s1 -> r2s2
+edge r2s2 -> r2s3
+edge r3s1 -> r3s2
+edge r3s2 -> r3s3
+
+edge r1s3 -> collector
+edge r2s3 -> collector
+edge r3s3 -> collector

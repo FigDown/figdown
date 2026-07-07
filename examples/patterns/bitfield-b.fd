@@ -1,0 +1,21 @@
+figdown 0.1 bitfield
+# Multi-word descriptor/entry — four 32-bit words, lsb0 numbering (ruler 31..0)
+title Multi-Word Descriptor Pattern
+
+bitfield descriptor "Multi-Word Descriptor" unit=32
+# Word 0: identifier in upper half + flag cluster + small type code in low bits
+field TYPE 4
+field FLAG_B:1, FLAG_A:1
+field Reserved 10
+field FIELD_A 16
+wrap
+# Word 1: wide bitmap/trace field across upper bits + small reserved in lower bits
+field Reserved 8
+field FIELD_B 24
+wrap
+# Word 2: two medium-width fields covering the full word
+field FIELD_D 16
+field FIELD_C 16
+wrap
+# Word 3: full-word payload/data slot (variable length shown as one unit)
+field DATA * note="variable-length payload; one unit shown as representative row"

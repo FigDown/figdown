@@ -1,0 +1,6 @@
+figdown 0.1 wave
+wave handshake "Clocked handshake: request / acknowledge"
+signal clk   pppppppppppppp
+signal req   00011111110000
+signal ack   00000111111000
+signal done  00000000001100

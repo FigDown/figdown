@@ -1,0 +1,40 @@
+figdown 0.1 topology
+title "Chain with redundant pair and link bundle"
+
+# Structural pattern abstracted from real topology figures:
+#   - Linear ingress → core → egress chain
+#   - A redundant device pair in the core (Device B1 + Device B2),
+#     each carrying one leg of the traffic
+#   - A link bundle grouping the two parallel legs between the
+#     upstream and downstream core nodes
+#   - Numbered port labels on each link
+
+node in1 "Ingress Node" shape=rounded color=#f0fdf4
+node c1  "Core Node 1" shape=rounded color=#eff6ff
+
+group pair "Redundant Pair"
+node b1  "Device B1" shape=rounded color=#fef9c3 in=pair
+node b2  "Device B2" shape=rounded color=#fef9c3 in=pair
+
+node c2  "Core Node 2" shape=rounded color=#eff6ff
+node out1 "Egress Node" shape=rounded color=#f0fdf4
+
+flow right
+rank b1 b2
+
+# ingress to first core node
+edge in1 -- c1 taillabel="p1" headlabel="p1"
+
+# c1 fans into the redundant pair
+edge c1 -- b1 taillabel="p2" headlabel="p1"
+edge c1 -- b2 taillabel="p3" headlabel="p1"
+
+# redundant pair fans into second core node
+edge b1 -- c2 taillabel="p2" headlabel="p1"
+edge b2 -- c2 taillabel="p2" headlabel="p2"
+
+# egress
+edge c2 -- out1 taillabel="p3" headlabel="p1"
+
+# link bundle: the two parallel legs through the redundant pair
+bundle bund1 "Link Bundle 1" c1--b1, c1--b2

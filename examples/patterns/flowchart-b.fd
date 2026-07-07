@@ -1,0 +1,21 @@
+figdown 0.1 flowchart
+title "Flow with Retry Loop"
+
+node s   "Start"       shape=rounded
+node p1  "Step 1"
+node d1  "Check A?"    shape=diamond
+node p2  "Step 2"
+node d2  "Check B?"    shape=diamond
+node p3  "Step 3"
+node e   "Done"        shape=rounded
+
+flow down
+
+edge s  -> p1
+edge p1 -> d1
+edge d1 -> p2  label="yes"
+edge d1 -> e   label="no"
+edge p2 -> d2
+edge d2 -> p3  label="yes"
+edge d2 -> p1  label="no"
+edge p3 -> e

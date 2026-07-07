@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 397 610" width="397" height="610" font-family="system-ui,sans-serif"><defs><marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#555"/></marker><pattern id="hatch" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><line x1="0" y1="0" x2="0" y2="6" stroke="#bbb" stroke-width="2"/></pattern></defs><g transform="translate(18,6)"><text x="0" y="16" font-size="15" font-weight="600" font-family="var(--sans)">Linear Flow with Two Sequential Decisions</text><line x1="184.39999999999998" y1="86" x2="184.39999999999998" y2="130" stroke="#555" stroke-width="1.6" marker-end="url(#arr)"/><line x1="184.39999999999998" y1="166" x2="184.39999999999998" y2="210" stroke="#555" stroke-width="1.6" marker-end="url(#arr)"/><line x1="184.39999999999998" y1="258" x2="184.39999999999998" y2="302" stroke="#555" stroke-width="1.6" marker-end="url(#arr)"/><text x="184.39999999999998" y="275" font-size="11" text-anchor="middle" fill="#555" paint-order="stroke" stroke="#fff" stroke-width="3">yes</text><line x1="171.22790697674418" y1="258" x2="52.67906976744186" y2="474" stroke="#555" stroke-width="1.6" marker-end="url(#arr)"/><text x="111.95348837209302" y="361" font-size="11" text-anchor="middle" fill="#555" paint-order="stroke" stroke="#fff" stroke-width="3">no</text><line x1="184.39999999999998" y1="338" x2="184.39999999999998" y2="382" stroke="#555" stroke-width="1.6" marker-end="url(#arr)"/><line x1="184.39999999999998" y1="430" x2="184.39999999999998" y2="474" stroke="#555" stroke-width="1.6" marker-end="url(#arr)"/><text x="184.39999999999998" y="447" font-size="11" text-anchor="middle" fill="#555" paint-order="stroke" stroke="#fff" stroke-width="3">yes</text><line x1="223.91627906976743" y1="430" x2="296.3627906976744" y2="474" stroke="#555" stroke-width="1.6" marker-end="url(#arr)"/><text x="260.1395348837209" y="447" font-size="11" text-anchor="middle" fill="#555" paint-order="stroke" stroke="#fff" stroke-width="3">no</text><line x1="74.66" y1="510" x2="155.99999999999997" y2="555.954802259887" stroke="#555" stroke-width="1.6" marker-end="url(#arr)"/><line x1="184.39999999999998" y1="510" x2="184.39999999999998" y2="554" stroke="#555" stroke-width="1.6" marker-end="url(#arr)"/><line x1="294.14" y1="510" x2="212.79999999999998" y2="555.9548022598871" stroke="#555" stroke-width="1.6" marker-end="url(#arr)"/><g data-node="s" data-x="152.39999999999998" data-y="50" style="cursor:move"><rect x="152.39999999999998" y="50" width="64" height="36" rx="14" fill="#fff" stroke="#8a8880" stroke-width="1.8"/><text x="184.39999999999998" y="72.55" font-size="13" text-anchor="middle" fill="#1d1d1b">Start</text></g><g data-node="p1" data-x="148.79999999999998" data-y="130" style="cursor:move"><rect x="148.79999999999998" y="130" width="71.2" height="36" fill="#fff" stroke="#8a8880"/><text x="184.39999999999998" y="152.55" font-size="13" text-anchor="middle" fill="#1d1d1b">Step 1</text></g><g data-node="d1" data-x="131.59999999999997" data-y="210" style="cursor:move"><polygon points="184.39999999999998,210 237.19999999999996,234 184.39999999999998,258 131.59999999999997,234" fill="#fff" stroke="#8a8880"/><text x="184.39999999999998" y="238.55" font-size="13" text-anchor="middle" fill="#1d1d1b">Check A?</text></g><g data-node="p2" data-x="148.79999999999998" data-y="302" style="cursor:move"><rect x="148.79999999999998" y="302" width="71.2" height="36" fill="#fff" stroke="#8a8880"/><text x="184.39999999999998" y="324.55" font-size="13" text-anchor="middle" fill="#1d1d1b">Step 2</text></g><g data-node="d2" data-x="131.59999999999997" data-y="382" style="cursor:move"><polygon points="184.39999999999998,382 237.19999999999996,406 184.39999999999998,430 131.59999999999997,406" fill="#fff" stroke="#8a8880"/><text x="184.39999999999998" y="410.55" font-size="13" text-anchor="middle" fill="#1d1d1b">Check B?</text></g><g data-node="r1" data-x="0" data-y="474" style="cursor:move"><rect x="0" y="474" width="85.6" height="36" fill="#fff" stroke="#8a8880"/><text x="42.8" y="496.55" font-size="13" text-anchor="middle" fill="#1d1d1b">Result X</text></g><g data-node="r2" data-x="141.6" data-y="474" style="cursor:move"><rect x="141.6" y="474" width="85.6" height="36" fill="#fff" stroke="#8a8880"/><text x="184.39999999999998" y="496.55" font-size="13" text-anchor="middle" fill="#1d1d1b">Result Y</text></g><g data-node="r3" data-x="283.2" data-y="474" style="cursor:move"><rect x="283.2" y="474" width="85.6" height="36" fill="#fff" stroke="#8a8880"/><text x="326" y="496.55" font-size="13" text-anchor="middle" fill="#1d1d1b">Result Z</text></g><g data-node="e" data-x="155.99999999999997" data-y="554" style="cursor:move"><rect x="155.99999999999997" y="554" width="56.8" height="36" rx="14" fill="#fff" stroke="#8a8880" stroke-width="1.8"/><text x="184.39999999999998" y="576.55" font-size="13" text-anchor="middle" fill="#1d1d1b">Done</text></g></g><metadata id="figdown-source" data-sha256="36e6c03516e2856f74f2481048bbdced6836cba811b42562f6ccb01fdcdb4e43"><![CDATA[
+figdown 0.1 flowchart
+title "Linear Flow with Two Sequential Decisions"
+
+node s   "Start"    shape=rounded
+node p1  "Step 1"
+node d1  "Check A?" shape=diamond
+node p2  "Step 2"
+node d2  "Check B?" shape=diamond
+node r1  "Result X"
+node r2  "Result Y"
+node r3  "Result Z"
+node e   "Done"     shape=rounded
+
+flow down
+
+edge s  -> p1
+edge p1 -> d1
+edge d1 -> p2  label="yes"
+edge d1 -> r1  label="no"
+edge p2 -> d2
+edge d2 -> r2  label="yes"
+edge d2 -> r3  label="no"
+edge r1 -> e
+edge r2 -> e
+edge r3 -> e
+
+]]></metadata></svg>

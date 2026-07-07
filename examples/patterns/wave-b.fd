@@ -1,0 +1,5 @@
+figdown 0.1 wave
+wave datatransfer "Data-bus transfer: valid + labelled data segments"
+signal clk   pppppppppppppppppp
+signal valid 000011110001111000
+signal data  xxx.==..xxx.==..xx  labels="A,B,C,D"

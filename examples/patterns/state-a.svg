@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 266" width="100" height="266" font-family="system-ui,sans-serif"><defs><marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#555"/></marker><pattern id="hatch" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><line x1="0" y1="0" x2="0" y2="6" stroke="#bbb" stroke-width="2"/></pattern></defs><g transform="translate(18,6)"><text x="0" y="16" font-size="15" font-weight="600" font-family="var(--sans)">3-State Cycle with Conditional Transitions</text><line x1="35.6" y1="86" x2="35.6" y2="130" stroke="#555" stroke-width="1.6" marker-end="url(#arr)"/><text x="35.6" y="103" font-size="11" text-anchor="middle" fill="#555" paint-order="stroke" stroke="#fff" stroke-width="3">cond1</text><line x1="35.6" y1="166" x2="35.6" y2="210" stroke="#555" stroke-width="1.6" marker-end="url(#arr)"/><text x="35.6" y="183" font-size="11" text-anchor="middle" fill="#555" paint-order="stroke" stroke="#fff" stroke-width="3">cond2</text><line x1="35.6" y1="210" x2="35.6" y2="86" stroke="#555" stroke-width="1.6" marker-end="url(#arr)"/><text x="35.6" y="143" font-size="11" text-anchor="middle" fill="#555" paint-order="stroke" stroke="#fff" stroke-width="3">reset</text><line x1="35.6" y1="210" x2="35.6" y2="166" stroke="#555" stroke-width="1.6" marker-end="url(#arr)"/><text x="35.6" y="183" font-size="11" text-anchor="middle" fill="#555" paint-order="stroke" stroke="#fff" stroke-width="3">retry</text><line x1="35.6" y1="130" x2="35.6" y2="86" stroke="#555" stroke-width="1.6" marker-end="url(#arr)"/><text x="35.6" y="103" font-size="11" text-anchor="middle" fill="#555" paint-order="stroke" stroke="#fff" stroke-width="3">abort</text><g data-node="idle" data-x="7.200000000000003" data-y="50" style="cursor:move"><rect x="7.200000000000003" y="50" width="56.8" height="36" rx="14" fill="#dbeafe" stroke="#8a8880" stroke-width="1.8"/><text x="35.6" y="72.55" font-size="13" text-anchor="middle" fill="#1d1d1b">IDLE</text></g><g data-node="active" data-x="0" data-y="130" style="cursor:move"><rect x="0" y="130" width="71.2" height="36" rx="14" fill="#fff" stroke="#8a8880" stroke-width="1.8"/><text x="35.6" y="152.55" font-size="13" text-anchor="middle" fill="#1d1d1b">ACTIVE</text></g><g data-node="wait" data-x="7.200000000000003" data-y="210" style="cursor:move"><rect x="7.200000000000003" y="210" width="56.8" height="36" rx="14" fill="#fff" stroke="#8a8880" stroke-width="1.8"/><text x="35.6" y="232.55" font-size="13" text-anchor="middle" fill="#1d1d1b">WAIT</text></g></g><metadata id="figdown-source" data-sha256="b0323c571f9c77d2cc45799da77f92c6372b9f8cb63cf83df1c236800b44892e"><![CDATA[
+figdown 0.1 flowchart
+title "3-State Cycle with Conditional Transitions"
+
+node idle   "IDLE"    shape=rounded color=#dbeafe
+node active "ACTIVE"  shape=rounded
+node wait   "WAIT"    shape=rounded
+
+flow down
+
+edge idle   -> active  label="cond1"
+edge active -> wait    label="cond2"
+edge wait   -> idle    label="reset"
+edge wait   -> active  label="retry"
+edge active -> idle    label="abort"
+
+]]></metadata></svg>

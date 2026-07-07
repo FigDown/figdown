@@ -1,0 +1,41 @@
+figdown 0.1 block
+title "Nested containment with cross-tier feedback edges"
+
+# Outer region holds an inner sub-group (two sibling stores) and a
+# state table.  A separate process tier sits below.  Colored feedback
+# edges cross both tiers in opposite directions, capturing the pattern:
+#   outer group { inner group { unit A, unit B }, unit C }
+#   process tier { process X, process Y, interrupt node }
+#   edge C -> process X  (down-path)
+#   edge process X -> unit B  (feedback, up-path)
+#   edge process Y -> interrupt  (cross-process trigger)
+#   edge interrupt -> unit C  (feedback, up-path, dashed)
+
+group outer "Subsystem A"
+
+group inner "Store Group" in=outer
+node unit-a "Unit A" in=inner
+node unit-b "Unit B" in=inner
+
+node unit-c "Unit C" in=outer
+
+node in-port  "in"  shape=rounded
+node out-port "out" shape=rounded
+
+group procs "Process Tier"
+node proc-x "Process X" in=procs color=#bfdbfe
+node intr   "Interrupt"  in=procs color=#fca5a5 shape=rounded
+node proc-y "Process Y"  in=procs color=#bfdbfe
+
+flow right
+rank unit-a unit-b
+rank proc-x intr proc-y
+
+edge in-port  -> outer
+edge outer    -> out-port
+edge unit-c   -> proc-x   label="ref"
+edge unit-c   -> unit-a   label="ptr"
+edge proc-x   -> unit-b   label="feedback" style=dashed
+edge proc-y   -> intr
+edge intr     -> unit-c   label="interrupt" style=dashed
+edge proc-y   -> unit-c   label="up-path"

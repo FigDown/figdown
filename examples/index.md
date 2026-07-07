@@ -9,6 +9,9 @@
 > figure-type census ([census.md](../census.md)).
 >
 > 繁體中文版：[index.zh-tw.md](index.zh-tw.md)
+>
+> See also the [structure pattern library](patterns/index.md) — generic
+> skeletons distilled from a real 774-document corpus.
 
 ## Block & architecture (census #1)
 

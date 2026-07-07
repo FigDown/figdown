@@ -1,0 +1,19 @@
+figdown 0.1 flowchart
+title "Hub Pattern: Multiple States Converging to Reset"
+
+node idle    "IDLE"     shape=rounded color=#dbeafe
+node state_a "STATE_A"  shape=rounded
+node state_b "STATE_B"  shape=rounded
+node state_c "STATE_C"  shape=rounded
+node state_d "STATE_D"  shape=rounded
+
+flow down
+
+edge idle    -> state_a  label="cond1"
+edge idle    -> state_b  label="cond2"
+edge idle    -> state_c  label="cond3"
+edge idle    -> state_d  label="cond4"
+edge state_a -> idle     label="reset"
+edge state_b -> idle     label="reset"
+edge state_c -> idle     label="reset"
+edge state_d -> idle     label="reset"

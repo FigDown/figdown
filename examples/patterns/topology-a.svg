@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 519 198" width="519" height="198" font-family="system-ui,sans-serif"><defs><marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#555"/></marker><pattern id="hatch" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><line x1="0" y1="0" x2="0" y2="6" stroke="#bbb" stroke-width="2"/></pattern></defs><g transform="translate(18,6)"><text x="0" y="16" font-size="15" font-weight="600" font-family="var(--sans)">Two-tier full-mesh: aggregation tier to access tier</text><g data-group="agg" data-gx="110.40000000000003" data-gy="50" style="cursor:move"><rect x="96.40000000000003" y="24" width="284" height="74" rx="10" fill="#f6f5ef" stroke="#d6d4cc"/><text x="106.40000000000003" y="40" font-size="11.5" fill="#6f6e69">Aggregation Tier</text></g><g data-group="acc" data-gx="0" data-gy="130" style="cursor:move"><rect x="-14" y="104" width="504.80000000000007" height="74" rx="10" fill="#f6f5ef" stroke="#d6d4cc"/><text x="-4" y="120" font-size="11.5" fill="#6f6e69">Access Tier</text></g><line x1="137.99000000000004" y1="86" x2="83.21000000000001" y2="130" stroke="#555" stroke-width="1.6"/><text x="128.12960000000004" y="89.92" font-size="10" text-anchor="middle" fill="#555" paint-order="stroke" stroke="#fff" stroke-width="3">p1</text><text x="93.0704" y="118.08" font-size="10" text-anchor="middle" fill="#555" paint-order="stroke" stroke="#fff" stroke-width="3">p1</text><line x1="177.95000000000005" y1="86" x2="220.85000000000002" y2="130" stroke="#555" stroke-width="1.6"/><text x="185.67200000000005" y="89.92" font-size="10" text-anchor="middle" fill="#555" paint-order="stroke" stroke="#fff" stroke-width="3">p2</text><text x="213.12800000000001" y="118.08" font-size="10" text-anchor="middle" fill="#555" paint-order="stroke" stroke="#fff" stroke-width="3">p1</text><line x1="210.40000000000003" y1="83.64945226917058" x2="358.49000000000007" y2="130" stroke="#555" stroke-width="1.6"/><text x="237.05620000000005" y="87.99255086071987" font-size="10" text-anchor="middle" fill="#555" paint-order="stroke" stroke="#fff" stroke-width="3">p3</text><text x="331.83380000000005" y="117.6569014084507" font-size="10" text-anchor="middle" fill="#555" paint-order="stroke" stroke="#fff" stroke-width="3">p1</text><line x1="266.40000000000003" y1="83.64945226917058" x2="118.31" y2="130" stroke="#555" stroke-width="1.6"/><text x="239.74380000000002" y="87.99255086071987" font-size="10" text-anchor="middle" fill="#555" paint-order="stroke" stroke="#fff" stroke-width="3">p1</text><text x="144.96620000000001" y="117.6569014084507" font-size="10" text-anchor="middle" fill="#555" paint-order="stroke" stroke="#fff" stroke-width="3">p2</text><line x1="298.85" y1="86" x2="255.95000000000005" y2="130" stroke="#555" stroke-width="1.6"/><text x="291.12800000000004" y="89.92" font-size="10" text-anchor="middle" fill="#555" paint-order="stroke" stroke="#fff" stroke-width="3">p2</text><text x="263.672" y="118.08" font-size="10" text-anchor="middle" fill="#555" paint-order="stroke" stroke="#fff" stroke-width="3">p2</text><line x1="338.81000000000006" y1="86" x2="393.59000000000003" y2="130" stroke="#555" stroke-width="1.6"/><text x="348.67040000000003" y="89.92" font-size="10" text-anchor="middle" fill="#555" paint-order="stroke" stroke="#fff" stroke-width="3">p3</text><text x="383.7296" y="118.08" font-size="10" text-anchor="middle" fill="#555" paint-order="stroke" stroke="#fff" stroke-width="3">p2</text><g data-node="a1" data-x="110.40000000000003" data-y="50" style="cursor:move"><rect x="110.40000000000003" y="50" width="100" height="36" rx="14" fill="#dbeafe" stroke="#8a8880" stroke-width="1.8"/><text x="160.40000000000003" y="72.55" font-size="13" text-anchor="middle" fill="#1d1d1b">Agg Node 1</text></g><g data-node="a2" data-x="266.40000000000003" data-y="50" style="cursor:move"><rect x="266.40000000000003" y="50" width="100" height="36" rx="14" fill="#dbeafe" stroke="#8a8880" stroke-width="1.8"/><text x="316.40000000000003" y="72.55" font-size="13" text-anchor="middle" fill="#1d1d1b">Agg Node 2</text></g><g data-node="b1" data-x="0" data-y="130" style="cursor:move"><rect x="0" y="130" width="121.60000000000001" height="36" fill="#fff" stroke="#8a8880"/><text x="60.800000000000004" y="152.55" font-size="13" text-anchor="middle" fill="#1d1d1b">Access Node 1</text></g><g data-node="b2" data-x="177.60000000000002" data-y="130" style="cursor:move"><rect x="177.60000000000002" y="130" width="121.60000000000001" height="36" fill="#fff" stroke="#8a8880"/><text x="238.40000000000003" y="152.55" font-size="13" text-anchor="middle" fill="#1d1d1b">Access Node 2</text></g><g data-node="b3" data-x="355.20000000000005" data-y="130" style="cursor:move"><rect x="355.20000000000005" y="130" width="121.60000000000001" height="36" fill="#fff" stroke="#8a8880"/><text x="416.00000000000006" y="152.55" font-size="13" text-anchor="middle" fill="#1d1d1b">Access Node 3</text></g></g><metadata id="figdown-source" data-sha256="41d6ae1a7295b9bb0c084c12e63438552d82ce0f514bae32f1e8d6a1043c5675"><![CDATA[
+figdown 0.1 topology
+title "Two-tier full-mesh: aggregation tier to access tier"
+
+# Structural pattern abstracted from real topology figures:
+#   - Two aggregation nodes in tier 1 (redundant pair)
+#   - Three access nodes in tier 2
+#   - Every access node connects to BOTH aggregation nodes (full mesh between tiers)
+#   - Port labels on each link endpoint
+
+group agg "Aggregation Tier"
+node a1 "Agg Node 1" shape=rounded color=#dbeafe in=agg
+node a2 "Agg Node 2" shape=rounded color=#dbeafe in=agg
+
+group acc "Access Tier"
+node b1 "Access Node 1" in=acc
+node b2 "Access Node 2" in=acc
+node b3 "Access Node 3" in=acc
+
+flow down
+rank a1 a2
+rank b1 b2 b3
+
+# full mesh: every access node uplinks to both aggregation nodes
+edge a1 -- b1 taillabel="p1" headlabel="p1"
+edge a1 -- b2 taillabel="p2" headlabel="p1"
+edge a1 -- b3 taillabel="p3" headlabel="p1"
+edge a2 -- b1 taillabel="p1" headlabel="p2"
+edge a2 -- b2 taillabel="p2" headlabel="p2"
+edge a2 -- b3 taillabel="p3" headlabel="p2"
+
+]]></metadata></svg>

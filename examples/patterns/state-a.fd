@@ -1,0 +1,14 @@
+figdown 0.1 flowchart
+title "3-State Cycle with Conditional Transitions"
+
+node idle   "IDLE"    shape=rounded color=#dbeafe
+node active "ACTIVE"  shape=rounded
+node wait   "WAIT"    shape=rounded
+
+flow down
+
+edge idle   -> active  label="cond1"
+edge active -> wait    label="cond2"
+edge wait   -> idle    label="reset"
+edge wait   -> active  label="retry"
+edge active -> idle    label="abort"

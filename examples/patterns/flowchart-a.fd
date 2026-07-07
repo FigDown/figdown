@@ -1,0 +1,25 @@
+figdown 0.1 flowchart
+title "Linear Flow with Two Sequential Decisions"
+
+node s   "Start"    shape=rounded
+node p1  "Step 1"
+node d1  "Check A?" shape=diamond
+node p2  "Step 2"
+node d2  "Check B?" shape=diamond
+node r1  "Result X"
+node r2  "Result Y"
+node r3  "Result Z"
+node e   "Done"     shape=rounded
+
+flow down
+
+edge s  -> p1
+edge p1 -> d1
+edge d1 -> p2  label="yes"
+edge d1 -> r1  label="no"
+edge p2 -> d2
+edge d2 -> r2  label="yes"
+edge d2 -> r3  label="no"
+edge r1 -> e
+edge r2 -> e
+edge r3 -> e

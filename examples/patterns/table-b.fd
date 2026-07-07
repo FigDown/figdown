@@ -1,0 +1,19 @@
+figdown 0.1 table
+table tb "Feature Matrix — rowspan/colspan merges with cell colors"
+| Feature          | Cat A    | Cat B   | Notes         |
+|------------------|:--------:|:-------:|---------------|
+| Item 1           | yes      | yes     | baseline      |
+| Item 2           | yes      | no      | cat-a only    |
+| Item 3           | no       | yes     | cat-b only    |
+| Item 4           | yes            || shared        |
+| Item 5           | ^^             || shared        |
+| Item 6           | —       | —       | none          |
+cell 1 highlight
+cell 4 highlight
+cell 6 highlight
+cell 1,2 color=#d1fae5
+cell 1,3 color=#d1fae5
+cell 2,3 color=#fecaca
+cell 3,2 color=#fecaca
+cell 4,2 color=#dbeafe
+cell 5,2 color=#dbeafe
