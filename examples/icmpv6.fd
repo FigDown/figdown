@@ -1,0 +1,7 @@
+figdown 0.1 bitfield
+# ICMPv6 Header — RFC 4443
+bitfield icmpv6 "ICMPv6 Header (RFC 4443)" unit=32 numbering=msb0
+field Type       8  note="high bit 0 = error, 1 = informational"
+field Code       8
+field Checksum  16  note="over pseudo-header + ICMPv6 message"
+field "Message Body" *  note="variable-length; format depends on Type and Code"

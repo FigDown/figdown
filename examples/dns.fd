@@ -1,0 +1,28 @@
+figdown 0.1 bitfield
+
+# DNS Message Header — RFC 1035 §4.1.1
+# Each row is 16 bits, MSB-0 numbering (bit 0 at left).
+
+bitfield dns "DNS Message Header (RFC 1035)" unit=16 numbering=msb0
+
+# Row 1: Transaction ID
+field ID 16 note="Identifier assigned by the program that generates the query; copied into the reply"
+
+# Row 2: Flags (QR + Opcode + AA + TC + RD + RA + Z + RCODE = 16 bits)
+field QR:1, Opcode:4, AA:1, TC:1, RD:1, RA:1, Z:3, RCODE:4
+
+# Row 3: Question Count
+field QDCOUNT 16 note="Number of entries in the question section"
+
+# Row 4: Answer Record Count
+field ANCOUNT 16 note="Number of resource records in the answer section"
+
+# Row 5: Authority Record Count
+field NSCOUNT 16 note="Number of name server resource records in the authority section"
+
+# Row 6: Additional Record Count
+field ARCOUNT 16 note="Number of resource records in the additional records section"
+
+# Variable-length sections (one representative row each)
+wrap
+field "Question / Answer / Authority / Additional sections" * note="Variable-length sections follow the header; see RFC 1035 §4.1.2–4.1.4"

@@ -1,0 +1,25 @@
+figdown 0.1 bitfield
+
+# IPv6 Header — RFC 8200
+# Each row is 32 bits, MSB-0 numbering (bit 0 at left).
+
+bitfield ipv6 "IPv6 Header (RFC 8200)" unit=32 numbering=msb0
+
+# Row 1: Version · Traffic Class · Flow Label
+field Version 4
+field "Traffic Class" 8
+field "Flow Label" 20
+
+# Row 2: Payload Length · Next Header · Hop Limit
+field "Payload Length" 16
+field "Next Header" 8
+field "Hop Limit" 8
+
+# Row 3–6: Source Address (128 bits = 4 rows)
+field "Source Address" 128 color=#dbeafe
+
+# Row 7–10: Destination Address (128 bits = 4 rows)
+field "Destination Address" 128 color=#dbeafe
+
+# Payload (variable length; one unit shown as representative row)
+field Payload * note="variable length; upper-layer PDU or extension headers"

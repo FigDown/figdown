@@ -1,0 +1,10 @@
+figdown 0.1 bitfield
+# GRE header — RFC 2784 (base) + RFC 2890 (Key/Sequence extensions)
+bitfield gre "GRE Header (RFC 2784/2890)" unit=32 numbering=msb0
+field C:1, R:1, K:1, S:1, s:1, Recur:3, Flags:5, Ver:3
+field "Protocol Type" 16 color=#dbeafe note="EtherType of the payload"
+field "Checksum (optional)" 16 optional note="present if C = 1"
+field "Offset (optional)" 16 optional
+field "Key (optional)" 32 optional color=#fef9c3 note="present if K = 1"
+field "Sequence Number (optional)" 32 optional note="present if S = 1"
+field "Payload packet" * note="e.g. inner IP packet"

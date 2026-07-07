@@ -1,0 +1,13 @@
+figdown 0.1 bitfield
+# ICMP Echo Request/Reply Header — RFC 792
+title ICMP Echo Header
+bitfield icmp "ICMP Echo Request / Reply Header (RFC 792)" unit=32 numbering=msb0
+# Row 1: Type (8) + Code (8) + Checksum (16) = 32 bits
+field Type 8 note="8 = echo request, 0 = echo reply"
+field Code 8
+field Checksum 16
+# Row 2: Identifier (16) + Sequence Number (16) = 32 bits
+field Identifier 16
+field "Sequence Number" 16
+# Row 3: Data payload (variable length)
+field Data * note="Variable-length data payload; echoed back verbatim in reply"

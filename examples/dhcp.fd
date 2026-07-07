@@ -1,0 +1,42 @@
+figdown 0.1 bitfield
+# DHCP Message Format — RFC 2131 (BOOTP layout)
+title DHCP Message
+
+bitfield dhcp "DHCP Message (RFC 2131)" unit=32 numbering=msb0
+
+# Row 1: op(8) + htype(8) + hlen(8) + hops(8) = 32 bits
+field op 8 note="1 = BOOTREQUEST, 2 = BOOTREPLY"
+field htype 8
+field hlen 8
+field hops 8
+
+# Row 2: xid = 32 bits
+field xid 32
+
+# Row 3: secs(16) + flags(16) = 32 bits
+field secs 16
+field flags 16
+
+# Row 4: ciaddr = 32 bits
+field ciaddr 32
+
+# Row 5: yiaddr = 32 bits
+field yiaddr 32 color=#d1fae5 note="your (client) IP address"
+
+# Row 6: siaddr = 32 bits
+field siaddr 32
+
+# Row 7: giaddr = 32 bits
+field giaddr 32
+
+# Row 8: chaddr (16 bytes, shown as one 32-bit representative row)
+field "chaddr (16 bytes)" 32 note="client hardware address"
+
+# Row 9: sname (64 bytes, shown as one 32-bit representative row)
+field "sname (64 bytes)" 32 note="server host name"
+
+# Row 10: file (128 bytes, shown as one 32-bit representative row)
+field "file (128 bytes)" 32 note="boot file name"
+
+# Row 11: options (variable)
+field "options (variable)" * note="magic cookie 99.130.83.99 then options; option 53 = DHCP message type"

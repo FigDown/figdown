@@ -57,6 +57,33 @@ a `bundle` multi-homing ring, multi-line host captions.
 ### VXLAN — RFC 7348  — [source](vxlan.fd)
 ![VXLAN header](vxlan.svg)
 
+### ARP — RFC 826  — [source](arp.fd)
+![ARP packet](arp.svg)
+
+### IPv6 — RFC 8200  — [source](ipv6.fd)
+![IPv6 header](ipv6.svg)
+
+### ICMP — RFC 792  — [source](icmp.fd)
+![ICMP header](icmp.svg)
+
+### ICMPv6 — RFC 4443  — [source](icmpv6.fd)
+![ICMPv6 header](icmpv6.svg)
+
+### GRE — RFC 2784/2890  — [source](gre.fd)
+![GRE header](gre.svg)
+
+### MPLS label stack — RFC 3032  — [source](mpls.fd)
+![MPLS label stack](mpls.svg)
+
+### DNS message header — RFC 1035  — [source](dns.fd)
+![DNS header](dns.svg)
+
+### DHCP — RFC 2131  — [source](dhcp.fd)
+![DHCP message](dhcp.svg)
+
+### QUIC long header — RFC 9000  — [source](quic.fd)
+![QUIC long header](quic.svg)
+
 ## Tables & data (census #3)
 
 ### Queue-occupancy heatmap  — [source](queue-heatmap.fd)

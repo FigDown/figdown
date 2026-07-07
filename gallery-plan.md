@@ -7,7 +7,7 @@
 >
 > 繁體中文版：[gallery-plan.zh-tw.md](gallery-plan.zh-tw.md)
 
-## E1 — Protocol headers (bitfield template) — ready today
+## E1 — Protocol headers (bitfield template) — ✅ complete (2026-07-06)
 
 The template is implemented; production is the AI-author → parser-validate
 loop (ProtoFlow §8 heritage). Target set (~15, all `numbering=msb0`

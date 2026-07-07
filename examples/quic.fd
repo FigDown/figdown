@@ -1,0 +1,35 @@
+figdown 0.1 bitfield
+
+# QUIC Long Header — Initial Packet
+# RFC 9000 §17.2 / §17.2.2
+# Each row is 32 bits, MSB-0 numbering (bit 0 at left).
+
+bitfield quic_initial "QUIC Long Header — Initial Packet (RFC 9000)" unit=32 numbering=msb0
+
+# ── Byte 0: First Byte (8 bits) ──────────────────────────────────────────────
+# Compact form: Header Form:1, Fixed Bit:1, Long Packet Type:2, Reserved:2, Packet Number Length:2
+field "Header Form":1, "Fixed Bit":1, "Long Packet Type":2, Reserved:2, "Packet Number Length":2
+wrap
+
+# ── Version (32 bits) ────────────────────────────────────────────────────────
+field Version 32 color=#dbeafe note="0x00000001 = QUIC v1"
+
+# ── Destination Connection ID ─────────────────────────────────────────────────
+field "DCID Length" 8
+field "Destination Connection ID (0..20 bytes)" 24 note="variable length; padded to 24 bits for display"
+
+# ── Source Connection ID ──────────────────────────────────────────────────────
+field "SCID Length" 8
+field "Source Connection ID (0..20 bytes)" 24 note="variable length; padded to 24 bits for display"
+
+# ── Token (Initial packets only) ─────────────────────────────────────────────
+field "Token Length (varint)" 8 optional
+field Token 24 optional note="Initial packets only"
+
+# ── Length + Packet Number ────────────────────────────────────────────────────
+field "Length (varint)" 16
+field "Packet Number (1-4 bytes)" 16 color=#d1fae5
+
+# ── Payload ───────────────────────────────────────────────────────────────────
+wrap
+field Payload * note="protected"

@@ -55,6 +55,33 @@ bridge domain、連線埠標籤、`bundle` 多歸屬圈、多行主機說明。
 ### VXLAN — RFC 7348 — [來源](vxlan.fd)
 ![VXLAN header](vxlan.svg)
 
+### ARP — RFC 826 — [來源](arp.fd)
+![ARP packet](arp.svg)
+
+### IPv6 — RFC 8200 — [來源](ipv6.fd)
+![IPv6 header](ipv6.svg)
+
+### ICMP — RFC 792 — [來源](icmp.fd)
+![ICMP header](icmp.svg)
+
+### ICMPv6 — RFC 4443 — [來源](icmpv6.fd)
+![ICMPv6 header](icmpv6.svg)
+
+### GRE — RFC 2784/2890 — [來源](gre.fd)
+![GRE header](gre.svg)
+
+### MPLS label stack — RFC 3032 — [來源](mpls.fd)
+![MPLS label stack](mpls.svg)
+
+### DNS 訊息標頭 — RFC 1035 — [來源](dns.fd)
+![DNS header](dns.svg)
+
+### DHCP — RFC 2131 — [來源](dhcp.fd)
+![DHCP message](dhcp.svg)
+
+### QUIC long header — RFC 9000 — [來源](quic.fd)
+![QUIC long header](quic.svg)
+
 ## 表格與數據（普查第 3）
 
 ### 佇列佔用熱圖 — [來源](queue-heatmap.fd)

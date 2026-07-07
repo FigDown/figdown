@@ -1,0 +1,22 @@
+figdown 0.1 bitfield
+# MPLS Label Stack — RFC 3032 §2.1 (two stack entries)
+title MPLS Label Stack
+
+bitfield mpls "MPLS Label Stack (RFC 3032)" unit=32 numbering=msb0
+
+# --- Stack entry 1 (outermost label, S=0) ---
+field Label 20 color=#dbeafe note="20-bit label value (entry 1)"
+field TC 3 note="Traffic Class, formerly EXP"
+field S 1 note="Bottom of Stack = 0"
+field TTL 8
+wrap
+
+# --- Stack entry 2 (innermost label, S=1) ---
+field Label 20 color=#dbeafe note="20-bit label value (entry 2)"
+field TC 3 note="Traffic Class, formerly EXP"
+field S 1 color=#d1fae5 note="Bottom of Stack = 1"
+field TTL 8
+wrap
+
+# --- Payload ---
+field "Payload (e.g. IP packet)" * note="Variable-length payload follows the label stack"

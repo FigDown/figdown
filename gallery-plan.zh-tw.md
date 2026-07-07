@@ -7,7 +7,7 @@
 >
 > English version: [gallery-plan.md](gallery-plan.md)
 
-## E1 — 常見協議標頭（bitfield template）— 今天就能做
+## E1 — 常見協議標頭（bitfield template）— ✅ 已完成（2026-07-06）
 
 Template 已實作；生產方式是 AI 撰寫 → parser 驗證迴圈（ProtoFlow §8
 傳承）。目標集（約 15 個，除註明外皆 `numbering=msb0` RFC 風格）：
