@@ -1,6 +1,6 @@
 figdown 0.1 bitfield
 # ARP Packet — RFC 826, Ethernet/IPv4 case
-title ARP Packet
+title "ARP Packet"
 
 bitfield arp "ARP Packet (RFC 826, Ethernet/IPv4)" unit=32 numbering=msb0
 
@@ -13,16 +13,9 @@ field "Hardware Length" 8
 field "Protocol Length" 8
 field Operation 16 color=#dbeafe note="1 = request, 2 = reply"
 
-# Row 3–4: Sender Hardware Address (48 bits = 1.5 rows)
+# Addresses are packed back-to-back on the wire — NO padding, so no wrap:
+# SHA(48) is followed immediately by SPA(32) in the same row, etc.
 field "Sender Hardware Address" 48 color=#dbeafe note="Sender MAC address"
-wrap
-
-# Row 5: Sender Protocol Address (32 bits = 1 row)
-field "Sender Protocol Address" 32 color=#dbeafe note="Sender IPv4 address"
-
-# Row 6–7: Target Hardware Address (48 bits = 1.5 rows)
+field "Sender Protocol Address" 32 color=#d1fae5 note="Sender IPv4 address"
 field "Target Hardware Address" 48 color=#dbeafe note="Target MAC address; all-zeros in request"
-wrap
-
-# Row 8: Target Protocol Address (32 bits = 1 row)
-field "Target Protocol Address" 32 color=#dbeafe note="Target IPv4 address"
+field "Target Protocol Address" 32 color=#d1fae5 note="Target IPv4 address"
