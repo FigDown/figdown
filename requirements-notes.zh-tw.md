@@ -817,6 +817,37 @@ ERD 以既有構件即可表達——一實體一 `node`（標籤首行 = 名稱
 agent 需要的語意。鴉爪基數運算子（`||--o{`）作為方向否決：
 ASCII-art 詞彙，其語意端點標籤已能承載。
 
+### R38 — 日用級編輯器：draw.io 級操作、文字為本（2026-07-10）
+
+**原意**：需要一個強大的編輯器，使用起來跟 draw.io/Visio 類似——
+但不是以圖為本：文字要保持是方便看的主體。把目前的 figdown.html
+擴充成真正方便用的編輯器，能 load/save `.fd` 檔——至少自己日常
+用起來要方便。
+
+**整理解讀**：編輯器是人類端的採用載體（R6），公理 7 已定其架構：
+draw.io 級的直接操作、但**每個 GUI 動作都是文字編輯**。已在 PoC
+實作：File System Access API 真實檔案握把（開 `.fd`、Ctrl+S 存回
+同一檔案；其他瀏覽器退回 picker/下載）、另存/新建/以檔名命名的
+SVG 匯出、全編輯 undo/redo（GUI 動作逐一快照、打字合併）、
+localStorage 自動儲存與跨 session 還原、dirty 標記＋放棄確認、
+雙擊空白畫布 → 在點擊處新增 node + pin、方向鍵微移（Shift ×10）
+→ 改寫 pin、角落縮放握把 → 寫入 `size` 行、Del → 連同 pins/edges
+刪除節點、Esc → 取消選取、點錯誤訊息 → 跳到該行。
+
+### R39 — 可安裝的 agent skill：圖片維護自動化（2026-07-10）
+
+**原意**：提供 agent skill——裝上就能讓 agent 自動用 FigDown 維護
+`.fd`、把 SVG 內嵌到 `.md`；至少要滿足自己的需求。
+
+**整理解讀**：`skill/figdown/` 是自足的包：`SKILL.md`（觸發描述、
+工作流、穩定性規則、R37 讀取規則、完整速查表），加上
+`build-svg.js` 與引擎（`figdown.html`），驗證→渲染迴圈只需
+Node.js——不用 clone、不用網路。安裝 =
+`cp -r skill/figdown ~/.claude/skills/`（或專案的
+`.claude/skills/`）。此包是建置產物，由 `tools/make-skill.js` 從
+單一引擎來源再生（永不 fork）。AGENT-GUIDE.md 仍是給非 skill
+框架 agent 的中性等價物。
+
 ### R37 — 讀取語意也是規範：意義只由語法即可還原（2026-07-10）
 
 **原意**：同時要確保 AI agent 引用我們的語法時，能清楚對應其意義

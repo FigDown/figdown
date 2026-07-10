@@ -79,9 +79,14 @@ SVG 給人看；`source:` 註腳指向 `.fd`——它是圖的唯一真相來源
   英文版 [prior-art.md](prior-art.md)
 - [examples/index.zh-tw.md](examples/index.zh-tw.md) — 範例藝廊：
   真實圖形以 `.fd`+`.svg` 成對入庫（協議標頭先行）
-- [poc/figdown.html](poc/figdown.html) — 概念驗證渲染器：用任何瀏覽器
-  開啟，左邊改文字、右邊即時得到確定性的 SVG（核心場景 + bitfield +
-  table + wave）。匯出的 SVG 內嵌自身來源與 SHA-256。
+- [poc/figdown.html](poc/figdown.html) — 編輯器：用任何瀏覽器開啟，
+  左邊改文字、右邊即時得到確定性的 SVG（核心場景 + bitfield +
+  table + wave）。可開啟/儲存 `.fd` 檔（Ctrl+S 存回同一檔案）、
+  undo/redo、自動儲存、draw.io 式直接操作——每個 GUI 動作都是
+  文字編輯。匯出的 SVG 內嵌自身來源與 SHA-256。
+- [skill/README.md](skill/README.md) — 可安裝的 agent skill：讓
+  coding agent（如 Claude Code）用 FigDown 維護圖片——
+  `cp -r skill/figdown ~/.claude/skills/` 之後直接要求畫圖即可。
 
 ## 參與
 

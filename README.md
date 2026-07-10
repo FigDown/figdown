@@ -94,10 +94,15 @@ file alone can always be reopened and edited. See
   weighted by adoption, also in [繁體中文](prior-art.zh-tw.md)
 - [examples/index.md](examples/index.md) — the example gallery: real
   figures as committed `.fd`+`.svg` pairs (protocol headers first)
-- [poc/figdown.html](poc/figdown.html) — proof-of-concept renderer:
-  open in any browser, edit text on the left, get a deterministic SVG
-  on the right (core scene + bitfield + table + wave). The exported SVG
-  embeds its own source and SHA-256.
+- [poc/figdown.html](poc/figdown.html) — the editor: open in any
+  browser, edit text on the left, get a deterministic SVG on the right
+  (core scene + bitfield + table + wave). Opens/saves `.fd` files
+  (Ctrl+S writes back to the same file), undo/redo, autosave,
+  draw.io-style direct manipulation where every GUI action is a text
+  edit. The exported SVG embeds its own source and SHA-256.
+- [skill/README.md](skill/README.md) — installable agent skill: teach
+  a coding agent (e.g. Claude Code) to maintain figures with FigDown —
+  `cp -r skill/figdown ~/.claude/skills/` and ask for a figure.
 
 ## Contributing
 
