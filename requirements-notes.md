@@ -1037,6 +1037,30 @@ loses agent-needed meaning. Crow's-foot cardinality operators
 (`||--o{`) are rejected as a direction: ASCII-art vocabulary with the
 same meaning already carried by endpoint labels.
 
+### R37 — Reading semantics are normative: meaning recoverable from syntax alone (2026-07-10)
+
+**Original**: We must also make sure that when an AI agent consumes our
+syntax, the corresponding meaning is unambiguous — e.g. for the
+bitfield template, can an AI accurately know the header layout it
+expresses, from the syntax alone?
+
+**Interpretation**: The reading direction gets the same rigor as the
+writing direction. Principle: **a construct's semantics must be
+derivable from the text without running the renderer**; anything
+visible only in drawing geometry is presentation by definition, and a
+reading agent MUST NOT infer meaning from it. The audit prompted by
+this requirement found one latent ambiguity: bitfield `wrap` advances
+the drawing cursor to the next row, leaving blank cells that a naive
+reader could take for bits — exactly the fabricated-padding failure
+class caught earlier in the ARP example. Resolution: the spec now
+carries a normative **"Semantic model (the reading rule)"** block per
+typed block — bitfield (offset = cumulative sum of declared widths; no
+implicit padding ever; `wrap` presentation-only; `numbering=` labels
+only; `optional` → conditional offsets; offsets after `*` are relative),
+table (the logical grid + merges; `colw`/colors/alignment never change
+it), wave (tick = lane character position; contiguous across `gap`).
+AGENT-GUIDE §2 teaches the same rules to reading agents.
+
 ### ~~Open question OQ1~~ — Build on D2 vs. a new language (2026-07-02, resolved 2026-07-10)
 
 D2 is close enough that R11 (survey before invent) obliges a deep read of

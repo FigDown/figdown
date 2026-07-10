@@ -28,6 +28,18 @@ human eyes; it also embeds its own source and a SHA-256 of it
   metadata; if the embedded SHA-256 does not match the recovered text,
   the artifact was edited after generation — treat the `.fd` as truth
   and regenerate.
+- **Meaning is derived from the syntax alone, never from drawing
+  geometry** (R37). The rules per block:
+  - *bitfield*: field *k*'s bit offset = the sum of all earlier
+    declared widths; there is **no implicit padding** (real padding is
+    always an explicit field); `wrap` only breaks the drawing row —
+    blank cells after it are not bits; `numbering=` changes ruler
+    labels only; offsets after an `optional` field hold only when it
+    is present.
+  - *table*: the logical grid = the pipe rows plus `^^`/`||` merges
+    (anchored top-left); `colw`, colors and alignment never change it.
+  - *wave*: tick *t* = the *t*-th lane character, `.` continues the
+    previous value; ticks stay contiguous across a `gap`.
 
 ## 3. Embedding convention for Markdown docs (current stage)
 

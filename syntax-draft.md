@@ -301,6 +301,20 @@ wrap                       # explicit row break when a field ends mid-unit
   labels change.
 - `optional` renders the conventional dashed border (per corpus style).
 
+**Semantic model (normative — the reading rule, R37).** A bitfield's
+meaning is exactly its ordered field list: field *k* occupies the bits
+`[Σ widths of fields 1..k-1, +w_k)` of the header, in declaration
+order. There is **no implicit padding anywhere** — a real
+padding/reserved region MUST be declared as an explicit field (the
+anti-fabrication rule). `wrap` is **presentation-only**: it starts a
+new drawing row and never adds, skips, or reorders bits. `numbering=`
+relabels the per-row ruler only and never changes placement. A field
+marked `optional` is conditionally present — absolute offsets of later
+fields hold only when it is present. After a `*` field, later offsets
+are relative to that field's variable end. A reading agent MUST derive
+the layout from this model and MUST NOT infer bits from drawing
+geometry (blank cells after a `wrap` are not bits).
+
 ### 4.2 `table` — config/state tables, memory maps (census #3, 9.6% weighted)
 
 ```figdown
@@ -352,6 +366,14 @@ cell h1,1 color=#eeede6            # header tiers address as h1..hN, top-down
 - Tables can attach to scene nodes (`table fib ... attach=r1`) — the
   packet-walk scenario (usecases 4) needs this; deferred to v0.2.
 
+**Semantic model (normative — the reading rule, R37).** A table's
+meaning is its logical grid: header tiers (rows above the separator,
+`h1..hN` top-down), data rows (1-based), with `||`/`^^` producing
+spanned logical cells anchored at their top-left cell. `cell` marks
+and `highlight` are annotations attached to grid addresses (the fact
+of annotation is semantic; its color is presentation). `colw` and
+alignment are presentation-only and never change the grid.
+
 ### 4.3 `wave` — timing/waveform (census #5, 7.2% weighted)
 
 Borrow WaveDrom's proven per-signal character lanes verbatim (R11: do not
@@ -373,6 +395,13 @@ line error; further WaveDrom characters are reserved for future
 versions. Note the two `gap` meanings: `gap <tick>` is a wave-block
 child (visual time break); `gap=<px>` is a group layout option — the
 scopes never overlap.
+
+**Semantic model (normative — the reading rule, R37).** A wave's
+meaning is per-signal: at tick *t* the signal has the value of the
+*t*-th lane character (`.` = the previous value continues). Ticks are
+contiguous and aligned across all signals in the block; `gap <tick>`
+is a presentation-only break marker and never removes or renumbers
+ticks. `labels=` names the `=` data cells in order of appearance.
 
 ### 4.4 `plot` — charts from table data (EXPERIMENTAL, non-normative in v0.1)
 
