@@ -53,6 +53,24 @@ figure** — never a full re-layout that destroys the reader's mental map.
    page/step sequence (for algorithm/protocol walkthroughs), not a
    timeline animation language.
 
+## Recommended usage in Markdown documents (current stage)
+
+Until `.fd` is natively rendered by Markdown viewers (as mermaid is),
+embed figures like this:
+
+```markdown
+![Ingress datapath](figures/ingress.svg)
+
+<sub>source: [figures/ingress.fd](figures/ingress.fd)</sub>
+```
+
+The SVG is what humans see; the `source:` footer points at the `.fd`,
+which is the figure's single source of truth — **AI agents read the
+`.fd` for the meaning** and never paste its content into the `.md`.
+Each generated SVG also embeds its own source + SHA-256, so the figure
+file alone can always be reopened and edited. See
+[AGENT-GUIDE.md](AGENT-GUIDE.md) for the full agent-facing workflow.
+
 ## Status
 
 **Requirements & design phase.** Nothing to install yet. Current documents:
@@ -62,6 +80,12 @@ figure** — never a full re-layout that destroys the reader's mental map.
   [繁體中文](requirements-notes.zh-tw.md)
 - [syntax-draft.md](syntax-draft.md) — syntax draft v0.0 (discussion
   stage), also in [繁體中文](syntax-draft.zh-tw.md)
+- [AGENT-GUIDE.md](AGENT-GUIDE.md) — the self-contained guide for AI
+  agents maintaining figures with FigDown, also in
+  [繁體中文](AGENT-GUIDE.zh-tw.md)
+- [MIGRATIONS.md](MIGRATIONS.md) — schema-migration-style version log:
+  every syntax change ships a mechanical rewrite rule, also in
+  [繁體中文](MIGRATIONS.zh-tw.md)
 - [census.md](census.md) — figure-type census over a real 774-document
   corpus; the empirical basis for v0.1 scope and priorities, also in
   [繁體中文](census.zh-tw.md)

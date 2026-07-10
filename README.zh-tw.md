@@ -43,6 +43,21 @@ Mermaid 表達不了的圖型（網路拓撲、帶註記的方塊圖、查表鏈
 8. **靜態優先；動態後行。** 動態 = 靜態 + 離散的頁/步驟序列（用於
    演算法/協議講解），不是時間軸動畫語言。
 
+## Markdown 文件中的建議用法（現階段）
+
+在 `.fd` 尚未被 MD viewer 原生渲染（如 mermaid）之前，圖片這樣嵌入：
+
+```markdown
+![Ingress datapath](figures/ingress.svg)
+
+<sub>source: [figures/ingress.fd](figures/ingress.fd)</sub>
+```
+
+SVG 給人看；`source:` 註腳指向 `.fd`——它是圖的唯一真相來源，
+**AI agent 讀 `.fd` 取得意義**，且絕不把其內容貼進 `.md`。每個生成
+的 SVG 也內嵌自身來源 + SHA-256，因此單憑圖檔永遠能重新開啟編輯。
+完整的 agent 工作流見 [AGENT-GUIDE.zh-tw.md](AGENT-GUIDE.zh-tw.md)。
+
 ## 現狀
 
 **需求與設計階段。** 目前還沒有可安裝的東西。現有文件：
@@ -52,6 +67,11 @@ Mermaid 表達不了的圖型（網路拓撲、帶註記的方塊圖、查表鏈
   [requirements-notes.md](requirements-notes.md)
 - [syntax-draft.zh-tw.md](syntax-draft.zh-tw.md) — 語法草案 v0.0
   （討論階段），英文版 [syntax-draft.md](syntax-draft.md)
+- [AGENT-GUIDE.zh-tw.md](AGENT-GUIDE.zh-tw.md) — 給 AI agent 的
+  自足指南（以 FigDown 維護圖片），英文版 [AGENT-GUIDE.md](AGENT-GUIDE.md)
+- [MIGRATIONS.zh-tw.md](MIGRATIONS.zh-tw.md) — schema-migration 式
+  版本紀錄：每次語法變更附機械式改寫規則，英文版
+  [MIGRATIONS.md](MIGRATIONS.md)
 - [census.zh-tw.md](census.zh-tw.md) — 對 774 份真實文件語料的圖型
   普查；v0.1 範圍與優先順序的數據依據，英文版 [census.md](census.md)
 - [examples/index.zh-tw.md](examples/index.zh-tw.md) — 範例藝廊：

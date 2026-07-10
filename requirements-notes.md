@@ -907,6 +907,44 @@ Existing instances confirmed by this law: compact `field a:1, b:2`,
 Review rule for every new parameter: rank its use cases by expected
 frequency, then assign spellings shortest-first.
 
+### R31 — Spec versions like a database schema: migration entries (2026-07-10)
+
+**Original**: The spec should follow DB schema-migration practice.
+Before convergence it will change often; every semantic change must
+keep a conversion record, so that upgrading v1→v5 means applying the
+v1→v2→…→v5 migration specs and a v1 document converts to v5 syntax
+correctly.
+
+**Interpretation**: [MIGRATIONS.md](MIGRATIONS.md) established — every
+change ships an entry with a **mechanical rewrite rule** (non-mechanical
+steps must be flagged). The six draft-period breaking changes (pin px,
+GFM tables, shape=, bundle, line/fill split, positional fill) are
+recorded retroactively as worked examples of the format. Draft-period
+versions are `0.1-dev.N`, squashed at freeze.
+
+### R32 — The Markdown embedding convention & agent-first documentation (2026-07-10)
+
+**Original**: The project exists so AI/agents can maintain a `.fd`
+(text content as the HTML, drawing parameters as the CSS) that renders
+a stable, minimally-drifting SVG. It must ship a guideline/spec written
+for AI agents, such that a fresh agent session, pointed at the FigDown
+protocol, can maintain the figures of an MD repository. Recommended
+current-stage usage — to be stated explicitly in the project: every
+figure appears in the .md as an embedded SVG with a footer noting the
+corresponding `.fd` path/filename; the `.fd` is the source; agents
+read the `.fd` for meaning; `.fd` content is never pasted into the
+.md. This is the best strategy while `.fd` lacks native MD-viewer
+rendering (mermaid-style).
+
+**Interpretation**: [AGENT-GUIDE.md](AGENT-GUIDE.md) established — a
+self-contained, token-lean (R7) entry point covering the model
+(HTML+CSS analogy), the reading rule (.fd first, SVG metadata as
+fallback with SHA-256 staleness check), the embedding convention
+(SVG + `source:` footer), the maintenance workflow (edit .fd →
+build-svg → commit pair), stability rules, a syntax cheat sheet, and
+the migration-based upgrade path. The convention is also stated in the
+README as the project's recommended usage.
+
 ### Open question OQ1 — Build on D2 vs. a new language (2026-07-02)
 
 D2 is close enough that R11 (survey before invent) obliges a deep read of

@@ -711,6 +711,36 @@ per-queue 計數值的 3D 長條圖 + 半透明門檻平面。照片未提交。
 `numbering=lsb0` 預設、GFM 表格原樣貼上。每個新參數的審查規則：
 按預期頻率排列其使用情境，再由短到長分配拼法。
 
+### R31 — 規格書比照資料庫 schema：遷移條目（2026-07-10）
+
+**原意**：規格書要參考 DB schema migration 作法。正式收斂以前會
+常常修改，一定要保留每一版語意的轉換紀錄；從 v1 升到 v5，只要
+按照 v1→v2→…→v5 的 migration spec，就能把 v1 語法正確轉為 v5。
+
+**整理後解讀**：已建立 [MIGRATIONS.zh-tw.md](MIGRATIONS.zh-tw.md)——
+每次變更附**機械式改寫規則**的條目（非機械步驟必須標注）。草案期
+的六次破壞性修改（pin px、GFM 表格、shape=、bundle、line/fill
+拆分、位置式 fill）已回溯記錄，作為條目格式的實作範例。草案期
+版號為 `0.1-dev.N`，凍結時 squash。
+
+### R32 — Markdown 嵌入慣例與 agent 優先文件（2026-07-10）
+
+**原意**：本專案主要協助 AI/agent 維護一份 `.fd`（文字內容如
+HTML、製圖參數如 CSS），穩定繪出飄動極小的 SVG。專案應提出一份
+給 AI agent 看的 guideline 與 spec，讓新的 agent session 參考
+FigDown 協議即可維護 MD 文件中的圖片。現階段建議做法——須在專案
+中明確說明：MD 內每張圖以 SVG 呈現、底部註明對應 `.fd` 路徑與
+檔名；`.fd` 是原始來源；agent 理解圖的意義優先讀 `.fd`；MD 中
+不放 `.fd` 內容。這是 `.fd` 尚未成為 MD viewer 內建渲染標準
+（如 mermaid）前的最佳策略。
+
+**整理後解讀**：已建立 [AGENT-GUIDE.zh-tw.md](AGENT-GUIDE.zh-tw.md)
+——自足、token 精簡（R7）的入口文件：模型（HTML+CSS 類比）、
+閱讀規則（.fd 優先、SVG metadata 為後備並以 SHA-256 驗過期）、
+嵌入慣例（SVG + `source:` 註腳）、維護工作流（改 .fd → build-svg
+→ 成對 commit）、穩定性規則、語法速查、以遷移為基礎的升級路徑。
+該慣例同時寫入 README 作為專案建議用法。
+
 ### 待議 OQ1 — 站在 D2 之上 vs. 全新語言（2026-07-02）
 
 D2 近到 R11（借鑑優先）要求先深讀 D2 的語言、排版引擎與授權，再決定
