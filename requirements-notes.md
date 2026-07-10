@@ -967,6 +967,63 @@ namespace; informative ABNF sketch. Rejected: indented block sugar
 pure presentation). The reviewer's files themselves are not committed;
 adopted substance lands in project-maintained documents only.
 
+### R34 — Edge labels: three inline positions (2026-07-10)
+
+**Original**: For `P1 -- P2`, both endpoints often need their role or
+meaning stated. The arrow forms themselves (`A -> B`, `A <-> B`,
+`A <- B`, `A -- B`) already carry clear meaning in the text — the text
+itself has the picture in it. But sometimes, when naming `A -> B`, one
+also wants to describe A's role and have that description sit near A
+in the figure. Proposal: use `[ ]` to express a label at different
+positions, and a line has **at most three meaningful positions**:
+`A [label_for_A] <-[label_for_line]-> [label_for_B] B` — this is the
+maximal usage.
+
+**Interpretation**: This is the resolution direction for OQ-S7. The
+three-position model (tail/mid/head) is universal in the mainstream —
+Graphviz names the positions, PlantUML spells endpoint labels inline
+(`Class1 "1" *-- "many" Class2`), Mermaid splits the operator around
+the mid label (`A -- text --> B`); no surveyed language offers more
+than three positions (survey: [prior-art.md](prior-art.md) §1). The
+inline spelling also serves R22 directly: the label appears in the
+text at the position it occupies in the figure. If adopted,
+`label=`/`taillabel=`/`headlabel=` retire in the same version (R28)
+with a mechanical migration. Final spelling (bracket escape rules,
+empty-bracket handling) pending freeze.
+
+### R35 — Both arrow directions: `<-` joins `->` (2026-07-10)
+
+**Original**: Both directions should be supported if not hard to do —
+it is a matter of human writing habit, like habitually typing
+`Left -- Right`. If the author means `Left <- Right`, they should not
+be forced to type `Right -> Left`.
+
+**Interpretation**: Accepted in principle. `A <- B` is semantically
+`B -> A`, so R28/R30 would normally reject the second spelling — but
+the author's *statement order* is itself part of how humans encode
+meaning (which side they are talking about), and D2's operator set is
+exactly `-- -> <- <->` (precedent). Landing is deferred to ride the
+R34 edge rework so the operator registry changes once, not twice.
+
+### R36 — ERD: blocks-first; semantic construct only after survey + evidence (2026-07-10)
+
+**Original**: For ERD, prioritize the blocks direction — supporting
+the basic usage is enough. But ERD is commonly used in software and
+databases to express structural relations, so consult the mainstream
+standards (Mermaid, D2, …) before finalizing that part.
+
+**Interpretation**: Two levels (survey:
+[prior-art.md](prior-art.md) §2). Level 1 (now): ERD is expressible
+with existing constructs — one `node` per entity (first label line =
+name, following lines = attributes, PK/FK as plain text), one `edge`
+per relationship, cardinality as endpoint labels; ships as a gallery
+pattern, zero new vocabulary. Level 2 (v0.2 candidate): a semantic
+`entity` typed block following Mermaid erDiagram's attribute grammar
+(most adopted), R28-gated on corpus evidence plus proof that Level 1
+loses agent-needed meaning. Crow's-foot cardinality operators
+(`||--o{`) are rejected as a direction: ASCII-art vocabulary with the
+same meaning already carried by endpoint labels.
+
 ### Open question OQ1 — Build on D2 vs. a new language (2026-07-02)
 
 D2 is close enough that R11 (survey before invent) obliges a deep read of

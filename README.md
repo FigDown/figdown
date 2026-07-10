@@ -89,6 +89,9 @@ file alone can always be reopened and edited. See
 - [census.md](census.md) — figure-type census over a real 774-document
   corpus; the empirical basis for v0.1 scope and priorities, also in
   [繁體中文](census.zh-tw.md)
+- [prior-art.md](prior-art.md) — informative survey of mainstream
+  diagram-language conventions (edge labels, ERD, D2 relationship),
+  weighted by adoption, also in [繁體中文](prior-art.zh-tw.md)
 - [examples/index.md](examples/index.md) — the example gallery: real
   figures as committed `.fd`+`.svg` pairs (protocol headers first)
 - [poc/figdown.html](poc/figdown.html) — proof-of-concept renderer:

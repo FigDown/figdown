@@ -74,6 +74,9 @@ SVG 給人看；`source:` 註腳指向 `.fd`——它是圖的唯一真相來源
   [MIGRATIONS.md](MIGRATIONS.md)
 - [census.zh-tw.md](census.zh-tw.md) — 對 774 份真實文件語料的圖型
   普查；v0.1 範圍與優先順序的數據依據，英文版 [census.md](census.md)
+- [prior-art.zh-tw.md](prior-art.zh-tw.md) — 主流圖語言慣例的
+  資訊性調查（edge 標籤、ERD、與 D2 的關係），以採用度加權，
+  英文版 [prior-art.md](prior-art.md)
 - [examples/index.zh-tw.md](examples/index.zh-tw.md) — 範例藝廊：
   真實圖形以 `.fd`+`.svg` 成對入庫（協議標頭先行）
 - [poc/figdown.html](poc/figdown.html) — 概念驗證渲染器：用任何瀏覽器

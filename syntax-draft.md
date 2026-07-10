@@ -444,10 +444,15 @@ transient split as in ProtoFlow). Deferred until the static core ships.
 - ~~OQ-S5: multi-figure documents~~ — resolved: one `.fd` produces one
   `.svg` artifact; a document MAY contain multiple top-level blocks,
   composed in document order.
-- ~~OQ-S6: relationship to D2~~ — moved to an informative appendix; not
-  a freeze blocker.
-- OQ-S7: edge labels as structured children of the edge (tail/mid/head
-  as first-class parts) — under discussion.
+- ~~OQ-S6: relationship to D2~~ — informative appendix:
+  [prior-art.md](prior-art.md) §3.
+- OQ-S7: edge labels at the three meaningful positions (tail/mid/head).
+  Concrete inline proposal on the table (R34):
+  `edge A [tail] <-[mid]-> [head] B` — operator halves split around the
+  mid label; `<-` joins the operator set (R35). Mainstream survey and
+  the full proposal: [prior-art.md](prior-art.md) §1. Pending freeze;
+  if adopted, `label=`/`taillabel=`/`headlabel=` retire with a
+  mechanical migration.
 
 ## 10. Keyword registry, conformance modes, extensions
 
