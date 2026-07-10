@@ -10,7 +10,7 @@
 ## E1 — Protocol headers (bitfield template) — ✅ complete (2026-07-06)
 
 The template is implemented; production is the AI-author → parser-validate
-loop (ProtoFlow §8 heritage). Target set (~15, all `numbering=msb0`
+loop. Target set (~15, all `numbering=msb0`
 RFC style unless noted):
 
 Ethernet II · 802.1Q VLAN · ARP · IPv4 · IPv6 · TCP · UDP · ICMP ·
@@ -40,8 +40,7 @@ trees) · hash table with chaining · adjacency list/matrix pairs ·
 DP table filling (table template + cell colors!) · sorting passes as a
 figure sequence (one .fd per step — the page/frame model, R1).
 
-Dynamic versions (`page`/`step`) come when the dynamic profile lands;
-the ProtoFlow engine and text-anime v2 prototypes are the reference.
+Dynamic versions (`page`/`step`) come when the dynamic profile lands.
 
 ## E4 — Math expression support (new requirement, R20)
 

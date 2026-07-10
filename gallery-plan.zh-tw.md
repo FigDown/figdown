@@ -9,8 +9,7 @@
 
 ## E1 — 常見協議標頭（bitfield template）— ✅ 已完成（2026-07-06）
 
-Template 已實作；生產方式是 AI 撰寫 → parser 驗證迴圈（ProtoFlow §8
-傳承）。目標集（約 15 個，除註明外皆 `numbering=msb0` RFC 風格）：
+Template 已實作；生產方式是 AI 撰寫 → parser 驗證迴圈。目標集（約 15 個，除註明外皆 `numbering=msb0` RFC 風格）：
 
 Ethernet II · 802.1Q VLAN · ARP · IPv4 · IPv6 · TCP · UDP · ICMP ·
 ICMPv6 · GRE（已有）· VXLAN · MPLS label stack · DNS message ·
@@ -37,8 +36,7 @@ sequenceDiagram 慣例（`A->>B: SYN`）——Mermaid 最強的正是這裡，
 雜湊表 · 鄰接串列/矩陣對照 · DP 填表（table template + 儲存格
 上色！）· 排序過程逐步圖（一步一個 .fd——頁/幀模型，R1）。
 
-動態版（`page`/`step`）待動態 profile 落地；ProtoFlow 引擎與
-text-anime v2 原型是參考實作。
+動態版（`page`/`step`）待動態 profile 落地。
 
 ## E4 — 數學運算式支援（新需求，R20）
 

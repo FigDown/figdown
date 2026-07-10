@@ -15,7 +15,7 @@ From the requirements log, the syntax is boxed in by:
 1. **Closed, line-oriented grammar** — every non-blank, non-comment
    line begins with a registered line-start token (a keyword, or `|`
    for table rows); unknown lines are errors carrying a 1-based line number
-   (powers the AI write→validate→fix loop). (R7, ProtoFlow heritage)
+   (powers the AI write→validate→fix loop). (R7)
 2. **Mechanically renderable** — a plain program (no LLM) converts text
    to SVG, deterministically. (D1)
 3. **Rigid/flexible attribute model** — every attribute either carries an
@@ -260,8 +260,7 @@ Normative rules:
 
 Three figure families are *not* box-and-wire graphs and get dedicated,
 closed sub-grammars. Each is introduced by its keyword and terminated by
-the next top-level directive (sticky-scope, like ProtoFlow steps — no
-`end` keyword). Priority order below is final, per the completed census.
+the next top-level directive (sticky scope — no `end` keyword). Priority order below is final, per the completed census.
 
 ### 4.1 `bitfield` — packet headers / register layouts (census #2, 23.7% weighted)
 
@@ -429,8 +428,8 @@ set r1.fib row="10.1.0.0/16 R4 p2"    # sticky delta on the static scene
 pulse r1                                # transient highlight
 ```
 
-Dynamic = the static scene + an ordered list of page deltas (sticky/
-transient split as in ProtoFlow). Deferred until the static core ships.
+Dynamic = the static scene + an ordered list of page deltas (sticky vs.
+transient). Deferred until the static core ships.
 
 ## 7. Embedding & artifacts (R14, D1)
 

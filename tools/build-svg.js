@@ -3,7 +3,7 @@
 // Deterministic: same source -> same SVG, bit-level. The artifact embeds
 // its own source and a SHA-256 of it (spec draft section 7).
 // The engine is never forked: parser+renderer are extracted from the PoC
-// single file at build time (the ProtoFlow "regenerate, don't fork" rule).
+// single file at build time (the "regenerate, don't fork" rule).
 'use strict';
 const fs = require('fs');
 const path = require('path');

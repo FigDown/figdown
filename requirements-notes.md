@@ -5,9 +5,10 @@
 > 繁體中文版：[requirements-notes.zh-tw.md](requirements-notes.zh-tw.md)
 
 Status: requirements gathering (since 2026-07-01).
-Purpose: generalize the ProtoFlow editor approach into a formal standard
-(text as source, figures as artifacts, knowledge shared across two kinds of
-readers). This file records the user's dictated requirements one by one;
+Purpose: generalize the approach of a prior editor prototype into a formal
+standard (text as source, figures as artifacts, knowledge shared across two
+kinds of readers; the prototype's draft generations are referred to as
+v1/v2 below). This file records the user's dictated requirements one by one;
 once consolidated, they will be rewritten into a formal standard document.
 
 ## Background (core principles of the existing implementation, for reference)
@@ -76,7 +77,7 @@ the figure types it cannot cover (topologies etc.) and layout expressiveness.
 
 ### R2 — Positioning of dynamic (2026-07-01)
 
-**Original**: Dynamic exists for scenarios like the current editor.html
+**Original**: Dynamic exists for scenarios like the prototype editor's
 examples — to **demonstrate and explain** algorithms, or figures with
 steps/flows that are easier to understand animated.
 
@@ -88,11 +89,11 @@ steps/flows that are easier to understand animated.
 - In other words, two audience scenarios diverge:
   - **Static**: serves R0's core need (Word-document knowledge shared by
     AI + humans)
-  - **Dynamic**: serves demonstration/explanation (= what ProtoFlow/v2
+  - **Dynamic**: serves demonstration/explanation (= what the v2 prototype
     already does)
-- The existing editor.html + ProtoFlow is regarded by the user as the
-  positive example for the dynamic scenario; the standard should adopt it
-  as the reference implementation of the dynamic layer, not rebuild it.
+- The existing prototype is regarded by the user as the positive example
+  for the dynamic scenario; the standard should adopt its approach as the
+  reference for the dynamic layer, not rebuild it.
 
 ### R3 — Text as source, figures as artifacts (single truth, dual-reader projection) (2026-07-01)
 
@@ -120,7 +121,7 @@ secondary (artifacts)**.
   **deterministic** (same text → same figure), otherwise the figure cannot
   be trusted as a faithful projection of the text — same origin as the v2
   draft's determinism principle.
-- This is precisely the text-anime editor's iron rule ("text is the single
+- This is precisely the prototype editor's iron rule ("text is the single
   source of truth; GUI = editing text on the user's behalf") generalized to
   the document scenario: the editor's GUI is a projection; here the
   "figure" is also a projection.
@@ -144,7 +145,7 @@ done by a **tool** — **never by a human**.
 - Corollary 2: the tool's quality bar is high — "does the auto-laid-out
   figure look good enough / human-drawn enough" directly decides whether
   this standard survives. This is exactly the core competence accumulated
-  in the text-anime project (declarative layout, three-tier layout,
+  in the prototype project (declarative layout, three-tier layout,
   determinism).
 - Corollary 3: escape hatches must also take the form of "declarations
   written in the text" (like v1's `pos`/`nudge`), never "manually touched-up
@@ -177,7 +178,7 @@ for (human) users to exercise.
   semantic constraints (flow/rank/zone) → explicit positions (grid/pos
   escape hatch). R5 confirms all three tiers are needed, with the
   "unwritten = fully automatic" optional nature.
-- **Tension with the v1 iron rule (to clarify)**: v1/ProtoFlow decrees
+- **Tension with the v1 iron rule (to clarify)**: v1 decrees
   "authors never choose colors" (plane→color is fixed); R5 asks for basic
   attribute control including color. Possible reconciliation: the document
   scenario (static figures) opens up presentation attributes, while the
@@ -197,7 +198,7 @@ the figure they want.
   companion tool. The human authoring flow is "drawing", not "writing
   code" — even though the truth is text, humans need a visual interface.
 - Composed with the R3/R4 axioms, the inevitable form is the existing
-  editor.html iron rule: **GUI drawing actions = editing the text on the
+  prototype editor's iron rule: **GUI drawing actions = editing the text on the
   user's behalf**. Humans "draw"; the editor transcribes the drawing
   actions into text declarations (drag node→pos, connect→link,
   recolor→attribute line); text remains the single truth, the figure
@@ -209,7 +210,7 @@ the figure they want.
 - Corollary: language design must consider "GUI write-back" — every visual
   operation needs a corresponding text directive (the `nudge` precedent);
   this is the bidirectional contract between language and editor.
-- Existing asset: editor.html's architecture (CodeMirror + direct canvas
+- Existing asset: the prototype editor's architecture (CodeMirror + direct canvas
   manipulation + build-from-engine) can serve directly as the reference
   implementation.
 
@@ -221,7 +222,7 @@ should be **lean** — it should not take many tokens of prompt to make an AI
 agent understand it.
 
 **Interpretation**: three sub-requirements:
-1. **Formal standardization**: a normative spec (protoflow-spec.md grade:
+1. **Formal standardization**: a normative spec (full reference grade:
    syntax, semantics, error model, EBNF), not a "de-facto tool format".
 2. **Generality**: across scenarios (not tied to network protocols), across
    tools (anyone can implement a renderer/editor from the spec),
@@ -436,7 +437,7 @@ reserved**.
 - **Extensibility ≠ implemented extensions**: the first version does not
   build future features, but the syntax structure must leave room for
   them — concrete mechanisms (existing precedents):
-  - version header (v1 `protoflow 1` pattern) + compatibility rules
+  - version header (v1's version-header pattern) + compatibility rules
     (spec §12)
   - keyword-initial line grammar: new capability = new keyword; old
     parsers report errors precisely

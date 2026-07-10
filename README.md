@@ -99,10 +99,6 @@ file alone can always be reopened and edited. See
   on the right (core scene + bitfield + table + wave). The exported SVG
   embeds its own source and SHA-256.
 
-Prior art feeding this design: **ProtoFlow**, a protocol-animation DSL
-with a single-file engine/editor (to be published separately), where the
-axioms above were first proven end-to-end.
-
 ## Contributing
 
 Ideas, counter-examples, and prior-art pointers are very welcome — please
