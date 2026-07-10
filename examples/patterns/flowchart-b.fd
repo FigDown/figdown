@@ -13,9 +13,9 @@ flow down
 
 edge s  -> p1
 edge p1 -> d1
-edge d1 -> p2  label="yes"
-edge d1 -> e   label="no"
+edge d1 -[yes]-> p2
+edge d1 -[no]-> e
 edge p2 -> d2
-edge d2 -> p3  label="yes"
-edge d2 -> p1  label="no"
+edge d2 -[yes]-> p3
+edge d2 -[no]-> p1
 edge p3 -> e

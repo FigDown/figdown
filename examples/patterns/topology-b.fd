@@ -23,18 +23,18 @@ flow right
 rank b1 b2
 
 # ingress to first core node
-edge in1 -- c1 taillabel="p1" headlabel="p1"
+edge in1 [p1] -- [p1] c1
 
 # c1 fans into the redundant pair
-edge c1 -- b1 taillabel="p2" headlabel="p1"
-edge c1 -- b2 taillabel="p3" headlabel="p1"
+edge c1 [p2] -- [p1] b1
+edge c1 [p3] -- [p1] b2
 
 # redundant pair fans into second core node
-edge b1 -- c2 taillabel="p2" headlabel="p1"
-edge b2 -- c2 taillabel="p2" headlabel="p2"
+edge b1 [p2] -- [p1] c2
+edge b2 [p2] -- [p2] c2
 
 # egress
-edge c2 -- out1 taillabel="p3" headlabel="p1"
+edge c2 [p3] -- [p1] out1
 
 # link bundle: the two parallel legs through the redundant pair
 bundle bund1 "Link Bundle 1" c1--b1, c1--b2

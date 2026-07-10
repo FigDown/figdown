@@ -65,7 +65,7 @@ Lexical rules:
   (so `color=#0d9488` is never mistaken for a comment).
 - Escapes inside quoted strings: `\n` line break, `\"` literal quote,
   `\\` literal backslash. Any other escape is a line error. Quotes also
-  work inside option values: `label="on miss"`. (Pipe rows additionally
+  work inside option values: `note="on miss"`. (Pipe rows additionally
   use `\|` and `\^^`, §4.2.)
 - `title` consumes the remainder of its line: `title TCP Header` and
   `title "TCP Header"` are equivalent (multi-word titles are never
@@ -125,14 +125,34 @@ one-frame-with-dividers look. OQ-S1 (indented block sugar) is
 
 ```figdown
 edge parser -> l2
-edge l2 -> l3 label="on miss" style=dashed
-edge sw1 -- sw2 label="100G"        # undirected link
-edge a <-> b                        # bidirectional
+edge l2 -[on miss]-> acl style=dashed
+edge sw1 [e1/1] -- [e1/2] sw2          # endpoint (port) labels
+edge peer1 <-[3-way handshake]-> peer2
+edge ack <- syn                        # statement order = author's focus
 ```
 
-`->` `--` `<->` follow Mermaid/D2 conventions (AI prior knowledge, R11).
-Endpoint (port) labels use Graphviz's `taillabel=`/`headlabel=` (R18) —
-the ubiquitous `e1/22.2`-style interface tags of network figures.
+Operators `--` `->` `<-` `<->` — exactly D2's set (Mermaid/D2
+conventions, AI prior knowledge, R11/R35). `A <- B` draws the same as
+`B -> A`; the spelling exists because the author's statement order is
+itself part of how humans encode meaning.
+
+**Labels are inline, at the three meaningful positions** (R34): near
+the tail, on the line, near the head — each written where it appears
+in the figure (R22: text is a 1-D encoding of the figure). A `[mid]`
+label splits the operator into halves (left `-` or `<-`, right `-` or
+`->`), mirroring Mermaid's `A -- text --> B`. No mainstream language
+offers more than three positions ([prior-art.md](prior-art.md) §1).
+Typical uses: interface tags (`e1/22.2`), cardinalities (`1`/`N`),
+endpoint roles.
+
+Bracket content rules:
+- Balanced inner brackets nest verbatim: `[flags[3:0]]` displays
+  `flags[3:0]`.
+- For unbalanced brackets, `\n`, or literal quotes, use the quoted
+  form `["..."]` — the standard string escapes apply (Mermaid's
+  quote-inside-shape convention).
+- An empty `[]` is a line error. `label=`/`taillabel=`/`headlabel=`
+  are retired (migration 0.1-dev.9).
 
 ### 2.4 Layers (R5)
 
@@ -439,20 +459,21 @@ transient split as in ProtoFlow). Deferred until the static core ships.
 - ~~OQ-S3: column widths~~ — resolved: `colw` is in v0.1 (§4.2); mixed
   per-column alignment stays out (census 1.4%).
 - ~~OQ-S4: edge label position hints~~ — **rejected for v0.1** (pure
-  presentation; would invite pixel-level hand-tuning; revisit as an
-  editor extension).
+  presentation; would invite pixel-level hand-tuning). User ruling
+  2026-07-10: stay conservative now; if real figures ever demand it,
+  it can be added later — additions are cheap under R31, and the
+  three-position model (§2.3) already carries *which position* as
+  semantics.
 - ~~OQ-S5: multi-figure documents~~ — resolved: one `.fd` produces one
   `.svg` artifact; a document MAY contain multiple top-level blocks,
   composed in document order.
 - ~~OQ-S6: relationship to D2~~ — informative appendix:
   [prior-art.md](prior-art.md) §3.
-- OQ-S7: edge labels at the three meaningful positions (tail/mid/head).
-  Concrete inline proposal on the table (R34):
-  `edge A [tail] <-[mid]-> [head] B` — operator halves split around the
-  mid label; `<-` joins the operator set (R35). Mainstream survey and
-  the full proposal: [prior-art.md](prior-art.md) §1. Pending freeze;
-  if adopted, `label=`/`taillabel=`/`headlabel=` retire with a
-  mechanical migration.
+- ~~OQ-S7: edge labels~~ — **resolved (2026-07-10)**: inline labels at
+  the three meaningful positions, `edge A [tail] <-[mid]-> [head] B`
+  (§2.3); `<-` joined the operator set;
+  `label=`/`taillabel=`/`headlabel=` retired (migration 0.1-dev.9).
+  Survey: [prior-art.md](prior-art.md) §1.
 
 ## 10. Keyword registry, conformance modes, extensions
 

@@ -43,7 +43,7 @@ node crc2 "CRC (new)\n4B" color=#bbf7d0 stroke=#16a34a
 pin  crc2 at=775,260
 
 # the key idea: the 12-bit VLAN becomes a 24-bit VNI in the VXLAN header
-edge dot1q -> vxh label="VNI\n12-bit VLAN → 24-bit VNI" style=dashed color=#ea580c
+edge dot1q -["VNI\n12-bit VLAN → 24-bit VNI"]-> vxh style=dashed color=#ea580c
 
 # ── Supplementary knowledge ─────────────────────────────────────────
 table overhead "Encapsulation overhead (MAC-in-UDP)"

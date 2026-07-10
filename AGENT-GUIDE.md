@@ -77,8 +77,11 @@ title "..."                 # optional, takes the rest of the line;
 node a "Label" [shape=rounded|circle|ellipse|cloud|diamond|cylinder]
                [color=#hex] [style=dashed] [in=<group>]
 group g "Label" [gap=0]     # container; gap=0 packs members flush
-edge a -> b [label="..."] [taillabel="p1"] [headlabel="p2"] [style=dashed]
-edge a -- b                 # undirected; a <-> b bidirectional
+edge a -> b [style=dashed] [color=#hex]  # ops: -> <- -- <->
+edge a -[label]-> b         # on-line label splits the operator
+edge a [p1] -- [p2] b       # endpoint labels (ports/cardinality/roles)
+                            # [flags[3:0]] nests; ["..."] for \n or
+                            # unbalanced brackets (string escapes apply)
 flow right|down             # layout direction
 rank a b c                  # same row/column
 pin a at=x,y                # absolute px; group members are group-local

@@ -33,9 +33,9 @@ rank proc-x intr proc-y
 
 edge in-port  -> outer
 edge outer    -> out-port
-edge unit-c   -> proc-x   label="ref"
-edge unit-c   -> unit-a   label="ptr"
-edge proc-x   -> unit-b   label="feedback" style=dashed
+edge unit-c -[ref]-> proc-x
+edge unit-c -[ptr]-> unit-a
+edge proc-x -[feedback]-> unit-b style=dashed
 edge proc-y   -> intr
-edge intr     -> unit-c   label="interrupt" style=dashed
-edge proc-y   -> unit-c   label="up-path"
+edge intr -[interrupt]-> unit-c style=dashed
+edge proc-y -[up-path]-> unit-c

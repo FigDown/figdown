@@ -55,19 +55,19 @@ pin  h3 at=1020,500
 # fabric attachment
 edge sp1 -- cloud
 edge sp2 -- cloud
-edge cloud -- vrf2 taillabel="irb0.24\nAnycast-IP .254"
+edge cloud ["irb0.24\nAnycast-IP .254"] -- vrf2
 edge cloud -- vrf4
 edge cloud -- vrf3
 
 # PE-CE and access links, port labels at the endpoints
-edge bd2 -- ce3 label="PE-CE\nBGP IPv4" style=dashed color=#1d4ed8 headlabel="20.1.1.2/24"
-edge bd2   -- h2  taillabel="e1/12.24"
-edge bd24a -- srv taillabel="lag1.24"
-edge bd24b -- srv taillabel="lag1.24"
+edge bd2 -["PE-CE\nBGP IPv4"]- [20.1.1.2/24] ce3 style=dashed color=#1d4ed8
+edge bd2 [e1/12.24] -- h2
+edge bd24a [lag1.24] -- srv
+edge bd24b [lag1.24] -- srv
 
 # multi-homing: declare the SEMANTICS (these links form one bundle) and
 # the renderer derives the dashed ring — it follows the nodes wherever
 # they move; no coordinates involved
 bundle es1 "ES-1 / LAG-1" bd24a--srv, bd24b--srv color=#0ea5e9
-edge bd4   -- h4  taillabel="e1/13.4"
-edge bd3   -- h3  taillabel="e1/2.3"
+edge bd4 [e1/13.4] -- h4
+edge bd3 [e1/2.3] -- h3

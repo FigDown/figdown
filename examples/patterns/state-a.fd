@@ -7,8 +7,8 @@ node wait   "WAIT"    shape=rounded
 
 flow down
 
-edge idle   -> active  label="cond1"
-edge active -> wait    label="cond2"
-edge wait   -> idle    label="reset"
-edge wait   -> active  label="retry"
-edge active -> idle    label="abort"
+edge idle -[cond1]-> active
+edge active -[cond2]-> wait
+edge wait -[reset]-> idle
+edge wait -[retry]-> active
+edge active -[abort]-> idle

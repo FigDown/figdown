@@ -45,7 +45,7 @@ D2 > DBML/WaveDrom (domain-specific)**.
    hints) rejected: mainstream treats *which position* as semantic and
    *where exactly* as the renderer's job.
 
-### 1.3 Implication for FigDown (PROPOSAL — not yet frozen)
+### 1.3 Implication for FigDown (ADOPTED 2026-07-10 — landed as migration 0.1-dev.9)
 
 The user's requirement (R34): both endpoints of a link often carry a
 role/meaning, and a line has **at most three meaningful positions**.
@@ -69,15 +69,18 @@ edge a -[label only on the line]- b
   delimiter that is unambiguous in our closed grammar. (PlantUML
   demonstrates that *inline endpoint labels* are mainstream; the exact
   delimiter has no cross-language consensus to follow.)
-- If adopted, `label=` / `taillabel=` / `headlabel=` retire in the
-  same version (R28: one mechanism), with a mechanical migration:
+- `label=` / `taillabel=` / `headlabel=` retired in the same version
+  (R28: one mechanism), with a mechanical migration:
   `edge A -> B label="x" taillabel="t" headlabel="h"` →
   `edge A [t] -[x]-> [h] B`.
-- `<-` joins the registry (R35; D2 precedent — its operator set is
+- `<-` joined the registry (R35; D2 precedent — its operator set is
   exactly `--` `->` `<-` `<->`). Writing `Left <- Right` must not
   force the author to reorder into `Right -> Left`.
-- Open details before freeze: escape rules inside `[...]` (literal
-  `]`), and whether an empty `[]` is an error.
+- Bracket content (ruled 2026-07-10): balanced inner brackets nest
+  verbatim (`[flags[3:0]]` works as-is); unbalanced brackets / `\n` /
+  literal quotes use the quoted form `["..."]` with the standard
+  string escapes — Mermaid's quote-inside-shape precedent
+  (`id1["text with [brackets]"]`); an empty `[]` is a line error.
 
 ## 2. ERD conventions (feeds R36)
 
@@ -152,3 +155,5 @@ things, and they have different answers:
 
 **Recommendation**: close OQ1 as "not a base language" and re-file the
 remainder as a v0.2 exporter/interop question.
+
+**Ruling (2026-07-10)**: adopted — OQ1 closed as recommended.

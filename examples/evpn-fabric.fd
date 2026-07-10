@@ -15,7 +15,7 @@ rank sp1 sp2
 rank lf1 lf2 lf3
 
 # underlay: every leaf peers with every spine
-edge sp1 -- lf1 label="eBGP"
+edge sp1 -[eBGP]- lf1
 edge sp1 -- lf2
 edge sp1 -- lf3
 edge sp2 -- lf1
@@ -27,7 +27,7 @@ edge lf3 -- h3
 
 # overlay: VXLAN tunnel between the two VTEPs sharing VNI 10010
 layer overlay "VXLAN tunnels" z=2
-edge lf1 <-> lf2 label="VXLAN VNI 10010" style=dashed color=#dc2626 layer=overlay
+edge lf1 <-[VXLAN VNI 10010]-> lf2 style=dashed color=#dc2626 layer=overlay
 
 # ── Supplementary knowledge ─────────────────────────────────────────
 table vni "VNI mapping"

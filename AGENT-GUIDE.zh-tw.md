@@ -70,8 +70,11 @@ title "..."                 # 選用，吃掉整行剩餘內容；
 node a "Label" [shape=rounded|circle|ellipse|cloud|diamond|cylinder]
                [color=#hex] [style=dashed] [in=<group>]
 group g "Label" [gap=0]     # 容器；gap=0 使成員貼齊
-edge a -> b [label="..."] [taillabel="p1"] [headlabel="p2"] [style=dashed]
-edge a -- b                 # 無向；a <-> b 雙向
+edge a -> b [style=dashed] [color=#hex]  # 運算子：-> <- -- <->
+edge a -[label]-> b         # 線上標籤把運算子拆開
+edge a [p1] -- [p2] b       # 端點標籤（埠/基數/角色）
+                            # [flags[3:0]] 可巢狀；\n 或不平衡括號
+                            # 用 ["..."]（套用字串跳脫）
 flow right|down             # 佈局方向
 rank a b c                  # 同列/同欄
 pin a at=x,y                # 絕對 px；群組成員為群組局部座標

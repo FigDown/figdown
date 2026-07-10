@@ -9,11 +9,11 @@ node state_d "STATE_D"  shape=rounded
 
 flow down
 
-edge idle    -> state_a  label="cond1"
-edge idle    -> state_b  label="cond2"
-edge idle    -> state_c  label="cond3"
-edge idle    -> state_d  label="cond4"
-edge state_a -> idle     label="reset"
-edge state_b -> idle     label="reset"
-edge state_c -> idle     label="reset"
-edge state_d -> idle     label="reset"
+edge idle -[cond1]-> state_a
+edge idle -[cond2]-> state_b
+edge idle -[cond3]-> state_c
+edge idle -[cond4]-> state_d
+edge state_a -[reset]-> idle
+edge state_b -[reset]-> idle
+edge state_c -[reset]-> idle
+edge state_d -[reset]-> idle

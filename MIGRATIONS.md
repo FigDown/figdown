@@ -85,3 +85,18 @@ Change:  `zone` (layout-tier hint, accepted but never acted on) removed
 Rule:    delete every line matching `^\s*zone\b`. No semantic loss —
          the directive had no defined rendering.
 Example: `zone left ingress` → (line deleted)
+
+## 0.1-dev.8 → 0.1-dev.9  (2026-07-10, R34/R35)
+Change:  edge labels moved **inline** to the three meaningful positions
+         (tail / mid / head): `edge A [t] -[m]-> [h] B`. A `[mid]`
+         label splits the operator into halves (`-`|`<-` + `-`|`->`);
+         `<-` joined the operator set. `label=` / `taillabel=` /
+         `headlabel=` are retired.
+Rule:    per edge line: `taillabel="T"` → `[T]` after the source id;
+         `headlabel="H"` → `[H]` before the target id; `label="M"` →
+         split the operator around `[M]`: `--`→`-[M]-`, `->`→`-[M]->`,
+         `<-`→`<-[M]-`, `<->`→`<-[M]->`. If the label text contains
+         quotes, backslashes or brackets that do not balance, use the
+         quoted form `["…"]` (standard string escapes).
+Example: `edge a -- b label="eBGP" taillabel="p1"` →
+         `edge a [p1] -[eBGP]- b`
