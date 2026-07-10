@@ -1,0 +1,38 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 142 550" width="142" height="550" font-family="system-ui,sans-serif"><defs><marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#555"/></marker><pattern id="hatch" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><line x1="0" y1="0" x2="0" y2="6" stroke="#bbb" stroke-width="2"/></pattern></defs><g transform="translate(18,6)"><text x="0" y="16" font-size="15" font-weight="600" font-family="var(--sans)">Hash table with chaining</text><g data-group="table" data-gx="0" data-gy="50" style="cursor:move"><rect x="-14" y="24" width="128" height="182" rx="10" fill="#f6f5ef" stroke="#d6d4cc"/><text x="-4" y="40" font-size="11.5" fill="#6f6e69">Bucket array</text></g><line x1="39.971428571428575" y1="122" x2="44.94285714285714" y2="238" stroke="#555" stroke-width="1.6" marker-end="url(#arr)"/><text x="42.457142857142856" y="175" font-size="11" text-anchor="middle" fill="#555" paint-order="stroke" stroke="#fff" stroke-width="3">ptr</text><line x1="39.56404494382023" y1="158" x2="45.7123595505618" y2="462" stroke="#555" stroke-width="1.6" marker-end="url(#arr)"/><text x="42.63820224719102" y="305" font-size="11" text-anchor="middle" fill="#555" paint-order="stroke" stroke="#fff" stroke-width="3">ptr</text><line x1="46.4" y1="306" x2="46.4" y2="350" stroke="#555" stroke-width="1.6" marker-end="url(#arr)"/><text x="46.4" y="323" font-size="11" text-anchor="middle" fill="#555" paint-order="stroke" stroke="#fff" stroke-width="3">next</text><g data-node="b0" data-x="0" data-y="50" style="cursor:move"><rect x="0" y="50" width="100" height="36" fill="#f1f5f9" stroke="#8a8880"/><text x="50" y="72.55" font-size="13" text-anchor="middle" fill="#1d1d1b">[ 0 ] null</text></g><g data-node="b1" data-x="0" data-y="86" style="cursor:move"><rect x="0" y="86" width="78.4" height="36" fill="#f1f5f9" stroke="#8a8880"/><text x="39.2" y="108.55" font-size="13" text-anchor="middle" fill="#1d1d1b">[ 1 ] •</text></g><g data-node="b2" data-x="0" data-y="122" style="cursor:move"><rect x="0" y="122" width="78.4" height="36" fill="#f1f5f9" stroke="#8a8880"/><text x="39.2" y="144.55" font-size="13" text-anchor="middle" fill="#1d1d1b">[ 2 ] •</text></g><g data-node="b3" data-x="0" data-y="158" style="cursor:move"><rect x="0" y="158" width="100" height="36" fill="#f1f5f9" stroke="#8a8880"/><text x="50" y="180.55" font-size="13" text-anchor="middle" fill="#1d1d1b">[ 3 ] null</text></g><g data-node="e1a" data-x="0" data-y="238" style="cursor:move"><rect x="0" y="238" width="92.8" height="68" fill="#dbeafe" stroke="#8a8880"/><text x="46.4" y="259.65000000000003" font-size="13" text-anchor="middle" fill="#1d1d1b"><tspan x="46.4" dy="0">key=alpha</tspan><tspan x="46.4" dy="16.900000000000002">val=42</tspan><tspan x="46.4" dy="16.900000000000002">next •</tspan></text></g><g data-node="e1b" data-x="0" data-y="350" style="cursor:move"><rect x="0" y="350" width="92.8" height="68" fill="#dbeafe" stroke="#8a8880"/><text x="46.4" y="371.65000000000003" font-size="13" text-anchor="middle" fill="#1d1d1b"><tspan x="46.4" dy="0">key=gamma</tspan><tspan x="46.4" dy="16.900000000000002">val=7</tspan><tspan x="46.4" dy="16.900000000000002">next null</tspan></text></g><g data-node="e2a" data-x="0" data-y="462" style="cursor:move"><rect x="0" y="462" width="92.8" height="68" fill="#dcfce7" stroke="#8a8880"/><text x="46.4" y="483.65000000000003" font-size="13" text-anchor="middle" fill="#1d1d1b"><tspan x="46.4" dy="0">key=beta</tspan><tspan x="46.4" dy="16.900000000000002">val=99</tspan><tspan x="46.4" dy="16.900000000000002">next null</tspan></text></g></g><metadata id="figdown-source" data-sha256="6c23ef413b75ef29a50a5a14528447517e0585273151bbbc202b41aa0a9a5a0c"><![CDATA[
+figdown 0.1 block
+title "Hash table with chaining"
+
+# Static data-structure figure: a hash table of 4 buckets where
+# collisions are resolved by a linked list (separate chaining).
+#   bucket[0] — empty
+#   bucket[1] — 2-node chain  (two keys hashed to slot 1)
+#   bucket[2] — 1-node chain  (one key in slot 2)
+#   bucket[3] — empty
+# The bucket array is a fixed-size slot group; each chain entry node
+# holds a key/value pair and a next-pointer edge to the successor.
+
+group table "Bucket array" gap=0
+node b0 "[ 0 ] null" in=table color=#f1f5f9
+node b1 "[ 1 ] •"    in=table color=#f1f5f9
+node b2 "[ 2 ] •"    in=table color=#f1f5f9
+node b3 "[ 3 ] null" in=table color=#f1f5f9
+
+# chain for bucket 1 — two entries
+node e1a "key=alpha\nval=42\nnext •" color=#dbeafe
+node e1b "key=gamma\nval=7\nnext null" color=#dbeafe
+
+# chain for bucket 2 — one entry
+node e2a "key=beta\nval=99\nnext null" color=#dcfce7
+
+flow right
+rank b0 b1 b2 b3
+rank e1a e2a
+
+# bucket pointers into chain heads
+edge b1 -[ptr]-> e1a
+edge b2 -[ptr]-> e2a
+
+# chain links
+edge e1a -[next]-> e1b
+
+]]></metadata></svg>

@@ -48,3 +48,8 @@
   ![state-a](state-a.svg)
 - [state-b](state-b.fd) — 輪輻：多狀態匯回 reset
   ![state-b](state-b.svg)
+
+## 實體關係（blocks 優先，R36）
+- [erd-a](erd-a.fd) — 實體 = 多行標籤節點（PK/FK 為標籤文字）、
+  關係 = 行內動詞 + 端點基數標籤
+  ![erd-a](erd-a.svg)

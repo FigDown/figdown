@@ -280,6 +280,10 @@ wrap                       # explicit row break when a field ends mid-unit
 
 - `unit=32` — bits per row (default 32, the common case per census).
 - Widths in bits; renderer computes bit indices and draws the ruler.
+  A field **wider than the remaining row space spans onto the
+  following rows automatically** (e.g. a 128-bit field over four
+  32-bit rows) — it stays ONE field; authors MUST NOT split it into
+  per-row pieces, which would misstate the field list (R37).
 - Width is a bit count, or `*` = **variable-length field**: fills the
   remainder of the current row; if `*` appears at a row boundary it
   consumes one full row (the RFC-diagram shape for Payload/Data

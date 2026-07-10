@@ -15,6 +15,33 @@ Markdown 裡——讓**同一份來源**同時被：
 Mermaid 表達不了的圖型（網路拓撲、帶註記的方塊圖、查表鏈、封包走訪
 ……），並把 layout 視為知識的一部分。
 
+## 眼見為憑
+
+這張圖*就是* FigDown——下面的文字是它的完整來源：
+
+```figdown
+figdown 0.1 block
+title "One source, two readers"
+
+node src  "ingress.fd\n(source of truth)"  shape=rounded  color=#e0e7ff
+node rend "FigDown renderer\n(build-svg.js)"
+node svg  "ingress.svg\n(artifact)"        shape=rounded  color=#dcfce7
+node human "human reader"                  shape=ellipse
+node agent "AI agent"                      shape=ellipse   color=#fef9c3
+
+flow right
+rank svg human
+
+edge src  -[deterministic build]->  rend
+edge rend -[stable SVG]->           svg
+edge svg  -[reads visually]->       human
+edge src  -[reads for meaning]->    agent
+```
+
+![One source, two readers](figures/one-source-two-readers.svg)
+
+<sub>來源：[figures/one-source-two-readers.fd](figures/one-source-two-readers.fd)</sub>
+
 ## 為什麼
 
 技術文件裡充滿「**排版本身承載語意**」的圖——位階、分區、方向、相鄰

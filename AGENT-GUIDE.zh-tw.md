@@ -97,7 +97,9 @@ bundle b1 "LAG" a--c, b--c  # 鏈路捆綁：虛線圈自動繪製
 bitfield x "Title" unit=32 [numbering=msb0]
 field Name 16 [optional] [color=#hex] [note="..."]
 field a:1, b:2, Long Name:16     # 緊湊形式；寬度 * = 填滿本列
-wrap
+field Marker 128                 # 寬於 unit → 自動跨列
+                                 # （這是「一個」欄位——永不手動拆開）
+wrap                             # 只用於顯式的列中換列
 
 # table（原封 GFM；^^ rowspan、|| colspan、\| 字面管線）
 table t "Title"
@@ -118,6 +120,9 @@ signal d   x.==..x. labels="A,B"
 
 文法是封閉的：任何未知行/關鍵字/選項都是帶行號的錯誤。不要發明
 語法——若覺得缺什麼，用上述構件組合表達，或回報維護者。
+標頭的 template 只挑選*預設值*——永不限制哪些指令可用。`flow`
+是文件層級。id（`node a`、`bitfield x`、`table t`）必填、只為
+被引用而存在。
 
 ## 6. 版本
 

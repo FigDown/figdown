@@ -87,6 +87,11 @@ a `bundle` multi-homing ring, multi-line host captions.
 ### QUIC long header — RFC 9000  — [source](quic.fd)
 ![QUIC long header](quic.svg)
 
+### BGP message header — RFC 4271  — [source](bgp.fd)
+The 128-bit Marker is ONE field spanning four 32-bit rows — fields
+wider than the unit continue automatically.
+![BGP message header](bgp.svg)
+
 ## Tables & data (census #3)
 
 ### Queue-occupancy heatmap  — [source](queue-heatmap.fd)
@@ -94,6 +99,13 @@ One table, two projections: a heatmap (per-cell marks) and a `plot`
 bars3d chart with a threshold plane — rows→X, columns→Y, values→Z.
 
 ![Queue heatmap](queue-heatmap.svg)
+
+## Algorithms & data structures
+
+### Hash table with chaining  — [source](hash-chaining.fd)
+Bucket-array group, empty and occupied slots, pointer edges to
+singly-linked entry chains — a static data-structure explainer.
+![Hash table with chaining](hash-chaining.svg)
 
 ## Just for fun
 

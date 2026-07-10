@@ -107,7 +107,9 @@ bundle b1 "LAG" a--c, b--c  # link bundle: dashed ring drawn automatically
 bitfield x "Title" unit=32 [numbering=msb0]
 field Name 16 [optional] [color=#hex] [note="..."]
 field a:1, b:2, Long Name:16     # compact; * width = fill rest of row
-wrap
+field Marker 128                 # wider than unit → spans rows automatically
+                                 # (ONE field — never split it by hand)
+wrap                             # only for an explicit mid-row break
 
 # table (verbatim GFM; ^^ rowspan, || colspan, \| literal pipe)
 table t "Title"
@@ -129,6 +131,9 @@ signal d   x.==..x. labels="A,B"
 Grammar is CLOSED: any unknown line/keyword/option is an error with a
 1-based line number. Do not invent syntax — if something seems missing,
 express it with the constructs above or flag it to the maintainer.
+The header template only picks *defaults* — it never restricts which
+directives are valid. `flow` is document-level. Ids (`node a`,
+`bitfield x`, `table t`) are required and exist only for reference.
 
 ## 6. Versioning
 

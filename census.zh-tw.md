@@ -20,6 +20,10 @@
 
 ## 結果
 
+![Figure-type census summary](figures/census-summary.svg)
+
+<sub>來源：[figures/census-summary.fd](figures/census-summary.fd)——這張圖本身就是 FigDown</sub>
+
 **唯一圖片（已分類 2,177 張）：**
 
 | 圖型 | 數量 | 佔比 |

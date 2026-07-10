@@ -17,6 +17,33 @@ extended to the diagram types Mermaid can't express (network topologies,
 annotated block diagrams, lookup chains, packet walks…), with layout
 treated as part of the knowledge.
 
+## See it
+
+This figure *is* FigDown — the text below is its complete source:
+
+```figdown
+figdown 0.1 block
+title "One source, two readers"
+
+node src  "ingress.fd\n(source of truth)"  shape=rounded  color=#e0e7ff
+node rend "FigDown renderer\n(build-svg.js)"
+node svg  "ingress.svg\n(artifact)"        shape=rounded  color=#dcfce7
+node human "human reader"                  shape=ellipse
+node agent "AI agent"                      shape=ellipse   color=#fef9c3
+
+flow right
+rank svg human
+
+edge src  -[deterministic build]->  rend
+edge rend -[stable SVG]->           svg
+edge svg  -[reads visually]->       human
+edge src  -[reads for meaning]->    agent
+```
+
+![One source, two readers](figures/one-source-two-readers.svg)
+
+<sub>source: [figures/one-source-two-readers.fd](figures/one-source-two-readers.fd)</sub>
+
 ## Why
 
 Technical documents are full of figures whose *layout carries meaning* —

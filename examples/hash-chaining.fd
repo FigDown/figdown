@@ -1,0 +1,35 @@
+figdown 0.1 block
+title "Hash table with chaining"
+
+# Static data-structure figure: a hash table of 4 buckets where
+# collisions are resolved by a linked list (separate chaining).
+#   bucket[0] — empty
+#   bucket[1] — 2-node chain  (two keys hashed to slot 1)
+#   bucket[2] — 1-node chain  (one key in slot 2)
+#   bucket[3] — empty
+# The bucket array is a fixed-size slot group; each chain entry node
+# holds a key/value pair and a next-pointer edge to the successor.
+
+group table "Bucket array" gap=0
+node b0 "[ 0 ] null" in=table color=#f1f5f9
+node b1 "[ 1 ] •"    in=table color=#f1f5f9
+node b2 "[ 2 ] •"    in=table color=#f1f5f9
+node b3 "[ 3 ] null" in=table color=#f1f5f9
+
+# chain for bucket 1 — two entries
+node e1a "key=alpha\nval=42\nnext •" color=#dbeafe
+node e1b "key=gamma\nval=7\nnext null" color=#dbeafe
+
+# chain for bucket 2 — one entry
+node e2a "key=beta\nval=99\nnext null" color=#dcfce7
+
+flow right
+rank b0 b1 b2 b3
+rank e1a e2a
+
+# bucket pointers into chain heads
+edge b1 -[ptr]-> e1a
+edge b2 -[ptr]-> e2a
+
+# chain links
+edge e1a -[next]-> e1b

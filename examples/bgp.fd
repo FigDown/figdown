@@ -1,0 +1,10 @@
+figdown 0.1 bitfield
+title BGP message header — RFC 4271
+
+# The 16-byte Marker spans four 32-bit rows automatically: a field
+# wider than the unit continues onto the following rows (one field,
+# not four — the .fd is the machine-readable truth).
+bitfield bgp "BGP Message Header" unit=32 numbering=msb0
+field Marker 128 note="all ones (RFC 4271 §4.1)"
+field Length 16
+field Type 8

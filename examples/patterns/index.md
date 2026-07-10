@@ -50,3 +50,9 @@
   ![state-a](state-a.svg)
 - [state-b](state-b.fd) — hub: states converging to reset
   ![state-b](state-b.svg)
+
+## Entity-relationship (blocks-first, R36)
+- [erd-a](erd-a.fd) — entities as multi-line nodes (PK/FK in label
+  text), relationships with an inline verb and cardinality endpoint
+  labels
+  ![erd-a](erd-a.svg)

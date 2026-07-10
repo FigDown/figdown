@@ -1,0 +1,21 @@
+figdown 0.1 table
+title "Figure-type census — 774 documents / 12,342 images"
+
+table census "Occurrence-weighted share by figure type (N = 9,558 non-boilerplate)"
+| Type                                      | Weighted share | v0.1 |
+|:------------------------------------------|---------------:|:----:|
+| block-architecture                        |         24.3%  |  ✓   |
+| packet-bitfield                           |         23.7%  |  ✓   |
+| other (fragments / decorative / composite)|         17.1%  |  —   |
+| table-matrix                              |          9.6%  |  ✓   |
+| flowchart                                 |          8.3%  |  ✓   |
+| timing-waveform                           |          7.2%  |  ✓   |
+| topology                                  |          5.0%  |  ✓   |
+| state / sequence / chart / mindmap / class-er / screenshot | each ≤1.2% | v0.2 |
+colw 55% 20% 25%
+cell 1 highlight
+cell 2 highlight
+cell 4 highlight
+cell 5 highlight
+cell 6 highlight
+cell 7 highlight

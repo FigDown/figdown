@@ -23,6 +23,10 @@
 
 ## Results
 
+![Figure-type census summary](figures/census-summary.svg)
+
+<sub>source: [figures/census-summary.fd](figures/census-summary.fd) — this figure is FigDown</sub>
+
 **Unique images (2,177 classified):**
 
 | Type | Count | Share |

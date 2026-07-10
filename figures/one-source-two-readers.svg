@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 548 282" width="548" height="282" font-family="system-ui,sans-serif"><defs><marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#555"/></marker><pattern id="hatch" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><line x1="0" y1="0" x2="0" y2="6" stroke="#bbb" stroke-width="2"/></pattern></defs><g transform="translate(18,6)"><text x="0" y="16" font-size="15" font-weight="600" font-family="var(--sans)">One source, two readers</text><line x1="150.4" y1="156" x2="206.4" y2="156" stroke="#555" stroke-width="1.6" marker-end="url(#arr)"/><text x="178.4" y="151" font-size="11" text-anchor="middle" fill="#555" paint-order="stroke" stroke="#fff" stroke-width="3">deterministic build</text><line x1="336.89" y1="130" x2="405.6" y2="99.6644591611479" stroke="#555" stroke-width="1.6" marker-end="url(#arr)"/><text x="371.245" y="109.83222958057395" font-size="11" text-anchor="middle" fill="#555" paint-order="stroke" stroke="#fff" stroke-width="3">stable SVG</text><line x1="460.2636363636364" y1="102" x2="462.06363636363636" y2="146" stroke="#555" stroke-width="1.6" marker-end="url(#arr)"/><text x="461.1636363636364" y="119" font-size="11" text-anchor="middle" fill="#555" paint-order="stroke" stroke="#fff" stroke-width="3">reads visually</text><line x1="150.4" y1="173.7320471596999" x2="405.6" y2="233.90782422293677" stroke="#555" stroke-width="1.6" marker-end="url(#arr)"/><text x="278" y="198.81993569131834" font-size="11" text-anchor="middle" fill="#555" paint-order="stroke" stroke="#fff" stroke-width="3">reads for meaning</text><g data-node="src" data-x="0" data-y="130" style="cursor:move"><rect x="0" y="130" width="150.4" height="52" rx="14" fill="#e0e7ff" stroke="#8a8880" stroke-width="1.8"/><text x="75.2" y="152.10000000000002" font-size="13" text-anchor="middle" fill="#1d1d1b"><tspan x="75.2" dy="0">ingress.fd</tspan><tspan x="75.2" dy="16.900000000000002">(source of truth)</tspan></text></g><g data-node="rend" data-x="206.4" data-y="130" style="cursor:move"><rect x="206.4" y="130" width="143.2" height="52" fill="#fff" stroke="#8a8880"/><text x="278" y="152.10000000000002" font-size="13" text-anchor="middle" fill="#1d1d1b"><tspan x="278" dy="0">FigDown renderer</tspan><tspan x="278" dy="16.900000000000002">(build-svg.js)</tspan></text></g><g data-node="svg" data-x="405.6" data-y="50" style="cursor:move"><rect x="405.6" y="50" width="107.2" height="52" rx="14" fill="#dcfce7" stroke="#8a8880" stroke-width="1.8"/><text x="459.20000000000005" y="72.1" font-size="13" text-anchor="middle" fill="#1d1d1b"><tspan x="459.20000000000005" dy="0">ingress.svg</tspan><tspan x="459.20000000000005" dy="16.900000000000002">(artifact)</tspan></text></g><g data-node="human" data-x="405.6" data-y="146" style="cursor:move"><ellipse cx="462.8" cy="164" rx="57.2" ry="18" fill="#fff" stroke="#8a8880"/><text x="462.8" y="168.55" font-size="13" text-anchor="middle" fill="#1d1d1b">human reader</text></g><g data-node="agent" data-x="405.6" data-y="226" style="cursor:move"><ellipse cx="448.40000000000003" cy="244" rx="42.8" ry="18" fill="#fef9c3" stroke="#8a8880"/><text x="448.40000000000003" y="248.55" font-size="13" text-anchor="middle" fill="#1d1d1b">AI agent</text></g></g><metadata id="figdown-source" data-sha256="598202235eec7f8e7f8d9ee6044cdbaa5b71c8a84290eff758271721f1a528b6"><![CDATA[
+figdown 0.1 block
+title "One source, two readers"
+
+# A single .fd file is the source of truth.
+# It feeds two completely different reading paths:
+#   (a) deterministic renderer  ->  SVG artifact  ->  human
+#   (b) AI agent reads the .fd directly for meaning
+
+node src  "ingress.fd\n(source of truth)"  shape=rounded  color=#e0e7ff
+node rend "FigDown renderer\n(build-svg.js)"
+node svg  "ingress.svg\n(artifact)"        shape=rounded  color=#dcfce7
+node human "human reader"                  shape=ellipse
+node agent "AI agent"                      shape=ellipse   color=#fef9c3
+
+flow right
+rank svg human
+
+edge src  -[deterministic build]->  rend
+edge rend -[stable SVG]->           svg
+edge svg  -[reads visually]->       human
+edge src  -[reads for meaning]->    agent
+
+]]></metadata></svg>

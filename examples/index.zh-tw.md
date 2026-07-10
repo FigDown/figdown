@@ -85,6 +85,11 @@ bridge domain、連線埠標籤、`bundle` 多歸屬圈、多行主機說明。
 ### QUIC long header — RFC 9000 — [來源](quic.fd)
 ![QUIC long header](quic.svg)
 
+### BGP 訊息標頭 — RFC 4271 — [來源](bgp.fd)
+128-bit 的 Marker 是「一個」欄位、自動跨四個 32-bit 列——寬於
+unit 的欄位自動延續。
+![BGP message header](bgp.svg)
+
 ## 表格與數據（普查第 3）
 
 ### 佇列佔用熱圖 — [來源](queue-heatmap.fd)
@@ -92,6 +97,13 @@ bridge domain、連線埠標籤、`bundle` 多歸屬圈、多行主機說明。
 （含門檻平面）——列→X、欄→Y、值→Z。
 
 ![Queue heatmap](queue-heatmap.svg)
+
+## 演算法與資料結構
+
+### 雜湊表與鏈結法 — [來源](hash-chaining.fd)
+桶陣列群組、空槽與佔用槽、指標連線到單向鏈結的項目鏈——靜態
+資料結構講解圖。
+![Hash table with chaining](hash-chaining.svg)
 
 ## 純屬好玩
 

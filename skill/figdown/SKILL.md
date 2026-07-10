@@ -80,10 +80,12 @@ fill 15% in=g color=#hex    # zone band; fill 15-35% = explicit range;
 bundle b1 "LAG" a--c, b--c  # link bundle: dashed ring drawn automatically
 
 # bitfield (lsb0 register-style default; numbering=msb0 for RFC style)
-bitfield x "Title" unit=32 [numbering=msb0]
+bitfield x "Title" unit=32 [numbering=msb0]   # id required, like node ids
 field Name 16 [optional] [color=#hex] [note="..."]
 field a:1, b:2, Long Name:16     # compact; * width = fill rest of row
-wrap
+field Marker 128                 # wider than unit → spans rows automatically
+                                 # (ONE field — never split it by hand)
+wrap                             # only for an explicit mid-row break
 
 # table (verbatim GFM; ^^ rowspan, || colspan, \| literal pipe)
 table t "Title"
@@ -100,6 +102,12 @@ wave w "Title"
 signal clk pppppppp
 signal d   x.==..x. labels="A,B"
 ```
+
+Notes that save a wrong guess: the header template only picks
+*defaults* — it never restricts which directives are valid (every
+directive works under every template). `flow` is document-level (one
+per document). Ids (`node a`, `bitfield x`, `table t`) are required
+and exist only so other lines can reference them.
 
 Do not invent syntax — if something seems missing, compose it from the
 constructs above or tell the user. The header pins the version

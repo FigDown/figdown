@@ -1,0 +1,21 @@
+figdown 0.1 block
+title "Entity-relationship skeleton: orders domain"
+
+# Blocks-first ERD pattern:
+#   entity = node; attributes = label lines (\n-separated)
+#   first label line = entity name, subsequent lines = attribute list
+#   PK/FK noted as plain text in the attribute list
+#   relationships = edges with inline verb and endpoint cardinality labels
+
+node customer "Customer\n---\nPK customer_id\nname\nemail" shape=rounded color=#dbeafe
+node order    "Order\n---\nPK order_id\nFK customer_id\nordered_at\nstatus"    shape=rounded color=#dcfce7
+node item     "Item\n---\nPK item_id\nname\nunit_price"                        shape=rounded color=#fef9c3
+node order_line "OrderLine\n---\nPK FK order_id\nPK FK item_id\nqty\nline_total" shape=rounded color=#f3e8ff
+
+flow right
+rank customer order
+
+# relationships: cardinality at each endpoint, verb on the line
+edge customer [1] -[places]-> [N] order
+edge order    [1] -[contains]-> [N] order_line
+edge item     [1] -[appears in]-> [N] order_line
