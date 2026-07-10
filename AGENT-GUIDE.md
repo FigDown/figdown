@@ -70,7 +70,8 @@ Stability rules while editing:
 ```figdown
 figdown 0.1 <template>      # REQUIRED first line; template ∈
                             # block|topology|flowchart|bitfield|table|wave
-title "..."                 # optional; "\n" in quotes = line break
+title "..."                 # optional, takes the rest of the line;
+                            # escapes in quotes: \n \" \\ only
 
 # core scene (block / topology / flowchart)
 node a "Label" [shape=rounded|circle|ellipse|cloud|diamond|cylinder]
@@ -98,9 +99,11 @@ table t "Title"
 | A | B |
 |---|:-:|
 | 1 | 2 |
-cell 1,2 color=#hex          # row 0 = bottom header tier
+colw auto 25%                # optional column widths (auto | px | %)
+cell 1,2 color=#hex          # data rows 1-based; header tiers h1..hN top-down
+cell h1,1 color=#hex         # never annotate a merged-away cell — use the anchor
 cell 1 highlight
-plot t level=40              # X-Y-Z bars from the table's numeric cells
+plot t level=40              # EXPERIMENTAL: X-Y-Z bars from numeric cells
 
 # wave (WaveDrom-style lanes; p clock, 0/1, x undef, = data, . continue)
 wave w "Title"

@@ -68,3 +68,20 @@ Change:  `fill` range became positional.
 Rule:    `fill in=<t> from=0% to=<b>%` → `fill <b>% in=<t>`;
          `fill in=<t> from=<a>% to=<b>%` (a>0) → `fill <a>-<b>% in=<t>`.
 Example: `fill in=pool from=0% to=15%` → `fill 15% in=pool`
+
+## 0.1-dev.6 → 0.1-dev.7  (2026-07-10, review A-4/F-2)
+Change:  table cell addressing — row `0` (bottom header tier) retired;
+         header tiers now address as `h1..hN` **top-down**. Data-row
+         addressing (1-based below the separator) is unchanged.
+Rule:    with N = the table's header-tier count:
+         `cell 0,<c> …` → `cell hN,<c> …` (0 was the *bottom* tier);
+         other header tiers were previously unaddressable — no other
+         rewrites exist.
+Example: (two-tier header) `cell 0,1 color=#eee` → `cell h2,1 color=#eee`
+
+## 0.1-dev.7 → 0.1-dev.8  (2026-07-10, review B-3)
+Change:  `zone` (layout-tier hint, accepted but never acted on) removed
+         from the language; the keyword is no longer registered.
+Rule:    delete every line matching `^\s*zone\b`. No semantic loss —
+         the directive had no defined rendering.
+Example: `zone left ingress` → (line deleted)

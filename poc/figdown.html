@@ -110,7 +110,13 @@ function tokenize(line){
     if(line[i]==='"'){
       let j=i+1, s='';
       while(j<line.length && line[j]!=='"'){
-        if(line[j]==='\\'&&line[j+1]==='n'){ s+='\n'; j+=2; continue; }  // "\n" = line break
+        if(line[j]==='\\'){
+          const e=line[j+1];
+          if(e==='n'){ s+='\n'; j+=2; continue; }
+          if(e==='"'){ s+='"'; j+=2; continue; }
+          if(e==='\\'){ s+='\\'; j+=2; continue; }
+          return {error:'unknown escape "\\'+(e||'')+'" (allowed: \\n \\" \\\\)'};
+        }
         s+=line[j]; j++;
       }
       if(j>=line.length) return {error:'unterminated string'};
@@ -121,7 +127,13 @@ function tokenize(line){
         if(line[j]==='"'){                        // key="value with spaces"
           j++;
           while(j<line.length && line[j]!=='"'){
-            if(line[j]==='\\'&&line[j+1]==='n'){ s+='\n'; j+=2; continue; }
+            if(line[j]==='\\'){
+              const e=line[j+1];
+              if(e==='n'){ s+='\n'; j+=2; continue; }
+              if(e==='"'){ s+='"'; j+=2; continue; }
+              if(e==='\\'){ s+='\\'; j+=2; continue; }
+              return {error:'unknown escape "\\'+(e||'')+'" (allowed: \\n \\" \\\\)'};
+            }
             s+=line[j]; j++;
           }
           if(j>=line.length) return {error:'unterminated string'};
@@ -232,7 +244,7 @@ function parse(text){
     } else if(kw==='figdown'){ err(n,'duplicate version header'); continue; }
 
     // typed-block children
-    if(cur && ['field','wrap','cell','signal','gap'].includes(kw)){
+    if(cur && ['field','wrap','cell','colw','signal','gap'].includes(kw)){
       if(cur.type==='bitfield' && kw==='field'){
         // Compact form (C bit-field convention): field F1:16,F2:8 SYN:1 ...
         // — bare name:width items separated by commas and/or spaces, no
@@ -263,19 +275,36 @@ function parse(text){
         for(const it of parsed) cur.fields.push({name:it.name,w:it.w,optional:false,line:n});
       } else if(cur.type==='bitfield' && kw==='wrap'){
         cur.fields.push({wrap:true,line:n});
+      } else if(cur.type==='table' && kw==='colw'){
+        if(cur.colw){ err(n,'duplicate colw'); continue; }
+        const vals=pos.slice(1);
+        if(!vals.length){ err(n,'colw needs one width per column (auto | <px> | <n>%)'); continue; }
+        let badw=null;
+        const parsed=vals.map(v=>{
+          if(v==='auto') return {t:'auto'};
+          let m=/^(\d+(?:\.\d+)?)px$/.exec(v)||/^(\d+(?:\.\d+)?)$/.exec(v);
+          if(m) return {t:'px',v:+m[1]};
+          m=/^(\d+(?:\.\d+)?)%$/.exec(v);
+          if(m) return {t:'pct',v:+m[1]};
+          badw='bad width "'+v+'" (auto | <px> | <n>%)'; return null;
+        });
+        if(badw){ err(n,badw); continue; }
+        cur.colw={vals:parsed,line:n};
       } else if(cur.type==='table' && kw==='cell'){
-        // cell <r>,<c> color=…   (r=0 bottom header tier, data rows 1-based)
-        // cell <r> highlight     (whole-row highlight)
-        const rc=/^(\d+)(?:,(\d+))?$/.exec(pos[1]||'');
+        // cell h<k>,<c> | <r>,<c> color=…  (h1..hN = header tiers top-down;
+        // data rows 1-based below the separator);  cell <r> highlight
+        const rc=/^(h?)(\d+)(?:,(\d+))?$/.exec(pos[1]||'');
         const hl=pos.includes('highlight');
-        if(!rc||(!opts.color&&!hl)){ err(n,'cell needs <row>[,<col>] with color=… or highlight'); continue; }
-        if(hl&&rc[2]===undefined){
+        if(!rc||(!opts.color&&!hl)){ err(n,'cell needs [h]<row>[,<col>] with color=… or highlight'); continue; }
+        if(!rc[1]&&+rc[2]===0){ err(n,'row 0 is retired — address header tiers as h1..hN (top-down)'); continue; }
+        if(hl&&rc[3]===undefined){
+          if(rc[1]){ err(n,'highlight applies to data rows only'); continue; }
           cur.rowmarks=cur.rowmarks||[];
-          cur.rowmarks.push({r:+rc[1],line:n});
-        } else if(rc[2]!==undefined&&opts.color){
+          cur.rowmarks.push({r:+rc[2],line:n});
+        } else if(rc[3]!==undefined&&opts.color){
           cur.marks=cur.marks||[];
-          cur.marks.push({r:+rc[1],c:+rc[2],color:opts.color,line:n});
-        } else { err(n,'cell needs <row>,<col> color=… or <row> highlight'); }
+          cur.marks.push({hdr:!!rc[1],r:+rc[2],c:+rc[3],color:opts.color,line:n});
+        } else { err(n,'cell needs [h]<row>,<col> color=… or <row> highlight'); }
       } else if(cur.type==='wave' && kw==='signal'){
         const name=pos[1], lane=pos[2];
         if(!name||!lane){ err(n,'signal needs <name> <lane>'); continue; }
@@ -291,7 +320,13 @@ function parse(text){
     cur=null; // any other keyword closes the block
 
     switch(kw){
-      case 'title': doc.title=pos[1]||''; break;
+      case 'title': {
+        // rest-of-line: `title TCP Header` == `title "TCP Header"` (A-1)
+        let t=raw.trim().replace(/^title\s*/,'');
+        const qm=/^"([\s\S]*)"$/.exec(t);
+        if(qm) t=qm[1].replace(/\\n/g,'\n').replace(/\\"/g,'"').replace(/\\\\/g,'\\');
+        doc.title=t; break;
+      }
       case 'layer': {
         const id=pos[1];
         if(!id||!ID_RE.test(id)){ err(n,'layer needs an id'); break; }
@@ -305,9 +340,11 @@ function parse(text){
         if(!id||!ID_RE.test(id)){ err(n,'node needs an id'); break; }
         if(nodeIds.has(id)||groupIds.has(id)){ err(n,'duplicate id "'+id+'"'); break; }
         if(opts.kind!==undefined){ err(n,'kind= has been renamed: use shape= (geometric; the label text carries the device semantics)'); break; }
+        if(opts.w!==undefined||opts.h!==undefined){ err(n,'node does not take w=/h= — use a size line'); break; }
         const shape=opts.shape||'box';
         if(!SHAPES.includes(shape)){ err(n,'unknown shape "'+shape+'" ('+SHAPES.join('|')+')'); break; }
         nodeIds.add(id);
+        if(pos.length>3){ err(n,'unexpected argument "'+pos[3]+'"'); break; }
         const nstyle=opts.style||'solid';
         if(!['solid','dashed','dotted'].includes(nstyle)){ err(n,'style must be solid|dashed|dotted'); break; }
         doc.nodes.push({id,label:pos[2]||id,shape,color:opts.color,stroke:opts.stroke,
@@ -318,6 +355,7 @@ function parse(text){
         const id=pos[1];
         if(!id||!ID_RE.test(id)){ err(n,'group needs an id'); break; }
         if(nodeIds.has(id)||groupIds.has(id)){ err(n,'duplicate id "'+id+'"'); break; }
+        if(pos.length>3){ err(n,'unexpected argument "'+pos[3]+'"'); break; }
         groupIds.add(id);
         let ggap;
         if(opts.gap!==undefined){
@@ -338,6 +376,7 @@ function parse(text){
       }
       case 'flow': {
         if(!['right','down','left','up'].includes(pos[1])){ err(n,'flow needs right|down|left|up'); break; }
+        if(pos.length>2){ err(n,'unexpected argument "'+pos[2]+'"'); break; }
         doc.flow=pos[1]; break;
       }
       case 'rank': {
@@ -405,10 +444,6 @@ function parse(text){
         doc.fills.push({target:opts['in'],from,to,dir:fdir,color:opts.color||'#e5e7eb',line:n});
         break;
       }
-      case 'zone': {
-        if(!['left','right','top','bottom'].includes(pos[1])||!pos[2]){ err(n,'zone needs <left|right|top|bottom> <group-id>'); break; }
-        break; // accepted; PoC does not act on zone yet
-      }
       case 'pin': {
         const id=pos[1], at=opts.at;
         const m=at&&/^(-?[\d.]+),(-?[\d.]+)$/.exec(at);
@@ -470,8 +505,11 @@ function parse(text){
       errs.push('Line '+f.line+': unknown target "'+f.target+'" for fill');
   for(const t of doc.trunks) for(const [a,b] of t.pairs){
     if(!nodeIds.has(a)||!nodeIds.has(b)){ errs.push('Line '+t.line+': unknown endpoint in "'+a+'--'+b+'"'); continue; }
-    if(!doc.edges.some(e=>(e.a===a&&e.b===b)||(e.a===b&&e.b===a)))
+    const matches=doc.edges.filter(e=>(e.a===a&&e.b===b)||(e.a===b&&e.b===a)).length;
+    if(matches===0)
       errs.push('Line '+t.line+': no edge between "'+a+'" and "'+b+'" for bundle member');
+    else if(matches>1)
+      errs.push('Line '+t.line+': "'+a+'--'+b+'" is ambiguous ('+matches+' parallel edges); parallel edges are out of scope for v0.1');
   }
   for(const id in doc.pins) if(!nodeIds.has(id)&&!groupIds.has(id))
     errs.push('Line '+doc.pins[id].line+': pin of unknown id "'+id+'"');
@@ -491,9 +529,18 @@ function parse(text){
             { errs.push('Line '+b.line+': plot data must be numeric (row value "'+r.cells[c].v+'")'); break; }
       }
     }
+    if(b.type==='table'&&b.colw&&b.colw.vals.length!==b.cols.length)
+      errs.push('Line '+b.colw.line+': colw has '+b.colw.vals.length+' widths, expected '+b.cols.length);
     if(b.type==='table'&&b.marks) for(const mk of b.marks){
-      if(mk.r>b.rows.length||mk.c<1||mk.c>b.cols.length)
-        errs.push('Line '+mk.line+': cell '+mk.r+','+mk.c+' out of range');
+      const H=b.heads.length;
+      const inRange = mk.hdr ? (mk.r>=1&&mk.r<=H) : (mk.r>=1&&mk.r<=b.rows.length);
+      if(!inRange||mk.c<1||mk.c>b.cols.length){
+        errs.push('Line '+mk.line+': cell '+(mk.hdr?'h':'')+mk.r+','+mk.c+' out of range'); continue;
+      }
+      // merged-away targets must be rejected: annotations target the anchor
+      const cells = mk.hdr ? b.heads[mk.r-1] : b.rows[mk.r-1].cells;
+      if(cells[mk.c-1].m)
+        errs.push('Line '+mk.line+': cell '+(mk.hdr?'h':'')+mk.r+','+mk.c+' is merged away — annotate the anchor cell');
     }
     if(b.type==='table'&&b.rowmarks) for(const mk of b.rowmarks){
       if(mk.r<1||mk.r>b.rows.length)
@@ -838,9 +885,16 @@ function renderTable(t,y0){
     for(const r of t.rows) if(!r.cells[i].m) w=Math.max(w,tw(r.cells[i].v));
     return w;
   });
+  if(t.colw){                       // colw: auto = natural, px fixed, % of natural total
+    const base=widths.reduce((a,b2)=>a+b2,0);
+    t.colw.vals.forEach((v,i)=>{
+      if(v.t==='px') widths[i]=v.v;
+      else if(v.t==='pct') widths[i]=v.v/100*base;
+    });
+  }
   const totalW=widths.reduce((a,b)=>a+b,0);
-  // cell marks: r=0 addresses the bottom header tier, r>=1 the data rows
-  const markOf=(r,c)=>(t.marks||[]).find(mk=>(mk.r===0?H-1:H-1+mk.r)===r&&mk.c===c+1);
+  // cell marks: h1..hN address header tiers top-down, r>=1 the data rows
+  const markOf=(r,c)=>(t.marks||[]).find(mk=>(mk.hdr?mk.r-1:H+mk.r-1)===r&&mk.c===c+1);
   const yTop=y+4;
   for(let r=0;r<grid.length;r++){
     for(let c=0;c<grid[r].length;c++){
@@ -1333,7 +1387,7 @@ $('src').addEventListener('input',refresh);
 let lastSVG='', lastMeta=null, lastPad={x:0,y:0}, lastDoc=null;
 
 // ---- direct manipulation: every GUI action is a text edit ----
-const SCENE_KW=/^(figdown|title|node|group|edge|layer|flow|rank|zone|pin|size)\b/;
+const SCENE_KW=/^(figdown|title|node|group|edge|layer|flow|rank|pin|size|line|fill|bundle)\b/;
 const LAYOUT_MARK='# --- layout (materialized by the editor; delete freely, structure above is complete) ---';
 function applyPins(pins){ // pins: array of [id, px, py] — one text update, one refresh
   const lines=$('src').value.split('\n');

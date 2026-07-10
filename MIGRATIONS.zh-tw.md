@@ -64,3 +64,19 @@ Change:  `fill` 範圍改為位置參數。
 Rule:    `fill in=<t> from=0% to=<b>%` → `fill <b>% in=<t>`；
          `fill in=<t> from=<a>% to=<b>%`（a>0）→ `fill <a>-<b>% in=<t>`。
 Example: `fill in=pool from=0% to=15%` → `fill 15% in=pool`
+
+## 0.1-dev.6 → 0.1-dev.7（2026-07-10，review A-4/F-2）
+Change:  表格儲存格定址——第 `0` 列（最底層表頭）退役；表頭層
+         改以 `h1..hN` 定址、**由上往下**。資料列定址（分隔列
+         以下 1 起算）不變。
+Rule:    設 N = 該表格的表頭層數：
+         `cell 0,<c> …` → `cell hN,<c> …`（0 過去指*最底*層）；
+         其他表頭層過去無法定址——不存在其他改寫。
+Example: （兩層表頭）`cell 0,1 color=#eee` → `cell h2,1 color=#eee`
+
+## 0.1-dev.7 → 0.1-dev.8（2026-07-10，review B-3）
+Change:  `zone`（排版層提示，僅接受、從未作用）自語言移除；
+         關鍵字不再註冊。
+Rule:    刪除所有符合 `^\s*zone\b` 的行。無語意損失——該指令
+         從未定義任何渲染行為。
+Example: `zone left ingress` →（刪行）

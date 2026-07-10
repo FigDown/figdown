@@ -945,6 +945,28 @@ build-svg → commit pair), stability rules, a syntax cheat sheet, and
 the migration-based upgrade path. The convention is also stated in the
 README as the project's recommended usage.
 
+### R33 — External review adopted item-by-item (2026-07-10)
+
+**Original**: A collaborator's RFC-style review checklist of the
+template/syntax draft was evaluated item by item; everything worth
+adopting was formalized into the spec and the PoC.
+
+**Interpretation**: Adopted and landed: title consumes the rest of its
+line; the escape set is closed (`\n \" \\`, unknown escape = error);
+case-sensitivity, hash-over-exact-bytes, and extra-positional-args-
+are-errors are stated as lexical rules; templates narrowed to
+defaults-only (D8); `zone` removed (0.1-dev.8); table header
+addressing moved to `h1..hN` top-down (0.1-dev.7); `colw` added;
+annotations on merged-away cells rejected; bundle member references
+must be unambiguous; the wave alphabet is frozen; `plot` reclassified
+experimental; `w=`/`h=` on nodes rejected (size is the one mechanism);
+tiered conformance (parser MUST / same-renderer MUST / cross-renderer
+SHOULD); keyword registry + strict/lenient modes + `x-` extension
+namespace; informative ABNF sketch. Rejected: indented block sugar
+(OQ-S1, second containment syntax), edge label position hints (OQ-S4,
+pure presentation). The reviewer's files themselves are not committed;
+adopted substance lands in project-maintained documents only.
+
 ### Open question OQ1 — Build on D2 vs. a new language (2026-07-02)
 
 D2 is close enough that R11 (survey before invent) obliges a deep read of
@@ -1068,3 +1090,18 @@ stability); (2) invisible characters carrying semantics is a classic
 failure mode (Makefile tabs) and a hallucination source for LLMs.
 Per-column stays GFM colons; if per-cell alignment is ever needed
 (census: 1.4%), it will be `cell r,c align=left|right|center`.
+
+### D8 — Templates are defaults-only (2026-07-10)
+
+Review outcome (R33), narrowing R16: the `figdown 0.1 <template>`
+header stays, but a template selects **defaults and a validation
+profile only** — default flow, default edge directedness, default
+units, each tuned to that figure type's census statistics. A template
+MUST NOT change the core meaning of a standard directive (`node` is
+always a node, `edge` always a relationship): meaning that varies by
+template would force every reader to carry per-template semantics,
+breaking the one-core-model economy that R28 protects. A new template
+still requires corpus evidence AND semantic impossibility (R28). The
+header also carries version-compatibility rules: unknown major version
+rejected, unknown minor version parses leniently, unknown template
+rejected in strict mode.

@@ -8,7 +8,7 @@ table ta "Group Matrix — two-tier header with label column"
 | Group B  | x     | x     |       |       |
 | ^^       |       | x     | x     | x     |
 | Group C  | x     | x     | x     | x     |
-cell 0,2 color=#dbeafe
-cell 0,4 color=#d1fae5
+cell h2,2 color=#dbeafe
+cell h2,4 color=#d1fae5
 cell 1 highlight
 cell 4 highlight

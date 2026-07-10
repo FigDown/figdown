@@ -63,7 +63,8 @@
 ```figdown
 figdown 0.1 <template>      # 必要首行；template ∈
                             # block|topology|flowchart|bitfield|table|wave
-title "..."                 # 選用；引號內 "\n" = 換行
+title "..."                 # 選用，吃掉整行剩餘內容；
+                            # 引號內跳脫僅限 \n \" \\
 
 # 核心場景（block / topology / flowchart）
 node a "Label" [shape=rounded|circle|ellipse|cloud|diamond|cylinder]
@@ -91,9 +92,11 @@ table t "Title"
 | A | B |
 |---|:-:|
 | 1 | 2 |
-cell 1,2 color=#hex          # 第 0 列 = 最底層表頭
+colw auto 25%                # 選用欄寬（auto | px | %）
+cell 1,2 color=#hex          # 資料列 1 起算；表頭層 h1..hN 由上往下
+cell h1,1 color=#hex         # 勿標註被合併掉的格——標註錨點格
 cell 1 highlight
-plot t level=40              # 由表格數值繪製 X-Y-Z 長條
+plot t level=40              # 實驗性：由表格數值繪製 X-Y-Z 長條
 
 # wave（WaveDrom 式軌道；p 時脈、0/1、x 未定、= 資料、. 延續）
 wave w "Title"
