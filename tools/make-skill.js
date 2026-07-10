@@ -11,7 +11,7 @@ const DEST = path.join(ROOT, 'skill', 'figdown');
 
 fs.mkdirSync(DEST, { recursive: true });
 for (const [src, dst] of [
-  [path.join(ROOT, 'poc', 'figdown.html'), path.join(DEST, 'figdown.html')],
+  [path.join(ROOT, 'editor', 'figdown.html'), path.join(DEST, 'figdown.html')],
   [path.join(__dirname, 'build-svg.js'), path.join(DEST, 'build-svg.js')],
 ]) {
   fs.copyFileSync(src, dst);

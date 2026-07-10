@@ -3,8 +3,8 @@
 > Audience: **AI agents** asked to create or maintain figures in
 > Markdown documentation using FigDown. This file is self-contained —
 > a fresh session pointed here can start working. Full normative
-> details live in [syntax-draft.md](syntax-draft.md); version changes
-> in [MIGRATIONS.md](MIGRATIONS.md).
+> details live in [syntax-draft.md](spec/syntax-draft.md); version changes
+> in [MIGRATIONS.md](spec/MIGRATIONS.md).
 >
 > 繁體中文版：[AGENT-GUIDE.zh-tw.md](AGENT-GUIDE.zh-tw.md)
 
@@ -139,5 +139,5 @@ directives are valid. `flow` is document-level. Ids (`node a`,
 
 The header pins the version (`figdown 0.1`). When the spec moves, each
 change ships a mechanical rewrite rule in
-[MIGRATIONS.md](MIGRATIONS.md); upgrade a document by applying the
+[MIGRATIONS.md](spec/MIGRATIONS.md); upgrade a document by applying the
 entries in order. Never silently mix syntax generations in one file.

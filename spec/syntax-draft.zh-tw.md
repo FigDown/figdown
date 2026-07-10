@@ -1,10 +1,10 @@
 # FigDown 語法 — 草案 v0.0（討論稿）
 
 > 狀態：**標準前的草圖**，供討論，2026-07-02。依據
-> [requirements-notes.zh-tw.md](requirements-notes.zh-tw.md)（R0–R15、
+> [requirements-notes.zh-tw.md](../design/requirements-notes.zh-tw.md)（R0–R15、
 > D1–D3）推導。此處沒有任何內容是定案。圖型優先順序依已完成的圖型
 > 普查（774 份文件、1.2 萬張圖）定案——見
-> [census.zh-tw.md](census.zh-tw.md)：下方 v0.1 範圍約覆蓋語料中
+> [census.zh-tw.md](../design/census.zh-tw.md)：下方 v0.1 範圍約覆蓋語料中
 > 可分類圖形的 95%。
 >
 > English version: [syntax-draft.md](syntax-draft.md)
@@ -125,7 +125,7 @@ AI 先驗知識，R11/R35）。`A <- B` 畫出來與 `B -> A` 相同；這個
 靠頭——各自寫在它於圖面出現的位置（R22：文字是圖的一維編碼）。
 `[mid]` 標籤把運算子拆成兩半（左半 `-` 或 `<-`、右半 `-` 或
 `->`），鏡射 Mermaid 的 `A -- text --> B`。主流語言沒有任何一個
-提供超過三個位置（[prior-art.zh-tw.md](prior-art.zh-tw.md) §1）。
+提供超過三個位置（[prior-art.zh-tw.md](../design/prior-art.zh-tw.md) §1）。
 典型用途：介面標記（`e1/22.2`）、基數（`1`/`N`）、端點角色。
 
 中括號內容規則：
@@ -372,7 +372,7 @@ plot hm level=40        # hm 為 table id：列→X、欄→Y、儲存格→Z
 就是核心場景模型（§2）；flowchart（8.3%，第 4）與 topology（5.0%）
 也收攏進同一模型。普查定案的算術：核心場景（37.6%）
 + bitfield（23.7%）+ table（9.6%）+ wave（7.2%）= **非模板圖出現
-次數的 78%，約等於可分類圖形的 95%**（[census.zh-tw.md](census.zh-tw.md)）。
+次數的 78%，約等於可分類圖形的 95%**（[census.zh-tw.md](../design/census.zh-tw.md)）。
 
 ## 5. 展現屬性（R5）
 
@@ -434,12 +434,12 @@ pulse r1                                # 瞬時高亮
 - ~~OQ-S5：多圖文件~~——已定案：一個 `.fd` 產出一個 `.svg` 產物；
   文件**可以**含多個頂層區塊，按文件順序合成。
 - ~~OQ-S6：與 D2 的關係~~——資訊性附錄：
-  [prior-art.zh-tw.md](prior-art.zh-tw.md) §3。
+  [prior-art.zh-tw.md](../design/prior-art.zh-tw.md) §3。
 - ~~OQ-S7：edge 標籤~~——**已定案（2026-07-10）**：行內標籤、
   三個有意義的位置，`edge A [tail] <-[mid]-> [head] B`（§2.3）；
   `<-` 加入運算子集；`label=`／`taillabel=`／`headlabel=` 退役
   （migration 0.1-dev.9）。調查：
-  [prior-art.zh-tw.md](prior-art.zh-tw.md) §1。
+  [prior-art.zh-tw.md](../design/prior-art.zh-tw.md) §1。
 
 ## 10. 關鍵字註冊表、一致性模式、擴充
 

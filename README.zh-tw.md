@@ -89,24 +89,24 @@ SVG 給人看；`source:` 註腳指向 `.fd`——它是圖的唯一真相來源
 
 **需求與設計階段。** 目前還沒有可安裝的東西。現有文件：
 
-- [requirements-notes.zh-tw.md](requirements-notes.zh-tw.md) —
+- [requirements-notes.zh-tw.md](design/requirements-notes.zh-tw.md) —
   需求記錄（R0–R15）與決議（D1–D3），英文版
-  [requirements-notes.md](requirements-notes.md)
-- [syntax-draft.zh-tw.md](syntax-draft.zh-tw.md) — 語法草案 v0.0
-  （討論階段），英文版 [syntax-draft.md](syntax-draft.md)
+  [requirements-notes.md](design/requirements-notes.md)
+- [syntax-draft.zh-tw.md](spec/syntax-draft.zh-tw.md) — 語法草案 v0.0
+  （討論階段），英文版 [syntax-draft.md](spec/syntax-draft.md)
 - [AGENT-GUIDE.zh-tw.md](AGENT-GUIDE.zh-tw.md) — 給 AI agent 的
   自足指南（以 FigDown 維護圖片），英文版 [AGENT-GUIDE.md](AGENT-GUIDE.md)
-- [MIGRATIONS.zh-tw.md](MIGRATIONS.zh-tw.md) — schema-migration 式
+- [MIGRATIONS.zh-tw.md](spec/MIGRATIONS.zh-tw.md) — schema-migration 式
   版本紀錄：每次語法變更附機械式改寫規則，英文版
-  [MIGRATIONS.md](MIGRATIONS.md)
-- [census.zh-tw.md](census.zh-tw.md) — 對 774 份真實文件語料的圖型
-  普查；v0.1 範圍與優先順序的數據依據，英文版 [census.md](census.md)
-- [prior-art.zh-tw.md](prior-art.zh-tw.md) — 主流圖語言慣例的
+  [MIGRATIONS.md](spec/MIGRATIONS.md)
+- [census.zh-tw.md](design/census.zh-tw.md) — 對 774 份真實文件語料的圖型
+  普查；v0.1 範圍與優先順序的數據依據，英文版 [census.md](design/census.md)
+- [prior-art.zh-tw.md](design/prior-art.zh-tw.md) — 主流圖語言慣例的
   資訊性調查（edge 標籤、ERD、與 D2 的關係），以採用度加權，
-  英文版 [prior-art.md](prior-art.md)
+  英文版 [prior-art.md](design/prior-art.md)
 - [examples/index.zh-tw.md](examples/index.zh-tw.md) — 範例藝廊：
   真實圖形以 `.fd`+`.svg` 成對入庫（協議標頭先行）
-- [poc/figdown.html](poc/figdown.html) — 編輯器：用任何瀏覽器開啟，
+- [editor/figdown.html](editor/figdown.html) — 編輯器：用任何瀏覽器開啟，
   左邊改文字、右邊即時得到確定性的 SVG（核心場景 + bitfield +
   table + wave）。可開啟/儲存 `.fd` 檔（Ctrl+S 存回同一檔案）、
   undo/redo、自動儲存、draw.io 式直接操作——每個 GUI 動作都是

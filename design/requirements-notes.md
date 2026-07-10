@@ -916,7 +916,7 @@ keep a conversion record, so that upgrading v1→v5 means applying the
 v1→v2→…→v5 migration specs and a v1 document converts to v5 syntax
 correctly.
 
-**Interpretation**: [MIGRATIONS.md](MIGRATIONS.md) established — every
+**Interpretation**: [MIGRATIONS.md](../spec/MIGRATIONS.md) established — every
 change ships an entry with a **mechanical rewrite rule** (non-mechanical
 steps must be flagged). The six draft-period breaking changes (pin px,
 GFM tables, shape=, bundle, line/fill split, positional fill) are
@@ -937,7 +937,7 @@ read the `.fd` for meaning; `.fd` content is never pasted into the
 .md. This is the best strategy while `.fd` lacks native MD-viewer
 rendering (mermaid-style).
 
-**Interpretation**: [AGENT-GUIDE.md](AGENT-GUIDE.md) established — a
+**Interpretation**: [AGENT-GUIDE.md](../AGENT-GUIDE.md) established — a
 self-contained, token-lean (R7) entry point covering the model
 (HTML+CSS analogy), the reading rule (.fd first, SVG metadata as
 fallback with SHA-256 staleness check), the embedding convention

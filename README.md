@@ -102,26 +102,26 @@ file alone can always be reopened and edited. See
 
 **Requirements & design phase.** Nothing to install yet. Current documents:
 
-- [requirements-notes.md](requirements-notes.md) — the requirements log
+- [requirements-notes.md](design/requirements-notes.md) — the requirements log
   (R0–R15) and decisions (D1–D3), also in
-  [繁體中文](requirements-notes.zh-tw.md)
-- [syntax-draft.md](syntax-draft.md) — syntax draft v0.0 (discussion
-  stage), also in [繁體中文](syntax-draft.zh-tw.md)
+  [繁體中文](design/requirements-notes.zh-tw.md)
+- [syntax-draft.md](spec/syntax-draft.md) — syntax draft v0.0 (discussion
+  stage), also in [繁體中文](spec/syntax-draft.zh-tw.md)
 - [AGENT-GUIDE.md](AGENT-GUIDE.md) — the self-contained guide for AI
   agents maintaining figures with FigDown, also in
   [繁體中文](AGENT-GUIDE.zh-tw.md)
-- [MIGRATIONS.md](MIGRATIONS.md) — schema-migration-style version log:
+- [MIGRATIONS.md](spec/MIGRATIONS.md) — schema-migration-style version log:
   every syntax change ships a mechanical rewrite rule, also in
-  [繁體中文](MIGRATIONS.zh-tw.md)
-- [census.md](census.md) — figure-type census over a real 774-document
+  [繁體中文](spec/MIGRATIONS.zh-tw.md)
+- [census.md](design/census.md) — figure-type census over a real 774-document
   corpus; the empirical basis for v0.1 scope and priorities, also in
-  [繁體中文](census.zh-tw.md)
-- [prior-art.md](prior-art.md) — informative survey of mainstream
+  [繁體中文](design/census.zh-tw.md)
+- [prior-art.md](design/prior-art.md) — informative survey of mainstream
   diagram-language conventions (edge labels, ERD, D2 relationship),
-  weighted by adoption, also in [繁體中文](prior-art.zh-tw.md)
+  weighted by adoption, also in [繁體中文](design/prior-art.zh-tw.md)
 - [examples/index.md](examples/index.md) — the example gallery: real
   figures as committed `.fd`+`.svg` pairs (protocol headers first)
-- [poc/figdown.html](poc/figdown.html) — the editor: open in any
+- [editor/figdown.html](editor/figdown.html) — the editor: open in any
   browser, edit text on the left, get a deterministic SVG on the right
   (core scene + bitfield + table + wave). Opens/saves `.fd` files
   (Ctrl+S writes back to the same file), undo/redo, autosave,

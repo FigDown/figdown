@@ -6,7 +6,7 @@
 > 讀者」的實際樣貌。
 >
 > 分區對應 template 家族，依圖型普查佔比排序
-> （[census.zh-tw.md](../census.zh-tw.md)）。
+> （[census.zh-tw.md](../design/census.zh-tw.md)）。
 >
 > English version: [index.md](index.md)
 >
@@ -115,5 +115,5 @@ unit 的欄位自動延續。
 
 ---
 
-後續梯次見[藝廊規劃](../gallery-plan.zh-tw.md)：完整標頭集（E1）、
+後續梯次見[藝廊規劃](../design/gallery-plan.zh-tw.md)：完整標頭集（E1）、
 協議協商時序（E2）、演算法與資料結構圖（E3）、含數學註記的圖（E4）。

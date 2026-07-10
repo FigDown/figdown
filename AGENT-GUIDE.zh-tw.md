@@ -2,8 +2,8 @@
 
 > 對象：被要求以 FigDown 建立或維護 Markdown 文件中圖片的
 > **AI agents**。本檔自足——新的 session 指到這裡即可開工。完整
-> 規範見 [syntax-draft.zh-tw.md](syntax-draft.zh-tw.md)；版本變更見
-> [MIGRATIONS.zh-tw.md](MIGRATIONS.zh-tw.md)。
+> 規範見 [syntax-draft.zh-tw.md](spec/syntax-draft.zh-tw.md)；版本變更見
+> [MIGRATIONS.zh-tw.md](spec/MIGRATIONS.zh-tw.md)。
 >
 > English version: [AGENT-GUIDE.md](AGENT-GUIDE.md)
 
@@ -127,5 +127,5 @@ signal d   x.==..x. labels="A,B"
 ## 6. 版本
 
 標頭釘住版本（`figdown 0.1`）。規格演進時，每次變更在
-[MIGRATIONS.zh-tw.md](MIGRATIONS.zh-tw.md) 附機械式改寫規則；升級
+[MIGRATIONS.zh-tw.md](spec/MIGRATIONS.zh-tw.md) 附機械式改寫規則；升級
 文件 = 依序套用條目。永不在同一檔案默默混用不同世代的語法。

@@ -6,7 +6,7 @@
 > text editor to see the "one source, two readers" idea in action.
 >
 > Sections mirror the template families, ordered by their share in the
-> figure-type census ([census.md](../census.md)).
+> figure-type census ([census.md](../design/census.md)).
 >
 > 繁體中文版：[index.zh-tw.md](index.zh-tw.md)
 >
@@ -117,6 +117,6 @@ No `layer` directives at all: line order is the layer. Seven concentric
 
 ---
 
-More waves per the [gallery plan](../gallery-plan.md): the full header
+More waves per the [gallery plan](../design/gallery-plan.md): the full header
 set (E1), protocol negotiation sequences (E2), algorithm & data-structure
 figures (E3), and math-annotated figures (E4).

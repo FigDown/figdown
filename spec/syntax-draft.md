@@ -1,9 +1,9 @@
 # FigDown Syntax — Draft v0.0 (discussion draft)
 
 > Status: **pre-standard sketch** for discussion, 2026-07-02. Derived from
-> [requirements-notes.md](requirements-notes.md) (R0–R15, D1–D3). Nothing
+> [requirements-notes.md](../design/requirements-notes.md) (R0–R15, D1–D3). Nothing
 > here is frozen. Type priorities follow the completed figure-type census
-> over a 774-document / 12k-image corpus — see [census.md](census.md):
+> over a 774-document / 12k-image corpus — see [census.md](../design/census.md):
 > the v0.1 scope below covers ~95% of the corpus's classifiable diagrams.
 >
 > 繁體中文版：[syntax-draft.zh-tw.md](syntax-draft.zh-tw.md)
@@ -141,7 +141,7 @@ the tail, on the line, near the head — each written where it appears
 in the figure (R22: text is a 1-D encoding of the figure). A `[mid]`
 label splits the operator into halves (left `-` or `<-`, right `-` or
 `->`), mirroring Mermaid's `A -- text --> B`. No mainstream language
-offers more than three positions ([prior-art.md](prior-art.md) §1).
+offers more than three positions ([prior-art.md](../design/prior-art.md) §1).
 Typical uses: interface tags (`e1/22.2`), cardinalities (`1`/`N`),
 endpoint roles.
 
@@ -430,7 +430,7 @@ block** — it is the core scene model (§2) plus `kind`s; flowchart
 (8.3%, #4) and topology (5.0%) fold into the same model. Final census
 arithmetic: core scene (37.6%) + bitfield (23.7%) + table (9.6%) +
 wave (7.2%) = **78% of all non-boilerplate figure occurrences, ≈95% of
-classifiable diagrams** ([census.md](census.md)).
+classifiable diagrams** ([census.md](../design/census.md)).
 
 ## 5. Presentation attributes (R5)
 
@@ -500,12 +500,12 @@ transient). Deferred until the static core ships.
   `.svg` artifact; a document MAY contain multiple top-level blocks,
   composed in document order.
 - ~~OQ-S6: relationship to D2~~ — informative appendix:
-  [prior-art.md](prior-art.md) §3.
+  [prior-art.md](../design/prior-art.md) §3.
 - ~~OQ-S7: edge labels~~ — **resolved (2026-07-10)**: inline labels at
   the three meaningful positions, `edge A [tail] <-[mid]-> [head] B`
   (§2.3); `<-` joined the operator set;
   `label=`/`taillabel=`/`headlabel=` retired (migration 0.1-dev.9).
-  Survey: [prior-art.md](prior-art.md) §1.
+  Survey: [prior-art.md](../design/prior-art.md) §1.
 
 ## 10. Keyword registry, conformance modes, extensions
 

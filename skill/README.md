@@ -35,7 +35,7 @@ framework-neutral form.
 ## Keeping the bundle fresh
 
 The engine copy in this directory is a **build artifact** regenerated
-from the single source (`poc/figdown.html`) — never edited by hand:
+from the single source (`editor/figdown.html`) — never edited by hand:
 
 ```sh
 node tools/make-skill.js

@@ -2,7 +2,7 @@
 // FigDown Stage-0 sidecar generator (R14): X.fd -> X.svg
 // Deterministic: same source -> same SVG, bit-level. The artifact embeds
 // its own source and a SHA-256 of it (spec draft section 7).
-// The engine is never forked: parser+renderer are extracted from the PoC
+// The engine is never forked: parser+renderer are extracted from the editor
 // single file at build time (the "regenerate, don't fork" rule).
 'use strict';
 const fs = require('fs');
@@ -10,12 +10,12 @@ const path = require('path');
 const crypto = require('crypto');
 
 // The engine file is looked up in order: $FIGDOWN_HTML, a co-located
-// copy (the agent-skill bundle layout), then ../poc/figdown.html (the
+// copy (the agent-skill bundle layout), then ../editor/figdown.html (the
 // repository layout).
 const ENGINE = [
   process.env.FIGDOWN_HTML,
   path.join(__dirname, 'figdown.html'),
-  path.join(__dirname, '..', 'poc', 'figdown.html'),
+  path.join(__dirname, '..', 'editor', 'figdown.html'),
 ].filter(Boolean).find(p => fs.existsSync(p));
 
 function loadEngine() {
