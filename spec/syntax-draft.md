@@ -513,10 +513,12 @@ transient). Deferred until the static core ships.
   `label=`/`taillabel=`/`headlabel=` retired (migration 0.1-dev.9).
   Survey: [prior-art.md](../design/prior-art.md) §1.
 - OQ-S8: a named **legend** mechanism for semantic colors (field
-  feedback F1/F4 — flows distinguished by color need their meaning in
-  text per §5; a legend strip would state the color→meaning map once
-  instead of labeling every edge). Needs corpus frequency + a
-  prior-art pass before the R28 gate.
+  feedback F1/F4). Prior-art survey done —
+  [prior-art.md](../design/prior-art.md) §4: no surveyed language
+  binds meaning to a class of elements machine-readably. Candidate
+  design on the table: `class <id> "<meaning>" [color=…]` +
+  `class=<id>` on elements, legend strip derived (Mermaid classDef
+  heritage). Pending: corpus frequency pass + ruling.
 - OQ-S9: **discriminated variants** in bitfields — the same bits
   reinterpreted by an external mode (field feedback F3; register maps
   do this constantly). Current standard practice: carry the condition

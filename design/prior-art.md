@@ -157,3 +157,58 @@ things, and they have different answers:
 remainder as a v0.2 exporter/interop question.
 
 **Ruling (2026-07-10)**: adopted — OQ1 closed as recommended.
+
+## 4. Legend mechanisms (feeds OQ-S8)
+
+### 4.1 What the mainstream does
+
+| Language | Legend | Machine-readable binding? |
+|---|---|---|
+| PlantUML | native `legend [left\|right\|top\|bottom\|center] … endlegend` | no — a free-text box; nothing links entries to elements |
+| D2 | `vars.d2-legend`: declare sample shapes/connections with labels and styles; the legend renders those samples | no — entries are styled *dummies*; real elements are not linked to them |
+| Mermaid | **none** (long-standing feature request; users hack legends from dummy subgraphs) | `classDef name fill:…` + `class n1,n2 name` / `:::` binds a **named style class** to elements — but no meaning text, no legend |
+| Graphviz | none (workaround: HTML-like label tables / cluster of samples) | no |
+
+### 4.2 Findings
+
+1. Every ecosystem needs legends (PlantUML and D2 shipped one; Mermaid
+   users keep asking), yet **no surveyed language binds a *meaning* to
+   a *class of elements* machine-readably** — PlantUML's is free text,
+   D2's entries are styled dummies detached from the real elements.
+2. Mermaid's `classDef`/`class` is the adoption-weighted prior art for
+   the *naming* half: a named class attached to elements, styles
+   declared once. It lacks the meaning label and the derived legend.
+3. FigDown's §5 rule ("color MUST NOT be the sole carrier of meaning")
+   currently has no in-language mechanism — authors must repeat the
+   meaning in prose or per-edge labels. That is the actual gap the
+   downstream feedback hit (three flow colors on one figure).
+
+### 4.3 Candidate design (PROPOSAL — pending corpus frequency + ruling)
+
+Bind meaning and style to a **named class**, and derive the legend —
+the semantics-first shape (R24: name the meaning, the engine owns the
+drawing convention):
+
+```figdown
+class vidp "VID_P (primary VLAN)"   color=#dc2626
+class vidc "VID_C (community VLAN)" color=#2563eb
+edge p1 -> p2 class=vidp
+edge p2 -> p3 class=vidc
+```
+
+- One `class` line = meaning text + presentation defaults, declared
+  once (Mermaid `classDef` heritage; the HTML+CSS analogy of R5 made
+  literal). `class=` on any element applies it.
+- The legend strip is **derived** — drawn automatically when classes
+  exist, like `bundle`'s ring; no coordinates, no dummy elements.
+- R37 payoff: an agent reads `class=vidp` on the edge itself — no
+  correlating raw hex colors against a side table.
+- The presentation-ignorable invariant (§5) refines naturally:
+  stripping `color=`/`style=` from a `class` line loses nothing
+  semantic; the class *name and meaning* stay.
+- v0.1 workaround, sanctioned today: a small `table` with per-cell
+  color marks serves as a legend (two lines per entry; clunky but
+  complete).
+- Before the R28 gate: a corpus pass counting legend incidence
+  (legends were not a census dimension), and the ruling on whether
+  `class` subsumes per-element `color=` in practice.

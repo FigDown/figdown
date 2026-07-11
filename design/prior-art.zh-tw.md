@@ -129,3 +129,53 @@ dagre/ELK。
 匯出器/互通問題。
 
 **裁示（2026-07-10）**：採納——OQ1 依建議結案。
+
+## 4. Legend 機制（餵給 OQ-S8）
+
+### 4.1 主流做法
+
+| 語言 | Legend | 機器可讀的綁定？ |
+|---|---|---|
+| PlantUML | 原生 `legend [left\|right\|top\|bottom\|center] … endlegend` | 無——自由文字框；條目與元素零連結 |
+| D2 | `vars.d2-legend`：宣告帶標籤與樣式的樣本 shape/connection，legend 渲染這些樣本 | 無——條目是帶樣式的*假元素*；真實元素未與之連結 |
+| Mermaid | **無**（長年 feature request；使用者以假 subgraph 湊 legend） | `classDef name fill:…` + `class n1,n2 name`／`:::` 把**具名樣式類**綁上元素——但無意義文字、無 legend |
+| Graphviz | 無（替代：HTML-like label 表格／樣本 cluster） | 無 |
+
+### 4.2 調查結論
+
+1. 每個生態都需要 legend（PlantUML、D2 都出了；Mermaid 使用者
+   一直在要），但**沒有任何被調查語言把「意義」機器可讀地綁到
+   「一類元素」上**——PlantUML 是自由文字、D2 的條目是脫離真實
+   元素的假樣本。
+2. Mermaid 的 `classDef`/`class` 是「命名」這一半按採用度加權的
+   prior art：具名類綁上元素、樣式宣告一次。它缺意義標籤與
+   衍生 legend。
+3. FigDown §5 規則（「顏色不得為語意唯一載體」）目前沒有語言內
+   機制——作者只能在散文或逐邊標籤重複意義。這正是下游回饋
+   撞到的缺口（一張圖三種流向色）。
+
+### 4.3 候選設計（**提案**——待語料頻率＋裁決）
+
+把意義與樣式綁到**具名類**、legend 由此衍生——語意優先的形狀
+（R24：說出意義，繪圖慣例歸引擎）：
+
+```figdown
+class vidp "VID_P (primary VLAN)"   color=#dc2626
+class vidc "VID_C (community VLAN)" color=#2563eb
+edge p1 -> p2 class=vidp
+edge p2 -> p3 class=vidc
+```
+
+- 一行 `class` = 意義文字＋展現預設，宣告一次（Mermaid
+  `classDef` 傳承；R5 的 HTML+CSS 類比在此變成字面事實）。
+  任何元素以 `class=` 套用。
+- Legend 條**自動衍生**——有 class 就畫，如 `bundle` 的圈；
+  無座標、無假元素。
+- R37 紅利：agent 直接在 edge 上讀到 `class=vidp`——不用拿
+  hex 色值去對照旁表。
+- §5 的「展現可忽略」不變量自然細化：從 `class` 行剝除
+  `color=`/`style=` 不損失語意；類的*名字與意義*留下。
+- v0.1 現行替代（已認可）：小型 `table` 配儲存格色標即為
+  legend（每條目兩行；笨重但完整）。
+- 過 R28 關卡前：補一次語料掃描統計 legend 出現率（普查當時
+  沒有這個維度），並裁決 `class` 實務上是否取代逐元素 `color=`。
