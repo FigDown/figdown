@@ -209,6 +209,42 @@ edge p2 -> p3 class=vidc
 - v0.1 workaround, sanctioned today: a small `table` with per-cell
   color marks serves as a legend (two lines per entry; clunky but
   complete).
-- Before the R28 gate: a corpus pass counting legend incidence
-  (legends were not a census dimension), and the ruling on whether
-  `class` subsumes per-element `color=` in practice.
+- Before the R28 gate: ~~a corpus pass counting legend incidence~~
+  (done — §4.4), and the ruling on whether `class` subsumes
+  per-element `color=` in practice.
+
+### 4.4 Corpus frequency (measured 2026-07-10)
+
+Method: stratified random sample of **310 unique images** from the
+census corpus (seed 20260710; block 60, bitfield/flowchart/table/
+topology 40 each, waveform 30, state 25, chart 21, sequence 14 — the
+last three sampled exhaustively), judged by eight independent AI
+vision passes against a fixed rubric (a *legend* requires a dedicated
+key region; a title/caption does not count).
+
+| Bucket | n | explicit legend | semantic color, **no** key | color carries meaning at all |
+|---|---:|---:|---:|---:|
+| block-architecture | 60 | 2% | 50% | 52% |
+| packet-bitfield | 40 | 0% | 65% | 65% |
+| flowchart | 40 | 5% | 60% | 65% |
+| table-matrix | 40 | 2% | 42% | 45% |
+| timing-waveform | 30 | 3% | 57% | 60% |
+| topology | 40 | 18% | 60% | 78% |
+| state | 25 | 20% | 24% | 44% |
+| chart | 21 | 0% | 76% | 76% |
+| sequence | 14 | 7% | 79% | 86% |
+| **overall (unweighted)** | 310 | **5.8%** | **55.2%** | **61.0%** |
+| **overall (census-weighted)** | — | **3.1%** | **56.0%** | **59.1%** |
+
+**Reading.** Explicit legends are rare (≈3–6%) — as a *drawing
+feature*, a legend would fail the R28 frequency test. But the survey
+exposed the real number: **56% of corpus figures encode categorical
+meaning in color/line-style with no stated mapping anywhere** — the
+reader infers it. In bitmaps a human manages; in a FigDown
+transcription, an agent reading `color=#dc2626` recovers nothing
+(R37's blind spot at corpus scale). The evidence therefore supports
+`class` **as the semantic carrier for that 56%**, not as a legend
+renderer: per-element category membership is not expressible today
+except by repeating label text everywhere (and node fills often have
+no label slot at all). The derived legend strip is a bonus that also
+covers the 3%.

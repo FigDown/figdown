@@ -442,12 +442,14 @@ pulse r1                                # 瞬時高亮
   `<-` 加入運算子集；`label=`／`taillabel=`／`headlabel=` 退役
   （migration 0.1-dev.9）。調查：
   [prior-art.zh-tw.md](../design/prior-art.zh-tw.md) §1。
-- OQ-S8：語意顏色的具名 **legend** 機制（實戰回饋 F1/F4）。
-  prior-art 調查完成——
+- OQ-S8：語意顏色的具名 **legend/class** 機制（實戰回饋
+  F1/F4）。prior-art 調查與語料實測皆完成——
   [prior-art.zh-tw.md](../design/prior-art.zh-tw.md) §4：沒有任何
-  被調查語言把意義機器可讀地綁到一類元素上。候選設計已上桌：
-  `class <id> "<意義>" [color=…]` ＋ 元素上 `class=<id>`、legend
-  條自動衍生（Mermaid classDef 傳承）。待補：語料頻率＋裁決。
+  被調查語言把意義機器可讀地綁到一類元素上；實測語料出現率：
+  顯式 legend ≈3%（加權），但 **56% 的圖以顏色承載分類語意而
+  無任何對映陳述**——證據支持 `class <id> "<意義>" [color=…]`
+  ＋ 元素上 `class=<id>` 作為那 56% 的語意載體，legend 條自動
+  衍生（Mermaid classDef 傳承）。待：使用者裁決。
 - OQ-S9：bitfield 的**判別式變體**——同一段位元依外部模式重新
   解釋（實戰回饋 F3；暫存器圖極常見）。現行標準做法：以
   `note="valid when …"` 攜帶條件並標記人工覆核。row 級 `when=`
