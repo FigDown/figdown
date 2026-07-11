@@ -15,9 +15,20 @@ node cp2 "Community p2"
 node ip1 "Isolated p1"
 
 flow right
-rank cp1 ip1
 
 edge up  -> pp1 class=vidp
 edge pp1 -> cp1 class=vidc
 edge cp1 <-> cp2 class=vidc
 edge pp1 -> ip1 class=vidi
+
+# --- layout (materialized; delete freely, structure above is complete) ---
+# Two rows: top row = uplink / promisc / community ports (left to right);
+# bottom row = isolated port below promisc, showing segregation.
+# cp1 and cp2 side by side so the peer edge is horizontal.
+# ip1 below and between up/pp1 column to visually separate it from community.
+# y0=30 (title) so canvas y = 50 + p.fy.
+pin up  at=0,30
+pin pp1 at=170,30
+pin cp1 at=340,0
+pin cp2 at=480,0
+pin ip1 at=170,120

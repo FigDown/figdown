@@ -5,7 +5,7 @@ title Multi-Word Descriptor Pattern
 bitfield descriptor "Multi-Word Descriptor" unit=32
 # Word 0: identifier in upper half + flag cluster + small type code in low bits
 field TYPE 4
-field FLAG_B:1, FLAG_A:1
+field FB:1, FA:1  # FB=FLAG_B FA=FLAG_A
 field Reserved 10
 field FIELD_A 16
 wrap

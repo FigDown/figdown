@@ -9,4 +9,4 @@ field TYPE 4
 field FIELD_A 8
 field MODE 6
 field Reserved 6
-field FLAG_C:1, FLAG_B:1, FLAG_A:1, EN:1
+field FC:1, FB:1, FA:1, EN:1  # FC=FLAG_C FB=FLAG_B FA=FLAG_A EN=Enable

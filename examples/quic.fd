@@ -7,8 +7,9 @@ figdown 0.1 bitfield
 bitfield quic_initial "QUIC Long Header — Initial Packet (RFC 9000)" unit=32 numbering=msb0
 
 # ── Byte 0: First Byte (8 bits) ──────────────────────────────────────────────
-# Compact form: Header Form:1, Fixed Bit:1, Long Packet Type:2, Reserved:2, Packet Number Length:2
-field "Header Form":1, "Fixed Bit":1, "Long Packet Type":2, Reserved:2, "Packet Number Length":2
+# Abbreviated labels for 1-bit/2-bit cells (each cell is 1/32 of row width):
+#   H=Header Form  F=Fixed Bit  PT=Long Packet Type  Rs=Reserved  PN=Pkt Num Len
+field H:1, F:1, PT:2, Rs:2, PN:2
 wrap
 
 # ── Version (32 bits) ────────────────────────────────────────────────────────

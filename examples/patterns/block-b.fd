@@ -31,11 +31,16 @@ flow right
 rank unit-a unit-b
 rank proc-x intr proc-y
 
-edge in-port  -> outer
-edge outer    -> out-port
+edge in-port  -> unit-c
+edge unit-c   -> out-port
 edge unit-c -[ref]-> proc-x
 edge unit-c -[ptr]-> unit-a
 edge proc-x -[feedback]-> unit-b style=dashed
 edge proc-y   -> intr
 edge intr -[interrupt]-> unit-c style=dashed
 edge proc-y -[up-path]-> unit-c
+
+# --- layout block-b ---
+# Pin in/out ports to left and right margins so they flank the main cluster.
+pin in-port  at=20,180
+pin out-port at=550,180

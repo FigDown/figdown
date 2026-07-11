@@ -597,7 +597,9 @@ function parse(text){
   }
   for(const e of doc.edges){
     if(!nodeIds.has(e.a)&&!groupIds.has(e.a)) errs.push('Line '+e.line+': unknown endpoint "'+e.a+'"');
+    else if(groupIds.has(e.a)) errs.push('Line '+e.line+': edge endpoint "'+e.a+'" is a group — connect to a member node (group edges are not in v0.1)');
     if(!nodeIds.has(e.b)&&!groupIds.has(e.b)) errs.push('Line '+e.line+': unknown endpoint "'+e.b+'"');
+    else if(groupIds.has(e.b)) errs.push('Line '+e.line+': edge endpoint "'+e.b+'" is a group — connect to a member node (group edges are not in v0.1)');
     if(e.layer && !layerIds.has(e.layer)) errs.push('Line '+e.line+': unknown layer "'+e.layer+'"');
   }
   for(const r of doc.ranks) for(const id of r.ids)
@@ -707,7 +709,8 @@ function render(doc){
     if(b.marks)  for(const mk of b.marks) rs(mk,'color');
   }
   const parts=[]; let y=0, maxW=0;
-  if(doc.title){ parts.push('<text x="0" y="16" font-size="15" font-weight="600" font-family="var(--sans)">'+esc(doc.title)+'</text>'); y=30; }
+  if(doc.title){ parts.push('<text x="0" y="16" font-size="15" font-weight="600" font-family="var(--sans)">'+esc(doc.title)+'</text>'); y=30;
+    maxW=Math.max(maxW, doc.title.length*8.6); }  // canvas must fit the title
   let sceneMeta=null;
   if(doc.nodes.length||doc.edges.length){
     const s=renderScene(doc,y); parts.push(s.svg); y=s.y; maxW=Math.max(maxW,s.w);

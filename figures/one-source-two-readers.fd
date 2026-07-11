@@ -19,3 +19,10 @@ edge src  -[deterministic build]->  rend
 edge rend -[stable SVG]->           svg
 edge svg  -[reads visually]->       human
 edge src  -[reads for meaning]->    agent
+
+# --- layout (auto-generated; strip to reset) ---
+pin src   at=20,20
+pin rend  at=200,20
+pin svg   at=370,20
+pin human at=535,20
+pin agent at=110,140

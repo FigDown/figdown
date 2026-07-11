@@ -158,6 +158,10 @@ Bracket content rules:
   quote-inside-shape convention).
 - An empty `[]` is a line error. `label=`/`taillabel=`/`headlabel=`
   are retired (migration 0.1-dev.9).
+- Edge endpoints are **nodes only**: an endpoint naming a group is a
+  line error (connect to a member node; group-level edges are out of
+  scope for v0.1 — silently dropping them would violate the
+  no-silent-failure rule).
 
 ### 2.4 Layers (R5)
 

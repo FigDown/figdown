@@ -12,3 +12,10 @@ edge active -[cond2]-> wait
 edge wait -[reset]-> idle
 edge wait -[retry]-> active
 edge active -[abort]-> idle
+
+# --- layout state-a ---
+# Triangular arrangement so cycle edges are spatially distinct from back-edges.
+# idle at top-centre; active at bottom-left; wait at bottom-right.
+pin idle   at=180,50
+pin active at=50,220
+pin wait   at=310,220

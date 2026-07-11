@@ -13,9 +13,18 @@ node item     "Item\n---\nPK item_id\nname\nunit_price"                        s
 node order_line "OrderLine\n---\nPK FK order_id\nPK FK item_id\nqty\nline_total" shape=rounded color=#f3e8ff
 
 flow right
-rank customer order
 
 # relationships: cardinality at each endpoint, verb on the line
 edge customer [1] -[places]-> [N] order
 edge order    [1] -[contains]-> [N] order_line
 edge item     [1] -[appears in]-> [N] order_line
+
+# --- layout (materialized; delete freely, structure above is complete) ---
+# Top row: Customer → Order → OrderLine (left to right, same y).
+# Item below Order in the second row; edge to OrderLine goes up-right.
+# Node widths are auto-sized; gaps approximate GAPX=56 px.
+# y0=30 (title present) so canvas y = 50 + p.fy for ungrouped pins.
+pin customer    at=0,0
+pin order       at=185,0
+pin order_line  at=370,0
+pin item        at=185,170

@@ -24,8 +24,6 @@ node e1b "key=gamma\nval=7\nnext null" color=#dbeafe
 node e2a "key=beta\nval=99\nnext null" color=#dcfce7
 
 flow right
-rank b0 b1 b2 b3
-rank e1a e2a
 
 # bucket pointers into chain heads
 edge b1 -[ptr]-> e1a
@@ -33,3 +31,21 @@ edge b2 -[ptr]-> e2a
 
 # chain links
 edge e1a -[next]-> e1b
+
+# --- layout (materialized; delete freely, structure above is complete) ---
+# Bucket array: left column. Each slot is 68 px tall to match the
+# chain-entry height; 10 px gap between rows keeps them visually distinct.
+# Row pitch = 78 px (68 h + 10 gap). Chain heads at x=200, e1b at x=340.
+# Group origin at canvas y=60 (fy=10, y0=50); members at group-local coords.
+size b0 w=110 h=68
+size b1 w=110 h=68
+size b2 w=110 h=68
+size b3 w=110 h=68
+pin table at=0,10
+pin b0 at=0,0
+pin b1 at=0,78
+pin b2 at=0,156
+pin b3 at=0,234
+pin e1a at=200,78
+pin e1b at=340,78
+pin e2a at=200,156
