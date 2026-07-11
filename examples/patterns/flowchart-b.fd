@@ -20,11 +20,3 @@ edge d2 -[yes]-> p3
 edge d2 -[no]-> p1
 edge p3 -> e
 
-# --- layout (materialized; delete freely, structure above is complete) ---
-pin s  at=105,0
-pin p1 at=105,85
-pin d1 at=90,165
-pin p2 at=330,230
-pin d2 at=315,375
-pin p3 at=330,465
-pin e  at=105,545

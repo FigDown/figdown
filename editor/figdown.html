@@ -768,65 +768,160 @@ function renderScene(doc,y0){
     if(n.shape==='diamond'){ n.w=Math.max(n.w+20,70); n.h=Math.max(n.h,48); }
     if(n.shape==='circle'){ n.w=n.h=Math.max(n.w,n.h); }
   }
-  // ranks: longest-path layering over directed edges among unpinned nodes
+  // ranks: DFS from document-order sources classifies back-edges; a
+  // longest-path layering runs on the remaining DAG so sources sit at
+  // layer 0. `rank a b c` merges its nodes into ONE vertex for the
+  // layering (same layer) without dragging unrelated branches along.
   const pinned=id=>doc.pins[id]!==undefined;
-  const adj={}; nodes.forEach(n=>adj[n.id]=[]);
+  nodes.forEach((n,i)=>n.di=i);            // document order (sort tiebreak)
+  const rep={}; nodes.forEach(n=>rep[n.id]=n.id);   // rank-group union-find
+  const find=u=>{ while(rep[u]!==u) u=rep[u]=rep[rep[u]]; return u; };
+  for(const r of doc.ranks){
+    const ids=r.ids.filter(id=>byId[id]);
+    for(let i=1;i<ids.length;i++){ const a=find(ids[0]),b=find(ids[i]); if(a!==b) rep[b]=a; }
+  }
+  const adj={}; nodes.forEach(n=>{ adj[find(n.id)]=adj[find(n.id)]||[]; });
+  const isBack=new Set();                  // edges that close a cycle
   for(const e of doc.edges){
     // undirected/bidirectional edges still order ranks by document direction
-    if(byId[e.a] && byId[e.b]) adj[e.a].push(e.b);
+    if(!byId[e.a]||!byId[e.b]) continue;
+    if(e.a===e.b){ isBack.add(e); continue; }        // self-loop
+    const u=find(e.a), v=find(e.b);
+    if(u!==v) adj[u].push({v,e});
   }
-  const rank={}; const state={};
-  function dfs(u){
-    if(state[u]===1) return 0;           // cycle guard: break back edge
-    if(state[u]===2) return rank[u];
-    state[u]=1; let r=0;
-    for(const v of adj[u]) r=Math.max(r, dfs(v)+1);
-    state[u]=2; rank[u]=r; return r;
+  const state={};
+  const classify=u=>{
+    state[u]=1;
+    for(const {v,e} of adj[u]){
+      if(state[v]===1) isBack.add(e);      // gray hit = back-edge
+      else if(!state[v]) classify(v);
+    }
+    state[u]=2;
+  };
+  for(const n of nodes){ const u=find(n.id); if(!state[u]) classify(u); }
+  const radj={}; nodes.forEach(n=>{ radj[find(n.id)]=radj[find(n.id)]||[]; });
+  for(const e of doc.edges){
+    if(!byId[e.a]||!byId[e.b]||isBack.has(e)) continue;
+    const u=find(e.a), v=find(e.b); if(u!==v) radj[v].push(u);
   }
-  nodes.forEach(n=>dfs(n.id));
-  // invert (sources rank 0)
-  const maxR=Math.max(0,...nodes.map(n=>rank[n.id]||0));
-  nodes.forEach(n=>n.rank=maxR-(rank[n.id]||0));
-  // rank directives: pull listed nodes to the max of their ranks
-  for(const r of doc.ranks){
-    const rr=Math.max(...r.ids.filter(id=>byId[id]).map(id=>byId[id].rank));
-    r.ids.forEach(id=>{ if(byId[id]) byId[id].rank=rr; });
-  }
-  // positions
-  const horiz=(doc.flow==='right'||doc.flow==='left');
+  const rk={};
+  const rankOf=u=>{
+    if(rk[u]!==undefined) return rk[u];
+    rk[u]=0;                               // DAG: placeholder is never read
+    let r=0; for(const p of radj[u]) r=Math.max(r, rankOf(p)+1);
+    return rk[u]=r;
+  };
+  nodes.forEach(n=>n.rank=rankOf(find(n.id)));
+  // positions: children spread around their parents' lane (barycenter
+  // sweeps down/up/down). Edges that span multiple layers get invisible
+  // waypoint slots so they no longer cut through intermediate nodes.
   // ALL nodes participate in auto layout (pinned ones hold their slot so
   // that pinning X never reflows Y); pins override coordinates afterwards.
-  const ranksArr=[];
-  for(const n of nodes){ (ranksArr[n.rank]=ranksArr[n.rank]||[]).push(n); }
+  const horiz=(doc.flow==='right'||doc.flow==='left');
+  const lblPx=s=>Math.max(...String(s).split('\n').map(l=>l.length))*6.5;
+  const lay=[...nodes];                    // layout participants
+  const chains=new Map();                  // edge -> [A, ...waypoints, B]
+  for(const e of doc.edges){
+    const A=byId[e.a], B=byId[e.b];
+    if(!A||!B||isBack.has(e)) continue;
+    if(B.rank-A.rank<=1 || pinned(e.a) || pinned(e.b)) continue;
+    const chain=[A];
+    for(let r=A.rank+1;r<B.rank;r++){
+      const v={virtual:true,rank:r,w:1,h:1,mn:e.mid?lblPx(e.mid):0,di:lay.length};
+      lay.push(v); chain.push(v);
+    }
+    chain.push(B); chains.set(e,chain);
+  }
+  const preds=new Map(), succs=new Map(); // over layout segments
+  const link=(p,c)=>{ if(!preds.has(c)) preds.set(c,[]); preds.get(c).push(p);
+                      if(!succs.has(p)) succs.set(p,[]); succs.get(p).push(c); };
+  for(const e of doc.edges){
+    const A=byId[e.a], B=byId[e.b];
+    if(!A||!B||isBack.has(e)||A.rank===B.rank) continue;
+    const ch=chains.get(e)||[A,B];
+    for(let i=1;i<ch.length;i++) link(ch[i-1],ch[i]);
+  }
+  const midW={};        // widest mid label on a one-layer edge, per node
+  for(const e of doc.edges){
+    if(!e.mid) continue;
+    const A=byId[e.a], B=byId[e.b];
+    if(!A||!B||isBack.has(e)||Math.abs(A.rank-B.rank)!==1) continue;
+    midW[e.a]=Math.max(midW[e.a]||0,lblPx(e.mid));
+    midW[e.b]=Math.max(midW[e.b]||0,lblPx(e.mid));
+  }
+  const cs=n=>horiz?n.h:n.w;               // cross-axis size
   const gapOf=(a,b)=>{  // spacing between adjacent lane members
     if(a.group&&a.group===b.group){
       const g=doc.groups.find(x=>x.id===a.group);
-      if(g&&g.gap!==undefined) return g.gap;
+      if(g&&g.gap!==undefined) return g.gap;   // explicit group gap is exact
     }
-    return horiz?GAPY:GAPX;
+    let base=horiz?GAPY:GAPX;
+    if(a.virtual||b.virtual) base=Math.min(base,30);
+    if(!horiz){           // beside-labels on vertical edges need width
+      const la=a.virtual?a.mn:(midW[a.id]||0);
+      if(la) base=Math.max(base,la+23-cs(a)/2);
+    }
+    return base;
   };
-  const laneSize=[], laneSpan=[];
+  const ranksArr=[];
+  for(const n of lay){ (ranksArr[n.rank]=ranksArr[n.rank]||[]).push(n); }
+  const laneSize=[], mainGap=[];
   ranksArr.forEach((lane,i)=>{
     if(!lane) return;
     laneSize[i]=Math.max(...lane.map(n=>horiz?n.w:n.h));
-    let span=0;
-    lane.forEach((n,k)=>{ span+=(horiz?n.h:n.w); if(k<lane.length-1) span+=gapOf(n,lane[k+1]); });
-    laneSpan[i]=span;
+    mainGap[i]=horiz?GAPX:GAPY;
   });
-  const maxSpan=Math.max(0,...laneSpan.filter(v=>v!==undefined));
+  if(horiz) for(const e of doc.edges){     // labels ride ON horizontal edges:
+    if(!e.mid||isBack.has(e)) continue;    // layer pitch grows to fit them
+    const A=byId[e.a], B=byId[e.b]; if(!A||!B) continue;
+    const r0=Math.min(A.rank,B.rank), r1=Math.max(A.rank,B.rank);
+    if(r0===r1) continue;
+    const need=(lblPx(e.mid)+24)/(r1-r0);
+    for(let i=r0;i<r1;i++) mainGap[i]=Math.max(mainGap[i],need);
+  }
+  const center=n=>n.cross+cs(n)/2;
+  ranksArr.forEach(lane=>{ if(!lane) return; let c=0;    // seed: doc order
+    lane.forEach((n,k)=>{ n.cross=c; c+=cs(n)+(k<lane.length-1?gapOf(n,lane[k+1]):0); }); });
+  const place=(lane,des)=>{   // order by desired center, resolve overlaps,
+    const arr=lane.map(n=>({n,d:des.get(n)}));           // recenter the lane
+    arr.sort((p,q)=>p.d-q.d||p.n.di-q.n.di);
+    let cEnd=-Infinity;
+    arr.forEach((x,i)=>{
+      x.n.cross=Math.max(x.d-cs(x.n)/2, cEnd);
+      cEnd=x.n.cross+cs(x.n)+(i<arr.length-1?gapOf(x.n,arr[i+1].n):0);
+    });
+    const err=arr.reduce((s,x)=>s+center(x.n)-x.d,0)/arr.length;
+    arr.forEach(x=>{ x.n.cross-=err; });
+    lane.length=0; arr.forEach(x=>lane.push(x.n));
+  };
+  const sweep=dir=>{          // 1 = align to parents, -1 = align to children
+    const idx=[]; ranksArr.forEach((l,i)=>l&&idx.push(i));
+    const order=dir===1?idx.slice(1):idx.slice(0,-1).reverse();
+    for(const i of order){
+      const lane=ranksArr[i], des=new Map();
+      for(const n of lane){
+        const ref=(dir===1?preds:succs).get(n);
+        des.set(n, ref&&ref.length ? ref.reduce((s,m)=>s+center(m),0)/ref.length : center(n));
+      }
+      place(lane,des);
+    }
+  };
+  sweep(1); sweep(-1); sweep(1);
+  let minC=Infinity; lay.forEach(n=>{ minC=Math.min(minC,n.cross); });
+  if(!isFinite(minC)) minC=0;
   let main=0;
   ranksArr.forEach((lane,i)=>{
     if(!lane) return;
-    let cross=(maxSpan-laneSpan[i])/2;
-    lane.forEach((n,k)=>{
-      const sp=k<lane.length-1?gapOf(n,lane[k+1]):0;
-      if(horiz){ n.x=main; n.y=y0+20+cross; cross+=n.h+sp; }
-      else     { n.y=y0+20+main; n.x=cross; cross+=n.w+sp; }
+    lane.forEach(n=>{
+      // waypoints span the full layer so chain bends happen in the gaps
+      if(n.virtual){ if(horiz) n.w=laneSize[i]; else n.h=laneSize[i]; }
+      if(horiz){ n.x=main; n.y=y0+20+n.cross-minC; }
+      else     { n.y=y0+20+main; n.x=n.cross-minC; }
     });
-    main+=laneSize[i]+(horiz?GAPX:GAPY);
+    main+=laneSize[i]+mainGap[i];
   });
   if(doc.flow==='left'||doc.flow==='up'){
-    const M=main; for(const n of nodes){
+    const M=main; for(const n of lay){
       if(horiz) n.x=M-n.x-n.w; else n.y=y0+20+(M-(n.y-y0-20))-n.h; }
   }
   // Two-level coordinates (D6): a pinned GROUP anchors its local origin in
@@ -848,7 +943,7 @@ function renderScene(doc,y0){
     else { n.x=p.fx; n.y=y0+20+p.fy; }
   }
   let W=0,Hh=0;
-  for(const n of nodes){ W=Math.max(W,n.x+n.w); Hh=Math.max(Hh,n.y+n.h-y0-20); }
+  for(const n of lay){ W=Math.max(W,n.x+n.w); Hh=Math.max(Hh,n.y+n.h-y0-20); }
   if(W===0){W=480;} if(Hh===0){Hh=280;}
   // groups
   const gsvg=[]; const gBox={};
@@ -883,16 +978,106 @@ function renderScene(doc,y0){
   const zOf=l=>{const L=doc.layers.find(x=>x.id===l);return L?L.z:0;};
   const edges=[...doc.edges].sort((p,q)=>zOf(p.layer)-zOf(q.layer));
   const esvg=[], lblsvg=[];  // labels paint last = closest to the viewer
+  // back-edge side channel: beyond the occupied lanes (nodes AND group boxes)
+  let occR=0, occB=0;
+  for(const n of nodes){ occR=Math.max(occR,n.x+n.w); occB=Math.max(occB,n.y+n.h); }
+  for(const k in gBox){ occR=Math.max(occR,gBox[k].x1); occB=Math.max(occB,gBox[k].yB); }
+  if(!horiz) chains.forEach((chain,e)=>{      // chain labels stick out right
+    if(!e.mid) return;
+    const v=chain[1+Math.floor((chain.length-3)/2)];
+    occR=Math.max(occR, v.x+v.w/2+9+lblPx(e.mid));
+  });
+  let chn=0, chOff=0;        // channel slots handed out in paint order
   for(const e of edges){
     const A=byId[e.a], B=byId[e.b]; if(!A||!B) continue;
-    const ax=A.x+A.w/2, ay=A.y+A.h/2, bx=B.x+B.w/2, by=B.y+B.h/2;
-    const [x1,yy1]=borderPoint(A,bx,by), [x2,yy2]=borderPoint(B,ax,ay);
     const col=e.color||'#555';
     const dash=e.style==='dashed'?' stroke-dasharray="6 4"':(e.style==='dotted'?' stroke-dasharray="2 4"':'');
     const m1=(e.op==='<->'||e.op==='<-')?' marker-start="url(#arr)"':'',
           m2=(e.op==='<->'||e.op==='->')?' marker-end="url(#arr)"':'';
-    esvg.push('<line x1="'+x1+'" y1="'+yy1+'" x2="'+x2+'" y2="'+yy2+'" stroke="'+col+'" stroke-width="1.6"'+dash+m1+m2+'/>');
     const halo=' paint-order="stroke" stroke="#fff" stroke-width="3"';
+    const seg=(p,q,t,lbl,fs)=>lblsvg.push(textEl(p[0]+(q[0]-p[0])*t, p[1]+(q[1]-p[1])*t-4, fs,'middle','#555',lbl,halo));
+    if(isBack.has(e)&&!pinned(e.a)&&!pinned(e.b)){
+      // back-edge (retry loop): polyline through a side channel beyond the
+      // occupied lanes instead of a straight line hidden under the spine.
+      // When the sideways run to the channel would cut through a sibling
+      // node, the route drops into the inter-layer gap first.
+      const lane=r=>(ranksArr[r]||[]).filter(n=>!n.virtual);
+      const pts=[];
+      if(horiz){             // channel runs below the lanes
+        const chY=occB+28+chOff; chOff+=22;   // labels ride ON the channel
+        const colR=r=>Math.max(...lane(r).map(n=>n.x+n.w));
+        const blockedV=(y1,y2,xx,skip)=>nodes.some(n=>n!==skip&&n.x<xx&&n.x+n.w>xx&&n.y+n.h>y1&&n.y<y2);
+        const sx=A===B?A.x+A.w*0.3:A.x+A.w/2, tx=A===B?B.x+B.w*0.7:B.x+B.w/2;
+        if(A!==B&&blockedV(A.y+A.h,chY,sx,A)){
+          const gx=colR(A.rank)+10+chn*7;
+          pts.push([A.x+A.w,A.y+A.h/2],[gx,A.y+A.h/2],[gx,chY]);
+        } else pts.push([sx,A.y+A.h],[sx,chY]);
+        if(A!==B&&blockedV(B.y+B.h,chY,tx,B)){
+          const gx=colR(B.rank)+10+chn*7;
+          pts.push([gx,chY],[gx,B.y+B.h/2],[B.x+B.w,B.y+B.h/2]);
+        } else pts.push([tx,chY],[tx,B.y+B.h]);
+        if(e.mid){
+          const c1=pts.findIndex(p=>p[1]===chY);
+          lblsvg.push(textEl((pts[c1][0]+pts[c1+1][0])/2, chY-5, 11,'middle',col,e.mid,halo));
+        }
+      } else {               // channel runs right of the lanes
+        const chX=occR+28+chOff; chOff+=e.mid?Math.max(22,lblPx(e.mid)+14):22;
+        const laneB=r=>Math.max(...lane(r).map(n=>n.y+n.h));
+        const blockedH=(x1,x2,yy,skip)=>nodes.some(n=>n!==skip&&n.y<yy&&n.y+n.h>yy&&n.x+n.w>x1&&n.x<x2);
+        const sy=A===B?A.y+A.h*0.3:A.y+A.h/2, ty=A===B?B.y+B.h*0.7:B.y+B.h/2;
+        if(A!==B&&blockedH(A.x+A.w,chX,sy,A)){
+          const gy=laneB(A.rank)+10+chn*7;
+          pts.push([A.x+A.w/2,A.y+A.h],[A.x+A.w/2,gy],[chX,gy]);
+        } else pts.push([A.x+A.w,sy],[chX,sy]);
+        if(A!==B&&blockedH(B.x+B.w,chX,ty,B)){
+          const gy=laneB(B.rank)+10+chn*7;
+          pts.push([chX,gy],[B.x+B.w/2,gy],[B.x+B.w/2,B.y+B.h]);
+        } else pts.push([chX,ty],[B.x+B.w,ty]);
+        if(e.mid){
+          const c1=pts.findIndex(p=>p[0]===chX);
+          lblsvg.push(textEl(chX+7,(pts[c1][1]+pts[c1+1][1])/2+4,11,'start',col,e.mid,halo));
+          W=Math.max(W, chX+9+lblPx(e.mid));
+        }
+      }
+      chn++;
+      for(const p of pts){ W=Math.max(W,p[0]+4); Hh=Math.max(Hh,p[1]+16-y0-20); }
+      esvg.push('<path d="M'+pts.map(p=>p.join(' ')).join(' L')+'" fill="none" stroke="'+col+'" stroke-width="1.6"'+dash+m1+m2+'/>');
+      if(e.tail) seg(pts[0],pts[1],0.5,e.tail,10);
+      if(e.head) seg(pts[pts.length-1],pts[pts.length-2],0.5,e.head,10);
+      continue;
+    }
+    const chain=chains.get(e);
+    if(chain){
+      // multi-layer edge: polyline through its reserved waypoint lane;
+      // each waypoint contributes an entry and an exit port so the run
+      // through a layer is parallel to it and diagonals stay in the gaps
+      const pts=[];
+      let px=A.x+A.w/2, py=A.y+A.h/2;
+      for(const v of chain.slice(1,-1)){
+        const cx=v.x+v.w/2, cy=v.y+v.h/2;
+        let p=horiz?[v.x,cy]:[cx,v.y], q=horiz?[v.x+v.w,cy]:[cx,v.y+v.h];
+        if(horiz? px>cx : py>cy){ const t=p; p=q; q=t; }
+        pts.push(p,q); px=q[0]; py=q[1];
+      }
+      const p0=borderPoint(A,pts[0][0],pts[0][1]);
+      const p1=borderPoint(B,pts[pts.length-1][0],pts[pts.length-1][1]);
+      pts.unshift(p0); pts.push(p1);
+      esvg.push('<path d="M'+pts.map(p=>p.join(' ')).join(' L')+'" fill="none" stroke="'+col+'" stroke-width="1.6"'+dash+m1+m2+'/>');
+      if(e.mid){
+        const v=chain[1+Math.floor((chain.length-3)/2)];  // middle waypoint
+        const cx=v.x+v.w/2, cy=v.y+v.h/2;
+        // sit in the inter-layer gap: lane centers carry crossing traffic
+        if(horiz) lblsvg.push(textEl(cx, cy-5, 11,'middle',col,e.mid,halo));
+        else{ lblsvg.push(textEl(cx+7, v.y-4, 11,'start',col,e.mid,halo));
+              W=Math.max(W, cx+9+lblPx(e.mid)); }
+      }
+      if(e.tail) seg(p0,pts[1],0.4,e.tail,10);
+      if(e.head) seg(p1,pts[pts.length-2],0.4,e.head,10);
+      continue;
+    }
+    const ax=A.x+A.w/2, ay=A.y+A.h/2, bx=B.x+B.w/2, by=B.y+B.h/2;
+    const [x1,yy1]=borderPoint(A,bx,by), [x2,yy2]=borderPoint(B,ax,ay);
+    esvg.push('<line x1="'+x1+'" y1="'+yy1+'" x2="'+x2+'" y2="'+yy2+'" stroke="'+col+'" stroke-width="1.6"'+dash+m1+m2+'/>');
     if(e.mid){
       const mx=(x1+x2)/2, my=(yy1+yy2)/2;
       if(Math.abs(x2-x1)>=Math.abs(yy2-yy1))
