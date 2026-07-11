@@ -44,11 +44,16 @@ title "L3 Forwarding Datapath"  # optional
 names the document's template: `block` | `topology` | `flowchart` |
 `bitfield` | `table` | `wave`. A template selects **defaults and a
 validation profile only** — default flow (`block`→right,
-`flowchart`→down), default edge directedness (`topology`→undirected),
-default units — each tuned to that figure type's census statistics.
-A template MUST NOT change the core meaning of a standard directive:
-`node` is always a node, `edge` is always a relationship. A new
-template requires corpus evidence AND semantic impossibility (R28).
+`flowchart`→down), default units — each tuned to that figure type's
+census statistics. A template MUST NOT change the core meaning of a
+standard directive: `node` is always a node, `edge` is always a
+relationship — and it can never take expressiveness away: explicit
+syntax (operators, options) is never defaulted or restricted by the
+template. Directed, colored edges work under `topology` exactly as
+under `block` (field feedback F1 — a downstream transcription lost
+direction semantics because an earlier draft of this paragraph implied
+otherwise). A new template requires corpus evidence AND semantic
+impossibility (R28).
 
 **Version compatibility.** The header carries the wire-grammar version
 and the template. An unknown major version MUST be rejected; an unknown
@@ -448,7 +453,8 @@ NOT change the document's semantic structure; semantic consumers MAY
 ignore them. Consequently **color and style MUST NOT be the sole
 carrier of meaning** — if color/dash denotes state, role, plane or
 classification, that meaning SHOULD also appear in text or a semantic
-annotation. Semantic-color profiles can be layered on later; the
+annotation (a named legend mechanism that would carry this is under
+consideration — OQ-S8). Semantic-color profiles can be layered on later; the
 document scenario keeps colors free. (resolves the R5 tension)
 
 ## 6. Dynamic — reserved, not specified (R1, R2)
@@ -506,6 +512,21 @@ transient). Deferred until the static core ships.
   (§2.3); `<-` joined the operator set;
   `label=`/`taillabel=`/`headlabel=` retired (migration 0.1-dev.9).
   Survey: [prior-art.md](../design/prior-art.md) §1.
+- OQ-S8: a named **legend** mechanism for semantic colors (field
+  feedback F1/F4 — flows distinguished by color need their meaning in
+  text per §5; a legend strip would state the color→meaning map once
+  instead of labeling every edge). Needs corpus frequency + a
+  prior-art pass before the R28 gate.
+- OQ-S9: **discriminated variants** in bitfields — the same bits
+  reinterpreted by an external mode (field feedback F3; register maps
+  do this constantly). Current standard practice: carry the condition
+  in `note="valid when …"` and flag for human review. A row-level
+  `when=` or a first-class variant concept needs prior art
+  (SystemRDL/IP-XACT) + corpus evidence.
+- OQ-S10: group-level `flow` (side-by-side sub-areas inside one
+  figure; field feedback F4). Current standard answer: split composite
+  originals into one `.fd` per concept and let the Markdown compose
+  them.
 
 ## 10. Keyword registry, conformance modes, extensions
 
@@ -533,7 +554,7 @@ NOT begin with `x-`. Strict mode rejects unknown `x-` lines unless
 explicitly enabled.
 
 **Teachability check (R7).** Target: the full AI authoring guide fits
-in ≤120 lines (see AGENT-GUIDE.md §5). Any addition pushing the
+in ≤120 lines (see the AGENT-GUIDE cheat sheet). Any addition pushing the
 top-level set past ~20 keywords must survive the R28 gate.
 
 ## 11. Grammar sketch (ABNF, informative until freeze)

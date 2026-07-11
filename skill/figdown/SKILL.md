@@ -114,4 +114,16 @@ constructs above or tell the user. The header pins the version
 (`figdown 0.1`); when the spec moves, each change ships a mechanical
 rewrite rule in the project's MIGRATIONS.md.
 
+## Transcribing existing figures
+
+Semantic reconstruction, not tracing: recover what the original means,
+then state it in FigDown. Verify every bitfield row's width sum
+against the original ruler. Never fabricate — mark uncertainty in a
+`#` comment for human review. Record provenance (original filename +
+hash + spec section) in comments at the top of the `.fd`. Per-node
+annotations: dashed node + dotted edge when adjacency carries meaning,
+one centralized table when it is dense data. Conditional encodings:
+`note="valid when …"`. Composite originals: split into one `.fd` per
+concept; the Markdown composes them.
+
 Full spec and docs: https://github.com/FigDown/figdown

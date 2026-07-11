@@ -1075,6 +1075,46 @@ alone — no clone, no network. Install =
 AGENT-GUIDE.md remains the framework-neutral equivalent for non-skill
 agents.
 
+### R40 — First downstream field feedback: axioms verified, six findings triaged (2026-07-10)
+
+**Original**: A downstream documentation project adopted FigDown as its
+figure standard and transcribed its first batch of real spec figures
+(five: three bitfields, one block, one topology), returning field
+feedback with reproducible samples.
+
+**Interpretation — validations**: determinism held on real figures
+(two builds byte-identical; independently re-verified bit-identical by
+a third party — axiom 2); the closed grammar + line-numbered errors
+let an agent complete every transcription autonomously with zero
+human render-debugging (axiom 6).
+
+**Findings and dispositions**:
+- *F1 (direction/color lost under topology)*: engine-verified
+  **already supported** — directed, colored, labeled edges work under
+  every template. Root cause was a spec documentation bug: §1 claimed
+  a "default edge directedness (topology→undirected)", a default that
+  cannot exist since operators are always explicit. Spec corrected;
+  "templates never take expressiveness away" now stated normatively.
+- *F2 (per-node annotation boxes)*: no new syntax (R28) — sanctioned
+  patterns documented in the AGENT-GUIDE: dashed node + dotted edge
+  when adjacency carries meaning; centralized table when it is dense
+  data; choose by meaning (R29).
+- *F3 (conditional sub-encodings)*: current convention blessed
+  (`note="valid when …"` + human-review flag); first-class
+  discriminated variants tracked as OQ-S9 (prior art:
+  SystemRDL/IP-XACT).
+- *F4 (composite figures)*: standard answer documented — split into
+  one `.fd` per concept, the Markdown composes them; group-level
+  `flow` tracked as OQ-S10. A named legend mechanism for semantic
+  colors tracked as OQ-S8 (it would operationalize §5's
+  color-never-sole-carrier rule).
+- *F5 (transcription workflow)*: adopted in full — new AGENT-GUIDE
+  section "Transcribing existing figures" (semantic reconstruction not
+  tracing; per-row bit-width verification; no fabrication, mark
+  uncertainty; provenance comments), mirrored into the skill.
+- *F6 (EMF preprocessing)*: adopted — tools/README.md documents the
+  docx → extract → EMF-to-PNG → transcribe → validate pipeline.
+
 ### R37 — Reading semantics are normative: meaning recoverable from syntax alone (2026-07-10)
 
 **Original**: We must also make sure that when an AI agent consumes our

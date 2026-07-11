@@ -77,7 +77,34 @@ Stability rules while editing:
   per node. The renderer may draw both the same — the text difference
   is the knowledge.
 
-## 5. Core syntax cheat sheet
+## 5. Transcribing existing figures (from a spec/image original)
+
+Transcription is **semantic reconstruction, not tracing**: recover
+what the original *means*, then state that meaning in FigDown — never
+copy geometry for its own sake.
+
+- **Verify bit totals.** For every bitfield row, sum the declared
+  widths against the original's ruler — multi-row encoding-variant
+  figures are where transcriptions silently drift.
+- **Never fabricate.** If the original is ambiguous or unreadable, do
+  not invent fields, bits or connections — mark the uncertainty in a
+  `#` comment and flag it for human review.
+- **Record provenance.** Put the original figure's filename, content
+  hash, and spec section anchor in `#` comments at the top of the
+  `.fd` — the transcription stays auditable.
+- **Per-node annotations**: if spatial adjacency carries meaning, use
+  a small `style=dashed` node next to the target with a dotted edge;
+  if it is dense tabular data, one centralized `table` is the better
+  transcription. Choose by meaning (R29) — both are sanctioned.
+- **Conditional encodings** (same bits reinterpreted by a mode):
+  current convention is `note="valid when …"` on the field plus a
+  human-review flag (OQ-S9 tracks a first-class construct).
+- **Composite originals** (two concept areas in one image): split
+  into one `.fd` per concept; the Markdown document composes them.
+- Templates never restrict expressiveness: directed, colored edges
+  work under `topology` exactly as under `block`.
+
+## 6. Core syntax cheat sheet
 
 ```figdown
 figdown 0.1 <template>      # REQUIRED first line; template ∈
@@ -135,7 +162,7 @@ The header template only picks *defaults* — it never restricts which
 directives are valid. `flow` is document-level. Ids (`node a`,
 `bitfield x`, `table t`) are required and exist only for reference.
 
-## 6. Versioning
+## 7. Versioning
 
 The header pins the version (`figdown 0.1`). When the spec moves, each
 change ships a mechanical rewrite rule in
