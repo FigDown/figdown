@@ -688,6 +688,13 @@ function tw(s){
 }
 // multi-line <text>: "\n" in labels becomes centered tspans
 function textEl(x,y,fs,anchor,fill,content,extraAttrs){
+  // halo text = two layers (white under-stroke + plain top copy) so the
+  // halo survives SVG renderers without paint-order support
+  if(extraAttrs && extraAttrs.indexOf('paint-order')>=0){
+    const rest=extraAttrs.replace(' paint-order="stroke" stroke="#fff" stroke-width="3"','');
+    return textEl(x,y,fs,anchor,'#fff',content,rest+' stroke="#fff" stroke-width="3" stroke-linejoin="round"')
+         + textEl(x,y,fs,anchor,fill,content,rest);
+  }
   const lines=String(content).split('\n');
   const attrs='font-size="'+fs+'" text-anchor="'+anchor+'" fill="'+fill+'"'+(extraAttrs||'');
   if(lines.length===1)
@@ -875,7 +882,7 @@ function renderScene(doc,y0){
   // edges (sorted by layer z, then doc order)
   const zOf=l=>{const L=doc.layers.find(x=>x.id===l);return L?L.z:0;};
   const edges=[...doc.edges].sort((p,q)=>zOf(p.layer)-zOf(q.layer));
-  const esvg=[];
+  const esvg=[], lblsvg=[];  // labels paint last = closest to the viewer
   for(const e of edges){
     const A=byId[e.a], B=byId[e.b]; if(!A||!B) continue;
     const ax=A.x+A.w/2, ay=A.y+A.h/2, bx=B.x+B.w/2, by=B.y+B.h/2;
@@ -888,13 +895,16 @@ function renderScene(doc,y0){
     const halo=' paint-order="stroke" stroke="#fff" stroke-width="3"';
     if(e.mid){
       const mx=(x1+x2)/2, my=(yy1+yy2)/2;
-      esvg.push(textEl(mx,my-5,11,'middle',col,e.mid,halo));
+      if(Math.abs(x2-x1)>=Math.abs(yy2-yy1))
+        lblsvg.push(textEl(mx,my-5,11,'middle',col,e.mid,halo));   // above a horizontal edge
+      else
+        lblsvg.push(textEl(mx+7,my+4,11,'start',col,e.mid,halo));  // beside a vertical edge
     }
     // endpoint labels at the tail/head positions (three-position model, R34)
     if(e.tail)
-      esvg.push(textEl(x1+(x2-x1)*0.18, yy1+(yy2-yy1)*0.18-4, 10,'middle','#555',e.tail,halo));
+      lblsvg.push(textEl(x1+(x2-x1)*0.18, yy1+(yy2-yy1)*0.18-4, 10,'middle','#555',e.tail,halo));
     if(e.head)
-      esvg.push(textEl(x1+(x2-x1)*0.82, yy1+(yy2-yy1)*0.82-4, 10,'middle','#555',e.head,halo));
+      lblsvg.push(textEl(x1+(x2-x1)*0.82, yy1+(yy2-yy1)*0.82-4, 10,'middle','#555',e.head,halo));
   }
   // nodes on top (each wrapped in a draggable, identifiable group)
   const nsvg=[];
@@ -965,7 +975,7 @@ function renderScene(doc,y0){
     W=Math.max(W, B.x1+8+tw(gl.label)); Hh=Math.max(Hh, B.yB-y0-20);
   }
   const yEnd=y0+20+Hh+10;
-  return {svg:gsvg.join('')+esvg.join('')+nsvg.join('')+tsvg.join(''), y:yEnd, w:W+2,
+  return {svg:gsvg.join('')+esvg.join('')+nsvg.join('')+tsvg.join('')+lblsvg.join(''), y:yEnd, w:W+2,
           meta:{W:W, top:y0+20, Hh:Hh}};
 }
 function borderPoint(n,tx,ty){

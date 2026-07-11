@@ -23,3 +23,14 @@ edge d2 -[no]-> r3
 edge r1 -> e
 edge r2 -> e
 edge r3 -> e
+
+# --- layout (materialized; delete freely, structure above is complete) ---
+pin s  at=170,0
+pin p1 at=170,85
+pin d1 at=155,165
+pin p2 at=170,255
+pin d2 at=155,335
+pin r1 at=10,255
+pin r2 at=170,425
+pin r3 at=330,425
+pin e  at=170,510

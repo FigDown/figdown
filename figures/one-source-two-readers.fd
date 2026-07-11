@@ -22,7 +22,7 @@ edge src  -[reads for meaning]->    agent
 
 # --- layout (auto-generated; strip to reset) ---
 pin src   at=20,20
-pin rend  at=200,20
-pin svg   at=370,20
-pin human at=535,20
-pin agent at=110,140
+pin rend  at=330,20
+pin svg   at=615,20
+pin human at=855,20
+pin agent at=110,150
