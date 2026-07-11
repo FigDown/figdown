@@ -1271,6 +1271,25 @@ failure mode (Makefile tabs) and a hallucination source for LLMs.
 Per-column stays GFM colons; if per-cell alignment is ever needed
 (census: 1.4%), it will be `cell r,c align=left|right|center`.
 
+### D9 — Semantic classes: `class` + derived legend (2026-07-10)
+
+OQ-S8 resolved on evidence. The corpus measurement
+([prior-art.md](prior-art.md) §4.4) showed explicit legends are rare
+(≈3% weighted) but **56% of figures carry categorical meaning in
+color/line-style with no stated mapping** — dark semantics that a
+FigDown transcription would otherwise lose (R37 blind spot at corpus
+scale). Adopted (spec §2.7, migration 0.1-dev.10, additive):
+`class <id> "<meaning>" [presentation defaults]`, elements join via
+`class=<id>` (node/group/edge/field/cell), a legend strip derives
+automatically in declaration order. Explicit element attributes
+override class defaults (R8). Normative stance: when color classifies,
+authors SHOULD use `class`; bare `color=` is decoration. Prior art:
+Mermaid `classDef` for the naming half; no surveyed language binds
+meaning to element classes machine-readably — this is FigDown
+differentiation, not invention for its own sake (R18/R28 both
+satisfied: 56% frequency, semantics inexpressible today without
+repeating labels everywhere).
+
 ### D8 — Templates are defaults-only (2026-07-10)
 
 Review outcome (R33), narrowing R16: the `figdown 0.1 <template>`

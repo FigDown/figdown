@@ -43,6 +43,11 @@ a `bundle` multi-homing ring, multi-line host captions.
 
 ![EVPN-VXLAN IRB](srl-evpn-irb.svg)
 
+### Private-VLAN traffic flows — semantic classes  — [source](pvlan-flows.fd)
+Three flow types as `class` declarations: meaning is machine-readable
+on every edge (`class=vidp`), the legend strip derives automatically.
+![Private-VLAN flows](pvlan-flows.svg)
+
 ## Protocol headers (bitfield, census #2)
 
 ### Ethernet II (+ optional 802.1Q)  — [source](ethernet-ii.fd)

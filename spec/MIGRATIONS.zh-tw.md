@@ -81,6 +81,17 @@ Rule:    刪除所有符合 `^\s*zone\b` 的行。無語意損失——該指令
          從未定義任何渲染行為。
 Example: `zone left ingress` →（刪行）
 
+## 0.1-dev.9 → 0.1-dev.10（2026-07-10，D9）
+Change:  新增語意類：`class <id> "<意義>" [color=] [stroke=]
+         [text=] [style=]` ＋ node/group/edge/field/cell 上的
+         `class=<id>`；legend 條自動衍生。
+Rule:    **純新增**——既有文件零改寫。建議（**非機械**，需作者
+         知道意義）：顏色用於分類處，把重複的 `color=#X` 改為
+         一行 `class` ＋ `class=` 引用。
+Example: `edge a -> b color=#dc2626`（已知意義：primary-VLAN
+         流向）→ `class vidp "VID_P" color=#dc2626` ＋
+         `edge a -> b class=vidp`
+
 ## 0.1-dev.8 → 0.1-dev.9（2026-07-10，R34/R35）
 Change:  edge 標籤改為**行內**、位於三個有意義的位置（尾/中/頭）：
          `edge A [t] -[m]-> [h] B`。`[mid]` 標籤把運算子拆成兩半

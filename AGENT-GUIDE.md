@@ -96,6 +96,10 @@ copy geometry for its own sake.
   a small `style=dashed` node next to the target with a dotted edge;
   if it is dense tabular data, one centralized `table` is the better
   transcription. Choose by meaning (R29) — both are sanctioned.
+- **Semantic colors → classes.** When the original distinguishes
+  categories by color/line style (56% of corpus figures do), declare a
+  `class` per category and join elements with `class=` — never leave
+  bare `color=` carrying unstated meaning.
 - **Conditional encodings** (same bits reinterpreted by a mode):
   current convention is `note="valid when …"` on the field plus a
   human-review flag (OQ-S9 tracks a first-class construct).
@@ -129,6 +133,9 @@ line "Cap" in=g at=80%      # threshold marker across a group
 fill 15% in=g color=#hex    # zone band; fill 15-35% = explicit range;
                             # dir=up|down|left|right (default up)
 bundle b1 "LAG" a--c, b--c  # link bundle: dashed ring drawn automatically
+class vidp "VID_P flow" color=#hex [style=dashed]  # semantic class:
+edge a -> b class=vidp      # meaning+style once; legend derives;
+                            # also on node/group/field/cell marks
 
 # bitfield (packet headers lsb0-default; use numbering=msb0 for RFC style)
 bitfield x "Title" unit=32 [numbering=msb0]

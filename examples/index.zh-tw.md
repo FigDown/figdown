@@ -41,6 +41,11 @@ bridge domain、連線埠標籤、`bundle` 多歸屬圈、多行主機說明。
 
 ![EVPN-VXLAN IRB](srl-evpn-irb.svg)
 
+### Private-VLAN 流向 — 語意類 — [來源](pvlan-flows.fd)
+三種流向以 `class` 宣告：每條邊的意義機器可讀（`class=vidp`），
+legend 條自動衍生。
+![Private-VLAN flows](pvlan-flows.svg)
+
 ## 協議標頭（bitfield，普查第 2）
 
 ### Ethernet II（+ 選用 802.1Q）— [來源](ethernet-ii.fd)

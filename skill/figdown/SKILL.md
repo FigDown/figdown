@@ -78,6 +78,9 @@ line "Cap" in=g at=80%      # threshold marker across a group
 fill 15% in=g color=#hex    # zone band; fill 15-35% = explicit range;
                             # dir=up|down|left|right (default up)
 bundle b1 "LAG" a--c, b--c  # link bundle: dashed ring drawn automatically
+class vidp "VID_P flow" color=#hex   # semantic class: meaning+style once;
+edge a -> b class=vidp               # legend derives; also on node/group/
+                                     # field/cell marks
 
 # bitfield (lsb0 register-style default; numbering=msb0 for RFC style)
 bitfield x "Title" unit=32 [numbering=msb0]   # id required, like node ids
@@ -122,7 +125,9 @@ against the original ruler. Never fabricate — mark uncertainty in a
 `#` comment for human review. Record provenance (original filename +
 hash + spec section) in comments at the top of the `.fd`. Per-node
 annotations: dashed node + dotted edge when adjacency carries meaning,
-one centralized table when it is dense data. Conditional encodings:
+one centralized table when it is dense data. Colors that classify →
+declare a `class` per category, join with `class=`; never leave bare
+color= carrying unstated meaning. Conditional encodings:
 `note="valid when …"`. Composite originals: split into one `.fd` per
 concept; the Markdown composes them.
 

@@ -213,6 +213,35 @@ fill 15% in=buf color=#a3c93a
   column's occupancy watermark). The writer chooses the scope that
   states their intent; the renderer treats both identically.
 
+### 2.7 Semantic classes: `class` (+ derived legend)
+
+```figdown
+class vidp "VID_P — primary VLAN"   color=#dc2626
+class vidc "VID_C — community VLAN" color=#2563eb style=dashed
+edge up  -> pp1 class=vidp
+edge pp1 -> cp1 class=vidc
+```
+
+`class <id> "<meaning>" [color=] [stroke=] [text=] [style=]` declares a
+**semantic class** once: a machine-readable meaning plus presentation
+defaults (Mermaid `classDef` heritage; R5's HTML+CSS analogy made
+literal). Any `node`, `group`, `edge`, `field`, or `cell` mark joins it
+via `class=<id>`.
+
+- The corpus evidence (prior-art §4.4): 56% of real figures carry
+  categorical meaning in color with no stated mapping. `class` is that
+  mapping — an agent reads `class=vidp` on the element itself (R37),
+  never correlating hex values.
+- A **legend strip derives automatically** (declaration order, swatch +
+  meaning) — like `bundle`'s ring, no coordinates, no dummy elements.
+- Explicit element attributes override class defaults (rigidity, R8).
+- Class ids are their own namespace; referencing an undeclared class
+  is a line error; duplicates are errors.
+- Stripping `color=`/`style=` from a `class` line loses nothing
+  semantic — the id and meaning stay (§5 invariant refined). When a
+  color *classifies*, authors SHOULD use `class`; bare `color=` is for
+  decoration.
+
 ## 3. Layout control — the three tiers (R5, R8)
 
 Everything in this section is **optional**; with none of it, the renderer
@@ -453,8 +482,9 @@ NOT change the document's semantic structure; semantic consumers MAY
 ignore them. Consequently **color and style MUST NOT be the sole
 carrier of meaning** — if color/dash denotes state, role, plane or
 classification, that meaning SHOULD also appear in text or a semantic
-annotation (a named legend mechanism that would carry this is under
-consideration — OQ-S8). Semantic-color profiles can be layered on later; the
+annotation — the `class` mechanism (§2.7) is that carrier: when
+color/dash classifies, declare a `class` and join elements to it;
+bare `color=` remains for decoration. Semantic-color profiles can be layered on later; the
 document scenario keeps colors free. (resolves the R5 tension)
 
 ## 6. Dynamic — reserved, not specified (R1, R2)
@@ -512,16 +542,10 @@ transient). Deferred until the static core ships.
   (§2.3); `<-` joined the operator set;
   `label=`/`taillabel=`/`headlabel=` retired (migration 0.1-dev.9).
   Survey: [prior-art.md](../design/prior-art.md) §1.
-- OQ-S8: a named **legend/class** mechanism for semantic colors
-  (field feedback F1/F4). Prior-art survey AND corpus measurement
-  done — [prior-art.md](../design/prior-art.md) §4: no surveyed
-  language binds meaning to a class of elements machine-readably;
-  measured corpus incidence: explicit legends ≈3% (weighted), but
-  **56% of figures carry categorical meaning in color with no stated
-  mapping** — the evidence supports `class <id> "<meaning>"
-  [color=…]` + `class=<id>` as the semantic carrier for that 56%,
-  with the legend strip derived (Mermaid classDef heritage).
-  Pending: user ruling.
+- ~~OQ-S8: legend/class mechanism~~ — **resolved (2026-07-10, D9)**:
+  `class` adopted (§2.7); legend strip derived. Evidence:
+  [prior-art.md](../design/prior-art.md) §4 (56% of corpus figures
+  carried unmapped color semantics; explicit legends only ≈3%).
 - OQ-S9: **discriminated variants** in bitfields — the same bits
   reinterpreted by an external mode (field feedback F3; register maps
   do this constantly). Current standard practice: carry the condition
@@ -535,9 +559,10 @@ transient). Deferred until the static core ships.
 
 ## 10. Keyword registry, conformance modes, extensions
 
-**Registry (v0.1).** Top-level keywords (16):
+**Registry (v0.1).** Top-level keywords (17):
 `figdown title node group edge layer flow rank bundle line fill pin
-size bitfield table wave` — plus the table-row line-start token `|`.
+size class bitfield table wave` — plus the table-row line-start token
+`|`.
 Typed-block child keywords (6): `field wrap cell colw signal gap`.
 Reserved for the dynamic profile: `page step set pulse`.
 Experimental (outside the v0.1 conformance surface): `plot`.

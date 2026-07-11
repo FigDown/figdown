@@ -161,7 +161,7 @@ function tokenize(line){
 // here is a positional argument (this lets wave lanes contain '=').
 const OPT_KEYS=new Set(['kind','shape','color','stroke','text','in','layer','label',
   'style','z','at','w','h','unit','note','labels','numbering','fill','from','to','gap','dir','level',
-  'taillabel','headlabel']);
+  'taillabel','headlabel','class']);
 function splitOpts(toks){
   const pos=[], opts={};
   for(const t of toks){
@@ -175,8 +175,9 @@ const ID_RE=/^[A-Za-z_][A-Za-z0-9_-]*$/;
 function parse(text){
   const errs=[];
   const doc={title:'',nodes:[],groups:[],edges:[],layers:[{id:'base',label:'',z:0}],
-             flow:'right',ranks:[],pins:{},sizes:{},blocks:[],trunks:[],glines:[],fills:[]};
-  const nodeIds=new Set(), groupIds=new Set(), layerIds=new Set(['base']);
+             flow:'right',ranks:[],pins:{},sizes:{},blocks:[],trunks:[],glines:[],fills:[],
+             classes:[]};
+  const nodeIds=new Set(), groupIds=new Set(), layerIds=new Set(['base']), classIds=new Set();
   let cur=null;             // current typed block (bitfield/table/wave)
   let sawHeader=false, firstContent=true;
   const lines=text.split('\n');
@@ -254,7 +255,8 @@ function parse(text){
     if(p2.length){ err(n,'unexpected argument "'+p2[0]+'"'); return; }
     for(const k of ['label','taillabel','headlabel'])
       if(o2[k]!==undefined){ err(n,k+'= is retired — write the label inline: edge A [tail] -[mid]-> [head] B (MIGRATIONS 0.1-dev.9)'); return; }
-    doc.edges.push({a,b,op,tail,mid,head,style:o2.style||'solid',
+    if(o2.style!==undefined && !['solid','dashed','dotted'].includes(o2.style)){ err(n,'style must be solid|dashed|dotted'); return; }
+    doc.edges.push({a,b,op,tail,mid,head,style:o2.style,cls:o2['class'],
                     color:o2.color,layer:o2.layer||'base',line:n});
   }
 
@@ -348,7 +350,7 @@ function parse(text){
         // '*' = variable-length field: fills the remainder of the current row
         const cname=pos[1], cw=pos[2];
         if(cname!==undefined && (/^\d+$/.test(cw||'')&&+cw>=1 || cw==='*')){
-          cur.fields.push({name:cname,w:cw==='*'?'*':+cw,optional:pos.includes('optional'),color:opts.color,note:opts.note,line:n});
+          cur.fields.push({name:cname,w:cw==='*'?'*':+cw,optional:pos.includes('optional'),color:opts.color,cls:opts['class'],note:opts.note,line:n});
           continue;
         }
         // Compact form (C bit-field convention): field a:1, b:2, Long Name:16
@@ -390,16 +392,16 @@ function parse(text){
         // data rows 1-based below the separator);  cell <r> highlight
         const rc=/^(h?)(\d+)(?:,(\d+))?$/.exec(pos[1]||'');
         const hl=pos.includes('highlight');
-        if(!rc||(!opts.color&&!hl)){ err(n,'cell needs [h]<row>[,<col>] with color=… or highlight'); continue; }
+        if(!rc||(!opts.color&&!opts['class']&&!hl)){ err(n,'cell needs [h]<row>[,<col>] with color=…/class=… or highlight'); continue; }
         if(!rc[1]&&+rc[2]===0){ err(n,'row 0 is retired — address header tiers as h1..hN (top-down)'); continue; }
         if(hl&&rc[3]===undefined){
           if(rc[1]){ err(n,'highlight applies to data rows only'); continue; }
           cur.rowmarks=cur.rowmarks||[];
           cur.rowmarks.push({r:+rc[2],line:n});
-        } else if(rc[3]!==undefined&&opts.color){
+        } else if(rc[3]!==undefined&&(opts.color||opts['class'])){
           cur.marks=cur.marks||[];
-          cur.marks.push({hdr:!!rc[1],r:+rc[2],c:+rc[3],color:opts.color,line:n});
-        } else { err(n,'cell needs [h]<row>,<col> color=… or <row> highlight'); }
+          cur.marks.push({hdr:!!rc[1],r:+rc[2],c:+rc[3],color:opts.color,cls:opts['class'],line:n});
+        } else { err(n,'cell needs [h]<row>,<col> color=…/class=… or <row> highlight'); }
       } else if(cur.type==='wave' && kw==='signal'){
         const name=pos[1], lane=pos[2];
         if(!name||!lane){ err(n,'signal needs <name> <lane>'); continue; }
@@ -422,6 +424,21 @@ function parse(text){
         if(qm) t=qm[1].replace(/\\n/g,'\n').replace(/\\"/g,'"').replace(/\\\\/g,'\\');
         doc.title=t; break;
       }
+      case 'class': {
+        // semantic class (D9): meaning + presentation defaults declared
+        // once; elements join via class=<id>; the legend strip derives
+        const id=pos[1];
+        if(!id||!ID_RE.test(id)){ err(n,'class needs an id'); break; }
+        if(classIds.has(id)){ err(n,'duplicate class "'+id+'"'); break; }
+        if(!pos[2]){ err(n,'class needs a meaning: class '+id+' "<meaning>"'); break; }
+        if(pos.length>3){ err(n,'unexpected argument "'+pos[3]+'"'); break; }
+        const cstyle=opts.style;
+        if(cstyle!==undefined && !['solid','dashed','dotted'].includes(cstyle)){ err(n,'style must be solid|dashed|dotted'); break; }
+        classIds.add(id);
+        doc.classes.push({id,label:pos[2],color:opts.color,stroke:opts.stroke,
+                          text:opts.text,style:cstyle,line:n});
+        break;
+      }
       case 'layer': {
         const id=pos[1];
         if(!id||!ID_RE.test(id)){ err(n,'layer needs an id'); break; }
@@ -440,10 +457,11 @@ function parse(text){
         if(!SHAPES.includes(shape)){ err(n,'unknown shape "'+shape+'" ('+SHAPES.join('|')+')'); break; }
         nodeIds.add(id);
         if(pos.length>3){ err(n,'unexpected argument "'+pos[3]+'"'); break; }
-        const nstyle=opts.style||'solid';
-        if(!['solid','dashed','dotted'].includes(nstyle)){ err(n,'style must be solid|dashed|dotted'); break; }
+        const nstyle=opts.style;
+        if(nstyle!==undefined && !['solid','dashed','dotted'].includes(nstyle)){ err(n,'style must be solid|dashed|dotted'); break; }
         doc.nodes.push({id,label:pos[2]||id,shape,color:opts.color,stroke:opts.stroke,
-                        style:nstyle,text:opts.text,group:opts['in']||null,layer:opts.layer||'base',line:n});
+                        style:nstyle,text:opts.text,cls:opts['class'],
+                        group:opts['in']||null,layer:opts.layer||'base',line:n});
         break;
       }
       case 'group': {
@@ -457,7 +475,7 @@ function parse(text){
           ggap=parseFloat(opts.gap);
           if(!isFinite(ggap)||ggap<0){ err(n,'gap must be a non-negative number'); break; }
         }
-        doc.groups.push({id,label:pos[2]||id,color:opts.color,gap:ggap,line:n});
+        doc.groups.push({id,label:pos[2]||id,color:opts.color,gap:ggap,cls:opts['class'],line:n});
         break;
       }
       case 'flow': {
@@ -599,6 +617,17 @@ function parse(text){
   }
   for(const id in doc.pins) if(!nodeIds.has(id)&&!groupIds.has(id))
     errs.push('Line '+doc.pins[id].line+': pin of unknown id "'+id+'"');
+  { // class references must resolve (closed grammar)
+    const chk=(cls,line)=>{ if(cls!==undefined && !classIds.has(cls))
+      errs.push('Line '+line+': unknown class "'+cls+'"'); };
+    for(const x of doc.nodes) chk(x.cls,x.line);
+    for(const x of doc.groups) chk(x.cls,x.line);
+    for(const x of doc.edges) chk(x.cls,x.line);
+    for(const b of doc.blocks){
+      if(b.fields) for(const f of b.fields) chk(f.cls,f.line);
+      if(b.marks)  for(const mk of b.marks) chk(mk.cls,mk.line);
+    }
+  }
   for(const id in doc.sizes) if(!nodeIds.has(id)&&!groupIds.has(id))
     errs.push('Line '+doc.sizes[id].line+': size of unknown id "'+id+'"');
   for(const b of doc.blocks){
@@ -667,6 +696,16 @@ function textEl(x,y,fs,anchor,fill,content,extraAttrs){
 }
 
 function render(doc){
+  // resolve class defaults (explicit element attributes win — rigidity, R8)
+  const C={}; for(const c of doc.classes||[]) C[c.id]=c;
+  const rs=(x,k)=>{ if(x[k]===undefined && x.cls && C[x.cls] && C[x.cls][k]!==undefined) x[k]=C[x.cls][k]; };
+  for(const n of doc.nodes){ rs(n,'color'); rs(n,'stroke'); rs(n,'text'); rs(n,'style'); if(n.style===undefined) n.style='solid'; }
+  for(const g of doc.groups){ rs(g,'color'); }
+  for(const e of doc.edges){ rs(e,'color'); rs(e,'style'); if(e.style===undefined) e.style='solid'; }
+  for(const b of doc.blocks){
+    if(b.fields) for(const f of b.fields) rs(f,'color');
+    if(b.marks)  for(const mk of b.marks) rs(mk,'color');
+  }
   const parts=[]; let y=0, maxW=0;
   if(doc.title){ parts.push('<text x="0" y="16" font-size="15" font-weight="600" font-family="var(--sans)">'+esc(doc.title)+'</text>'); y=30; }
   let sceneMeta=null;
@@ -681,6 +720,20 @@ function render(doc){
     else if(b.type==='plot') s=renderPlot(b,y,doc);
     else s=renderWave(b,y);
     parts.push(s.svg); y=s.y+24; maxW=Math.max(maxW,s.w);
+  }
+  if((doc.classes||[]).length){
+    // derived legend strip (D9): declaration order, swatch + meaning
+    const es=[]; let lx=0, ly=y+8; const rowH=20, wrapW=Math.max(maxW,420);
+    for(const c of doc.classes){
+      const tw=String(c.label).length*6.6+30;
+      if(lx>0 && lx+tw>wrapW){ lx=0; ly+=rowH; }
+      const dash=c.style==='dashed'?' stroke-dasharray="6 4"':(c.style==='dotted'?' stroke-dasharray="2 4"':'');
+      es.push('<rect x="'+lx+'" y="'+(ly+3)+'" width="16" height="11" fill="'+(c.color||'#fff')+'" stroke="'+(c.stroke||'#555')+'"'+dash+'/>');
+      es.push('<text x="'+(lx+21)+'" y="'+(ly+12.5)+'" font-size="11" fill="#1d1d1b">'+esc(c.label)+'</text>');
+      lx+=tw+14; maxW=Math.max(maxW,lx);
+    }
+    parts.push(es.join(''));
+    y=ly+rowH;
   }
   const PADL=18, PADT=6;
   const W=Math.ceil(maxW)+PADL+8, H=Math.ceil(y)+PADT+4;
@@ -1478,7 +1531,7 @@ $('src').addEventListener('input',refresh);
 let lastSVG='', lastMeta=null, lastPad={x:0,y:0}, lastDoc=null;
 
 // ---- direct manipulation: every GUI action is a text edit ----
-const SCENE_KW=/^(figdown|title|node|group|edge|layer|flow|rank|pin|size|line|fill|bundle)\b/;
+const SCENE_KW=/^(figdown|title|node|group|edge|layer|flow|rank|pin|size|line|fill|bundle|class)\b/;
 const LAYOUT_MARK='# --- layout (materialized by the editor; delete freely, structure above is complete) ---';
 function applyPins(pins){ // pins: array of [id, px, py] — one text update, one refresh
   const lines=$('src').value.split('\n');

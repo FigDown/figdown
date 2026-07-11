@@ -1,0 +1,23 @@
+figdown 0.1 topology
+title Private-VLAN traffic flows — semantic classes + derived legend
+
+# The field-feedback pattern (F1): three flow types distinguished by
+# color. Each flow's MEANING is machine-readable via class= — the
+# legend strip below is derived automatically from the class lines.
+class vidp "VID_P — primary VLAN"   color=#dc2626
+class vidc "VID_C — community VLAN" color=#2563eb
+class vidi "VID_I — isolated VLAN"  color=#16a34a style=dashed
+
+node up  "Uplink port"    shape=rounded
+node pp1 "Promisc port"
+node cp1 "Community p1"
+node cp2 "Community p2"
+node ip1 "Isolated p1"
+
+flow right
+rank cp1 ip1
+
+edge up  -> pp1 class=vidp
+edge pp1 -> cp1 class=vidc
+edge cp1 <-> cp2 class=vidc
+edge pp1 -> ip1 class=vidi

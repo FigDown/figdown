@@ -81,6 +81,9 @@ FigDown 陳述那個意義——永不為了幾何而抄幾何。
 - **逐節點註記**：空間鄰近本身承載語意時，用一個貼著目標的小型
   `style=dashed` 節點＋點線 edge；若是密集表格式資料，集中一張
   `table` 才是更好的轉寫。依語意選擇（R29）——兩者皆為正解。
+- **語意色 → class。** 原圖以顏色/線型區分類別時（56% 語料圖
+  如此），逐類別宣告 `class` 並以 `class=` 加入元素——永不留
+  裸 `color=` 承載未陳述的意義。
 - **條件式編碼**（同段位元依模式重新解釋）：現行慣例是欄位上
   `note="valid when …"` ＋人工覆核標記（一級構件由 OQ-S9 追蹤）。
 - **複合原圖**（一張圖兩個概念區）：拆成一概念一 `.fd`，由
@@ -113,6 +116,9 @@ line "Cap" in=g at=80%      # 橫跨群組的門檻標記線
 fill 15% in=g color=#hex    # 著色帶；fill 15-35% = 顯式範圍；
                             # dir=up|down|left|right（預設 up）
 bundle b1 "LAG" a--c, b--c  # 鏈路捆綁：虛線圈自動繪製
+class vidp "VID_P flow" color=#hex [style=dashed]  # 語意類：
+edge a -> b class=vidp      # 意義+樣式一次宣告；legend 自動衍生；
+                            # node/group/field/cell 標註皆可用
 
 # bitfield（預設 lsb0 暫存器風格；RFC 風格用 numbering=msb0）
 bitfield x "Title" unit=32 [numbering=msb0]

@@ -186,6 +186,32 @@ fill 15% in=buf color=#a3c93a
   附掛於*節點*（`fill 15-35% in=g2`——如某欄的佔用水位）。
   寫作者選擇能陳述其意圖的 scope；renderer 對兩者一視同仁。
 
+### 2.7 語意類：`class`（＋衍生 legend）
+
+```figdown
+class vidp "VID_P — primary VLAN"   color=#dc2626
+class vidc "VID_C — community VLAN" color=#2563eb style=dashed
+edge up  -> pp1 class=vidp
+edge pp1 -> cp1 class=vidc
+```
+
+`class <id> "<意義>" [color=] [stroke=] [text=] [style=]` 一次宣告
+一個**語意類**：機器可讀的意義＋展現預設（Mermaid `classDef`
+傳承；R5 的 HTML+CSS 類比在此成為字面事實）。任何 `node`、
+`group`、`edge`、`field`、`cell` 標註以 `class=<id>` 加入。
+
+- 語料證據（prior-art §4.4）：56% 的真實圖以顏色承載分類語意
+  卻無對映陳述。`class` 就是那個對映——agent 直接在元素上讀
+  `class=vidp`（R37），永不對照 hex 色值。
+- **Legend 條自動衍生**（宣告順序、色塊＋意義）——如 `bundle`
+  的圈：無座標、無假元素。
+- 元素上的顯式屬性覆蓋類預設（剛性，R8）。
+- class id 是獨立命名空間；引用未宣告的類為行錯誤；重複宣告
+  為錯誤。
+- 從 `class` 行剝除 `color=`/`style=` 不損失語意——id 與意義
+  留下（§5 不變量細化）。顏色*用於分類*時，作者**應**使用
+  `class`；裸 `color=` 留給裝飾。
+
 ## 3. 排版控制——三層級（R5、R8）
 
 本節全部**選用**；一項都不寫時，renderer 確定性地全自動排版。
@@ -389,7 +415,8 @@ renderer/主題，不屬於語言。
 （`pin`、`size`）**不得**改變文件的語意結構；語意消費者**可以**
 忽略它們。因此**顏色與樣式不得是語意的唯一載體**——若顏色/虛線
 代表狀態、角色、平面或分類，該語意**應**同時出現在文字或語意
-註記中（承載此事的具名 legend 機制評估中——OQ-S8）。語意配色 profile 日後可疊加；文件場景維持顏色自由。
+註記中——`class` 機制（§2.7）即為該載體：顏色/虛線用於分類
+時，宣告 `class` 並讓元素加入；裸 `color=` 留給裝飾。語意配色 profile 日後可疊加；文件場景維持顏色自由。
 （化解 R5 的張力）
 
 ## 6. 動態——保留、不規範（R1、R2）
@@ -442,14 +469,10 @@ pulse r1                                # 瞬時高亮
   `<-` 加入運算子集；`label=`／`taillabel=`／`headlabel=` 退役
   （migration 0.1-dev.9）。調查：
   [prior-art.zh-tw.md](../design/prior-art.zh-tw.md) §1。
-- OQ-S8：語意顏色的具名 **legend/class** 機制（實戰回饋
-  F1/F4）。prior-art 調查與語料實測皆完成——
-  [prior-art.zh-tw.md](../design/prior-art.zh-tw.md) §4：沒有任何
-  被調查語言把意義機器可讀地綁到一類元素上；實測語料出現率：
-  顯式 legend ≈3%（加權），但 **56% 的圖以顏色承載分類語意而
-  無任何對映陳述**——證據支持 `class <id> "<意義>" [color=…]`
-  ＋ 元素上 `class=<id>` 作為那 56% 的語意載體，legend 條自動
-  衍生（Mermaid classDef 傳承）。待：使用者裁決。
+- ~~OQ-S8：legend/class 機制~~——**已定案（2026-07-10，D9）**：
+  `class` 採納（§2.7）；legend 條自動衍生。證據：
+  [prior-art.zh-tw.md](../design/prior-art.zh-tw.md) §4（56% 語料
+  圖帶著無對映的顏色語意；顯式 legend 僅 ≈3%）。
 - OQ-S9：bitfield 的**判別式變體**——同一段位元依外部模式重新
   解釋（實戰回饋 F3；暫存器圖極常見）。現行標準做法：以
   `note="valid when …"` 攜帶條件並標記人工覆核。row 級 `when=`
@@ -459,9 +482,9 @@ pulse r1                                # 瞬時高亮
 
 ## 10. 關鍵字註冊表、一致性模式、擴充
 
-**註冊表（v0.1）。** 頂層關鍵字（16 個）：
+**註冊表（v0.1）。** 頂層關鍵字（17 個）：
 `figdown title node group edge layer flow rank bundle line fill pin
-size bitfield table wave`——加上表格列行首 token `|`。
+size class bitfield table wave`——加上表格列行首 token `|`。
 型別區塊子關鍵字（6 個）：`field wrap cell colw signal gap`。
 動態 profile 保留：`page step set pulse`。
 實驗性（v0.1 一致性表面之外）：`plot`。

@@ -86,6 +86,18 @@ Rule:    delete every line matching `^\s*zone\b`. No semantic loss —
          the directive had no defined rendering.
 Example: `zone left ingress` → (line deleted)
 
+## 0.1-dev.9 → 0.1-dev.10  (2026-07-10, D9)
+Change:  semantic classes added: `class <id> "<meaning>" [color=]
+         [stroke=] [text=] [style=]` + `class=<id>` on node/group/
+         edge/field/cell; a legend strip derives automatically.
+Rule:    ADDITIVE — no rewrite needed for existing documents.
+         Recommended (NON-MECHANICAL, needs the author's knowledge of
+         the meaning): where a color classifies, replace repeated
+         `color=#X` with one `class` line + `class=` references.
+Example: `edge a -> b color=#dc2626` (meaning known: primary-VLAN
+         flow) → `class vidp "VID_P" color=#dc2626` +
+         `edge a -> b class=vidp`
+
 ## 0.1-dev.8 → 0.1-dev.9  (2026-07-10, R34/R35)
 Change:  edge labels moved **inline** to the three meaningful positions
          (tail / mid / head): `edge A [t] -[m]-> [h] B`. A `[mid]`
