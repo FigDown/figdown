@@ -1,0 +1,1 @@
+Line 5: "^^" cannot appear in the first data row (rowspan does not cross the header separator)

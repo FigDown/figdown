@@ -1,0 +1,45 @@
+{
+  "header": {
+    "version": "0.1",
+    "template": "wave"
+  },
+  "flow": "right",
+  "classes": [],
+  "layers": [
+    {
+      "id": "base",
+      "z": 0
+    }
+  ],
+  "nodes": [],
+  "groups": [],
+  "edges": [],
+  "ranks": [],
+  "pins": [],
+  "sizes": [],
+  "lines": [],
+  "fills": [],
+  "bundles": [],
+  "blocks": [
+    {
+      "type": "wave",
+      "id": "w",
+      "label": "Lane tokens may contain =",
+      "signals": [
+        {
+          "name": "data",
+          "lane": "x=1=x...",
+          "labels": [
+            "a",
+            "b"
+          ]
+        },
+        {
+          "name": "clk",
+          "lane": "p......."
+        }
+      ],
+      "line": 2
+    }
+  ]
+}

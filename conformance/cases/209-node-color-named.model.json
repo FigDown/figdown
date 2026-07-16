@@ -1,0 +1,51 @@
+{
+  "header": {
+    "version": "0.1",
+    "template": "block"
+  },
+  "flow": "right",
+  "classes": [],
+  "layers": [
+    {
+      "id": "base",
+      "z": 0
+    }
+  ],
+  "nodes": [
+    {
+      "id": "a",
+      "label": "Named",
+      "shape": "box",
+      "layer": "base",
+      "color": "teal",
+      "stroke": "black",
+      "text": "white",
+      "line": 2
+    },
+    {
+      "id": "b",
+      "label": "Spacer",
+      "shape": "box",
+      "layer": "base",
+      "color": "transparent",
+      "line": 3
+    },
+    {
+      "id": "c",
+      "label": "Hex3",
+      "shape": "box",
+      "layer": "base",
+      "color": "#0d9",
+      "line": 4
+    }
+  ],
+  "groups": [],
+  "edges": [],
+  "ranks": [],
+  "pins": [],
+  "sizes": [],
+  "lines": [],
+  "fills": [],
+  "bundles": [],
+  "blocks": []
+}

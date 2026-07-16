@@ -1,0 +1,4 @@
+figdown 0.1 wave
+wave w "Lane tokens may contain ="
+signal data x=1=x... labels="a,b"
+signal clk p.......

@@ -1,0 +1,2 @@
+Line 2: unexpected argument "trailing"
+Line 3: "field" is a typed-block child — it needs a bitfield/table/wave block above it
