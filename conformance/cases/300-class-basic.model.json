@@ -1,0 +1,63 @@
+{
+  "header": {
+    "version": "0.1",
+    "template": "block"
+  },
+  "flow": "right",
+  "classes": [
+    {
+      "id": "vidp",
+      "meaning": "VID_P primary VLAN",
+      "color": "#dc2626",
+      "line": 2
+    },
+    {
+      "id": "vidc",
+      "meaning": "VID_C community VLAN",
+      "color": "#2563eb",
+      "style": "dashed",
+      "line": 3
+    }
+  ],
+  "layers": [
+    {
+      "id": "base",
+      "z": 0
+    }
+  ],
+  "nodes": [
+    {
+      "id": "up",
+      "label": "Uplink",
+      "shape": "box",
+      "layer": "base",
+      "line": 4
+    },
+    {
+      "id": "pp1",
+      "label": "Port 1",
+      "shape": "box",
+      "layer": "base",
+      "class": "vidp",
+      "line": 5
+    }
+  ],
+  "groups": [],
+  "edges": [
+    {
+      "a": "up",
+      "op": "->",
+      "b": "pp1",
+      "layer": "base",
+      "class": "vidc",
+      "line": 6
+    }
+  ],
+  "ranks": [],
+  "pins": [],
+  "sizes": [],
+  "lines": [],
+  "fills": [],
+  "bundles": [],
+  "blocks": []
+}

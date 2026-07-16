@@ -1,0 +1,65 @@
+{
+  "header": {
+    "version": "0.1",
+    "template": "block"
+  },
+  "flow": "right",
+  "classes": [],
+  "layers": [
+    {
+      "id": "base",
+      "z": 0
+    }
+  ],
+  "nodes": [
+    {
+      "id": "m",
+      "label": "Member",
+      "shape": "box",
+      "group": "g",
+      "layer": "base",
+      "line": 3
+    },
+    {
+      "id": "free",
+      "label": "Free",
+      "shape": "box",
+      "layer": "base",
+      "line": 4
+    }
+  ],
+  "groups": [
+    {
+      "id": "g",
+      "label": "G",
+      "line": 2
+    }
+  ],
+  "edges": [],
+  "ranks": [],
+  "pins": [
+    {
+      "id": "g",
+      "x": 40,
+      "y": 60,
+      "line": 5
+    },
+    {
+      "id": "m",
+      "x": 10,
+      "y": 12,
+      "line": 6
+    },
+    {
+      "id": "free",
+      "x": -20,
+      "y": 300.5,
+      "line": 7
+    }
+  ],
+  "sizes": [],
+  "lines": [],
+  "fills": [],
+  "bundles": [],
+  "blocks": []
+}

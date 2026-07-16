@@ -1,0 +1,2 @@
+Line 4: bad item "b:2 color=#fff" (expected name:width)
+Line 5: bad item "Name 8" (expected name:width)

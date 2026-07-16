@@ -1,0 +1,6 @@
+figdown 0.1 block
+node a "A"
+node b "B"
+edge a -[]-> b
+edge a -[oops-> b
+edge a -[has # hash]-> b

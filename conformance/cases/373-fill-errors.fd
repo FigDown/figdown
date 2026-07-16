@@ -1,0 +1,8 @@
+figdown 0.1 block
+group g "G"
+fill 35-15% in=g
+fill 15% in=g from=0 to=15
+fill 15%
+fill 15% in=g dir=diagonal
+fill 15-15% in=g
+fill 15% in=ghost

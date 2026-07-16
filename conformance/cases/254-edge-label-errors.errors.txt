@@ -1,0 +1,3 @@
+Line 4: empty [label]
+Line 5: unterminated [label] — for unbalanced brackets use ["..."]
+Line 6: unterminated [label] — for unbalanced brackets use ["..."]

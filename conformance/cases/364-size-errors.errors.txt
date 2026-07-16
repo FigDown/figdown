@@ -1,0 +1,2 @@
+Line 3: size needs <id> w=<px> and/or h=<px>
+Line 4: size of unknown id "ghost"

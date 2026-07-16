@@ -1,0 +1,6 @@
+figdown 0.1 table
+table fib "FIB"
+| Route || Forwarding ||
+| Prefix | Next Hop | Port | VRF |
+|--------|----------|------|-----|
+| 10.0.0.0/8 | R2 | p1 | default |

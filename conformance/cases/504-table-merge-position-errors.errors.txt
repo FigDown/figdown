@@ -1,0 +1,2 @@
+Line 3: "^^" cannot appear in the first row
+Line 6: colspan cannot start in the first column

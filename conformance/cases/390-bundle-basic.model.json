@@ -1,0 +1,72 @@
+{
+  "header": {
+    "version": "0.1",
+    "template": "topology"
+  },
+  "flow": "right",
+  "classes": [],
+  "layers": [
+    {
+      "id": "base",
+      "z": 0
+    }
+  ],
+  "nodes": [
+    {
+      "id": "bd24a",
+      "label": "Leaf-A",
+      "shape": "box",
+      "layer": "base",
+      "line": 2
+    },
+    {
+      "id": "bd24b",
+      "label": "Leaf-B",
+      "shape": "box",
+      "layer": "base",
+      "line": 3
+    },
+    {
+      "id": "srv",
+      "label": "Server",
+      "shape": "box",
+      "layer": "base",
+      "line": 4
+    }
+  ],
+  "groups": [],
+  "edges": [
+    {
+      "a": "bd24a",
+      "op": "--",
+      "b": "srv",
+      "layer": "base",
+      "line": 5
+    },
+    {
+      "a": "bd24b",
+      "op": "--",
+      "b": "srv",
+      "layer": "base",
+      "line": 6
+    }
+  ],
+  "ranks": [],
+  "pins": [],
+  "sizes": [],
+  "lines": [],
+  "fills": [],
+  "bundles": [
+    {
+      "id": "es1",
+      "label": "ES-1 / LAG-1",
+      "members": [
+        "bd24a--srv",
+        "bd24b--srv"
+      ],
+      "color": "#0ea5e9",
+      "line": 7
+    }
+  ],
+  "blocks": []
+}

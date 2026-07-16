@@ -1,0 +1,6 @@
+figdown 0.1 table
+table t "T"
+| A | B | C | D |
+|---|---|---|---|
+| 1 | 2 | 3 | 4 |
+colw auto 90 120px 25%

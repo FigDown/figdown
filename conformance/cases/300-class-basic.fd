@@ -1,0 +1,6 @@
+figdown 0.1 block
+class vidp "VID_P primary VLAN" color=#dc2626
+class vidc "VID_C community VLAN" color=#2563eb style=dashed
+node up "Uplink"
+node pp1 "Port 1" class=vidp
+edge up -> pp1 class=vidc

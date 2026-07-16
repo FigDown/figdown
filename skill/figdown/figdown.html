@@ -551,7 +551,7 @@ function parse(text){
       case 'pin': {
         const id=pos[1], at=opts.at;
         const m=at&&/^(-?[\d.]+),(-?[\d.]+)$/.exec(at);
-        if(!id||!m){ err(n,'pin needs <id> at=<fx>,<fy>'); break; }
+        if(!id||!m){ err(n,'pin needs <id> at=<x>,<y>'); break; }
         doc.pins[id]={fx:parseFloat(m[1]),fy:parseFloat(m[2]),line:n};
         break;
       }
@@ -584,6 +584,8 @@ function parse(text){
       }
       case 'page': case 'step': case 'set': case 'pulse':
         err(n,'"'+kw+'" is reserved for the dynamic profile (not in v0.1)'); break;
+      case 'field': case 'wrap': case 'cell': case 'colw': case 'signal': case 'gap':
+        err(n,'"'+kw+'" is a typed-block child — it needs a bitfield/table/wave block above it'); break;
       default:
         err(n,'unrecognized line (unknown keyword "'+kw+'")');
     }

@@ -1,0 +1,72 @@
+{
+  "header": {
+    "version": "0.1",
+    "template": "table"
+  },
+  "flow": "right",
+  "classes": [],
+  "layers": [
+    {
+      "id": "base",
+      "z": 0
+    }
+  ],
+  "nodes": [],
+  "groups": [],
+  "edges": [],
+  "ranks": [],
+  "pins": [],
+  "sizes": [],
+  "lines": [],
+  "fills": [],
+  "bundles": [],
+  "blocks": [
+    {
+      "type": "table",
+      "id": "t",
+      "label": "T",
+      "heads": [
+        [
+          {
+            "v": "A"
+          },
+          {
+            "v": "B"
+          },
+          {
+            "v": "C"
+          },
+          {
+            "v": "D"
+          }
+        ]
+      ],
+      "aligns": [
+        "none",
+        "none",
+        "none",
+        "none"
+      ],
+      "rows": [
+        {
+          "cells": [
+            {
+              "v": "a | pipe"
+            },
+            {
+              "v": "^^"
+            },
+            {
+              "v": ""
+            },
+            {
+              "v": "x raw"
+            }
+          ],
+          "line": 5
+        }
+      ],
+      "line": 2
+    }
+  ]
+}

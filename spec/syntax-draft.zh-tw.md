@@ -236,7 +236,9 @@ size l3 w=120 h=60              # 第 3 層：明確尺寸（px 或 %）
   確定性（同來源＋同 renderer 版本 → 位元級相同的 SVG）；不同
   renderer 之間**應**視覺等價（跨實作的位元級一致**不**要求——
   日後可由 Canonical SVG Rendering Profile 提供 opt-in）。局部
-  修改只能改變對應的局部區域。
+  修改只能改變對應的局部區域。parser 層可用
+  [conformance/](../conformance/README.md) 的 golden fixtures 驗證；
+  已知的引擎-規格偏差大聲記錄於其 DISCREPANCIES 檔，永不默默凍結。
 - **尺寸適應**（R10）：有明確 `size` → 內容遷就框（字級可微降）；
   無明確尺寸 → 框最小幅度長大、不推動全局。
 - **兩層釘點（D6）**：被釘的**群組**以畫布 px 錨定其局部原點；

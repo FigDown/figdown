@@ -1,0 +1,2 @@
+Line 4: edge endpoint "g" is a group — connect to a member node (group edges are not in v0.1)
+Line 5: unknown endpoint "ghost"

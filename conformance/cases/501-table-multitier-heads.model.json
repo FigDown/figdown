@@ -1,0 +1,88 @@
+{
+  "header": {
+    "version": "0.1",
+    "template": "table"
+  },
+  "flow": "right",
+  "classes": [],
+  "layers": [
+    {
+      "id": "base",
+      "z": 0
+    }
+  ],
+  "nodes": [],
+  "groups": [],
+  "edges": [],
+  "ranks": [],
+  "pins": [],
+  "sizes": [],
+  "lines": [],
+  "fills": [],
+  "bundles": [],
+  "blocks": [
+    {
+      "type": "table",
+      "id": "fib",
+      "label": "FIB",
+      "heads": [
+        [
+          {
+            "v": "Route"
+          },
+          {
+            "v": "",
+            "merge": "left"
+          },
+          {
+            "v": "Forwarding"
+          },
+          {
+            "v": "",
+            "merge": "left"
+          }
+        ],
+        [
+          {
+            "v": "Prefix"
+          },
+          {
+            "v": "Next Hop"
+          },
+          {
+            "v": "Port"
+          },
+          {
+            "v": "VRF"
+          }
+        ]
+      ],
+      "aligns": [
+        "none",
+        "none",
+        "none",
+        "none"
+      ],
+      "rows": [
+        {
+          "cells": [
+            {
+              "v": "10.0.0.0/8"
+            },
+            {
+              "v": "R2"
+            },
+            {
+              "v": "p1"
+            },
+            {
+              "v": "default"
+            }
+          ],
+          "line": 6
+        }
+      ],
+      "line": 2
+    }
+  ]
+}

@@ -1,0 +1,6 @@
+figdown 0.1 bitfield
+bitfield x "X"
+field A 8
+# comment inside the block
+
+field B 8

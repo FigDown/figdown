@@ -1,0 +1,53 @@
+{
+  "header": {
+    "version": "0.1",
+    "template": "block"
+  },
+  "flow": "right",
+  "classes": [],
+  "layers": [
+    {
+      "id": "base",
+      "z": 0
+    }
+  ],
+  "nodes": [
+    {
+      "id": "q1",
+      "label": "Q1",
+      "shape": "box",
+      "group": "buf",
+      "layer": "base",
+      "line": 3
+    }
+  ],
+  "groups": [
+    {
+      "id": "buf",
+      "label": "Buffer",
+      "line": 2
+    }
+  ],
+  "edges": [],
+  "ranks": [],
+  "pins": [],
+  "sizes": [],
+  "lines": [
+    {
+      "label": "Max cap",
+      "in": "buf",
+      "at": 80,
+      "line": 4
+    },
+    {
+      "label": "Reserved",
+      "in": "buf",
+      "at": 15,
+      "color": "#a3c93a",
+      "line": 5
+    }
+  ],
+  "fills": [],
+  "bundles": [],
+  "blocks": []
+}

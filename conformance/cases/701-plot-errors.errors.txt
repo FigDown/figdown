@@ -1,0 +1,4 @@
+Line 6: plot data must be numeric (row value "abc")
+Line 7: plot references unknown table "ghost"
+Line 8: unknown plot kind "pie" (bars3d)
+Line 9: level must be a non-negative number

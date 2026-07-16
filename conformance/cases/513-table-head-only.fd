@@ -1,0 +1,4 @@
+figdown 0.1 table
+table t "Head Only"
+| A | B |
+|---|---|

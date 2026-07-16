@@ -1,0 +1,6 @@
+figdown 0.1 block
+node a "A"
+node b "B"
+edge a -[flags[3:0]]-> b
+edge a -["two\nlines ] ok"]-> b
+edge a -["has # hash"]-> b

@@ -1,0 +1,5 @@
+figdown 0.1 bitfield
+bitfield x "X"
+field OK 8
+field a:1, b:2 color=#fff
+field Name 8, c:2

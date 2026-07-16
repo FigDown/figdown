@@ -1,0 +1,39 @@
+{
+  "header": {
+    "version": "0.1",
+    "template": "block"
+  },
+  "flow": "right",
+  "classes": [],
+  "layers": [
+    {
+      "id": "base",
+      "z": 0
+    }
+  ],
+  "nodes": [
+    {
+      "id": "a",
+      "label": "A",
+      "shape": "box",
+      "layer": "base",
+      "line": 2
+    }
+  ],
+  "groups": [],
+  "edges": [],
+  "ranks": [],
+  "pins": [
+    {
+      "id": "a",
+      "x": 1,
+      "y": 2,
+      "line": 3
+    }
+  ],
+  "sizes": [],
+  "lines": [],
+  "fills": [],
+  "bundles": [],
+  "blocks": []
+}

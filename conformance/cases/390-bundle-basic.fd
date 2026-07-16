@@ -1,0 +1,7 @@
+figdown 0.1 topology
+node bd24a "Leaf-A"
+node bd24b "Leaf-B"
+node srv "Server"
+edge bd24a -- srv
+edge bd24b -- srv
+bundle es1 "ES-1 / LAG-1" bd24a--srv, bd24b--srv color=#0ea5e9

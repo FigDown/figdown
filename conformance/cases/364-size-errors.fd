@@ -1,0 +1,4 @@
+figdown 0.1 block
+node a "A"
+size a
+size ghost w=10

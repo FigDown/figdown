@@ -1,0 +1,5 @@
+figdown 0.1 block
+node a "A"
+node b "B"
+size a w=120 h=60
+size b w=80

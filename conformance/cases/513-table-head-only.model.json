@@ -1,0 +1,46 @@
+{
+  "header": {
+    "version": "0.1",
+    "template": "table"
+  },
+  "flow": "right",
+  "classes": [],
+  "layers": [
+    {
+      "id": "base",
+      "z": 0
+    }
+  ],
+  "nodes": [],
+  "groups": [],
+  "edges": [],
+  "ranks": [],
+  "pins": [],
+  "sizes": [],
+  "lines": [],
+  "fills": [],
+  "bundles": [],
+  "blocks": [
+    {
+      "type": "table",
+      "id": "t",
+      "label": "Head Only",
+      "heads": [
+        [
+          {
+            "v": "A"
+          },
+          {
+            "v": "B"
+          }
+        ]
+      ],
+      "aligns": [
+        "none",
+        "none"
+      ],
+      "rows": [],
+      "line": 2
+    }
+  ]
+}

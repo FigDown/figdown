@@ -1,0 +1,6 @@
+figdown 0.1 block
+group buf "Buffer"
+node col "Column" in=buf
+fill 15% in=buf color=#a3c93a
+fill 15-35% in=col
+fill 40% in=buf dir=right color=#fca5a5

@@ -1,0 +1,64 @@
+{
+  "header": {
+    "version": "0.1",
+    "template": "topology"
+  },
+  "flow": "right",
+  "classes": [],
+  "layers": [
+    {
+      "id": "base",
+      "z": 0
+    }
+  ],
+  "nodes": [
+    {
+      "id": "a",
+      "label": "A",
+      "shape": "box",
+      "layer": "base",
+      "line": 2
+    },
+    {
+      "id": "b",
+      "label": "B",
+      "shape": "box",
+      "layer": "base",
+      "line": 3
+    }
+  ],
+  "groups": [],
+  "edges": [
+    {
+      "a": "a",
+      "op": "--",
+      "b": "b",
+      "layer": "base",
+      "line": 4
+    }
+  ],
+  "ranks": [],
+  "pins": [],
+  "sizes": [],
+  "lines": [],
+  "fills": [],
+  "bundles": [
+    {
+      "id": "es1",
+      "label": "First",
+      "members": [
+        "a--b"
+      ],
+      "line": 5
+    },
+    {
+      "id": "es1",
+      "label": "Second",
+      "members": [
+        "a--b"
+      ],
+      "line": 6
+    }
+  ],
+  "blocks": []
+}

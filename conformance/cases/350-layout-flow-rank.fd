@@ -1,0 +1,6 @@
+figdown 0.1 block
+node a "A"
+node b "B"
+node c "C"
+flow down
+rank b c

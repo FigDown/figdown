@@ -1,0 +1,6 @@
+figdown 0.1 block
+# full-line comment
+   # indented comment
+node a "A" color=#0d9488 # trailing comment
+
+node b "B"

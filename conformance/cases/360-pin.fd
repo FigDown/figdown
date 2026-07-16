@@ -1,0 +1,7 @@
+figdown 0.1 block
+group g "G"
+node m "Member" in=g
+node free "Free"
+pin g at=40,60
+pin m at=10,12
+pin free at=-20,300.5

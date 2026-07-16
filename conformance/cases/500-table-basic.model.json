@@ -1,0 +1,79 @@
+{
+  "header": {
+    "version": "0.1",
+    "template": "table"
+  },
+  "flow": "right",
+  "classes": [],
+  "layers": [
+    {
+      "id": "base",
+      "z": 0
+    }
+  ],
+  "nodes": [],
+  "groups": [],
+  "edges": [],
+  "ranks": [],
+  "pins": [],
+  "sizes": [],
+  "lines": [],
+  "fills": [],
+  "bundles": [],
+  "blocks": [
+    {
+      "type": "table",
+      "id": "fib",
+      "label": "FIB Table",
+      "heads": [
+        [
+          {
+            "v": "Prefix"
+          },
+          {
+            "v": "Next Hop"
+          },
+          {
+            "v": "Port"
+          }
+        ]
+      ],
+      "aligns": [
+        "none",
+        "center",
+        "none"
+      ],
+      "rows": [
+        {
+          "cells": [
+            {
+              "v": "10.0.0.0/8"
+            },
+            {
+              "v": "R2"
+            },
+            {
+              "v": "p1"
+            }
+          ],
+          "line": 5
+        },
+        {
+          "cells": [
+            {
+              "v": "10.1.0.0/16"
+            },
+            {
+              "v": "R4"
+            },
+            {
+              "v": "p2"
+            }
+          ],
+          "line": 6
+        }
+      ],
+      "line": 2
+    }
+  ]
+}

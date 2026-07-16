@@ -1,0 +1,5 @@
+figdown 0.1 block
+layer base "Dup base"
+layer o "O"
+layer o "Dup"
+node a "A" layer=ghost

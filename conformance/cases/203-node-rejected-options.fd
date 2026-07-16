@@ -1,0 +1,4 @@
+figdown 0.1 block
+node a "A" w=100
+node b "B" h=40
+node c "C" kind=router

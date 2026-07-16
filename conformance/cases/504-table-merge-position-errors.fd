@@ -1,0 +1,6 @@
+figdown 0.1 table
+table t "T"
+| ^^ | A |
+| A | B |
+|---|---|
+|| b1 |

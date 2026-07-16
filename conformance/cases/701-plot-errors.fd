@@ -1,0 +1,9 @@
+figdown 0.1 table
+table t "T"
+| X | V |
+|---|---|
+| r1 | abc |
+plot t
+plot ghost
+plot t kind=pie
+plot t level=-1

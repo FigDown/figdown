@@ -1,0 +1,54 @@
+{
+  "header": {
+    "version": "0.1",
+    "template": "topology"
+  },
+  "flow": "right",
+  "classes": [],
+  "layers": [
+    {
+      "id": "base",
+      "z": 0
+    },
+    {
+      "id": "overlay",
+      "label": "LSP paths",
+      "z": 2
+    }
+  ],
+  "nodes": [
+    {
+      "id": "r1",
+      "label": "R1",
+      "shape": "box",
+      "layer": "base",
+      "line": 3
+    },
+    {
+      "id": "r2",
+      "label": "R2",
+      "shape": "box",
+      "layer": "base",
+      "line": 4
+    }
+  ],
+  "groups": [],
+  "edges": [
+    {
+      "a": "r1",
+      "op": "->",
+      "b": "r2",
+      "layer": "overlay",
+      "color": "#dc2626",
+      "style": "dashed",
+      "line": 5
+    }
+  ],
+  "ranks": [],
+  "pins": [],
+  "sizes": [],
+  "lines": [],
+  "fills": [],
+  "bundles": [],
+  "blocks": []
+}

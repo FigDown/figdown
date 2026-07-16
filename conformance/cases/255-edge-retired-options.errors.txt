@@ -1,0 +1,3 @@
+Line 4: label= is retired — write the label inline: edge A [tail] -[mid]-> [head] B (MIGRATIONS 0.1-dev.9)
+Line 5: taillabel= is retired — write the label inline: edge A [tail] -[mid]-> [head] B (MIGRATIONS 0.1-dev.9)
+Line 6: headlabel= is retired — write the label inline: edge A [tail] -[mid]-> [head] B (MIGRATIONS 0.1-dev.9)

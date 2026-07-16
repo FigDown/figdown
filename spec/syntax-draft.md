@@ -271,6 +271,10 @@ Normative rules:
   visually equivalent (byte-identical output across implementations is
   NOT required — a Canonical SVG Rendering Profile may make it opt-in
   later). A local edit must change only the corresponding local region.
+  The parser tier is testable against the golden fixtures in
+  [conformance/](../conformance/README.md); known engine-vs-spec
+  deviations are recorded loudly in its DISCREPANCIES file, never
+  frozen silently.
 - **Size adaptation** (R10): explicit `size` → content shrinks to fit
   (font may step down). No explicit size → box grows minimally without
   displacing the global layout.

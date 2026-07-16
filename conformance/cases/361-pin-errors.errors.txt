@@ -1,0 +1,2 @@
+Line 3: pin needs <id> at=<x>,<y>
+Line 4: pin of unknown id "ghost"

@@ -1,0 +1,60 @@
+{
+  "header": {
+    "version": "0.1",
+    "template": "wave"
+  },
+  "flow": "right",
+  "classes": [],
+  "layers": [
+    {
+      "id": "base",
+      "z": 0
+    }
+  ],
+  "nodes": [],
+  "groups": [],
+  "edges": [],
+  "ranks": [],
+  "pins": [],
+  "sizes": [],
+  "lines": [],
+  "fills": [],
+  "bundles": [],
+  "blocks": [
+    {
+      "type": "wave",
+      "id": "por",
+      "label": "Power-on reset",
+      "signals": [
+        {
+          "name": "clk",
+          "lane": "p......."
+        },
+        {
+          "name": "clkn",
+          "lane": "n......."
+        },
+        {
+          "name": "rst_n",
+          "lane": "0...1..."
+        },
+        {
+          "name": "data",
+          "lane": "x..=3=5x",
+          "labels": [
+            "cfg",
+            "val"
+          ]
+        },
+        {
+          "name": "bits",
+          "lane": "01019..."
+        }
+      ],
+      "gaps": [
+        4
+      ],
+      "line": 2
+    }
+  ]
+}

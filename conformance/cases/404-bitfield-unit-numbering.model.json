@@ -1,0 +1,50 @@
+{
+  "header": {
+    "version": "0.1",
+    "template": "bitfield"
+  },
+  "flow": "right",
+  "classes": [],
+  "layers": [
+    {
+      "id": "base",
+      "z": 0
+    }
+  ],
+  "nodes": [],
+  "groups": [],
+  "edges": [],
+  "ranks": [],
+  "pins": [],
+  "sizes": [],
+  "lines": [],
+  "fills": [],
+  "bundles": [],
+  "blocks": [
+    {
+      "type": "bitfield",
+      "id": "reg",
+      "label": "Control",
+      "unit": 16,
+      "numbering": "msb0",
+      "fields": [
+        {
+          "name": "EN",
+          "width": 1,
+          "line": 3
+        },
+        {
+          "name": "MODE",
+          "width": 3,
+          "line": 4
+        },
+        {
+          "name": "ADDR",
+          "width": 12,
+          "line": 5
+        }
+      ],
+      "line": 2
+    }
+  ]
+}

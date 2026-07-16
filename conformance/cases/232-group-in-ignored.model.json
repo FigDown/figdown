@@ -1,0 +1,35 @@
+{
+  "header": {
+    "version": "0.1",
+    "template": "block"
+  },
+  "flow": "right",
+  "classes": [],
+  "layers": [
+    {
+      "id": "base",
+      "z": 0
+    }
+  ],
+  "nodes": [],
+  "groups": [
+    {
+      "id": "outer",
+      "label": "Outer",
+      "line": 2
+    },
+    {
+      "id": "inner",
+      "label": "Inner",
+      "line": 3
+    }
+  ],
+  "edges": [],
+  "ranks": [],
+  "pins": [],
+  "sizes": [],
+  "lines": [],
+  "fills": [],
+  "bundles": [],
+  "blocks": []
+}

@@ -1,0 +1,43 @@
+{
+  "header": {
+    "version": "0.1",
+    "template": "block"
+  },
+  "flow": "right",
+  "classes": [
+    {
+      "id": "warn",
+      "meaning": "Needs review",
+      "color": "#fef3c7",
+      "stroke": "#d97706",
+      "text": "#7c2d12",
+      "style": "dotted",
+      "line": 2
+    }
+  ],
+  "layers": [
+    {
+      "id": "base",
+      "z": 0
+    }
+  ],
+  "nodes": [
+    {
+      "id": "a",
+      "label": "A",
+      "shape": "box",
+      "layer": "base",
+      "class": "warn",
+      "line": 3
+    }
+  ],
+  "groups": [],
+  "edges": [],
+  "ranks": [],
+  "pins": [],
+  "sizes": [],
+  "lines": [],
+  "fills": [],
+  "bundles": [],
+  "blocks": []
+}

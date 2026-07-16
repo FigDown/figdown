@@ -1,0 +1,6 @@
+Line 3: fill range needs 0 <= from < to <= 100
+Line 4: from=/to= retired — write the range positionally: fill 15% or fill 15-35%
+Line 5: fill needs in=<node-or-group-id>
+Line 6: dir must be up|down|left|right
+Line 7: fill range needs 0 <= from < to <= 100
+Line 8: unknown target "ghost" for fill

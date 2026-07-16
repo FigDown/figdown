@@ -1,0 +1,8 @@
+figdown 0.1 bitfield
+bitfield gre "GRE Header" unit=32
+field C 1
+field Reserved 9
+field Ver 3
+field "Protocol Type" 16 color=#bfdbfe note="rGRE_INT"
+field Checksum 16 optional
+field Offset 16 optional

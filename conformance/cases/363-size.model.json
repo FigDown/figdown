@@ -1,0 +1,51 @@
+{
+  "header": {
+    "version": "0.1",
+    "template": "block"
+  },
+  "flow": "right",
+  "classes": [],
+  "layers": [
+    {
+      "id": "base",
+      "z": 0
+    }
+  ],
+  "nodes": [
+    {
+      "id": "a",
+      "label": "A",
+      "shape": "box",
+      "layer": "base",
+      "line": 2
+    },
+    {
+      "id": "b",
+      "label": "B",
+      "shape": "box",
+      "layer": "base",
+      "line": 3
+    }
+  ],
+  "groups": [],
+  "edges": [],
+  "ranks": [],
+  "pins": [],
+  "sizes": [
+    {
+      "id": "a",
+      "w": 120,
+      "h": 60,
+      "line": 4
+    },
+    {
+      "id": "b",
+      "w": 80,
+      "line": 5
+    }
+  ],
+  "lines": [],
+  "fills": [],
+  "bundles": [],
+  "blocks": []
+}

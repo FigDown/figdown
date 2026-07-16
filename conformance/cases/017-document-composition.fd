@@ -1,0 +1,12 @@
+figdown 0.1 block
+title Mixed Composition
+node a "Ingress"
+node b "Parser"
+edge a -> b
+bitfield h "Header"
+field Ver 4
+field Len 12
+table t "Stats"
+| K | V |
+|---|---|
+| pkts | 42 |

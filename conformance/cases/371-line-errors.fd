@@ -1,0 +1,8 @@
+figdown 0.1 block
+group g "G"
+node a "A"
+line Cap in=g at=50%
+line "Cap" at=50%
+line "Cap" in=g at=120%
+line "Cap" in=g at=50% fill=below
+line "Cap" in=ghost at=50%

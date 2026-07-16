@@ -1,0 +1,7 @@
+figdown 0.1 table
+table hm "Heatmap"
+| X | c1 | c2 |
+|---|----|----|
+| r1 | 10 | 20 |
+| r2 | 30.5 | -4 |
+plot hm level=40

@@ -1,0 +1,45 @@
+{
+  "header": {
+    "version": "0.1",
+    "template": "bitfield"
+  },
+  "flow": "right",
+  "classes": [],
+  "layers": [
+    {
+      "id": "base",
+      "z": 0
+    }
+  ],
+  "nodes": [],
+  "groups": [],
+  "edges": [],
+  "ranks": [],
+  "pins": [],
+  "sizes": [],
+  "lines": [],
+  "fills": [],
+  "bundles": [],
+  "blocks": [
+    {
+      "type": "bitfield",
+      "id": "x",
+      "label": "X",
+      "unit": 32,
+      "numbering": "lsb0",
+      "fields": [
+        {
+          "name": "A",
+          "width": 8,
+          "line": 3
+        },
+        {
+          "name": "B",
+          "width": 8,
+          "line": 6
+        }
+      ],
+      "line": 2
+    }
+  ]
+}

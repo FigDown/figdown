@@ -1,0 +1,5 @@
+figdown 0.1 bitfield
+bitfield reg "Control" unit=16 numbering=msb0
+field EN 1
+field MODE 3
+field ADDR 12

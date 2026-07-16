@@ -1,0 +1,3 @@
+Line 3: duplicate class "v1"
+Line 4: class needs a meaning: class v2 "<meaning>"
+Line 5: style must be solid|dashed|dotted

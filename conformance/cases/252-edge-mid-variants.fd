@@ -1,0 +1,7 @@
+figdown 0.1 block
+node a "A"
+node b "B"
+edge a -[m1]- b
+edge a -[m2]-> b
+edge a <-[m3]- b
+edge a <-[m4]-> b

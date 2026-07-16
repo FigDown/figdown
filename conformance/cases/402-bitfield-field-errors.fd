@@ -1,0 +1,6 @@
+figdown 0.1 bitfield
+bitfield x "X"
+field A 8
+field a:1 b:2
+field Zero 0
+field NoWidth

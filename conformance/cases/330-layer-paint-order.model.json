@@ -1,0 +1,64 @@
+{
+  "header": {
+    "version": "0.1",
+    "template": "topology"
+  },
+  "flow": "right",
+  "classes": [],
+  "layers": [
+    {
+      "id": "base",
+      "z": 0
+    },
+    {
+      "id": "overlay",
+      "label": "Overlay",
+      "z": 2
+    },
+    {
+      "id": "under",
+      "label": "Underlay",
+      "z": 1
+    }
+  ],
+  "nodes": [
+    {
+      "id": "a",
+      "label": "A",
+      "shape": "box",
+      "layer": "base",
+      "line": 4
+    },
+    {
+      "id": "b",
+      "label": "B",
+      "shape": "box",
+      "layer": "base",
+      "line": 5
+    }
+  ],
+  "groups": [],
+  "edges": [
+    {
+      "a": "a",
+      "op": "->",
+      "b": "b",
+      "layer": "under",
+      "line": 6
+    },
+    {
+      "a": "a",
+      "op": "->",
+      "b": "b",
+      "layer": "overlay",
+      "line": 7
+    }
+  ],
+  "ranks": [],
+  "pins": [],
+  "sizes": [],
+  "lines": [],
+  "fills": [],
+  "bundles": [],
+  "blocks": []
+}

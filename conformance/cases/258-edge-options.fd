@@ -1,0 +1,5 @@
+figdown 0.1 topology
+layer overlay "LSP paths" z=2
+node r1 "R1"
+node r2 "R2"
+edge r1 -> r2 layer=overlay color=#dc2626 style=dashed

@@ -1,0 +1,6 @@
+Line 11: table has no |---| separator row
+Line 13: separator has 3 columns, expected 2
+Line 2: pipe row outside a table block
+Line 6: duplicate separator row
+Line 7: row has 3 cells, expected 2
+Line 8: table has no |---| separator row

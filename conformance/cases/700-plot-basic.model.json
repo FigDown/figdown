@@ -1,0 +1,86 @@
+{
+  "header": {
+    "version": "0.1",
+    "template": "table"
+  },
+  "flow": "right",
+  "classes": [],
+  "layers": [
+    {
+      "id": "base",
+      "z": 0
+    }
+  ],
+  "nodes": [],
+  "groups": [],
+  "edges": [],
+  "ranks": [],
+  "pins": [],
+  "sizes": [],
+  "lines": [],
+  "fills": [],
+  "bundles": [],
+  "blocks": [
+    {
+      "type": "table",
+      "id": "hm",
+      "label": "Heatmap",
+      "heads": [
+        [
+          {
+            "v": "X"
+          },
+          {
+            "v": "c1"
+          },
+          {
+            "v": "c2"
+          }
+        ]
+      ],
+      "aligns": [
+        "none",
+        "none",
+        "none"
+      ],
+      "rows": [
+        {
+          "cells": [
+            {
+              "v": "r1"
+            },
+            {
+              "v": "10"
+            },
+            {
+              "v": "20"
+            }
+          ],
+          "line": 5
+        },
+        {
+          "cells": [
+            {
+              "v": "r2"
+            },
+            {
+              "v": "30.5"
+            },
+            {
+              "v": "-4"
+            }
+          ],
+          "line": 6
+        }
+      ],
+      "line": 2
+    },
+    {
+      "type": "plot",
+      "table": "hm",
+      "kind": "bars3d",
+      "level": 40,
+      "line": 7
+    }
+  ]
+}

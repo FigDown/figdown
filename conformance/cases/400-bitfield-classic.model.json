@@ -1,0 +1,69 @@
+{
+  "header": {
+    "version": "0.1",
+    "template": "bitfield"
+  },
+  "flow": "right",
+  "classes": [],
+  "layers": [
+    {
+      "id": "base",
+      "z": 0
+    }
+  ],
+  "nodes": [],
+  "groups": [],
+  "edges": [],
+  "ranks": [],
+  "pins": [],
+  "sizes": [],
+  "lines": [],
+  "fills": [],
+  "bundles": [],
+  "blocks": [
+    {
+      "type": "bitfield",
+      "id": "gre",
+      "label": "GRE Header",
+      "unit": 32,
+      "numbering": "lsb0",
+      "fields": [
+        {
+          "name": "C",
+          "width": 1,
+          "line": 3
+        },
+        {
+          "name": "Reserved",
+          "width": 9,
+          "line": 4
+        },
+        {
+          "name": "Ver",
+          "width": 3,
+          "line": 5
+        },
+        {
+          "name": "Protocol Type",
+          "width": 16,
+          "color": "#bfdbfe",
+          "note": "rGRE_INT",
+          "line": 6
+        },
+        {
+          "name": "Checksum",
+          "width": 16,
+          "optional": true,
+          "line": 7
+        },
+        {
+          "name": "Offset",
+          "width": 16,
+          "optional": true,
+          "line": 8
+        }
+      ],
+      "line": 2
+    }
+  ]
+}

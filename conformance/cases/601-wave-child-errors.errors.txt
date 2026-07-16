@@ -1,0 +1,4 @@
+Line 4: lane may contain only 0 1 p n x = . digits
+Line 5: signal needs <name> <lane>
+Line 6: gap needs a tick number
+Line 7: gap needs a tick number

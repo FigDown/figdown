@@ -1,0 +1,4 @@
+Line 10: "wrap" not valid inside table
+Line 2: "field" is a typed-block child — it needs a bitfield/table/wave block above it
+Line 4: "signal" is a typed-block child — it needs a bitfield/table/wave block above it
+Line 9: "signal" not valid inside table

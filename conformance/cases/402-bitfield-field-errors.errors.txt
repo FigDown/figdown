@@ -1,0 +1,3 @@
+Line 4: "a:1 b:2" looks like two fields — missing comma?
+Line 5: field needs <name> <width-in-bits>, or a name:width list
+Line 6: field needs <name> <width-in-bits>, or a name:width list

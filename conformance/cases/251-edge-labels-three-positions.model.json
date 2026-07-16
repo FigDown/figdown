@@ -1,0 +1,50 @@
+{
+  "header": {
+    "version": "0.1",
+    "template": "topology"
+  },
+  "flow": "right",
+  "classes": [],
+  "layers": [
+    {
+      "id": "base",
+      "z": 0
+    }
+  ],
+  "nodes": [
+    {
+      "id": "sw1",
+      "label": "ToR-1",
+      "shape": "box",
+      "layer": "base",
+      "line": 2
+    },
+    {
+      "id": "sw2",
+      "label": "ToR-2",
+      "shape": "box",
+      "layer": "base",
+      "line": 3
+    }
+  ],
+  "groups": [],
+  "edges": [
+    {
+      "a": "sw1",
+      "op": "->",
+      "b": "sw2",
+      "tail": "e1/1",
+      "mid": "100G",
+      "head": "e1/2",
+      "layer": "base",
+      "line": 4
+    }
+  ],
+  "ranks": [],
+  "pins": [],
+  "sizes": [],
+  "lines": [],
+  "fills": [],
+  "bundles": [],
+  "blocks": []
+}

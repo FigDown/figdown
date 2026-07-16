@@ -1,0 +1,6 @@
+figdown 0.1 block
+node a "A"
+node b "B"
+edge a -> b label=x
+edge a -> b taillabel=x
+edge a -> b headlabel=x

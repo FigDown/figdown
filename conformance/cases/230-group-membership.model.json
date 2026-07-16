@@ -1,0 +1,55 @@
+{
+  "header": {
+    "version": "0.1",
+    "template": "block"
+  },
+  "flow": "right",
+  "classes": [],
+  "layers": [
+    {
+      "id": "base",
+      "z": 0
+    }
+  ],
+  "nodes": [
+    {
+      "id": "parser",
+      "label": "Parser",
+      "shape": "box",
+      "group": "ingress",
+      "layer": "base",
+      "line": 3
+    },
+    {
+      "id": "l2",
+      "label": "L2 Lookup",
+      "shape": "box",
+      "group": "ingress",
+      "layer": "base",
+      "line": 4
+    },
+    {
+      "id": "ext",
+      "label": "External",
+      "shape": "box",
+      "layer": "base",
+      "line": 5
+    }
+  ],
+  "groups": [
+    {
+      "id": "ingress",
+      "label": "Ingress Pipeline",
+      "gap": 0,
+      "line": 2
+    }
+  ],
+  "edges": [],
+  "ranks": [],
+  "pins": [],
+  "sizes": [],
+  "lines": [],
+  "fills": [],
+  "bundles": [],
+  "blocks": []
+}

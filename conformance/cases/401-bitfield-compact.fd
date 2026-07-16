@@ -1,0 +1,4 @@
+figdown 0.1 bitfield
+bitfield tcp "Flags"
+field C:1, R:1, K:1
+field Reserved:9, Ver:3, Protocol Type:16

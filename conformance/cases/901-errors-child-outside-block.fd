@@ -1,0 +1,10 @@
+figdown 0.1 block
+field A 8
+node n "N"
+signal clk pppp
+table t "T"
+| A |
+|---|
+| 1 |
+signal clk pppp
+wrap

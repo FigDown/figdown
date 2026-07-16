@@ -1,0 +1,39 @@
+{
+  "header": {
+    "version": "0.1",
+    "template": "block"
+  },
+  "flow": "right",
+  "classes": [],
+  "layers": [
+    {
+      "id": "base",
+      "z": 0
+    }
+  ],
+  "nodes": [
+    {
+      "id": "a",
+      "label": "a",
+      "shape": "box",
+      "layer": "base",
+      "line": 2
+    },
+    {
+      "id": "b",
+      "label": "Packet Parser",
+      "shape": "box",
+      "layer": "base",
+      "line": 3
+    }
+  ],
+  "groups": [],
+  "edges": [],
+  "ranks": [],
+  "pins": [],
+  "sizes": [],
+  "lines": [],
+  "fills": [],
+  "bundles": [],
+  "blocks": []
+}

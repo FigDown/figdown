@@ -1,0 +1,5 @@
+Line 4: line needs a quoted "<label>" first
+Line 5: line needs in=<group-id>
+Line 6: line needs at=<0..100>%
+Line 7: line is a pure marker — use the fill directive for zones
+Line 8: unknown group "ghost" for line

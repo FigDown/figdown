@@ -1,0 +1,64 @@
+{
+  "header": {
+    "version": "0.1",
+    "template": "block"
+  },
+  "flow": "right",
+  "classes": [],
+  "layers": [
+    {
+      "id": "base",
+      "z": 0
+    }
+  ],
+  "nodes": [
+    {
+      "id": "col",
+      "label": "Column",
+      "shape": "box",
+      "group": "buf",
+      "layer": "base",
+      "line": 3
+    }
+  ],
+  "groups": [
+    {
+      "id": "buf",
+      "label": "Buffer",
+      "line": 2
+    }
+  ],
+  "edges": [],
+  "ranks": [],
+  "pins": [],
+  "sizes": [],
+  "lines": [],
+  "fills": [
+    {
+      "in": "buf",
+      "from": 0,
+      "to": 15,
+      "dir": "up",
+      "color": "#a3c93a",
+      "line": 4
+    },
+    {
+      "in": "col",
+      "from": 15,
+      "to": 35,
+      "dir": "up",
+      "color": "#e5e7eb",
+      "line": 5
+    },
+    {
+      "in": "buf",
+      "from": 0,
+      "to": 40,
+      "dir": "right",
+      "color": "#fca5a5",
+      "line": 6
+    }
+  ],
+  "bundles": [],
+  "blocks": []
+}

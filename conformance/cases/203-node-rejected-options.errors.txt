@@ -1,0 +1,3 @@
+Line 2: node does not take w=/h= — use a size line
+Line 3: node does not take w=/h= — use a size line
+Line 4: kind= has been renamed: use shape= (geometric; the label text carries the device semantics)

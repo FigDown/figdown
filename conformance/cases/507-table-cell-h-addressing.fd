@@ -1,0 +1,9 @@
+figdown 0.1 table
+table t "T"
+| Top ||
+| A | B |
+|---|---|
+| a1 | b1 |
+cell h1,1 color=#eeede6
+cell h2,2 color=#dbeafe
+cell 1,1 color=#fee2e2

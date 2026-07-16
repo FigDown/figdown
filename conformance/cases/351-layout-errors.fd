@@ -1,0 +1,7 @@
+figdown 0.1 block
+node a "A"
+node b "B"
+flow diagonal
+flow right extra
+rank a
+rank a ghost

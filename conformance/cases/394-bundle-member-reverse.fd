@@ -1,0 +1,5 @@
+figdown 0.1 topology
+node a "A"
+node b "B"
+edge a -> b
+bundle x "Reverse" b--a

@@ -101,6 +101,9 @@ SVG 給人看；`source:` 註腳指向 `.fd`——它是圖的唯一真相來源
   [MIGRATIONS.md](spec/MIGRATIONS.md)
 - [census.zh-tw.md](design/census.zh-tw.md) — 對 774 份真實文件語料的圖型
   普查；v0.1 範圍與優先順序的數據依據，英文版 [census.md](design/census.md)
+- [conformance/](conformance/README.md) — parser 一致性 golden
+  fixtures（100 案例），供第二實作驗證；引擎-規格偏差記錄於其
+  DISCREPANCIES 檔
 - [prior-art.zh-tw.md](design/prior-art.zh-tw.md) — 主流圖語言慣例的
   資訊性調查（edge 標籤、ERD、與 D2 的關係），以採用度加權，
   英文版 [prior-art.md](design/prior-art.md)

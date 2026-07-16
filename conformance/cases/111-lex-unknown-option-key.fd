@@ -1,0 +1,4 @@
+figdown 0.1 block
+node a "A" foo=bar
+node b "B"
+pin b at=1,2 foo=bar

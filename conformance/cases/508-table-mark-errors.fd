@@ -1,0 +1,11 @@
+figdown 0.1 table
+table t "T"
+| A | B |
+|---|---|
+| a1 ||
+| a2 | b2 |
+cell 0,1 color=#fff
+cell 9,1 color=#fff
+cell 1,2 color=#fff
+cell h1 highlight
+cell 3 highlight

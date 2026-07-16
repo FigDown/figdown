@@ -116,6 +116,9 @@ file alone can always be reopened and edited. See
 - [census.md](design/census.md) — figure-type census over a real 774-document
   corpus; the empirical basis for v0.1 scope and priorities, also in
   [繁體中文](design/census.zh-tw.md)
+- [conformance/](conformance/README.md) — golden parser-conformance
+  fixtures (100 cases) a second implementation can be tested against;
+  engine-vs-spec deviations recorded in its DISCREPANCIES file
 - [prior-art.md](design/prior-art.md) — informative survey of mainstream
   diagram-language conventions (edge labels, ERD, D2 relationship),
   weighted by adoption, also in [繁體中文](design/prior-art.zh-tw.md)

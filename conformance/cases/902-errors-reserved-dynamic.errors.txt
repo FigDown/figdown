@@ -1,0 +1,4 @@
+Line 3: "page" is reserved for the dynamic profile (not in v0.1)
+Line 4: "step" is reserved for the dynamic profile (not in v0.1)
+Line 5: "set" is reserved for the dynamic profile (not in v0.1)
+Line 6: "pulse" is reserved for the dynamic profile (not in v0.1)

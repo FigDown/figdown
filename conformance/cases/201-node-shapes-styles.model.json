@@ -1,0 +1,90 @@
+{
+  "header": {
+    "version": "0.1",
+    "template": "block"
+  },
+  "flow": "right",
+  "classes": [],
+  "layers": [
+    {
+      "id": "base",
+      "z": 0
+    }
+  ],
+  "nodes": [
+    {
+      "id": "n1",
+      "label": "Box",
+      "shape": "box",
+      "layer": "base",
+      "line": 2
+    },
+    {
+      "id": "n2",
+      "label": "Rounded",
+      "shape": "rounded",
+      "layer": "base",
+      "line": 3
+    },
+    {
+      "id": "n3",
+      "label": "Circle",
+      "shape": "circle",
+      "layer": "base",
+      "line": 4
+    },
+    {
+      "id": "n4",
+      "label": "Ellipse",
+      "shape": "ellipse",
+      "layer": "base",
+      "line": 5
+    },
+    {
+      "id": "n5",
+      "label": "Cloud",
+      "shape": "cloud",
+      "layer": "base",
+      "line": 6
+    },
+    {
+      "id": "n6",
+      "label": "Diamond",
+      "shape": "diamond",
+      "layer": "base",
+      "line": 7
+    },
+    {
+      "id": "n7",
+      "label": "Cylinder",
+      "shape": "cylinder",
+      "layer": "base",
+      "line": 8
+    },
+    {
+      "id": "n8",
+      "label": "Dashed",
+      "shape": "box",
+      "layer": "base",
+      "style": "dashed",
+      "line": 9
+    },
+    {
+      "id": "n9",
+      "label": "Dotted",
+      "shape": "box",
+      "layer": "base",
+      "style": "dotted",
+      "line": 10
+    }
+  ],
+  "groups": [],
+  "edges": [],
+  "ranks": [],
+  "pins": [],
+  "sizes": [],
+  "lines": [],
+  "fills": [],
+  "bundles": [],
+  "blocks": []
+}

@@ -1,0 +1,4 @@
+figdown 0.1 topology
+node sw1 "ToR-1"
+node sw2 "ToR-2"
+edge sw1 [e1/1] -[100G]-> [e1/2] sw2

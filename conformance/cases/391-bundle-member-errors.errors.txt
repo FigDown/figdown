@@ -1,0 +1,3 @@
+Line 6: no edge between "a" and "c" for bundle member
+Line 7: unknown endpoint in "a--ghost"
+Line 8: bad member "xx" (expected A--B)

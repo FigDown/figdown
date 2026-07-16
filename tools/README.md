@@ -1,5 +1,7 @@
 # FigDown tools
 
+See also `../conformance/` — the v0.1 parser-conformance suite (golden fixtures + runner: `node conformance/run.js`).
+
 - `build-svg.js` — the sidecar generator: `node tools/build-svg.js
   <file.fd | dir> ...` validates and renders deterministically
   (`X.fd → X.svg`, source + SHA-256 embedded). Engine lookup order:

@@ -1,0 +1,47 @@
+{
+  "header": {
+    "version": "0.1",
+    "template": "flowchart"
+  },
+  "flow": "right",
+  "classes": [],
+  "layers": [
+    {
+      "id": "base",
+      "z": 0
+    }
+  ],
+  "nodes": [
+    {
+      "id": "a",
+      "label": "Start",
+      "shape": "box",
+      "layer": "base",
+      "line": 2
+    },
+    {
+      "id": "b",
+      "label": "End",
+      "shape": "box",
+      "layer": "base",
+      "line": 3
+    }
+  ],
+  "groups": [],
+  "edges": [
+    {
+      "a": "a",
+      "op": "->",
+      "b": "b",
+      "layer": "base",
+      "line": 4
+    }
+  ],
+  "ranks": [],
+  "pins": [],
+  "sizes": [],
+  "lines": [],
+  "fills": [],
+  "bundles": [],
+  "blocks": []
+}

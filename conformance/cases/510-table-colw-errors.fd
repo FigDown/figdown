@@ -1,0 +1,12 @@
+figdown 0.1 table
+table t "T"
+| A | B |
+|---|---|
+| 1 | 2 |
+colw auto
+colw auto 12em
+table u "U"
+| C |
+|---|
+| 3 |
+colw 12em

@@ -1,0 +1,13 @@
+figdown 0.1 table
+| stray | row |
+table t "T"
+| A | B |
+|---|---|
+|---|---|
+| 1 | 2 | 3 |
+table u "NoSep"
+| C |
+| 1 |
+table v "SepMismatch"
+| D | E |
+|---|---|---|

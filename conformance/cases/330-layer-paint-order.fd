@@ -1,0 +1,7 @@
+figdown 0.1 topology
+layer overlay "Overlay" z=2
+layer under "Underlay" z=1
+node a "A"
+node b "B"
+edge a -> b layer=under
+edge a -> b layer=overlay
