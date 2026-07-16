@@ -129,7 +129,7 @@ function extractEdges(svgText, tx, ty) {
   const edges = [];
 
   // straight <line> edges
-  const lineRe = /<line x1="([^"]*)" y1="([^"]*)" x2="([^"]*)" y2="([^"]*)"[^/]*stroke-width="1\.6"[^/]*\/>/g;
+  const lineRe = /<line(?: data-edge="[^"]*")? x1="([^"]*)" y1="([^"]*)" x2="([^"]*)" y2="([^"]*)"[^/]*stroke-width="1\.6"[^/]*\/>/g;
   let m;
   while ((m = lineRe.exec(svgText)) !== null) {
     const x1 = parseFloat(m[1]) + tx, y1 = parseFloat(m[2]) + ty;
@@ -144,7 +144,7 @@ function extractEdges(svgText, tx, ty) {
   // Use a conservative check: path must have fill="none" and not be inside <defs>.
   //
   // Strategy: find the <g transform="translate("> content block and scan it.
-  const pathRe = /<path d="([^"]*)" fill="none" stroke="[^"]*" stroke-width="1\.6"[^/]*\/>/g;
+  const pathRe = /<path(?: data-edge="[^"]*")? d="([^"]*)" fill="none" stroke="[^"]*" stroke-width="1\.6"[^/]*\/>/g;
   while ((m = pathRe.exec(svgText)) !== null) {
     // skip the arrowhead path (M0,0 L10,5 L0,10 z — it lives in <defs>)
     const d = m[1];

@@ -942,6 +942,81 @@ function renderScene(doc,y0){
     if(o){ n.x=o.x+p.fx; n.y=o.y+p.fy; }
     else { n.x=p.fx; n.y=y0+20+p.fy; }
   }
+  // back-edge channel plan: slots used to be handed out in paint order, so
+  // a far source could take the innermost slot and its long run crossed
+  // every other return. Sort channel-bound back-edges so the source NEAREST
+  // the channel gets the INNERMOST slot (vertical flow, right channel:
+  // larger cx = nearer; horizontal flow, bottom channel: larger cy = nearer;
+  // ties: document order). Where the pattern allows it (vertical flow,
+  // clear space below the source, clear sky above the target) the loop is
+  // drawn as a full concentric ring — drop row, channel, return row and hub
+  // entry nested in the same order, entering the hub's top edge on the
+  // channel side — so fan-in hubs (N states -> IDLE reset) have no crossings.
+  const chPlan=new Map(); let chTop=0, chShift=0;
+  {
+    const chList=doc.edges.filter(e=>byId[e.a]&&byId[e.b]&&isBack.has(e)&&!pinned(e.a)&&!pinned(e.b));
+    const near=e=>{ const A=byId[e.a]; return horiz?A.y+A.h/2:A.x+A.w/2; };
+    const order=chList.map((e,i)=>({e,i}));
+    order.sort((p,q)=>near(q.e)-near(p.e)||p.i-q.i);
+    let cum=0;
+    order.forEach(({e},ring)=>{
+      const A=byId[e.a], B=byId[e.b], sx=A.x+A.w/2;
+      const ringOK=!horiz&&A!==B
+        &&!nodes.some(n=>n!==A&&n.x<sx&&n.x+n.w>sx&&n.y+n.h>A.y+A.h)
+        &&!nodes.some(n=>n!==B&&n.x<B.x+B.w&&n.x+n.w>B.x&&n.y<B.y);
+      chPlan.set(e,{ring,slot:cum,ringOK});
+      cum+=(!horiz&&e.mid)?Math.max(22,lblPx(e.mid)+14):22;
+    });
+    // rings are all-or-nothing per target: a hub whose loops are part ring,
+    // part legacy would reintroduce crossings between the two styles
+    const byT={};
+    order.forEach(({e})=>{ (byT[e.b]=byT[e.b]||[]).push(e); });
+    for(const t in byT)
+      if(!byT[t].every(e=>chPlan.get(e).ringOK))
+        byT[t].forEach(e=>{ chPlan.get(e).ringOK=false; });
+    // hub entries fan across the target's top edge, innermost ring nearest
+    // the channel, so concentric rings never cross on their way in
+    for(const t in byT){
+      const g=byT[t].filter(e=>chPlan.get(e).ringOK);
+      const B=byId[t], m=g.length;
+      g.forEach((e,k)=>{ chPlan.get(e).ex=B.x+B.w*(m-k)/(m+1); });
+    }
+    // ring return rows run above the top rank; shift the whole scene down
+    // when they would spill into the title band. The shift is uniform
+    // (relative geometry, incl. pins, is preserved) and meta.top reports
+    // the shifted origin so the editor's drag->pin round-trip stays stable.
+    const rings=order.filter(({e})=>chPlan.get(e).ringOK);
+    if(rings.length){
+      let occT=Infinity;
+      for(const n of nodes) occT=Math.min(occT, n.y-(n.group?26:0));
+      const maxRing=Math.max(...rings.map(({e})=>chPlan.get(e).ring));
+      chShift=Math.max(0, y0+20+maxRing*12-occT);
+      if(chShift){ for(const n of lay) n.y+=chShift;
+                   for(const k in gOrigin) gOrigin[k].y+=chShift; }
+      chTop=occT+chShift;
+    }
+  }
+  // anti-parallel straight edges (A->B and B->A) used to coincide: offset
+  // each member of a same-pair straight group along the pair's CANONICAL
+  // normal (endpoints sorted by id), so opposite directions land on
+  // opposite sides; endpoints and labels shift together.
+  const apOff=new Map();
+  {
+    const straight=e=>byId[e.a]&&byId[e.b]&&!(isBack.has(e)&&!pinned(e.a)&&!pinned(e.b))&&!chains.get(e);
+    const pk=e=>e.a<e.b?e.a+'\t'+e.b:e.b+'\t'+e.a;
+    const pairN={}, seen={};
+    for(const e of doc.edges) if(straight(e)){ const k=pk(e); pairN[k]=(pairN[k]||0)+1; }
+    for(const e of doc.edges){
+      if(!straight(e)) continue;
+      const k=pk(e), kk=pairN[k]; if(kk<2) continue;
+      const idx=seen[k]||0; seen[k]=idx+1;
+      const off=(idx-(kk-1)/2)*7;
+      const lo=e.a<e.b?e.a:e.b, hi=e.a<e.b?e.b:e.a;
+      const P=byId[lo], Q=byId[hi];
+      const dx=(Q.x+Q.w/2)-(P.x+P.w/2), dy=(Q.y+Q.h/2)-(P.y+P.h/2), L=Math.hypot(dx,dy)||1;
+      apOff.set(e,[-dy/L*off, dx/L*off]);
+    }
+  }
   let W=0,Hh=0;
   for(const n of lay){ W=Math.max(W,n.x+n.w); Hh=Math.max(Hh,n.y+n.h-y0-20); }
   if(W===0){W=480;} if(Hh===0){Hh=280;}
@@ -987,7 +1062,6 @@ function renderScene(doc,y0){
     const v=chain[1+Math.floor((chain.length-3)/2)];
     occR=Math.max(occR, v.x+v.w/2+9+lblPx(e.mid));
   });
-  let chn=0, chOff=0;        // channel slots handed out in paint order
   for(const e of edges){
     const A=byId[e.a], B=byId[e.b]; if(!A||!B) continue;
     const col=e.color||'#555';
@@ -998,39 +1072,51 @@ function renderScene(doc,y0){
     const seg=(p,q,t,lbl,fs)=>lblsvg.push(textEl(p[0]+(q[0]-p[0])*t, p[1]+(q[1]-p[1])*t-4, fs,'middle','#555',lbl,halo));
     if(isBack.has(e)&&!pinned(e.a)&&!pinned(e.b)){
       // back-edge (retry loop): polyline through a side channel beyond the
-      // occupied lanes instead of a straight line hidden under the spine.
-      // When the sideways run to the channel would cut through a sibling
-      // node, the route drops into the inter-layer gap first.
+      // occupied lanes instead of a straight line hidden under the spine,
+      // using the nested slot from the channel plan. Ring-eligible loops
+      // wrap over the top and enter the hub's top edge; otherwise, when
+      // the sideways run to the channel would cut through a sibling node,
+      // the route drops into the inter-layer gap first.
       const lane=r=>(ranksArr[r]||[]).filter(n=>!n.virtual);
+      const P=chPlan.get(e), ring=P.ring;
       const pts=[];
       if(horiz){             // channel runs below the lanes
-        const chY=occB+28+chOff; chOff+=22;   // labels ride ON the channel
+        const chY=occB+28+P.slot;             // labels ride ON the channel
         const colR=r=>Math.max(...lane(r).map(n=>n.x+n.w));
         const blockedV=(y1,y2,xx,skip)=>nodes.some(n=>n!==skip&&n.x<xx&&n.x+n.w>xx&&n.y+n.h>y1&&n.y<y2);
         const sx=A===B?A.x+A.w*0.3:A.x+A.w/2, tx=A===B?B.x+B.w*0.7:B.x+B.w/2;
         if(A!==B&&blockedV(A.y+A.h,chY,sx,A)){
-          const gx=colR(A.rank)+10+chn*7;
+          const gx=colR(A.rank)+10+ring*7;
           pts.push([A.x+A.w,A.y+A.h/2],[gx,A.y+A.h/2],[gx,chY]);
         } else pts.push([sx,A.y+A.h],[sx,chY]);
         if(A!==B&&blockedV(B.y+B.h,chY,tx,B)){
-          const gx=colR(B.rank)+10+chn*7;
+          const gx=colR(B.rank)+10+ring*7;
           pts.push([gx,chY],[gx,B.y+B.h/2],[B.x+B.w,B.y+B.h/2]);
         } else pts.push([tx,chY],[tx,B.y+B.h]);
         if(e.mid){
           const c1=pts.findIndex(p=>p[1]===chY);
           lblsvg.push(textEl((pts[c1][0]+pts[c1+1][0])/2, chY-5, 11,'middle',col,e.mid,halo));
         }
+      } else if(P.ringOK){   // concentric ring: under, around, over, in
+        const sx=A.x+A.w/2;
+        const gy=occB+14+ring*12, chX=occR+28+P.slot, topY=chTop-14-ring*12;
+        pts.push([sx,A.y+A.h],[sx,gy],[chX,gy],[chX,topY],[P.ex,topY],[P.ex,B.y]);
+        if(e.mid){
+          const c1=pts.findIndex(p=>p[0]===chX);
+          lblsvg.push(textEl(chX+7,(pts[c1][1]+pts[c1+1][1])/2+4,11,'start',col,e.mid,halo));
+          W=Math.max(W, chX+9+lblPx(e.mid));
+        }
       } else {               // channel runs right of the lanes
-        const chX=occR+28+chOff; chOff+=e.mid?Math.max(22,lblPx(e.mid)+14):22;
+        const chX=occR+28+P.slot;
         const laneB=r=>Math.max(...lane(r).map(n=>n.y+n.h));
         const blockedH=(x1,x2,yy,skip)=>nodes.some(n=>n!==skip&&n.y<yy&&n.y+n.h>yy&&n.x+n.w>x1&&n.x<x2);
         const sy=A===B?A.y+A.h*0.3:A.y+A.h/2, ty=A===B?B.y+B.h*0.7:B.y+B.h/2;
         if(A!==B&&blockedH(A.x+A.w,chX,sy,A)){
-          const gy=laneB(A.rank)+10+chn*7;
+          const gy=laneB(A.rank)+10+ring*7;
           pts.push([A.x+A.w/2,A.y+A.h],[A.x+A.w/2,gy],[chX,gy]);
         } else pts.push([A.x+A.w,sy],[chX,sy]);
         if(A!==B&&blockedH(B.x+B.w,chX,ty,B)){
-          const gy=laneB(B.rank)+10+chn*7;
+          const gy=laneB(B.rank)+10+ring*7;
           pts.push([chX,gy],[B.x+B.w/2,gy],[B.x+B.w/2,B.y+B.h]);
         } else pts.push([chX,ty],[B.x+B.w,ty]);
         if(e.mid){
@@ -1039,9 +1125,8 @@ function renderScene(doc,y0){
           W=Math.max(W, chX+9+lblPx(e.mid));
         }
       }
-      chn++;
       for(const p of pts){ W=Math.max(W,p[0]+4); Hh=Math.max(Hh,p[1]+16-y0-20); }
-      esvg.push('<path d="M'+pts.map(p=>p.join(' ')).join(' L')+'" fill="none" stroke="'+col+'" stroke-width="1.6"'+dash+m1+m2+'/>');
+      esvg.push('<path data-edge="'+e.line+'" d="M'+pts.map(p=>p.join(' ')).join(' L')+'" fill="none" stroke="'+col+'" stroke-width="1.6"'+dash+m1+m2+'/>');
       if(e.tail) seg(pts[0],pts[1],0.5,e.tail,10);
       if(e.head) seg(pts[pts.length-1],pts[pts.length-2],0.5,e.head,10);
       continue;
@@ -1062,7 +1147,7 @@ function renderScene(doc,y0){
       const p0=borderPoint(A,pts[0][0],pts[0][1]);
       const p1=borderPoint(B,pts[pts.length-1][0],pts[pts.length-1][1]);
       pts.unshift(p0); pts.push(p1);
-      esvg.push('<path d="M'+pts.map(p=>p.join(' ')).join(' L')+'" fill="none" stroke="'+col+'" stroke-width="1.6"'+dash+m1+m2+'/>');
+      esvg.push('<path data-edge="'+e.line+'" d="M'+pts.map(p=>p.join(' ')).join(' L')+'" fill="none" stroke="'+col+'" stroke-width="1.6"'+dash+m1+m2+'/>');
       if(e.mid){
         const v=chain[1+Math.floor((chain.length-3)/2)];  // middle waypoint
         const cx=v.x+v.w/2, cy=v.y+v.h/2;
@@ -1076,8 +1161,10 @@ function renderScene(doc,y0){
       continue;
     }
     const ax=A.x+A.w/2, ay=A.y+A.h/2, bx=B.x+B.w/2, by=B.y+B.h/2;
-    const [x1,yy1]=borderPoint(A,bx,by), [x2,yy2]=borderPoint(B,ax,ay);
-    esvg.push('<line x1="'+x1+'" y1="'+yy1+'" x2="'+x2+'" y2="'+yy2+'" stroke="'+col+'" stroke-width="1.6"'+dash+m1+m2+'/>');
+    let [x1,yy1]=borderPoint(A,bx,by), [x2,yy2]=borderPoint(B,ax,ay);
+    const ap=apOff.get(e);   // anti-parallel fan-out (labels ride along)
+    if(ap){ x1+=ap[0]; yy1+=ap[1]; x2+=ap[0]; yy2+=ap[1]; }
+    esvg.push('<line data-edge="'+e.line+'" x1="'+x1+'" y1="'+yy1+'" x2="'+x2+'" y2="'+yy2+'" stroke="'+col+'" stroke-width="1.6"'+dash+m1+m2+'/>');
     if(e.mid){
       const mx=(x1+x2)/2, my=(yy1+yy2)/2;
       if(Math.abs(x2-x1)>=Math.abs(yy2-yy1))
@@ -1161,7 +1248,7 @@ function renderScene(doc,y0){
   }
   const yEnd=y0+20+Hh+10;
   return {svg:gsvg.join('')+esvg.join('')+nsvg.join('')+tsvg.join('')+lblsvg.join(''), y:yEnd, w:W+2,
-          meta:{W:W, top:y0+20, Hh:Hh}};
+          meta:{W:W, top:y0+20+chShift, Hh:Hh}};
 }
 function borderPoint(n,tx,ty){
   const cx=n.x+n.w/2, cy=n.y+n.h/2, dx=tx-cx, dy=ty-cy;
