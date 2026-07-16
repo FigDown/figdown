@@ -12,17 +12,6 @@ Resolved items move to the **Resolved** section at the bottom — history
 is kept, never deleted. Items D2–D14 were resolved in the 0.1-dev.11
 strictness batch (migration entry `0.1-dev.10 → 0.1-dev.11`).
 
-No engine *behavior* was changed while building the suite. During the
-independent audit round two **cosmetic error-message** changes were
-applied to the engine (no grammar or model change): the `pin` usage
-message now says `at=<x>,<y>` (the `fx`/`fy` wording was retired
-fraction-era vocabulary), and a typed-block child keyword outside any
-block (`field`, `wrap`, `cell`, `colw`, `signal`, `gap`) now reports
-`"<kw>" is a typed-block child — it needs a bitfield/table/wave block
-above it` instead of the generic unknown-keyword error. Goldens 361 and
-901 carry the new texts; the skill bundle was regenerated
-(`tools/make-skill.js`) per the repo rule.
-
 ## D1 — `flowchart` template does not default `flow` to `down`
 
 - Case: `011-header-template-flowchart-flow`
@@ -33,6 +22,22 @@ above it` instead of the generic unknown-keyword error. Goldens 361 and
   `figdown 0.1 flowchart`.
 
 ---
+
+**Resolved (0.1-dev.12, 2026-07-16)**: implemented — the `flowchart`
+template now defaults `flow` to `down`; an explicit `flow` line
+overrides. Golden 011 updated; migration entry ships the rewrite rule
+for documents that relied on the old behavior.
+
+No engine *behavior* was changed while building the suite. During the
+independent audit round two **cosmetic error-message** changes were
+applied to the engine (no grammar or model change): the `pin` usage
+message now says `at=<x>,<y>` (the `fx`/`fy` wording was retired
+fraction-era vocabulary), and a typed-block child keyword outside any
+block (`field`, `wrap`, `cell`, `colw`, `signal`, `gap`) now reports
+`"<kw>" is a typed-block child — it needs a bitfield/table/wave block
+above it` instead of the generic unknown-keyword error. Goldens 361 and
+901 carry the new texts; the skill bundle was regenerated
+(`tools/make-skill.js`) per the repo rule.
 
 ## Spec-unsupported strictness / policy frozen without spec backing
 

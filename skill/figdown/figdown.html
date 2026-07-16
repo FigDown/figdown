@@ -412,7 +412,10 @@ function parse(text){
         if(pos[2]!==undefined){
           const TEMPLATES=['block','topology','flowchart','bitfield','table','wave'];
           if(!TEMPLATES.includes(pos[2])) err(n,'unknown template "'+pos[2]+'" (block|topology|flowchart|bitfield|table|wave)');
-          else doc.template=pos[2];
+          else{ doc.template=pos[2];
+            // template defaults (D8/R13): flowchart figures flow down —
+            // the census-dominant direction; an explicit flow line overrides
+            if(pos[2]==='flowchart') doc.flow='down'; }
         }
         badOpts('figdown');
         continue;

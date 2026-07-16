@@ -86,6 +86,16 @@ Rule:    delete every line matching `^\s*zone\b`. No semantic loss —
          the directive had no defined rendering.
 Example: `zone left ingress` → (line deleted)
 
+## 0.1-dev.11 → 0.1-dev.12  (2026-07-16, D1)
+Change:  the `flowchart` template now applies its promised default
+         flow (`down`) when no explicit `flow` line is present
+         (spec §1 template defaults, census-dominant direction).
+Rule:    flowchart-template documents WITHOUT a `flow` line that
+         relied on the old right-flowing behavior: add `flow right`.
+         Documents with an explicit `flow` line are unaffected.
+Example: `figdown 0.1 flowchart` (no flow line) → add `flow right`
+         to preserve the previous rendering.
+
 ## 0.1-dev.9 → 0.1-dev.10  (2026-07-10, D9)
 Change:  semantic classes added: `class <id> "<meaning>" [color=]
          [stroke=] [text=] [style=]` + `class=<id>` on node/group/

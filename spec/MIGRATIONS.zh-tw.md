@@ -81,6 +81,14 @@ Rule:    刪除所有符合 `^\s*zone\b` 的行。無語意損失——該指令
          從未定義任何渲染行為。
 Example: `zone left ingress` →（刪行）
 
+## 0.1-dev.11 → 0.1-dev.12（2026-07-16，D1）
+Change:  `flowchart` template 現在落實其承諾的預設流向（`down`，
+         無顯式 `flow` 行時；規格 §1 template 預設、普查主流方向）。
+Rule:    沒有 `flow` 行、且依賴舊有向右行為的 flowchart-template
+         文件：補一行 `flow right`。有顯式 `flow` 行者不受影響。
+Example: `figdown 0.1 flowchart`（無 flow 行）→ 補 `flow right`
+         以保持先前的渲染。
+
 ## 0.1-dev.9 → 0.1-dev.10（2026-07-10，D9）
 Change:  新增語意類：`class <id> "<意義>" [color=] [stroke=]
          [text=] [style=]` ＋ node/group/edge/field/cell 上的
