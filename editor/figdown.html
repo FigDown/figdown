@@ -1125,6 +1125,27 @@ function renderScene(doc,y0){
           W=Math.max(W, chX+9+lblPx(e.mid));
         }
       }
+      // non-incident nodes are obstacles for the channel runs too: a run
+      // that would cut through a sibling (e.g. a pinned node parked on the
+      // escape lane) detours around it instead of drawing across it. When
+      // spanning the following corner point gives a shorter total run than
+      // detour + remaining leg (a detour "spike"), the corner is dropped.
+      const obsN=nodes.filter(n=>n!==A&&n!==B).map(n=>({x:n.x,y:n.y,w:n.w,h:n.h}));
+      const plen=pp=>{let s=0;for(let k=0;k+1<pp.length;k++)s+=Math.hypot(pp[k+1][0]-pp[k][0],pp[k+1][1]-pp[k][1]);return s;};
+      for(let i=0;i+1<pts.length;i++){
+        const d=routeAround(pts[i],pts[i+1],obsN);
+        if(!d) continue;
+        let ins=d.slice(1,-1), drop=0;
+        if(i+2<pts.length){
+          const span=segHitsObs(pts[i],pts[i+2],obsN)
+            ?routeAround(pts[i],pts[i+2],obsN):[pts[i],pts[i+2]];
+          if(span&&plen(span)<plen(d)+Math.hypot(pts[i+2][0]-pts[i+1][0],pts[i+2][1]-pts[i+1][1])-1e-6){
+            ins=span.slice(1,-1); drop=1;
+          }
+        }
+        pts.splice(i+1,drop,...ins);
+        i+=ins.length;
+      }
       for(const p of pts){ W=Math.max(W,p[0]+4); Hh=Math.max(Hh,p[1]+16-y0-20); }
       esvg.push('<path data-edge="'+e.line+'" d="M'+pts.map(p=>p.join(' ')).join(' L')+'" fill="none" stroke="'+col+'" stroke-width="1.6"'+dash+m1+m2+'/>');
       if(e.tail) seg(pts[0],pts[1],0.5,e.tail,10);
@@ -1164,6 +1185,44 @@ function renderScene(doc,y0){
     let [x1,yy1]=borderPoint(A,bx,by), [x2,yy2]=borderPoint(B,ax,ay);
     const ap=apOff.get(e);   // anti-parallel fan-out (labels ride along)
     if(ap){ x1+=ap[0]; yy1+=ap[1]; x2+=ap[0]; yy2+=ap[1]; }
+    // group boxes and non-incident nodes are routing obstacles: a straight
+    // run that pierces a node it does not touch, or a group box it neither
+    // starts nor ends inside, detours around the obstacle boundary instead
+    // (routeAround). Obstacle-free edges keep the plain line unchanged.
+    let route=null;
+    if(A!==B){
+      const obs=nodes.filter(n=>n!==A&&n!==B).map(n=>({x:n.x,y:n.y,w:n.w,h:n.h}));
+      for(const k in gBox){
+        const b=gBox[k];
+        const inG=(px,py)=>px>b.x0&&px<b.x1&&py>b.yA&&py<b.yB;
+        if(!inG(x1,yy1)&&!inG(x2,yy2))
+          obs.push({x:b.x0,y:b.yA,w:b.x1-b.x0,h:b.yB-b.yA});
+      }
+      route=routeAround([x1,yy1],[x2,yy2],obs);
+      if(route){           // leave the node facing the first/last bend
+        route[0]=borderPoint(A,route[1][0],route[1][1]);
+        route[route.length-1]=borderPoint(B,route[route.length-2][0],route[route.length-2][1]);
+      }
+    }
+    if(route){
+      esvg.push('<path data-edge="'+e.line+'" d="M'+route.map(p=>p.join(' ')).join(' L')+'" fill="none" stroke="'+col+'" stroke-width="1.6"'+dash+m1+m2+'/>');
+      if(e.mid){             // the longest segment carries the mid label
+        let bi=0,bl=-1;
+        for(let i=0;i+1<route.length;i++){
+          const l=Math.hypot(route[i+1][0]-route[i][0],route[i+1][1]-route[i][1]);
+          if(l>bl){ bl=l; bi=i; }
+        }
+        const pP=route[bi], qP=route[bi+1], mx=(pP[0]+qP[0])/2, my=(pP[1]+qP[1])/2;
+        if(Math.abs(qP[0]-pP[0])>=Math.abs(qP[1]-pP[1]))
+          lblsvg.push(textEl(mx,my-5,11,'middle',col,e.mid,halo));   // above a horizontal run
+        else{ lblsvg.push(textEl(mx+7,my+4,11,'start',col,e.mid,halo)); // beside a vertical run
+              W=Math.max(W,mx+9+lblPx(e.mid)); }
+      }
+      if(e.tail) seg(route[0],route[1],0.25,e.tail,10);
+      if(e.head) seg(route[route.length-1],route[route.length-2],0.25,e.head,10);
+      for(const pP of route){ W=Math.max(W,pP[0]+4); Hh=Math.max(Hh,pP[1]+4-y0-20); }
+      continue;
+    }
     esvg.push('<line data-edge="'+e.line+'" x1="'+x1+'" y1="'+yy1+'" x2="'+x2+'" y2="'+yy2+'" stroke="'+col+'" stroke-width="1.6"'+dash+m1+m2+'/>');
     if(e.mid){
       const mx=(x1+x2)/2, my=(yy1+yy2)/2;
@@ -1255,6 +1314,68 @@ function borderPoint(n,tx,ty){
   if(dx===0&&dy===0) return [cx,cy];
   const sx=(n.w/2)/Math.abs(dx||1e-9), sy=(n.h/2)/Math.abs(dy||1e-9), s=Math.min(sx,sy);
   return [cx+dx*s, cy+dy*s];
+}
+// straight-edge obstacle routing: group boxes and non-incident nodes are
+// obstacles a straight edge must not cut through.
+// clipSegRect (Liang-Barsky): the [t0,t1] parameter window where segment
+// p->q lies inside the box, or null when it misses entirely.
+function clipSegRect(p,q,x0,y0,x1,y1){
+  let t0=0,t1=1; const dx=q[0]-p[0], dy=q[1]-p[1];
+  for(const [den,num] of [[-dx,p[0]-x0],[dx,x1-p[0]],[-dy,p[1]-y0],[dy,y1-p[1]]]){
+    if(den===0){ if(num<0) return null; continue; }
+    const t=num/den;
+    if(den<0){ if(t>t1) return null; if(t>t0) t0=t; }
+    else     { if(t<t0) return null; if(t<t1) t1=t; }
+  }
+  return t0<t1?[t0,t1]:null;
+}
+// routeAround: detour segment p->q around obstacle rects via the shortest
+// clear polyline. Candidate bend points are the corners of each obstacle
+// expanded by a 10px clearance margin; a sight-line is clear when it cuts
+// no obstacle interior. Dijkstra over that visibility graph keeps routes
+// short and calm, and is deterministic (fixed vertex order — endpoints,
+// then obstacles in caller order with corners clockwise from top-left —
+// breaks ties). Obstacles already containing an endpoint cannot be
+// avoided and are ignored. Returns the detour polyline, or null when the
+// straight segment is clear — callers keep their original rendering then.
+function segHitsObs(p,q,obs){
+  for(const r of obs)
+    if(clipSegRect(p,q,r.x+2,r.y+2,r.x+r.w-2,r.y+r.h-2)) return true;
+  return false;
+}
+function routeAround(p,q,obs){
+  const M=10;
+  const inside=(pt,r)=>pt[0]>r.x+2&&pt[0]<r.x+r.w-2&&pt[1]>r.y+2&&pt[1]<r.y+r.h-2;
+  obs=obs.filter(r=>!inside(p,r)&&!inside(q,r));
+  const blocked=(a,b)=>segHitsObs(a,b,obs);
+  if(!blocked(p,q)) return null;
+  const V=[p.slice(),q.slice()];
+  for(const r of obs){
+    const L=r.x-M, T=r.y-M, R=r.x+r.w+M, B=r.y+r.h+M;
+    for(const c of [[L,T],[R,T],[R,B],[L,B]])
+      if(!obs.some(o=>inside(c,o))) V.push(c);
+  }
+  const n=V.length, dist=Array(n).fill(Infinity), from=Array(n).fill(-1), done=Array(n).fill(false);
+  dist[0]=0;
+  for(;;){
+    let u=-1;
+    for(let i=0;i<n;i++) if(!done[i]&&(u<0||dist[i]<dist[u])) u=i;
+    if(u<0||u===1||dist[u]===Infinity) break;
+    done[u]=true;
+    for(let v=0;v<n;v++){
+      if(done[v]||blocked(V[u],V[v])) continue;
+      const d=dist[u]+Math.hypot(V[v][0]-V[u][0],V[v][1]-V[u][1]);
+      if(d<dist[v]-1e-9){ dist[v]=d; from[v]=u; }
+    }
+  }
+  if(dist[1]===Infinity) return null;    // boxed in: keep the straight line
+  const pts=[]; for(let v=1;v!==-1;v=from[v]) pts.push(V[v]); pts.reverse();
+  for(let i=1;i+1<pts.length;i++){ // drop duplicate / collinear midpoints
+    const a=pts[i-1], b=pts[i], c=pts[i+1];
+    const cr=(b[0]-a[0])*(c[1]-a[1])-(b[1]-a[1])*(c[0]-a[0]);
+    if(Math.hypot(b[0]-a[0],b[1]-a[1])<0.5||Math.abs(cr)<1e-6){ pts.splice(i,1); i--; }
+  }
+  return pts.length>2?pts:null;
 }
 
 // ---- bitfield ----

@@ -42,10 +42,13 @@ function strAttr(el, name) {
 }
 
 // Parse a <path d="..."> "M x y L x y L x y ..." into an array of [x,y] points.
+// The engine glues the command letter to the first coordinate ("M169.6 142 L201.6 150"),
+// so letters are split off before tokenizing.
 function parsePath(d) {
   const pts = [];
-  // normalise: replace commas/multiple spaces with single space, trim leading M
-  const tokens = d.trim().replace(/,/g, ' ').replace(/\s+/g, ' ').split(' ');
+  // normalise: detach command letters, replace commas/multiple spaces with single space
+  const tokens = d.trim().replace(/([A-Za-z])/g, ' $1 ')
+    .replace(/,/g, ' ').replace(/\s+/g, ' ').trim().split(' ');
   let i = 0, cx = 0, cy = 0;
   while (i < tokens.length) {
     const t = tokens[i];
