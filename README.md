@@ -137,7 +137,9 @@ file alone can always be reopened and edited. See
 ## Contributing
 
 Ideas, counter-examples, and prior-art pointers are very welcome — please
-open an issue. The most valuable contributions right now:
+open an issue (the syntax-proposal template shows what evidence a
+ruling needs; the change process itself is documented in
+[spec/PROCESS.md](spec/PROCESS.md)). The most valuable contributions right now:
 
 - diagram types we must cover (with real samples),
 - existing standards/conventions we should borrow instead of invent,
