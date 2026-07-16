@@ -62,8 +62,10 @@ documented normatively in the header comment of
 
 - Keys appear in a fixed order; arrays are in document order.
 - Only spec-defined semantics appear — no engine internals.
-- Absent optional attributes are **omitted**, never `null`. A `null` in
-  a golden is a preserved engine defect (NaN) — see DISCREPANCIES D6/D7.
+- Absent optional attributes are **omitted**, never `null`. No golden
+  contains a `null` (non-numeric `z`/`w`/`h` are line errors since
+  0.1-dev.11 — DISCREPANCIES D6/D7, resolved); a `null` appearing in a
+  regenerated golden would signal a new engine NaN defect.
 - Every element carries its 1-based source `line` where the engine
   records one (layers and wave signals do not).
 - `header.version` is the constant `"0.1"` (the engine accepts exactly

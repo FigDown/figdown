@@ -12,8 +12,9 @@
 //   - Keys are emitted in the fixed order documented below; arrays are in
 //     document order (pins/sizes are ordered by source line).
 //   - Absent optional attributes are OMITTED — never emitted as null.
-//     (A literal `null` appearing in a golden therefore marks a spot where
-//     the engine produced NaN — see DISCREPANCIES.md.)
+//     (A literal `null` in a golden would mark a spot where the engine
+//     produced NaN. Since 0.1-dev.11 — DISCREPANCIES D6/D7 resolved —
+//     no golden contains one; a new `null` signals an engine defect.)
 //   - Engine-internal fields (cols caches, hl flags, synthetic plot ids,
 //     resolved presentation defaults other than fill color — see README)
 //     are excluded.

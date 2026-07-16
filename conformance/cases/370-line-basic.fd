@@ -2,4 +2,4 @@ figdown 0.1 block
 group buf "Buffer"
 node q1 "Q1" in=buf
 line "Max cap" in=buf at=80%
-line "Reserved" in=buf at=15 color=#a3c93a
+line "Reserved" in=buf at=15% color=#a3c93a

@@ -56,16 +56,21 @@ otherwise). A new template requires corpus evidence AND semantic
 impossibility (R28).
 
 **Version compatibility.** The header carries the wire-grammar version
-and the template. An unknown major version MUST be rejected; an unknown
-minor version SHOULD parse in lenient mode (§10); an unknown template
-MUST be rejected in strict mode.
+and the template. An unknown major version MUST be rejected. The
+minor-version leniency is scoped by conformance mode (§10): a
+viewer-tier (lenient-mode) implementation SHOULD parse an unknown minor
+version in lenient mode; a strict authoring-tier implementation MAY
+reject an unknown minor version outright (the reference engine does).
+An unknown template MUST be rejected in strict mode.
 
 Lexical rules:
 
 - Directive = `keyword positional-args… key=value-options…`
 - Strings with spaces are double-quoted; bare words need no quotes.
 - IDs are `[A-Za-z_][A-Za-z0-9_-]*`, unique per document.
-- Colors are CSS hex (`#0d9488`) or CSS named colors.
+- Colors are CSS hex (`#rgb` or `#rrggbb`, e.g. `#0d9488`) or CSS named
+  colors (the 147 CSS/SVG color keywords, lowercase, plus
+  `transparent`); any other value is a line error.
 - `#` begins a comment only at the start of a line or after whitespace
   (so `color=#0d9488` is never mistaken for a comment).
 - Escapes inside quoted strings: `\n` line break, `\"` literal quote,
@@ -121,7 +126,9 @@ node vm1 "VM" in=vtep1               # one level of nesting
 ```
 
 Flat `in=` reference keeps the grammar line-oriented (no indentation
-semantics, no `end` blocks). Groups accept `gap=<px>` — member spacing
+semantics, no `end` blocks). `in=` is a **node** option; `group` does
+not accept it — nesting is one level (a node in a group) in v0.1, so
+`group … in=…` is a line error. Groups accept `gap=<px>` — member spacing
 (presentation, R5); `gap=0` packs members flush, giving the classic
 one-frame-with-dividers look. OQ-S1 (indented block sugar) is
 **rejected**: it would be a second containment syntax (R28/R30).
@@ -256,7 +263,7 @@ flow right                      # tier 2: overall direction (right|down|left|up)
 rank l2 l3                      # tier 2: these nodes share a rank/row
 pin l3 at=420,80                # tier 3: position in px, relative to the
                                 #         element's positioning context
-size l3 w=120 h=60              # tier 3: explicit size (px or %)
+size l3 w=120 h=60              # tier 3: explicit size (px only)
 ```
 
 Normative rules:
@@ -277,7 +284,8 @@ Normative rules:
   frozen silently.
 - **Size adaptation** (R10): explicit `size` → content shrinks to fit
   (font may step down). No explicit size → box grows minimally without
-  displacing the global layout.
+  displacing the global layout. Sizes are **px only** in v0.1 —
+  percentage sizes are reserved for a future version.
 - **Two-level pins (D6)**: a pinned **group** anchors its local origin
   in canvas px; a pinned **member** is group-local (relative to that
   origin). Moving a group is therefore a one-line edit and edits inside

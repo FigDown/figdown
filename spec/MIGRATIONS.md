@@ -112,3 +112,44 @@ Rule:    per edge line: `taillabel="T"` → `[T]` after the source id;
          quoted form `["…"]` (standard string escapes).
 Example: `edge a -- b label="eBGP" taillabel="p1"` →
          `edge a [p1] -[eBGP]- b`
+
+## 0.1-dev.10 → 0.1-dev.11  (2026-07-16, DISCREPANCIES D2–D14)
+Change:  strictness batch — the conformance audit's engine-vs-spec
+         discrepancies were resolved in the spec's favor (closed
+         grammar: typos never pass silently). Newly line errors,
+         previously silently accepted/ignored:
+         - registered-but-inapplicable option keys on every directive
+           (e.g. `node … unit=32`, `bitfield … at=50%`), including
+           `group … in=` (nesting is one level: node in=group);
+         - unknown option keys (`foo=bar`) on every directive;
+         - extra positional arguments on `pin`, `size`, `layer`,
+           `plot`, `bitfield`/`table`/`wave` declarations, `cell`,
+           and the classic `field` form;
+         - duplicate `bundle` ids;
+         - non-numeric `layer z=` and `size w=`/`h=` values;
+         - `size` percentages (sizes are px only in v0.1);
+         - bare `line at=<n>` without the `%` sign;
+         - `^^` in the first data row (rowspan cannot cross the
+           header separator);
+         - invalid color values — colors must be `#rgb`/`#rrggbb` or
+           a CSS named color (147 keywords, lowercase, plus
+           `transparent`).
+         Two decode changes: quoted `title` escapes now decode
+         left-to-right in one pass like every other string (`"a\\nb"`
+         is backslash + letter `n`, not a line break); table-cell
+         text keeps a leading backslash literal unless it is the
+         `\|` or `\^^` escape.
+Rule:    mostly NONE — a document that parsed clean and meant what it
+         said is unchanged; every newly-erroring line was a silent
+         author mistake — delete or correct each line the validator
+         now reports. Two mechanical rewrites for the decode changes:
+         (1) quoted titles: decode with the old order (`\n` first,
+         `\\` last), then re-encode with the standard escaping — in
+         practice, a `\\` immediately followed by `n` that relied on
+         rendering backslash + line break becomes `\\\n`;
+         (2) table cells: delete a leading backslash that is not
+         `\|`/`\^^` if the stripped text was intended.
+Example: `title "a\\nb"` (old render: `a\` + line break + `b`) →
+         `title "a\\\nb"`; cell `\x raw` (old render: `x raw`) →
+         `x raw`; `group inner "I" in=outer` → `group inner "I"`
+         (the `in=` was silently discarded — no nesting is lost).

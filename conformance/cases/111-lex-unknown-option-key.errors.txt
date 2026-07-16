@@ -1,1 +1,2 @@
-Line 2: unexpected argument "foo=bar"
+Line 2: unknown option "foo="
+Line 4: unknown option "foo="

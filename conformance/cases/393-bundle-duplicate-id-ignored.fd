@@ -1,6 +1,0 @@
-figdown 0.1 topology
-node a "A"
-node b "B"
-edge a -- b
-bundle es1 "First" a--b
-bundle es1 "Second" a--b

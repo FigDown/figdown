@@ -1,3 +1,0 @@
-figdown 0.1 block
-group outer "Outer"
-group inner "Inner" in=outer

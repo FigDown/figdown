@@ -1,10 +1,10 @@
 figdown 0.1 block
-title "Nested containment with cross-tier feedback edges"
+title "Sibling groups with cross-tier feedback edges"
 
-# Outer region holds an inner sub-group (two sibling stores) and a
-# state table.  A separate process tier sits below.  Colored feedback
-# edges cross both tiers in opposite directions, capturing the pattern:
-#   outer group { inner group { unit A, unit B }, unit C }
+# A subsystem group and a store group side by side (v0.1 nesting is one
+# level: nodes in groups), plus a separate process tier below.  Colored
+# feedback edges cross the tiers in opposite directions:
+#   subsystem group { unit C } · store group { unit A, unit B }
 #   process tier { process X, process Y, interrupt node }
 #   edge C -> process X  (down-path)
 #   edge process X -> unit B  (feedback, up-path)
@@ -13,7 +13,7 @@ title "Nested containment with cross-tier feedback edges"
 
 group outer "Subsystem A"
 
-group inner "Store Group" in=outer
+group inner "Store Group"
 node unit-a "Unit A" in=inner
 node unit-b "Unit B" in=inner
 

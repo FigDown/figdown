@@ -111,6 +111,25 @@ Closed grammar: unknown lines are errors with line numbers. No LLM, no dependenc
 // 1. PARSER — closed, line-oriented grammar (draft v0.0)
 // ============================================================
 const SHAPES = ['box','rounded','circle','ellipse','cloud','diamond','cylinder'];
+// Colors are CSS hex (#rgb / #rrggbb) or CSS named colors (spec §1) — the
+// 147 CSS/SVG color keywords (lowercase) plus `transparent`. Anything else
+// is a line error (closed grammar, 0.1-dev.11).
+const CSS_COLORS=new Set(('aliceblue antiquewhite aqua aquamarine azure beige bisque black blanchedalmond '+
+ 'blue blueviolet brown burlywood cadetblue chartreuse chocolate coral cornflowerblue cornsilk crimson cyan '+
+ 'darkblue darkcyan darkgoldenrod darkgray darkgreen darkgrey darkkhaki darkmagenta darkolivegreen darkorange '+
+ 'darkorchid darkred darksalmon darkseagreen darkslateblue darkslategray darkslategrey darkturquoise darkviolet '+
+ 'deeppink deepskyblue dimgray dimgrey dodgerblue firebrick floralwhite forestgreen fuchsia gainsboro ghostwhite '+
+ 'gold goldenrod gray green greenyellow grey honeydew hotpink indianred indigo ivory khaki lavender lavenderblush '+
+ 'lawngreen lemonchiffon lightblue lightcoral lightcyan lightgoldenrodyellow lightgray lightgreen lightgrey '+
+ 'lightpink lightsalmon lightseagreen lightskyblue lightslategray lightslategrey lightsteelblue lightyellow '+
+ 'lime limegreen linen magenta maroon mediumaquamarine mediumblue mediumorchid mediumpurple mediumseagreen '+
+ 'mediumslateblue mediumspringgreen mediumturquoise mediumvioletred midnightblue mintcream mistyrose moccasin '+
+ 'navajowhite navy oldlace olive olivedrab orange orangered orchid palegoldenrod palegreen paleturquoise '+
+ 'palevioletred papayawhip peachpuff peru pink plum powderblue purple red rosybrown royalblue saddlebrown '+
+ 'salmon sandybrown seagreen seashell sienna silver skyblue slateblue slategray slategrey snow springgreen '+
+ 'steelblue tan teal thistle tomato turquoise violet wheat white whitesmoke yellow yellowgreen transparent')
+ .split(' '));
+const isColor=v=>/^#([0-9a-fA-F]{3}|[0-9a-fA-F]{6})$/.test(v)||CSS_COLORS.has(v);
 
 function tokenize(line){
   // split by whitespace, honoring double quotes
@@ -157,18 +176,46 @@ function tokenize(line){
   }
   return {toks};
 }
-// Option keys are a CLOSED set: an unquoted token whose key is not listed
-// here is a positional argument (this lets wave lanes contain '=').
+// Option keys are a CLOSED set (two levels, 0.1-dev.11):
+//  - a key listed in OPT_KEYS is parsed as an option; whether it is
+//    *applicable* is checked per directive against DIRECTIVE_OPTS
+//    (a registered-but-inapplicable key is a line error, D3);
+//  - a key=value token with an unregistered key is an "unknown option"
+//    line error (D12) — except inside wave `signal` lanes, where bare
+//    tokens may contain '=' and stay positional (laneMode).
 const OPT_KEYS=new Set(['kind','shape','color','stroke','text','in','layer','label',
   'style','z','at','w','h','unit','note','labels','numbering','fill','from','to','gap','dir','level',
   'taillabel','headlabel','class']);
-function splitOpts(toks){
-  const pos=[], opts={};
+// Applicable option keys per directive. Keys with dedicated diagnostics
+// (node kind/w/h, edge label/taillabel/headlabel, line fill, fill from/to)
+// are listed so their specific error messages fire. `edge` is consumed by
+// parseEdgeLine; `title` takes its rest-of-line verbatim (no options).
+const DIRECTIVE_OPTS={
+  figdown:[],
+  node:['shape','color','stroke','text','style','class','in','layer','kind','w','h'],
+  group:['color','gap','class'],
+  edge:['style','class','color','layer','label','taillabel','headlabel'],
+  layer:['z'], flow:[], rank:[],
+  bundle:['color'],
+  line:['in','at','color','fill'],
+  fill:['in','dir','color','from','to'],
+  pin:['at'], size:['w','h'],
+  'class':['color','stroke','text','style'],
+  bitfield:['unit','numbering'], table:[], wave:[],
+  plot:['kind','level'],
+  field:['color','class','note'], wrap:[],
+  cell:['color','class'], colw:[],
+  signal:['labels'], gap:[]
+};
+function splitOpts(toks, laneMode){
+  const pos=[], opts={}, unk=[];
   for(const t of toks){
     const m = !t.q && /^([A-Za-z_][A-Za-z0-9_-]*)=([\s\S]*)$/.exec(t.v);
-    if(m && OPT_KEYS.has(m[1])) opts[m[1]]=m[2]; else pos.push(t.v);
+    if(m && OPT_KEYS.has(m[1])) opts[m[1]]=m[2];
+    else if(m && !laneMode) unk.push(m[1]);
+    else pos.push(t.v);
   }
-  return {pos,opts};
+  return {pos,opts,unk};
 }
 const ID_RE=/^[A-Za-z_][A-Za-z0-9_-]*$/;
 
@@ -177,7 +224,8 @@ function parse(text){
   const doc={title:'',nodes:[],groups:[],edges:[],layers:[{id:'base',label:'',z:0}],
              flow:'right',ranks:[],pins:{},sizes:{},blocks:[],trunks:[],glines:[],fills:[],
              classes:[]};
-  const nodeIds=new Set(), groupIds=new Set(), layerIds=new Set(['base']), classIds=new Set();
+  const nodeIds=new Set(), groupIds=new Set(), layerIds=new Set(['base']), classIds=new Set(),
+        bundleIds=new Set();
   let cur=null;             // current typed block (bitfield/table/wave)
   let sawHeader=false, firstContent=true;
   const lines=text.split('\n');
@@ -251,10 +299,14 @@ function parse(text){
     if(!b){ err(n,'edge needs a target id after the operator'); return; }
     const tk2=tokenize(s.slice(i).trim());
     if(tk2.error){ err(n,tk2.error); return; }
-    const {pos:p2,opts:o2}=splitOpts(tk2.toks);
+    const {pos:p2,opts:o2,unk:u2}=splitOpts(tk2.toks);
+    if(u2.length){ err(n,'unknown option "'+u2[0]+'="'); return; }
     if(p2.length){ err(n,'unexpected argument "'+p2[0]+'"'); return; }
+    for(const k in o2)
+      if(!DIRECTIVE_OPTS.edge.includes(k)){ err(n,'edge does not take '+k+'='); return; }
     for(const k of ['label','taillabel','headlabel'])
       if(o2[k]!==undefined){ err(n,k+'= is retired — write the label inline: edge A [tail] -[mid]-> [head] B (MIGRATIONS 0.1-dev.9)'); return; }
+    if(o2.color!==undefined && !isColor(o2.color)){ err(n,'unknown color "'+o2.color+'" (#hex or CSS color name)'); return; }
     if(o2.style!==undefined && !['solid','dashed','dotted'].includes(o2.style)){ err(n,'style must be solid|dashed|dotted'); return; }
     doc.edges.push({a,b,op,tail,mid,head,style:o2.style,cls:o2['class'],
                     color:o2.color,layer:o2.layer||'base',line:n});
@@ -294,12 +346,14 @@ function parse(text){
         continue;
       }
       // content row: raw empty segment = colspan-left (multimd "||");
-      // cell exactly ^^ = rowspan-up (multimd); \^^ is a literal ^^
+      // cell exactly ^^ = rowspan-up (multimd). The only cell escapes are
+      // \| (handled during segmentation) and \^^ (literal caret pair) —
+      // any other leading backslash is literal cell text (D10).
       const cells=segs.map(x=>{
         if(x.length===0) return {v:'', m:'left'};
         const t=x.trim();
         if(t==='^^') return {v:'', m:'up'};
-        return {v:t.startsWith('\\')?t.slice(1):t, m:null};
+        return {v:t.startsWith('\\^^')?t.slice(1):t, m:null};
       });
       if(cells[0].m==='left'){ err(n,'colspan cannot start in the first column'); continue; }
       if(cur.heads.length===0 && cells.some(c=>c.m==='up')){ err(n,'"^^" cannot appear in the first row'); continue; }
@@ -309,6 +363,9 @@ function parse(text){
         if(cur.heads.length===1) cur.cols=cells.map(c=>c.v);
       } else {
         if(cells.length!==cur.cols.length){ err(n,'row has '+cells.length+' cells, expected '+cur.cols.length); continue; }
+        // rowspan cannot cross the thead/tbody boundary (multimd prior
+        // art): "^^" in the first data row is a line error (D9).
+        if(!cur.rows.length && cells.some(c=>c.m==='up')){ err(n,'"^^" cannot appear in the first data row (rowspan does not cross the header separator)'); continue; }
         cur.rows.push({cells,hl:false,line:n});
       }
       continue;
@@ -323,8 +380,29 @@ function parse(text){
     }
     const tk=tokenize(raw.trim());
     if(tk.error){ err(n,tk.error); continue; }
-    const {pos,opts}=splitOpts(tk.toks);
+    const lead=(tk.toks.length&&!tk.toks[0].q)?tk.toks[0].v:'';
+    const {pos,opts,unk}=splitOpts(tk.toks, lead==='signal');
     const kw=pos[0];
+    // D3/D12/D14 (0.1-dev.11): uniform per-directive option checks —
+    // unknown keys, registered-but-inapplicable keys, invalid colors.
+    // Directives not in DIRECTIVE_OPTS (title's rest-of-line, unknown
+    // keywords) are handled by their own paths.
+    const badOpts=(k)=>{
+      const allowed=DIRECTIVE_OPTS[k];
+      if(!allowed) return false;
+      let bad=false;
+      for(const u of unk){ err(n,'unknown option "'+u+'="'); bad=true; }
+      for(const o in opts){
+        if(allowed.includes(o)) continue;
+        if(k==='group'&&o==='in') err(n,'group does not take in= — nesting is one level (node in=group) in v0.1');
+        else err(n,k+' does not take '+o+'=');
+        bad=true;
+      }
+      for(const o of ['color','stroke','text'])
+        if(opts[o]!==undefined && allowed.includes(o) && !isColor(opts[o])){
+          err(n,'unknown color "'+opts[o]+'" (#hex or CSS color name)'); bad=true; }
+      return bad;
+    };
 
     if(firstContent){
       firstContent=false;
@@ -336,12 +414,14 @@ function parse(text){
           if(!TEMPLATES.includes(pos[2])) err(n,'unknown template "'+pos[2]+'" (block|topology|flowchart|bitfield|table|wave)');
           else doc.template=pos[2];
         }
+        badOpts('figdown');
         continue;
       } else { err(n,'first line must be "figdown 0.1 [template]"'); }
     } else if(kw==='figdown'){ err(n,'duplicate version header'); continue; }
 
     // typed-block children
     if(cur && ['field','wrap','cell','colw','signal','gap'].includes(kw)){
+      if(badOpts(kw)) continue;
       if(cur.type==='bitfield' && kw==='field'){
         // Compact form (C bit-field convention): field F1:16,F2:8 SYN:1 ...
         // — bare name:width items separated by commas and/or spaces, no
@@ -350,6 +430,8 @@ function parse(text){
         // '*' = variable-length field: fills the remainder of the current row
         const cname=pos[1], cw=pos[2];
         if(cname!==undefined && (/^\d+$/.test(cw||'')&&+cw>=1 || cw==='*')){
+          const fextra=pos.slice(3).find(x=>x!=='optional');
+          if(fextra!==undefined){ err(n,'unexpected argument "'+fextra+'"'); continue; }
           cur.fields.push({name:cname,w:cw==='*'?'*':+cw,optional:pos.includes('optional'),color:opts.color,cls:opts['class'],note:opts.note,line:n});
           continue;
         }
@@ -392,6 +474,8 @@ function parse(text){
         // data rows 1-based below the separator);  cell <r> highlight
         const rc=/^(h?)(\d+)(?:,(\d+))?$/.exec(pos[1]||'');
         const hl=pos.includes('highlight');
+        const cextra=pos.slice(2).find(x=>x!=='highlight');
+        if(cextra!==undefined){ err(n,'unexpected argument "'+cextra+'"'); continue; }
         if(!rc||(!opts.color&&!opts['class']&&!hl)){ err(n,'cell needs [h]<row>[,<col>] with color=…/class=… or highlight'); continue; }
         if(!rc[1]&&+rc[2]===0){ err(n,'row 0 is retired — address header tiers as h1..hN (top-down)'); continue; }
         if(hl&&rc[3]===undefined){
@@ -415,13 +499,29 @@ function parse(text){
       continue;
     }
     cur=null; // any other keyword closes the block
+    if(badOpts(kw)) continue;
 
     switch(kw){
       case 'title': {
         // rest-of-line: `title TCP Header` == `title "TCP Header"` (A-1)
         let t=raw.trim().replace(/^title\s*/,'');
         const qm=/^"([\s\S]*)"$/.exec(t);
-        if(qm) t=qm[1].replace(/\\n/g,'\n').replace(/\\"/g,'"').replace(/\\\\/g,'\\');
+        if(qm){
+          // decode escapes left-to-right in one pass, exactly like the
+          // generic tokenizer: \\ consumes first, so "a\\nb" is a\nb
+          // (backslash + letter n), never a line break (D2, 0.1-dev.11).
+          // Unknown escapes were already rejected by tokenize() above.
+          const s0=qm[1]; t='';
+          for(let ii=0;ii<s0.length;ii++){
+            if(s0[ii]==='\\'){
+              const e=s0[ii+1];
+              if(e==='n'){ t+='\n'; ii++; continue; }
+              if(e==='"'){ t+='"'; ii++; continue; }
+              if(e==='\\'){ t+='\\'; ii++; continue; }
+            }
+            t+=s0[ii];
+          }
+        }
         doc.title=t; break;
       }
       case 'class': {
@@ -443,8 +543,14 @@ function parse(text){
         const id=pos[1];
         if(!id||!ID_RE.test(id)){ err(n,'layer needs an id'); break; }
         if(layerIds.has(id)){ err(n,'duplicate layer id "'+id+'"'); break; }
+        if(pos.length>3){ err(n,'unexpected argument "'+pos[3]+'"'); break; }
+        let z=doc.layers.length;
+        if(opts.z!==undefined){
+          if(!/^-?\d+$/.test(opts.z)){ err(n,'z must be a number'); break; }
+          z=parseInt(opts.z,10);
+        }
         layerIds.add(id);
-        doc.layers.push({id,label:pos[2]||'',z:opts.z?parseInt(opts.z,10):doc.layers.length});
+        doc.layers.push({id,label:pos[2]||'',z});
         break;
       }
       case 'node': {
@@ -493,6 +599,7 @@ function parse(text){
         // the dashed ellipse around the member links automatically
         const id=pos[1];
         if(!id||!ID_RE.test(id)){ err(n,'bundle needs an id'); break; }
+        if(bundleIds.has(id)){ err(n,'duplicate bundle id "'+id+'"'); break; }
         let rest=pos.slice(2), tlabel=id;
         if(tk.toks[2]&&tk.toks[2].q){ tlabel=pos[2]; rest=pos.slice(3); }
         const pairs=[]; let badp=null;
@@ -503,6 +610,7 @@ function parse(text){
         }
         if(badp){ err(n,badp); break; }
         if(!pairs.length){ err(n,'bundle needs at least one member link A--B'); break; }
+        bundleIds.add(id);
         doc.trunks.push({id,label:tlabel,pairs,color:opts.color,line:n});
         break;
       }
@@ -512,8 +620,8 @@ function parse(text){
         const glabel=(tk.toks[1]&&tk.toks[1].q)?pos[1]:null;
         if(glabel===null){ err(n,'line needs a quoted "<label>" first'); break; }
         if(!opts['in']){ err(n,'line needs in=<group-id>'); break; }
-        const m=/^(\d+(?:\.\d+)?)%?$/.exec(opts.at||'');
-        if(!m||+m[1]<0||+m[1]>100){ err(n,'line needs at=<0..100>%'); break; }
+        const m=/^(\d+(?:\.\d+)?)%$/.exec(opts.at||'');   // % is mandatory (D8)
+        if(!m||+m[1]<0||+m[1]>100){ err(n,'line needs at=<0..100>% (with the % sign)'); break; }
         if(opts.fill!==undefined){ err(n,'line is a pure marker — use the fill directive for zones'); break; }
         doc.glines.push({label:glabel,group:opts['in'],pct:+m[1],color:opts.color,line:n});
         break;
@@ -523,6 +631,7 @@ function parse(text){
         // rows -> X, columns -> Y, numeric cells -> Z (the table IS the data)
         const tid=pos[1];
         if(!tid||!ID_RE.test(tid)){ err(n,'plot needs a table id'); break; }
+        if(pos.length>2){ err(n,'unexpected argument "'+pos[2]+'"'); break; }
         const pkind=opts.kind||'bars3d';
         if(pkind!=='bars3d'){ err(n,'unknown plot kind "'+pkind+'" (bars3d)'); break; }
         let plevel=null;
@@ -550,6 +659,7 @@ function parse(text){
       }
       case 'pin': {
         const id=pos[1], at=opts.at;
+        if(pos.length>2){ err(n,'unexpected argument "'+pos[2]+'"'); break; }
         const m=at&&/^(-?[\d.]+),(-?[\d.]+)$/.exec(at);
         if(!id||!m){ err(n,'pin needs <id> at=<x>,<y>'); break; }
         doc.pins[id]={fx:parseFloat(m[1]),fy:parseFloat(m[2]),line:n};
@@ -557,13 +667,25 @@ function parse(text){
       }
       case 'size': {
         const id=pos[1];
+        if(pos.length>2){ err(n,'unexpected argument "'+pos[2]+'"'); break; }
         if(!id||(!opts.w&&!opts.h)){ err(n,'size needs <id> w=<px> and/or h=<px>'); break; }
-        doc.sizes[id]={w:opts.w?parseFloat(opts.w):null,h:opts.h?parseFloat(opts.h):null,line:n};
+        let badsz=false;
+        const dim=(k)=>{                       // px only (D7/D13)
+          const v=opts[k]; if(v===undefined||v==='') return null;
+          if(/%$/.test(v)){ err(n,'percentage sizes are not in v0.1 — use px'); badsz=true; return null; }
+          const f=parseFloat(v);
+          if(!isFinite(f)){ err(n,k+' must be a number'); badsz=true; return null; }
+          return f;
+        };
+        const w=dim('w'), h=dim('h');
+        if(badsz) break;
+        doc.sizes[id]={w,h,line:n};
         break;
       }
       case 'bitfield': {
         const id=pos[1];
         if(!id||!ID_RE.test(id)){ err(n,'bitfield needs an id'); break; }
+        if(pos.length>3){ err(n,'unexpected argument "'+pos[3]+'"'); break; }
         cur={type:'bitfield',id,label:pos[2]||id,unit:opts.unit?parseInt(opts.unit,10):32,
              numbering:opts.numbering||'lsb0',fields:[],line:n};
         if(!isFinite(cur.unit)||cur.unit<1){ err(n,'bad unit'); cur.unit=32; }
@@ -573,12 +695,14 @@ function parse(text){
       case 'table': {
         const id=pos[1];
         if(!id||!ID_RE.test(id)){ err(n,'table needs an id'); break; }
+        if(pos.length>3){ err(n,'unexpected argument "'+pos[3]+'"'); break; }
         cur={type:'table',id,label:pos[2]||id,cols:[],heads:[],rows:[],line:n};
         doc.blocks.push(cur); break;
       }
       case 'wave': {
         const id=pos[1];
         if(!id||!ID_RE.test(id)){ err(n,'wave needs an id'); break; }
+        if(pos.length>3){ err(n,'unexpected argument "'+pos[3]+'"'); break; }
         cur={type:'wave',id,label:pos[2]||id,signals:[],gaps:[],line:n};
         doc.blocks.push(cur); break;
       }

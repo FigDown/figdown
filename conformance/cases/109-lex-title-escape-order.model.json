@@ -3,7 +3,7 @@
     "version": "0.1",
     "template": "block"
   },
-  "title": "a\\\nb",
+  "title": "a\\nb",
   "flow": "right",
   "classes": [],
   "layers": [
