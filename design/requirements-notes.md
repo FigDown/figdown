@@ -1271,6 +1271,18 @@ failure mode (Makefile tabs) and a hallucination source for LLMs.
 Per-column stays GFM colons; if per-cell alignment is ever needed
 (census: 1.4%), it will be `cell r,c align=left|right|center`.
 
+### D10 — The project speaks through a durable pseudonymous maintainer (2026-07-16)
+
+Governance ruling accompanying [PROCESS](../spec/PROCESS.md): community
+interaction (issues, release notes, articles, outreach) is carried by
+one durable pseudonymous maintainer identity rather than a faceless
+org voice or a real name. Rationale: adopters of a standard need a
+consistent human presence to build trust against ("who rules, and are
+they responsive?"), the evidence-chain process covers the substance,
+and pseudonymity is upward-reversible — it can later be attached to a
+real identity, never the other way around. The org account remains the
+publisher of record; the maintainer handle is the voice.
+
 ### D9 — Semantic classes: `class` + derived legend (2026-07-10)
 
 OQ-S8 resolved on evidence. The corpus measurement
