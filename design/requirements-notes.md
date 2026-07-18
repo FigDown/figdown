@@ -1075,6 +1075,38 @@ alone — no clone, no network. Install =
 AGENT-GUIDE.md remains the framework-neutral equivalent for non-skill
 agents.
 
+### R41 — Second field-feedback batch: a second downstream use case, three new items (2026-07-18)
+
+**Original**: The downstream project consolidated its feedback across
+two uses — (A) spec-figure transcription (the R40 batch) and (B)
+analyzer-result visualization (DB data → flowchart/table figures,
+three more figures) — adding F7–F9.
+
+**Interpretation — validations**: use case B independently re-confirms
+the axioms (all figures double-build byte-identical; third-party
+bit-identical rebuilds; fully autonomous agent authoring; the table
+template carried multi-wave quantitative comparisons). Note: the
+consolidation predates 0.1-dev.12 — F1–F6 and the legend request were
+already resolved (R40, D9) before it arrived.
+
+**New items and dispositions**:
+- *F7 (semantic swimlanes / named layers)*: three parallel input paths
+  could only be arranged with pins; the author wants to DECLARE
+  input/stage/output layering. `rank` already declares same-layer
+  membership (and works since auto-layout v2); the missing piece is a
+  *named, rendered* lane. Tracked as OQ-S11 — the unifying umbrella
+  for the "layout carries meaning" family (direction F1 · layering F7
+  · side-by-side F4/OQ-S10), pending a prior-art pass (PlantUML
+  swimlanes, BPMN lanes, Mermaid subgraphs) and corpus frequency.
+- *F8 (dual-axis edge classes)*: **already shipped** — `class`
+  combines `color=` and `style=` orthogonally since D9
+  (`class fix27 "ISS-0027 repair" color=#dc2626 style=dashed`),
+  engine-verified. A downstream sync gap, not a feature gap.
+- *F9 (in-table sparklines/trend)*: sanctioned current answer —
+  Unicode block characters (▁▃▅▇) as authored cell text express a
+  trend today with zero new syntax; a first-class `trend` primitive
+  is tracked as OQ-S12, gated on corpus evidence (chart family ≈1%).
+
 ### R40 — First downstream field feedback: axioms verified, six findings triaged (2026-07-10)
 
 **Original**: A downstream documentation project adopted FigDown as its

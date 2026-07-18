@@ -491,6 +491,14 @@ pulse r1                                # 瞬時高亮
   或一級變體概念需先看 prior art（SystemRDL/IP-XACT）＋語料證據。
 - OQ-S10：group 級 `flow`（同一張圖內的並排子區；實戰回饋 F4）。
   現行標準答案：複合原圖拆成一概念一 `.fd`，由 Markdown 並排。
+- OQ-S11：**具名 lane／語意分層**（實戰回饋 F7）——「layout 承載
+  語意」家族的統一傘（方向・分層・並排，涵蓋 OQ-S10）。`rank`
+  已能宣告同層歸屬；未決的是具名、有視覺呈現的 lane 構件。過
+  R28 關卡前需 prior-art 調查（PlantUML swimlane、BPMN lane、
+  Mermaid subgraph）＋語料頻率。
+- OQ-S12：表格內**趨勢／sparkline** 原語（實戰回饋 F9）。現行
+  認可解：Unicode 方塊字元（▁▃▅▇）作為儲存格文字。一級構件
+  待語料證據（chart 家族 ≈1%）。
 
 ## 10. 關鍵字註冊表、一致性模式、擴充
 

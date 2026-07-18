@@ -572,6 +572,17 @@ transient). Deferred until the static core ships.
   figure; field feedback F4). Current standard answer: split composite
   originals into one `.fd` per concept and let the Markdown compose
   them.
+- OQ-S11: **named lanes / semantic layering** (field feedback F7) —
+  the unifying umbrella for the layout-carries-meaning family
+  (direction · layering · side-by-side, subsuming OQ-S10). `rank`
+  already declares same-layer membership; the open question is a
+  named, rendered lane construct. Needs a prior-art pass (PlantUML
+  swimlanes, BPMN lanes, Mermaid subgraphs) + corpus frequency before
+  the R28 gate.
+- OQ-S12: in-table **trend/sparkline** primitive (field feedback F9).
+  Current sanctioned answer: Unicode block characters (▁▃▅▇) as
+  authored cell text. A first-class construct waits on corpus
+  evidence (chart family ≈1%).
 
 ## 10. Keyword registry, conformance modes, extensions
 

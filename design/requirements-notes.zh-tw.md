@@ -848,6 +848,32 @@ Node.js——不用 clone、不用網路。安裝 =
 單一引擎來源再生（永不 fork）。AGENT-GUIDE.md 仍是給非 skill
 框架 agent 的中性等價物。
 
+### R41 — 第二批實戰回饋：第二個下游用途、三個新項（2026-07-18）
+
+**原始需求**：下游專案把兩個用途的回饋彙整——(A) spec 圖轉寫
+（即 R40 批次）與 (B) analyzer 成果視覺化（DB 資料 → flowchart/
+table，再加 3 張圖）——新增 F7–F9。
+
+**整理解讀——驗證面**：用途 B 獨立再次驗證公理（全部圖 double-
+build 位元級相同；第三方 bit-identical 重建；agent 全自主繪製；
+table 模板承載多波量化對比）。註：彙整版早於 0.1-dev.12——
+F1–F6 與 legend 訴求在其送達前已解決（R40、D9）。
+
+**新項與裁決**：
+- *F7（語意 swimlane／具名分層）*：三條並行輸入路徑只能靠 pin
+  排列；作者想「宣告」輸入/stage/輸出分層。`rank` 已能宣告同層
+  （auto-layout v2 後真正可用）；缺的是*具名、有視覺呈現*的
+  lane。以 OQ-S11 追蹤——「layout 承載語意」家族的統一傘
+  （方向 F1・分層 F7・並排 F4/OQ-S10），待 prior-art 調查
+  （PlantUML swimlane、BPMN lane、Mermaid subgraph）與語料頻率。
+- *F8（edge class 雙軸區分）*：**早已出貨**——D9 起 `class` 的
+  `color=` 與 `style=` 即正交組合
+  （`class fix27 "ISS-0027 repair" color=#dc2626 style=dashed`），
+  引擎實測通過。是下游同步落差，不是功能缺口。
+- *F9（表格內 sparkline／趨勢）*：現行認可解——Unicode 方塊字元
+  （▁▃▅▇）作為儲存格文字即可表達趨勢、零新語法；一級 `trend`
+  原語以 OQ-S12 追蹤，待語料證據（chart 家族 ≈1%）。
+
 ### R40 — 第一批下游實戰回饋：公理獲驗證，六項發現已裁決（2026-07-10）
 
 **原始需求**：某下游文件專案採用 FigDown 為其圖表標準，完成第一批
