@@ -94,6 +94,9 @@ SVG 給人看；`source:` 註腳指向 `.fd`——它是圖的唯一真相來源
   [requirements-notes.md](design/requirements-notes.md)
 - [syntax-draft.zh-tw.md](spec/syntax-draft.zh-tw.md) — 語法草案 v0.0
   （討論階段），英文版 [syntax-draft.md](spec/syntax-draft.md)
+- [AUTHORING.zh-tw.md](AUTHORING.zh-tw.md) — 撰寫 SOP：如何選
+  template、以既有構件表達語意、缺口如何升級為語法提案，英文版
+  [AUTHORING.md](AUTHORING.md)
 - [AGENT-GUIDE.zh-tw.md](AGENT-GUIDE.zh-tw.md) — 給 AI agent 的
   自足指南（以 FigDown 維護圖片），英文版 [AGENT-GUIDE.md](AGENT-GUIDE.md)
 - [MIGRATIONS.zh-tw.md](spec/MIGRATIONS.zh-tw.md) — schema-migration 式

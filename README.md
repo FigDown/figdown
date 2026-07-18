@@ -107,6 +107,9 @@ file alone can always be reopened and edited. See
   [繁體中文](design/requirements-notes.zh-tw.md)
 - [syntax-draft.md](spec/syntax-draft.md) — syntax draft v0.0 (discussion
   stage), also in [繁體中文](spec/syntax-draft.zh-tw.md)
+- [AUTHORING.md](AUTHORING.md) — the authoring SOP: how to pick a
+  template, express meaning with existing constructs, and escalate a
+  gap into a syntax proposal, also in [繁體中文](AUTHORING.zh-tw.md)
 - [AGENT-GUIDE.md](AGENT-GUIDE.md) — the self-contained guide for AI
   agents maintaining figures with FigDown, also in
   [繁體中文](AGENT-GUIDE.zh-tw.md)
