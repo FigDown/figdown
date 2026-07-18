@@ -10,6 +10,12 @@ See also `../conformance/` — the v0.1 parser-conformance suite (golden fixture
 - `make-skill.js` — regenerates the self-contained agent-skill bundle
   in `skill/figdown/` from the single engine source. Run after any
   engine change.
+- `make-lib.js` — regenerates the embeddable library builds in `dist/`
+  (`figdown.mjs` ESM + `figdown.js` UMD; API: `parse`, `render`,
+  `renderDoc`, `artifact`, `version` — see `dist/README.md`) from the
+  single engine source. Deterministic (same engine → byte-identical
+  files). Run after any engine change; the library version constant
+  lives at the top of the script.
 
 ## layout-lint.js
 
