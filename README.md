@@ -17,6 +17,10 @@ extended to the diagram types Mermaid can't express (network topologies,
 annotated block diagrams, lookup chains, packet walks…), with layout
 treated as part of the knowledge.
 
+**[Try it live — the editor runs in your browser, no install](https://figdown.github.io/figdown/)**
+(edit text on the left, deterministic SVG on the right; open/save real
+`.fd` files; every GUI action is a text edit).
+
 ## See it
 
 This figure *is* FigDown — the text below is its complete source:
@@ -127,7 +131,8 @@ file alone can always be reopened and edited. See
   weighted by adoption, also in [繁體中文](design/prior-art.zh-tw.md)
 - [examples/index.md](examples/index.md) — the example gallery: real
   figures as committed `.fd`+`.svg` pairs (protocol headers first)
-- [editor/figdown.html](editor/figdown.html) — the editor: open in any
+- [editor/figdown.html](editor/figdown.html) — the editor
+  ([live](https://figdown.github.io/figdown/)): open in any
   browser, edit text on the left, get a deterministic SVG on the right
   (core scene + bitfield + table + wave). Opens/saves `.fd` files
   (Ctrl+S writes back to the same file), undo/redo, autosave,

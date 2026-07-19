@@ -15,6 +15,10 @@ Markdown 裡——讓**同一份來源**同時被：
 Mermaid 表達不了的圖型（網路拓撲、帶註記的方塊圖、查表鏈、封包走訪
 ……），並把 layout 視為知識的一部分。
 
+**[線上試用——編輯器直接在瀏覽器跑，零安裝](https://figdown.github.io/figdown/)**
+（左邊改文字、右邊即時確定性 SVG；可開啟/儲存真實 `.fd` 檔；
+每個 GUI 動作都是文字編輯）。
+
 ## 眼見為憑
 
 這張圖*就是* FigDown——下面的文字是它的完整來源：
@@ -112,7 +116,8 @@ SVG 給人看；`source:` 註腳指向 `.fd`——它是圖的唯一真相來源
   英文版 [prior-art.md](design/prior-art.md)
 - [examples/index.zh-tw.md](examples/index.zh-tw.md) — 範例藝廊：
   真實圖形以 `.fd`+`.svg` 成對入庫（協議標頭先行）
-- [editor/figdown.html](editor/figdown.html) — 編輯器：用任何瀏覽器開啟，
+- [editor/figdown.html](editor/figdown.html) — 編輯器
+  （[線上版](https://figdown.github.io/figdown/)）：用任何瀏覽器開啟，
   左邊改文字、右邊即時得到確定性的 SVG（核心場景 + bitfield +
   table + wave）。可開啟/儲存 `.fd` 檔（Ctrl+S 存回同一檔案）、
   undo/redo、自動儲存、draw.io 式直接操作——每個 GUI 動作都是
