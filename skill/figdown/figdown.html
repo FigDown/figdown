@@ -833,7 +833,10 @@ function textEl(x,y,fs,anchor,fill,content,extraAttrs){
     lines.map((l,i)=>'<tspan x="'+x+'" dy="'+(i?lh:0)+'">'+esc(l)+'</tspan>').join('')+'</text>';
 }
 
-function render(doc){
+function render(doc,ropts){
+  // presentation options (renderer tier, not language): {title:false}
+  // skips DRAWING the title — the title text stays semantic in the source.
+  const RO=ropts||{};
   // resolve class defaults (explicit element attributes win — rigidity, R8)
   const C={}; for(const c of doc.classes||[]) C[c.id]=c;
   const rs=(x,k)=>{ if(x[k]===undefined && x.cls && C[x.cls] && C[x.cls][k]!==undefined) x[k]=C[x.cls][k]; };
@@ -845,7 +848,7 @@ function render(doc){
     if(b.marks)  for(const mk of b.marks) rs(mk,'color');
   }
   const parts=[]; let y=0, maxW=0;
-  if(doc.title){ parts.push('<text x="0" y="16" font-size="15" font-weight="600" font-family="var(--sans)">'+esc(doc.title)+'</text>'); y=30;
+  if(doc.title && RO.title!==false){ parts.push('<text x="0" y="16" font-size="15" font-weight="600">'+esc(doc.title)+'</text>'); y=30;
     maxW=Math.max(maxW, doc.title.length*8.6); }  // canvas must fit the title
   let sceneMeta=null;
   if(doc.nodes.length||doc.edges.length){
@@ -2556,7 +2559,7 @@ $('undobtn').onclick=undo; $('redobtn').onclick=redo;
 // export SVG today, drop it back in tomorrow, tweak, export again.
 async function loadText(name, text){
   if(name.endsWith('.svg') || text.trimStart().startsWith('<')){
-    const m=/<metadata id="figdown-source" data-sha256="([0-9a-f]{64})"><!\[CDATA\[\n([\s\S]*?)\n\]\]><\/metadata>/.exec(text);
+    const m=/<metadata id="figdown-source" data-sha256="([0-9a-f]{64})"[^>]*><!\[CDATA\[\n([\s\S]*?)\n\]\]><\/metadata>/.exec(text);
     if(!m){ $('status').textContent='no embedded FigDown source in this SVG'; return false; }
     const src=m[2].replace(/\]\]\]\]><!\[CDATA\[>/g,']]>');
     const buf=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(src));

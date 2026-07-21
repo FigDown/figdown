@@ -1075,6 +1075,26 @@ alone — no clone, no network. Install =
 AGENT-GUIDE.md remains the framework-neutral equivalent for non-skill
 agents.
 
+### R42 — Render option `no-title`: captions live once (2026-07-18)
+
+**Original**: In real embedding, most figures already carry their own
+caption/title in the surrounding document (observed in a downstream
+PDF-transcription pipeline whose `.fd` files carry the source caption
+as both `title` and provenance comments). Rendering the title inside
+the SVG duplicates it — there must be an option not to draw it.
+
+**Interpretation**: The title TEXT is semantics (the `.fd` stays
+self-describing for agents); whether to DRAW it is presentation, and
+a per-artifact choice (the same `.fd` may be embedded under a caption
+or viewed standalone). Resolution: a **renderer-tier option**, not
+language syntax — zero new grammar, registry untouched, no R28 gate
+needed. `build-svg.js --no-title`, lib `render(text,{title:false})`,
+markdown-it plugin `showTitle:false`. Determinism protocol: accepted
+options are recorded in the artifact metadata
+(`data-render-options="no-title"`), keeping the artifact a pure
+function of (source, recorded options) — spec §7. The editor's
+roundtrip loader tolerates the extra metadata attribute.
+
 ### R41 — Second field-feedback batch: a second downstream use case, three new items (2026-07-18)
 
 **Original**: The downstream project consolidated its feedback across

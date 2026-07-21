@@ -98,26 +98,30 @@ function parse(text) {
   var p = __engine.parse(String(text));
   return { doc: p.doc, errors: p.errs };
 }
-// render(text) -> { svg, errors }  svg is null when there are errors
+// render(text, opts) -> { svg, errors }  svg is null when there are errors
 // (determinism over convenience: no partial renders of invalid input).
-function render(text) {
+// opts (presentation, renderer tier): { title: false } skips drawing the
+// title — e.g. when the embedding document supplies its own caption.
+function render(text, opts) {
   var p = parse(text);
   if (p.errors.length) return { svg: null, errors: p.errors };
-  return { svg: __engine.render(p.doc).svg, errors: [] };
+  return { svg: __engine.render(p.doc, opts).svg, errors: [] };
 }
-// renderDoc(doc) -> svg string, for an already-validated doc from parse().
-function renderDoc(doc) {
-  return __engine.render(doc).svg;
+// renderDoc(doc, opts) -> svg string, for an already-validated doc from parse().
+function renderDoc(doc, opts) {
+  return __engine.render(doc, opts).svg;
 }
 // artifact(text) -> { svg, errors }  svg is the full self-carrying SVG:
 // the render plus a <metadata id="figdown-source"> block embedding the
 // source text and its SHA-256 (same convention as tools/build-svg.js).
 // svg is null when there are errors.
-function artifact(text) {
+function artifact(text, opts) {
   var src = String(text);
-  var p = render(src);
+  var p = render(src, opts);
   if (p.errors.length) return { svg: null, errors: p.errors };
-  var meta = '<metadata id="figdown-source" data-sha256="' + __sha256hex(src) + '"><![CDATA[\\n'
+  // recorded render options keep third-party rebuilds bit-identical
+  var optAttr = (opts && opts.title === false) ? ' data-render-options="no-title"' : '';
+  var meta = '<metadata id="figdown-source" data-sha256="' + __sha256hex(src) + '"' + optAttr + '><![CDATA[\\n'
     + src.replace(/]]>/g, ']]]]><![CDATA[>') + '\\n]]></metadata>';
   return { svg: p.svg.replace(/<\\/svg>$/, meta + '</svg>'), errors: [] };
 }

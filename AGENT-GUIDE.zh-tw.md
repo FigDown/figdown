@@ -54,7 +54,9 @@
 
 1. 編輯 `.fd`（永不編輯 SVG）。
 2. 重建：`node tools/build-svg.js <file.fd>`——同時驗證與渲染。
-   錯誤格式為 `Line N: message`；修正後重跑直到 OK。
+   錯誤格式為 `Line N: message`；修正後重跑直到 OK。Markdown 文件
+   自帶 caption 時，改用 `--no-title` 建置以免標題畫兩次（選項
+   記錄於產物；標題文字仍留在 `.fd`）。
 3. `.fd` 與 `.svg` 一起 commit。
 
 編輯時的穩定性規則：

@@ -524,6 +524,15 @@ transient). Deferred until the static core ships.
   (`<metadata id="figdown-source">`) and a SHA-256 of the source —
   making the artifact self-carrying and staleness detectable.
 - Same-basename pairing (`X.fd` ⇔ `X.svg`) is normative.
+- **Render options (renderer tier, not language).** A renderer MAY
+  accept presentation options — v0.1 defines one: `no-title` (skip
+  drawing the title when the embedding document supplies its own
+  caption; the title TEXT stays semantic in the source). Any accepted
+  option MUST be recorded in the artifact metadata
+  (`data-render-options="…"`), so an artifact remains a pure function
+  of (source, recorded options) and third-party rebuilds stay
+  bit-identical. Options never appear in the source grammar — the
+  registry is untouched.
 
 ## 8. Error model
 

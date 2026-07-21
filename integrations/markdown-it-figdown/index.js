@@ -11,7 +11,7 @@ function escapeHtml(s) {
     .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 }
 
-module.exports = function figdownPlugin(md) {
+module.exports = function figdownPlugin(md, opts) {
   const defaultFence = md.renderer.rules.fence
     || function (tokens, idx, options, env, self) {
       return self.renderToken(tokens, idx, options);
@@ -23,7 +23,10 @@ module.exports = function figdownPlugin(md) {
     if (info !== 'figdown') return defaultFence(tokens, idx, options, env, self);
     // Never throw: a broken figure must not take down the whole page.
     try {
-      const { svg, errors } = figdown.render(token.content);
+      // showTitle:false maps to the renderer's no-title option — typical
+      // for Markdown, where the document supplies the caption
+      const { svg, errors } = figdown.render(token.content,
+        opts && opts.showTitle === false ? { title: false } : undefined);
       if (errors.length) {
         return '<pre class="figdown-error">' + escapeHtml(errors.join('\n')) + '</pre>\n';
       }

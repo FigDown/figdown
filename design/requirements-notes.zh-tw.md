@@ -848,6 +848,23 @@ Node.js——不用 clone、不用網路。安裝 =
 單一引擎來源再生（永不 fork）。AGENT-GUIDE.md 仍是給非 skill
 框架 agent 的中性等價物。
 
+### R42 — 渲染選項 `no-title`：caption 只活一次（2026-07-18）
+
+**原始需求**：實際嵌入時，多數圖在文件裡本來就有自己的
+caption/title（觀察自下游 PDF 轉寫管線——其 `.fd` 同時以
+`title` 與 provenance 註解攜帶原 caption）。SVG 內再畫一次標題
+就是重複——渲染時要有「不顯示」的選項。
+
+**整理解讀**：標題**文字**是語意（`.fd` 對 agent 保持自我描述）；
+**畫不畫**是展現，且是逐產物的選擇（同一 `.fd` 可能嵌在 caption
+之下、也可能獨立檢視）。解法：**renderer 層選項**而非語言語法——
+零新文法、註冊表不動、無需過 R28。`build-svg.js --no-title`、
+lib `render(text,{title:false})`、markdown-it 外掛
+`showTitle:false`。確定性協議：被接受的選項記錄於產物 metadata
+（`data-render-options="no-title"`），產物維持（來源、記錄選項）
+的純函數——規格 §7。編輯器 roundtrip 載入器容忍新增的 metadata
+屬性。
+
 ### R41 — 第二批實戰回饋：第二個下游用途、三個新項（2026-07-18）
 
 **原始需求**：下游專案把兩個用途的回饋彙整——(A) spec 圖轉寫
