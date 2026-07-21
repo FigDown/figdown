@@ -1,0 +1,5 @@
+Line 5: boundary needs an id
+Line 6: unexpected argument "extra"
+Line 7: boundary does not take color=
+Line 8: boundary does not take shape=
+Line 9: unknown option "nonsense="

@@ -1,0 +1,10 @@
+# boundary ids share the node/group namespace: cross-kind collisions are
+# line errors in every direction
+figdown 0.1 block
+boundary x "external"
+node x "Node X"
+group g "Group"
+boundary g
+node n "N" in=g
+boundary b "B"
+node b "Node B"

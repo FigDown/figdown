@@ -127,6 +127,8 @@ title "..."                 # optional, takes the rest of the line;
 node a "Label" [shape=rounded|circle|ellipse|cloud|diamond|cylinder]
                [color=#hex] [style=dashed] [in=<group>]
 group g "Label" [gap=0]     # container; gap=0 packs members flush
+boundary ext "PKT in"       # external I/O endpoint ("the outside world"):
+                            # edges end open there; never drawn as a shape
 edge a -> b [style=dashed] [color=#hex]  # ops: -> <- -- <->
 edge a -[label]-> b         # on-line label splits the operator
 edge a [p1] -- [p2] b       # endpoint labels (ports/cardinality/roles)

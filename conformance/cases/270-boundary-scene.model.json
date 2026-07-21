@@ -1,0 +1,79 @@
+{
+  "header": {
+    "version": "0.1",
+    "template": "block"
+  },
+  "flow": "right",
+  "classes": [],
+  "layers": [
+    {
+      "id": "base",
+      "z": 0
+    }
+  ],
+  "nodes": [
+    {
+      "id": "parser",
+      "label": "Parser",
+      "shape": "box",
+      "layer": "base",
+      "line": 6
+    },
+    {
+      "id": "lookup",
+      "label": "Lookup",
+      "shape": "box",
+      "layer": "base",
+      "line": 7
+    }
+  ],
+  "groups": [],
+  "boundaries": [
+    {
+      "id": "ext_in",
+      "label": "PKT in",
+      "line": 4
+    },
+    {
+      "id": "ext_out",
+      "line": 5
+    }
+  ],
+  "edges": [
+    {
+      "a": "ext_in",
+      "op": "->",
+      "b": "parser",
+      "layer": "base",
+      "line": 8
+    },
+    {
+      "a": "parser",
+      "op": "->",
+      "b": "lookup",
+      "layer": "base",
+      "line": 9
+    },
+    {
+      "a": "lookup",
+      "op": "->",
+      "b": "ext_out",
+      "layer": "base",
+      "line": 10
+    }
+  ],
+  "ranks": [],
+  "pins": [
+    {
+      "id": "ext_out",
+      "x": 420,
+      "y": 26,
+      "line": 13
+    }
+  ],
+  "sizes": [],
+  "lines": [],
+  "fills": [],
+  "bundles": [],
+  "blocks": []
+}

@@ -186,3 +186,24 @@ Rule:    ADDITIVE — no rewrite. Documents that write neither
 Example: (nothing) → `routing orthogonal` +
          `route c -> a via=340,20;10,20` in the `# --- layout ---`
          section.
+
+## 0.1-dev.13 → 0.1-dev.14  (2026-07-21, R44)
+Change:  external I/O endpoints added (spec §2.8):
+         `boundary <id> ["label"]` declares "the outside world" —
+         referenced by edges at either endpoint like a node (bundle
+         members may reference such edges normally), pinnable for
+         layout, NEVER drawn as a shape: the edge simply ends open
+         with its normal arrowhead, the optional label as small muted
+         text beyond the open end. Ids share the node/group
+         namespace (duplicates and cross-kind collisions are line
+         errors); `boundary` takes no options; extra positionals are
+         line errors. Truly unknown edge-endpoint ids remain
+         dangling-endpoint errors.
+         Registry: top-level keywords 19 → 20.
+Rule:    ADDITIVE — no rewrite. Documents that declare no `boundary`
+         parse and render exactly as before. (Authors who previously
+         faked externals with a dummy node may replace
+         `node ext "PKT"` + its edge with `boundary ext "PKT"` —
+         optional, NON-MECHANICAL: only the author knows whether the
+         node meant a participant or the outside world.)
+Example: (nothing) → `boundary wire "to wire"` + `edge mac -> wire`.

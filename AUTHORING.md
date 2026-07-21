@@ -44,6 +44,7 @@ most rows.
 | these links form one logical bundle (LAG/ES…) | `bundle` |
 | role/port/cardinality at a line's ends, or a verb on the line | inline edge labels: `a [1] -[places]-> [N] b` |
 | these belong together spatially | `group` + `in=`; same row/column → `rank` |
+| connects to / from the outside world (open-ended arrow) | `boundary ext "label"` + an edge to/from it — never a dummy node |
 | a note attached to one node | small `style=dashed` node + dotted edge (if adjacency matters) or one collected `table` (if it's dense data) |
 | same bits reinterpreted by a mode | `note="valid when …"` on the field (OQ-S9) |
 | two concept areas in one original image | split into one `.fd` per concept; the Markdown composes them |

@@ -1,0 +1,6 @@
+# duplicate boundary id is a line error
+figdown 0.1 block
+boundary ext "PKT in"
+boundary ext "PKT in again"
+node a "A"
+edge ext -> a

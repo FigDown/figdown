@@ -165,10 +165,11 @@ Bracket content rules:
   quote-inside-shape convention).
 - An empty `[]` is a line error. `label=`/`taillabel=`/`headlabel=`
   are retired (migration 0.1-dev.9).
-- Edge endpoints are **nodes only**: an endpoint naming a group is a
-  line error (connect to a member node; group-level edges are out of
-  scope for v0.1 — silently dropping them would violate the
-  no-silent-failure rule).
+- Edge endpoints are **nodes or declared `boundary` endpoints** (§2.8):
+  an endpoint naming a group is a line error (connect to a member node;
+  group-level edges are out of scope for v0.1 — silently dropping them
+  would violate the no-silent-failure rule), and a truly unknown id is
+  a dangling-endpoint line error.
 
 Edge lines carry **pure semantics** — endpoints, direction, labels,
 plane. *How* a connection is drawn across the canvas is a rendering
@@ -258,6 +259,34 @@ via `class=<id>`.
   semantic — the id and meaning stay (§5 invariant refined). When a
   color *classifies*, authors SHOULD use `class`; bare `color=` is for
   decoration.
+
+### 2.8 External endpoints: `boundary`
+
+```figdown
+boundary wire "to wire"
+node mac "MAC"
+edge mac -> wire
+```
+
+`boundary <id> ["label"]` declares an **external I/O endpoint** — the
+outside world an edge enters from or leaves to. Reading semantics
+(R37): a boundary is *not* a participant node; it states only that the
+connection crosses the figure's boundary.
+
+- Edges reference it at either endpoint exactly like a node, and
+  `bundle` members may reference such edges normally. It takes **no
+  options**; extra positional arguments are line errors.
+- Ids share the node/group namespace — duplicates and cross-kind
+  collisions are line errors.
+- **Never drawn as a shape.** The edge simply ends open (keeping its
+  normal arrowhead) at a small invisible anchor that auto-layout
+  places at the figure's natural margin; `pin <id> at=x,y` overrides
+  with node-pin semantics. The label, when given, renders as small
+  muted text just beyond the open end, away from the edge direction.
+  `shape=none` was rejected: `shape=` is purely geometric (D7) — a
+  boundary is honest semantics, not a hidden node.
+- Corpus evidence (R44): 70–80% of block/flowchart figures contain at
+  least one open-ended arrow.
 
 ## 3. Layout control — the three tiers (R5, R8)
 
@@ -581,8 +610,10 @@ transient). Deferred until the static core ships.
 
 - Unknown keyword / malformed line → `Line N: <message>`, parse continues
   (error-recovery mode) so all errors report in one pass.
-- Unknown `shape`, duplicate ID, dangling edge endpoint, `in=` cycle,
-  bitfield width overflow, table row/col mismatch → all line errors.
+- Unknown `shape`, duplicate ID (node/group/`boundary` share one
+  namespace), dangling edge endpoint (an id that names no node and no
+  `boundary`), `in=` cycle, bitfield width overflow, table row/col
+  mismatch → all line errors.
 - A document with errors renders nothing (no partial/best-effort output —
   determinism over convenience).
 
@@ -638,10 +669,10 @@ transient). Deferred until the static core ships.
 
 ## 10. Keyword registry, conformance modes, extensions
 
-**Registry (v0.1).** Top-level keywords (19):
-`figdown title node group edge layer flow rank bundle line fill pin
-size class routing route bitfield table wave` — plus the table-row
-line-start token `|`.
+**Registry (v0.1).** Top-level keywords (20):
+`figdown title node group boundary edge layer flow rank bundle line
+fill pin size class routing route bitfield table wave` — plus the
+table-row line-start token `|`.
 Typed-block child keywords (6): `field wrap cell colw signal gap`.
 Reserved for the dynamic profile: `page step set pulse`.
 Experimental (outside the v0.1 conformance surface): `plot`.

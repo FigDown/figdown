@@ -144,9 +144,10 @@ AI 先驗知識，R11/R35）。`A <- B` 畫出來與 `B -> A` 相同；這個
   套用標準字串跳脫（Mermaid 的「形狀內引號」慣例）。
 - 空的 `[]` 為行錯誤。`label=`／`taillabel=`／`headlabel=` 已
   退役（migration 0.1-dev.9）。
-- edge 端點**僅限節點**：端點指向 group 是行錯誤（請連到成員
-  節點；group 級 edge 不在 v0.1 範圍——靜默丟棄會違反反靜默
-  失敗規則）。
+- edge 端點限**節點或已宣告的 `boundary` 端點**（§2.8）：端點
+  指向 group 是行錯誤（請連到成員節點；group 級 edge 不在 v0.1
+  範圍——靜默丟棄會違反反靜默失敗規則）；真正未知的 id 則是
+  懸空端點行錯誤。
 
 edge 行承載**純語意**——端點、方向、標籤、平面。連線在畫布上
 *怎麼走*是不帶意義的渲染參數：由 `routing` 與 `route` 指令（§3）
@@ -225,6 +226,31 @@ edge pp1 -> cp1 class=vidc
 - 從 `class` 行剝除 `color=`/`style=` 不損失語意——id 與意義
   留下（§5 不變量細化）。顏色*用於分類*時，作者**應**使用
   `class`；裸 `color=` 留給裝飾。
+
+### 2.8 外部端點：`boundary`
+
+```figdown
+boundary wire "to wire"
+node mac "MAC"
+edge mac -> wire
+```
+
+`boundary <id> ["label"]` 宣告一個**外部 I/O 端點**——連線由之
+進入、或流向的外界。讀取語意（R37）：boundary *不是*參與的節點；
+它只陳述這條連線越過了圖的邊界。
+
+- edge 可在任一端點像節點一樣引用它；`bundle` 成員也可正常引用
+  這類 edge。它**不接受任何選項**；多餘的位置參數是行錯誤。
+- id 與 node/group 共用同一命名空間——重複與跨類衝突皆為行
+  錯誤。
+- **永不畫成形狀。** edge 就在一個小的隱形錨點處開放收尾（保留
+  原本的箭頭）；錨點由自動排版放在圖的自然邊緣，`pin <id>
+  at=x,y` 可覆蓋（與節點 pin 同語意）。若有標籤，以小號淡色
+  文字畫在開放端稍外、背向連線方向處。`shape=none` 已否決：
+  `shape=` 純屬幾何（D7）——boundary 是誠實的語意，不是隱藏
+  節點。
+- 語料證據（R44）：70–80% 的方塊圖／流程圖含至少一個開放端
+  箭頭。
 
 ## 3. 排版控制——三層級（R5、R8）
 
@@ -496,8 +522,9 @@ pulse r1                                # 瞬時高亮
 
 - 未知關鍵字/格式錯誤的行 → `Line N: <message>`，解析繼續（錯誤
   恢復模式），一次回報全部錯誤。
-- 未知 `shape`、重複 ID、懸空的 edge 端點、`in=` 循環、bitfield
-  寬度溢出、table 列欄不符 → 一律行錯誤。
+- 未知 `shape`、重複 ID（node/group/`boundary` 共用一個命名
+  空間）、懸空的 edge 端點（既非節點也非 `boundary` 的 id）、
+  `in=` 循環、bitfield 寬度溢出、table 列欄不符 → 一律行錯誤。
 - 有錯誤的文件不渲染任何輸出（不做 partial/best-effort——確定性
   優先於方便）。
 
@@ -541,10 +568,10 @@ pulse r1                                # 瞬時高亮
 
 ## 10. 關鍵字註冊表、一致性模式、擴充
 
-**註冊表（v0.1）。** 頂層關鍵字（19 個）：
-`figdown title node group edge layer flow rank bundle line fill pin
-size class routing route bitfield table wave`——加上表格列行首
-token `|`。
+**註冊表（v0.1）。** 頂層關鍵字（20 個）：
+`figdown title node group boundary edge layer flow rank bundle line
+fill pin size class routing route bitfield table wave`——加上表格
+列行首 token `|`。
 型別區塊子關鍵字（6 個）：`field wrap cell colw signal gap`。
 動態 profile 保留：`page step set pulse`。
 實驗性（v0.1 一致性表面之外）：`plot`。

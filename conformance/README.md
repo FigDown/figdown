@@ -103,10 +103,13 @@ table `colw`/`marks`/`highlights`, wave signal `labels`, wave `gaps`,
 plot `level`. Also (0.1-dev.13, additive): top-level `routing` appears
 only when the document writes an explicit `routing` line, and the
 top-level `routes` array is omitted entirely when there are no `route`
-lines — so every pre-dev.13 golden stayed byte-identical.
+lines — so every pre-dev.13 golden stayed byte-identical. Likewise
+(0.1-dev.14, additive): the top-level `boundaries` array is omitted
+when the document declares no `boundary` lines, and a boundary's
+`label` is omitted when not written (a boundary has no id-default).
 
 Empty top-level collections stay as `[]` — the document shape is fixed
-(`routes` is the one omit-when-empty exception above).
+(`routes` and `boundaries` are the omit-when-empty exceptions above).
 In `aligns`, a column with no explicit `:` alignment is `"none"`.
 
 ## Running

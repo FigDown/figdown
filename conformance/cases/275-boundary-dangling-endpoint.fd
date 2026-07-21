@@ -1,0 +1,8 @@
+# declaring boundaries does not loosen endpoint validation: a truly
+# unknown id on an edge is still a dangling-endpoint error
+figdown 0.1 block
+boundary ext "out"
+node a "A"
+edge a -> ext
+edge a -> nothere
+edge ghost -> ext

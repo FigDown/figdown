@@ -1,0 +1,8 @@
+# a bundle member may reference an edge whose endpoint is a boundary
+figdown 0.1 topology
+boundary wire "to wire"
+node mac1 "MAC-1"
+node mac2 "MAC-2"
+edge mac1 -- wire
+edge mac2 -- wire
+bundle lag1 "LAG-1" mac1--wire, mac2--wire

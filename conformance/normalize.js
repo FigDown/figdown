@@ -42,13 +42,17 @@
 //       routes (0.1-dev.13): the whole array is omitted when the document
 //       has no `route` lines — both exceptions keep every pre-dev.13
 //       golden byte-identical (additive change)
+//     - boundaries (0.1-dev.14): the whole array is omitted when the
+//       document declares no `boundary` lines (additive, same rule as
+//       routes); a boundary's label is omitted when not written
 //   Empty top-level collections stay as [] (the document shape is fixed;
 //   `routes` is the one exception above).
 //   Table aligns: a column with no explicit `:` alignment is "none".
 //
 // Top-level key order:
-//   header, title, flow, routing?, classes, layers, nodes, groups, edges,
-//   ranks, pins, sizes, routes?, lines, fills, bundles, blocks
+//   header, title, flow, routing?, classes, layers, nodes, groups,
+//   boundaries?, edges, ranks, pins, sizes, routes?, lines, fills,
+//   bundles, blocks
 //
 // Element key orders:
 //   class : id, meaning, color, stroke, text, style, line
@@ -57,6 +61,8 @@
 //   node  : id, label, shape, group, layer, color, stroke, text, style,
 //           class, line
 //   group : id, label, gap, color, class, line
+//   boundary: id, label, line                 (label only when written —
+//                                             a boundary has no id-default)
 //   edge  : a, op, b, tail, mid, head, layer, color, style, class, line
 //   rank  : ids, line
 //   pin   : id, x, y, line
@@ -180,6 +186,9 @@ function normalize(doc) {
   model.groups = (doc.groups || []).map(g => o([
     ['id', g.id], ['label', g.label], ['gap', g.gap], ['color', g.color],
     ['class', g.cls], ['line', g.line]]));
+  if ((doc.boundaries || []).length)
+    model.boundaries = doc.boundaries.map(b => o([
+      ['id', b.id], ['label', b.label], ['line', b.line]]));
   model.edges = (doc.edges || []).map(e => o([
     ['a', e.a], ['op', e.op], ['b', e.b],
     ['tail', e.tail], ['mid', e.mid], ['head', e.head],

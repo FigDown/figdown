@@ -194,6 +194,7 @@ const DIRECTIVE_OPTS={
   figdown:[],
   node:['shape','color','stroke','text','style','class','in','layer','kind','w','h'],
   group:['color','gap','class'],
+  boundary:[],
   edge:['style','class','color','layer','label','taillabel','headlabel'],
   layer:['z'], flow:[], rank:[],
   bundle:['color'],
@@ -224,9 +225,9 @@ function parse(text){
   const errs=[];
   const doc={title:'',nodes:[],groups:[],edges:[],layers:[{id:'base',label:'',z:0}],
              flow:'right',ranks:[],pins:{},sizes:{},blocks:[],trunks:[],glines:[],fills:[],
-             classes:[],routes:[]};
+             classes:[],routes:[],boundaries:[]};
   const nodeIds=new Set(), groupIds=new Set(), layerIds=new Set(['base']), classIds=new Set(),
-        bundleIds=new Set();
+        bundleIds=new Set(), boundaryIds=new Set();
   let cur=null;             // current typed block (bitfield/table/wave)
   let sawHeader=false, firstContent=true;
   const lines=text.split('\n');
@@ -560,7 +561,7 @@ function parse(text){
       case 'node': {
         const id=pos[1];
         if(!id||!ID_RE.test(id)){ err(n,'node needs an id'); break; }
-        if(nodeIds.has(id)||groupIds.has(id)){ err(n,'duplicate id "'+id+'"'); break; }
+        if(nodeIds.has(id)||groupIds.has(id)||boundaryIds.has(id)){ err(n,'duplicate id "'+id+'"'); break; }
         if(opts.kind!==undefined){ err(n,'kind= has been renamed: use shape= (geometric; the label text carries the device semantics)'); break; }
         if(opts.w!==undefined||opts.h!==undefined){ err(n,'node does not take w=/h= — use a size line'); break; }
         const shape=opts.shape||'box';
@@ -577,7 +578,7 @@ function parse(text){
       case 'group': {
         const id=pos[1];
         if(!id||!ID_RE.test(id)){ err(n,'group needs an id'); break; }
-        if(nodeIds.has(id)||groupIds.has(id)){ err(n,'duplicate id "'+id+'"'); break; }
+        if(nodeIds.has(id)||groupIds.has(id)||boundaryIds.has(id)){ err(n,'duplicate id "'+id+'"'); break; }
         if(pos.length>3){ err(n,'unexpected argument "'+pos[3]+'"'); break; }
         groupIds.add(id);
         let ggap;
@@ -586,6 +587,20 @@ function parse(text){
           if(!isFinite(ggap)||ggap<0){ err(n,'gap must be a non-negative number'); break; }
         }
         doc.groups.push({id,label:pos[2]||id,color:opts.color,gap:ggap,cls:opts['class'],line:n});
+        break;
+      }
+      case 'boundary': {
+        // external I/O endpoint (R44): "the outside world", not a
+        // participant node. Referenced by edges like a node, pinnable for
+        // layout, NEVER drawn as a shape — the edge simply ends open at an
+        // invisible anchor, optionally with the small label beyond the end.
+        // Shares the node/group id namespace; takes no options.
+        const id=pos[1];
+        if(!id||!ID_RE.test(id)){ err(n,'boundary needs an id'); break; }
+        if(nodeIds.has(id)||groupIds.has(id)||boundaryIds.has(id)){ err(n,'duplicate id "'+id+'"'); break; }
+        if(pos.length>3){ err(n,'unexpected argument "'+pos[3]+'"'); break; }
+        boundaryIds.add(id);
+        doc.boundaries.push({id,label:pos[2]||undefined,line:n});
         break;
       }
       case 'flow': {
@@ -759,9 +774,9 @@ function parse(text){
     if(nd.layer && !layerIds.has(nd.layer)) errs.push('Line '+nd.line+': unknown layer "'+nd.layer+'"');
   }
   for(const e of doc.edges){
-    if(!nodeIds.has(e.a)&&!groupIds.has(e.a)) errs.push('Line '+e.line+': unknown endpoint "'+e.a+'"');
+    if(!nodeIds.has(e.a)&&!groupIds.has(e.a)&&!boundaryIds.has(e.a)) errs.push('Line '+e.line+': unknown endpoint "'+e.a+'"');
     else if(groupIds.has(e.a)) errs.push('Line '+e.line+': edge endpoint "'+e.a+'" is a group — connect to a member node (group edges are not in v0.1)');
-    if(!nodeIds.has(e.b)&&!groupIds.has(e.b)) errs.push('Line '+e.line+': unknown endpoint "'+e.b+'"');
+    if(!nodeIds.has(e.b)&&!groupIds.has(e.b)&&!boundaryIds.has(e.b)) errs.push('Line '+e.line+': unknown endpoint "'+e.b+'"');
     else if(groupIds.has(e.b)) errs.push('Line '+e.line+': edge endpoint "'+e.b+'" is a group — connect to a member node (group edges are not in v0.1)');
     if(e.layer && !layerIds.has(e.layer)) errs.push('Line '+e.line+': unknown layer "'+e.layer+'"');
   }
@@ -773,7 +788,7 @@ function parse(text){
     if(!groupIds.has(f.target)&&!nodeIds.has(f.target))
       errs.push('Line '+f.line+': unknown target "'+f.target+'" for fill');
   for(const t of doc.trunks) for(const [a,b] of t.pairs){
-    if(!nodeIds.has(a)||!nodeIds.has(b)){ errs.push('Line '+t.line+': unknown endpoint in "'+a+'--'+b+'"'); continue; }
+    if((!nodeIds.has(a)&&!boundaryIds.has(a))||(!nodeIds.has(b)&&!boundaryIds.has(b))){ errs.push('Line '+t.line+': unknown endpoint in "'+a+'--'+b+'"'); continue; }
     const matches=doc.edges.filter(e=>(e.a===a&&e.b===b)||(e.a===b&&e.b===a)).length;
     if(matches===0)
       errs.push('Line '+t.line+': no edge between "'+a+'" and "'+b+'" for bundle member');
@@ -794,7 +809,7 @@ function parse(text){
       matches[0].route=r;      // renderer convenience; the model keeps doc.routes
     }
   }
-  for(const id in doc.pins) if(!nodeIds.has(id)&&!groupIds.has(id))
+  for(const id in doc.pins) if(!nodeIds.has(id)&&!groupIds.has(id)&&!boundaryIds.has(id))
     errs.push('Line '+doc.pins[id].line+': pin of unknown id "'+id+'"');
   { // class references must resolve (closed grammar)
     const chk=(cls,line)=>{ if(cls!==undefined && !classIds.has(cls))
@@ -901,7 +916,7 @@ function render(doc,ropts){
   if(doc.title && RO.title===true){ parts.push('<text x="0" y="16" font-size="15" font-weight="600">'+esc(doc.title)+'</text>'); y=30;
     maxW=Math.max(maxW, doc.title.length*8.6); }  // canvas must fit the title
   let sceneMeta=null;
-  if(doc.nodes.length||doc.edges.length){
+  if(doc.nodes.length||doc.edges.length||(doc.boundaries||[]).length){
     const s=renderScene(doc,y); parts.push(s.svg); y=s.y; maxW=Math.max(maxW,s.w);
     sceneMeta=s.meta;
   }
@@ -941,9 +956,15 @@ function render(doc,ropts){
 // ---- scene ----
 function renderScene(doc,y0){
   const nodes=doc.nodes.map(n=>({...n}));
+  // boundary anchors (R44): external I/O endpoints join the layout as
+  // small invisible ~12x12 extents so externals land at natural margins;
+  // they are never drawn as shapes (the edge ends open at the anchor).
+  for(const b of doc.boundaries||[])
+    nodes.push({id:b.id,label:b.label||'',boundary:true,layer:'base',group:null,line:b.line});
   const byId={}; nodes.forEach(n=>byId[n.id]=n);
   // sizes
   for(const n of nodes){
+    if(n.boundary){ n.w=n.h=12; continue; }
     const nLines=String(n.label).split('\n').length;
     n.w=tw(n.label); n.h=NH+(nLines-1)*16;
     const s=doc.sizes[n.id]; if(s){ if(s.w)n.w=s.w; if(s.h)n.h=s.h; n.rigid=true; }
@@ -1124,6 +1145,32 @@ function renderScene(doc,y0){
     if(o){ n.x=o.x+p.fx; n.y=o.y+p.fy; }
     else { n.x=p.fx; n.y=y0+20+p.fy; }
   }
+  // Boundary labels sit beyond the open end, away from the figure (R44).
+  // bDir = outward direction of an anchor: away from its first incident
+  // edge's other endpoint (document order; [0,1] = below when unwired).
+  const bDir=n=>{
+    for(const e of doc.edges){
+      const o=e.a===n.id?byId[e.b]:(e.b===n.id?byId[e.a]:null);
+      if(!o||o===n) continue;
+      return [n.x+n.w/2-(o.x+o.w/2), n.y+n.h/2-(o.y+o.h/2)];
+    }
+    return [0,1];
+  };
+  // A left-pointing label (an inbound external under flow right) would
+  // stick out past the canvas' left edge: shift the whole scene right so
+  // it stays on canvas. The shift is uniform (relative geometry, incl.
+  // pins, is preserved — same pattern as the ring-channel y-shift below)
+  // and meta.left reports it so drag→pin round-trips stay stable.
+  let bShift=0;
+  for(const n of nodes){
+    if(!n.boundary||!n.label) continue;
+    const [bdx,bdy]=bDir(n), cx=n.x+n.w/2;
+    const ext=Math.abs(bdx)>=Math.abs(bdy) ? (bdx<0 ? cx-10-lblPx(n.label) : 0)
+                                           : cx-lblPx(n.label)/2;
+    bShift=Math.max(bShift,-ext);
+  }
+  if(bShift){ for(const n of lay) n.x+=bShift;
+              for(const k in gOrigin) gOrigin[k].x+=bShift; }
   // back-edge channel plan: slots used to be handed out in paint order, so
   // a far source could take the innermost slot and its long run crossed
   // every other return. Sort channel-bound back-edges so the source NEAREST
@@ -1144,8 +1191,8 @@ function renderScene(doc,y0){
     order.forEach(({e},ring)=>{
       const A=byId[e.a], B=byId[e.b], sx=A.x+A.w/2;
       const ringOK=!horiz&&A!==B
-        &&!nodes.some(n=>n!==A&&n.x<sx&&n.x+n.w>sx&&n.y+n.h>A.y+A.h)
-        &&!nodes.some(n=>n!==B&&n.x<B.x+B.w&&n.x+n.w>B.x&&n.y<B.y);
+        &&!nodes.some(n=>n!==A&&!n.boundary&&n.x<sx&&n.x+n.w>sx&&n.y+n.h>A.y+A.h)
+        &&!nodes.some(n=>n!==B&&!n.boundary&&n.x<B.x+B.w&&n.x+n.w>B.x&&n.y<B.y);
       chPlan.set(e,{ring,slot:cum,ringOK});
       cum+=(!horiz&&e.mid)?Math.max(22,lblPx(e.mid)+14):22;
     });
@@ -1308,7 +1355,7 @@ function renderScene(doc,y0){
       if(horiz){             // channel runs below the lanes
         const chY=occB+28+P.slot;             // labels ride ON the channel
         const colR=r=>Math.max(...lane(r).map(n=>n.x+n.w));
-        const blockedV=(y1,y2,xx,skip)=>nodes.some(n=>n!==skip&&n.x<xx&&n.x+n.w>xx&&n.y+n.h>y1&&n.y<y2);
+        const blockedV=(y1,y2,xx,skip)=>nodes.some(n=>n!==skip&&!n.boundary&&n.x<xx&&n.x+n.w>xx&&n.y+n.h>y1&&n.y<y2);
         const sx=A===B?A.x+A.w*0.3:A.x+A.w/2, tx=A===B?B.x+B.w*0.7:B.x+B.w/2;
         if(A!==B&&blockedV(A.y+A.h,chY,sx,A)){
           const gx=colR(A.rank)+10+ring*7;
@@ -1334,7 +1381,7 @@ function renderScene(doc,y0){
       } else {               // channel runs right of the lanes
         const chX=occR+28+P.slot;
         const laneB=r=>Math.max(...lane(r).map(n=>n.y+n.h));
-        const blockedH=(x1,x2,yy,skip)=>nodes.some(n=>n!==skip&&n.y<yy&&n.y+n.h>yy&&n.x+n.w>x1&&n.x<x2);
+        const blockedH=(x1,x2,yy,skip)=>nodes.some(n=>n!==skip&&!n.boundary&&n.y<yy&&n.y+n.h>yy&&n.x+n.w>x1&&n.x<x2);
         const sy=A===B?A.y+A.h*0.3:A.y+A.h/2, ty=A===B?B.y+B.h*0.7:B.y+B.h/2;
         if(A!==B&&blockedH(A.x+A.w,chX,sy,A)){
           const gy=laneB(A.rank)+10+ring*7;
@@ -1355,7 +1402,7 @@ function renderScene(doc,y0){
       // escape lane) detours around it instead of drawing across it. When
       // spanning the following corner point gives a shorter total run than
       // detour + remaining leg (a detour "spike"), the corner is dropped.
-      const obsN=nodes.filter(n=>n!==A&&n!==B).map(n=>({x:n.x,y:n.y,w:n.w,h:n.h}));
+      const obsN=nodes.filter(n=>n!==A&&n!==B&&!n.boundary).map(n=>({x:n.x,y:n.y,w:n.w,h:n.h}));
       const plen=pp=>{let s=0;for(let k=0;k+1<pp.length;k++)s+=Math.hypot(pp[k+1][0]-pp[k][0],pp[k+1][1]-pp[k][1]);return s;};
       for(let i=0;i+1<pts.length;i++){
         const d=routeAround(pts[i],pts[i+1],obsN);
@@ -1416,7 +1463,7 @@ function renderScene(doc,y0){
     // (routeAround). Obstacle-free edges keep the plain line unchanged.
     let route=null;
     if(A!==B){
-      const obs=nodes.filter(n=>n!==A&&n!==B).map(n=>({x:n.x,y:n.y,w:n.w,h:n.h}));
+      const obs=nodes.filter(n=>n!==A&&n!==B&&!n.boundary).map(n=>({x:n.x,y:n.y,w:n.w,h:n.h}));
       for(const k in gBox){
         const b=gBox[k];
         const inG=(px,py)=>px>b.x0&&px<b.x1&&py>b.yA&&py<b.yB;
@@ -1480,6 +1527,23 @@ function renderScene(doc,y0){
   // nodes on top (each wrapped in a draggable, identifiable group)
   const nsvg=[];
   for(const n of nodes){
+    if(n.boundary){
+      // never drawn as a shape (R44): the edge already ended open at the
+      // anchor; a declared label sits just beyond the open end, on the
+      // side away from the figure — small muted text with a white halo
+      if(!n.label) continue;
+      const cx=n.x+n.w/2, cy=n.y+n.h/2, [bdx,bdy]=bDir(n);
+      const bhalo=' paint-order="stroke" stroke="#fff" stroke-width="3"';
+      if(Math.abs(bdx)>=Math.abs(bdy)){
+        if(bdx>=0){ lblsvg.push(textEl(cx+10,cy+3.5,10,'start','#555',n.label,bhalo));
+                    W=Math.max(W,cx+12+lblPx(n.label)); }
+        else lblsvg.push(textEl(cx-10,cy+3.5,10,'end','#555',n.label,bhalo));
+      } else if(bdy>=0){
+        lblsvg.push(textEl(cx,cy+17,10,'middle','#555',n.label,bhalo));
+        Hh=Math.max(Hh,cy+21-y0-20);
+      } else lblsvg.push(textEl(cx,cy-10,10,'middle','#555',n.label,bhalo));
+      continue;
+    }
     nsvg.push('<g data-node="'+n.id+'" data-x="'+n.x+'" data-y="'+n.y+'" style="cursor:move">');
     const fill=n.color||'#fff', stroke=n.stroke||'#8a8880', txt=n.text||'#1d1d1b';
     const ndash=n.style==='dashed'?' stroke-dasharray="6 4"':(n.style==='dotted'?' stroke-dasharray="2 4"':'');
@@ -1547,7 +1611,7 @@ function renderScene(doc,y0){
   }
   const yEnd=y0+20+Hh+10;
   return {svg:gsvg.join('')+esvg.join('')+nsvg.join('')+tsvg.join('')+lblsvg.join(''), y:yEnd, w:W+2,
-          meta:{W:W, top:y0+20+chShift, Hh:Hh}};
+          meta:{W:W, top:y0+20+chShift, Hh:Hh, left:bShift}};
 }
 function borderPoint(n,tx,ty){
   const cx=n.x+n.w/2, cy=n.y+n.h/2, dx=tx-cx, dy=ty-cy;
@@ -2177,7 +2241,7 @@ $('src').addEventListener('input',refresh);
 let lastSVG='', lastMeta=null, lastPad={x:0,y:0}, lastDoc=null;
 
 // ---- direct manipulation: every GUI action is a text edit ----
-const SCENE_KW=/^(figdown|title|node|group|edge|layer|flow|rank|pin|size|line|fill|bundle|class|routing|route)\b/;
+const SCENE_KW=/^(figdown|title|node|group|boundary|edge|layer|flow|rank|pin|size|line|fill|bundle|class|routing|route)\b/;
 const LAYOUT_MARK='# --- layout (materialized by the editor; delete freely, structure above is complete) ---';
 function applyPins(pins){ // pins: array of [id, px, py] — one text update, one refresh
   const lines=$('src').value.split('\n');
@@ -2210,7 +2274,7 @@ function collectPins(overrides){
   for(const gid in originOf){
     const o=(overrides&&overrides[gid])||originOf[gid];
     originOf[gid]=o;
-    pins.push([gid, Math.round(o.x), Math.round(o.y-lastMeta.top)]);
+    pins.push([gid, Math.round(o.x-(lastMeta.left||0)), Math.round(o.y-lastMeta.top)]);
   }
   svg.querySelectorAll('[data-node]').forEach(g=>{
     const id=g.dataset.node;
@@ -2218,7 +2282,7 @@ function collectPins(overrides){
     const nd=lastDoc.nodes.find(n=>n.id===id);
     const o=nd&&nd.group?originOf[nd.group]:null;
     if(o) pins.push([id, Math.round(abs.x-o.x), Math.round(abs.y-o.y)]);
-    else  pins.push([id, Math.round(abs.x), Math.round(abs.y-lastMeta.top)]);
+    else  pins.push([id, Math.round(abs.x-(lastMeta.left||0)), Math.round(abs.y-lastMeta.top)]);
   });
   return pins;
 }

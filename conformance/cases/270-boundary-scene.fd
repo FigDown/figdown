@@ -1,0 +1,13 @@
+# boundary (R44, 0.1-dev.14): external I/O endpoints — declared with and
+# without a label, referenced by edges at either endpoint, pinnable.
+figdown 0.1 block
+boundary ext_in "PKT in"
+boundary ext_out
+node parser "Parser"
+node lookup "Lookup"
+edge ext_in -> parser
+edge parser -> lookup
+edge lookup -> ext_out
+
+# --- layout ---
+pin ext_out at=420,26

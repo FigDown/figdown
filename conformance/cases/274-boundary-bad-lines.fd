@@ -1,0 +1,9 @@
+# boundary takes <id> ["label"] and nothing else: extra positionals and
+# any option key are line errors (it accepts no options)
+figdown 0.1 block
+boundary ok "fine"
+boundary
+boundary e1 "label" extra
+boundary e2 color=#fff
+boundary e3 shape=box
+boundary e4 nonsense=1

@@ -108,6 +108,8 @@ title "..."                 # 選用，吃掉整行剩餘內容；
 node a "Label" [shape=rounded|circle|ellipse|cloud|diamond|cylinder]
                [color=#hex] [style=dashed] [in=<group>]
 group g "Label" [gap=0]     # 容器；gap=0 使成員貼齊
+boundary ext "PKT in"       # 外部 I/O 端點（「外界」）：edge 在此
+                            # 開放收尾；永不畫成形狀
 edge a -> b [style=dashed] [color=#hex]  # 運算子：-> <- -- <->
 edge a -[label]-> b         # 線上標籤把運算子拆開
 edge a [p1] -- [p2] b       # 端點標籤（埠/基數/角色）
