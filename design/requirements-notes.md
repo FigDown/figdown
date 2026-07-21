@@ -1075,6 +1075,46 @@ alone — no clone, no network. Install =
 AGENT-GUIDE.md remains the framework-neutral equivalent for non-skill
 agents.
 
+### R45 — Third field-feedback batch: cross-PDF census + gutter + logic gates (2026-07-21)
+
+**Original**: The downstream pipeline ran a caption census over 30
+PDFs (6,823 figures) and a representability pass, surfacing (a) an
+external per-row index/address gutter pattern (27 memory/message/
+descriptor figures in one PDF), and (b) a new gap candidate —
+digital logic-gate primitives (168 "logic" captions corpus-wide).
+
+**Interpretation & dispositions** (evidence-first, PROCESS §2 —
+recorded, not rushed to implement):
+- *Gutter / `index=` (R-4a/R-4b)* → **OQ-S14**. The clean argument is
+  semantic separation: a row's address is distinct knowledge from the
+  cell's content, and inlining (`"n+0x0 CONTROL"`) conflates them
+  (an R37 machine-readability point, not mere prettiness). But
+  composition can express it today (inline, or a table column), so per
+  R28 the meaning-gap is modest and the frequency is one-PDF. Ruling:
+  OQ-S14, sanctioned workaround = inline the index in the label;
+  trigger = the full 30-PDF frequency the pipeline offers to measure.
+- *Logic-gate primitives* → **OQ-S15**, the top new candidate. A
+  gate's TYPE (AND/OR/XOR/NAND/NOT/MUX + inversion bubble) is
+  genuine semantics that box+edge loses; 168 corpus captions is real
+  frequency. But a ruling needs (i) a vision-pass count of actual gate
+  figures (captions overcount) and (ii) a prior-art survey (digital-
+  logic notation conventions; whether this is a shape family or a
+  `gate` construct). Gather evidence before ruling.
+- *Block-title suppression* → tracked as extending R42: R42 handled
+  the document title but bitfield/table/wave block headings are still
+  always drawn (empty label falls back to the id). The same law
+  applies (the heading is semantic, drawing it is presentation, an
+  embedded figure has an external caption). A small consistent fix,
+  batchable into a future dev increment.
+- *timing sufficiency (72), chart (24)* → deferred pending the vision
+  pass; chart likely stays "unsupported, keep the original raster"
+  rather than new syntax (census ≈1%, R28).
+
+**Validation note**: the census re-confirms the axioms hold on raster-
+sourced figures (a raster bitfield was still authored cleanly as
+`bitfield`) — storage format is not a representability gap; figure
+type is.
+
 ### R44 — Open external endpoints: `boundary` ruled in on measured evidence (2026-07-21)
 
 **Original** (downstream transcription requirement): edges are

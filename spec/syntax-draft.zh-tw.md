@@ -562,6 +562,13 @@ pulse r1                                # 瞬時高亮
   已能宣告同層歸屬；未決的是具名、有視覺呈現的 lane 構件。過
   R28 關卡前需 prior-art 調查（PlantUML swimlane、BPMN lane、
   Mermaid subgraph）＋語料頻率。
+- OQ-S14：框外逐列 **index/address gutter**（`index=` 語意屬性 +
+  `gutter` 放置；實戰回饋 R45）。認可解：位址 inline 於 label。
+  裁決觸發：下游管線願意量測的全語料頻率。
+- OQ-S15：數位**邏輯閘原語**（AND/OR/XOR/NAND/NOT/MUX + 反相；
+  全語料 168 條 logic caption，R45）。裁決前需 vision-pass 對閘圖
+  計數（caption 會高估）＋ prior-art 調查；shape 家族 vs `gate`
+  構件未定。
 - OQ-S12：表格內**趨勢／sparkline** 原語（實戰回饋 F9）。現行
   認可解：Unicode 方塊字元（▁▃▅▇）作為儲存格文字。一級構件
   待語料證據（chart 家族 ≈1%）。

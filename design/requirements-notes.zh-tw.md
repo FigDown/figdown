@@ -848,6 +848,36 @@ Node.js——不用 clone、不用網路。安裝 =
 單一引擎來源再生（永不 fork）。AGENT-GUIDE.md 仍是給非 skill
 框架 agent 的中性等價物。
 
+### R45 — 第三批實戰回饋：跨 PDF 普查 + gutter + 邏輯閘（2026-07-21）
+
+**原始需求**：下游管線對 30 份 PDF 做 caption 普查（6,823 張圖）
+與 representability 初評，浮現 (a) 框外逐列 index/address gutter
+版式（單一 PDF 內 27 張 memory/message/descriptor 圖），與 (b)
+新缺口候選——數位邏輯閘原語（全語料 168 條 logic caption）。
+
+**整理與裁決**（證據優先，PROCESS §2——記錄、不急著實作）：
+- *Gutter／`index=`（R-4a/R-4b）* → **OQ-S14**。乾淨的論點是
+  語意分離：一列的位址是與內容不同的知識，inline（`"n+0x0
+  CONTROL"`）把兩者混在一起（R37 機器可讀性論點，非只是好看）。
+  但組合今天就能表達（inline，或 table 一欄），故依 R28 意義
+  缺口不大、頻率僅單一 PDF。裁決：OQ-S14，認可解 = 位址 inline
+  於 label；觸發 = 管線願意量測的 30-PDF 完整頻率。
+- *邏輯閘原語* → **OQ-S15**，最高優先新候選。閘的**型別**
+  （AND/OR/XOR/NAND/NOT/MUX + 反相泡泡）是 box+edge 會喪失的
+  真語意；168 條 caption 是實在頻率。但裁決需 (i) vision-pass 對
+  實際閘圖計數（caption 會高估）與 (ii) prior-art 調查（數位邏輯
+  記法慣例；是 shape 家族還是 `gate` 構件）。先蒐證再裁。
+- *Block 標題隱藏* → 記為 R42 的延伸：R42 處理了文件 title，但
+  bitfield/table/wave 的 block 標題仍必畫（空 label 會 fallback
+  成 id）。同一法則適用（標題是語意、繪它是展現、嵌入圖有外部
+  caption）。小而一致的修正，可併入未來 dev。
+- *timing 充分性（72）、chart（24）* → 待 vision-pass；chart 很
+  可能維持「不支援、保留原 raster」而非新語法（普查 ≈1%，R28）。
+
+**驗證註記**：普查再次確認公理在 raster 來源的圖上成立（raster
+的 bitfield 仍被乾淨地寫成 `bitfield`）——儲存格式不是
+representability 缺口，圖型才是。
+
 ### R44 — 外部開放端點：`boundary` 依實測證據裁決採納（2026-07-21）
 
 **原始需求**（下游轉寫）：edge 端點僅限節點，「從圖外進入／離開

@@ -662,6 +662,14 @@ transient). Deferred until the static core ships.
   named, rendered lane construct. Needs a prior-art pass (PlantUML
   swimlanes, BPMN lanes, Mermaid subgraphs) + corpus frequency before
   the R28 gate.
+- OQ-S14: external per-row **index/address gutter** (`index=` semantic
+  property + `gutter` placement; field feedback R45). Sanctioned
+  workaround: inline the index in the label. Trigger for a ruling: the
+  full-corpus frequency measurement the downstream pipeline offers.
+- OQ-S15: digital **logic-gate primitives** (AND/OR/XOR/NAND/NOT/MUX +
+  inversion; 168 corpus "logic" captions, R45). Needs a vision-pass
+  gate-figure count (captions overcount) + a prior-art survey before a
+  ruling; shape-family vs. `gate` construct is open.
 - OQ-S12: in-table **trend/sparkline** primitive (field feedback F9).
   Current sanctioned answer: Unicode block characters (▁▃▅▇) as
   authored cell text. A first-class construct waits on corpus
