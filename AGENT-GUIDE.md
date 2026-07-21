@@ -62,9 +62,9 @@ the project's recommended usage is:
 1. Edit the `.fd` (never the SVG).
 2. Rebuild: `node tools/build-svg.js <file.fd>` — this validates and
    renders. Errors come as `Line N: message`; fix and rerun until OK.
-   When the Markdown supplies the figure's caption, build with
-   `--no-title` so the caption isn't drawn twice (the option is
-   recorded in the artifact; the title text stays in the `.fd`).
+   Titles are NOT drawn by default (the Markdown supplies the
+   caption). For a standalone artifact that should carry its visible
+   name, build with `--with-title` (recorded in the artifact).
 3. Commit the `.fd` and `.svg` together.
 
 Stability rules while editing:

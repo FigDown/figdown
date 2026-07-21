@@ -100,8 +100,9 @@ function parse(text) {
 }
 // render(text, opts) -> { svg, errors }  svg is null when there are errors
 // (determinism over convenience: no partial renders of invalid input).
-// opts (presentation, renderer tier): { title: false } skips drawing the
-// title — e.g. when the embedding document supplies its own caption.
+// opts (presentation, renderer tier): { title: true } draws the title;
+// the default does NOT (embedded figures almost always sit under the
+// host document's caption — the majority case).
 function render(text, opts) {
   var p = parse(text);
   if (p.errors.length) return { svg: null, errors: p.errors };
@@ -120,7 +121,7 @@ function artifact(text, opts) {
   var p = render(src, opts);
   if (p.errors.length) return { svg: null, errors: p.errors };
   // recorded render options keep third-party rebuilds bit-identical
-  var optAttr = (opts && opts.title === false) ? ' data-render-options="no-title"' : '';
+  var optAttr = (opts && opts.title === true) ? ' data-render-options="with-title"' : '';
   var meta = '<metadata id="figdown-source" data-sha256="' + __sha256hex(src) + '"' + optAttr + '><![CDATA[\\n'
     + src.replace(/]]>/g, ']]]]><![CDATA[>') + '\\n]]></metadata>';
   return { svg: p.svg.replace(/<\\/svg>$/, meta + '</svg>'), errors: [] };

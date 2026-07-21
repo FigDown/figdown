@@ -738,8 +738,10 @@ function textEl(x,y,fs,anchor,fill,content,extraAttrs){
 }
 
 function render(doc,ropts){
-  // presentation options (renderer tier, not language): {title:false}
-  // skips DRAWING the title — the title text stays semantic in the source.
+  // presentation options (renderer tier, not language): {title:true}
+  // draws the title. Default is NOT drawn (R13: embedded figures almost
+  // always sit under a caption in the host document; the title text
+  // stays semantic in the source either way).
   const RO=ropts||{};
   // resolve class defaults (explicit element attributes win — rigidity, R8)
   const C={}; for(const c of doc.classes||[]) C[c.id]=c;
@@ -752,7 +754,7 @@ function render(doc,ropts){
     if(b.marks)  for(const mk of b.marks) rs(mk,'color');
   }
   const parts=[]; let y=0, maxW=0;
-  if(doc.title && RO.title!==false){ parts.push('<text x="0" y="16" font-size="15" font-weight="600">'+esc(doc.title)+'</text>'); y=30;
+  if(doc.title && RO.title===true){ parts.push('<text x="0" y="16" font-size="15" font-weight="600">'+esc(doc.title)+'</text>'); y=30;
     maxW=Math.max(maxW, doc.title.length*8.6); }  // canvas must fit the title
   let sceneMeta=null;
   if(doc.nodes.length||doc.edges.length){
@@ -1667,8 +1669,9 @@ function parse(text) {
 }
 // render(text, opts) -> { svg, errors }  svg is null when there are errors
 // (determinism over convenience: no partial renders of invalid input).
-// opts (presentation, renderer tier): { title: false } skips drawing the
-// title — e.g. when the embedding document supplies its own caption.
+// opts (presentation, renderer tier): { title: true } draws the title;
+// the default does NOT (embedded figures almost always sit under the
+// host document's caption — the majority case).
 function render(text, opts) {
   var p = parse(text);
   if (p.errors.length) return { svg: null, errors: p.errors };
@@ -1687,7 +1690,7 @@ function artifact(text, opts) {
   var p = render(src, opts);
   if (p.errors.length) return { svg: null, errors: p.errors };
   // recorded render options keep third-party rebuilds bit-identical
-  var optAttr = (opts && opts.title === false) ? ' data-render-options="no-title"' : '';
+  var optAttr = (opts && opts.title === true) ? ' data-render-options="with-title"' : '';
   var meta = '<metadata id="figdown-source" data-sha256="' + __sha256hex(src) + '"' + optAttr + '><![CDATA[\n'
     + src.replace(/]]>/g, ']]]]><![CDATA[>') + '\n]]></metadata>';
   return { svg: p.svg.replace(/<\/svg>$/, meta + '</svg>'), errors: [] };

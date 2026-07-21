@@ -23,10 +23,10 @@ module.exports = function figdownPlugin(md, opts) {
     if (info !== 'figdown') return defaultFence(tokens, idx, options, env, self);
     // Never throw: a broken figure must not take down the whole page.
     try {
-      // showTitle:false maps to the renderer's no-title option — typical
-      // for Markdown, where the document supplies the caption
+      // titles are not drawn by default (Markdown supplies the caption);
+      // showTitle:true opts in for standalone-style embeds
       const { svg, errors } = figdown.render(token.content,
-        opts && opts.showTitle === false ? { title: false } : undefined);
+        opts && opts.showTitle === true ? { title: true } : undefined);
       if (errors.length) {
         return '<pre class="figdown-error">' + escapeHtml(errors.join('\n')) + '</pre>\n';
       }

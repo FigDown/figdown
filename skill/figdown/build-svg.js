@@ -40,7 +40,7 @@ function buildOne(engine, fdPath) {
   const hash = crypto.createHash('sha256').update(src, 'utf8').digest('hex');
   // render options are recorded in the artifact so a third-party rebuild
   // (same source + same recorded options) stays bit-identical
-  const optAttr = RENDER_OPTS.title === false ? ' data-render-options="no-title"' : '';
+  const optAttr = RENDER_OPTS.title === true ? ' data-render-options="with-title"' : '';
   const meta = '<metadata id="figdown-source" data-sha256="' + hash + '"' + optAttr + '><![CDATA[\n'
     + src.replace(/]]>/g, ']]]]><![CDATA[>') + '\n]]></metadata>';
   const artifact = svg.replace(/<\/svg>$/, meta + '</svg>');
@@ -53,11 +53,12 @@ function buildOne(engine, fdPath) {
 const argv = process.argv.slice(2);
 const RENDER_OPTS = {};
 const args = argv.filter(a => {
-  if (a === '--no-title') { RENDER_OPTS.title = false; return false; }
+  if (a === '--with-title') { RENDER_OPTS.title = true; return false; }
+  if (a === '--no-title') { return false; }  // the default since 0.1-dev.12 (kept for compat)
   return true;
 });
 if (!args.length) {
-  console.error('usage: node tools/build-svg.js [--no-title] <file.fd | dir> ...');
+  console.error('usage: node tools/build-svg.js [--with-title] <file.fd | dir> ...');
   process.exit(2);
 }
 const engine = loadEngine();

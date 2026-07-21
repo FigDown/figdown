@@ -525,14 +525,17 @@ transient). Deferred until the static core ships.
   making the artifact self-carrying and staleness detectable.
 - Same-basename pairing (`X.fd` ⇔ `X.svg`) is normative.
 - **Render options (renderer tier, not language).** A renderer MAY
-  accept presentation options — v0.1 defines one: `no-title` (skip
-  drawing the title when the embedding document supplies its own
-  caption; the title TEXT stays semantic in the source). Any accepted
-  option MUST be recorded in the artifact metadata
-  (`data-render-options="…"`), so an artifact remains a pure function
-  of (source, recorded options) and third-party rebuilds stay
-  bit-identical. Options never appear in the source grammar — the
-  registry is untouched.
+  accept presentation options — v0.1 defines one: `with-title` (draw
+  the title inside the SVG). The DEFAULT is not drawn: embedded
+  figures almost always sit under the host document's caption (R13 —
+  defaults follow the majority; mainstream tools also do not draw
+  titles by default). The title TEXT stays semantic in the source
+  either way. Any non-default option MUST be recorded in the artifact
+  metadata (`data-render-options="…"`), so an artifact remains a pure
+  function of (source, recorded options) and third-party rebuilds
+  stay bit-identical. Options never appear in the source grammar —
+  the registry is untouched, and option vocabulary is kept minimal
+  (a knob must justify its existence like syntax must).
 
 ## 8. Error model
 
