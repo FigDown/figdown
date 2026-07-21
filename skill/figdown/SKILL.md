@@ -53,6 +53,8 @@ there; on hash mismatch, treat the `.fd` as truth and rebuild.
   `colw`/colors/alignment never change it.
 - *wave*: tick *t* = the *t*-th lane character; `.` continues; ticks
   stay contiguous across a `gap`.
+- Everything from the first `# --- layout` comment down is
+  rendering-only — skip it when reading for semantics (R43).
 - Never infer meaning from drawing geometry.
 
 ## Syntax cheat sheet (grammar is CLOSED — unknown lines are errors)
@@ -76,6 +78,11 @@ flow right|down             # layout direction
 rank a b c                  # same row/column
 pin a at=x,y                # px; group members are group-local
 size a w=120 h=60
+routing orthogonal          # straight edges draw as right-angle elbows
+route c -> a via=x,y;x,y    # rigid waypoints for ONE edge (as written);
+                            # routing/route are presentation-only — put
+                            # them in the trailing # --- layout ---
+                            # section, never on the edge line
 line "Cap" in=g at=80%      # threshold marker across a group
 fill 15% in=g color=#hex    # zone band; fill 15-35% = explicit range;
                             # dir=up|down|left|right (default up)

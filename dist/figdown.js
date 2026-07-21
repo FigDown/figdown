@@ -1,4 +1,4 @@
-// figdown.js — FigDown embeddable library (0.1-dev.12)
+// figdown.js — FigDown embeddable library (0.1-dev.13)
 // GENERATED FILE, DO NOT EDIT. Built from editor/figdown.html.
 // Regenerate with: node tools/make-lib.js
 (function (root, factory) {
@@ -10,7 +10,7 @@
   }
 }(typeof globalThis !== 'undefined' ? globalThis : this, function () {
   'use strict';
-var VERSION = "0.1-dev.12";
+var VERSION = "0.1-dev.13";
 
 // ---- engine (extracted verbatim from editor/figdown.html) ----
 var __engine = (function () {
@@ -89,7 +89,7 @@ function tokenize(line){
 //    tokens may contain '=' and stay positional (laneMode).
 const OPT_KEYS=new Set(['kind','shape','color','stroke','text','in','layer','label',
   'style','z','at','w','h','unit','note','labels','numbering','fill','from','to','gap','dir','level',
-  'taillabel','headlabel','class']);
+  'taillabel','headlabel','class','via','routing']);
 // Applicable option keys per directive. Keys with dedicated diagnostics
 // (node kind/w/h, edge label/taillabel/headlabel, line fill, fill from/to)
 // are listed so their specific error messages fire. `edge` is consumed by
@@ -104,6 +104,7 @@ const DIRECTIVE_OPTS={
   line:['in','at','color','fill'],
   fill:['in','dir','color','from','to'],
   pin:['at'], size:['w','h'],
+  routing:[], route:['via','routing'],
   'class':['color','stroke','text','style'],
   bitfield:['unit','numbering'], table:[], wave:[],
   plot:['kind','level'],
@@ -127,7 +128,7 @@ function parse(text){
   const errs=[];
   const doc={title:'',nodes:[],groups:[],edges:[],layers:[{id:'base',label:'',z:0}],
              flow:'right',ranks:[],pins:{},sizes:{},blocks:[],trunks:[],glines:[],fills:[],
-             classes:[]};
+             classes:[],routes:[]};
   const nodeIds=new Set(), groupIds=new Set(), layerIds=new Set(['base']), classIds=new Set(),
         bundleIds=new Set();
   let cur=null;             // current typed block (bitfield/table/wave)
@@ -589,6 +590,39 @@ function parse(text){
         doc.sizes[id]={w,h,line:n};
         break;
       }
+      case 'routing': {
+        // document-level presentation directive (0.1-dev.13): how straight
+        // scene edges are drawn. straight (default) = today's direct lines;
+        // orthogonal = deterministic manhattan elbows. Rendering parameter
+        // only — no semantics; belongs in the trailing layout section.
+        if(!['orthogonal','straight'].includes(pos[1]||'')){ err(n,'routing needs orthogonal|straight'); break; }
+        if(pos.length>2){ err(n,'unexpected argument "'+pos[2]+'"'); break; }
+        doc.routing=pos[1]; break;
+      }
+      case 'route': {
+        // per-edge declared waypoints (0.1-dev.13): route <a> <op> <b>
+        // via=x,y;x,y;… [routing=orthogonal|straight]. References ONE
+        // existing edge exactly as written (a, operator, b — endpoint
+        // order matters, unlike bundle members); waypoints are rigid
+        // canvas px, the same space as ungrouped pin. Layout section only.
+        const a=pos[1], op=pos[2], b=pos[3];
+        if(!a||!ID_RE.test(a)||!['->','<-','--','<->'].includes(op||'')||!b||!ID_RE.test(b)){
+          err(n,'route needs <a> ->|<-|--|<-> <b> via=x,y;x,y;…'); break; }
+        if(pos.length>4){ err(n,'unexpected argument "'+pos[4]+'"'); break; }
+        if(opts.via===undefined){ err(n,'route needs via=x,y;x,y;… (canvas px waypoints)'); break; }
+        const pairs=[]; let badv=null;
+        for(const t of String(opts.via).split(';')){
+          const m=/^(-?[\d.]+),(-?[\d.]+)$/.exec(t.trim());
+          const px=m&&parseFloat(m[1]), py=m&&parseFloat(m[2]);
+          if(!m||!isFinite(px)||!isFinite(py)){ badv='bad via point "'+t.trim()+'" (expected x,y)'; break; }
+          pairs.push([px,py]);
+        }
+        if(badv){ err(n,badv); break; }
+        if(opts.routing!==undefined && !['orthogonal','straight'].includes(opts.routing)){
+          err(n,'routing must be orthogonal|straight'); break; }
+        doc.routes.push({a,op,b,via:pairs,routing:opts.routing,line:n});
+        break;
+      }
       case 'bitfield': {
         const id=pos[1];
         if(!id||!ID_RE.test(id)){ err(n,'bitfield needs an id'); break; }
@@ -649,6 +683,20 @@ function parse(text){
       errs.push('Line '+t.line+': no edge between "'+a+'" and "'+b+'" for bundle member');
     else if(matches>1)
       errs.push('Line '+t.line+': "'+a+'--'+b+'" is ambiguous ('+matches+' parallel edges); parallel edges are out of scope for v0.1');
+  }
+  { // route lines reference ONE existing edge exactly as written (a-op-b;
+    // endpoint order matters — unlike bundle members); parallel edges are
+    // ambiguous; one route per edge (closed grammar, 0.1-dev.13)
+    const seenRt=new Set();
+    for(const r of doc.routes){
+      const ref=r.a+' '+r.op+' '+r.b;
+      const matches=doc.edges.filter(e=>e.a===r.a&&e.op===r.op&&e.b===r.b);
+      if(!matches.length){ errs.push('Line '+r.line+': no edge "'+ref+'" for route (must match the edge as written)'); continue; }
+      if(matches.length>1){ errs.push('Line '+r.line+': "'+ref+'" is ambiguous ('+matches.length+' parallel edges); parallel edges are out of scope for v0.1'); continue; }
+      if(seenRt.has(ref)){ errs.push('Line '+r.line+': duplicate route for "'+ref+'"'); continue; }
+      seenRt.add(ref);
+      matches[0].route=r;      // renderer convenience; the model keeps doc.routes
+    }
   }
   for(const id in doc.pins) if(!nodeIds.has(id)&&!groupIds.has(id))
     errs.push('Line '+doc.pins[id].line+': pin of unknown id "'+id+'"');
@@ -861,7 +909,7 @@ function renderScene(doc,y0){
   const chains=new Map();                  // edge -> [A, ...waypoints, B]
   for(const e of doc.edges){
     const A=byId[e.a], B=byId[e.b];
-    if(!A||!B||isBack.has(e)) continue;
+    if(!A||!B||isBack.has(e)||e.route) continue;   // routed edges draw their own waypoints
     if(B.rank-A.rank<=1 || pinned(e.a) || pinned(e.b)) continue;
     const chain=[A];
     for(let r=A.rank+1;r<B.rank;r++){
@@ -992,7 +1040,7 @@ function renderScene(doc,y0){
   // channel side — so fan-in hubs (N states -> IDLE reset) have no crossings.
   const chPlan=new Map(); let chTop=0, chShift=0;
   {
-    const chList=doc.edges.filter(e=>byId[e.a]&&byId[e.b]&&isBack.has(e)&&!pinned(e.a)&&!pinned(e.b));
+    const chList=doc.edges.filter(e=>byId[e.a]&&byId[e.b]&&isBack.has(e)&&!pinned(e.a)&&!pinned(e.b)&&!e.route);
     const near=e=>{ const A=byId[e.a]; return horiz?A.y+A.h/2:A.x+A.w/2; };
     const order=chList.map((e,i)=>({e,i}));
     order.sort((p,q)=>near(q.e)-near(p.e)||p.i-q.i);
@@ -1040,7 +1088,7 @@ function renderScene(doc,y0){
   // opposite sides; endpoints and labels shift together.
   const apOff=new Map();
   {
-    const straight=e=>byId[e.a]&&byId[e.b]&&!(isBack.has(e)&&!pinned(e.a)&&!pinned(e.b))&&!chains.get(e);
+    const straight=e=>byId[e.a]&&byId[e.b]&&!(isBack.has(e)&&!pinned(e.a)&&!pinned(e.b))&&!chains.get(e)&&!e.route;
     const pk=e=>e.a<e.b?e.a+'\t'+e.b:e.b+'\t'+e.a;
     const pairN={}, seen={};
     for(const e of doc.edges) if(straight(e)){ const k=pk(e); pairN[k]=(pairN[k]||0)+1; }
@@ -1108,6 +1156,49 @@ function renderScene(doc,y0){
           m2=(e.op==='<->'||e.op==='->')?' marker-end="url(#arr)"':'';
     const halo=' paint-order="stroke" stroke="#fff" stroke-width="3"';
     const seg=(p,q,t,lbl,fs)=>lblsvg.push(textEl(p[0]+(q[0]-p[0])*t, p[1]+(q[1]-p[1])*t-4, fs,'middle','#555',lbl,halo));
+    if(e.route){
+      // declared waypoints (route … via=, 0.1-dev.13) are RIGID: the edge
+      // draws source → via1 → … → viaN → target and bypasses the automatic
+      // machinery (chains, channels, obstacle detours). Waypoints are
+      // canvas px in the same space as ungrouped pins (and follow the
+      // ring-channel scene shift like pins do). Under orthogonal routing
+      // (route-level routing= wins over the document directive) consecutive
+      // points are joined by deterministic manhattan elbows — horizontal-
+      // then-vertical for flow right|left, vertical-then-horizontal for
+      // down|up — reusing the standard borderPoint anchoring at both ends.
+      const orth=(e.route.routing||doc.routing||'straight')==='orthogonal';
+      const via=e.route.via.map(p=>[p[0], y0+20+chShift+p[1]]);
+      let pts=[borderPoint(A,via[0][0],via[0][1])]
+        .concat(via,[borderPoint(B,via[via.length-1][0],via[via.length-1][1])]);
+      if(orth){
+        const out=[pts[0]];
+        for(let i=1;i<pts.length;i++){
+          const p=out[out.length-1], q=pts[i];
+          if(p[0]!==q[0]&&p[1]!==q[1]) out.push(horiz?[q[0],p[1]]:[p[0],q[1]]);
+          out.push(q);
+        }
+        pts=out;
+      }
+      for(let i=1;i+1<pts.length;i++)  // drop zero-length interior steps
+        if(Math.hypot(pts[i][0]-pts[i-1][0],pts[i][1]-pts[i-1][1])<0.5){ pts.splice(i,1); i--; }
+      esvg.push('<path data-edge="'+e.line+'" d="M'+pts.map(p=>p.join(' ')).join(' L')+'" fill="none" stroke="'+col+'" stroke-width="1.6"'+dash+m1+m2+'/>');
+      if(e.mid){               // the longest segment carries the mid label
+        let bi=0,bl=-1;
+        for(let i=0;i+1<pts.length;i++){
+          const l=Math.hypot(pts[i+1][0]-pts[i][0],pts[i+1][1]-pts[i][1]);
+          if(l>bl){ bl=l; bi=i; }
+        }
+        const pP=pts[bi], qP=pts[bi+1], mx=(pP[0]+qP[0])/2, my=(pP[1]+qP[1])/2;
+        if(Math.abs(qP[0]-pP[0])>=Math.abs(qP[1]-pP[1]))
+          lblsvg.push(textEl(mx,my-5,11,'middle',col,e.mid,halo));   // above a horizontal run
+        else{ lblsvg.push(textEl(mx+7,my+4,11,'start',col,e.mid,halo)); // beside a vertical run
+              W=Math.max(W,mx+9+lblPx(e.mid)); }
+      }
+      if(e.tail) seg(pts[0],pts[1],0.25,e.tail,10);
+      if(e.head) seg(pts[pts.length-1],pts[pts.length-2],0.25,e.head,10);
+      for(const pP of pts){ W=Math.max(W,pP[0]+4); Hh=Math.max(Hh,pP[1]+16-y0-20); }
+      continue;
+    }
     if(isBack.has(e)&&!pinned(e.a)&&!pinned(e.b)){
       // back-edge (retry loop): polyline through a side channel beyond the
       // occupied lanes instead of a straight line hidden under the spine,
@@ -1241,6 +1332,21 @@ function renderScene(doc,y0){
         route[0]=borderPoint(A,route[1][0],route[1][1]);
         route[route.length-1]=borderPoint(B,route[route.length-2][0],route[route.length-2][1]);
       }
+    }
+    if(!route && A!==B && doc.routing==='orthogonal' && ax!==bx && ay!==by){
+      // document-level orthogonal routing (0.1-dev.13): plain straight
+      // edges become deterministic manhattan elbows — horizontal-then-
+      // vertical under flow right|left, vertical-then-horizontal under
+      // down|up — anchored by the same borderPoint rule (the corner sits
+      // on the far node's main-axis line, so exits are clean right-angle
+      // stubs). Obstacle detours and channel/chain polylines keep their
+      // existing shapes; axis-aligned pairs stay plain straight lines.
+      const corner=horiz?[bx,ay]:[ax,by];
+      let sP=borderPoint(A,corner[0],corner[1]), tP=borderPoint(B,corner[0],corner[1]);
+      if(ap){ sP=[sP[0]+ap[0],sP[1]+ap[1]]; tP=[tP[0]+ap[0],tP[1]+ap[1]]; }
+      const mid=horiz?[tP[0],sP[1]]:[sP[0],tP[1]];
+      const deg=(pp,qq)=>Math.hypot(pp[0]-qq[0],pp[1]-qq[1])<0.5;
+      if(!deg(mid,sP)&&!deg(mid,tP)) route=[sP,mid,tP];
     }
     if(route){
       esvg.push('<path data-edge="'+e.line+'" d="M'+route.map(p=>p.join(' ')).join(' L')+'" fill="none" stroke="'+col+'" stroke-width="1.6"'+dash+m1+m2+'/>');

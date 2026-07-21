@@ -28,6 +28,10 @@ human eyes; it also embeds its own source and a SHA-256 of it
   metadata; if the embedded SHA-256 does not match the recovered text,
   the artifact was edited after generation — treat the `.fd` as truth
   and regenerate.
+- **You may stop at the layout marker** (R43): everything from the
+  first `# --- layout` comment down is rendering-only
+  (`pin`/`size`/`route`/`routing`) and carries no meaning — skip it
+  when reading for semantics.
 - **Meaning is derived from the syntax alone, never from drawing
   geometry** (R37). The rules per block:
   - *bitfield*: field *k*'s bit offset = the sum of all earlier
@@ -132,6 +136,11 @@ flow right|down             # layout direction
 rank a b c                  # same row/column
 pin a at=x,y                # absolute px; group members are group-local
 size a w=120 h=60
+routing orthogonal          # straight edges draw as right-angle elbows
+route c -> a via=x,y;x,y    # rigid waypoints for ONE edge (as written);
+                            # routing/route are presentation-only and go
+                            # in the trailing # --- layout --- section,
+                            # never on the edge line itself
 line "Cap" in=g at=80%      # threshold marker across a group
 fill 15% in=g color=#hex    # zone band; fill 15-35% = explicit range;
                             # dir=up|down|left|right (default up)

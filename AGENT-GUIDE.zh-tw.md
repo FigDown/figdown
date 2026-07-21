@@ -24,6 +24,9 @@
 - 若 `.fd` 遺失，從 SVG 內嵌 metadata 還原來源；若內嵌 SHA-256 與
   還原文字不符，代表 SVG 在生成後被改過——以 `.fd` 為真相並重新
   生成。
+- **可在 layout 標記處停止**（R43）：自第一個 `# --- layout`
+  註解起皆為純渲染（`pin`/`size`/`route`/`routing`）、不含意義
+  ——為語意而讀時可直接跳過。
 - **意義只由語法推導，永不由繪圖幾何推斷**（R37）。各區塊規則：
   - *bitfield*：第 *k* 個欄位的位元 offset = 前面所有宣告寬度的
     總和；**沒有隱含填充**（真實 padding 一律是顯式欄位）；
@@ -114,6 +117,10 @@ flow right|down             # 佈局方向
 rank a b c                  # 同列/同欄
 pin a at=x,y                # 絕對 px；群組成員為群組局部座標
 size a w=120 h=60
+routing orthogonal          # 直線 edge 改畫直角折線
+route c -> a via=x,y;x,y    # 對一條 edge（照原文引用）宣告剛性途經點；
+                            # routing/route 為純展現，收在尾部
+                            # # --- layout --- 區，永不寫在 edge 行上
 line "Cap" in=g at=80%      # 橫跨群組的門檻標記線
 fill 15% in=g color=#hex    # 著色帶；fill 15-35% = 顯式範圍；
                             # dir=up|down|left|right（預設 up）

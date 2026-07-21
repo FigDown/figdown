@@ -1,0 +1,6 @@
+figdown 0.1 block
+node a "A"
+node b "B"
+edge a -> b
+route a -> b via=10,20
+route a -> b via=30,40

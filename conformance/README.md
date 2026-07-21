@@ -41,9 +41,9 @@ conformance/
 Every case has **exactly one** golden — `.model.json` if it parses
 clean, `.errors.txt` if it does not. Case numbering groups by area:
 `01x` header, `1xx` lexical, `2xx` node/group, `25x` edge, `3xx`
-class/layer/layout, `36x` pin/size, `37x` line/fill, `39x` bundle,
-`4xx` bitfield, `5xx` table, `6xx` wave, `7xx` plot (experimental),
-`9xx` cross-cutting errors. Each case isolates one behavior (error
+class/layer/layout, `36x` pin/size, `37x` line/fill, `38x`
+routing/route, `39x` bundle, `4xx` bitfield, `5xx` table, `6xx` wave,
+`7xx` plot (experimental), `9xx` cross-cutting errors. Each case isolates one behavior (error
 cases may carry several lines of the *same* behavior family, since the
 parser reports all errors in one pass).
 
@@ -100,9 +100,13 @@ appear in the model):
 `group.gap`, edge `tail`/`mid`/`head`, `size.w`/`size.h` (either may be
 absent), guide-line `color`, field `optional`/`color`/`class`/`note`,
 table `colw`/`marks`/`highlights`, wave signal `labels`, wave `gaps`,
-plot `level`.
+plot `level`. Also (0.1-dev.13, additive): top-level `routing` appears
+only when the document writes an explicit `routing` line, and the
+top-level `routes` array is omitted entirely when there are no `route`
+lines — so every pre-dev.13 golden stayed byte-identical.
 
-Empty top-level collections stay as `[]` — the document shape is fixed.
+Empty top-level collections stay as `[]` — the document shape is fixed
+(`routes` is the one omit-when-empty exception above).
 In `aligns`, a column with no explicit `:` alignment is `"none"`.
 
 ## Running

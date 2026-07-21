@@ -1,0 +1,101 @@
+{
+  "header": {
+    "version": "0.1",
+    "template": "topology"
+  },
+  "title": "Declared waypoints for a wrap-around edge",
+  "flow": "right",
+  "classes": [],
+  "layers": [
+    {
+      "id": "base",
+      "z": 0
+    }
+  ],
+  "nodes": [
+    {
+      "id": "a",
+      "label": "Stage A",
+      "shape": "box",
+      "layer": "base",
+      "line": 3
+    },
+    {
+      "id": "b",
+      "label": "Stage B",
+      "shape": "box",
+      "layer": "base",
+      "line": 4
+    },
+    {
+      "id": "c",
+      "label": "Stage C",
+      "shape": "box",
+      "layer": "base",
+      "line": 5
+    }
+  ],
+  "groups": [],
+  "edges": [
+    {
+      "a": "a",
+      "op": "->",
+      "b": "b",
+      "layer": "base",
+      "line": 6
+    },
+    {
+      "a": "b",
+      "op": "->",
+      "b": "c",
+      "layer": "base",
+      "line": 7
+    },
+    {
+      "a": "c",
+      "op": "->",
+      "b": "a",
+      "mid": "return",
+      "layer": "base",
+      "line": 8
+    }
+  ],
+  "ranks": [],
+  "pins": [],
+  "sizes": [],
+  "routes": [
+    {
+      "a": "c",
+      "op": "->",
+      "b": "a",
+      "via": [
+        {
+          "x": 340,
+          "y": -20
+        },
+        {
+          "x": 10,
+          "y": -20
+        }
+      ],
+      "routing": "orthogonal",
+      "line": 11
+    },
+    {
+      "a": "a",
+      "op": "->",
+      "b": "b",
+      "via": [
+        {
+          "x": 90,
+          "y": 60
+        }
+      ],
+      "line": 12
+    }
+  ],
+  "lines": [],
+  "fills": [],
+  "bundles": [],
+  "blocks": []
+}

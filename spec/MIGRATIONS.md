@@ -163,3 +163,26 @@ Example: `title "a\\nb"` (old render: `a\` + line break + `b`) →
          `title "a\\\nb"`; cell `\x raw` (old render: `x raw`) →
          `x raw`; `group inner "I" in=outer` → `group inner "I"`
          (the `in=` was silently discarded — no nesting is lost).
+
+## 0.1-dev.12 → 0.1-dev.13  (2026-07-21, spec §3 edge routing)
+Change:  presentation-tier edge routing added (tier 3, no semantics —
+         both directives join the §5 presentation-ignorable strip
+         list and live in the trailing layout section, never on
+         `edge` lines):
+         - `routing orthogonal|straight` — document-level; default
+           `straight` is exactly the previous behavior. Under
+           `orthogonal`, plain straight scene edges draw as
+           deterministic manhattan elbows.
+         - `route <a> <op> <b> via=x,y;x,y;…
+           [routing=orthogonal|straight]` — rigid waypoints for ONE
+           existing edge, referenced exactly as written (endpoint
+           order and operator matter); waypoints are canvas px in the
+           ungrouped-`pin` space. Unknown/ambiguous references, bad
+           via pairs, unknown modes and duplicate routes are line
+           errors.
+         Registry: top-level keywords 17 → 19.
+Rule:    ADDITIVE — no rewrite. Documents that write neither
+         directive parse and render exactly as before.
+Example: (nothing) → `routing orthogonal` +
+         `route c -> a via=340,20;10,20` in the `# --- layout ---`
+         section.

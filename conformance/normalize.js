@@ -37,12 +37,18 @@
 //       absent); line (guide) color; field optional/color/class/note;
 //       table colw/marks/highlights; wave signal labels; wave gaps;
 //       plot level
-//   Empty top-level collections stay as [] (the document shape is fixed).
+//     - routing (0.1-dev.13): emitted only when the document writes an
+//       explicit `routing` line (the renderer default is "straight");
+//       routes (0.1-dev.13): the whole array is omitted when the document
+//       has no `route` lines — both exceptions keep every pre-dev.13
+//       golden byte-identical (additive change)
+//   Empty top-level collections stay as [] (the document shape is fixed;
+//   `routes` is the one exception above).
 //   Table aligns: a column with no explicit `:` alignment is "none".
 //
 // Top-level key order:
-//   header, title, flow, classes, layers, nodes, groups, edges, ranks,
-//   pins, sizes, lines, fills, bundles, blocks
+//   header, title, flow, routing?, classes, layers, nodes, groups, edges,
+//   ranks, pins, sizes, routes?, lines, fills, bundles, blocks
 //
 // Element key orders:
 //   class : id, meaning, color, stroke, text, style, line
@@ -55,6 +61,9 @@
 //   rank  : ids, line
 //   pin   : id, x, y, line
 //   size  : id, w, h, line
+//   route : a, op, b, via, routing, line   (via: array of {x,y} canvas-px
+//                                           waypoints; routing only when
+//                                           written on the route line)
 //   line  : label, in, at, color, line       (guide line; `at` is a
 //                                             percentage number)
 //   fill  : in, from, to, dir, color, line   (from/to percentages; color
@@ -156,6 +165,7 @@ function normalize(doc) {
   model.header = o([['version', '0.1'], ['template', doc.template]]);
   if (doc.title) model.title = doc.title;
   model.flow = doc.flow;
+  if (doc.routing) model.routing = doc.routing;
   model.classes = (doc.classes || []).map(c => o([
     ['id', c.id], ['meaning', c.label], ['color', c.color],
     ['stroke', c.stroke], ['text', c.text], ['style', c.style],
@@ -184,6 +194,11 @@ function normalize(doc) {
     .map(id => ({ id, s: doc.sizes[id] }))
     .sort((a, b) => byLine(a.s, b.s))
     .map(x => o([['id', x.id], ['w', x.s.w], ['h', x.s.h], ['line', x.s.line]]));
+  if ((doc.routes || []).length)
+    model.routes = doc.routes.map(r => o([
+      ['a', r.a], ['op', r.op], ['b', r.b],
+      ['via', r.via.map(p => ({ x: p[0], y: p[1] }))],
+      ['routing', r.routing], ['line', r.line]]));
   model.lines = (doc.glines || []).map(g => o([
     ['label', g.label], ['in', g.group], ['at', g.pct], ['color', g.color],
     ['line', g.line]]));

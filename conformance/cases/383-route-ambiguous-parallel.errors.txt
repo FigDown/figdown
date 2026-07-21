@@ -1,0 +1,1 @@
+Line 6: "a -> b" is ambiguous (2 parallel edges); parallel edges are out of scope for v0.1

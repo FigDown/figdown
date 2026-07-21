@@ -170,6 +170,12 @@ Bracket content rules:
   scope for v0.1 — silently dropping them would violate the
   no-silent-failure rule).
 
+Edge lines carry **pure semantics** — endpoints, direction, labels,
+plane. *How* a connection is drawn across the canvas is a rendering
+parameter with no meaning: the `routing` and `route` directives (§3)
+exist for that, and they belong in the trailing layout section like
+`pin`/`size` — never inline on an `edge` line.
+
 ### 2.4 Layers (R5)
 
 ```figdown
@@ -264,6 +270,8 @@ rank l2 l3                      # tier 2: these nodes share a rank/row
 pin l3 at=420,80                # tier 3: position in px, relative to the
                                 #         element's positioning context
 size l3 w=120 h=60              # tier 3: explicit size (px only)
+routing orthogonal              # tier 3: straight edges draw as elbows
+route c -> a via=340,20;10,20   # tier 3: declared-rigid waypoints for ONE edge
 ```
 
 Normative rules:
@@ -290,17 +298,48 @@ Normative rules:
   in canvas px; a pinned **member** is group-local (relative to that
   origin). Moving a group is therefore a one-line edit and edits inside
   one group can never disturb another. Ungrouped pins are canvas px.
-- **Semantic-completeness invariant (R25)**: stripping every `pin` and
-  `size` line from a document MUST leave one that still parses, still
-  renders under auto layout, and expresses the identical structure and
-  relationships. Editors conventionally materialize layout into a
-  trailing `# layout` section so the structure reads first.
+- **Edge routing (0.1-dev.13)** — presentation-tier, tier 3, no
+  semantics. `routing orthogonal|straight` is a document-level
+  directive (default `straight` — the plain direct lines). Under
+  `orthogonal`, plain straight scene edges render as deterministic
+  manhattan elbows — horizontal-then-vertical under `flow right|left`,
+  vertical-then-horizontal under `down|up` — anchored by the same
+  border-point rule as straight edges; back-edge channels are already
+  orthogonal, and obstacle detours keep their shapes. `route <a> <op>
+  <b> via=x,y;x,y;… [routing=orthogonal|straight]` declares
+  **rigid waypoints** for ONE existing edge: the reference must match
+  the edge **as written** (`a`, operator, `b` — endpoint order and
+  operator matter, unlike `bundle` members), must resolve to a unique
+  edge (a parallel-edge reference is ambiguous = line error), and at
+  most one `route` per edge (duplicate = line error). Waypoint pairs
+  are canvas px in the same coordinate space as an ungrouped `pin`;
+  the edge renders as the polyline source→via1→…→viaN→target
+  (elbows between consecutive points when routing is orthogonal — the
+  route-level `routing=` overrides the document directive for that
+  edge). The mid label sits on the longest segment (beside it when the
+  segment is near-vertical); arrowheads are preserved. Like
+  `pin`/`size`, `routing`/`route` are rendering parameters **without
+  meaning** and belong in the trailing layout section — never inline
+  on `edge` lines (§2.3).
+- **Semantic-completeness invariant (R25)**: stripping every `pin`,
+  `size`, `routing` and `route` line from a document MUST leave one
+  that still parses, still renders under auto layout, and expresses
+  the identical structure and relationships. Editors conventionally
+  materialize layout into a trailing `# layout` section so the
+  structure reads first.
 - **OQ-S2 resolved: `at=` is px relative to the element's positioning
   context** — the canvas for ungrouped nodes and groups; the group's
   local coordinate system for group members (D6). Canvas-relative
   fractions were tried and rejected (canvas growth moved every
   fractional pin). Edges are always derived from node borders — they
   adapt, and can never be pinned.
+- **The two-zone reading contract (R43, normative)**: a document has a
+  semantic zone (top) and a rendering zone — everything from the first
+  comment line beginning `# --- layout` to the end. The rendering zone
+  holds ONLY rendering declarations (`pin` `size` `route` `routing`)
+  and MUST NOT carry semantics; the semantic zone SHOULD NOT hold
+  information needed only for rendering. A reading agent MAY therefore
+  stop reading at the layout marker with no loss of meaning.
 - *Informative (editor policy, not wire format)*: editors MAY
   materialize computed positions into `pin` lines (the reference editor
   does so on the user's first drag — "pin-on-first-touch") and SHOULD
@@ -487,15 +526,16 @@ classifiable diagrams** ([census.md](../design/census.md)).
 Optional on any element: `color=` (fill), `stroke=`, `text=` (label
 color), `style=solid|dashed|dotted`, `layer=`; `gap=` on groups.
 Dimensions belong exclusively to the `size` directive — `w=`/`h=` on a
-node line is an error (one mechanism, not two). Everything else (fonts,
-spacing, arrowheads, routing) belongs to the renderer/theme, not the
-language.
+node line is an error (one mechanism, not two). Edge routing belongs
+exclusively to the `routing`/`route` directives in the layout section
+(§3) — never to `edge` lines. Everything else (fonts, spacing,
+arrowheads) belongs to the renderer/theme, not the language.
 
 Normative boundary (the presentation-ignorable invariant, extending
 R25): removing all presentation-only attributes (`color`, `stroke`,
-`text`, `style`, `gap`, `z`) and layout directives (`pin`, `size`) MUST
-NOT change the document's semantic structure; semantic consumers MAY
-ignore them. Consequently **color and style MUST NOT be the sole
+`text`, `style`, `gap`, `z`) and layout directives (`pin`, `size`,
+`routing`, `route`) MUST NOT change the document's semantic structure;
+semantic consumers MAY ignore them. Consequently **color and style MUST NOT be the sole
 carrier of meaning** — if color/dash denotes state, role, plane or
 classification, that meaning SHOULD also appear in text or a semantic
 annotation — the `class` mechanism (§2.7) is that carrier: when
@@ -598,10 +638,10 @@ transient). Deferred until the static core ships.
 
 ## 10. Keyword registry, conformance modes, extensions
 
-**Registry (v0.1).** Top-level keywords (17):
+**Registry (v0.1).** Top-level keywords (19):
 `figdown title node group edge layer flow rank bundle line fill pin
-size class bitfield table wave` — plus the table-row line-start token
-`|`.
+size class routing route bitfield table wave` — plus the table-row
+line-start token `|`.
 Typed-block child keywords (6): `field wrap cell colw signal gap`.
 Reserved for the dynamic profile: `page step set pulse`.
 Experimental (outside the v0.1 conformance surface): `plot`.

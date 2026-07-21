@@ -1,0 +1,6 @@
+figdown 0.1 block
+node a "A"
+node b "B"
+edge a -> b
+routing diagonal
+route a -> b via=10,20 routing=curvy

@@ -1,0 +1,12 @@
+figdown 0.1 topology
+title "Declared waypoints for a wrap-around edge"
+node a "Stage A"
+node b "Stage B"
+node c "Stage C"
+edge a -> b
+edge b -> c
+edge c -[return]-> a
+
+# --- layout ---
+route c -> a via=340,-20;10,-20 routing=orthogonal
+route a -> b via=90,60

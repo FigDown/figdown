@@ -1,0 +1,3 @@
+Line 5: bad via point "10" (expected x,y)
+Line 6: bad via point "nope" (expected x,y)
+Line 7: route needs via=x,y;x,y;… (canvas px waypoints)

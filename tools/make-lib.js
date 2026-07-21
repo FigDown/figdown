@@ -18,7 +18,7 @@ const path = require('path');
 
 // The library version. Single place; tracks the spec draft version
 // (spec/MIGRATIONS.md, latest entry).
-const VERSION = '0.1-dev.12';
+const VERSION = '0.1-dev.13';
 
 const ROOT = path.join(__dirname, '..');
 const ENGINE_HTML = path.join(ROOT, 'editor', 'figdown.html');

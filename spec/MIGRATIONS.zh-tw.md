@@ -146,3 +146,22 @@ Example: `title "a\\nb"`（舊呈現：`a\`＋換行＋`b`）→
          `title "a\\\nb"`；儲存格 `\x raw`（舊呈現：`x raw`）→
          `x raw`；`group inner "I" in=outer` → `group inner "I"`
          （`in=` 原本即被默默丟棄——沒有任何嵌套損失）。
+
+## 0.1-dev.12 → 0.1-dev.13（2026-07-21，spec §3 edge 走線）
+Change:  新增展現層 edge 走線（第 3 層、不帶語意——兩個指令都
+         加入 §5「展現可忽略」剝除清單，收在尾部 layout 區，
+         永不寫在 `edge` 行）：
+         - `routing orthogonal|straight`——文件級；預設
+           `straight` 即原本的行為。`orthogonal` 之下，普通直線
+           場景 edge 改畫成確定性的曼哈頓直角折線。
+         - `route <a> <op> <b> via=x,y;x,y;…
+           [routing=orthogonal|straight]`——對**一條**既存 edge
+           宣告剛性途經點，引用必須與 edge 原文一致（端點順序與
+           運算子都算數）；途經點為畫布 px、與未分組 `pin` 同一
+           座標空間。未知/歧義引用、壞的 via 數對、未知模式與
+           重複 route 都是行錯誤。
+         註冊表：頂層關鍵字 17 → 19。
+Rule:    **純新增**——零改寫。兩個指令都不寫的文件，解析與渲染
+         與先前完全相同。
+Example: （無）→ 在 `# --- layout ---` 區加入
+         `routing orthogonal` ＋ `route c -> a via=340,20;10,20`。

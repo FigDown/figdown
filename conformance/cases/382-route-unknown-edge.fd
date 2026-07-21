@@ -1,0 +1,9 @@
+figdown 0.1 block
+node a "A"
+node b "B"
+edge a -> b
+# route must match the edge AS WRITTEN (a, operator, b): a reversed
+# spelling, a different operator, or an unknown endpoint never resolve
+route b <- a via=10,10
+route a -- b via=10,10
+route a -> c via=10,10

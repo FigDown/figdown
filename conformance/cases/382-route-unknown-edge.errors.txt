@@ -1,0 +1,3 @@
+Line 7: no edge "b <- a" for route (must match the edge as written)
+Line 8: no edge "a -- b" for route (must match the edge as written)
+Line 9: no edge "a -> c" for route (must match the edge as written)

@@ -1,0 +1,14 @@
+figdown 0.1 block
+title "Document-level orthogonal routing"
+node a "A"
+node b "B"
+node c "C"
+flow right
+edge a -> b
+edge b -[hop]-> c
+
+# --- layout ---
+routing orthogonal
+pin a at=0,0
+pin b at=160,90
+pin c at=320,0
