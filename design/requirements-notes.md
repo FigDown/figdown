@@ -1075,6 +1075,30 @@ alone — no clone, no network. Install =
 AGENT-GUIDE.md remains the framework-neutral equivalent for non-skill
 agents.
 
+### R43 — The two-zone reading contract: AI may stop at the layout marker (2026-07-21)
+
+**Original** (three directives, consolidated): rendering parameters
+should live in the trailing section of the `.fd`, not in the main
+section, whenever they carry no meaning of their own; if the main
+section already expresses the meaning fully, information needed only
+for rendering (for humans) must not sit there; the GOAL is that an
+AI/LLM reading the source (no rendering need) can completely ignore
+the trailing rendering section.
+
+**Interpretation**: This promotes the `# --- layout ---` editor
+convention (R25) into a NORMATIVE two-zone contract: the semantic
+zone (top) fully expresses the figure's meaning; the rendering zone
+(from the layout marker down) holds only rendering declarations
+(`pin`/`size`/`route`/`routing`) and MUST NOT carry semantics — so a
+reading agent may stop at the marker, saving tokens and attention.
+Consequences: the new `route`/`via`/`routing` directives (0.1-dev.13)
+are specified as layout-zone residents, never inline on edge lines;
+inline presentation attributes on semantic lines (e.g. decorative
+`color=`) remain legal (they are skippable tokens, and §5 already
+lets semantic consumers ignore them) but a relocatable spelling is
+tracked as OQ-S13 should field demand appear. Spec §3 / AGENT-GUIDE
+reading rules to state the contract explicitly.
+
 ### R42 — Render option `no-title`: captions live once (2026-07-18)
 
 **Original**: In real embedding, most figures already carry their own
