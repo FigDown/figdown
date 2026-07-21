@@ -1075,6 +1075,33 @@ alone — no clone, no network. Install =
 AGENT-GUIDE.md remains the framework-neutral equivalent for non-skill
 agents.
 
+### R44 — Open external endpoints: `boundary` ruled in on measured evidence (2026-07-21)
+
+**Original** (downstream transcription requirement): edges are
+node-only, so "enters from outside the figure / leaves to outside"
+— the open arrow at a pipeline's mouth and tail — cannot be
+expressed. Proposals offered: `shape=none` unrendered anchors, or a
+`boundary` endpoint construct.
+
+**Evidence (measured 2026-07-21)**: stratified sample of 110 corpus
+images (seed 20260721; block 50, topology 30, flowchart 30), three
+independent vision passes: figures containing ≥1 open-ended arrow —
+block-architecture **78%**, flowchart **80%**, topology 33%; overall
+70%, census-weighted ≈72%. The R28 frequency gate passes by an order
+of magnitude.
+
+**Ruling**: adopt **`boundary <id> ["label"]`** — a first-class but
+minimal construct declaring an external I/O endpoint: referenced by
+edges like a node, pinnable for layout, never drawn as a shape (the
+edge simply ends open, optionally with the small label at the open
+end). `shape=none` is REJECTED: `shape=` is purely geometric (D7);
+"none" would smuggle an existential semantic into a presentation
+enum, leaving a reading agent unable to tell participants from
+placeholders. A `boundary` is honest semantics — external I/O is
+knowledge (R24), as the corpus shows (labeled stubs like "PKT",
+"NHOP_IDX", "to wire" everywhere). Implementation queued behind the
+in-flight 0.1-dev.13 routing work to avoid same-file collisions.
+
 ### R43 — The two-zone reading contract: AI may stop at the layout marker (2026-07-21)
 
 **Original** (three directives, consolidated): rendering parameters
