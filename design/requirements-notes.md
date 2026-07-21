@@ -1095,6 +1095,20 @@ options are recorded in the artifact metadata
 function of (source, recorded options) — spec §7. The editor's
 roundtrip loader tolerates the extra metadata attribute.
 
+
+**Amended (2026-07-21, default flipped)**: the maintainer's design-law
+review caught the first cut backwards. Per R13 the DEFAULT must follow
+the majority usage — and the majority artifact is embedded under a
+host-document caption (the R32 convention, the transcription corpus,
+this project's own gallery), with mainstream tools also not drawing
+titles by default. So: titles are NOT drawn by default;
+`--with-title` / `{title:true}` / `showTitle:true` opt in (recorded as
+`data-render-options="with-title"`); the editor, a standalone-viewing
+context, opts in and records it in its exports. General law reaffirmed
+for a public standard: knobs are minimized — an option must justify
+its necessity like syntax must, and its default follows the highest-
+probability habit, never the implementer's first instinct.
+
 ### R41 — Second field-feedback batch: a second downstream use case, three new items (2026-07-18)
 
 **Original**: The downstream project consolidated its feedback across

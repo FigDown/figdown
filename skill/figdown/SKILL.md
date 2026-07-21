@@ -16,8 +16,8 @@ only job is rendering stability.
 1. Edit or create `X.fd` (never edit an `.svg`).
 2. Build + validate: `node <this-skill-dir>/build-svg.js X.fd`
    Errors come as `Line N: message` — fix and rerun until `OK`.
-   Add `--no-title` when the Markdown supplies the caption (avoids
-   drawing it twice; recorded in the artifact metadata).
+   Titles are not drawn by default (Markdown supplies the caption);
+   use `--with-title` for standalone artifacts (recorded in metadata).
 3. Embed in Markdown (SVG only; never paste `.fd` content into `.md`):
 
    ```markdown

@@ -3,9 +3,9 @@
 See also `../conformance/` — the v0.1 parser-conformance suite (golden fixtures + runner: `node conformance/run.js`).
 
 - `build-svg.js` — the sidecar generator: `node tools/build-svg.js
-  [--no-title] <file.fd | dir> ...` validates and renders deterministically
-  (`--no-title` skips drawing the title for caption-bearing documents;
-  recorded in the artifact metadata)
+  [--with-title] <file.fd | dir> ...` validates and renders deterministically
+  (titles are not drawn by default — the majority embedding case has a
+  caption; `--with-title` opts in and is recorded in the artifact metadata)
   (`X.fd → X.svg`, source + SHA-256 embedded). Engine lookup order:
   `$FIGDOWN_HTML`, a co-located `figdown.html`, `../editor/figdown.html`.
 - `layout-lint.js` — render-quality linter for scene figures (see below).
