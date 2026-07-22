@@ -1075,6 +1075,56 @@ alone — no clone, no network. Install =
 AGENT-GUIDE.md remains the framework-neutral equivalent for non-skill
 agents.
 
+### R46 — Vision census delivers the OQ-S15 evidence; logic primitives ready to rule; chart ruled out (2026-07-21)
+
+**Original**: The downstream pipeline ran a vision-model type-pass over
+all 427 figures of one PDF (semantic-completeness + visual-fidelity +
+missing-primitives scores) and a priority table, plus two new proposals
+(logic-schematic primitives; curly-brace grouping) and an explicit
+ruling request on charts.
+
+**Validations**: the census re-confirms two things. (1) Semantic
+expressibility is already high — 356/427 figures score ≥90 on
+semantic-completeness-possible; the remaining gaps are visual-fidelity
+in a few MEANING-bearing primitives, exactly where the language should
+grow and nowhere else. (2) The top-two measured gaps by frequency —
+open external endpoints (213) and orthogonal routing/waypoints (136) —
+are ALREADY SHIPPED (boundary, R44; routing/route, 0.1-dev.13). The
+process is tracking reality.
+
+**Dispositions**:
+- *Logic-schematic primitives (OQ-S15)* — the vision pass supplies the
+  evidence the ruling was gated on: figure_type logic-schematic=8,
+  mixed=49; missing-primitive mentions mux/trapezoid ~30, bus-slash 7,
+  inversion 5, gates 4. My earlier "captions overcount" worry was
+  right (168 captions → ~55 real primitive mentions), but the count is
+  still real and concentrated. Prior-art surveyed (verified 2026-07-21):
+  gate symbols are internationally standardized (ANSI/IEEE 91-1984,
+  IEC 60617-12: NOT/OR/NOR/AND/NAND/XOR/XNOR + inversion bubble =
+  active-low); NO mainstream text-to-diagram tool ships them (Graphviz
+  has trapezium/invtrapezium but no gates; Mermaid/D2/PlantUML none) —
+  so this is borrow-the-standard (R18) AND differentiation, not
+  reinvention. R28 met: gate type / inversion / mux-select / bus-width
+  are meaning a box cannot carry; shape names stay pure-geometry (D7,
+  like `cylinder`). **Rulable-in on the merits** — but it is the
+  largest vocabulary expansion yet (≈8 gate shapes + mux/demux + edge
+  options inv=/role=select/width=) and lands next to the v0.1 freeze,
+  so scope/timing is a maintainer-owned decision (see the open
+  question posed 2026-07-21).
+- *Curly-brace grouping (OQ-S16)* — a named set over a contiguous range
+  of fields/rows/nodes, distinct from `group` (box, changes layout) and
+  `class` (legend). Semantic argument plausible; frequency modest (20×,
+  one PDF); composition partially covers it (a boxless group). Recorded
+  as OQ-S16 pending broader frequency.
+- *Charts / plot* — **ruled out (D11)**. The 6 X-Y figures score
+  semantic-completeness 0 (they are data plots, not knowledge-bearing
+  structure); census ≈1%. FigDown does not grow a charting language:
+  keep the original raster and describe the data points in prose or a
+  `table`. `plot` stays EXPERIMENTAL and non-normative. (Confirms the
+  standing R28 reasoning for the chart family.)
+- *block-title suppression, timing sufficiency* — unchanged from R45
+  (tracked as extending R42; timing deferred).
+
 ### R45 — Third field-feedback batch: cross-PDF census + gutter + logic gates (2026-07-21)
 
 **Original**: The downstream pipeline ran a caption census over 30

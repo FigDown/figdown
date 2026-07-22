@@ -848,6 +848,43 @@ Node.js——不用 clone、不用網路。安裝 =
 單一引擎來源再生（永不 fork）。AGENT-GUIDE.md 仍是給非 skill
 框架 agent 的中性等價物。
 
+### R46 — vision 普查補齊 OQ-S15 證據；邏輯原語可裁；chart 裁定不做（2026-07-21）
+
+**原始需求**：下游管線對單一 PDF 全 427 圖做 vision 判型（語意完整度
+＋視覺保真度＋缺失原語評分）與優先序總表，另附兩個新提案（邏輯
+schematic 原語；花括號群組）與一個明確的 chart 裁決請求。
+
+**驗證**：普查再次確認兩件事。(1) 語意可表達性已高——356/427 圖
+語意完整度 ≥90；剩餘缺口是少數**帶語意原語**的視覺保真，語言正該
+在此成長、別處不長。(2) 依頻率排名前二的缺口——開放外部端點
+（213）與正交走線/waypoints（136）——**都已出貨**（boundary，R44；
+routing/route，0.1-dev.13）。流程貼著現實走。
+
+**裁決**：
+- *邏輯 schematic 原語（OQ-S15）* — vision pass 補齊了裁決所需證據：
+  figure_type logic-schematic=8、mixed=49；缺失原語提及 mux/梯形
+  ~30、bus 斜線 7、反相 5、閘 4。我先前「caption 高估」的疑慮成立
+  （168 caption → ~55 真實原語提及），但數量仍實在且集中。Prior-art
+  已調查（2026-07-21 查證）：閘符號國際標準化（ANSI/IEEE 91-1984、
+  IEC 60617-12：NOT/OR/NOR/AND/NAND/XOR/XNOR + 反相泡泡＝active-low）；
+  無任何主流 text-to-diagram 工具內建（Graphviz 有 trapezium 但無閘；
+  Mermaid/D2/PlantUML 皆無）——故此為借標準（R18）兼差異化、非重造。
+  R28 滿足：閘型/反相/mux-select/bus 寬是方框無法承載的語意；shape
+  名維持純幾何（D7，如 `cylinder`）。**依證據可裁採納**——但這是
+  至今最大的詞彙擴充（≈8 個閘 shape + mux/demux + edge 選項
+  inv=/role=select/width=）、且緊鄰 v0.1 凍結，故 scope/時機屬維護者
+  裁決（見 2026-07-21 提出的開放問題）。
+- *花括號群組（OQ-S16）* — 對連續一段 field/row/node 的具名集合，
+  異於 `group`（方框、改佈局）與 `class`（圖例）。語意論點合理；
+  頻率不高（20×、單一 PDF）；組合部分可覆蓋（無框 group）。記為
+  OQ-S16，待更廣頻率。
+- *Chart／plot* — **裁定不做（D11）**。6 張 X-Y 圖語意完整度為 0
+  （是資料圖、非承載知識的結構）；普查 ≈1%。FigDown 不長成製圖
+  語言：保留原 raster、以正文或 `table` 描述資料點。`plot` 維持
+  實驗性、非規範。（確認 chart 家族一貫的 R28 論理。）
+- *block 標題隱藏、timing 充分性* — 同 R45（記為 R42 延伸；timing
+  延後）。
+
 ### R45 — 第三批實戰回饋：跨 PDF 普查 + gutter + 邏輯閘（2026-07-21）
 
 **原始需求**：下游管線對 30 份 PDF 做 caption 普查（6,823 張圖）

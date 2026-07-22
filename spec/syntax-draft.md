@@ -666,10 +666,17 @@ transient). Deferred until the static core ships.
   property + `gutter` placement; field feedback R45). Sanctioned
   workaround: inline the index in the label. Trigger for a ruling: the
   full-corpus frequency measurement the downstream pipeline offers.
-- OQ-S15: digital **logic-gate primitives** (AND/OR/XOR/NAND/NOT/MUX +
-  inversion; 168 corpus "logic" captions, R45). Needs a vision-pass
-  gate-figure count (captions overcount) + a prior-art survey before a
-  ruling; shape-family vs. `gate` construct is open.
+- OQ-S15: digital **logic-gate primitives** (gate shapes
+  and/or/xor/xnor/nand/nor/not/buf + mux/demux; edge options
+  inv=/role=select/width=). Evidence complete (R46): vision census +
+  prior art (ANSI/IEEE 91-1984 standard symbols; no text-tool ships
+  them). R28/R18 met — rulable-in; scope and freeze-timing are the
+  open maintainer decision.
+- OQ-S16: **curly-brace grouping** — a named set over a contiguous
+  range of fields/rows/nodes (`brace <fields|rows|nodes> <range>
+  "label"`), distinct from `group` (box) and `class` (legend).
+  Semantic gap plausible; frequency modest (R46) — pending broader
+  measurement.
 - OQ-S12: in-table **trend/sparkline** primitive (field feedback F9).
   Current sanctioned answer: Unicode block characters (▁▃▅▇) as
   authored cell text. A first-class construct waits on corpus

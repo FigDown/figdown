@@ -565,10 +565,15 @@ pulse r1                                # 瞬時高亮
 - OQ-S14：框外逐列 **index/address gutter**（`index=` 語意屬性 +
   `gutter` 放置；實戰回饋 R45）。認可解：位址 inline 於 label。
   裁決觸發：下游管線願意量測的全語料頻率。
-- OQ-S15：數位**邏輯閘原語**（AND/OR/XOR/NAND/NOT/MUX + 反相；
-  全語料 168 條 logic caption，R45）。裁決前需 vision-pass 對閘圖
-  計數（caption 會高估）＋ prior-art 調查；shape 家族 vs `gate`
-  構件未定。
+- OQ-S15：數位**邏輯閘原語**（閘 shape
+  and/or/xor/xnor/nand/nor/not/buf + mux/demux；edge 選項
+  inv=/role=select/width=）。證據已齊（R46）：vision 普查 + prior-art
+  （ANSI/IEEE 91-1984 標準符號；無 text-tool 內建）。R28/R18 滿足
+  ——可裁採納；scope 與凍結時機為未決的維護者裁決。
+- OQ-S16：**花括號群組** — 對連續一段 field/row/node 的具名集合
+  （`brace <fields|rows|nodes> <range> "label"`），異於 `group`
+  （方框）與 `class`（圖例）。語意缺口合理；頻率不高（R46）——
+  待更廣量測。
 - OQ-S12：表格內**趨勢／sparkline** 原語（實戰回饋 F9）。現行
   認可解：Unicode 方塊字元（▁▃▅▇）作為儲存格文字。一級構件
   待語料證據（chart 家族 ≈1%）。
