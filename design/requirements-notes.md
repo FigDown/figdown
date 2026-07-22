@@ -1109,8 +1109,11 @@ process is tracking reality.
   like `cylinder`). **Rulable-in on the merits** — but it is the
   largest vocabulary expansion yet (≈8 gate shapes + mux/demux + edge
   options inv=/role=select/width=) and lands next to the v0.1 freeze,
-  so scope/timing is a maintainer-owned decision (see the open
-  question posed 2026-07-21).
+  so scope/timing is a maintainer-owned decision. **Ruled 2026-07-21:
+  gather more evidence first** — hold the ruling until the downstream
+  full 30-PDF frequency measurement lands; the merits pass but the
+  broader corpus count decides scope, and v0.1 freezes without it.
+  OQ-S15 stays open with that explicit trigger.
 - *Curly-brace grouping (OQ-S16)* — a named set over a contiguous range
   of fields/rows/nodes, distinct from `group` (box, changes layout) and
   `class` (legend). Semantic argument plausible; frequency modest (20×,

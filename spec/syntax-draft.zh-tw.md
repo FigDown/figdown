@@ -569,7 +569,8 @@ pulse r1                                # 瞬時高亮
   and/or/xor/xnor/nand/nor/not/buf + mux/demux；edge 選項
   inv=/role=select/width=）。證據已齊（R46）：vision 普查 + prior-art
   （ANSI/IEEE 91-1984 標準符號；無 text-tool 內建）。R28/R18 滿足
-  ——可裁採納；scope 與凍結時機為未決的維護者裁決。
+  ——依理可裁，但按住等全語料頻率量測後再定 scope（維護者裁決
+  2026-07-21）；v0.1 不含它即凍結。
 - OQ-S16：**花括號群組** — 對連續一段 field/row/node 的具名集合
   （`brace <fields|rows|nodes> <range> "label"`），異於 `group`
   （方框）與 `class`（圖例）。語意缺口合理；頻率不高（R46）——

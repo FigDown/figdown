@@ -670,8 +670,9 @@ transient). Deferred until the static core ships.
   and/or/xor/xnor/nand/nor/not/buf + mux/demux; edge options
   inv=/role=select/width=). Evidence complete (R46): vision census +
   prior art (ANSI/IEEE 91-1984 standard symbols; no text-tool ships
-  them). R28/R18 met — rulable-in; scope and freeze-timing are the
-  open maintainer decision.
+  them). R28/R18 met — rulable-in on the merits, but held for the
+  full-corpus frequency measurement before scope is set (maintainer
+  ruling 2026-07-21); v0.1 freezes without it.
 - OQ-S16: **curly-brace grouping** — a named set over a contiguous
   range of fields/rows/nodes (`brace <fields|rows|nodes> <range>
   "label"`), distinct from `group` (box) and `class` (legend).
