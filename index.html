@@ -1,5 +1,165 @@
 <!DOCTYPE html>
+<html lang="en">
+<head>
 <meta charset="utf-8">
-<meta http-equiv="refresh" content="0; url=editor/figdown.html">
-<title>FigDown — figures as text</title>
-<a href="editor/figdown.html">FigDown live editor</a>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>FigDown — figures as text, one source, two readers</title>
+<meta name="description" content="FigDown is an open standard for describing figures as plain text inside Markdown: agents read the .fd for meaning, humans see a deterministic SVG.">
+<style>
+  :root{
+    --bg:#fcfcfb; --panel:#ffffff; --ink:#1d1d1b; --muted:#6f6e69;
+    --line:#e3e1d9; --hair:#d6d4cc; --code:#f6f5ef; --link:#1d4ed8;
+    --sans:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;
+    --mono:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+  }
+  @media (prefers-color-scheme:dark){
+    :root{
+      --bg:#17171a; --panel:#1f1f23; --ink:#eceae4; --muted:#a3a099;
+      --line:#33333a; --hair:#43434b; --code:#232329; --link:#93b4fd;
+    }
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);line-height:1.55}
+  .wrap{max-width:1100px;margin:0 auto;padding:34px 20px 56px}
+  a{color:var(--link)}
+  header h1{font-size:26px;font-weight:600;margin:0 0 4px;letter-spacing:-.015em}
+  header p.tagline{margin:0;color:var(--muted);font-size:15px}
+  h2{font-size:16px;font-weight:600;margin:34px 0 10px;letter-spacing:-.01em}
+  p{margin:0 0 12px}
+  .lede{max-width:66ch}
+  .lede li{margin-bottom:6px}
+  hr{border:0;border-top:1px solid var(--line);margin:28px 0}
+  .two{display:grid;grid-template-columns:minmax(320px,1.15fr) minmax(300px,1fr);gap:16px;align-items:start}
+  @media (max-width:900px){ .two{grid-template-columns:1fr} }
+  figure{margin:0;background:#ffffff;border:1px solid var(--line);border-radius:12px;padding:14px;overflow-x:auto}
+  figure img{max-width:100%;height:auto;display:block}
+  pre{margin:0;font-family:var(--mono);font-size:12.2px;line-height:1.55;background:var(--code);
+      border:1px solid var(--line);border-radius:12px;padding:14px;overflow-x:auto;tab-size:4}
+  code{font-family:var(--mono)}
+  .cap{font-size:12.5px;color:var(--muted);margin:8px 0 0}
+  .cap strong{color:var(--ink);font-weight:600}
+  ul.router{list-style:none;margin:0;padding:0;display:grid;gap:10px}
+  ul.router li{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:13px 15px}
+  ul.router b{display:block;font-size:14.5px;font-weight:600;margin-bottom:3px}
+  ul.router span{display:block;font-size:13.5px;color:var(--muted)}
+  ul.plain{margin:0 0 12px;padding-left:20px}
+  ul.plain li{margin-bottom:5px}
+  footer{margin-top:34px;padding-top:14px;border-top:1px solid var(--line);color:var(--muted);font-size:12.5px}
+  footer a{color:var(--muted)}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <h1>FigDown</h1>
+  <p class="tagline">Figures as text in Markdown — one source, two readers.</p>
+</header>
+
+<section class="lede">
+  <p>FigDown is an open standard for describing figures as plain text inside
+  Markdown, so that <strong>one</strong> source serves two readers who need
+  completely different things from it:</p>
+  <ul class="plain">
+    <li><strong>AI agents read the <code>.fd</code> for meaning.</strong> Participants,
+      relationships, containment, field widths, table structure — none of it locked
+      inside a bitmap.</li>
+    <li><strong>Humans see a deterministic SVG.</strong> Converted by a plain program,
+      no model in the rendering path, and the artifact travels with the document.</li>
+  </ul>
+</section>
+
+<h2>The claim, shown rather than described</h2>
+<p class="lede">Below is one FigDown document in both of its forms. The picture on
+the left is what a human reads; the text on the right is what an agent reads. They
+are the same content, and the picture was rendered from that text by FigDown itself.</p>
+
+<div class="two">
+  <figure>
+    <img src="figures/one-source-two-readers.svg"
+         alt="One source, two readers: ingress.fd feeds the FigDown renderer, which produces ingress.svg for a human reader; the same ingress.fd is read directly for meaning by an AI agent.">
+  </figure>
+  <div>
+<pre><code># FigDown — figures as text. Spec: https://github.com/FigDown/figdown
+
+figdown 0.1 block
+title "One source, two readers"
+
+# A single .fd file is the source of truth.
+# It feeds two completely different reading paths:
+#   (a) deterministic renderer  -&gt;  SVG artifact  -&gt;  human
+#   (b) AI agent reads the .fd directly for meaning
+
+node src  "ingress.fd\n(source of truth)"  shape=rounded  fill=#e0e7ff
+node rend "FigDown renderer\n(build-svg.js)"
+node svg  "ingress.svg\n(artifact)"        shape=rounded  fill=#dcfce7
+node human "human reader"                  shape=ellipse
+node agent "AI agent"                      shape=ellipse   fill=#fef9c3
+
+flow right
+rank svg,human
+
+edge src  -[deterministic build]-&gt;  rend
+edge rend -[stable SVG]-&gt;           svg
+edge svg  -[reads visually]-&gt;       human
+edge src  -[reads for meaning]-&gt;    agent
+
+layout
+pin src   at=(20,20)
+pin rend  at=(330,20)
+pin svg   at=(615,20)
+pin human at=(855,20)
+pin agent at=(110,150)</code></pre>
+  </div>
+</div>
+<p class="cap">source:
+<a href="figures/one-source-two-readers.fd">figures/one-source-two-readers.fd</a>
+— <strong>this figure is FigDown</strong>.</p>
+
+<hr>
+
+<h2>Where to go</h2>
+<ul class="router">
+  <li>
+    <b><a href="read/0.1/reading.md">I have a <code>.fd</code> and need to read it correctly</a></b>
+    <span>The reading contract for language version <code>figdown 0.1</code>, in
+    <code>read/0.1/</code>: what each construct means, and what you may not infer.
+    <strong>Nothing needs installing</strong> — the files are Markdown, the
+    <code>.fd</code> is text, and reading it requires no renderer, no package and no
+    network.</span>
+  </li>
+  <li>
+    <b><a href="skill/figdown/SKILL.md">I am an agent that must author figures</a></b>
+    <span>The agent skill bundle — procedure, genre reference and a self-contained
+    renderer, in one directory that works with no repository and no network.</span>
+  </li>
+  <li>
+    <b><a href="spec/core.md">I want the normative specification</a></b>
+    <span>The contract: grammar, the semantic model, diagnostics, and the stability
+    and versioning policy. The genre definitions sit beside it in
+    <code>spec/</code>.</span>
+  </li>
+  <li>
+    <b><a href="editor/figdown.html">I want to try it</a></b>
+    <span>The live editor: text on the left, deterministic SVG on the right. It runs
+    entirely in your browser — no install, no server, no account.</span>
+  </li>
+</ul>
+
+<h2>Releases and the archive</h2>
+<p class="lede">Every released version keeps one git tag and one archived engine page
+that is never rewritten, so a figure written today can always be re-rendered exactly
+as it was. Release <strong>v0.1.0</strong>:
+<a href="archive/0.1/figdown.html">archive/0.1/figdown.html</a>. The editor above
+tracks the current development state and is <em>not</em> an archive.</p>
+
+<footer>
+  <p>FigDown is an early, in-design open standard; <code>0.x</code> is a preview and
+  is not stable. Source, issues and the full documentation:
+  <a href="https://github.com/FigDown/figdown">github.com/FigDown/figdown</a> ·
+  <a href="README.md">README</a> · MIT licensed.</p>
+</footer>
+
+</div>
+</body>
+</html>

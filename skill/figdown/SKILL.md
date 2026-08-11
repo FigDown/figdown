@@ -31,12 +31,16 @@ the figure do prose's job.
 2. Build + validate: `node <this-skill-dir>/build-svg.js X.fd`
    Errors come as `Line N: message` — fix and rerun until `OK`. Titles are not
    drawn by default (Markdown supplies the caption); `--with-title` opts in.
-3. Embed in Markdown — the SVG only, never `.fd` content:
+3. Embed in Markdown — the SVG only, never `.fd` content. Below, `X` is the
+   basename from step 1 and both paths are written relative to the **host
+   document**, not to this skill. The source footer is the convention that
+   lets a later reader find the `.fd` behind a rendered figure, so it is
+   written on every embed:
 
    ```markdown
-   ![Ingress datapath](figures/ingress.svg)
+   ![What the figure shows](figures/X.svg)
 
-   <sub>source: [figures/ingress.fd](figures/ingress.fd)</sub>
+   <sub>source: [figures/X.fd](figures/X.fd)</sub>
    ```
 
 4. Keep `X.fd` and `X.svg` side by side, same basename; commit both.
