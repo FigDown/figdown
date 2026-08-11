@@ -1,4 +1,4 @@
-// figdown.js — FigDown embeddable library (0.1.2)
+// figdown.js — FigDown embeddable library (0.1.3)
 // GENERATED FILE, DO NOT EDIT. Built from editor/figdown.html.
 // Regenerate with: node tools/make-lib.js
 (function (root, factory) {
@@ -10,7 +10,7 @@
   }
 }(typeof globalThis !== 'undefined' ? globalThis : this, function () {
   'use strict';
-var VERSION = "0.1.2";
+var VERSION = "0.1.3";
 
 // ---- engine (extracted verbatim from editor/figdown.html) ----
 var __engine = (function () {
@@ -24,7 +24,7 @@ const SHAPES = ['box','rounded','circle','ellipse','diamond','cylinder'];
 // input to that promise, and under core §13 a 0.x renderer may differ from
 // the next — which makes the recorded version the only thing that can
 // explain a diff between two renderings of one source.
-const FIGDOWN_VERSION = '0.1.2';
+const FIGDOWN_VERSION = '0.1.3';
 // Retired shape VALUES keep a named diagnostic (PROCESS §5(d)), the same way
 // retired option keys do: `cloud` was the one value that named a domain
 // (the internet cloud) in an enum the language keeps purely geometric

@@ -102,21 +102,22 @@ that gets separated from its `.fd` can always be recovered and reopened.
 
 ### One document, several coordinated forms
 
-A `.fd` is not one picture per file. Two examples, shown small — the source is
-behind each link, because their point is range and range needs more room than a
-side-by-side fence gives:
+A `.fd` is not one picture per file. One document can yield several forms that
+have to keep agreeing with each other — and a figure is only evidence at a size
+where its text can be read, so there is one here, at full width:
 
-<a href="examples/vxlan-encap.fd"><img src="examples/vxlan-encap.svg" width="46%" alt="VXLAN encapsulation: the Ethernet frame before encapsulation and the VXLAN-encapsulated frame after it, an overhead table, and a legend derived from the class declarations"></a>
-<a href="examples/pvlan-flows.fd"><img src="examples/pvlan-flows.svg" width="46%" alt="Private VLAN: a topology of promiscuous, community and isolated ports, a derived legend, and two rule tables"></a>
+![VXLAN encapsulation: the Ethernet frame before encapsulation and the VXLAN-encapsulated frame after it, an overhead table, and a legend derived from the class declarations](examples/vxlan-encap.svg)
 
-- **[`examples/vxlan-encap.fd`](examples/vxlan-encap.fd)** — the frame layout
-  before and after encapsulation, side by side in one document, plus the
-  encapsulation overhead. The legend is derived from the `class` declarations;
-  nobody drew it.
-- **[`examples/pvlan-flows.fd`](examples/pvlan-flows.fd)** — one document
-  producing a topology, a derived legend and two rule tables, because the
-  prohibitions that define a private VLAN cannot be drawn as arrows and have to
-  be written down.
+<sub>source: [examples/vxlan-encap.fd](examples/vxlan-encap.fd) — the same frame
+before and after encapsulation in one document, plus the encapsulation overhead.
+The legend is derived from the `class` declarations; nobody drew it.</sub>
+
+[`examples/pvlan-flows.fd`](examples/pvlan-flows.fd) goes further and needs its
+own page: one document yielding a topology, a derived legend and two rule tables,
+because the prohibitions that define a private VLAN cannot be drawn as arrows and
+have to be written down. It is 1243×832 with four sub-figures, so it is shown
+full size in the [example gallery](examples/index.md) rather than shrunk to fit
+here.
 
 ---
 

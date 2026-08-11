@@ -37,8 +37,11 @@
       border:1px solid var(--line);border-radius:12px;padding:14px;overflow-x:auto;tab-size:4}
   code{font-family:var(--mono)}
   figure.hero{margin:0 0 0}
-  .gallery figure{display:flex;flex-direction:column;gap:10px}
-  .gallery figcaption{margin:0}
+  /* A full-width figure must carry its own native size, or its text stops being
+     readable. The wrap's content box is 1100 - 2*20 = 1060px, so 10px padding
+     plus 1px borders leaves 1038px — enough for examples/vxlan-encap.svg
+     (1036 wide) to render unscaled. */
+  figure.wide{padding:10px}
   .cap{font-size:12.5px;color:var(--muted);margin:8px 0 0}
   .cap strong{color:var(--ink);font-weight:600}
   ul.router{list-style:none;margin:0;padding:0;display:grid;gap:10px}
@@ -134,28 +137,26 @@ same facts off the text: <code>RCODE</code> is the low four bits of the second
 deliberately declines to give.</p>
 
 <h2>One document, several coordinated forms</h2>
-<p class="lede">A <code>.fd</code> is not one picture per file. Two examples,
-shown small &mdash; the source is behind each link, because their point is range
-and range needs more room than a side-by-side view gives.</p>
+<p class="lede">A <code>.fd</code> is not one picture per file. One document can
+yield several forms that have to keep agreeing with each other &mdash; and a
+figure is only evidence at a size where its text can be read, so there is one
+here, at full width.</p>
 
-<div class="two gallery">
-  <figure>
-    <a href="examples/vxlan-encap.fd"><img src="examples/vxlan-encap.svg"
-       alt="VXLAN encapsulation: the Ethernet frame before encapsulation and the VXLAN-encapsulated frame after it, an overhead table, and a legend derived from the class declarations."></a>
-    <figcaption class="cap"><a href="examples/vxlan-encap.fd">examples/vxlan-encap.fd</a>
-    &mdash; the frame layout before and after encapsulation, side by side in one
-    document, plus the encapsulation overhead. The legend is derived from the
-    <code>class</code> declarations; nobody drew it.</figcaption>
-  </figure>
-  <figure>
-    <a href="examples/pvlan-flows.fd"><img src="examples/pvlan-flows.svg"
-       alt="Private VLAN: a topology of promiscuous, community and isolated ports, a derived legend, and two rule tables."></a>
-    <figcaption class="cap"><a href="examples/pvlan-flows.fd">examples/pvlan-flows.fd</a>
-    &mdash; one document producing a topology, a derived legend and two rule
-    tables, because the prohibitions that define a private VLAN cannot be drawn
-    as arrows and have to be written down.</figcaption>
-  </figure>
-</div>
+<figure class="wide">
+  <img src="examples/vxlan-encap.svg"
+       alt="VXLAN encapsulation: the Ethernet frame before encapsulation and the VXLAN-encapsulated frame after it, an overhead table, and a legend derived from the class declarations.">
+</figure>
+<p class="cap">source: <a href="examples/vxlan-encap.fd">examples/vxlan-encap.fd</a>
+&mdash; the same frame before and after encapsulation in one document, plus the
+encapsulation overhead. The legend is derived from the <code>class</code>
+declarations; nobody drew it.</p>
+
+<p class="lede"><a href="examples/pvlan-flows.fd"><code>examples/pvlan-flows.fd</code></a>
+goes further and needs its own page: one document yielding a topology, a derived
+legend and two rule tables, because the prohibitions that define a private VLAN
+cannot be drawn as arrows and have to be written down. It is 1243&times;832 with
+four sub-figures, so it is shown full size in the
+<a href="examples/index.md">example gallery</a> rather than shrunk to fit here.</p>
 
 <hr>
 

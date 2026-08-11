@@ -65,7 +65,57 @@ Statuses referred to above are defined in [`spec/README.md`](spec/README.md).
 
 Nothing yet.
 
-## v0.1.0 — unreleased
+## v0.1.3 — 2026-08-11
+
+**Language version: `0.1`.** Patch. No language change.
+
+A gallery on the front page put two figures side by side, so one rendered at
+37% of its natural size and its table text landed near four pixels. A figure
+whose text cannot be read demonstrates nothing, and on a front page it argues
+against the tool rather than for it. The gallery no longer juxtaposes: the
+wider figure takes the full column alone at native size, and the second became
+a line and a link, because 1243 by 832 with four sub-figures needs a page
+rather than a slot.
+
+## v0.1.2 — 2026-08-11
+
+**Language version: `0.1`.** Patch. No language change.
+
+The skill gained the process around drawing, which had been missing entirely:
+take the structure out of a source rather than reading its picture, since a
+container ships the drawing twice and the render is not the source; let the
+extraction choose the genre; keep what the source states apart from what you
+concluded. And the step that did not exist — diff the `.fd` against the
+extracted structure, because an invented node and a dropped edge are both
+invisible in a picture that looks fine, then look at the render. A process
+whose last step is "write the file" has no way to fail.
+
+Both front doors illustrated a standard that claims to cover what a flowchart
+tool cannot express with a diagram any flowchart tool draws. The worked example
+is now a protocol header, spliced in by byte so its claim of completeness is
+checkable.
+
+The publish pipeline now asserts the files the published tree owns outright.
+`CNAME` was the one that mattered: it had no source, no generator and no gate,
+so nothing could lose it — and nothing would have noticed if something did.
+
+## v0.1.1 — 2026-08-11
+
+**Language version: `0.1`.** Patch. No language change.
+
+v0.1.0 stated in this repository that each released version's entry links its
+tag and its runnable engine page, and then shipped without such an entry. This
+release meets that obligation: `archive/0.1/figdown.html` is the engine v0.1.0
+shipped, byte-identical to what anyone who installed that release ran, served
+at an address that does not move.
+
+`gate:archive` asks two questions that are not the same one: that generated
+content still matches its generator, and that every archived version is
+byte-unchanged from the release that shipped it. It fails on modification and
+on deletion, because a manifest that notices only edits is blind to the
+likelier accident.
+
+## v0.1.0 — 2026-08-11
 
 **Language version: `0.1`.** The first release of the FigDown standard.
 
