@@ -65,6 +65,35 @@ Statuses referred to above are defined in [`spec/README.md`](spec/README.md).
 
 Nothing yet.
 
+## v0.1.5 — 2026-08-11
+
+**Language version: `0.1`.** Patch. No language change.
+
+The skill shipped as a directory to copy. That still works and stays
+supported, but it could not be installed through the plugin mechanism and
+could not be submitted anywhere. Two manifests fix both without a second copy
+of anything: the plugin manifest's skills path resolves to the directory
+already documented, and the marketplace entry's source is this repository
+root. Nothing is duplicated, so nothing has to be kept in sync.
+`/plugin marketplace add FigDown/figdown` works from this release.
+
+A gate now guards the joins rather than the bytes, since a wrapper cannot
+drift in content: one release number across three files, a skills path
+resolving to exactly one skill, the source still the root. The failure it
+exists for is silent — a plugin with a missed skills path installs perfectly
+and teaches nothing.
+
+The elision strip's dotted side lines are drawn unconditionally again,
+reversing a ruling in v0.1.0 that suppressed them when the strip spanned the
+whole word. That reasoning established what the marks MEAN — which columns
+are elided — and never asked what they DO. Their second job had never been
+written down: they make the gap read as part of the figure. Without them a
+full-word elision is two bordered boxes with whitespace between and a small
+grey ellipsis floating in it, which reads as an artefact rather than a mark.
+Two figures redraw.
+
+(v0.1.4 was prepared and never published; its contents are in this release.)
+
 ## v0.1.3 — 2026-08-11
 
 **Language version: `0.1`.** Patch. No language change.
