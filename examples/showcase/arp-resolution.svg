@@ -1,0 +1,53 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 559 408" width="559" height="408" font-family="system-ui,sans-serif"><g transform="translate(0,0)"><defs><marker id="s0_arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#555"/></marker><pattern id="s0_hatch" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><line x1="0" y1="0" x2="0" y2="6" stroke="#bbb" stroke-width="2"/></pattern></defs><g transform="translate(18,6)"><line data-edge="34" x1="172" y1="74.86640581330352" x2="365" y2="54.36892118501956" stroke="#dc2626" stroke-width="1.6" stroke-dasharray="6 4"/><line data-edge="35" x1="172" y1="95.46666666666667" x2="365" y2="121.2" stroke="#dc2626" stroke-width="1.6" stroke-dasharray="6 4"/><path data-edge="39" d="M443.8 72 L443.8 146 Q443.8 156 433.8 156 L96 156 Q86 156 86 146 L86 110" fill="none" stroke="#16a34a" stroke-width="1.6"/><g data-node="a" data-x="0" data-y="58" style="cursor:move"><rect x="0" y="58" width="172" height="52" fill="#fff" stroke="#8a8880"/><text x="86" y="80.1" font-size="13" text-anchor="middle" fill="#1d1d1b"><tspan x="86" dy="0">Host A</tspan><tspan x="86" dy="16.900000000000002">wants MAC for B's IP</tspan></text></g><g data-node="b" data-x="365" data-y="20" style="cursor:move"><rect x="365" y="20" width="157.6" height="52" fill="#fff" stroke="#8a8880"/><text x="443.8" y="42.099999999999994" font-size="13" text-anchor="middle" fill="#1d1d1b"><tspan x="443.8" dy="0">Host B</tspan><tspan x="443.8" dy="16.900000000000002">owns the target IP</tspan></text></g><text x="268.5" y="58.86766349916154" font-size="11" text-anchor="middle" fill="#fff" stroke="#fff" stroke-width="3" stroke-linejoin="round">1: who-has B?  (broadcast)</text><text x="268.5" y="58.86766349916154" font-size="11" text-anchor="middle" fill="#dc2626">1: who-has B?  (broadcast)</text><path d="M365 54.36892118501956 L355.5677913970842 61.00215877092595 L354.38495222174663 49.864794114720844 z" fill="#dc2626" stroke="none"/><text x="268.5" y="102.58333333333334" font-size="11" text-anchor="middle" fill="#fff" stroke="#fff" stroke-width="3" stroke-linejoin="round">1: heard, ignored</text><text x="268.5" y="102.58333333333334" font-size="11" text-anchor="middle" fill="#dc2626">1: heard, ignored</text><path d="M365 121.2 L354.2683059286093 125.41866594530529 L355.7485395936288 114.31691345765978 z" fill="#dc2626" stroke="none"/><text x="264.9" y="150.25" font-size="11" text-anchor="middle" fill="#fff" stroke="#fff" stroke-width="3" stroke-linejoin="round">2: B is at aa:bb:cc:...  A caches it</text><text x="264.9" y="150.25" font-size="11" text-anchor="middle" fill="#16a34a">2: B is at aa:bb:cc:...  A caches it</text><path d="M86 110 L91.6 120.08 L80.4 120.08 z" fill="#16a34a" stroke="none"/><text x="381" y="119" font-size="10" text-anchor="start" fill="#fff" stroke="#fff" stroke-width="3" stroke-linejoin="round"><tspan x="381" dy="0">rest of the LAN</tspan><tspan x="381" dy="13">(hosts C, D, ...)</tspan></text><text x="381" y="119" font-size="10" text-anchor="start" fill="#555"><tspan x="381" dy="0">rest of the LAN</tspan><tspan x="381" dy="13">(hosts C, D, ...)</tspan></text><rect x="0" y="193" width="16" height="11" fill="#fff" stroke="#dc2626" stroke-dasharray="6 4"/><text x="21" y="202.5" font-size="11" fill="#1d1d1b">Broadcast — delivered to every host on the LAN (dst MAC ff:ff:ff:ff:ff:ff)</text><rect x="0" y="213" width="16" height="11" fill="#fff" stroke="#16a34a"/><text x="21" y="222.5" font-size="11" fill="#1d1d1b">Unicast — delivered only to the requester (dst MAC = A's MAC)</text></g></g><g transform="translate(0,268)"><defs><marker id="s1_arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#555"/></marker><pattern id="s1_hatch" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><line x1="0" y1="0" x2="0" y2="6" stroke="#bbb" stroke-width="2"/></pattern></defs><g transform="translate(18,6)"><text x="0" y="14" font-size="13" font-weight="600">Host A's ARP cache — before and after the exchange</text><rect x="0" y="22" width="164.8" height="26" fill="#eeede6" stroke="#c9c7bf" data-cell="cache:0:1" style="cursor:pointer"/><text x="82.4" y="39.3" font-size="12" text-anchor="middle" font-weight="600">Moment</text><rect x="164.8" y="22" width="359.2" height="26" fill="#eeede6" stroke="#c9c7bf" data-cell="cache:0:2" style="cursor:pointer"/><text x="344.4" y="39.3" font-size="12" text-anchor="middle" font-weight="600">Entry</text><rect x="0" y="48" width="164.8" height="26" fill="#fff" stroke="#c9c7bf" data-cell="cache:1:1" style="cursor:pointer"/><text x="7" y="65.3" font-size="12" text-anchor="start">before the exchange</text><rect x="164.8" y="48" width="359.2" height="26" fill="#fff" stroke="#c9c7bf" data-cell="cache:1:2" style="cursor:pointer"/><text x="171.8" y="65.3" font-size="12" text-anchor="start">(no entry for B's IP)</text><rect x="0" y="74" width="164.8" height="26" fill="#fff" stroke="#c9c7bf" data-cell="cache:2:1" style="cursor:pointer"/><text x="7" y="91.3" font-size="12" text-anchor="start">after segment 2</text><rect x="164.8" y="74" width="359.2" height="26" fill="#fff" stroke="#c9c7bf" data-cell="cache:2:2" style="cursor:pointer"/><text x="171.8" y="91.3" font-size="12" text-anchor="start">B's IP → aa:bb:cc:... , learned from the reply</text></g></g><metadata id="figdown-source" data-sha256="6ddb80cf95500ada2890c436006495c99a7cfa719412f6dafdc298badffa743e" data-engine-version="0.1.0"><![CDATA[
+# FigDown — figures as text. Spec: https://github.com/FigDown/figdown
+
+figdown 0.1 topology
+# ARP address resolution (RFC 826): Host A needs the MAC for B's IP.
+# A broadcasts "who-has", B replies unicast, A caches the mapping.
+# The broadcast vs unicast distinction is a CLASS (meaning in the label,
+# dashed is only its presentation, `PRESENTATION-AS-MEANING-CARRIER`) — presentation is never the sole
+# carrier. "The rest of the LAN" is an external, not an invented node.
+#
+# HONEST LIMIT (guide/expressing.md "strict message ordering"): step order rides on
+# the 1/2 label ordinals, a naming convention; the sequence genre
+# (`FLOWCHART-GENRE-DESIGN`, v0.2) will make it first-class. The cache update is a local
+# action on A, not a message — it rides on the reply label and the prose
+# (mode 3: figure + prose are one deliverable), not on a self-edge.
+title "ARP Resolution"
+
+# Semantic classes: delivery scope. Label = MEANING; dashed = presentation
+# only; the legend derives automatically (spec §2.7, `PRESENTATION-AS-MEANING-CARRIER`).
+class bcast "Broadcast — delivered to every host on the LAN (dst MAC ff:ff:ff:ff:ff:ff)" stroke=#dc2626 style=dashed
+class ucast "Unicast — delivered only to the requester (dst MAC = A's MAC)" stroke=#16a34a
+
+node a "Host A\nwants MAC for B's IP"
+node b "Host B\nowns the target IP"
+
+# Every other station on the segment hears the broadcast but is outside the
+# resolution proper: an external, drawn as an open edge end (spec §2.8).
+external lan "rest of the LAN\n(hosts C, D, ...)"
+
+flow right
+
+# Step 1: A broadcasts the request to the whole segment. The same broadcast
+# reaches every other station too; they ignore it (short label — detail here
+# and in the showcase prose).
+edge a -[1: who-has B?  (broadcast)]-> b class=bcast
+edge a -[1: heard, ignored]-> lan class=bcast
+
+# Step 2: B replies to A directly (unicast); on receipt A caches the
+# IP -> MAC binding — a local action on A, stated on the label, not a message.
+edge b -[2: B is at aa:bb:cc:...  A caches it]-> a class=ucast
+
+# Hybrid panels: a second figdown section below (multi-section `MULTI-FIGURE-DOCUMENTS`),
+# not nested under the scene header. Each section has one genre (`GENRE-KEYWORD-ALLOWLIST`).
+
+# --- panel: separate genre section (main-standard hybrid = multi-section `MULTI-FIGURE-DOCUMENTS`) ---
+figdown 0.1 table
+table cache "Host A's ARP cache — before and after the exchange"
+| Moment             | Entry                                   |
+|--------------------|-----------------------------------------|
+| before the exchange| (no entry for B's IP)                   |
+| after segment 2    | B's IP → aa:bb:cc:... , learned from the reply |
+
+]]></metadata></svg>

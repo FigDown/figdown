@@ -1,0 +1,1 @@
+  L2  [bitfield-numbering] bitfield requires numbering=lsb0|msb0 (cannot invent direction)

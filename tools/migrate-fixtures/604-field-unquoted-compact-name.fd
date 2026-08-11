@@ -1,0 +1,3 @@
+figdown 0.1 bitfield
+bitfield h "H" word=32 numbering=lsb0
+field Total Length:16, Checksum:16

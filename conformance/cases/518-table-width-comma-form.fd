@@ -1,0 +1,13 @@
+figdown 0.1 table
+# 0.1: `width auto,90,25%` — ONE comma-delimited token — is the
+# canonical spelling; 0.1 RETIRED the space form (same rule as `rank`).
+table t "T"
+| A | B | C |
+|---|---|---|
+| 1 | 2 | 3 |
+width auto,90,25%
+table u "U"
+| A | B | C |
+|---|---|---|
+| 1 | 2 | 3 |
+width auto,90,25%

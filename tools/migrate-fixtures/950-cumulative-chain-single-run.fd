@@ -1,0 +1,14 @@
+figdown 0.1 block
+# core §13.4: a document from ANY earlier version must reach the current one
+# in a SINGLE run. This is written in the oldest spellings the tool still
+# carries — six releases of them — and must land fully migrated after one pass.
+layer over "Overlay"
+node a "A" layer=over
+node b "B" kind=decision
+node c "C" kind=process
+boundary e "Upstream"
+edge a -> b
+edge a -> e
+render
+pin a at=20,20
+size b w=100 h=40

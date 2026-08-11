@@ -1,0 +1,74 @@
+# FigDown — figures as text. Spec: https://github.com/FigDown/figdown
+
+# A packet ingress path, written with the flowchart ROLE vocabulary
+# (`FLOWCHART-ROLE-KEYWORDS`). The point of the figure is that every step says WHAT IT
+# IS in a word — `terminator`, `process`, `decision` — so a reader who has
+# never opened the FigDown spec can follow it from the syntax alone. The
+# drawing is derived from those words and carries none of the meaning.
+figdown 0.1 flowchart
+title "Packet ingress path"
+
+class dropped "Dropped — the packet leaves the pipeline here" fill=#fee2e2 stroke=#dc2626
+class passed  "Passed on — handed to the forwarding stage"    fill=#dcfce7 stroke=#16a34a
+
+# The wire and the next stage are outside this figure (`EXTERNAL-EDGE-ENDPOINTS`: never drawn).
+external port  "from the ingress port"
+external stage "to the forwarding stage"
+
+terminator rx "Frame received"
+process    l2 "Read the L2 header"
+
+# The n-way dispatch. `shape=ellipse` is here on purpose: it is what the
+# production corpus actually does to a wide dispatch, because an ellipse is
+# narrower than a diamond and the branch labels fit around it. Under the old
+# spelling (`node … shape=ellipse`) that layout choice DELETED the fact that
+# this is a branch point — the reader saw an oval and had no way back to
+# "decision". With the role as a word the drawing is free and the meaning is
+# safe: the model says decision, the ellipse says only "narrow".
+decision ethertype "EtherType?" shape=ellipse
+
+# The five outcomes of the dispatch, in the order they are drawn left to
+# right: the three protocols this stage understands, the fallback, and last
+# the one branch that comes back (see the back-edge below).
+process    ipv4   "Check IPv4 header"
+process    ipv6   "Check IPv6 header"
+process    arp    "Answer or relay ARP"
+terminator ignore "Drop:\nunknown type" class=dropped
+process    vlan   "Pop one VLAN tag"
+
+# A binary decision, drawn the conventional way because nothing here needs a
+# different picture. Same keyword, different shape — and the keyword is what a
+# reading agent uses, in both figures.
+decision csum "IPv4 checksum OK?"
+
+terminator drop    "Drop:\nbad checksum" class=dropped
+terminator forward "Forward"             class=passed
+
+flow down
+# The five dispatch outcomes are PEERS — one of them fires, never two.
+rank ipv4,ipv6,arp,ignore,vlan
+
+edge port -> rx
+edge rx -> l2
+edge l2 -> ethertype
+
+# Five exits, each labelled with the VALUE that selects it, plus a fallback.
+# The labels are the only thing that says which branch fires — not the shape,
+# not the colour, not where the box landed on the canvas.
+edge ethertype -[0x0800 IPv4]-> ipv4
+edge ethertype -[0x86dd IPv6]-> ipv6
+edge ethertype -[0x0806 ARP]-> arp
+edge ethertype -[other]-> ignore
+edge ethertype -[0x8100 VLAN]-> vlan
+
+# The loop: after popping a tag the EtherType is read again, which is how a
+# double-tagged frame unwinds. A plain back-edge IS the loop — FigDown has no
+# loop keyword, and one would state nothing this line does not.
+edge vlan -[re-read]-> ethertype
+
+edge ipv4 -> csum
+edge csum -[no]-> drop
+edge csum -[yes]-> forward
+edge ipv6 -> forward
+edge arp -> forward
+edge forward -> stage

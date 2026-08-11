@@ -1,0 +1,5 @@
+figdown 0.1 block
+plane base "Dup base"
+plane o "O"
+plane o "Dup"
+node a "A" plane=ghost

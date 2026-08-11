@@ -1,0 +1,2 @@
+Line 2: "frobnicate" is not allowed in genre block
+Line 3: "x-note" is not allowed in genre block

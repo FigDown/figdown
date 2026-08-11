@@ -1,0 +1,52 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 993 346" width="993" height="346" font-family="system-ui,sans-serif"><defs><marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#555"/></marker><pattern id="hatch" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><line x1="0" y1="0" x2="0" y2="6" stroke="#bbb" stroke-width="2"/></pattern></defs><g transform="translate(18,6)"><text x="0" y="14" font-size="13" font-weight="600">QUIC Long Header — Initial Packet (RFC 9000)</text><text x="11.5" y="29" font-size="8.5" text-anchor="middle" fill="#6f6e69">0</text><text x="34.5" y="29" font-size="8.5" text-anchor="middle" fill="#6f6e69">1</text><text x="57.5" y="29" font-size="8.5" text-anchor="middle" fill="#6f6e69">2</text><text x="80.5" y="29" font-size="8.5" text-anchor="middle" fill="#6f6e69">3</text><text x="103.5" y="29" font-size="8.5" text-anchor="middle" fill="#6f6e69">4</text><text x="126.5" y="29" font-size="8.5" text-anchor="middle" fill="#6f6e69">5</text><text x="149.5" y="29" font-size="8.5" text-anchor="middle" fill="#6f6e69">6</text><text x="172.5" y="29" font-size="8.5" text-anchor="middle" fill="#6f6e69">7</text><text x="195.5" y="29" font-size="8.5" text-anchor="middle" fill="#6f6e69">8</text><text x="218.5" y="29" font-size="8.5" text-anchor="middle" fill="#6f6e69">9</text><text x="241.5" y="29" font-size="8.5" text-anchor="middle" fill="#6f6e69">10</text><text x="264.5" y="29" font-size="8.5" text-anchor="middle" fill="#6f6e69">11</text><text x="287.5" y="29" font-size="8.5" text-anchor="middle" fill="#6f6e69">12</text><text x="310.5" y="29" font-size="8.5" text-anchor="middle" fill="#6f6e69">13</text><text x="333.5" y="29" font-size="8.5" text-anchor="middle" fill="#6f6e69">14</text><text x="356.5" y="29" font-size="8.5" text-anchor="middle" fill="#6f6e69">15</text><text x="379.5" y="29" font-size="8.5" text-anchor="middle" fill="#6f6e69">16</text><text x="402.5" y="29" font-size="8.5" text-anchor="middle" fill="#6f6e69">17</text><text x="425.5" y="29" font-size="8.5" text-anchor="middle" fill="#6f6e69">18</text><text x="448.5" y="29" font-size="8.5" text-anchor="middle" fill="#6f6e69">19</text><text x="471.5" y="29" font-size="8.5" text-anchor="middle" fill="#6f6e69">20</text><text x="494.5" y="29" font-size="8.5" text-anchor="middle" fill="#6f6e69">21</text><text x="517.5" y="29" font-size="8.5" text-anchor="middle" fill="#6f6e69">22</text><text x="540.5" y="29" font-size="8.5" text-anchor="middle" fill="#6f6e69">23</text><text x="563.5" y="29" font-size="8.5" text-anchor="middle" fill="#6f6e69">24</text><text x="586.5" y="29" font-size="8.5" text-anchor="middle" fill="#6f6e69">25</text><text x="609.5" y="29" font-size="8.5" text-anchor="middle" fill="#6f6e69">26</text><text x="632.5" y="29" font-size="8.5" text-anchor="middle" fill="#6f6e69">27</text><text x="655.5" y="29" font-size="8.5" text-anchor="middle" fill="#6f6e69">28</text><text x="678.5" y="29" font-size="8.5" text-anchor="middle" fill="#6f6e69">29</text><text x="701.5" y="29" font-size="8.5" text-anchor="middle" fill="#6f6e69">30</text><text x="724.5" y="29" font-size="8.5" text-anchor="middle" fill="#6f6e69">31</text><rect x="0" y="34" width="23" height="30" fill="#fff" stroke="#555"/><text x="11.5" y="52.85" font-size="11" text-anchor="middle">H</text><rect x="23" y="34" width="23" height="30" fill="#fff" stroke="#555"/><text x="34.5" y="52.85" font-size="11" text-anchor="middle">F</text><rect x="46" y="34" width="46" height="30" fill="#fff" stroke="#555"/><text x="69" y="52.85" font-size="11" text-anchor="middle">PT</text><rect x="92" y="34" width="46" height="30" fill="#fff" stroke="#555"/><text x="115" y="52.85" font-size="11" text-anchor="middle">Rs</text><rect x="138" y="34" width="46" height="30" fill="#fff" stroke="#555"/><text x="161" y="52.85" font-size="11" text-anchor="middle">PN</text><rect x="0" y="64" width="736" height="30" fill="#dbeafe" stroke="#555"><title>0x00000001 = QUIC v1</title></rect><text x="368" y="82.85" font-size="11" text-anchor="middle">Version</text><rect x="0" y="94" width="184" height="30" fill="#fff" stroke="#555"/><text x="92" y="112.85" font-size="11" text-anchor="middle">DCID Length</text><rect x="184" y="94" width="552" height="30" fill="#fff" stroke="#555"><title>length is carried in the preceding DCID Length field — RFC 9000 §17.2</title></rect><text x="460" y="112.85" font-size="11" text-anchor="middle">Destination Connection ID (0-160 bits, 0-20 octets)</text><rect x="0" y="124" width="184" height="30" fill="#fff" stroke="#555"/><text x="92" y="142.85" font-size="11" text-anchor="middle">SCID Length</text><rect x="184" y="124" width="552" height="30" fill="#fff" stroke="#555"><title>length is carried in the preceding SCID Length field — RFC 9000 §17.2</title></rect><text x="460" y="142.85" font-size="11" text-anchor="middle">Source Connection ID (0-160 bits, 0-20 octets)</text><rect x="0" y="154" width="184" height="30" fill="#fff" stroke="#555" stroke-dasharray="5 3"><title>RFC 9000 §16: a variable-length integer is 1, 2, 4 or 8 octets</title></rect><text x="92" y="171.90874363327674" font-size="8.3106960950764" text-anchor="middle">Token Length (8/16/32/64 bits, varint)</text><rect x="184" y="154" width="552" height="30" fill="#fff" stroke="#555" stroke-dasharray="5 3"><title>length is carried in the preceding Token Length field — RFC 9000 §17.2.2</title></rect><text x="460" y="172.85" font-size="11" text-anchor="middle">Token (variable)</text><rect x="0" y="184" width="368" height="30" fill="#fff" stroke="#555"><title>RFC 9000 §16: a variable-length integer is 1, 2, 4 or 8 octets</title></rect><text x="184" y="202.85" font-size="11" text-anchor="middle">Length (8/16/32/64 bits, varint)</text><rect x="368" y="184" width="368" height="30" fill="#d1fae5" stroke="#555"><title>length is 1 + the two-bit Packet Number Length in the first byte — RFC 9000 §17.2</title></rect><text x="552" y="202.85" font-size="11" text-anchor="middle">Packet Number (8-32 bits, 1-4 octets)</text><rect x="0" y="214" width="736" height="30" fill="#fff" stroke="#555"><title>protected</title></rect><text x="368" y="232.85" font-size="11" text-anchor="middle">Payload</text><text x="0" y="263" font-size="10.5" fill="#6f6e69">Token Length (8/16/32/64 bits, varint) — present: Initial packets only</text><text x="0" y="277" font-size="10.5" fill="#6f6e69">Token (variable) — present: Initial packets only</text><text x="0" y="328.5" font-size="11" fill="#1d1d1b">Width is VARIABLE on the wire; the declared width is a drawn placeholder — read the real extent from the label, never from this figure's widths</text></g><metadata id="figdown-source" data-sha256="6227803bf45f19be6ad102f13d577ef4d3a1c8e8a661f98402e25defcbf1cb92" data-engine-version="0.1.0"><![CDATA[
+# FigDown — figures as text. Spec: https://github.com/FigDown/figdown
+
+figdown 0.1 bitfield
+
+# QUIC Long Header — Initial Packet
+# RFC 9000 §17.2 / §17.2.2
+# Each row is 32 bits, MSB-0 numbering (bit 0 at left).
+
+# Six of this header's fields are VARIABLE-length on the wire and v0.1 has no
+# RANGE width (`BITFIELD-RANGE-WIDTH`): three connection-id/token regions and three varints.
+# Until this release they carried invented widths (24, 24, 24, 8, 16, 16) with
+# nothing in the model to say so, and `note="padded to 24 bits for display"`
+# — a renderer's excuse in a channel that does not draw. The `*` budget is one
+# per block and it is spent on Payload, so the honest move available in v0.1
+# is to DECLARE the fabrication: the real extent goes in the label, and the
+# class meaning (which IS in the model, §12.7) says the number is a drawn
+# placeholder rather than a width.
+class varlen "Width is VARIABLE on the wire; the declared width is a drawn placeholder — read the real extent from the label, never from this figure's widths"
+
+bitfield quic_initial "QUIC Long Header — Initial Packet (RFC 9000)" word=32 numbering=msb0
+
+# ── Byte 0: First Byte (8 bits) ──────────────────────────────────────────────
+# Abbreviated labels for 1-bit/2-bit cells (each cell is 1/32 of row width):
+#   H=Header Form  F=Fixed Bit  PT=Long Packet Type  Rs=Reserved  PN=Pkt Num Len
+field H:1,F:1,PT:2,Rs:2,PN:2
+break
+
+# ── Version (32 bits) ────────────────────────────────────────────────────────
+field "Version" 32 fill=#dbeafe description="0x00000001 = QUIC v1"
+
+# ── Destination Connection ID ─────────────────────────────────────────────────
+field "DCID Length" 8
+field "Destination Connection ID (0-160 bits, 0-20 octets)" 24 class=varlen description="length is carried in the preceding DCID Length field — RFC 9000 §17.2"
+
+# ── Source Connection ID ──────────────────────────────────────────────────────
+field "SCID Length" 8
+field "Source Connection ID (0-160 bits, 0-20 octets)" 24 class=varlen description="length is carried in the preceding SCID Length field — RFC 9000 §17.2"
+
+# ── Token (Initial packets only) ─────────────────────────────────────────────
+field "Token Length (8/16/32/64 bits, varint)" 8 present="Initial packets only" class=varlen description="RFC 9000 §16: a variable-length integer is 1, 2, 4 or 8 octets"
+field "Token (variable)" 24 present="Initial packets only" class=varlen description="length is carried in the preceding Token Length field — RFC 9000 §17.2.2"
+
+# ── Length + Packet Number ────────────────────────────────────────────────────
+field "Length (8/16/32/64 bits, varint)" 16 class=varlen description="RFC 9000 §16: a variable-length integer is 1, 2, 4 or 8 octets"
+field "Packet Number (8-32 bits, 1-4 octets)" 16 fill=#d1fae5 class=varlen description="length is 1 + the two-bit Packet Number Length in the first byte — RFC 9000 §17.2"
+
+# ── Payload ───────────────────────────────────────────────────────────────────
+break
+field "Payload" * description="protected"
+
+]]></metadata></svg>

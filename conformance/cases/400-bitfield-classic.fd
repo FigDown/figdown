@@ -1,0 +1,8 @@
+figdown 0.1 bitfield
+bitfield gre "GRE Header" word=32 numbering=lsb0
+field "C" 1
+field "Reserved" 9
+field "Ver" 3
+field "Protocol Type" 16 fill=#bfdbfe description="rGRE_INT"
+field "Checksum" 16 present=""
+field "Offset" 16 present=""

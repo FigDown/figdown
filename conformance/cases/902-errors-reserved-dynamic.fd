@@ -1,0 +1,6 @@
+figdown 0.1 block
+node a "A"
+page "After ARP"
+step 1
+set a.x y=1
+pulse a

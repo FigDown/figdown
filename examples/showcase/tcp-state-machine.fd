@@ -1,0 +1,150 @@
+# FigDown — figures as text. Spec: https://github.com/FigDown/figdown
+
+figdown 0.1 flowchart
+title "TCP Connection State Machine (RFC 9293, Figure 5)"
+
+# ── What this figure is ─────────────────────────────────────────────
+# The complete TCP connection state machine from RFC 9293 §3.3.2,
+# Figure 5: all 11 states and every state transition, each labelled
+# "event / action" exactly as the RFC writes it. `x` is the RFC's own
+# notation for "no action". This is the hardest showcase figure — it
+# answers the maintainer question "can FigDown fully express the TCP
+# state machine with its transitions and conditions?" — and the answer
+# it gives is: yes, every state and every labelled transition rides on
+# an edge, so a reading agent recovers the whole machine from the text.
+#
+# HONEST LIMIT — state-ness is not yet first-class. FigDown has no
+# "state" genre in which a node IS a state as a machine-declarable fact
+# (that genre is the `GENRE-EARNING-THRESHOLD` §6 candidate; OQ tracks it). Here each state is
+# a `shape=rounded` node and the fact "this node is a protocol state" is
+# carried by the `states` class label, not by the genre. Interim, ruled.
+#
+# HONEST LIMIT — the CLOSED identity (`IDENTITY-ASSERTION`). The canonical RFC figure
+# draws CLOSED TWICE — top (origin) and bottom (the terminus TIME-WAIT
+# and LAST-ACK return to) — and so do we, because taking every terminal
+# edge back to a single top node produced long lines that struck the
+# setup-abort labels around CLOSED and made the figure unreadable. But
+# FigDown CANNOT declare two nodes to be the SAME entity: there is no
+# node-identity / alias construct (`IDENTITY-ASSERTION`). So `closed` and `closed2`
+# are two nodes that a human reads as one state only because the shared
+# `states` class label SAYS "the two CLOSED nodes are one state."
+# A reading agent sees two ids; the identity is asserted
+# in the label, not machine-declarable. This is the single fact this
+# figure cannot carry that the canonical drawing implies by reusing the
+# name — documented, not hidden.
+#
+# HONEST LIMIT — RFC Note 2. The canonical Figure 5 OMITS the
+# FIN-WAIT-1 → TIME-WAIT transition and says so in its Note 2 (it occurs
+# when a FIN arrives that also ACKs our FIN). We DRAW it (edge fw1→tw),
+# so this figure is strictly MORE complete than the canonical drawing
+# while carrying the same semantics the RFC prose states. Note 1 (rcv
+# RST → LISTEN applies only to a passively-opened SYN-RECEIVED) rides on
+# that edge's label.
+
+# ── Semantic classes — the meaning behind every stroke ──────────────
+# A reading agent queries these to group transitions by role; the
+# colour/dash is only presentation (`MEANING-RECOVERY-SOURCE`), the meaning is the label.
+class states  "A node IS a TCP state (RFC 9293 §3.3.2); the two CLOSED nodes are one state drawn twice — only this label says so" fill=#eef2ff
+class setup   "Connection-setup transition — opening the connection (OPEN, SYN exchange, first ACK)" stroke=#2563eb
+class client  "Active-close path (typically the client) — calls CLOSE first: FIN-WAIT-1 → FIN-WAIT-2 / CLOSING → TIME-WAIT → CLOSED" stroke=#dc2626
+class server  "Passive-close path (typically the server) — receives the peer's FIN first: CLOSE-WAIT → LAST-ACK → CLOSED" stroke=#16a34a
+class rare    "Rare / simultaneous transition — simultaneous open or close, or a reset/abort (RST, close from a half-open state)" stroke=#9333ea style=dashed
+
+# ── The 11 states (CLOSED drawn twice; see `IDENTITY-ASSERTION` note above) ────────
+node closed "CLOSED"        shape=rounded class=states
+node listen "LISTEN"        shape=rounded class=states
+node synsent "SYN-SENT"     shape=rounded class=states
+node synrcvd "SYN-RECEIVED" shape=rounded class=states
+node estab  "ESTABLISHED"   shape=rounded class=states
+node fw1    "FIN-WAIT-1"    shape=rounded class=states
+node fw2    "FIN-WAIT-2"    shape=rounded class=states
+node closing "CLOSING"      shape=rounded class=states
+node closewait "CLOSE-WAIT" shape=rounded class=states
+node lastack "LAST-ACK"     shape=rounded class=states
+node timewait "TIME-WAIT"   shape=rounded class=states
+node closed2 "CLOSED"       shape=rounded class=states
+
+flow down
+
+# ── Opening the connection (setup) ──────────────────────────────────
+edge closed -[passive OPEN / create TCB]-> listen class=setup
+edge closed -[active OPEN / create TCB, snd SYN]-> synsent class=setup
+edge listen -[SEND / snd SYN]-> synsent class=setup
+edge listen -[rcv SYN / snd SYN,ACK]-> synrcvd class=setup
+edge synsent -[rcv SYN / snd SYN,ACK]-> synrcvd class=rare
+edge synsent -[rcv SYN,ACK / snd ACK]-> estab class=setup
+edge synrcvd -[rcv ACK of SYN / x]-> estab class=setup
+
+# ── Aborting a half-open connection (rare / reset) ──────────────────
+edge listen -[CLOSE / delete TCB]-> closed class=rare
+edge synsent -[CLOSE / delete TCB]-> closed class=rare
+edge synrcvd -[rcv RST (note 1) / x]-> listen class=rare
+
+# ── Active close — the endpoint that calls CLOSE first ──────────────
+edge synrcvd -[CLOSE / snd FIN]-> fw1 class=client
+edge estab -[CLOSE / snd FIN]-> fw1 class=client
+edge fw1 -[rcv ACK of FIN / x]-> fw2 class=client
+edge fw1 -[rcv FIN / snd ACK]-> closing class=client
+edge fw1 -[rcv FIN,ACK / snd ACK]-> timewait class=rare
+edge fw2 -[rcv FIN / snd ACK]-> timewait class=client
+edge closing -[rcv ACK of FIN / x]-> timewait class=client
+edge timewait -[Timeout=2MSL / delete TCB]-> closed2 class=client
+
+# ── Passive close — the endpoint that receives the peer's FIN ───────
+edge estab -[rcv FIN / snd ACK]-> closewait class=server
+edge closewait -[CLOSE / snd FIN]-> lastack class=server
+edge lastack -[rcv ACK of FIN / x]-> closed2 class=server
+
+layout
+# ── Presentation only (`GUI-WRITEBACK-STRUCTURE`) ─────────────────────────────────────────
+# The strip test holds: delete every line below and the machine is
+# unchanged — all 11 states, all 21 transitions and their event/action
+# labels live in the `node`/`edge`/`class` lines above (closed2 is not
+# an orphan: it is the target of two terminal edges). 
+# the layout namespace is `pin` alone, so "every line below" is a shorter
+# list than it used to be.
+#
+# The grid reproduces the CANONICAL Figure 5 composition, mirrored about
+# one central vertical axis (x≈430, the shared centre of CLOSED, LISTEN
+# and ESTABLISHED):
+#   row0 CLOSED · row1 LISTEN · row2 SYN-RECEIVED | SYN-SENT (a mirrored
+#   pair) · row3 ESTABLISHED · row4 FIN-WAIT-1 | CLOSE-WAIT (same mirror)
+#   · row5 FIN-WAIT-2, CLOSING, LAST-ACK · row6 TIME-WAIT, CLOSED
+#   (terminus, under LAST-ACK as the RFC draws it).
+# Column discipline: CLOSED→LISTEN, SYN-RECEIVED→FIN-WAIT-1→FIN-WAIT-2,
+# CLOSING→TIME-WAIT, CLOSE-WAIT→LAST-ACK→CLOSED run dead vertical; the
+# simultaneous-open edge SYN-SENT→SYN-RECEIVED runs dead horizontal
+# between the mirrored pair. All meaning is in the edges; this is
+# layout, not knowledge.
+#
+# WHAT CHANGED, AND WHY THE TOP ROWS ARE WIDER.
+# Hand-routed corridors used to sit below these pins: the active
+# OPEN hugged the right margin with two elbows, and the two aborts back
+# to the top CLOSED bowed out on the outer left and outer right. The
+# whole construct was WITHDRAWN from the language (`EDGE-GEOMETRY-CONSTRUCTS`) — see
+# spec/migrations.md 0.1 and core §9 `EDGE-IDENTITY-AND-GEOMETRY` — so those three
+# transitions now draw straight, which puts each of them alongside its
+# own anti-parallel partner: CLOSED↔LISTEN and CLOSED↔SYN-SENT each
+# became a near-parallel pair whose two labels landed on top of one
+# another. The linter could not see it (0 crossings either way); a
+# rendered comparison could.
+# The fix is content-zone geometry, not a replacement for the waypoints:
+# rows 1 and 2 gained 20 px and 10 px, and the right-hand column moved
+# ~90 px further out, which pushes the two pairs' label midpoints far
+# enough apart to read. Both pairs still run close together, exactly as
+# the LISTEN↔SYN-RECEIVED pair always has in this figure — the ±7 px
+# anti-parallel fan-out is the language's answer to a same-pair edge, and
+# the class colours (blue = setup, purple = rare) say which stroke is
+# which.
+pin closed    at=(394,20)
+pin listen    at=(394,170)
+pin synrcvd   at=(120,290)
+pin synsent   at=(700,290)
+pin estab     at=(376,410)
+pin fw1       at=(159,540)
+pin closewait at=(690,540)
+pin fw2       at=(159,670)
+pin closing   at=(311,670)
+pin lastack   at=(690,670)
+pin timewait  at=(304,800)
+pin closed2   at=(697,800)

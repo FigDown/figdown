@@ -1,0 +1,13 @@
+figdown 0.1 block
+# A node's box is sized by width=/height= on its `pin` line, never on the node
+# itself: the node line is semantics, the extent is layout (`CONTENT-LAYOUT-ZONE-SPLIT`), and they live
+# in different
+# zones of the document.
+node a "A" width=100
+node b "B" height=40
+node c "C" kind=router
+# 0.1: the OLD spellings `w=`/`h=` are retired language-wide, so they
+# get the rename diagnostic rather than this directive's message — a retired
+# spelling must name its migration entry (PROCESS §5(d)).
+node d "D" w=100
+node e "E" h=40

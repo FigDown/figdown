@@ -1,0 +1,6 @@
+figdown 0.1 block
+node a "A" shape=diamond
+node b "B" shape=rounded
+node c "C" shape=cylinder
+node d "D" shape=rounded
+node e "E" shape=rounded

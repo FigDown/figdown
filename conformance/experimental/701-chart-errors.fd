@@ -1,0 +1,10 @@
+figdown 0.1 table
+table t "T"
+| X | V |
+|---|---|
+| r1 | abc |
+chart t
+chart ghost
+chart t type=pie
+chart t type=bars3d
+chart t level=-1   # 0.1 (`CHART-LEVEL-KEY`): level= is DELETED, not renamed

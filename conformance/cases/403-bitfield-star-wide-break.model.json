@@ -1,0 +1,58 @@
+{
+  "header": {
+    "version": "0.1",
+    "genre": "bitfield"
+  },
+  "flow": "right",
+  "classes": [],
+  "planes": [
+    {
+      "id": "base",
+      "z": 0
+    }
+  ],
+  "nodes": [],
+  "groups": [],
+  "edges": [],
+  "ranks": [],
+  "pins": [],
+  "thresholds": [],
+  "bands": [],
+  "bundles": [],
+  "regions": [
+    {
+      "genre": "bitfield",
+      "id": "v6",
+      "label": "Header",
+      "word": 32,
+      "numbering": "lsb0",
+      "fields": [
+        {
+          "name": "Version",
+          "width": 4,
+          "line": 3
+        },
+        {
+          "name": "Flow",
+          "width": 28,
+          "line": 4
+        },
+        {
+          "name": "Marker",
+          "width": 128,
+          "line": 5
+        },
+        {
+          "break": true,
+          "line": 6
+        },
+        {
+          "name": "Payload",
+          "width": "*",
+          "line": 7
+        }
+      ],
+      "line": 2
+    }
+  ]
+}

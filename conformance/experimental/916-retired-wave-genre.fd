@@ -1,0 +1,9 @@
+# `TIMING-GENRE-NAMING`: the EXPERIMENTAL genre `wave` became `timing`, as the
+# header genre token AND as the block opener. `wave` was WaveDrom's MEMBER
+# KEY — in WaveJSON `signal` is the root object and `wave` is a property of
+# one signal, its lane activity string — so FigDown named a figure kind after
+# a per-lane attribute and left WaveDrom's own figure name ("Digital Timing
+# Diagram") unused. Both positions carry the named diagnostic.
+figdown 0.1 wave
+wave w "W"
+signal clk pppp

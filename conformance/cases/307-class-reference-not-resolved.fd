@@ -1,0 +1,19 @@
+figdown 0.1 block
+# spec §12.4 rule 4 and §12.6: `class=` is recorded as a REFERENCE and its
+# presentation values are never copied onto the member. This case joins a
+# class from every directive that accepts `class=` (§10 registry: node,
+# group, edge, field, cell) — group/field/cell were previously unexercised
+# — and the golden shows no fill, stroke or style on any member.
+class hot "Hot path" fill=#fee2e2 stroke=#dc2626 style=dashed
+group g "Group" class=hot
+node a "A" in=g class=hot
+node b "B" in=g
+edge a -> b class=hot
+bitfield bf "Bits" numbering=msb0
+field "One" 4 class=hot
+field "Two" 28
+table t "Table"
+| h | i |
+|---|---|
+| 1 | 2 |
+cell (1,1) class=hot

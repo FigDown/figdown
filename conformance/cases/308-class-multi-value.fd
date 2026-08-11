@@ -1,0 +1,6 @@
+figdown 0.1 block
+class hot "Hot path" fill=#dc2626 stroke=#dc2626
+class deprecated "Deprecated" style=dashed
+node a "A" class=hot,deprecated
+node b "B" class=hot
+edge a -> b class=hot,deprecated

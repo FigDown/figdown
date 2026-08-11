@@ -1,0 +1,5 @@
+figdown 0.1 block
+node a "A"
+node b "B"
+edge a -> b
+path a -> b points=(40,10),(80,10)

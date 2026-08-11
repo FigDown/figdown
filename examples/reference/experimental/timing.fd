@@ -1,0 +1,25 @@
+# FigDown — figures as text. Spec: https://github.com/FigDown/figdown
+
+# Reference set for genre `timing` (EXPERIMENTAL; spelled `wave` until this release, `TIMING-GENRE-NAMING`).
+figdown 0.1 timing
+title "Reference: timing diagram"
+
+timing bus "Request / grant" fill=#f8fafc
+# `stroke=` is the waveform colour (NORMATIVE, `STROKE-KEY-STATUS`);
+# written here as the value the renderer already uses, so the drawing is
+# unchanged. On a signal with `=` data cells it also colours the box border.
+# `style=` left `signal` (`STYLE-KEY-SCOPE`) — a lane's meaning is its lane
+# string, and a dashed waveform said nothing the string did not.
+# `p` is ONE WHOLE CYCLE — high half then low half — so a clock is a RUN of
+# `p`, never `pnpn…`. `n` is the same cycle with the opposite polarity (low
+# half then high half), which is what an inverted or negative-edge clock is
+# made of. ALTERNATING the two is legal and is NOT a clock: `p` ends low and
+# `n` starts low, so the two cells merge and the boundary loses its edge tick,
+# halving the apparent rate. Each polarity gets its own lane below.
+signal clk   pppppppppppp stroke=#1d4ed8
+signal clk_n nnnnnnnnnnnn stroke=#1d4ed8   # the inverted clock: `n` per cycle
+signal req   0.1.=.0.....
+signal gnt   0...1=...0.. data=active
+signal data  xxxx==..xxxx data=d0,d1
+gap 6
+signal done  0......1.0..

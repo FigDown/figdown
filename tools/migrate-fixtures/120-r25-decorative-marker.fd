@@ -1,0 +1,9 @@
+figdown 0.1 block
+title "A paint-order demo"
+
+# r25: decorative
+# The geometry IS the subject; nothing here must survive the strip test.
+
+node a " " shape=ellipse fill=#ef4444
+layout
+pin a at=(20,20) width=200 height=200

@@ -1,0 +1,7 @@
+figdown 0.1 bitfield
+bitfield v6 "Header" numbering=lsb0
+field "Version" 4
+field "Flow" 28
+field "Marker" 128
+break
+field "Payload" *

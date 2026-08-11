@@ -1,0 +1,8 @@
+figdown 0.1 block
+# 0.1 (`QUOTING-RULES`), scene half: labels and the class meaning.
+class hot Hot
+plane l1 Overlay
+node a Cache
+node b "B"
+group g Store
+external e External

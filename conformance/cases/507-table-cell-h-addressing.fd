@@ -1,0 +1,9 @@
+figdown 0.1 table
+table t "T"
+| Top ||
+| A | B |
+|---|---|
+| a1 | b1 |
+cell (h1,1) fill=#eeede6
+cell (h2,2) fill=#dbeafe
+cell (1,1) fill=#fee2e2

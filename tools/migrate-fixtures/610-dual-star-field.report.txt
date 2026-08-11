@@ -1,0 +1,1 @@
+  L4  [dual-star] more than one * field in a bitfield block (max one)

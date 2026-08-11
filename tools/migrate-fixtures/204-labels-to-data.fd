@@ -1,0 +1,4 @@
+figdown 0.1 timing
+timing w "W"
+signal clk 0101
+signal d ==.= labels=A,B,C

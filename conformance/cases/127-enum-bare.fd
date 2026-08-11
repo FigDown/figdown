@@ -1,0 +1,17 @@
+figdown 0.1 block
+# `RULE-POSITION-ENUMERATION`: RULE 2.4 reads "where the grammar expects an id OR AN
+# ENUM VALUE, the token MUST be bare". Until now only the id half existed:
+# 14 of 14 id positions rejected a quoted token, and 0 enum positions
+# rejected anything. Every enum-valued option key is checked by one loop over
+# ENUM_OPT_KEYS; each positional enum is checked at its own directive.
+flow "down"
+node a "A" shape="box"
+node b "B" style="dashed"
+figdown 0.1 bitfield
+bitfield bf "H" numbering="msb0"
+figdown 0.1 table
+table t "T"
+| A | B |
+|---|---|
+| 1 | 2 |
+cell 1 "highlight"

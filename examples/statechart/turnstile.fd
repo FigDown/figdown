@@ -1,0 +1,40 @@
+# FigDown — figures as text. Spec: https://github.com/FigDown/figdown
+
+# Classic teaching FSM: subway turnstile (Hopcroft/Ullman-style example).
+# Interim spelling: figdown 0.1 block (portable). Planned genre: statechart
+# (decisions/registry.md) — not registered in the engine yet.
+#
+# Authoring style: short canvas labels; multi-line human notes as # lines
+# (Markdown-like editing — do not pack the whole story into mid labels).
+figdown 0.1 block
+title "Turnstile statechart (classic FSM)"
+
+class mode "A mode of the turnstile mechanism" fill=#e0e7ff
+
+# ── states ──────────────────────────────────────────────────────────
+node locked "LOCKED" class=mode
+# Barrier locked. Coin is accepted; pushing the arm does nothing useful.
+
+node unlocked "UNLOCKED" class=mode
+# Barrier free for one passage. A second coin is kept (or ignored);
+# push returns the machine to LOCKED.
+
+# ── transitions ─────────────────────────────────────────────────────
+edge locked -[coin]-> unlocked
+# trigger: coin
+# effect: unlock barrier (one fare)
+
+edge unlocked -[push]-> locked
+# trigger: push (person passes)
+# effect: relock barrier
+
+edge locked -[push]-> locked
+# trigger: push while locked
+# effect: none (stay locked) — self-loop
+
+edge unlocked -[coin]-> unlocked
+# trigger: extra coin while unlocked
+# effect: none / farebox keeps coin — self-loop
+
+flow right
+rank locked,unlocked

@@ -1,0 +1,1 @@
+  L5  [block-label-multiword] table label is bare AND multi-word — My Caption. Quote it yourself: only you know whether that is one label or a label plus a surplus argument (`RULE-POSITION-ENUMERATION`)

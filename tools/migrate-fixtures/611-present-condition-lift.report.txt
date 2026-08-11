@@ -1,0 +1,1 @@
+  L3  [present-condition-lift] this field was `optional` and carries prose alongside it: "only when the K bit is set". NON-MECHANICAL: if that prose states the PRESENCE CONDITION, move it into present="…" (and shorten or drop the description=); if it says anything else, leave both alone. The tool never lifts it and never invents one (MIGRATIONS)

@@ -1,0 +1,2 @@
+Line 5: only one * field is allowed per bitfield (* fills the remainder of the row)
+Line 7: only one * field is allowed per bitfield (* fills the remainder of the row)

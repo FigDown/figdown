@@ -1,0 +1,4 @@
+figdown 0.1 block
+node a "A"
+boundary e "Upstream"
+edge a -> e

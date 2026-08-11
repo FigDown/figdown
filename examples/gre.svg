@@ -1,0 +1,80 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 764 324" width="764" height="324" font-family="system-ui,sans-serif"><defs><marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#555"/></marker><pattern id="hatch" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><line x1="0" y1="0" x2="0" y2="6" stroke="#bbb" stroke-width="2"/></pattern></defs><g transform="translate(18,6)"><text x="0" y="14" font-size="13" font-weight="600">GRE Header (RFC 2890 §2)</text><text x="11.5" y="29" font-size="8.5" text-anchor="middle" fill="#6f6e69">0</text><text x="34.5" y="29" font-size="8.5" text-anchor="middle" fill="#6f6e69">1</text><text x="57.5" y="29" font-size="8.5" text-anchor="middle" fill="#6f6e69">2</text><text x="80.5" y="29" font-size="8.5" text-anchor="middle" fill="#6f6e69">3</text><text x="103.5" y="29" font-size="8.5" text-anchor="middle" fill="#6f6e69">4</text><text x="126.5" y="29" font-size="8.5" text-anchor="middle" fill="#6f6e69">5</text><text x="149.5" y="29" font-size="8.5" text-anchor="middle" fill="#6f6e69">6</text><text x="172.5" y="29" font-size="8.5" text-anchor="middle" fill="#6f6e69">7</text><text x="195.5" y="29" font-size="8.5" text-anchor="middle" fill="#6f6e69">8</text><text x="218.5" y="29" font-size="8.5" text-anchor="middle" fill="#6f6e69">9</text><text x="241.5" y="29" font-size="8.5" text-anchor="middle" fill="#6f6e69">10</text><text x="264.5" y="29" font-size="8.5" text-anchor="middle" fill="#6f6e69">11</text><text x="287.5" y="29" font-size="8.5" text-anchor="middle" fill="#6f6e69">12</text><text x="310.5" y="29" font-size="8.5" text-anchor="middle" fill="#6f6e69">13</text><text x="333.5" y="29" font-size="8.5" text-anchor="middle" fill="#6f6e69">14</text><text x="356.5" y="29" font-size="8.5" text-anchor="middle" fill="#6f6e69">15</text><text x="379.5" y="29" font-size="8.5" text-anchor="middle" fill="#6f6e69">16</text><text x="402.5" y="29" font-size="8.5" text-anchor="middle" fill="#6f6e69">17</text><text x="425.5" y="29" font-size="8.5" text-anchor="middle" fill="#6f6e69">18</text><text x="448.5" y="29" font-size="8.5" text-anchor="middle" fill="#6f6e69">19</text><text x="471.5" y="29" font-size="8.5" text-anchor="middle" fill="#6f6e69">20</text><text x="494.5" y="29" font-size="8.5" text-anchor="middle" fill="#6f6e69">21</text><text x="517.5" y="29" font-size="8.5" text-anchor="middle" fill="#6f6e69">22</text><text x="540.5" y="29" font-size="8.5" text-anchor="middle" fill="#6f6e69">23</text><text x="563.5" y="29" font-size="8.5" text-anchor="middle" fill="#6f6e69">24</text><text x="586.5" y="29" font-size="8.5" text-anchor="middle" fill="#6f6e69">25</text><text x="609.5" y="29" font-size="8.5" text-anchor="middle" fill="#6f6e69">26</text><text x="632.5" y="29" font-size="8.5" text-anchor="middle" fill="#6f6e69">27</text><text x="655.5" y="29" font-size="8.5" text-anchor="middle" fill="#6f6e69">28</text><text x="678.5" y="29" font-size="8.5" text-anchor="middle" fill="#6f6e69">29</text><text x="701.5" y="29" font-size="8.5" text-anchor="middle" fill="#6f6e69">30</text><text x="724.5" y="29" font-size="8.5" text-anchor="middle" fill="#6f6e69">31</text><rect x="0" y="34" width="23" height="30" fill="#fff" stroke="#555"><title>Checksum Present (bit 0). If 1, the Checksum and Reserved1 fields are present and Checksum is valid — RFC 2784 §2.2</title></rect><text x="11.5" y="52.85" font-size="11" text-anchor="middle">C</text><rect x="23" y="34" width="23" height="30" fill="#fff" stroke="#555"><title>bit 1: drawn blank in RFC 2890 §2; inside Reserved0 (bits 1-12) per RFC 2784 §2.3; the Routing Present bit in RFC 1701</title></rect><text x="34.5" y="52.85" font-size="11" text-anchor="middle"></text><rect x="46" y="34" width="23" height="30" fill="#fff" stroke="#555"><title>Key Present (bit 2). If 1, the Key field is present — RFC 2890 §2</title></rect><text x="57.5" y="52.85" font-size="11" text-anchor="middle">K</text><rect x="69" y="34" width="23" height="30" fill="#fff" stroke="#555"><title>Sequence Number Present (bit 3). If 1, the Sequence Number field is present — RFC 2890 §2</title></rect><text x="80.5" y="52.85" font-size="11" text-anchor="middle">S</text><rect x="92" y="34" width="207" height="30" fill="#fff" stroke="#555"><title>bits 4-12. A receiver MUST discard a packet with any of bits 1-5 non-zero unless it implements RFC 1701; bits 6-12 MUST be sent as zero and ignored on receipt</title></rect><text x="195.5" y="52.85" font-size="11" text-anchor="middle">Reserved0</text><rect x="299" y="34" width="69" height="30" fill="#fff" stroke="#555"><title>Version Number (bits 13-15) MUST be zero — RFC 2784 §2.3.1</title></rect><text x="333.5" y="52.85" font-size="11" text-anchor="middle">Ver</text><rect x="368" y="34" width="368" height="30" fill="#dbeafe" stroke="#555"><title>EtherType of the payload packet (RFC 1700 / IANA ETHER TYPES); 0x0800 when the payload is IPv4</title></rect><text x="552" y="52.85" font-size="11" text-anchor="middle">Protocol Type</text><rect x="0" y="64" width="368" height="30" fill="#fff" stroke="#555" stroke-dasharray="5 3"><title>one's-complement checksum over the GRE header and the payload packet — RFC 2784 §2.5</title></rect><text x="184" y="82.85" font-size="11" text-anchor="middle">Checksum</text><rect x="368" y="64" width="368" height="30" fill="#fff" stroke="#555" stroke-dasharray="5 3"><title>MUST be transmitted as zero; present exactly when the Checksum field is present — RFC 2784 §2.6</title></rect><text x="552" y="82.85" font-size="11" text-anchor="middle">Reserved1</text><rect x="0" y="94" width="736" height="30" fill="#fef9c3" stroke="#555" stroke-dasharray="5 3"><title>four-octet flow identifier inserted by the encapsulator — RFC 2890 §2.1</title></rect><text x="368" y="112.85" font-size="11" text-anchor="middle">Key</text><rect x="0" y="124" width="736" height="30" fill="#fff" stroke="#555" stroke-dasharray="5 3"><title>four-octet counter for in-order delivery, starting at 0 — RFC 2890 §2.2</title></rect><text x="368" y="142.85" font-size="11" text-anchor="middle">Sequence Number</text><text x="0" y="173" font-size="10.5" fill="#6f6e69">Checksum — present: C = 1</text><text x="0" y="187" font-size="10.5" fill="#6f6e69">Reserved1 — present: C = 1</text><text x="0" y="201" font-size="10.5" fill="#6f6e69">Key — present: K = 1</text><text x="0" y="215" font-size="10.5" fill="#6f6e69">Sequence Number — present: S = 1</text><text x="0" y="266.5" font-size="11" fill="#1d1d1b">Present only if the C (Checksum Present) bit is 1 — RFC 2784 §2.2</text><text x="0" y="286.5" font-size="11" fill="#1d1d1b">Present only if the K (Key Present) bit is 1 — RFC 2890 §2</text><text x="0" y="306.5" font-size="11" fill="#1d1d1b">Present only if the S (Sequence Number Present) bit is 1 — RFC 2890 §2</text></g><metadata id="figdown-source" data-sha256="06eb4f485743b6ee5b2417bd1d8d39f87304832773fb6eb84d4c80cf157b02fa" data-engine-version="0.1.0"><![CDATA[
+# FigDown — figures as text. Spec: https://github.com/FigDown/figdown
+
+figdown 0.1 bitfield
+# GRE header — transcribed from the ASCII diagram in RFC 2890 §2
+# ("The proposed GRE header will have the following format", September 2000),
+# which is RFC 2784 §2.1's base header plus the K and S bits and the two
+# fields they gate. https://www.rfc-editor.org/rfc/rfc2890.txt
+#
+# What this figure probes: fields whose PRESENCE depends on a flag bit
+# elsewhere in the same header — Checksum and Reserved1 iff C = 1,
+# Key iff K = 1, Sequence Number iff S = 1.
+#
+# Fidelity rule for this file: it carries EXACTLY the fields RFC 2890 §2
+# draws. The payload packet follows on the wire (RFC 2784 §2 draws the
+# whole encapsulation) but is outside this diagram, so it is not a field.
+title "GRE header"
+
+# Two carriers, two different jobs.
+#
+#   present="C = 1"  states THIS field's presence condition. It draws — a
+#     caption under the block — so the human sees what the reading agent
+#     sees. The VALUE is opaque prose: §12.7 lets an agent quote it and
+#     forbids parsing it, evaluating it, or resolving `C` against the
+#     `field "C"` declared below (the language has no reference grammar,
+#     and a field name is a label, not an id — see `ANNOTATION-LOCATOR-SPLIT`).
+#
+#   class=ifc        states the CO-DEPENDENCY. Core §12.7 licenses a reading
+#     agent to take a class reference plus that class's meaning as a
+#     CATEGORY, so two fields carrying `class=ifc` are structurally in one
+#     category and a reader may conclude they appear and disappear together.
+#     That is real, machine-readable co-dependency, and it is the sanctioned
+#     answer for a condition SHARED by several fields (genres/bitfield.md).
+#
+# Neither carrier resolves a name. Both are here because they say different
+# things, and the descriptions below no longer repeat the condition a third
+# time.
+class ifc "Present only if the C (Checksum Present) bit is 1 — RFC 2784 §2.2"
+class ifk "Present only if the K (Key Present) bit is 1 — RFC 2890 §2"
+class ifs "Present only if the S (Sequence Number Present) bit is 1 — RFC 2890 §2"
+
+# msb0: bit 0 is the MSB, ruler 0…31 left to right, so the bit numbers the
+# RFC's own section headings use ("Checksum Present (bit 0)", "Reserved0
+# (bits 1-12)", "Version Number (bits 13-15)") read straight off the ruler.
+bitfield gre "GRE Header (RFC 2890 §2)" word=32 numbering=msb0
+
+# Word 0 — 1 + 1 + 1 + 1 + 9 + 3 + 16 = 32 bits. The four flag bits are
+# declared one per line so each gets its own bit position and its own note.
+field "C" 1 description="Checksum Present (bit 0). If 1, the Checksum and Reserved1 fields are present and Checksum is valid — RFC 2784 §2.2"
+# Bit 1 is drawn as an EMPTY cell in RFC 2890's figure and the RFC gives it
+# no name there, so this file gives it none either: `""` records an empty
+# label rather than inventing a caption. RFC 2784 §2.3 counts this bit
+# inside Reserved0 (bits 1-12); RFC 1701 used it as the Routing Present bit.
+field "" 1 description="bit 1: drawn blank in RFC 2890 §2; inside Reserved0 (bits 1-12) per RFC 2784 §2.3; the Routing Present bit in RFC 1701"
+field "K" 1 description="Key Present (bit 2). If 1, the Key field is present — RFC 2890 §2"
+field "S" 1 description="Sequence Number Present (bit 3). If 1, the Sequence Number field is present — RFC 2890 §2"
+field "Reserved0" 9 description="bits 4-12. A receiver MUST discard a packet with any of bits 1-5 non-zero unless it implements RFC 1701; bits 6-12 MUST be sent as zero and ignored on receipt"
+field "Ver" 3 description="Version Number (bits 13-15) MUST be zero — RFC 2784 §2.3.1"
+field "Protocol Type" 16 fill=#dbeafe description="EtherType of the payload packet (RFC 1700 / IANA ETHER TYPES); 0x0800 when the payload is IPv4"
+
+# Word 1 — present as a pair, or not at all. `present=` is the language's
+# "present only if": the WIDTH is fixed and only the presence is not. A
+# reader computing offsets across a conditionally present field must branch
+# and emit both offset sets, one with it present and one without — the fields
+# below each move 32 bits earlier when C = 0. The renderer dashes the cell
+# and, because a condition is STATED here, draws it as a caption under the
+# block, so the human sees exactly what the reading agent sees.
+field "Checksum" 16 present="C = 1" class=ifc description="one's-complement checksum over the GRE header and the payload packet — RFC 2784 §2.5"
+field "Reserved1" 16 present="C = 1" class=ifc description="MUST be transmitted as zero; present exactly when the Checksum field is present — RFC 2784 §2.6"
+
+# Word 2, then word 3. Independent of each other and of word 1: with C=0,
+# K=1, S=0 the Key is the SECOND word of the header, not the third.
+field "Key" 32 present="K = 1" class=ifk fill=#fef9c3 description="four-octet flow identifier inserted by the encapsulator — RFC 2890 §2.1"
+field "Sequence Number" 32 present="S = 1" class=ifs description="four-octet counter for in-order delivery, starting at 0 — RFC 2890 §2.2"
+
+# Eight presence combinations (C, K, S independent) share this one drawing;
+# the diagram above is the all-present case, which is what RFC 2890 draws.
+# The header is 4 octets when C=K=S=0 and 16 octets when all three are set.
+
+]]></metadata></svg>

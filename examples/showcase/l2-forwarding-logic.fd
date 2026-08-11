@@ -1,0 +1,43 @@
+# FigDown — figures as text. Spec: https://github.com/FigDown/figdown
+
+figdown 0.1 flowchart
+# The classic learning-bridge / L2 switch forwarding decision (IEEE 802.1D).
+# A frame arrives; the switch learns the source, looks up the destination,
+# and takes one of three actions. The LOGIC is machine-readable: a reader
+# answers "when does a switch flood?" by tracing the Y/N edges — no pixels.
+title "L2 Switch Forwarding Decision"
+
+# Semantic classes: the three terminal OUTCOMES. Each label states the
+# MEANING; the legend derives from these lines (spec §2.7).
+class forward "Forward — send the frame out the single learned egress port" fill=#16a34a
+class flood   "Flood — send out every port in the VLAN except the ingress port" fill=#2563eb
+class filter  "Filter — discard; destination is out the same port it arrived on" fill=#dc2626
+
+# The wire is external to the decision logic: the frame enters from outside
+# the figure (spec §2.8 external — never drawn as a shape, edge ends open).
+external wire "from ingress port"
+
+# 0.1 (`FLOWCHART-ROLE-KEYWORDS`): the role is a WORD, not a shape. `process` for the two
+# steps, `decision` for the two branch points, `terminator` for the three
+# outcomes — the diamond and the rounded ends are DERIVED, and a reading agent
+# gets the roles from the model instead of inferring them from geometry.
+process learn  "Learn source MAC:\nupdate MAC table\n(SA -> ingress port)"
+process lookup "Look up destination MAC\nin MAC table"
+decision hit   "Entry found?"
+decision same  "Egress port ==\ningress port?"
+terminator fwd "Forward out\nlearned port"                    class=forward
+terminator fld "Flood to all ports\nin VLAN except ingress"   class=flood
+terminator flt "Filter (drop):\nsame-port destination"        class=filter
+
+# top-to-bottom reading order for the decision process.
+flow down
+
+edge wire   -> learn
+edge learn  -> lookup
+edge lookup -> hit
+# Miss (unknown unicast, or broadcast/multicast) -> flood.
+edge hit  -[no]->  fld
+edge hit  -[yes]-> same
+# Hit, but destination is behind the ingress port -> filter; else forward.
+edge same -[yes]-> flt
+edge same -[no]->  fwd

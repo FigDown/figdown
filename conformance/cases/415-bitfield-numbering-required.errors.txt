@@ -1,0 +1,2 @@
+Line 5: bitfield requires numbering= (lsb0 or msb0)
+Line 7: numbering must be lsb0 or msb0

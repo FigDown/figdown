@@ -1,0 +1,52 @@
+{
+  "header": {
+    "version": "0.1",
+    "genre": "block"
+  },
+  "flow": "right",
+  "classes": [],
+  "planes": [
+    {
+      "id": "base",
+      "z": 0
+    }
+  ],
+  "nodes": [
+    {
+      "id": "q1",
+      "label": "Q1",
+      "shape": "box",
+      "group": "buf",
+      "plane": "base",
+      "line": 3
+    }
+  ],
+  "groups": [
+    {
+      "id": "buf",
+      "label": "Buffer",
+      "line": 2
+    }
+  ],
+  "edges": [],
+  "ranks": [],
+  "pins": [],
+  "thresholds": [
+    {
+      "label": "Max cap",
+      "in": "buf",
+      "offset": 80,
+      "line": 4
+    },
+    {
+      "label": "Reserved",
+      "in": "buf",
+      "offset": 15,
+      "stroke": "#a3c93a",
+      "line": 5
+    }
+  ],
+  "bands": [],
+  "bundles": [],
+  "regions": []
+}

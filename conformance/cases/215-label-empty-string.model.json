@@ -1,0 +1,129 @@
+{
+  "header": {
+    "version": "0.1",
+    "genre": "block"
+  },
+  "title": "",
+  "flow": "right",
+  "classes": [],
+  "planes": [
+    {
+      "id": "base",
+      "z": 0
+    },
+    {
+      "id": "over",
+      "label": "",
+      "z": 1
+    }
+  ],
+  "nodes": [
+    {
+      "id": "a",
+      "label": "",
+      "shape": "box",
+      "plane": "base",
+      "line": 12
+    },
+    {
+      "id": "b",
+      "label": "",
+      "shape": "box",
+      "group": "g",
+      "plane": "base",
+      "line": 15
+    }
+  ],
+  "groups": [
+    {
+      "id": "g",
+      "label": "",
+      "line": 13
+    }
+  ],
+  "externals": [
+    {
+      "id": "x",
+      "label": "",
+      "line": 14
+    }
+  ],
+  "edges": [
+    {
+      "a": "a",
+      "op": "->",
+      "b": "b",
+      "plane": "base",
+      "line": 16
+    }
+  ],
+  "ranks": [],
+  "pins": [],
+  "thresholds": [],
+  "bands": [],
+  "bundles": [
+    {
+      "id": "bl",
+      "label": "",
+      "members": [
+        "a--b"
+      ],
+      "line": 17
+    }
+  ],
+  "regions": [
+    {
+      "genre": "bitfield",
+      "id": "hdr",
+      "label": "",
+      "word": 32,
+      "numbering": "lsb0",
+      "fields": [
+        {
+          "name": "ver",
+          "width": 4,
+          "line": 19
+        }
+      ],
+      "line": 18
+    },
+    {
+      "genre": "table",
+      "id": "t",
+      "label": "",
+      "heads": [
+        [
+          {
+            "v": "A"
+          }
+        ]
+      ],
+      "aligns": [
+        "none"
+      ],
+      "rows": [
+        {
+          "cells": [
+            {
+              "v": "1"
+            }
+          ],
+          "line": 23
+        }
+      ],
+      "line": 20
+    },
+    {
+      "genre": "timing",
+      "id": "w",
+      "label": "",
+      "signals": [
+        {
+          "name": "clk",
+          "lane": "0101"
+        }
+      ],
+      "line": 24
+    }
+  ]
+}

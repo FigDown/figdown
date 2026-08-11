@@ -1,0 +1,1 @@
+  L2  [class-fill-on-edge] class `hot` sets fill= but no stroke=, and is used by BOTH a node and an edge (§8.4). ADD a stroke= (do not split the class — one meaning, one legend entry). To reproduce the old drawing exactly, use the fill colour: stroke=#c00000

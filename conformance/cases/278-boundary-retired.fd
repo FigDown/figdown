@@ -1,0 +1,6 @@
+figdown 0.1 block
+# `EXTERNAL-ENDPOINT-NAMING`: the scene keyword `boundary` became `external`.
+node a "A"
+boundary e "outside"
+external x "outside"
+edge a -> x

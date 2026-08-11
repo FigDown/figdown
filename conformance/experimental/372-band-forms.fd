@@ -1,0 +1,6 @@
+figdown 0.1 block
+group buf "Buffer"
+node col "Column" in=buf
+band "Reserved" 15% in=buf fill=#a3c93a
+band "Share" 15..35% in=col
+band "Headroom" 40% in=buf extend=right fill=#fca5a5

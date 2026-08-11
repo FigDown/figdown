@@ -1,0 +1,11 @@
+figdown 0.1 block
+title "Section one"
+node a "First a"
+group g "G"
+edge a -> a
+
+figdown 0.1 block
+title "Section two"
+node a "Second a"
+group g "G again"
+node b "B" in=g

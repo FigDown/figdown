@@ -1,0 +1,14 @@
+figdown 0.1 block junk
+# §1: "a directive line containing positional arguments its grammar does
+# not accept MUST be rejected" — including the version header itself.
+title "T" junk
+group g "G"
+node a "A" in=g
+threshold "cap" in=g offset=50% junk
+band "zone" 10% in=g junk
+bitfield b "B" numbering=lsb0
+field "one" 4
+break junk
+timing w "W"
+signal clk p... junk
+gap 1 junk

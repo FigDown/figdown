@@ -1,0 +1,70 @@
+{
+  "header": {
+    "version": "0.1",
+    "genre": "bitfield"
+  },
+  "flow": "right",
+  "classes": [],
+  "planes": [
+    {
+      "id": "base",
+      "z": 0
+    }
+  ],
+  "nodes": [],
+  "groups": [],
+  "edges": [],
+  "ranks": [],
+  "pins": [],
+  "thresholds": [],
+  "bands": [],
+  "bundles": [],
+  "regions": [
+    {
+      "genre": "bitfield",
+      "id": "b",
+      "label": "Header",
+      "word": 32,
+      "numbering": "msb0",
+      "fields": [
+        {
+          "name": "A",
+          "width": 8,
+          "index": {
+            "first": 0,
+            "last": "7 Step 2"
+          },
+          "line": 8
+        },
+        {
+          "name": "B",
+          "width": 8,
+          "index": {
+            "first": 0,
+            "last": "7 in steps of 2"
+          },
+          "line": 9
+        },
+        {
+          "name": "C",
+          "width": 8,
+          "index": {
+            "first": 0,
+            "last": "stepping"
+          },
+          "line": 10
+        },
+        {
+          "name": "D",
+          "width": 8,
+          "index": {
+            "first": 0,
+            "last": 7
+          },
+          "line": 11
+        }
+      ],
+      "line": 7
+    }
+  ]
+}

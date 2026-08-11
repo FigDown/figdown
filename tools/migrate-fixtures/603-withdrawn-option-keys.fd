@@ -1,0 +1,8 @@
+figdown 0.1 block
+node a "A"
+node b "B"
+edge a -> b
+edge a -> b src=e dst=w
+edge a -> b via=40,10;80,10
+edge a -> b tailport=0.5 headport=0.5
+edge a -> b routing=straight

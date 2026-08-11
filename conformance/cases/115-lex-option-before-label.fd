@@ -1,0 +1,23 @@
+figdown 0.1 block
+# `OPTION-POSITION-PARSING`: an option may appear ANYWHERE on a directive line —
+# `splitOpts` extracts `key=` tokens by shape and the positional arguments
+# close up behind them. Two directives contradicted that: `bundle` and
+# `threshold` (spelled `guide` until this release) tested quotedness on the RAW
+# token stream while reading the value from the option-stripped one, so an
+# option BEFORE the label shifted the indices apart and rejected a legal line
+# ("bad member ..." / "threshold needs a quoted label"). `band` joined the
+# label-bearing set (`BAND-LABEL-STATUS`) and obeys the same rule.
+# Quotedness is now carried `pos`-aligned, so the two behave like everyone
+# else. This case pins option-before-label on all six label-bearing directives
+# it applies to; its subject is the generic option/positional rule, not the
+# demoted constructs it uses to prove it (STATUS.txt criterion).
+class fill=#e0f2fe c1 "Fabric"
+plane z-index=2 L1 "Overlay"
+node fill=#fef9c3 a "A"
+node b "B"
+group fill=#f1f5f9 g "Pod"
+external plane=L1 e "Uplink"
+edge a -- b
+bundle stroke=#0ea5e9 t1 "LAG" a--b
+threshold in=g "Threshold" offset=50%
+band in=g "Shared" fill=#dcfce7 15..35%

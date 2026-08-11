@@ -1,0 +1,58 @@
+# Structure Pattern Library
+
+> De-identified structural skeletons — one file per entry below —
+> distilled from the figure-type census over a real 774-document corpus: for each major
+> figure family, agents read real samples and re-expressed **only the
+> structure** with generic placeholder labels — no content, no terms,
+> no fingerprints. Use them as starting skeletons: replace the labels,
+> keep the shape.
+
+## Block & architecture
+- [block-a](block-a.fd) — parallel lanes fanning into a collector
+  ![block-a](block-a.svg)
+- [block-b](block-b.fd) — containment tiers with cross-tier dashed feedback
+  ![block-b](block-b.svg)
+
+## Register / packet bit layouts
+- [bitfield-a](bitfield-a.fd) — one control word: flag run + wide fields + reserved (lsb0)
+  ![bitfield-a](bitfield-a.svg)
+- [bitfield-b](bitfield-b.fd) — multi-word descriptor with a variable tail
+  ![bitfield-b](bitfield-b.svg)
+
+## Tables
+- [table-a](table-a.fd) — two-tier merged header + rowspan label column
+  ![table-a](table-a.svg)
+- [table-b](table-b.fd) — rowspan/colspan merges + per-cell colors + row highlights
+  ![table-b](table-b.svg)
+
+## Flowcharts
+- [flowchart-a](flowchart-a.fd) — two sequential decisions, branches converging
+  (written with the 0.1 role keywords: no `shape=` at all)
+  ![flowchart-a](flowchart-a.svg)
+- [flowchart-b](flowchart-b.fd) — retry loop-back; the plain back-edge IS the
+  loop — there is no loop construct
+  ![flowchart-b](flowchart-b.svg)
+
+## Timing / waveforms
+- [timing-a](timing-a.fd) — clocked request/acknowledge handshake
+  ![timing-a](timing-a.svg)
+- [timing-b](timing-b.fd) — valid + labelled data-bus segments
+  ![timing-b](timing-b.svg)
+
+## Topologies
+- [topology-a](topology-a.fd) — two tiers, full mesh, port labels
+  ![topology-a](topology-a.svg)
+- [topology-b](topology-b.fd) — chain with a redundant pair and a link bundle
+  ![topology-b](topology-b.svg)
+
+## State machines
+- [state-a](state-a.fd) — cycle with retry/abort back-edges
+  ![state-a](state-a.svg)
+- [state-b](state-b.fd) — hub: states converging to reset
+  ![state-b](state-b.svg)
+
+## Entity-relationship (blocks-first, `ERD-EXPRESSION-LEVEL`)
+- [erd-a](erd-a.fd) — entities as multi-line nodes (PK/FK in label
+  text), relationships with an inline verb and cardinality endpoint
+  labels
+  ![erd-a](erd-a.svg)

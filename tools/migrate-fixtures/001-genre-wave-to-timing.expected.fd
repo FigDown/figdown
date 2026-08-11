@@ -1,0 +1,6 @@
+figdown 0.1 timing
+# `TIMING-GENRE-NAMING`: the EXPERIMENTAL genre token became `timing`. It is the
+# THIRD word of the header, which no line-initial rule reaches, so the header
+# branch carries its own rewrite.
+timing w "Bus"
+signal clk 0101

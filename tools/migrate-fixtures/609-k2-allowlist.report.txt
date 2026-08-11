@@ -1,0 +1,2 @@
+  L4  [k2-allowlist] `node` is not allowed in genre bitfield (use multi-section `MULTI-FIGURE-DOCUMENTS` or a scene host)
+  L5  [k2-allowlist] `edge` is not allowed in genre bitfield (use multi-section `MULTI-FIGURE-DOCUMENTS` or a scene host)

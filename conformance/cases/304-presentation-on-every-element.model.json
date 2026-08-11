@@ -1,0 +1,220 @@
+{
+  "header": {
+    "version": "0.1",
+    "genre": "block"
+  },
+  "title": "Presentation attributes, everywhere",
+  "flow": "right",
+  "classes": [
+    {
+      "id": "hot",
+      "meaning": "Hot path",
+      "fill": "#fee2e2",
+      "stroke": "#dc2626",
+      "style": "dashed",
+      "plane": "over",
+      "line": 8
+    }
+  ],
+  "planes": [
+    {
+      "id": "base",
+      "z": 0
+    },
+    {
+      "id": "over",
+      "label": "Overlay",
+      "z": 3
+    }
+  ],
+  "nodes": [
+    {
+      "id": "a",
+      "label": "A",
+      "shape": "box",
+      "group": "g",
+      "plane": "over",
+      "fill": "#dbeafe",
+      "stroke": "#1d4ed8",
+      "style": "dashed",
+      "line": 11
+    },
+    {
+      "id": "b",
+      "label": "B",
+      "shape": "box",
+      "group": "g",
+      "plane": "base",
+      "class": [
+        "hot"
+      ],
+      "line": 12
+    }
+  ],
+  "groups": [
+    {
+      "id": "g",
+      "label": "Group",
+      "plane": "over",
+      "fill": "#f6f5ef",
+      "stroke": "#94a3b8",
+      "style": "dotted",
+      "line": 10
+    }
+  ],
+  "externals": [
+    {
+      "id": "wire",
+      "label": "to the wire",
+      "plane": "over",
+      "line": 9
+    }
+  ],
+  "edges": [
+    {
+      "a": "a",
+      "op": "->",
+      "b": "b",
+      "tail": "tx",
+      "mid": "mid",
+      "head": "hx",
+      "plane": "over",
+      "stroke": "#059669",
+      "style": "dotted",
+      "line": 13
+    },
+    {
+      "a": "a",
+      "op": "->",
+      "b": "wire",
+      "plane": "base",
+      "line": 14
+    }
+  ],
+  "ranks": [],
+  "pins": [],
+  "thresholds": [
+    {
+      "label": "cap",
+      "in": "g",
+      "offset": 70,
+      "stroke": "#b45309",
+      "style": "dotted",
+      "plane": "over",
+      "line": 16
+    }
+  ],
+  "bands": [
+    {
+      "label": "zone",
+      "in": "g",
+      "from": 10,
+      "to": 40,
+      "extend": "up",
+      "fill": "#e0f2fe",
+      "stroke": "#0369a1",
+      "style": "dashed",
+      "plane": "over",
+      "line": 17
+    }
+  ],
+  "bundles": [
+    {
+      "id": "bd",
+      "label": "LAG",
+      "members": [
+        "a--b"
+      ],
+      "stroke": "#7c3aed",
+      "style": "dotted",
+      "plane": "over",
+      "line": 15
+    }
+  ],
+  "regions": [
+    {
+      "genre": "bitfield",
+      "id": "bf",
+      "label": "Bits",
+      "word": 16,
+      "numbering": "lsb0",
+      "fill": "#f8fafc",
+      "stroke": "#334155",
+      "fields": [
+        {
+          "name": "One",
+          "width": 4,
+          "fill": "#fde68a",
+          "stroke": "#b45309",
+          "line": 19
+        },
+        {
+          "name": "Two",
+          "width": 12,
+          "line": 20
+        }
+      ],
+      "line": 18
+    },
+    {
+      "genre": "table",
+      "id": "t",
+      "label": "Table",
+      "fill": "#f8fafc",
+      "stroke": "#475569",
+      "heads": [
+        [
+          {
+            "v": "h"
+          },
+          {
+            "v": "i"
+          }
+        ]
+      ],
+      "aligns": [
+        "none",
+        "none"
+      ],
+      "rows": [
+        {
+          "cells": [
+            {
+              "v": "1"
+            },
+            {
+              "v": "2"
+            }
+          ],
+          "line": 24
+        }
+      ],
+      "marks": [
+        {
+          "row": 1,
+          "col": 1,
+          "fill": "#fee2e2",
+          "stroke": "#dc2626",
+          "line": 25
+        }
+      ],
+      "line": 21
+    },
+    {
+      "genre": "timing",
+      "id": "w",
+      "label": "Wave",
+      "fill": "#ecfeff",
+      "stroke": "#0e7490",
+      "signals": [
+        {
+          "name": "clk",
+          "lane": "p...",
+          "fill": "#fef9c3",
+          "stroke": "#a16207"
+        }
+      ],
+      "line": 26
+    }
+  ]
+}

@@ -1,0 +1,18 @@
+# external auto-placement in a fully pinned scene (`EXTERNAL-EDGE-ENDPOINTS` presentation):
+# externals must land adjacent to their connected node in the flow
+# direction, not at a far auto-layout rank. Semantic model is unchanged
+# by the layout zone; this case pins down the parse of the scenario the
+# render-side tools/boundary-check.js asserts geometry for (the tool keeps
+# its filename; the keyword was renamed `external`).
+figdown 0.1 block
+external src "in"
+external dst "out"
+node ingress "Ingress"
+node egress "Egress"
+flow right
+edge src -> ingress
+edge ingress -> egress
+edge egress -> dst
+layout
+pin ingress at=(82,55) width=175 height=34
+pin egress at=(82,120) width=175 height=34

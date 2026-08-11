@@ -1,0 +1,16 @@
+# arrowhead visibility on an opaque target (pinned, gap=0): the edge
+# carries an arrowhead that must stay visible above the target fill —
+# the renderer paints explicit triangles above nodes. This case pins
+# down the parse of that regression scenario; the triangle geometry is
+# asserted render-side.
+figdown 0.1 block
+group left "Host" gap=0
+node a "CONTROL" in=left
+group right "Engine" gap=0
+node b "Control Logic" in=right fill=#d9d9d9
+flow right
+edge a -> b
+pin left at=(20,55)
+pin a at=(0,0) width=175 height=34
+pin right at=(265,15)
+pin b at=(0,0) width=480 height=60

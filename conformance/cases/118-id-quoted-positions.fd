@@ -1,0 +1,28 @@
+figdown 0.1 block
+# 0.1 (`QUOTED-IDS`): an id is BARE at EVERY id position. One wording covers
+# both halves — a needlessly quoted legal id (silently accepted before) and a
+# quoted token that is not a legal id (which used to report `<kw> needs an
+# id`, naming the wrong thing).
+class c "meaning"
+plane l1
+node a "A"
+node b "B"
+node "q" "Quoted id"
+node "Router 1" "Spaces"
+node 交換器 "Not an ASCII id"
+group "g" "Quoted group"
+external "e" "Quoted boundary"
+bundle "t" "L" a--b
+bitfield "bf" "B" numbering=msb0
+table "tb" "T"
+timing "wv" "W"
+chart "tb"
+edge "a" -> b
+edge a -> "b"
+node z "Z" class="c"
+node y "Y" in="g"
+node x "X" plane="l1"
+rank "a",b
+pin "a" at=(1,2)
+# a `size` id stood here until this release — that position left with the directive (`ELEMENT-GEOMETRY-DIRECTIVE`),
+# and a `path` id position stood here until this release — same, with `EDGE-GEOMETRY-CONSTRUCTS`

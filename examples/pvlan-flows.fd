@@ -1,0 +1,135 @@
+# FigDown — figures as text. Spec: https://github.com/FigDown/figdown
+
+figdown 0.1 topology
+title "Private VLAN — permitted flows (figure) + the full rule set (table)"
+
+# ── What this example is ────────────────────────────────────────────
+# A worked example of `COMPLETENESS-DEFINITION` mode 3: figure PLUS table as ONE deliverable.
+# The figure carries the SHAPE (who is wired to whom, in which VLAN);
+# the tables carry the RULES — including the PROHIBITIONS, which no
+# arrangement of arrows can state.
+#
+# Why the split is forced here. A PVLAN figure that draws only the
+# permitted flows makes its most characteristic fact — "two isolated
+# ports cannot reach EACH OTHER even though they share VID_I" — visible
+# only as a MISSING edge, and absence is ambiguous: is that pair
+# forbidden, or merely not drawn? Meaning riding on absence is weaker
+# than meaning riding on presentation, and `MEANING-RECOVERY-SOURCE` rules out both. So the
+# closed-world reading is DECLARED, in the `reach` table caption, and
+# every prohibition is written out in words in its own column.
+#
+# The port count is the minimum that lets every rule be STATED rather
+# than gestured at: one promiscuous port, two community ports in one
+# community (so "same community may talk" is showable), a second
+# community (so "different communities may not" is showable), and two
+# isolated ports (so "isolated may not talk to isolated" is showable).
+
+# ── Semantic classes: the three PVLAN VLAN types (`MEANING-RECOVERY-SOURCE`, §2.7) ────────
+# Each label states a MEANING, not just a name; the legend strip below
+# the figure derives from these lines automatically, so an agent reads
+# `class=vidi` off the edge itself and never correlates hex values.
+class vidp "VID_P primary VLAN — carries the promiscuous port, which is the uplink port; every secondary VLAN maps onto it" stroke=#dc2626
+class vidc "VID_C community VLAN — one per community; members reach each other and the promiscuous port"         stroke=#2563eb
+class vidi "VID_I isolated VLAN — one per PVLAN, shared by all isolated ports, yet no isolated pair may talk"    stroke=#16a34a style=dashed
+
+# ── The router — beyond the switch, and not a port ──────────────────
+# EVERY physical port on this switch has a PVLAN role, and the uplink
+# port is the one configured promiscuous: P1 below IS the uplink. What
+# lies BEYOND that port — the router — is not a port, has no PVLAN role
+# and appears in no VLAN table, so it is the `external` (spec §2.8):
+# the edge ends open at the left margin with a label and no shape is
+# drawn, correctly signalling "outside this figure's scope."
+external rtr "Router"
+
+# ── Port roles — four groups, six ports, one tier ────────────────────
+# Every port role gets its own group so all four roles are visually
+# parallel: equal-weight bounded containers at the same horizontal tier.
+# Promiscuous is a ROLE, not a rank. P1 is a port on this switch like
+# the other five, configured into the primary VLAN; what distinguishes
+# it is unrestricted reachability, and the fact that the router happens
+# to hang off it. Neither makes it a parent — the router is `external`,
+# so no drawn shape stands above P1 for a reader to mistake for one.
+# The promiscuous group sits second in the stack for edge density: every
+# permitted flow in this figure is incident on P1, so placing it between
+# Community A above and Isolated below lets those edges fan both ways
+# over short runs.
+group ca "Community A — VID_C1"
+node ca1 "A1" in=ca
+node ca2 "A2" in=ca
+group pp "Promiscuous — VID_P"
+node pp1 "P1 (uplink port)" in=pp
+group iso "Isolated — VID_I"
+node ip1 "I1" in=iso
+node ip2 "I2" in=iso
+group cb "Community B — VID_C2"
+node cb1 "B1" in=cb
+
+# flow right: the external sits at the left margin (outside the switch);
+# all four port-role groups are at the same x-tier (peers, not hierarchy).
+flow right
+
+# ── Permitted reachability ──────────────────────────────────────────
+# Bidirectional throughout: VLAN reachability is symmetric, so a
+# community port that P1 can reach can also reply to P1. Every pair
+# NOT drawn here is denied — stated in the `reach` table, not implied
+# by the missing arrow.
+edge rtr <-> pp1 class=vidp
+edge pp1 <-> ca1 class=vidc
+edge pp1 <-> ca2 class=vidc
+edge pp1 <-> cb1 class=vidc
+edge ca1 <-> ca2 class=vidc
+edge pp1 <-> ip1 class=vidi
+edge pp1 <-> ip2 class=vidi
+
+# ── The rules, in words ─────────────────────────────────────────────
+# The caption declares the closed-world reading for the whole document.
+
+# --- panel: separate genre section (main-standard hybrid = multi-section `MULTI-FIGURE-DOCUMENTS`) ---
+layout
+# Presentation only (`GUI-WRITEBACK-STRUCTURE`: stripping these lines changes nothing semantic —
+# peerhood is carried by the symmetric grouping above, not by coordinates).
+#
+# The arrangement puts the two community groups side by side on the top
+# row, with the promiscuous port centred below them and the isolated
+# group at the bottom. Like sits next to like: the two communities are
+# the same port role, so they read as a pair.
+#
+# sizes  — a two-member group holds two 150px boxes side by side; a
+#          one-member group holds one 310px box. All four frames end up
+#          the same size, and equal size is what carries peerhood: the
+#          promiscuous port is a peer of the others, distinguished by
+#          unrestricted reachability and by carrying the uplink —
+#          neither of which is a rank.
+# group pins — fix the row/column slots and keep uniform clearance
+#          between frames. Auto-layout would otherwise hoist the
+#          external-connected pp group to the top, implying it is the
+#          root of a hierarchy that does not exist.
+# member pins — group-local coordinates (spec `PIN-COORDINATE-SCOPE`).
+pin ca  at=(190,20)
+pin cb  at=(572,20)
+pin pp  at=(190,146)
+pin iso at=(190,272)
+pin ca1 at=(14,20) width=150 height=44
+pin ca2 at=(174,20) width=150 height=44
+pin pp1 at=(14,20) width=310 height=44
+pin ip1 at=(14,20) width=150 height=44
+pin ip2 at=(174,20) width=150 height=44
+pin cb1 at=(14,20) width=310 height=44
+
+figdown 0.1 table
+table reach "Reachability rules — the figure draws PERMITTED flows only; any pair not listed as reachable is DENIED"
+| Port type          | May reach                                            | May NOT reach                                                    |
+|--------------------|------------------------------------------------------|------------------------------------------------------------------|
+| Promiscuous (P1, the uplink port) | every port in the PVLAN, and the router beyond it | nothing — a promiscuous port is unrestricted        |
+| Community (A1, A2) | P1, and the router through it; ports of the SAME community | ports of any OTHER community (B1); every isolated port (I1, I2) |
+| Isolated (I1, I2)  | P1, and the router through it — nothing else         | each other (I1 to I2 denied, though both sit in VID_I); A1, A2, B1|
+cell 3 highlight
+
+table ports "Port configuration behind the figure — every port on the switch, and its role"
+| Port          | Port type   | VLAN membership                                                    |
+|---------------|-------------|--------------------------------------------------------------------|
+| P1 (uplink)   | promiscuous | VID_P — the primary VLAN itself; a promiscuous port has no secondary |
+| A1, A2        | community   | VID_C1                                                              |
+| B1            | community   | VID_C2                                                              |
+| I1, I2        | isolated    | VID_I — one shared isolated VLAN, which is what makes the denial surprising |
+

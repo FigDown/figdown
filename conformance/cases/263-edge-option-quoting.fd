@@ -1,0 +1,10 @@
+figdown 0.1 block
+# `RULE-POSITION-ENUMERATION`: `parseEdgeLine` has its own scanner and therefore its own
+# copies of the genre gate, the layout-zone gate and the retired-key sweep.
+# It never got a copy of the enum check, so `edge` was the one directive on
+# which a quoted `style=` parsed. The quoting is reported before the value,
+# the same order `badOpts` uses.
+node a "A"
+node b "B"
+edge a -> b style="dashed"
+edge a -> b style="zzz"

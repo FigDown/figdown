@@ -1,0 +1,25 @@
+figdown 0.1 table
+# `RULE-POSITION-ENUMERATION`: RULE 2.4's COMPLEMENT, and it is what stops 2.3 and 2.4
+# disagreeing at the table `width` position. Where a value comes from an OPEN
+# VALUE SPACE — a number, a point, a percentage, a range — redundant quotes
+# are INERT and legal: the model below is byte-identical to the one the bare
+# spellings produce. `index=`'s inertness is normative and load-bearing here
+# (core §12.7, §9 `INDEX-RANGE-STEP`).
+# `auto` and `*` are the two WORD-shaped spellings inside otherwise-numeric
+# grammars; they stay inert deliberately, SYNTAX-STYLE §8.6.
+table t "T"
+| A | B |
+|---|---|
+| 1 | 2 |
+width "auto",90
+cell "(1,1)" fill=#fee2e2
+figdown 0.1 bitfield
+bitfield bf "H" numbering=msb0
+field "A" "8"
+field "B" 8 index="0..7"
+field "C" "*"
+figdown 0.1 block
+node n1 "N1"
+group g "G" gap="4"
+layout
+pin n1 at="(40,40)" width="90"

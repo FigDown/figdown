@@ -1,0 +1,7 @@
+# Normative twin of 251-edge-labels-three-positions (that case is topology /
+# experimental genre). Same edge-label surface under `block` so the main
+# standard pins tail / mid / head without relying on an experimental header.
+figdown 0.1 block
+node sw1 "ToR-1"
+node sw2 "ToR-2"
+edge sw1 [e1/1] -[100G]-> [e1/2] sw2

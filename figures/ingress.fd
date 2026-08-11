@@ -1,0 +1,18 @@
+# FigDown — figures as text. Spec: https://github.com/FigDown/figdown
+
+figdown 0.1 block
+title "Ingress datapath (excerpt)"
+group ing "Ingress Pipeline"
+node mac "MAC RX" in=ing
+node parser "Parser" in=ing
+node l2 "L2 Lookup" in=ing
+node l3 "L3 Lookup" in=ing fill=#d1fae5
+node acl "ACL" in=ing
+node mmu "MMU / Buffer"
+flow right
+edge mac -> parser
+edge parser -> l2
+edge l2 -[L3 hit]-> l3
+edge l2 -[miss]-> acl style=dashed
+edge l3 -> mmu
+edge acl -> mmu

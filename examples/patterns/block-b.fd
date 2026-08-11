@@ -1,0 +1,48 @@
+# FigDown — figures as text. Spec: https://github.com/FigDown/figdown
+
+figdown 0.1 block
+title "Sibling groups with cross-tier feedback edges"
+
+# A subsystem group and a store group side by side (v0.1 nesting is one
+# level: nodes in groups), plus a separate process tier below.  Colored
+# feedback edges cross the tiers in opposite directions:
+#   subsystem group { unit C } · store group { unit A, unit B }
+#   process tier { process X, process Y, interrupt node }
+#   edge C -> process X  (down-path)
+#   edge process X -> unit B  (feedback, up-path)
+#   edge process Y -> interrupt  (cross-process trigger)
+#   edge interrupt -> unit C  (feedback, up-path, dashed)
+
+group outer "Subsystem A"
+
+group inner "Store Group"
+node unit-a "Unit A" in=inner
+node unit-b "Unit B" in=inner
+
+node unit-c "Unit C" in=outer
+
+node in-port  "in"  shape=rounded
+node out-port "out" shape=rounded
+
+group procs "Process Tier"
+node proc-x "Process X" in=procs fill=#bfdbfe
+node intr   "Interrupt"  in=procs fill=#fca5a5 shape=rounded
+node proc-y "Process Y"  in=procs fill=#bfdbfe
+
+flow right
+rank unit-a,unit-b
+rank proc-x,intr,proc-y
+
+edge in-port  -> unit-c
+edge unit-c   -> out-port
+edge unit-c -[ref]-> proc-x
+edge unit-c -[ptr]-> unit-a
+edge proc-x -[feedback]-> unit-b style=dashed
+edge proc-y   -> intr
+edge intr -[interrupt]-> unit-c style=dashed
+edge proc-y -[up-path]-> unit-c
+
+layout
+# Pin in/out ports to left and right margins so they flank the main cluster.
+pin in-port  at=(20,180)
+pin out-port at=(550,180)

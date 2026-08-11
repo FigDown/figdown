@@ -1,0 +1,9 @@
+figdown 0.1 timing
+# `TIMING-LANE-ALPHABET`: the lane digits 2-9 left the closed alphabet.
+# WaveDrom reads them as "value with color N" — the SAME brick as `=`,
+# needing a data entry — while FigDown drew the digit as the box label
+# and consumed none. Both signal lines below used to parse clean.
+# The fix is `=` per data cell, named in order: x..=.=.x  data=cfg,val
+timing w "retired lane digits"
+signal data x..=3=5x
+signal bits 01019...

@@ -1,0 +1,15 @@
+figdown 0.1 bitfield
+# `PRESENCE-CONDITION-EXPRESSION`: `present=` is a TRI-STATE, parallel to `class ""` (`CLASS-EMPTY-MEANING`)
+# and to the label tri-state (`EMPTY-LABEL-STATE`).
+#   key ABSENT    no presence claim — NOT an assertion that the field is
+#                 always present
+#   present=""    conditional; condition NOT stated (the author claimed
+#                 nothing, and an agent MUST NOT invent one)
+#   present="…"   conditional; condition stated, as opaque authored prose
+# The value is syntactically mandatory: there is no bare form.
+bitfield hdr "Presence tri-state" word=32 numbering=msb0
+field "Always" 8
+field "Maybe" 8 present=""
+field "IfC" 16 present="C = 1"
+field "Compact and line-wide" 32 present="the K bit is set" description="the key is available on the compact form too, where it is LINE-wide"
+field a:8,b:8,c:8,d:8 present="S = 1"

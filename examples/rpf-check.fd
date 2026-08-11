@@ -1,0 +1,68 @@
+# FigDown — figures as text. Spec: https://github.com/FigDown/figdown
+
+# Reverse-path-forwarding check — a small figure that reads RIGHT TO LEFT.
+#
+# What this figure probes: four constructs that had no demonstrator anywhere in
+# the corpus before this release. They are gathered into one small document on
+# purpose — a capability needs A demonstrator, not a document of its own.
+#
+#   1. `flow left`   — the reverse direction. Twelve figures in this corpus use
+#                      `flow right` and twelve use `flow down`; `left` and `up`
+#                      had none, so half of the enum was untested by any figure.
+#   2. `\"` escape   — a literal double quote INSIDE a quoted label.
+#   3. `#` inside a  — a `[...]` region is verbatim (`VERBATIM-REGION-SCOPE`): the
+#      bracketed        comment mark loses its meaning inside one, so an edge
+#      edge label       label may carry a `#` without quoting or escaping it.
+#   4. a NEGATIVE   — `at=` is canvas px and the origin is not a wall. A pin may
+#      `at=` pin        sit at a negative coordinate; the engine translates the
+#                       whole scene so the canvas still starts at (0,0).
+#
+# The subject fits the direction: an RPF check runs BACKWARDS along the path a
+# packet arrived on, so a figure that reads right to left is the honest layout,
+# not a stunt. That is the test for `flow left` in real use — if reversing the
+# reading order does not say something about the subject, use `flow right`.
+figdown 0.1 block
+title "RPF check on a multicast join"
+
+class fail "RPF failure — the packet arrived on an interface that is not the route back to the source" stroke=#b91c1c style=dashed
+
+# The source is on the RIGHT because the check walks back TOWARDS it.
+external src "from 198.51.100.7"
+# `\n` (a line break) and `\\` (a literal backslash) are the other two escapes
+# the grammar defines — core §11 lists exactly three, and all three are in this
+# file. The interface filter is a regex, which is where a backslash occurs
+# naturally in a network figure rather than as a demonstration of itself.
+node rx "Ingress ge-0/0/1\nfilter ge-0/0/\\d+" shape=rounded
+node lookup "Unicast RIB lookup" shape=box
+# The escape `\"` puts a literal double quote inside a quoted label. The label
+# is one token to the parser either way — the quotes delimit it, the backslash
+# says "this quote is data".
+node verdict "Arrived on the \"upstream\" interface?" shape=diamond
+node accept "Accept and forward" shape=rounded
+node drop "Drop (RPF fail)" shape=rounded class=fail
+
+# `#` inside a bracketed edge label. Before `VERBATIM-REGION-SCOPE` this needed quoting, because
+# the comment scanner ran before the label scanner and ate the rest of the line;
+# the ruling made a verbatim region protect EVERY mark, not just the one that
+# earned the rule. So `[VRF #7]` is four characters of label, not a comment.
+edge src -[VRF #7]-> rx
+edge rx -> lookup
+edge lookup -[next-hop ge-0/0/1]-> verdict
+edge verdict -[yes]-> accept
+edge verdict -[no]-> drop class=fail
+
+# `left` is the whole point of this document: the scene's flow axis runs from
+# the source on the right back to the verdict on the left. One `flow` line per
+# document (a second is a line error) — direction is a property of the figure.
+flow left
+rank accept,drop
+
+# Layout zone: geometry only, no meaning. Strip it and the figure still says
+# the same thing (`GUI-WRITEBACK-STRUCTURE`).
+layout
+# A negative coordinate. `at=` is canvas px, and the canvas origin is a
+# reference point, not a wall: this nudge places the two verdict outcomes
+# above the main axis, and the engine shifts the whole scene so the rendered
+# canvas still begins at (0,0). Nothing is clipped and no other pin has to be
+# rewritten to compensate.
+pin drop at=(-30,0)

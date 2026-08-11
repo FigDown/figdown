@@ -1,0 +1,12 @@
+figdown 0.1 table
+table t "T"
+| A | B |
+|---|---|
+| 1 | 2 |
+width auto
+width auto,12em
+table u "U"
+| C |
+|---|
+| 3 |
+width 12em

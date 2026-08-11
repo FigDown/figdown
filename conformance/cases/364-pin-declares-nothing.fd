@@ -1,0 +1,9 @@
+# A `pin` line carrying none of at=, width= and height= declares nothing,
+# so it is a line error rather than a weaker constraint (`ELEMENT-GEOMETRY-DIRECTIVE`). The second
+# line pins that the extent keys resolve their id like every other
+# reference: an id that names nothing is an error, never a synthesized
+# element (§12.4 rule 8).
+figdown 0.1 block
+node a "A"
+pin a
+pin ghost width=10

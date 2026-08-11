@@ -1,0 +1,6 @@
+figdown 0.1 block
+node a "A" kind=decision
+node b "B" kind=terminator
+node c "C" kind=datastore
+node d "D" kind=switch
+node e "E" kind=router

@@ -1,0 +1,15 @@
+figdown 0.1 bitfield
+# `RULE-POSITION-ENUMERATION`: `step` is RESERVED inside an index= range. `INDEX-RANGE-STEP` filed
+# `index="0..7 step 2"` as a v0.2 extension needing "no new key and no
+# migration" — but a prose <last> accepted any non-empty text, so that
+# spelling was already a LEGAL document with the model {first:0,
+# last:"7 step 2"}. Shipping the meaning later would have changed what an
+# existing document MEANS, and no engine could separate prose that reads like
+# a step clause from an author who meant the extension: the `color=` failure
+# shape. An extension is free only when its syntax is RESERVED, not merely
+# unused. The trigger is a BARE lowercase `step` token in the prose <last>.
+bitfield b "Header" numbering=msb0
+field "Base" 8
+field "S" 8 index="0..7 step 2"
+field "T" 8 index="0..N step 2"
+field "U" 8 index="0..end step"

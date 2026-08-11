@@ -1,0 +1,13 @@
+# `FLOWCHART-ROLE-KEYWORDS` / `GENRE-NAMESPACE` `GENRE-NAMESPACE`: `process`, `decision` and `terminator` belong to the
+# `flowchart` keyword namespace and to no other. The header genre's allowlist
+# is what enforces it — no per-keyword code — so the diagnostic is the same
+# "not allowed in genre X" a scene keyword gets inside `bitfield`. Multi-
+# section (`MULTI-FIGURE-DOCUMENTS`): one file, four headers, four allowlists.
+figdown 0.1 block
+decision q "Header valid?"
+figdown 0.1 topology
+process p "Forward"
+figdown 0.1 bitfield
+terminator t "Done"
+figdown 0.1 flowchart
+decision q "Header valid?"

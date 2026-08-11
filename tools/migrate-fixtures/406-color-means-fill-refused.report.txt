@@ -1,0 +1,1 @@
+  L2  [color-means-fill-refused] --color-means=fill REFUSED: this file also writes fill=, a key that did not exist while color= meant the FILL — so this color= cannot have meant the FILL, and rewriting it to fill= would turn a coloured LABEL into a coloured BOX. Re-run with --color-means=text, or classify the file by hand. (MIGRATIONS)

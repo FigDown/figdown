@@ -1,0 +1,5 @@
+Line 3: class meaning must be quoted: class hot "Hot" — whitespace also separates positionals, so a bare token cannot express a phrase (MIGRATIONS)
+Line 4: plane label must be quoted: plane l1 "Overlay" — whitespace also separates positionals, so a bare token cannot express a phrase (MIGRATIONS)
+Line 5: node label must be quoted: node a "Cache" — whitespace also separates positionals, so a bare token cannot express a phrase (MIGRATIONS)
+Line 7: group label must be quoted: group g "Store" — whitespace also separates positionals, so a bare token cannot express a phrase (MIGRATIONS)
+Line 8: external label must be quoted: external e "External" — whitespace also separates positionals, so a bare token cannot express a phrase (MIGRATIONS)

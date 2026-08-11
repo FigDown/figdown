@@ -1,0 +1,8 @@
+figdown 0.1 block
+# The ambiguous report with EVIDENCE, and the branch that names it. No
+# --color-means, so color= is unclassified and nothing is rewritten — but the
+# file is not silent about which reading it supports: it also writes fill=,
+# which the FILL reading cannot account for. The message says so and names
+# the flag that is left, which is the same deduction refusal (a) makes when
+# --color-means=fill is passed (fixture 406).
+node a "A" color=#ffffff fill=#0f172a

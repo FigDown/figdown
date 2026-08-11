@@ -1,0 +1,23 @@
+# FigDown — figures as text. Spec: https://github.com/FigDown/figdown
+
+figdown 0.1 bitfield
+# Multi-word descriptor/entry — four 32-bit words, lsb0 numbering (ruler 31..0)
+title "Multi-Word Descriptor Pattern"
+
+bitfield descriptor "Multi-Word Descriptor" word=32 numbering=lsb0
+# Word 0: identifier in upper half + flag cluster + small type code in low bits
+field "TYPE" 4
+field FB:1,FA:1  # FB=FLAG_B FA=FLAG_A
+field "Reserved" 10
+field "FIELD_A" 16
+break
+# Word 1: wide bitmap/trace field across upper bits + small reserved in lower bits
+field "Reserved" 8
+field "FIELD_B" 24
+break
+# Word 2: two medium-width fields covering the full word
+field "FIELD_D" 16
+field "FIELD_C" 16
+break
+# Word 3: full-word payload/data slot (variable length shown as one unit)
+field "DATA" * description="variable-length payload; one unit shown as representative row"

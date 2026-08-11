@@ -1,0 +1,69 @@
+{
+  "header": {
+    "version": "0.1",
+    "genre": "topology"
+  },
+  "flow": "right",
+  "classes": [],
+  "planes": [
+    {
+      "id": "base",
+      "z": 0
+    }
+  ],
+  "nodes": [
+    {
+      "id": "a",
+      "label": "A",
+      "shape": "box",
+      "plane": "base",
+      "line": 7
+    },
+    {
+      "id": "b",
+      "label": "B",
+      "shape": "box",
+      "plane": "base",
+      "line": 8
+    },
+    {
+      "id": "c",
+      "label": "C",
+      "shape": "box",
+      "plane": "base",
+      "line": 9
+    }
+  ],
+  "groups": [],
+  "edges": [
+    {
+      "a": "b",
+      "op": "<-",
+      "b": "a",
+      "plane": "base",
+      "line": 10
+    },
+    {
+      "a": "c",
+      "op": "<-",
+      "b": "b",
+      "plane": "base",
+      "line": 11
+    }
+  ],
+  "ranks": [],
+  "pins": [],
+  "thresholds": [],
+  "bands": [],
+  "bundles": [
+    {
+      "id": "x",
+      "label": "Members as written",
+      "members": [
+        "b--a"
+      ],
+      "line": 12
+    }
+  ],
+  "regions": []
+}

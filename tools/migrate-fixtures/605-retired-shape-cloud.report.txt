@@ -1,0 +1,1 @@
+  L2  [retired-shape] shape=cloud is retired (`SHAPE-ENUM-VOCABULARY`) — NON-MECHANICAL: shape=ellipse keeps the drawing, but move the meaning into the label (+ a class), or use a group; a callout has no v0.1 replacement (`NON-GRAPH-ANNOTATION-NODE`)

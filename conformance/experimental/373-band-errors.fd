@@ -1,0 +1,12 @@
+figdown 0.1 block
+group g "G"
+band "R" 35..15% in=g
+band "R" 15% in=g from=0 to=15
+band "R" 15%
+band "R" 15% in=g extend=diagonal
+band "R" 15..15% in=g
+band "R" 15% in=ghost
+# 0.1 (`BAND-LABEL-STATUS`): the label is mandatory and quoted, and comes first
+band 15% in=g
+# `RANGE-SPELLING`: the hyphen range is RETIRED — one range grammar, `..`.
+band "R" 15-35% in=g

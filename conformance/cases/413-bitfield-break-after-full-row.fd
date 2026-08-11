@@ -1,0 +1,12 @@
+figdown 0.1 bitfield
+# The legal neighbour of 412: a field that ends exactly on the row
+# edge still counts as the preceding field of that row, so the
+# row-closing `break` idiom keeps parsing.
+bitfield b "Rows" word=16 numbering=lsb0
+field "first" 16
+break
+field "second" 8
+field "third" 8
+break
+field "rest" *
+break

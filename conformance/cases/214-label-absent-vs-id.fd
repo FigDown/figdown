@@ -1,0 +1,18 @@
+figdown 0.1 block
+plane over
+node a
+node b "b"
+group g
+group h "h"
+node c "C" in=g
+external x
+edge a -> c
+bundle bl a--c
+bitfield hdr numbering=lsb0
+field "ver" 4
+table t
+| A | B |
+|---|---|
+| 1 | 2 |
+timing w
+signal clk 0101

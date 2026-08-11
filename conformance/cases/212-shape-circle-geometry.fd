@@ -1,0 +1,14 @@
+# Shape geometry, circle (engine backlog 14/16; DISCREPANCIES `SHAPE-AWARE-GEOMETRY`).
+# A circle is drawn with rx=ry=w/2, so a multi-line label needs a diameter
+# of at least the label box's diagonal — max(w,h) is not enough and the text
+# crosses the curve. Diagonal edges must land on the curve too. Parse model
+# unaffected; tools/shape-check.js asserts the geometry.
+figdown 0.1 block
+node hub "Route\nreflector\nRR1\ncore\nsite" shape=circle
+node p1 "Peer 1"
+node p2 "Peer 2"
+edge p1 -> hub
+edge hub -> p2
+pin p1 at=(20,20)
+pin hub at=(200,140)
+pin p2 at=(400,20)

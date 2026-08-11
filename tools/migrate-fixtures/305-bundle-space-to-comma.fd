@@ -1,0 +1,8 @@
+figdown 0.1 block
+node a "A"
+node b "B"
+node c "C"
+node d "D"
+edge a -> b
+edge c -> d
+bundle t "Link" a--b c--d

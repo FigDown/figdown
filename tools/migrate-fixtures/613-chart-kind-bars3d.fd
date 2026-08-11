@@ -1,0 +1,6 @@
+figdown 0.1 table
+table t "T"
+| X | V |
+|---|---|
+| r1 | 1 |
+chart t kind=bars3d

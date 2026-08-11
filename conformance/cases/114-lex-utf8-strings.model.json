@@ -1,0 +1,46 @@
+{
+  "header": {
+    "version": "0.1",
+    "genre": "block"
+  },
+  "title": "中文標題 CJK",
+  "flow": "right",
+  "classes": [],
+  "planes": [
+    {
+      "id": "base",
+      "z": 0
+    }
+  ],
+  "nodes": [
+    {
+      "id": "a",
+      "label": "路徑與標籤",
+      "shape": "box",
+      "plane": "base",
+      "line": 3
+    },
+    {
+      "id": "b",
+      "label": "line1\nline2",
+      "shape": "box",
+      "plane": "base",
+      "line": 4
+    },
+    {
+      "id": "c",
+      "label": "quote \" and \\ backslash",
+      "shape": "box",
+      "plane": "base",
+      "line": 5
+    }
+  ],
+  "groups": [],
+  "edges": [],
+  "ranks": [],
+  "pins": [],
+  "thresholds": [],
+  "bands": [],
+  "bundles": [],
+  "regions": []
+}

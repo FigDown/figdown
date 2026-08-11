@@ -1,0 +1,3 @@
+Line 10: ";" is reserved for a future statement separator and has no meaning in v0.1 — write one directive per line; a literal ";" belongs inside a quoted string, an [edge label] or a comment (MIGRATIONS)
+Line 11: ";" is reserved for a future statement separator and has no meaning in v0.1 — write one directive per line; a literal ";" belongs inside a quoted string, an [edge label] or a comment (MIGRATIONS)
+Line 9: ";" is reserved for a future statement separator and has no meaning in v0.1 — write one directive per line; a literal ";" belongs inside a quoted string, an [edge label] or a comment (MIGRATIONS)

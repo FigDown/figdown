@@ -1,0 +1,8 @@
+figdown 0.1 block
+# REFUSAL (b): --color-means=text asserts the file was written in
+# an earlier release, where color= set the LABEL. A file carrying a
+# pre-0.1 spelling cannot be that file, and deleting its color= would
+# silently discard a FILL. The older spellings still migrate; color= does not.
+node a "A" color=#dbeafe
+boundary e "Upstream"
+edge a -> e

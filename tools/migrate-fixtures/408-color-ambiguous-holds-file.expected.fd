@@ -1,0 +1,10 @@
+figdown 0.1 block
+# The DEFAULT invocation, and the one the hold matters most for. With no
+# --color-means the tool cannot classify color=, so it must not migrate
+# anything else either: `boundary` → `external` and `w=` → `width=` are the
+# very spellings refusal (b) reads to decide the file is too old to be a
+# pre-release document. Apply them here and a later --color-means=text run
+# has nothing left to refuse — it deletes a FILL and reports success.
+node a "A" color=#dbeafe
+boundary e "Upstream"
+edge a -> e

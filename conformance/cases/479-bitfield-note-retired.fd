@@ -1,0 +1,10 @@
+figdown 0.1 bitfield
+# `DESCRIPTION-KEY-SPELLING`: the option key `note=` became `description=` (IEEE
+# 1685-2022's spelling; SystemRDL's `desc` is barred by RULE 4.2 as an
+# abbreviation). The spelling left the LANGUAGE, so the diagnostic fires
+# wherever it appears — the `w=`/`h=`/`unit=` placement test (RULE 6.2).
+# The reason is the collision ahead: `ANNOTATION-LOCATOR-SPLIT` files `note` as the highest-demand
+# v0.2 annotation construct, and that one will be a DRAWN callout.
+bitfield hdr "Header" word=32 numbering=msb0
+field "A" 16 note="the retired spelling"
+field "B" 16 description="the live spelling"

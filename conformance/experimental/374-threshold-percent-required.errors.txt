@@ -1,0 +1,1 @@
+Line 4: threshold needs offset=<0..100>% (with the % sign)

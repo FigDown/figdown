@@ -1,0 +1,101 @@
+{
+  "header": {
+    "version": "0.1",
+    "genre": "block"
+  },
+  "title": "Mixed Composition",
+  "flow": "right",
+  "classes": [],
+  "planes": [
+    {
+      "id": "base",
+      "z": 0
+    }
+  ],
+  "nodes": [
+    {
+      "id": "a",
+      "label": "Ingress",
+      "shape": "box",
+      "plane": "base",
+      "line": 3
+    },
+    {
+      "id": "b",
+      "label": "Parser",
+      "shape": "box",
+      "plane": "base",
+      "line": 4
+    }
+  ],
+  "groups": [],
+  "edges": [
+    {
+      "a": "a",
+      "op": "->",
+      "b": "b",
+      "plane": "base",
+      "line": 5
+    }
+  ],
+  "ranks": [],
+  "pins": [],
+  "thresholds": [],
+  "bands": [],
+  "bundles": [],
+  "regions": [
+    {
+      "genre": "bitfield",
+      "id": "h",
+      "label": "Header",
+      "word": 32,
+      "numbering": "lsb0",
+      "fields": [
+        {
+          "name": "Ver",
+          "width": 4,
+          "line": 7
+        },
+        {
+          "name": "Len",
+          "width": 12,
+          "line": 8
+        }
+      ],
+      "line": 6
+    },
+    {
+      "genre": "table",
+      "id": "t",
+      "label": "Stats",
+      "heads": [
+        [
+          {
+            "v": "K"
+          },
+          {
+            "v": "V"
+          }
+        ]
+      ],
+      "aligns": [
+        "none",
+        "none"
+      ],
+      "rows": [
+        {
+          "cells": [
+            {
+              "v": "pkts"
+            },
+            {
+              "v": "42"
+            }
+          ],
+          "line": 12
+        }
+      ],
+      "line": 9
+    }
+  ]
+}

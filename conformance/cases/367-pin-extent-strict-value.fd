@@ -1,0 +1,7 @@
+figdown 0.1 block
+node a "A"
+pin a width=12em
+pin a width=120abc
+pin a width=-50
+pin a width=0
+pin a width=1e3

@@ -1,0 +1,177 @@
+{
+  "sections": [
+    {
+      "header": {
+        "version": "0.1",
+        "genre": "table"
+      },
+      "flow": "right",
+      "classes": [],
+      "planes": [
+        {
+          "id": "base",
+          "z": 0
+        }
+      ],
+      "nodes": [],
+      "groups": [],
+      "edges": [],
+      "ranks": [],
+      "pins": [],
+      "thresholds": [],
+      "bands": [],
+      "bundles": [],
+      "regions": [
+        {
+          "genre": "table",
+          "id": "t",
+          "label": "T",
+          "heads": [
+            [
+              {
+                "v": "A"
+              },
+              {
+                "v": "B"
+              }
+            ]
+          ],
+          "aligns": [
+            "none",
+            "none"
+          ],
+          "rows": [
+            {
+              "cells": [
+                {
+                  "v": "1"
+                },
+                {
+                  "v": "2"
+                }
+              ],
+              "line": 13
+            }
+          ],
+          "width": {
+            "widths": [
+              "auto",
+              {
+                "px": 90
+              }
+            ],
+            "line": 14
+          },
+          "marks": [
+            {
+              "row": 1,
+              "col": 1,
+              "fill": "#fee2e2",
+              "line": 15
+            }
+          ],
+          "line": 10
+        }
+      ]
+    },
+    {
+      "header": {
+        "version": "0.1",
+        "genre": "bitfield"
+      },
+      "flow": "right",
+      "classes": [],
+      "planes": [
+        {
+          "id": "base",
+          "z": 0
+        }
+      ],
+      "nodes": [],
+      "groups": [],
+      "edges": [],
+      "ranks": [],
+      "pins": [],
+      "thresholds": [],
+      "bands": [],
+      "bundles": [],
+      "regions": [
+        {
+          "genre": "bitfield",
+          "id": "bf",
+          "label": "H",
+          "word": 32,
+          "numbering": "msb0",
+          "fields": [
+            {
+              "name": "A",
+              "width": 8,
+              "line": 3
+            },
+            {
+              "name": "B",
+              "width": 8,
+              "index": {
+                "first": 0,
+                "last": 7
+              },
+              "line": 4
+            },
+            {
+              "name": "C",
+              "width": "*",
+              "line": 5
+            }
+          ],
+          "line": 2
+        }
+      ]
+    },
+    {
+      "header": {
+        "version": "0.1",
+        "genre": "block"
+      },
+      "flow": "right",
+      "classes": [],
+      "planes": [
+        {
+          "id": "base",
+          "z": 0
+        }
+      ],
+      "nodes": [
+        {
+          "id": "n1",
+          "label": "N1",
+          "shape": "box",
+          "plane": "base",
+          "line": 2
+        }
+      ],
+      "groups": [
+        {
+          "id": "g",
+          "label": "G",
+          "gap": 4,
+          "line": 3
+        }
+      ],
+      "edges": [],
+      "ranks": [],
+      "pins": [
+        {
+          "id": "n1",
+          "x": 40,
+          "y": 40,
+          "width": 90,
+          "line": 5
+        }
+      ],
+      "thresholds": [],
+      "bands": [],
+      "bundles": [],
+      "regions": []
+    }
+  ]
+}

@@ -1,0 +1,50 @@
+# FigDown — figures as text. Spec: https://github.com/FigDown/figdown
+
+figdown 0.1 topology
+# ARP address resolution (RFC 826): Host A needs the MAC for B's IP.
+# A broadcasts "who-has", B replies unicast, A caches the mapping.
+# The broadcast vs unicast distinction is a CLASS (meaning in the label,
+# dashed is only its presentation, `PRESENTATION-AS-MEANING-CARRIER`) — presentation is never the sole
+# carrier. "The rest of the LAN" is an external, not an invented node.
+#
+# HONEST LIMIT (guide/expressing.md "strict message ordering"): step order rides on
+# the 1/2 label ordinals, a naming convention; the sequence genre
+# (`FLOWCHART-GENRE-DESIGN`, v0.2) will make it first-class. The cache update is a local
+# action on A, not a message — it rides on the reply label and the prose
+# (mode 3: figure + prose are one deliverable), not on a self-edge.
+title "ARP Resolution"
+
+# Semantic classes: delivery scope. Label = MEANING; dashed = presentation
+# only; the legend derives automatically (spec §2.7, `PRESENTATION-AS-MEANING-CARRIER`).
+class bcast "Broadcast — delivered to every host on the LAN (dst MAC ff:ff:ff:ff:ff:ff)" stroke=#dc2626 style=dashed
+class ucast "Unicast — delivered only to the requester (dst MAC = A's MAC)" stroke=#16a34a
+
+node a "Host A\nwants MAC for B's IP"
+node b "Host B\nowns the target IP"
+
+# Every other station on the segment hears the broadcast but is outside the
+# resolution proper: an external, drawn as an open edge end (spec §2.8).
+external lan "rest of the LAN\n(hosts C, D, ...)"
+
+flow right
+
+# Step 1: A broadcasts the request to the whole segment. The same broadcast
+# reaches every other station too; they ignore it (short label — detail here
+# and in the showcase prose).
+edge a -[1: who-has B?  (broadcast)]-> b class=bcast
+edge a -[1: heard, ignored]-> lan class=bcast
+
+# Step 2: B replies to A directly (unicast); on receipt A caches the
+# IP -> MAC binding — a local action on A, stated on the label, not a message.
+edge b -[2: B is at aa:bb:cc:...  A caches it]-> a class=ucast
+
+# Hybrid panels: a second figdown section below (multi-section `MULTI-FIGURE-DOCUMENTS`),
+# not nested under the scene header. Each section has one genre (`GENRE-KEYWORD-ALLOWLIST`).
+
+# --- panel: separate genre section (main-standard hybrid = multi-section `MULTI-FIGURE-DOCUMENTS`) ---
+figdown 0.1 table
+table cache "Host A's ARP cache — before and after the exchange"
+| Moment             | Entry                                   |
+|--------------------|-----------------------------------------|
+| before the exchange| (no entry for B's IP)                   |
+| after segment 2    | B's IP → aa:bb:cc:... , learned from the reply |

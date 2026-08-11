@@ -1,0 +1,1 @@
+Line 6: "wide:40" is wider than word=32 — a compact item must fit one row; write it in the classic form to span rows: field "wide" 40

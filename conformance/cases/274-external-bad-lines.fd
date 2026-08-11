@@ -1,0 +1,9 @@
+# external takes <id> ["label"] and nothing else: extra positionals and
+# any option key but plane= are line errors
+figdown 0.1 block
+external ok "fine"
+external
+external e1 "label" extra
+external e2 fill=#fff
+external e3 shape=box
+external e4 nonsense=1

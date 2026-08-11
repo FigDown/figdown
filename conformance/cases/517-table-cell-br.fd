@@ -1,0 +1,6 @@
+figdown 0.1 table
+table t "T"
+| H1 | H2 |
+|----|----|
+| A<br>B | C<br/>D |
+| E<br />F | plain\nnotbreak |

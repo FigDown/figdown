@@ -1,0 +1,66 @@
+{
+  "header": {
+    "version": "0.1",
+    "genre": "block"
+  },
+  "flow": "right",
+  "classes": [],
+  "planes": [
+    {
+      "id": "base",
+      "z": 0
+    }
+  ],
+  "nodes": [
+    {
+      "id": "col",
+      "label": "Column",
+      "shape": "box",
+      "group": "buf",
+      "plane": "base",
+      "line": 3
+    }
+  ],
+  "groups": [
+    {
+      "id": "buf",
+      "label": "Buffer",
+      "line": 2
+    }
+  ],
+  "edges": [],
+  "ranks": [],
+  "pins": [],
+  "thresholds": [],
+  "bands": [
+    {
+      "label": "Reserved",
+      "in": "buf",
+      "from": 0,
+      "to": 15,
+      "extend": "up",
+      "fill": "#a3c93a",
+      "line": 4
+    },
+    {
+      "label": "Share",
+      "in": "col",
+      "from": 15,
+      "to": 35,
+      "extend": "up",
+      "fill": "#e5e7eb",
+      "line": 5
+    },
+    {
+      "label": "Headroom",
+      "in": "buf",
+      "from": 0,
+      "to": 40,
+      "extend": "right",
+      "fill": "#fca5a5",
+      "line": 6
+    }
+  ],
+  "bundles": [],
+  "regions": []
+}

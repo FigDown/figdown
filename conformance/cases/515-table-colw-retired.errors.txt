@@ -1,0 +1,2 @@
+Line 10: colw has been renamed: use width (one lowercase word; the table block scopes it to columns)
+Line 5: colw has been renamed: use width (one lowercase word; the table block scopes it to columns)

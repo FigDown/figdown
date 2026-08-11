@@ -1,0 +1,16 @@
+# FigDown — figures as text. Spec: https://github.com/FigDown/figdown
+
+figdown 0.1 table
+table ta "Group Matrix — two-tier header with label column"
+| Label    | Metric A     || Metric B     ||
+| Label    | v1    | v2    | v1    | v2    |
+|----------|:-----:|:-----:|:-----:|:-----:|
+| Group A  | x     | x     | x     |       |
+| ^^       | x     |       | x     | x     |
+| Group B  | x     | x     |       |       |
+| ^^       |       | x     | x     | x     |
+| Group C  | x     | x     | x     | x     |
+cell (h2,2) fill=#dbeafe
+cell (h2,4) fill=#d1fae5
+cell 1 highlight
+cell 4 highlight

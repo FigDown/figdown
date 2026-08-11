@@ -1,0 +1,10 @@
+figdown 0.1 timing
+timing w "W"
+signal a xxx data=""
+signal b x==x data=A,B,C
+signal c x=x data=a,,b
+signal d ppp
+gap 1.5
+gap 99
+gap 2
+gap 2

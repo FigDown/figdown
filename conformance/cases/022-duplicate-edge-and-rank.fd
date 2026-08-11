@@ -1,0 +1,10 @@
+figdown 0.1 block
+node a "A"
+node b "B"
+node c "C"
+edge a -> b
+edge a -> b
+edge a -[differs only by a label]-> b
+rank a,b
+rank b,c
+rank a,b

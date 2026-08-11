@@ -1,0 +1,11 @@
+# Static err() coverage: "<construct> needs an id"
+figdown 0.1 block
+class
+group
+node
+external
+bitfield
+table
+timing
+bundle
+plane

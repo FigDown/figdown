@@ -1,0 +1,48 @@
+# FigDown — figures as text. Spec: https://github.com/FigDown/figdown
+
+figdown 0.1 bitfield
+# IPv6 header — transcribed from the ASCII diagram in RFC 8200 §3
+# (Deering & Hinden, July 2017), https://www.rfc-editor.org/rfc/rfc8200.txt
+#
+# What this figure probes: a 128-bit field spanning four 32-bit rows.
+#
+# Fidelity rule for this file: it carries EXACTLY the fields RFC 8200 §3
+# draws, and nothing else. Payload and extension headers follow on the wire
+# but sit outside that diagram, so they are not fields here — an extra row
+# would mean the .fd no longer reconstructs back to the RFC one for one.
+title "IPv6 header"
+
+# `numbering=` is REQUIRED and has no default: a defaulted direction would
+# render a ruler asserting something false, and a wrong ruler looks exactly
+# like a right one. `msb0` is the IETF packet convention — bit 0 is the MSB,
+# ruler 0…31 left to right — which is what the "0 1 2 3 / 0 1 2 3 4 5 …"
+# scale above an RFC diagram means. `word=` is the row width in bits.
+bitfield ipv6 "IPv6 Header (RFC 8200 §3)" word=32 numbering=msb0
+
+# Word 0 — 4 + 8 + 20 = 32 bits.
+field "Version" 4 description="4-bit Internet Protocol version number = 6"
+field "Traffic Class" 8 description="RFC 8200 §7; carries DSCP and ECN (RFC 2474, RFC 3168)"
+field "Flow Label" 20 description="RFC 8200 §6, RFC 6437"
+
+# Word 1 — 16 + 8 + 8 = 32 bits.
+field "Payload Length" 16 description="octets of payload after this 40-octet header; any extension headers count as payload"
+field "Next Header" 8 description="8-bit selector, same values as the IPv4 Protocol field (IANA protocol numbers)"
+field "Hop Limit" 8 description="decremented by one per forwarding node; the packet is discarded at zero"
+
+# Words 2–5, then words 6–9. 128 is wider than `word=32`, so each address
+# spans FOUR rows automatically and is still ONE field — and
+# it DRAWS as one: a single box, no rules between the four rows, the name
+# written once. RFC 8200 §3 draws the same fact by joining the four rows with
+# `+` rules instead of `+-+-+` bit rules, and this figure is that convention
+# in SVG. Splitting an address into four 32-bit pieces would assert four
+# fields on the wire that do not exist.
+#
+# The drawing is a courtesy; the `.fd` is the machine-readable truth either
+# way. A reading agent takes the count off the `field` line — one field, 128
+# bits — never off the picture, so it answers "how wide is the source address"
+# identically whether the engine drew four joined rows or one tall box.
+field "Source Address" 128 fill=#dbeafe description="128-bit address of the originator of the packet"
+field "Destination Address" 128 fill=#dbeafe description="128-bit address of the intended recipient; possibly not the ultimate recipient, if a Routing header is present"
+
+# 4+8+20 + 16+8+8 + 128 + 128 = 320 bits = the fixed 40 octets of RFC 8200 §3.
+# Every width is in the text, so a reader checks that sum without the picture.

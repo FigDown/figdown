@@ -1,0 +1,4 @@
+figdown 0.1 bitfield
+bitfield h "H" unit=16 numbering=lsb0
+field "A" 8
+field "B" 8

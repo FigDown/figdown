@@ -1,0 +1,6 @@
+Line 10: unknown color "below" (#hex or CSS color name)
+Line 12: unknown option "below="
+Line 13: unknown target "ghost" for threshold
+Line 4: threshold needs a quoted "<label>" first
+Line 5: threshold needs in=<node-or-group-id>
+Line 6: threshold needs offset=<0..100>% (with the % sign)

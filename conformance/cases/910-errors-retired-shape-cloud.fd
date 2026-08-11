@@ -1,0 +1,13 @@
+figdown 0.1 block
+# 0.1: the shape VALUE `cloud` is retired. It was the only member of
+# a purely geometric enum that named a DOMAIN (the internet cloud), which is
+# what `SHAPE-ENUM-VOCABULARY`/`EXTERNAL-EDGE-ENDPOINTS` forbid the language to bind; under the three-way disposition
+# rule (`CONSTRUCT-STATUS-TIERS`) a construct judged wrong is deleted, not demoted. A retired
+# spelling must name its migration entry (PROCESS §5(d)), so the value keeps
+# a diagnostic exactly as the retired option KEYS do (`904-errors-retired-
+# keywords`, `905-errors-retired-color-option`). This case pins the message,
+# and pins that the named diagnostic beats the generic `unknown shape`.
+node a "Network" shape=cloud
+# an unregistered value that was never registered still gets the generic
+# message, whose enum text is now six values, not seven.
+node b "B" shape=hexagon

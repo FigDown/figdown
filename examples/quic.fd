@@ -1,0 +1,49 @@
+# FigDown — figures as text. Spec: https://github.com/FigDown/figdown
+
+figdown 0.1 bitfield
+
+# QUIC Long Header — Initial Packet
+# RFC 9000 §17.2 / §17.2.2
+# Each row is 32 bits, MSB-0 numbering (bit 0 at left).
+
+# Six of this header's fields are VARIABLE-length on the wire and v0.1 has no
+# RANGE width (`BITFIELD-RANGE-WIDTH`): three connection-id/token regions and three varints.
+# Until this release they carried invented widths (24, 24, 24, 8, 16, 16) with
+# nothing in the model to say so, and `note="padded to 24 bits for display"`
+# — a renderer's excuse in a channel that does not draw. The `*` budget is one
+# per block and it is spent on Payload, so the honest move available in v0.1
+# is to DECLARE the fabrication: the real extent goes in the label, and the
+# class meaning (which IS in the model, §12.7) says the number is a drawn
+# placeholder rather than a width.
+class varlen "Width is VARIABLE on the wire; the declared width is a drawn placeholder — read the real extent from the label, never from this figure's widths"
+
+bitfield quic_initial "QUIC Long Header — Initial Packet (RFC 9000)" word=32 numbering=msb0
+
+# ── Byte 0: First Byte (8 bits) ──────────────────────────────────────────────
+# Abbreviated labels for 1-bit/2-bit cells (each cell is 1/32 of row width):
+#   H=Header Form  F=Fixed Bit  PT=Long Packet Type  Rs=Reserved  PN=Pkt Num Len
+field H:1,F:1,PT:2,Rs:2,PN:2
+break
+
+# ── Version (32 bits) ────────────────────────────────────────────────────────
+field "Version" 32 fill=#dbeafe description="0x00000001 = QUIC v1"
+
+# ── Destination Connection ID ─────────────────────────────────────────────────
+field "DCID Length" 8
+field "Destination Connection ID (0-160 bits, 0-20 octets)" 24 class=varlen description="length is carried in the preceding DCID Length field — RFC 9000 §17.2"
+
+# ── Source Connection ID ──────────────────────────────────────────────────────
+field "SCID Length" 8
+field "Source Connection ID (0-160 bits, 0-20 octets)" 24 class=varlen description="length is carried in the preceding SCID Length field — RFC 9000 §17.2"
+
+# ── Token (Initial packets only) ─────────────────────────────────────────────
+field "Token Length (8/16/32/64 bits, varint)" 8 present="Initial packets only" class=varlen description="RFC 9000 §16: a variable-length integer is 1, 2, 4 or 8 octets"
+field "Token (variable)" 24 present="Initial packets only" class=varlen description="length is carried in the preceding Token Length field — RFC 9000 §17.2.2"
+
+# ── Length + Packet Number ────────────────────────────────────────────────────
+field "Length (8/16/32/64 bits, varint)" 16 class=varlen description="RFC 9000 §16: a variable-length integer is 1, 2, 4 or 8 octets"
+field "Packet Number (8-32 bits, 1-4 octets)" 16 fill=#d1fae5 class=varlen description="length is 1 + the two-bit Packet Number Length in the first byte — RFC 9000 §17.2"
+
+# ── Payload ───────────────────────────────────────────────────────────────────
+break
+field "Payload" * description="protected"

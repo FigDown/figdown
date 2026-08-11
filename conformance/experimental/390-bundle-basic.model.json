@@ -1,0 +1,80 @@
+{
+  "header": {
+    "version": "0.1",
+    "genre": "topology"
+  },
+  "flow": "right",
+  "classes": [],
+  "planes": [
+    {
+      "id": "base",
+      "z": 0
+    }
+  ],
+  "nodes": [
+    {
+      "id": "bd24a",
+      "label": "Leaf-A",
+      "shape": "box",
+      "plane": "base",
+      "line": 2
+    },
+    {
+      "id": "bd24b",
+      "label": "Leaf-B",
+      "shape": "box",
+      "plane": "base",
+      "line": 3
+    },
+    {
+      "id": "srv",
+      "label": "Server",
+      "shape": "box",
+      "plane": "base",
+      "line": 4
+    }
+  ],
+  "groups": [],
+  "edges": [
+    {
+      "a": "bd24a",
+      "op": "--",
+      "b": "srv",
+      "plane": "base",
+      "line": 5
+    },
+    {
+      "a": "bd24b",
+      "op": "--",
+      "b": "srv",
+      "plane": "base",
+      "line": 6
+    }
+  ],
+  "ranks": [],
+  "pins": [],
+  "thresholds": [],
+  "bands": [],
+  "bundles": [
+    {
+      "id": "es1",
+      "label": "ES-1 / LAG-1",
+      "members": [
+        "bd24a--srv",
+        "bd24b--srv"
+      ],
+      "stroke": "#0ea5e9",
+      "line": 7
+    },
+    {
+      "id": "es2",
+      "label": "ES-2",
+      "members": [
+        "bd24a--srv",
+        "bd24b--srv"
+      ],
+      "line": 14
+    }
+  ],
+  "regions": []
+}

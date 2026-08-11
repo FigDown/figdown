@@ -1,0 +1,21 @@
+# `FLOWCHART-ROLE-KEYWORDS`: the flowchart role vocabulary. `process`, `decision` and
+# `terminator` are `node` with a `role` field; the SHAPE is DERIVED from the
+# role (process->box, decision->diamond, terminator->rounded) and appears in
+# the model as the resolved value, exactly as `node`'s materialized default
+# does. The role shares the node id namespace and is addressable by edge,
+# rank and pin like any node.
+figdown 0.1 flowchart
+title "Roles"
+terminator start "Begin"
+process     step "Do the work"
+decision    gate "Continue?"
+terminator  stop "End"
+flow down
+rank step,gate
+edge start -> step
+edge step -> gate
+edge gate -[yes]-> stop
+edge gate -[no]-> step
+layout
+pin start at=(10,10)
+pin step width=90 height=30

@@ -1,0 +1,173 @@
+---
+name: figdown
+description: Create and maintain documentation figures as FigDown .fd text files with deterministic SVG artifacts embedded in Markdown. Use when asked to create, edit, fix, or read diagrams/figures in docs — block and architecture diagrams, topologies, flowcharts, bit-level layouts (packet headers, hardware registers), tables, timing waveforms — or when a .md contains an SVG with a "source: *.fd" footer.
+---
+
+# FigDown — figures as text, one source, two readers
+
+A figure lives as a `.fd` text file (single source of truth). The SVG is a
+deterministic build artifact for human eyes; **you read the `.fd` for meaning —
+never OCR the SVG**. Structure (nodes, edges, fields, rows) is the content;
+placement and colour are presentation whose only job is rendering stability.
+
+**Choose the form that communicates best.** Three modes: (1) prose, list or
+table alone for linear facts, values or procedures — do not draw; (2) a figure
+alone when it is self-contained; (3) figure + prose, the common case — the
+figure carries structure and relationships, the surrounding prose carries the
+detail. When the answer involves a figure, author one. When it does not, do
+not draw out of habit. The `.fd` must carry everything the rendered figure
+conveys, and no more is owed.
+
+**Mode 3 has an authoring consequence:** if the figure is the outline, do not
+cram the whole story into it. Keep labels short and leave the detail to the
+host document. Overstuffed labels are the visible symptom of an author making
+the figure do prose's job.
+
+## Workflow
+
+1. Edit or create `X.fd` (never edit an `.svg`). A new file opens with the
+   spec provenance line, verbatim, then the header — see *The document
+   skeleton* below.
+2. Build + validate: `node <this-skill-dir>/build-svg.js X.fd`
+   Errors come as `Line N: message` — fix and rerun until `OK`. Titles are not
+   drawn by default (Markdown supplies the caption); `--with-title` opts in.
+3. Embed in Markdown — the SVG only, never `.fd` content:
+
+   ```markdown
+   ![Ingress datapath](figures/ingress.svg)
+
+   <sub>source: [figures/ingress.fd](figures/ingress.fd)</sub>
+   ```
+
+4. Keep `X.fd` and `X.svg` side by side, same basename; commit both.
+
+If a `.fd` is missing, its `.svg` carries the source verbatim, the SHA-256 of
+that source and the engine version that rendered it, in
+`<metadata id="figdown-source" data-sha256="…" data-engine-version="…">`.
+Recover from there. On hash mismatch the `.fd` is truth: rebuild. If the hash
+matches but your drawing differs, compare `data-engine-version` — that is the
+other half of "same source → same SVG".
+
+## Load only what you need
+
+This file is the whole genre-independent language. **Everything else is one
+lookup away, and the lookup is mechanical:** line 1 of a `.fd` names its genre,
+so you know which file you need before you need it.
+
+<!-- skill-coverage: router -->
+
+| Genre on line 1 | Load | Add only for EXPERIMENTAL constructs |
+|---|---|---|
+| `block` — architecture, dataflow, hierarchy | `reference/scene.md`, `reference/layout.md` | `reference/experimental/constructs.md` |
+| `bitfield` — packet headers, register layouts | `reference/bitfield.md` | — |
+| `table` — config, state, memory maps | `reference/table.md` | `reference/experimental/constructs.md` |
+| `topology` | `reference/scene.md`, `reference/layout.md` | `reference/experimental/topology.md`, `reference/experimental/constructs.md` |
+| `flowchart` | `reference/scene.md`, `reference/layout.md` | `reference/experimental/flowchart.md`, `reference/experimental/constructs.md` |
+| `timing` | — | `reference/experimental/timing.md` |
+
+Two more files answer a **task** rather than a genre:
+
+- **Reading a `.fd` someone else wrote, to summarise or answer from it** →
+  `reference/reading.md`. It is the contract for what you may conclude and
+  what you must not infer, and it is all you need: a reader can skip every
+  genre file above.
+- **Transcribing an existing figure** — a drawing, a screenshot, another
+  format → `reference/transcribe.md`.
+
+Pick the genre by what the figure IS, not by its subject: the left-hand
+column above says what each is for. Prefer the first three — they are the
+portable ones.
+
+## The document skeleton
+
+The grammar is **CLOSED**: an unknown line is an error, never ignored. Five
+keywords — `figdown`, `title`, `class`, `layout`, `pin` — mean the same thing
+under every genre and no genre may redefine them. Everything else belongs to a
+genre.
+
+```figdown
+# FigDown — figures as text. Spec: https://github.com/FigDown/figdown
+                            # ^ FIRST LINE of every document you write.
+                            # Verbatim, em dash included. It is a comment:
+                            # the parser ignores it. It is there because the
+                            # file travels — into a wiki, a ticket, a pasted
+                            # message — and tells whoever meets it there what
+                            # the format is and where it is defined.
+figdown 0.1 block           # REQUIRED first significant line; comments and
+                            # blanks may precede it. The genre is REQUIRED.
+                            # A later `figdown 0.1 <genre>` starts a new
+                            # section with its own genre; one file still
+                            # renders to one SVG.
+title "Some Title"          # optional; the quotes are REQUIRED
+# comments start with '#'; inside quotes the only escapes are \n \" \\
+class hot "Congested path" stroke=#dc2626   # meaning + style, declared once
+```
+
+**Quotes mark a STRING, and nothing else.** Every label is quoted, at every
+position that has one — `title "TCP Header"`, `class c "meaning"`, and the
+label of every block opener — because whitespace also separates arguments, so
+a bare token cannot hold a phrase. Everything that is *not* a string is bare:
+ids and references (`class=hot`), and every value drawn from a fixed list of
+spellings (`style=dashed`, and the header's own `figdown 0.1 <genre>`).
+Quoting one of those is a line error. Quoting a NUMBER or a point is not:
+`width="90"` and `at="(1,2)"` are legal and mean exactly what the bare forms
+mean.
+
+**`class` is how meaning survives.** Colour and shape alone assert nothing a
+reader can recover: a `class` states the meaning in text and the legend draws
+itself from it. Anything you want a reader to *conclude* goes in a label or a
+class meaning — never in a colour alone. A class with an empty meaning
+(`class c ""`) deliberately claims nothing.
+
+**Two paint channels, SVG's own**, legal on any element that has them:
+
+| Key | What it paints |
+|---|---|
+| `fill=` | the **interior** of a shape — `#rgb`, `#rrggbb`, a CSS colour name, or `transparent` |
+| `stroke=` | the **outline** of a shape, and the **whole** of a line |
+| `style=` | `solid` \| `dashed` \| `dotted` |
+| `class=` | one or more declared class ids, comma-separated: `class=hot,legacy` |
+
+A line — an edge, a marker, a ring — has no interior, so `fill=` on one is an
+error naming `stroke=`. There is **no label-colour key**: a label's colour is
+derived from the background it sits on, so light text lands on dark fills by
+itself.
+
+**`layout` and `pin`** are the layout zone. Everything from a `layout` line
+down is geometry that exists only to stabilise the `.svg`: it carries no
+meaning, no genre may put its own semantics inside it, and `pin` is the only
+directive legal there. Skip the zone when reading; see `reference/layout.md`
+when writing.
+
+## Portability: two statuses, and the parser tells you nothing
+
+Every keyword, option key and genre is either **NORMATIVE** (NORMATIVE — inside the
+v0.1 conformance surface and its compatibility promise) or **EXPERIMENTAL**
+(EXPERIMENTAL — the engine accepts it and your document keeps working, but it is
+outside both, and may change or be withdrawn in a later `0.x`).
+
+**The parser never warns**, so a line that parses tells you nothing about its
+status — this is the only signal you get. Everything reachable *only* through
+the right-hand column of the router is EXPERIMENTAL: use it when the figure needs
+it, and say so beside the figure.
+
+**Hybrid figures** (a scene and a table in one artifact): start a second
+section with its own `figdown 0.1 <genre>` header rather than nesting one
+genre's block inside another's.
+
+## Do not invent syntax
+
+If something seems missing, compose it from what exists or tell the user.
+Retired spellings are hard errors whose message names the replacement — read
+the error instead of guessing around it.
+
+## Maintaining a document written against an older version
+
+Line 1 pins the version, so never mix syntax generations in one file. When the
+language moves, a **NORMATIVE** construct ships a mechanical rewrite rule and
+you upgrade by applying the rules in order. An **EXPERIMENTAL** one carries no
+such promise: it may be withdrawn with nothing that does what it did, in which
+case the tooling reports and cannot rewrite, and a human decides what the
+figure should say instead.
+
+Full spec and docs: https://github.com/FigDown/figdown

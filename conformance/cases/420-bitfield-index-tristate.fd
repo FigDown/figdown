@@ -1,0 +1,26 @@
+figdown 0.1 bitfield
+# `BITFIELD-REPETITION-CONSTRUCT`: `index=` is a TRI-STATE, the same shape as `present=`
+# (`PRESENCE-CONDITION-EXPRESSION`) and `class ""` (`CLASS-EMPTY-MEANING`).
+#   key ABSENT      no repetition claim — NOT an assertion of one occurrence
+#   index=""        it repeats; nothing about the indices is stated
+#   index=0..7      DETERMINATE: 8 elements, and every later field's declared
+#                   offset stays computable
+#   index=53..0     determinate and descending — 54 elements; `first > last`
+#                   carries descent with no separate key
+#   index="0..X"    the last index is opaque prose, so the count is not in
+#                   the document and later offsets are indeterminate
+# DETERMINACY IS DECIDED BY PARSING BOTH ENDS, NEVER BY QUOTING: RULE 2.3
+# makes quotes inert here, so index="0..7" is determinate exactly as
+# index=0..7 is. The model records an OBJECT so a reader can tell the two
+# apart without touching the author's prose — `last` a number means
+# determinate, `last` a string means it is not.
+title "Repetition tri-state"
+bitfield hdr "Index tri-state" word=32 numbering=msb0
+field "Never repeats" 8
+field "Repeats" 8 index=""
+field "Descending" 16 index=53..0
+break
+field "Literal run" 32 index=0..7
+field "Quoted literal run" 32 index="0..7"
+field "Prose last index" 32 index="0..Last Entry"
+field "Whitespace is not significant" 32 index="0 .. 7"

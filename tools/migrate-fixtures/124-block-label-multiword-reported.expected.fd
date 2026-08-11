@@ -1,0 +1,8 @@
+# 0.1 (`RULE-POSITION-ENUMERATION`): a bare MULTI-WORD block label is reported, not rewritten
+# — `table t My Caption` has two readings ("My Caption", or "My" plus a
+# surplus argument) and only the author knows which.
+figdown 0.1 table
+table t My Caption
+| A | B |
+|---|---|
+| 1 | 2 |

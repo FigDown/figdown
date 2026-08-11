@@ -1,0 +1,4 @@
+Line 3: class= must not be empty
+Line 4: class= must not contain empty members
+Line 5: duplicate option "class=" on one line
+Line 6: ids are bare and match [A-Za-z_][A-Za-z0-9_-]* — text with spaces or punctuation belongs in the label: node <id> "your text"

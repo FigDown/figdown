@@ -1,0 +1,43 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 288 250" width="288" height="250" font-family="system-ui,sans-serif"><defs><marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#555"/></marker><pattern id="hatch" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><line x1="0" y1="0" x2="0" y2="6" stroke="#bbb" stroke-width="2"/></pattern></defs><g transform="translate(18,6)"><line data-edge="23" x1="40.7059105359513" y1="55.68626805176439" x2="44.6659105359513" y2="99.68626805176439" stroke="#555" stroke-width="1.6"/><line data-edge="27" x1="37.6940894640487" y1="100.31373194823561" x2="33.7340894640487" y2="56.31373194823561" stroke="#555" stroke-width="1.6"/><path data-edge="31" d="M21.36 56 L-3.22 82.649 Q-10 90 -10 100 L-10 136 Q-10 146 -1.686 151.557 L41.526 180.443 Q49.84 186 57.369 179.419 L88.071 152.581 Q95.6 146 95.6 136 L95.6 100 Q95.6 90 87.573 84.036 L49.84 56" fill="none" stroke="#555" stroke-width="1.6"/><path data-edge="35" d="M25.68 136 L25.68 154 Q25.68 164 35.68 164 L49.92 164 Q59.92 164 59.92 154 L59.92 136" fill="none" stroke="#555" stroke-width="1.6"/><g data-node="locked" data-x="0" data-y="20" style="cursor:move"><rect x="0" y="20" width="71.2" height="36" fill="#e0e7ff" stroke="#8a8880"/><text x="35.6" y="42.55" font-size="13" text-anchor="middle" fill="#1d1d1b">LOCKED</text></g><g data-node="unlocked" data-x="0" data-y="100" style="cursor:move"><rect x="0" y="100" width="85.6" height="36" fill="#e0e7ff" stroke="#8a8880"/><text x="42.8" y="122.55" font-size="13" text-anchor="middle" fill="#1d1d1b">UNLOCKED</text></g><text x="49.161110535951295" y="86.26626805176438" font-size="11" text-anchor="start" fill="#fff" stroke="#fff" stroke-width="3" stroke-linejoin="round">coin</text><text x="49.161110535951295" y="86.26626805176438" font-size="11" text-anchor="start" fill="#555">coin</text><path d="M44.6659105359513 99.68626805176439 L38.18490566751064 90.14881682540164 L49.3398193825548 89.14487459104765 z" fill="#555" stroke="none"/><text x="4.189289464048699" y="86.89373194823561" font-size="11" text-anchor="start" fill="#fff" stroke="#fff" stroke-width="3" stroke-linejoin="round">push</text><text x="4.189289464048699" y="86.89373194823561" font-size="11" text-anchor="start" fill="#555">push</text><path d="M33.7340894640487 56.31373194823561 L40.21509433248936 65.85118317459836 L29.060180617445198 66.85512540895235 z" fill="#555" stroke="none"/><text x="35.599999999999994" y="180.25" font-size="11" text-anchor="middle" fill="#fff" stroke="#fff" stroke-width="3" stroke-linejoin="round">push</text><text x="35.599999999999994" y="180.25" font-size="11" text-anchor="middle" fill="#555">push</text><path d="M49.839999999999996 56 L61.27092600295816 57.516684118363074 L54.59122910861302 66.50677029145818 z" fill="#555" stroke="none"/><text x="42.8" y="158.25" font-size="11" text-anchor="middle" fill="#fff" stroke="#fff" stroke-width="3" stroke-linejoin="round">coin</text><text x="42.8" y="158.25" font-size="11" text-anchor="middle" fill="#555">coin</text><path d="M59.919999999999995 136 L65.52 146.08 L54.31999999999999 146.08 z" fill="#555" stroke="none"/><rect x="0" y="223" width="16" height="11" fill="#e0e7ff" stroke="#555"/><text x="21" y="232.5" font-size="11" fill="#1d1d1b">A mode of the turnstile mechanism</text></g><metadata id="figdown-source" data-sha256="a40f5ec7863eb420825dc8817ddbe1bda236e45e8edbea12349641c76c171f09" data-engine-version="0.1.0"><![CDATA[
+# FigDown — figures as text. Spec: https://github.com/FigDown/figdown
+
+# Classic teaching FSM: subway turnstile (Hopcroft/Ullman-style example).
+# Interim spelling: figdown 0.1 block (portable). Planned genre: statechart
+# (decisions/registry.md) — not registered in the engine yet.
+#
+# Authoring style: short canvas labels; multi-line human notes as # lines
+# (Markdown-like editing — do not pack the whole story into mid labels).
+figdown 0.1 block
+title "Turnstile statechart (classic FSM)"
+
+class mode "A mode of the turnstile mechanism" fill=#e0e7ff
+
+# ── states ──────────────────────────────────────────────────────────
+node locked "LOCKED" class=mode
+# Barrier locked. Coin is accepted; pushing the arm does nothing useful.
+
+node unlocked "UNLOCKED" class=mode
+# Barrier free for one passage. A second coin is kept (or ignored);
+# push returns the machine to LOCKED.
+
+# ── transitions ─────────────────────────────────────────────────────
+edge locked -[coin]-> unlocked
+# trigger: coin
+# effect: unlock barrier (one fare)
+
+edge unlocked -[push]-> locked
+# trigger: push (person passes)
+# effect: relock barrier
+
+edge locked -[push]-> locked
+# trigger: push while locked
+# effect: none (stay locked) — self-loop
+
+edge unlocked -[coin]-> unlocked
+# trigger: extra coin while unlocked
+# effect: none / farebox keeps coin — self-loop
+
+flow right
+rank locked,unlocked
+
+]]></metadata></svg>

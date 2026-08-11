@@ -1,0 +1,17 @@
+# `ELEMENT-GEOMETRY-DIRECTIVE`: `pin` carries at=, width= and height= on one line.
+# All three keys are optional and at least one is required, so this case
+# pins every legal combination: all three, position only, extent only,
+# and each extent key alone.
+figdown 0.1 block
+node a "A"
+node b "B"
+node c "C"
+node d "D"
+group g "G"
+node m "M" in=g
+layout
+pin a at=(10,20) width=120 height=60
+pin b width=80
+pin c height=44
+pin d at=(0,0)
+pin g at=(200,0)

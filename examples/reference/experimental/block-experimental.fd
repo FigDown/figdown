@@ -1,0 +1,116 @@
+# FigDown — figures as text. Spec: https://github.com/FigDown/figdown
+
+# Reference figure for genre `block` — EXPERIMENTAL constructs ONLY (`CONSTRUCT-STATUS-TIERS`).
+# Every construct in this file is OUTSIDE the v0.1 conformance surface and
+# OUTSIDE the compatibility promise: the engine accepts it and renders it
+# unchanged, but it may change or be withdrawn in a later 0.x WITHOUT a
+# migration entry. A portable v0.1 block document uses none of it.
+# The normative surface is block.fd — kept separate so a reader can see
+# exactly where the promise ends.
+figdown 0.1 block
+title "Uplink bundle and queue watermarks (experimental constructs)"
+
+# EXPERIMENTAL — `plane`, its `z-index=`, and the `plane=` that references one.
+# Absent z-index= takes the 1-based declaration index (overlay = 1); an explicit
+# z-index= sets only its own line and does not shift its neighbours. The implicit
+# `base` plane (z-index=0) is normative and needs no declaration.
+plane overlay "Annotation plane"
+plane top "Foreground" z-index=5
+# A plane's label has the same three states as any other (`EMPTY-LABEL-STATE`, core §12.3).
+# Written EMPTY is the stacking level that is only a stacking level: it orders
+# ink and names nothing, so it contributes no legend text and the model still
+# records `label: ""` rather than dropping the key. (The implicit `base` plane
+# writes no label at all — that is ABSENCE, and the two are different states.)
+plane grid ""
+
+# `stroke=` (border colour) was EXPERIMENTAL until this release and is now
+# NORMATIVE (`STROKE-KEY-STATUS`); `color=` (label colour) was RETIRED in the same release
+# (`COLOUR-KEY-STATUS`) and v0.1 has no label-colour key at all — the label colour is derived
+# from the fill it sits on (core §5, `LABEL-COLOUR-SOURCE`). Nothing on this line is
+# experimental any more; it is kept because the figure needs the class.
+class watch "Watched queue" fill=#fef3c7 stroke=#b45309
+
+group pool "Egress queues" stroke=#78716c
+node q0 "Q0" in=pool class=watch
+node q1 "Q1" in=pool
+node q2 "Q2" in=pool
+node tor "ToR" plane=overlay stroke=#2563eb
+node sp1 "Spine 1"
+node sp2 "Spine 2"
+external core "to the core"   # an external takes plane= and nothing else (`EXTERNAL-EDGE-ENDPOINTS`/§5)
+
+edge q0 -> tor
+edge q1 -> tor
+edge q2 -> tor
+edge tor -- sp1
+edge tor -- sp2
+edge sp1 -[uplink]-> core plane=top stroke=#0f766e   # all three labels follow the line (`LABEL-COLOUR-SOURCE`)
+
+flow right
+rank q0,q1,q2
+
+# EXPERIMENTAL — `bundle`: names the links that form ONE logical bundle (LAG,
+# Ethernet Segment, port-channel); the renderer derives the dashed ring. The
+# member list is one comma-delimited token; the space form
+# `tor--sp1 tor--sp2` stays accepted. Each member must resolve to a unique edge.
+bundle lag "LAG-1" tor--sp1,tor--sp2 stroke=#0ea5e9 style=dashed plane=overlay
+# A bundle's label is a label like any other, so it too has the empty form
+# (`EMPTY-LABEL-STATE`): the ring says "these links are one link" and the author declines to
+# name the bundle, which is the honest transcription of a source figure that
+# rings two links and prints no name beside them.
+bundle unnamed "" q0--tor,q1--tor
+
+# EXPERIMENTAL — `threshold`: a marker line across the target at a percentage
+# of its height (bottom = 0%). No id: nothing references a threshold. The target
+# is a node or a group; option position is free here too (`OPTION-POSITION-PARSING`). Spelled `guide`
+# until this release (`THRESHOLD-KEYWORD-SPELLING`) — in every vector editor a "guide" is an author-only
+# construction line that is never rendered, so the old name was inverted.
+threshold "80% cap" in=q0 offset=80% stroke=#b91c1c style=dashed
+threshold in=pool offset=50% "half"
+
+# EXPERIMENTAL — `band`: a NAMED range region. The label is mandatory and
+# quoted (`BAND-LABEL-STATUS`) and comes first, exactly as on `threshold`;
+# without it a band asserted nothing a reader could keep, because `fill=` is
+# presentation and §5 forbids meaning riding on colour alone. The range follows:
+# `band "X" 60%` is 0..60%; `band "X" 20..40%` is an explicit range in one
+# token. `..` is the language's ONE range separator (the hyphen form was
+# retired: between two numbers it reads as subtraction).
+# `extend=` picks the measuring axis and its 0% edge (`up` = waterline,
+# `right` = progress bar); it was spelled dir= until this release. One band per
+# axis below so all four values appear — a real figure would share one axis.
+band "Occupied" 60% in=q0 extend=up fill=#bbf7d0
+band "Congested" 20..40% in=q1 extend=down fill=#fecaca stroke=#b91c1c style=dotted
+band "Drained" 30% in=q2 extend=right fill=#bfdbfe
+band "Headroom" 15% in=q2 extend=left fill=#e9d5ff       # bands stack on one target
+
+# EXPERIMENTAL — a nested `timing` REGION inside this scene document (`GENRE-COMPOSITION`, core
+# §4). `bitfield`, `table` and `timing` are the three openers with a region
+# form, and the third is here because the genre itself is experimental: the
+# composition rule is normative, this instance of it is not. Everything from
+# here down to `layout` reads under the `timing` genre — `signal` and `gap` are
+# valid only inside the region, and `node` would be `not valid inside timing`.
+# The caption is written EMPTY (`EMPTY-LABEL-STATE`): the scene above already says what these
+# waveforms belong to, and a composed region that repeats its host's words is
+# the duplication a hybrid figure exists to avoid.
+timing lag_up "" fill=#f8fafc
+signal lacp   0.=.1.......  data=pdu stroke=#0ea5e9
+signal member 0....1......
+
+layout
+# The layout zone's whole vocabulary is `pin` (core `LAYOUT-ZONE-NAMESPACE`). It was three until
+# 0.1: `routing` and `path` were its EXPERIMENTAL half, and this figure
+# was where they were demonstrated — a `routing orthogonal` line and three
+# `path` lines showing a per-edge override, a waypoint list with a stored third
+# coordinate, and the two dock forms. All of it was WITHDRAWN from the language
+# (`EDGE-GEOMETRY-CONSTRUCTS`; spec/migrations.md 0.1, core §9 `EDGE-IDENTITY-AND-GEOMETRY`), so the reference
+# figure no longer teaches it — and nothing replaced it, because nothing does
+# what it did. The edges below draw under auto layout, and this figure scored
+# BETTER for it on tools/layout-lint.js (4 -> 2): the hand geometry had been
+# putting the LAG-1 bundle label under a routed stroke.
+# `pin` is unchanged: `at=` places an element, `width=`/`height=` extend it.
+pin q0 width=84 height=56
+pin q1 width=84 height=56
+pin q2 width=84 height=56
+pin tor width=84 height=48
+pin sp1 at=(350,90)
+pin sp2 at=(350,170)

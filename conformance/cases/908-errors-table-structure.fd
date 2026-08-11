@@ -1,0 +1,9 @@
+# Static err() coverage: pipe / separator / width / cell
+figdown 0.1 table
+table t "T"
+| a | b
+|---|
+| 1 | 2 |
+width
+cell
+cell 1 fill=#fee2e2

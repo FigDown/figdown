@@ -1,0 +1,3 @@
+figdown 0.1 bitfield
+# `BITS-PER-ROW-KEY-NAMING`: `unit=` was renamed `word=`.
+bitfield a "A" numbering=msb0 unit=32

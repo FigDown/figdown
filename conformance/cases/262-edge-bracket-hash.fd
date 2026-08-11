@@ -1,0 +1,13 @@
+figdown 0.1 block
+# `VERBATIM-REGION-SCOPE`: `[ ]` is a verbatim region for `#` too. SYNTAX-STYLE §1
+# names four verbatim regions and `;` has been honoured in all four since
+# 0.1; `#` was honoured in three, because comment stripping ran before
+# edge dispatch and knew nothing about brackets. `edge a -[hop #1]-> b` used
+# to report `unterminated [label]`, and `#1`/`#2` is the natural spelling for
+# hop and sequence numbers in the protocol figures this language targets.
+node a "A"
+node b "B"
+edge a -[hop #1]-> b
+edge a -["hop #2"]-> b
+edge a -[hop #3]-> b   # a real trailing comment still ends the line
+edge a -> b stroke=#0d9488

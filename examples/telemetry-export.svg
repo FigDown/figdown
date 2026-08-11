@@ -1,0 +1,101 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 764 917" width="764" height="917" font-family="system-ui,sans-serif"><defs><marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#555"/></marker><pattern id="hatch" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><line x1="0" y1="0" x2="0" y2="6" stroke="#bbb" stroke-width="2"/></pattern></defs><g transform="translate(18,6)"><line data-edge="43" x1="78" y1="280" x2="78" y2="236" stroke="#555" stroke-width="1.6"/><line data-edge="44" x1="78" y1="200" x2="78" y2="156" stroke="#555" stroke-width="1.6"/><line data-edge="45" x1="131.60000000000002" y1="138" x2="235.2" y2="138" stroke="#b91c1c" stroke-width="1.6" stroke-dasharray="6 4"/><line data-edge="46" x1="292.4" y1="120" x2="292.4" y2="76" stroke="#555" stroke-width="1.6"/><g data-node="sample" data-x="38.8" data-y="200" style="cursor:move"><rect x="38.8" y="200" width="78.4" height="36" rx="14" fill="#fff" stroke="#8a8880" stroke-width="1.8"/><text x="78" y="222.55" font-size="13" text-anchor="middle" fill="#1d1d1b">Sampler</text></g><g data-node="ring" data-x="24.4" data-y="120" style="cursor:move"><rect x="24.4" y="120" width="107.2" height="36" rx="3" fill="#fff" stroke="#b91c1c" stroke-dasharray="6 4"/><line x1="24.4" y1="127" x2="131.6" y2="127" stroke="#b91c1c"/><text x="78" y="142.55" font-size="13" text-anchor="middle" fill="#1d1d1b">Export ring</text></g><g data-node="enc" data-x="235.2" data-y="120" style="cursor:move"><rect x="235.2" y="120" width="114.4" height="36" fill="#fff" stroke="#8a8880"/><text x="292.4" y="142.55" font-size="13" text-anchor="middle" fill="#1d1d1b">gRPC encoder</text></g><text x="84" y="261.3" font-size="11" text-anchor="start" fill="#fff" stroke="#fff" stroke-width="3" stroke-linejoin="round">1 in 2048</text><text x="84" y="261.3" font-size="11" text-anchor="start" fill="#555">1 in 2048</text><path d="M78 236 L83.6 246.08 L72.4 246.08 z" fill="#555" stroke="none"/><path d="M78 156 L83.6 166.08 L72.4 166.08 z" fill="#555" stroke="none"/><text x="183.4" y="132.25" font-size="11" text-anchor="middle" fill="#fff" stroke="#fff" stroke-width="3" stroke-linejoin="round">drop on full</text><text x="183.4" y="132.25" font-size="11" text-anchor="middle" fill="#b91c1c">drop on full</text><path d="M235.2 138 L225.11999999999998 143.6 L225.11999999999998 132.4 z" fill="#b91c1c" stroke="none"/><path d="M292.4 76 L298 86.08 L286.79999999999995 86.08 z" fill="#555" stroke="none"/><text x="78" y="303" font-size="10" text-anchor="middle" fill="#fff" stroke="#fff" stroke-width="3" stroke-linejoin="round">from the forwarding ASIC</text><text x="78" y="303" font-size="10" text-anchor="middle" fill="#555">from the forwarding ASIC</text><text x="292.4" y="60" font-size="10" text-anchor="middle" fill="#fff" stroke="#fff" stroke-width="3" stroke-linejoin="round">to the collector</text><text x="292.4" y="60" font-size="10" text-anchor="middle" fill="#555">to the collector</text><text x="0" y="331" font-size="13" font-weight="600">Per-stage export budget</text><rect x="0" y="339" width="114.4" height="26" fill="#eeede6" stroke="#c9c7bf" data-cell="budget:0:1" style="cursor:pointer"/><text x="57.2" y="356.3" font-size="12" text-anchor="middle" font-weight="600">Stage</text><rect x="114.4" y="339" width="90" height="26" fill="#eeede6" stroke="#c9c7bf" data-cell="budget:0:2" style="cursor:pointer"/><text x="159.4" y="356.3" font-size="12" text-anchor="middle" font-weight="600">Rate (pps)</text><rect x="204.4" y="339" width="90" height="26" fill="#eeede6" stroke="#c9c7bf" data-cell="budget:0:3" style="cursor:pointer"/><text x="249.4" y="356.3" font-size="12" text-anchor="middle" font-weight="600">Drops/min</text><rect x="0" y="365" width="114.4" height="26" fill="#fff" stroke="#c9c7bf" data-cell="budget:1:1" style="cursor:pointer"/><text x="7" y="382.3" font-size="12" text-anchor="start">Sampler</text><rect x="114.4" y="365" width="90" height="26" fill="#fff" stroke="#c9c7bf" data-cell="budget:1:2" style="cursor:pointer"/><text x="197.4" y="382.3" font-size="12" text-anchor="end">12000</text><rect x="204.4" y="365" width="90" height="26" fill="#fff" stroke="#c9c7bf" data-cell="budget:1:3" style="cursor:pointer"/><text x="287.4" y="382.3" font-size="12" text-anchor="end">0</text><rect x="0" y="391" width="114.4" height="26" fill="#fff" stroke="#c9c7bf" data-cell="budget:2:1" style="cursor:pointer"/><text x="7" y="408.3" font-size="12" text-anchor="start">Export ring</text><rect x="114.4" y="391" width="90" height="26" fill="#fff" stroke="#c9c7bf" data-cell="budget:2:2" style="cursor:pointer"/><text x="197.4" y="408.3" font-size="12" text-anchor="end">9600</text><rect x="204.4" y="391" width="90" height="26" fill="#fee2e2" stroke="#c9c7bf" data-cell="budget:2:3" style="cursor:pointer"/><text x="287.4" y="408.3" font-size="12" text-anchor="end">410</text><rect x="0" y="417" width="114.4" height="26" fill="#fff" stroke="#c9c7bf" data-cell="budget:3:1" style="cursor:pointer"/><text x="7" y="434.3" font-size="12" text-anchor="start">gRPC encoder</text><rect x="114.4" y="417" width="90" height="26" fill="#fff" stroke="#c9c7bf" data-cell="budget:3:2" style="cursor:pointer"/><text x="197.4" y="434.3" font-size="12" text-anchor="end">9600</text><rect x="204.4" y="417" width="90" height="26" fill="#fff" stroke="#c9c7bf" data-cell="budget:3:3" style="cursor:pointer"/><text x="287.4" y="434.3" font-size="12" text-anchor="end">0</text><text x="0" y="487" font-size="13" font-weight="600"></text><text x="11.5" y="502" font-size="8.5" text-anchor="middle" fill="#6f6e69">0</text><text x="34.5" y="502" font-size="8.5" text-anchor="middle" fill="#6f6e69">1</text><text x="57.5" y="502" font-size="8.5" text-anchor="middle" fill="#6f6e69">2</text><text x="80.5" y="502" font-size="8.5" text-anchor="middle" fill="#6f6e69">3</text><text x="103.5" y="502" font-size="8.5" text-anchor="middle" fill="#6f6e69">4</text><text x="126.5" y="502" font-size="8.5" text-anchor="middle" fill="#6f6e69">5</text><text x="149.5" y="502" font-size="8.5" text-anchor="middle" fill="#6f6e69">6</text><text x="172.5" y="502" font-size="8.5" text-anchor="middle" fill="#6f6e69">7</text><text x="195.5" y="502" font-size="8.5" text-anchor="middle" fill="#6f6e69">8</text><text x="218.5" y="502" font-size="8.5" text-anchor="middle" fill="#6f6e69">9</text><text x="241.5" y="502" font-size="8.5" text-anchor="middle" fill="#6f6e69">10</text><text x="264.5" y="502" font-size="8.5" text-anchor="middle" fill="#6f6e69">11</text><text x="287.5" y="502" font-size="8.5" text-anchor="middle" fill="#6f6e69">12</text><text x="310.5" y="502" font-size="8.5" text-anchor="middle" fill="#6f6e69">13</text><text x="333.5" y="502" font-size="8.5" text-anchor="middle" fill="#6f6e69">14</text><text x="356.5" y="502" font-size="8.5" text-anchor="middle" fill="#6f6e69">15</text><text x="379.5" y="502" font-size="8.5" text-anchor="middle" fill="#6f6e69">16</text><text x="402.5" y="502" font-size="8.5" text-anchor="middle" fill="#6f6e69">17</text><text x="425.5" y="502" font-size="8.5" text-anchor="middle" fill="#6f6e69">18</text><text x="448.5" y="502" font-size="8.5" text-anchor="middle" fill="#6f6e69">19</text><text x="471.5" y="502" font-size="8.5" text-anchor="middle" fill="#6f6e69">20</text><text x="494.5" y="502" font-size="8.5" text-anchor="middle" fill="#6f6e69">21</text><text x="517.5" y="502" font-size="8.5" text-anchor="middle" fill="#6f6e69">22</text><text x="540.5" y="502" font-size="8.5" text-anchor="middle" fill="#6f6e69">23</text><text x="563.5" y="502" font-size="8.5" text-anchor="middle" fill="#6f6e69">24</text><text x="586.5" y="502" font-size="8.5" text-anchor="middle" fill="#6f6e69">25</text><text x="609.5" y="502" font-size="8.5" text-anchor="middle" fill="#6f6e69">26</text><text x="632.5" y="502" font-size="8.5" text-anchor="middle" fill="#6f6e69">27</text><text x="655.5" y="502" font-size="8.5" text-anchor="middle" fill="#6f6e69">28</text><text x="678.5" y="502" font-size="8.5" text-anchor="middle" fill="#6f6e69">29</text><text x="701.5" y="502" font-size="8.5" text-anchor="middle" fill="#6f6e69">30</text><text x="724.5" y="502" font-size="8.5" text-anchor="middle" fill="#6f6e69">31</text><rect x="0" y="507" width="92" height="30" fill="#fff" stroke="#555"/><text x="46" y="525.85" font-size="11" text-anchor="middle">Version</text><rect x="92" y="507" width="92" height="30" fill="#fff" stroke="#555"/><text x="138" y="525.85" font-size="11" text-anchor="middle">Type</text><rect x="184" y="507" width="552" height="30" fill="#fff" stroke="#555"/><text x="460" y="525.85" font-size="11" text-anchor="middle">Length</text><rect x="0" y="537" width="736" height="30" fill="#fff" stroke="#555"/><text x="368" y="555.85" font-size="11" text-anchor="middle">Observation Domain</text><rect x="0" y="567" width="736" height="30" fill="#fff" stroke="#555"/><text x="368" y="585.85" font-size="11" text-anchor="middle">Records</text><text x="0" y="641" font-size="13" font-weight="600">Per-stage export budget — bar3d</text><polygon points="68,781 8,811 48,831 108,801" fill="#f6f5ef" stroke="#d6d4cc"/><polygon points="53.6,661 68,668.2 68,798.2 53.6,791" fill="#2a5eb1"/><polygon points="68,668.2 82.4,661 82.4,791 68,798.2" fill="#204887"/><polygon points="68,653.8 53.6,661 68,668.2 82.4,661" fill="#3b82f6"/><polygon points="33.60000000000001,697 48,704.2 48,808.2 33.60000000000001,801" fill="#2a5eb1"/><polygon points="48,704.2 62.4,697 62.4,801 48,808.2" fill="#204887"/><polygon points="48,689.8 33.60000000000001,697 48,704.2 62.4,697" fill="#3b82f6"/><polygon points="53.60000000000001,806.5583333333333 68,813.7583333333333 68,818.2 53.60000000000001,811" fill="#188e44"/><polygon points="68,813.7583333333333 82.39999999999999,806.5583333333333 82.39999999999999,811 68,818.2" fill="#136c34"/><polygon points="68,799.3583333333332 53.60000000000001,806.5583333333333 68,813.7583333333333 82.39999999999999,806.5583333333333" fill="#22c55e"/><polygon points="13.600000000000009,707 28,714.2 28,818.2 13.600000000000009,811" fill="#2a5eb1"/><polygon points="28,714.2 42.39999999999999,707 42.39999999999999,811 28,818.2" fill="#204887"/><polygon points="28,699.8 13.600000000000009,707 28,714.2 42.39999999999999,707" fill="#3b82f6"/><text x="51" y="794.5" font-size="10" text-anchor="end" fill="#6f6e69">Sampler</text><text x="31" y="804.5" font-size="10" text-anchor="end" fill="#6f6e69">Export ring</text><text x="11" y="814.5" font-size="10" text-anchor="end" fill="#6f6e69">gRPC encoder</text><text x="19" y="827.5" font-size="10" text-anchor="start" fill="#6f6e69">Rate (pps)</text><text x="39" y="837.5" font-size="10" text-anchor="start" fill="#6f6e69">Drops/min</text><line x1="122" y1="801" x2="122" y2="671" stroke="#8a8880"/><line x1="119" y1="801" x2="125" y2="801" stroke="#8a8880"/><text x="129" y="804.5" font-size="9.5" text-anchor="start" fill="#6f6e69">0</text><line x1="119" y1="736" x2="125" y2="736" stroke="#8a8880"/><text x="129" y="739.5" font-size="9.5" text-anchor="start" fill="#6f6e69">6000</text><line x1="119" y1="671" x2="125" y2="671" stroke="#8a8880"/><text x="129" y="674.5" font-size="9.5" text-anchor="start" fill="#6f6e69">12000</text><rect x="0" y="890" width="16" height="11" fill="#fff" stroke="#b91c1c" stroke-dasharray="6 4"/><text x="21" y="899.5" font-size="11" fill="#1d1d1b">Lossy by design — this stage drops under back-pressure rather than blocking the datapath</text></g><metadata id="figdown-source" data-sha256="a6e18387895c7579624f17b43c9cf8c7590b600ada6c264536d620e57694a302" data-engine-version="0.1.0"><![CDATA[
+# FigDown — figures as text. Spec: https://github.com/FigDown/figdown
+
+# Telemetry export path — the ONE-DOCUMENT hybrid (`GENRE-COMPOSITION`, spec core §4).
+#
+# What this figure probes: a typed region NESTED INSIDE a scene document,
+# with NO second `figdown` header. FigDown has two ways to put a table (or a
+# bitfield, or a timing diagram) next to a box-and-wire figure, and this is
+# the one that had never been demonstrated in the corpus until this release:
+#
+#   `MULTI-FIGURE-DOCUMENTS`, multi-section — the file carries a second `figdown 0.1 table` header
+#     and the table is a SEPARATE DOCUMENT stacked below the first.
+#     See examples/evpn-fabric.fd and examples/pvlan-flows.fd.
+#
+#   `GENRE-COMPOSITION`, nested region (THIS FILE) — one header, one document. A `table`,
+#     `bitfield` or `timing` line opens a region governed by THAT genre's
+#     namespace, and the next top-level directive of the host genre closes
+#     it. No `end` keyword: scope is sticky, exactly as inside a genre's own
+#     document.
+#
+# The difference is not cosmetic. Under `MULTI-FIGURE-DOCUMENTS` the reader gets two documents with
+# two `sections` entries and no relation between them. Under `GENRE-COMPOSITION` it gets ONE
+# document whose region list stands in document order — still no declared
+# relation (that is `CROSS-BLOCK-REFERENCES`, v0.2), but one figure, one title, one artifact.
+# Reach for `GENRE-COMPOSITION` when the panel is PART OF the figure, and for `MULTI-FIGURE-DOCUMENTS` when it is a
+# second figure that merely travels with the first.
+#
+# Composition is NOT inheritance (core §4). This document is `block`, so
+# `node`/`edge`/`class` are its vocabulary; `|` rows, `cell` and `width` are
+# valid ONLY inside the `table` region below, and `field` would be a line
+# error anywhere in this file because no `bitfield` region is open.
+figdown 0.1 block
+title "Telemetry export path"
+
+class lossy "Lossy by design — this stage drops under back-pressure rather than blocking the datapath" stroke=#b91c1c style=dashed
+
+# ── Scene region: the export pipeline itself ─────────────────────────────
+external asic "from the forwarding ASIC"
+node sample "Sampler" shape=rounded
+node ring "Export ring" shape=cylinder class=lossy
+node enc "gRPC encoder" shape=box
+external coll "to the collector"
+
+edge asic -[1 in 2048]-> sample
+edge sample -> ring
+edge ring -[drop on full]-> enc class=lossy
+edge enc -> coll
+
+# `flow up`. The export path climbs OUT of the datapath: the ASIC is at the
+# bottom of the figure because it is at the bottom of the stack, and each
+# stage above it is further from the wire. Twelve figures in this corpus flow
+# `right` and twelve flow `down`; `up` and `left` had no demonstrator at all
+# before this release, so half of a four-value enum went into the freeze
+# untested by any figure. (`left` is in examples/rpf-check.fd.)
+flow up
+rank ring,enc
+
+# ── Nested table region — opens here, still the SAME document ────────────
+# The `table` keyword is in `block`'s top-level namespace precisely so a scene
+# can compose one. Everything from here to the next `block` directive reads
+# under the `table` genre: the `|` rows, `cell` and `width`.
+table budget "Per-stage export budget"
+| Stage        | Rate (pps) | Drops/min |
+|--------------|-----------:|----------:|
+| Sampler      |      12000 |         0 |
+| Export ring  |       9600 |       410 |
+| gRPC encoder |       9600 |         0 |
+# `cell` addresses the region's own grid — the region is a complete figure of
+# its genre, not a degraded fragment of one.
+cell (2,3) fill=#fee2e2
+width auto,90,90
+
+# ── Nested bitfield region — the SECOND composable genre, same document ──
+# `table` is not a special case: `bitfield` and `timing` open a region in a
+# scene document on exactly the same rule, and each is governed by its own
+# genre inside it. `field` is a line error anywhere above this line and legal
+# from here to the next `block` directive.
+#
+# The region's caption is written EMPTY (`EMPTY-LABEL-STATE`). The host figure has already
+# named this thing — it is the record `enc` writes into the export ring — so a
+# caption would repeat it, and the third label state exists precisely so the
+# author can record "none, deliberately" instead of omitting the key and
+# leaving a reader to wonder whether the caption was lost.
+bitfield rec "" word=32 numbering=msb0
+field "Version" 4
+field "Type" 4
+field "Length" 24
+field "Observation Domain" 32
+field "Records" *
+# `chart` is EXPERIMENTAL (core §4.4): it is outside the v0.1 compatibility
+# promise and may change or leave. It reads an existing table by id and draws
+# it, so it needs no data of its own — and it is listed in the `block` and
+# `topology` vocabularies exactly so a scene document can carry one over a
+# table it composed. That row had no demonstrator anywhere in the corpus
+# before this release, which is the whole reason this line is here. Every column
+# after the first must be numeric — a chart plots the numbers, and the label
+# column names the series, so the `Owner` column this table would otherwise
+# carry belongs in a `description` or a second table, not here.
+chart budget type=bar3d
+
+]]></metadata></svg>

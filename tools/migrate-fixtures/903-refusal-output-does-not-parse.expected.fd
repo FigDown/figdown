@@ -1,0 +1,7 @@
+figdown 0.1 bitfield
+# REFUSAL (c). The flag rewrite optional -> present="" would emit a SECOND
+# present= on a line that already has one: "duplicate option". The tool
+# computes the rewrite, parses it, finds an error the input did not have,
+# and writes nothing.
+bitfield h "H" word=32 numbering=lsb0
+field "A" 16 optional present="when the K bit is set"

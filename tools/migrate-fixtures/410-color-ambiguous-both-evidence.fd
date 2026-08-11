@@ -1,0 +1,8 @@
+figdown 0.1 block
+# CONTRADICTORY evidence: fill= rules out the FILL reading and `boundary`
+# rules out the LABEL reading, so no reading accounts for this file and BOTH
+# --color-means values are refused on it (406 and 407 each refuse one). The
+# message must not pick a flag here — there is none to pick.
+node a "A" color=#ffffff fill=#0f172a
+boundary e "Upstream"
+edge a -> e

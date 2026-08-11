@@ -1,0 +1,4 @@
+figdown 0.1 bitfield
+bitfield b numbering=msb0
+field "X" 8
+node a "A"

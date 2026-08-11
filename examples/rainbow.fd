@@ -1,0 +1,31 @@
+# FigDown — figures as text. Spec: https://github.com/FigDown/figdown
+
+figdown 0.1 block
+title "Rainbow rings — line order is the layer"
+
+# Seven concentric ellipses. Earlier lines paint first (bottom), later
+# lines paint on top — the ring effect needs no plane directives at all.
+
+# decorative
+# A rendering demo: the concentric geometry IS the subject (paint order),
+# not knowledge about relationships. Nothing here must survive the strip test.
+
+node red    " " shape=ellipse fill=#ef4444 stroke=#ef4444
+pin  red    at=(20,20) width=560 height=560
+node orange " " shape=ellipse fill=#f97316 stroke=#f97316
+pin  orange at=(60,60) width=480 height=480
+node yellow " " shape=ellipse fill=#facc15 stroke=#facc15
+pin  yellow at=(100,100) width=400 height=400
+node green  " " shape=ellipse fill=#22c55e stroke=#22c55e
+pin  green  at=(140,140) width=320 height=320
+node blue   " " shape=ellipse fill=#3b82f6 stroke=#3b82f6
+pin  blue   at=(180,180) width=240 height=240
+node indigo " " shape=ellipse fill=#6366f1 stroke=#6366f1
+pin  indigo at=(220,220) width=160 height=160
+node violet " " shape=ellipse fill=#a855f7 stroke=#a855f7
+pin  violet at=(260,260) width=80 height=80
+# The white core carries the wordmark, so its box must be the size the text
+# needs: 40x36 centred on (300,300), which is the outline the retired
+# `shape=cloud` used to draw for a 20x20 box (rx=w/2+10, ry=h/2+8).
+node core   "FigDown" shape=ellipse fill=#ffffff stroke=#ffffff
+pin  core   at=(280,282) width=40 height=36

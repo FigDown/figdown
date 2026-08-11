@@ -1,0 +1,49 @@
+{
+  "header": {
+    "version": "0.1",
+    "genre": "block"
+  },
+  "flow": "right",
+  "classes": [],
+  "planes": [
+    {
+      "id": "base",
+      "z": 0
+    }
+  ],
+  "nodes": [
+    {
+      "id": "a",
+      "label": "Named",
+      "shape": "box",
+      "plane": "base",
+      "fill": "teal",
+      "stroke": "black",
+      "line": 2
+    },
+    {
+      "id": "b",
+      "label": "Spacer",
+      "shape": "box",
+      "plane": "base",
+      "fill": "transparent",
+      "line": 3
+    },
+    {
+      "id": "c",
+      "label": "Hex3",
+      "shape": "box",
+      "plane": "base",
+      "fill": "#0d9",
+      "line": 4
+    }
+  ],
+  "groups": [],
+  "edges": [],
+  "ranks": [],
+  "pins": [],
+  "thresholds": [],
+  "bands": [],
+  "bundles": [],
+  "regions": []
+}

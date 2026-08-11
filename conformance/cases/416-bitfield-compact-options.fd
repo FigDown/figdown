@@ -1,0 +1,15 @@
+figdown 0.1 bitfield
+# 0.1: the compact form reads its item list from the OPTION-STRIPPED
+# token stream, so every `field` option is reachable from it — before this the
+# form used by most real bitfield documents could carry no presentation at all,
+# because the option text was re-read from the raw line and failed the item
+# regex. Options are LINE-wide: they apply to every item in the list, exactly
+# as the single option set of the classic form applies to its one field.
+class hdr "Header word"
+bitfield ip "IPv4 word 1" numbering=msb0
+field Version:4,IHL:4 fill=#dbeafe
+field DSCP:6,ECN:2 class=hdr description="RFC 3168 renamed the TOS byte"
+# a name containing spaces is quoted; the option still lands after the list
+field "Total Length":16 fill=#fef9c3
+# option BEFORE the list is equally legal — option position is free (`OPTION-POSITION-PARSING`)
+field stroke=#0f172a Identification:16

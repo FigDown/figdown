@@ -1,0 +1,8 @@
+Line 11: unexpected argument "junk"
+Line 12: timing has no signals
+Line 13: unexpected argument "junk"
+Line 14: unexpected argument "junk"
+Line 1: unexpected argument "junk"
+Line 4: unexpected argument "junk"
+Line 7: unexpected argument "junk"
+Line 8: unexpected argument "junk"

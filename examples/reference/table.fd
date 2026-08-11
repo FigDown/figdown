@@ -1,0 +1,98 @@
+# FigDown — figures as text. Spec: https://github.com/FigDown/figdown
+
+# Reference figure for genre `table` — NORMATIVE surface only (spec/genres/table.md).
+# Every construct here is inside the v0.1 conformance surface and the
+# compatibility promise. Experimental constructs are in table-experimental.fd.
+# The set demonstrates every FORM of every keyword, not just every keyword.
+# Coverage: node tools/reference-coverage.js --normative-only --strict table
+figdown 0.1 table
+title "Egress scheduler profile"
+
+# `class` declares a meaning ONCE; cells join it with class=. Use it rather
+# than a bare fill= whenever the mark MEANS something (`CATEGORICAL-MEANING-MAPPING`): the class label is
+# what a reading agent gets instead of a hex value.
+class review "Re-measured — awaiting sign-off"        fill=#fce7f3
+# A class reaches a CELL through `fill=` and `stroke=` only. `style=` cannot
+# reach one by any route: it left `cell`'s option list (`STYLE-KEY-SCOPE`),
+# and on a class it is silently ignored for cell members while the legend
+# still draws the dash — a swatch for ink no cell can carry
+# (`tools/legend-check.js` is the gate for that).
+class vendor "Vendor default, not from this profile"  stroke=#9333ea
+class capped "Hard ceiling — never oversubscribed"    fill=#dbeafe
+
+table qos "Per-queue scheduling and drop policy"
+# Every pipe row ABOVE the delimiter row is a header tier, addressed h1..hN
+# top-down. `||` is colspan-LEFT: the empty segment merges into the cell on
+# its left, so "Scheduling" covers Class and Weight. It is a line error in the
+# first column, where there is nothing to its left.
+| Queue | Scheduling || Drop      | Notes |
+# `^^` is rowspan-UP. It is a line error in the very first row (nothing above
+# to merge into) and in the first DATA row (a span never crosses the delimiter
+# row), but legal BETWEEN header tiers — which is what holds Queue and Notes
+# upright across both tiers here.
+| ^^    | Class | Weight | Threshold | ^^ |
+# The delimiter row is REQUIRED (GFM's own term) and is where the header ends
+# and data row 1 begins. Its colons set per-column alignment: `:---` left,
+# `:--:` centre, `---:` right, bare `---` takes the GFM default — data left,
+# headers always centred.
+|:------|:-----:|-------:|:----------|-----|
+# Data rows are 1-based below the delimiter row. `<br>`, `<br/>` and `<br />`
+# are the ONLY in-cell line break, case-insensitive, and become one real
+# newline in the model. `\n` in a pipe cell is two literal characters: a pipe
+# cell is raw GFM text, not a §1 quoted string.
+| Q7 | strict | —  | 100%       | control plane<br>never dropped |
+| Q5 | wfq    | 40 | 80%        | video<BR/>voice |
+# `\^^` at the START of a cell is the literal caret pair and `\|` anywhere in
+# a cell is a literal pipe. Those two are the whole pipe-row escape set — and
+# `\^^` is an escape at cell start only, because that is the only place a bare
+# `^^` would have meant rowspan.
+| Q3 | ^^     | 25 | 80%        | \^^ in the vendor sheet |
+| Q1 | ^^     | 20 | 60% \| 90% | best effort |
+| Q0 | ^^     | 15 | 40%        | scavenger<br />drop first |
+# `width` is ONE whitespace-free comma token, one value per column: `auto`
+# (natural), a bare number (px), or a percentage OF the natural total. A `px`
+# suffix and the retired space form are both line errors, so this spelling and
+# the `width=` option on the layout-zone `pin` share one value grammar.
+width auto,70,60,110,auto
+# Option position is free on every directive (`OPTION-POSITION-PARSING`) — before the address or
+# after. A spanned cell is addressed at its ANCHOR only: `cell (h1,3)` and
+# `cell (3,2)` are line errors here — `||` and `^^` merged those away.
+cell fill=#dbeafe (h1,2)
+cell (h2,4) class=capped
+# `highlight` is the ROW form: a bare row number, no comma, data rows only.
+cell 1 highlight
+# class= takes a comma-separated LIST, applied left to right and later wins
+# per channel; these two touch different channels, so the fill comes from
+# `review` and the outline colour from `vendor`.
+cell (2,5) class=review,vendor
+# `style=` left `cell` (`STYLE-KEY-SCOPE`): a dash on one cell carried no
+# meaning the table did not already carry, 0 documents outside this repository
+# ever wrote it, and it moved with `field`'s removal as one minimum set. So a
+# cell cannot be dashed AT ALL — not directly, and not through a class either.
+# Reach for a fill or an outline colour when a cell must be marked.
+
+# No label written: the model records it ABSENT and the renderer falls back to
+# the id (`OMITTED-LABEL-RECORDING`) — never invent a caption. `fill=` on the block is the default
+# DATA-cell fill; the header tint is structural and is not affected by it.
+table capacity fill=#fafaf9
+| Chassis | Queues per port | Shared buffer |
+|---------|----------------:|--------------:|
+| C1      |               8 |         32 MB |
+| C2      |              16 |         64 MB |
+width auto,45%,45%
+cell (h1,2) class=capped
+
+# The third label state: WRITTEN EMPTY (`EMPTY-LABEL-STATE`). `table capacity` above omits the
+# label and the renderer falls back to the id; `""` here is a decision — this
+# block is captioned by the prose that embeds it, and repeating the caption
+# inside the figure is the duplication `TRANSCRIPTION-FIDELITY-TIERS` warns about. Absent says nothing;
+# `""` says the author looked and chose none. Both are in the model, and a
+# consumer that tests truthiness rather than key presence merges them.
+table rings ""
+# A `#` inside a pipe row is ORDINARY TEXT (core §1). A row is raw GFM content
+# and no comment is stripped anywhere inside it, so `#0` below is a ring number
+# — the same `#` after whitespace on a directive line would open a comment.
+| Port     | Ring #0 | Ring #1 |
+|----------|--------:|--------:|
+| et-0/0/0 |    4096 |    4096 |
+| et-0/0/1 |    2048 |    2048 |

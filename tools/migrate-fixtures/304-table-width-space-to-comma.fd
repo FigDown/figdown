@@ -1,0 +1,6 @@
+figdown 0.1 table
+table t "T"
+| A | B |
+|---|---|
+| 1 | 2 |
+width auto 90

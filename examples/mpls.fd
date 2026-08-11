@@ -1,0 +1,24 @@
+# FigDown — figures as text. Spec: https://github.com/FigDown/figdown
+
+figdown 0.1 bitfield
+# MPLS Label Stack — RFC 3032 §2.1 (two stack entries)
+title "MPLS Label Stack"
+
+bitfield mpls "MPLS Label Stack (RFC 3032)" word=32 numbering=msb0
+
+# --- Stack entry 1 (outermost label, S=0) ---
+field "Label" 20 fill=#dbeafe description="20-bit label value (entry 1)"
+field "TC" 3 description="Traffic Class, formerly EXP"
+field "S" 1 description="Bottom of Stack = 0"
+field "TTL" 8
+break
+
+# --- Stack entry 2 (innermost label, S=1) ---
+field "Label" 20 fill=#dbeafe description="20-bit label value (entry 2)"
+field "TC" 3 description="Traffic Class, formerly EXP"
+field "S" 1 fill=#d1fae5 description="Bottom of Stack = 1"
+field "TTL" 8
+break
+
+# --- Payload ---
+field "Payload (e.g. IP packet)" * description="Variable-length payload follows the label stack"

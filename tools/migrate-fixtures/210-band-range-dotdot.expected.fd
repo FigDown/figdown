@@ -1,0 +1,8 @@
+figdown 0.1 block
+# `RANGE-SPELLING`: `band` moves onto the language's ONE range grammar.
+# The hyphen form reads as subtraction and is a line error.
+group g "G"
+node a "A" in=g
+band "Headroom" 15..35% in=g
+band "Guarantee" 0.5..15.5% in=g extend=down
+band "Reserved" 60% in=g

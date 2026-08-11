@@ -1,0 +1,8 @@
+# 0.1 (`RULE-POSITION-ENUMERATION`): `step` is RESERVED inside an index= range. REPORT ONLY,
+# never rewritten: the tool cannot tell prose that reads like a step clause
+# from an author who meant "every other element", which is the whole reason
+# the spelling was reserved.
+figdown 0.1 bitfield
+bitfield tlv "TLV" numbering=msb0
+field "Type" 8
+field "Entry" 8 index="0..7 step 2"

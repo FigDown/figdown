@@ -1,0 +1,31 @@
+# FigDown — figures as text. Spec: https://github.com/FigDown/figdown
+
+figdown 0.1 topology
+title "Two-tier full-mesh: aggregation tier to access tier"
+
+# Structural pattern abstracted from real topology figures:
+#   - Two aggregation nodes in tier 1 (redundant pair)
+#   - Three access nodes in tier 2
+#   - Every access node connects to BOTH aggregation nodes (full mesh between tiers)
+#   - Port labels on each link endpoint
+
+group agg "Aggregation Tier"
+node a1 "Agg Node 1" shape=rounded fill=#dbeafe in=agg
+node a2 "Agg Node 2" shape=rounded fill=#dbeafe in=agg
+
+group acc "Access Tier"
+node b1 "Access Node 1" in=acc
+node b2 "Access Node 2" in=acc
+node b3 "Access Node 3" in=acc
+
+flow down
+rank a1,a2
+rank b1,b2,b3
+
+# full mesh: every access node uplinks to both aggregation nodes
+edge a1 [p1] -- [p1] b1
+edge a1 [p2] -- [p1] b2
+edge a1 [p3] -- [p1] b3
+edge a2 [p1] -- [p2] b1
+edge a2 [p2] -- [p2] b2
+edge a2 [p3] -- [p2] b3

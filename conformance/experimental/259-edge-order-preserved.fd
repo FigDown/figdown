@@ -1,0 +1,12 @@
+figdown 0.1 topology
+# `bundle` matches a member WITHOUT regard to the order its endpoints were
+# written or the operator that joined them: `b--a` finds `edge b <- a`.
+# A `path` line stood below to make the contrast — it matched its edge AS
+# WRITTEN — and went with the directive (`EDGE-GEOMETRY-CONSTRUCTS`). The property
+# under test here is the bundle rule, and it is unchanged.
+node a "A"
+node b "B"
+node c "C"
+edge b <- a
+edge c <- b
+bundle x "Members as written" b--a

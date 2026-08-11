@@ -1,0 +1,82 @@
+{
+  "header": {
+    "version": "0.1",
+    "genre": "bitfield"
+  },
+  "flow": "right",
+  "classes": [],
+  "planes": [
+    {
+      "id": "base",
+      "z": 0
+    }
+  ],
+  "nodes": [],
+  "groups": [],
+  "edges": [],
+  "ranks": [],
+  "pins": [],
+  "thresholds": [],
+  "bands": [],
+  "bundles": [],
+  "regions": [
+    {
+      "genre": "bitfield",
+      "id": "hdr",
+      "label": "Presence tri-state",
+      "word": 32,
+      "numbering": "msb0",
+      "fields": [
+        {
+          "name": "Always",
+          "width": 8,
+          "line": 11
+        },
+        {
+          "name": "Maybe",
+          "width": 8,
+          "present": "",
+          "line": 12
+        },
+        {
+          "name": "IfC",
+          "width": 16,
+          "present": "C = 1",
+          "line": 13
+        },
+        {
+          "name": "Compact and line-wide",
+          "width": 32,
+          "present": "the K bit is set",
+          "description": "the key is available on the compact form too, where it is LINE-wide",
+          "line": 14
+        },
+        {
+          "name": "a",
+          "width": 8,
+          "present": "S = 1",
+          "line": 15
+        },
+        {
+          "name": "b",
+          "width": 8,
+          "present": "S = 1",
+          "line": 15
+        },
+        {
+          "name": "c",
+          "width": 8,
+          "present": "S = 1",
+          "line": 15
+        },
+        {
+          "name": "d",
+          "width": 8,
+          "present": "S = 1",
+          "line": 15
+        }
+      ],
+      "line": 10
+    }
+  ]
+}

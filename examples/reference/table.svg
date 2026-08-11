@@ -1,0 +1,101 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 519 611" width="519" height="611" font-family="system-ui,sans-serif"><defs><marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#555"/></marker><pattern id="hatch" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><line x1="0" y1="0" x2="0" y2="6" stroke="#bbb" stroke-width="2"/></pattern></defs><g transform="translate(18,6)"><text x="0" y="14" font-size="13" font-weight="600">Per-queue scheduling and drop policy</text><rect x="0" y="22" width="64" height="52" fill="#eeede6" stroke="#c9c7bf"/><text x="32" y="52.3" font-size="12" text-anchor="middle" font-weight="600">Queue</text><rect x="64" y="22" width="130" height="26" fill="#dbeafe" stroke="#c9c7bf"/><text x="129" y="39.3" font-size="12" text-anchor="middle" font-weight="600">Scheduling</text><rect x="194" y="22" width="110" height="26" fill="#eeede6" stroke="#c9c7bf"/><text x="249" y="39.3" font-size="12" text-anchor="middle" font-weight="600">Drop</text><rect x="304" y="22" width="186.4" height="52" fill="#eeede6" stroke="#c9c7bf"/><text x="397.2" y="52.3" font-size="12" text-anchor="middle" font-weight="600">Notes</text><rect x="64" y="48" width="70" height="26" fill="#eeede6" stroke="#c9c7bf" data-cell="qos:0:2" style="cursor:pointer"/><text x="99" y="65.3" font-size="12" text-anchor="middle" font-weight="600">Class</text><rect x="134" y="48" width="60" height="26" fill="#eeede6" stroke="#c9c7bf" data-cell="qos:0:3" style="cursor:pointer"/><text x="164" y="65.3" font-size="12" text-anchor="middle" font-weight="600">Weight</text><rect x="194" y="48" width="110" height="26" fill="#dbeafe" stroke="#c9c7bf" data-cell="qos:0:4" style="cursor:pointer"/><text x="249" y="65.3" font-size="12" text-anchor="middle" font-weight="600">Threshold</text><rect x="0" y="74" width="64" height="39" fill="#fef3c7" stroke="#c9c7bf" data-cell="qos:1:1" style="cursor:pointer"/><text x="7" y="97.8" font-size="12" text-anchor="start">Q7</text><rect x="64" y="74" width="70" height="39" fill="#fef3c7" stroke="#c9c7bf" data-cell="qos:1:2" style="cursor:pointer"/><text x="99" y="97.8" font-size="12" text-anchor="middle">strict</text><rect x="134" y="74" width="60" height="39" fill="#fef3c7" stroke="#c9c7bf" data-cell="qos:1:3" style="cursor:pointer"/><text x="187" y="97.8" font-size="12" text-anchor="end">—</text><rect x="194" y="74" width="110" height="39" fill="#fef3c7" stroke="#c9c7bf" data-cell="qos:1:4" style="cursor:pointer"/><text x="201" y="97.8" font-size="12" text-anchor="start">100%</text><rect x="304" y="74" width="186.4" height="39" fill="#fef3c7" stroke="#c9c7bf" data-cell="qos:1:5" style="cursor:pointer"/><text x="311" y="89.7" font-size="12" text-anchor="start" fill="#1d1d1b"><tspan x="311" dy="0">control plane</tspan><tspan x="311" dy="15.600000000000001">never dropped</tspan></text><rect x="0" y="113" width="64" height="39" fill="#fff" stroke="#c9c7bf" data-cell="qos:2:1" style="cursor:pointer"/><text x="7" y="136.8" font-size="12" text-anchor="start">Q5</text><rect x="64" y="113" width="70" height="130" fill="#fff" stroke="#c9c7bf" data-cell="qos:2:2" style="cursor:pointer"/><text x="99" y="182.3" font-size="12" text-anchor="middle">wfq</text><rect x="134" y="113" width="60" height="39" fill="#fff" stroke="#c9c7bf" data-cell="qos:2:3" style="cursor:pointer"/><text x="187" y="136.8" font-size="12" text-anchor="end">40</text><rect x="194" y="113" width="110" height="39" fill="#fff" stroke="#c9c7bf" data-cell="qos:2:4" style="cursor:pointer"/><text x="201" y="136.8" font-size="12" text-anchor="start">80%</text><rect x="304" y="113" width="186.4" height="39" fill="#fce7f3" stroke="#9333ea" data-cell="qos:2:5" style="cursor:pointer"/><text x="311" y="128.7" font-size="12" text-anchor="start" fill="#1d1d1b"><tspan x="311" dy="0">video</tspan><tspan x="311" dy="15.600000000000001">voice</tspan></text><rect x="0" y="152" width="64" height="26" fill="#fff" stroke="#c9c7bf" data-cell="qos:3:1" style="cursor:pointer"/><text x="7" y="169.3" font-size="12" text-anchor="start">Q3</text><rect x="134" y="152" width="60" height="26" fill="#fff" stroke="#c9c7bf" data-cell="qos:3:3" style="cursor:pointer"/><text x="187" y="169.3" font-size="12" text-anchor="end">25</text><rect x="194" y="152" width="110" height="26" fill="#fff" stroke="#c9c7bf" data-cell="qos:3:4" style="cursor:pointer"/><text x="201" y="169.3" font-size="12" text-anchor="start">80%</text><rect x="304" y="152" width="186.4" height="26" fill="#fff" stroke="#c9c7bf" data-cell="qos:3:5" style="cursor:pointer"/><text x="311" y="169.3" font-size="12" text-anchor="start">^^ in the vendor sheet</text><rect x="0" y="178" width="64" height="26" fill="#fff" stroke="#c9c7bf" data-cell="qos:4:1" style="cursor:pointer"/><text x="7" y="195.3" font-size="12" text-anchor="start">Q1</text><rect x="134" y="178" width="60" height="26" fill="#fff" stroke="#c9c7bf" data-cell="qos:4:3" style="cursor:pointer"/><text x="187" y="195.3" font-size="12" text-anchor="end">20</text><rect x="194" y="178" width="110" height="26" fill="#fff" stroke="#c9c7bf" data-cell="qos:4:4" style="cursor:pointer"/><text x="201" y="195.3" font-size="12" text-anchor="start">60% | 90%</text><rect x="304" y="178" width="186.4" height="26" fill="#fff" stroke="#c9c7bf" data-cell="qos:4:5" style="cursor:pointer"/><text x="311" y="195.3" font-size="12" text-anchor="start">best effort</text><rect x="0" y="204" width="64" height="39" fill="#fff" stroke="#c9c7bf" data-cell="qos:5:1" style="cursor:pointer"/><text x="7" y="227.8" font-size="12" text-anchor="start">Q0</text><rect x="134" y="204" width="60" height="39" fill="#fff" stroke="#c9c7bf" data-cell="qos:5:3" style="cursor:pointer"/><text x="187" y="227.8" font-size="12" text-anchor="end">15</text><rect x="194" y="204" width="110" height="39" fill="#fff" stroke="#c9c7bf" data-cell="qos:5:4" style="cursor:pointer"/><text x="201" y="227.8" font-size="12" text-anchor="start">40%</text><rect x="304" y="204" width="186.4" height="39" fill="#fff" stroke="#c9c7bf" data-cell="qos:5:5" style="cursor:pointer"/><text x="311" y="219.7" font-size="12" text-anchor="start" fill="#1d1d1b"><tspan x="311" dy="0">scavenger</tspan><tspan x="311" dy="15.600000000000001">drop first</tspan></text><text x="0" y="287" font-size="13" font-weight="600">capacity</text><rect x="0" y="295" width="78.4" height="26" fill="#eeede6" stroke="#c9c7bf" data-cell="capacity:0:1" style="cursor:pointer"/><text x="39.2" y="312.3" font-size="12" text-anchor="middle" font-weight="600">Chassis</text><rect x="78.4" y="295" width="151.20000000000002" height="26" fill="#dbeafe" stroke="#c9c7bf" data-cell="capacity:0:2" style="cursor:pointer"/><text x="154" y="312.3" font-size="12" text-anchor="middle" font-weight="600">Queues per port</text><rect x="229.60000000000002" y="295" width="151.20000000000002" height="26" fill="#eeede6" stroke="#c9c7bf" data-cell="capacity:0:3" style="cursor:pointer"/><text x="305.20000000000005" y="312.3" font-size="12" text-anchor="middle" font-weight="600">Shared buffer</text><rect x="0" y="321" width="78.4" height="26" fill="#fafaf9" stroke="#c9c7bf" data-cell="capacity:1:1" style="cursor:pointer"/><text x="7" y="338.3" font-size="12" text-anchor="start">C1</text><rect x="78.4" y="321" width="151.20000000000002" height="26" fill="#fafaf9" stroke="#c9c7bf" data-cell="capacity:1:2" style="cursor:pointer"/><text x="222.60000000000002" y="338.3" font-size="12" text-anchor="end">8</text><rect x="229.60000000000002" y="321" width="151.20000000000002" height="26" fill="#fafaf9" stroke="#c9c7bf" data-cell="capacity:1:3" style="cursor:pointer"/><text x="373.80000000000007" y="338.3" font-size="12" text-anchor="end">32 MB</text><rect x="0" y="347" width="78.4" height="26" fill="#fafaf9" stroke="#c9c7bf" data-cell="capacity:2:1" style="cursor:pointer"/><text x="7" y="364.3" font-size="12" text-anchor="start">C2</text><rect x="78.4" y="347" width="151.20000000000002" height="26" fill="#fafaf9" stroke="#c9c7bf" data-cell="capacity:2:2" style="cursor:pointer"/><text x="222.60000000000002" y="364.3" font-size="12" text-anchor="end">16</text><rect x="229.60000000000002" y="347" width="151.20000000000002" height="26" fill="#fafaf9" stroke="#c9c7bf" data-cell="capacity:2:3" style="cursor:pointer"/><text x="373.80000000000007" y="364.3" font-size="12" text-anchor="end">64 MB</text><text x="0" y="417" font-size="13" font-weight="600"></text><rect x="0" y="425" width="85.6" height="26" fill="#eeede6" stroke="#c9c7bf" data-cell="rings:0:1" style="cursor:pointer"/><text x="42.8" y="442.3" font-size="12" text-anchor="middle" font-weight="600">Port</text><rect x="85.6" y="425" width="78.4" height="26" fill="#eeede6" stroke="#c9c7bf" data-cell="rings:0:2" style="cursor:pointer"/><text x="124.8" y="442.3" font-size="12" text-anchor="middle" font-weight="600">Ring #0</text><rect x="164" y="425" width="78.4" height="26" fill="#eeede6" stroke="#c9c7bf" data-cell="rings:0:3" style="cursor:pointer"/><text x="203.2" y="442.3" font-size="12" text-anchor="middle" font-weight="600">Ring #1</text><rect x="0" y="451" width="85.6" height="26" fill="#fff" stroke="#c9c7bf" data-cell="rings:1:1" style="cursor:pointer"/><text x="7" y="468.3" font-size="12" text-anchor="start">et-0/0/0</text><rect x="85.6" y="451" width="78.4" height="26" fill="#fff" stroke="#c9c7bf" data-cell="rings:1:2" style="cursor:pointer"/><text x="157" y="468.3" font-size="12" text-anchor="end">4096</text><rect x="164" y="451" width="78.4" height="26" fill="#fff" stroke="#c9c7bf" data-cell="rings:1:3" style="cursor:pointer"/><text x="235.4" y="468.3" font-size="12" text-anchor="end">4096</text><rect x="0" y="477" width="85.6" height="26" fill="#fff" stroke="#c9c7bf" data-cell="rings:2:1" style="cursor:pointer"/><text x="7" y="494.3" font-size="12" text-anchor="start">et-0/0/1</text><rect x="85.6" y="477" width="78.4" height="26" fill="#fff" stroke="#c9c7bf" data-cell="rings:2:2" style="cursor:pointer"/><text x="157" y="494.3" font-size="12" text-anchor="end">2048</text><rect x="164" y="477" width="78.4" height="26" fill="#fff" stroke="#c9c7bf" data-cell="rings:2:3" style="cursor:pointer"/><text x="235.4" y="494.3" font-size="12" text-anchor="end">2048</text><rect x="0" y="544" width="16" height="11" fill="#fce7f3" stroke="#555"/><text x="21" y="553.5" font-size="11" fill="#1d1d1b">Re-measured — awaiting sign-off</text><rect x="0" y="564" width="16" height="11" fill="#fff" stroke="#9333ea"/><text x="21" y="573.5" font-size="11" fill="#1d1d1b">Vendor default, not from this profile</text><rect x="0" y="584" width="16" height="11" fill="#dbeafe" stroke="#555"/><text x="21" y="593.5" font-size="11" fill="#1d1d1b">Hard ceiling — never oversubscribed</text></g><metadata id="figdown-source" data-sha256="0435048ec344da6adad23163daa0068b852deb2fe035c5a414bb64b09df3ed59" data-engine-version="0.1.0"><![CDATA[
+# FigDown — figures as text. Spec: https://github.com/FigDown/figdown
+
+# Reference figure for genre `table` — NORMATIVE surface only (spec/genres/table.md).
+# Every construct here is inside the v0.1 conformance surface and the
+# compatibility promise. Experimental constructs are in table-experimental.fd.
+# The set demonstrates every FORM of every keyword, not just every keyword.
+# Coverage: node tools/reference-coverage.js --normative-only --strict table
+figdown 0.1 table
+title "Egress scheduler profile"
+
+# `class` declares a meaning ONCE; cells join it with class=. Use it rather
+# than a bare fill= whenever the mark MEANS something (`CATEGORICAL-MEANING-MAPPING`): the class label is
+# what a reading agent gets instead of a hex value.
+class review "Re-measured — awaiting sign-off"        fill=#fce7f3
+# A class reaches a CELL through `fill=` and `stroke=` only. `style=` cannot
+# reach one by any route: it left `cell`'s option list (`STYLE-KEY-SCOPE`),
+# and on a class it is silently ignored for cell members while the legend
+# still draws the dash — a swatch for ink no cell can carry
+# (`tools/legend-check.js` is the gate for that).
+class vendor "Vendor default, not from this profile"  stroke=#9333ea
+class capped "Hard ceiling — never oversubscribed"    fill=#dbeafe
+
+table qos "Per-queue scheduling and drop policy"
+# Every pipe row ABOVE the delimiter row is a header tier, addressed h1..hN
+# top-down. `||` is colspan-LEFT: the empty segment merges into the cell on
+# its left, so "Scheduling" covers Class and Weight. It is a line error in the
+# first column, where there is nothing to its left.
+| Queue | Scheduling || Drop      | Notes |
+# `^^` is rowspan-UP. It is a line error in the very first row (nothing above
+# to merge into) and in the first DATA row (a span never crosses the delimiter
+# row), but legal BETWEEN header tiers — which is what holds Queue and Notes
+# upright across both tiers here.
+| ^^    | Class | Weight | Threshold | ^^ |
+# The delimiter row is REQUIRED (GFM's own term) and is where the header ends
+# and data row 1 begins. Its colons set per-column alignment: `:---` left,
+# `:--:` centre, `---:` right, bare `---` takes the GFM default — data left,
+# headers always centred.
+|:------|:-----:|-------:|:----------|-----|
+# Data rows are 1-based below the delimiter row. `<br>`, `<br/>` and `<br />`
+# are the ONLY in-cell line break, case-insensitive, and become one real
+# newline in the model. `\n` in a pipe cell is two literal characters: a pipe
+# cell is raw GFM text, not a §1 quoted string.
+| Q7 | strict | —  | 100%       | control plane<br>never dropped |
+| Q5 | wfq    | 40 | 80%        | video<BR/>voice |
+# `\^^` at the START of a cell is the literal caret pair and `\|` anywhere in
+# a cell is a literal pipe. Those two are the whole pipe-row escape set — and
+# `\^^` is an escape at cell start only, because that is the only place a bare
+# `^^` would have meant rowspan.
+| Q3 | ^^     | 25 | 80%        | \^^ in the vendor sheet |
+| Q1 | ^^     | 20 | 60% \| 90% | best effort |
+| Q0 | ^^     | 15 | 40%        | scavenger<br />drop first |
+# `width` is ONE whitespace-free comma token, one value per column: `auto`
+# (natural), a bare number (px), or a percentage OF the natural total. A `px`
+# suffix and the retired space form are both line errors, so this spelling and
+# the `width=` option on the layout-zone `pin` share one value grammar.
+width auto,70,60,110,auto
+# Option position is free on every directive (`OPTION-POSITION-PARSING`) — before the address or
+# after. A spanned cell is addressed at its ANCHOR only: `cell (h1,3)` and
+# `cell (3,2)` are line errors here — `||` and `^^` merged those away.
+cell fill=#dbeafe (h1,2)
+cell (h2,4) class=capped
+# `highlight` is the ROW form: a bare row number, no comma, data rows only.
+cell 1 highlight
+# class= takes a comma-separated LIST, applied left to right and later wins
+# per channel; these two touch different channels, so the fill comes from
+# `review` and the outline colour from `vendor`.
+cell (2,5) class=review,vendor
+# `style=` left `cell` (`STYLE-KEY-SCOPE`): a dash on one cell carried no
+# meaning the table did not already carry, 0 documents outside this repository
+# ever wrote it, and it moved with `field`'s removal as one minimum set. So a
+# cell cannot be dashed AT ALL — not directly, and not through a class either.
+# Reach for a fill or an outline colour when a cell must be marked.
+
+# No label written: the model records it ABSENT and the renderer falls back to
+# the id (`OMITTED-LABEL-RECORDING`) — never invent a caption. `fill=` on the block is the default
+# DATA-cell fill; the header tint is structural and is not affected by it.
+table capacity fill=#fafaf9
+| Chassis | Queues per port | Shared buffer |
+|---------|----------------:|--------------:|
+| C1      |               8 |         32 MB |
+| C2      |              16 |         64 MB |
+width auto,45%,45%
+cell (h1,2) class=capped
+
+# The third label state: WRITTEN EMPTY (`EMPTY-LABEL-STATE`). `table capacity` above omits the
+# label and the renderer falls back to the id; `""` here is a decision — this
+# block is captioned by the prose that embeds it, and repeating the caption
+# inside the figure is the duplication `TRANSCRIPTION-FIDELITY-TIERS` warns about. Absent says nothing;
+# `""` says the author looked and chose none. Both are in the model, and a
+# consumer that tests truthiness rather than key presence merges them.
+table rings ""
+# A `#` inside a pipe row is ORDINARY TEXT (core §1). A row is raw GFM content
+# and no comment is stripped anywhere inside it, so `#0` below is a ring number
+# — the same `#` after whitespace on a directive line would open a comment.
+| Port     | Ring #0 | Ring #1 |
+|----------|--------:|--------:|
+| et-0/0/0 |    4096 |    4096 |
+| et-0/0/1 |    2048 |    2048 |
+
+]]></metadata></svg>

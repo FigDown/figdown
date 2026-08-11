@@ -1,0 +1,7 @@
+figdown 0.1 block
+edge a -> b
+node a "A" in=g
+node b "B" class=hot
+group g "Group"
+class hot "Hot path" stroke=#dc2626
+rank a,b

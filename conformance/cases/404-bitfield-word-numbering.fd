@@ -1,0 +1,13 @@
+figdown 0.1 bitfield
+# The two numbering conventions, same unit and same fields, so the ONLY
+# difference in the model is the `numbering` value — and in the drawing, the
+# per-row ruler direction (renderer tier, spec section 3, no golden bytes here).
+# `numbering=` is required, so neither block can be defaulted.
+bitfield reg_msb0 "Control (RFC convention)" word=16 numbering=msb0
+field "EN" 1
+field "MODE" 3
+field "ADDR" 12
+bitfield reg_lsb0 "Control (register convention)" word=16 numbering=lsb0
+field "EN" 1
+field "MODE" 3
+field "ADDR" 12

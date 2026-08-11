@@ -1,0 +1,1 @@
+  L2  [kind-unknown] kind=firewall has no shape mapping — set shape= manually

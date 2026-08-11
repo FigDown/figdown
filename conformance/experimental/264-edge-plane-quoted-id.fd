@@ -1,0 +1,11 @@
+figdown 0.1 topology
+# `RULE-POSITION-ENUMERATION`: `plane=` is an ID-VALUED option, and `badOpts` has
+# applied the id rule to `in=`/`plane=` (`QUOTED-IDS`). `edge` does
+# not go through `badOpts`, so it was the ONE id position in the language
+# that tolerated a quoted id: `node c "C" plane="over"` was a line error and
+# `edge a -> b plane="over"` was accepted. One missing call.
+plane over "Overlay" z-index=2
+node a "A"
+node b "B"
+node c "C" plane="over"
+edge a -> b plane="over"

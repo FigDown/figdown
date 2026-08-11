@@ -1,0 +1,139 @@
+{
+  "header": {
+    "version": "0.1",
+    "genre": "block"
+  },
+  "flow": "right",
+  "classes": [
+    {
+      "id": "hot",
+      "meaning": "Hot path",
+      "fill": "#fee2e2",
+      "stroke": "#dc2626",
+      "style": "dashed",
+      "line": 7
+    }
+  ],
+  "planes": [
+    {
+      "id": "base",
+      "z": 0
+    }
+  ],
+  "nodes": [
+    {
+      "id": "a",
+      "label": "A",
+      "shape": "box",
+      "group": "g",
+      "plane": "base",
+      "class": [
+        "hot"
+      ],
+      "line": 9
+    },
+    {
+      "id": "b",
+      "label": "B",
+      "shape": "box",
+      "group": "g",
+      "plane": "base",
+      "line": 10
+    }
+  ],
+  "groups": [
+    {
+      "id": "g",
+      "label": "Group",
+      "class": [
+        "hot"
+      ],
+      "line": 8
+    }
+  ],
+  "edges": [
+    {
+      "a": "a",
+      "op": "->",
+      "b": "b",
+      "plane": "base",
+      "class": [
+        "hot"
+      ],
+      "line": 11
+    }
+  ],
+  "ranks": [],
+  "pins": [],
+  "thresholds": [],
+  "bands": [],
+  "bundles": [],
+  "regions": [
+    {
+      "genre": "bitfield",
+      "id": "bf",
+      "label": "Bits",
+      "word": 32,
+      "numbering": "msb0",
+      "fields": [
+        {
+          "name": "One",
+          "width": 4,
+          "class": [
+            "hot"
+          ],
+          "line": 13
+        },
+        {
+          "name": "Two",
+          "width": 28,
+          "line": 14
+        }
+      ],
+      "line": 12
+    },
+    {
+      "genre": "table",
+      "id": "t",
+      "label": "Table",
+      "heads": [
+        [
+          {
+            "v": "h"
+          },
+          {
+            "v": "i"
+          }
+        ]
+      ],
+      "aligns": [
+        "none",
+        "none"
+      ],
+      "rows": [
+        {
+          "cells": [
+            {
+              "v": "1"
+            },
+            {
+              "v": "2"
+            }
+          ],
+          "line": 18
+        }
+      ],
+      "marks": [
+        {
+          "row": 1,
+          "col": 1,
+          "class": [
+            "hot"
+          ],
+          "line": 19
+        }
+      ],
+      "line": 15
+    }
+  ]
+}

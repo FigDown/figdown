@@ -1,0 +1,20 @@
+figdown 0.1 block
+# `EDGE-GEOMETRY-CONSTRUCTS`: the whole edge-geometry option-key family is WITHDRAWN.
+# Seven spellings, one behaviour: each is a REGISTERED-BUT-RETIRED key, so it
+# fires a named diagnostic language-wide (RULE 6.2 placement — the spelling
+# left the LANGUAGE, so it errors wherever it appears) instead of the generic
+# `unknown option`. None of them names a replacement, because there is none.
+#
+# Four of the seven were live until this release (`points=` `tailport=`
+# `headport=` `routing=`); the other three were renamed INTO those four at
+# 0.1 (`via=` `src=` `dst=`, `WAYPOINT-KEY-SPELLING`/`ENDPOINT-DOCKING-KEYS`) and their messages now state the
+# whole two-hop chain in one lookup, the `line` -> `guide` -> `threshold`
+# precedent. The host directive here is `node`, because the directive that
+# used to accept them is gone: these keys have NO acceptor at all now.
+node a "A" points=(10,20)
+node b "B" tailport=e
+node c "C" headport=w
+node d "D" routing=orthogonal
+node e "E" via=(10,20)
+node f "F" src=e
+node g "G" dst=w

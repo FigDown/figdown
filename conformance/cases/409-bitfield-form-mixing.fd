@@ -1,0 +1,12 @@
+figdown 0.1 bitfield
+# The classic form (`field <name> <width>`) and the compact form
+# (`field a:1, b:2`) may not be mixed inside ONE line. 0.1 narrowed
+# this case: `field a:1, b:2 fill=#fff` used to error here because the compact
+# list was re-read from the RAW source line, so the option text landed inside
+# the last item. Options are line-wide on the compact form now (see
+# 416-bitfield-compact-options); what stays illegal is mixing the two SHAPES.
+bitfield x "X" numbering=lsb0
+field "OK" 8
+field Name 8, c:2
+# a forgotten comma is not a second separator either
+field a:1 b:2

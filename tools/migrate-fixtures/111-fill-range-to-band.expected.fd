@@ -1,0 +1,7 @@
+figdown 0.1 block
+# The legacy band spelled with the keyword `fill`. `BAND-LABEL-STATUS` later gave `band` a
+# MANDATORY label, which the legacy form had no slot for — so the rewrite is
+# mechanical and the label is reported as the author's to supply.
+group pool "Pool"
+node a "A" in=pool
+fill 15-35% in=pool

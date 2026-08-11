@@ -1,0 +1,199 @@
+# FigDown — figures as text. Spec: https://github.com/FigDown/figdown
+
+# DHCP client finite-state machine (RFC 2131 §4.4, simplified).
+# Interim: block. Planned: statechart genre.
+#
+# MULTI-LINE guide/authoring.md DEMO:
+#   1) node labels:  "NAME\nshort role"     → wraps on canvas
+#   2) edge mids:    -["why\nwhat"]->         → reason always on the drawing
+#   3) # blocks:     multi-line prose         → edit like Markdown (not in SVG)
+#   4) table cells:  text<br>more             → multi-line list form
+#
+# Why some paths used to look "unlabeled": SVG only shows mid labels, not
+# # comments. Every edge mid is now two lines: reason + action/outcome.
+figdown 0.1 block
+title "DHCP client statechart (RFC 2131)\nmulti-line authoring sample"
+
+class mode "DHCP client protocol state" fill=#e0e7ff
+
+# ═══════════════════════════════════════════════════════════════════
+# STATES — multi-line canvas label + multi-line # narrative
+# ═══════════════════════════════════════════════════════════════════
+
+node init "INIT\nno lease" class=mode
+# No usable IPv4 lease on the interface.
+# Next step is usually broadcast DISCOVER, unless a stored lease
+# steers the client into INIT-REBOOT instead.
+
+node selecting "SELECTING\ncollect OFFERs" class=mode
+# One or more DHCPOFFER frames have arrived.
+# Client has not yet committed to a server / address.
+
+node requesting "REQUESTING\nawait ACK/NAK" class=mode
+# DHCPREQUEST outstanding (selecting an OFFER, or confirming
+# a remembered address on the reboot path).
+
+node bound "BOUND\nlease active" class=mode
+# Address in use (yiaddr / assigned).
+# T1 and T2 timers run; data plane may use the lease.
+
+node renewing "RENEWING\nT1 unicast" class=mode
+# T1 fired. Client unicasts DHCPREQUEST to the server
+# that granted the current lease.
+
+node rebinding "REBINDING\nT2 broadcast" class=mode
+# T2 fired (or renew path gave up). Client broadcasts
+# DHCPREQUEST so any server may extend the lease.
+
+node init_reboot "INIT-REBOOT\nstored lease" class=mode
+# Power-on (or restart) with a previously allocated address
+# still believed valid; confirm before using it.
+
+node rebooting "REBOOTING\nconfirm lease" class=mode
+# Confirmation REQUEST in flight for the remembered address.
+
+# ═══════════════════════════════════════════════════════════════════
+# TRANSITIONS — every mid is reason + outcome (visible on SVG)
+# # comments hold longer prose for .fd editors (not drawn)
+# ═══════════════════════════════════════════════════════════════════
+
+# --- acquire ---
+edge init -["need address\nsnd DISCOVER"]-> selecting
+# trigger: begin acquire (no stored lease, or policy chooses discover)
+# effect:  broadcast DHCPDISCOVER; start collecting DHCPOFFER
+
+edge selecting -["offer chosen\nsnd REQUEST"]-> requesting
+# trigger: client picks one OFFER
+# effect:  broadcast DHCPREQUEST with server-id + requested-ip
+
+edge requesting -["server grants\nACK → use IP"]-> bound
+# trigger: DHCPACK
+# effect:  install address; arm T1/T2; interface up for that lease
+
+edge requesting -["REQUEST failed\nNAK/timeout → INIT"]-> init
+# trigger: DHCPNAK, or retries exhausted
+# effect:  discard candidate; return to INIT
+# note:    individual REQUEST retransmits are collapsed (not drawn)
+
+# --- renew / rebind ---
+edge bound -["T1: renew time\nunicast REQUEST"]-> renewing
+# trigger: T1 (renewal time)
+# effect:  unicast DHCPREQUEST to binding server
+
+edge renewing -["lease extended\nACK → BOUND"]-> bound
+# trigger: DHCPACK from binding server
+# effect:  refresh lease timers; stay configured
+
+edge renewing -["server refuses\nNAK → drop IP"]-> init
+# trigger: DHCPNAK
+# effect:  stop using address; rediscover
+
+edge renewing -["T2: rebind time\nbcast REQUEST"]-> rebinding
+# trigger: T2 (rebinding time) while still unacked
+# effect:  broaden REQUEST to broadcast
+
+edge rebinding -["any server OK\nACK → BOUND"]-> bound
+# trigger: DHCPACK from any willing server
+# effect:  new binding parameters; back to BOUND
+
+edge rebinding -["no lease left\nNAK / expiry"]-> init
+# trigger: DHCPNAK, or lease lifetime ends
+# effect:  must not use address; INIT
+
+# --- reboot path ---
+edge init -["remembered lease\n→ confirm path"]-> init_reboot
+# trigger: non-volatile lease remembered across restart
+# else:    remain INIT and take DISCOVER path
+
+edge init_reboot -["confirm stored lease\nsnd REQUEST (bcast)"]-> rebooting
+# trigger: start confirmation of remembered address
+# effect:  broadcast DHCPREQUEST for that address
+# (this is the INIT-REBOOT → REBOOTING arc — pinned on its own row below)
+
+edge rebooting -["lease confirmed\nACK → BOUND"]-> bound
+# trigger: server confirms stored address
+# effect:  configure interface; arm timers (same as acquire ACK)
+
+edge rebooting -["cannot confirm\nNAK/timeout → INIT"]-> init
+# trigger: refusal or no answer
+# effect:  forget stored lease; full rediscover
+
+# --- release / loss ---
+edge bound -["give up / lost lease\nRELEASE → INIT"]-> init
+# trigger: DHCPRELEASE, or lease lost without renew
+# effect:  optional DHCPRELEASE; clear configuration
+
+# Hand layout: three bands — the cold-acquire row, the reboot row beneath
+# it, and the renew/rebind column under BOUND. Presentation only (`GUI-WRITEBACK-STRUCTURE`):
+# delete every `pin` below and all eight states and all fifteen labelled
+# transitions are still here, in the `node`/`edge` lines above.
+#
+# RE-AUTHORED (`EDGE-GEOMETRY-CONSTRUCTS`), AND THIS FIGURE IS WHY THE MEASUREMENT
+# MATTERED. It used to open the zone with `routing orthogonal` and carry
+# five hand-routed lines that ran short return corridors just under
+# the acquire row. All six constructs were WITHDRAWN from the language —
+# see spec/migrations.md 0.1 and core §9 `EDGE-IDENTITY-AND-GEOMETRY` — and the geometry
+# they encoded had SHIPPED A DEFECT: the corridors reached x=20 and the
+# canvas only ever grew right and down, so the published artifact drew
+# "membered lease" for "remembered lease" and "nnot confirm" for "cannot
+# confirm". Author waypoints did not protect this figure; they clipped it.
+#
+# The grid below is the same three bands, opened out. The old one was
+# built for corridors — 140 px between centres, boxes 96-112 px wide —
+# so with the corridors gone the transition labels printed straight over
+# the node boxes. Centres are now ~220 px apart and the reboot row sits
+# 220 px down, which is the whole fix: no clipping, no label over a box.
+# On tools/layout-lint.js the figure went 23 -> 8 (the tightest possible
+# strip scores 6, but it is the one that overprints labels, which the
+# linter does not measure — the number was checked against the picture,
+# not instead of it).
+flow right
+layout
+# row 0 — cold acquire, left to right
+pin init at=(20,40) width=96 height=44
+pin selecting at=(230,40) width=112 height=44
+pin requesting at=(450,40) width=112 height=44
+pin bound at=(670,40) width=100 height=44
+# row 1 left — reboot path under INIT/SELECTING
+pin init_reboot at=(20,260) width=112 height=44
+pin rebooting at=(230,260) width=112 height=44
+# column under BOUND — renew then rebind
+pin renewing at=(670,160) width=100 height=44
+pin rebinding at=(666,280) width=108 height=44
+
+# ═══════════════════════════════════════════════════════════════════
+# COMPANION TABLES — multi-line cells via <br>
+# ═══════════════════════════════════════════════════════════════════
+
+figdown 0.1 table
+table states "State catalog (multi-line notes in cells)"
+| State       | Role on wire                         | What the client is waiting for      |
+|-------------|--------------------------------------|-------------------------------------|
+| INIT        | no lease                             | policy to DISCOVER<br>or INIT-REBOOT |
+| SELECTING   | OFFERs arriving                      | choose server / address             |
+| REQUESTING  | REQUEST outstanding                  | ACK or NAK                          |
+| BOUND       | address configured<br>T1/T2 running  | T1, RELEASE, or link loss           |
+| RENEWING    | unicast renew                        | ACK, NAK, or T2                     |
+| REBINDING   | broadcast renew                      | ACK, NAK, or lease end              |
+| INIT-REBOOT | remembered lease                     | send confirm REQUEST                |
+| REBOOTING   | confirm REQUEST out                  | ACK or NAK/timeout                  |
+
+figdown 0.1 table
+table tr "Transition list (why → what)"
+| From → To              | Why (reason)                    | What happens                            |
+|------------------------|---------------------------------|-----------------------------------------|
+| INIT → SELECTING       | need an address                 | snd DHCPDISCOVER (bcast)                |
+| SELECTING → REQUESTING | an OFFER was chosen             | snd DHCPREQUEST (bcast)                 |
+| REQUESTING → BOUND     | server grants lease             | configure if;<br>arm T1/T2                |
+| REQUESTING → INIT      | refused or timed out            | discard candidate;<br>restart             |
+| BOUND → RENEWING       | T1 renewal time                 | unicast REQUEST                         |
+| RENEWING → BOUND       | lease extended                  | reset timers                            |
+| RENEWING → INIT        | server refuses                  | drop address                            |
+| RENEWING → REBINDING   | T2; binding server silent       | broadcast REQUEST                       |
+| REBINDING → BOUND      | some server extends             | accept new binding                      |
+| REBINDING → INIT       | no lease left                   | stop using address                      |
+| INIT → INIT-REBOOT     | remembered lease at boot        | skip cold DISCOVER                      |
+| INIT-REBOOT → REBOOTING| must confirm old IP             | bcast REQUEST for old addr              |
+| REBOOTING → BOUND      | lease confirmed                 | same as acquire ACK                     |
+| REBOOTING → INIT       | cannot confirm                  | full rediscover                         |
+| BOUND → INIT           | release or lease lost           | optional DHCPRELEASE;<br>clear config     |

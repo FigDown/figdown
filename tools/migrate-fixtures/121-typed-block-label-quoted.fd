@@ -1,0 +1,9 @@
+# 0.1 (`RULE-POSITION-ENUMERATION`): a typed-block opener's label is a positional string and
+# takes RULE 2.1's mandatory quotes, exactly as node/group/external/plane
+# already did. The rewrite ADDS the quotes its own pattern requires to be
+# absent, so it is idempotent by construction.
+figdown 0.1 bitfield
+bitfield hdr Header numbering=msb0
+field "Version" 4
+field "IHL" 4
+field "Payload" 24

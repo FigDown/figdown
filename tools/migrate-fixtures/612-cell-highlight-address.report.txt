@@ -1,0 +1,1 @@
+  L8  [cell-highlight-address] `highlight` on a CELL address was silently discarded and is a line error (`ROW-HIGHLIGHT-CELL-FILL-COLLISION`) — tint the row (`cell <row> highlight`) or paint the cell (`cell (<row>,<col>) fill=…`), not both

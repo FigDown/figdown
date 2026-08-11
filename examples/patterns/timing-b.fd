@@ -1,0 +1,7 @@
+# FigDown — figures as text. Spec: https://github.com/FigDown/figdown
+
+figdown 0.1 timing
+timing datatransfer "Data-bus transfer: valid + labelled data segments"
+signal clk   pppppppppppppppppp
+signal valid 000011110001111000
+signal data  xxx.==..xxx.==..xx  data=A,B,C,D

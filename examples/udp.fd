@@ -1,0 +1,10 @@
+# FigDown — figures as text. Spec: https://github.com/FigDown/figdown
+
+figdown 0.1 bitfield
+# UDP Header — RFC 768
+bitfield udp_header "UDP Header" word=32 numbering=msb0
+field "Source Port"      16
+field "Destination Port" 16
+field "Length"             16
+field "Checksum"           16 description="optional in IPv4, mandatory in IPv6"
+field "Data"               *  description="variable-length payload"

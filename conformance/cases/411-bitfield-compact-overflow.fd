@@ -1,0 +1,7 @@
+figdown 0.1 bitfield
+# Bit-width overflow: the compact form is the C bit-field convention, so
+# an item must fit one `unit`; a field meant to span rows is written in
+# the classic form (see 403), which keeps the documented spanning.
+bitfield b "Overflow" word=32 numbering=lsb0
+field ok:8,wide:40
+field "tail" 24

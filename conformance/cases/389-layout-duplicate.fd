@@ -1,0 +1,6 @@
+figdown 0.1 block
+node a "A"
+
+layout
+pin a at=(0,0)
+layout

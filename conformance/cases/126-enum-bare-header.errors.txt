@@ -1,0 +1,3 @@
+Line 11: this position takes a BARE value: write figdown 0.1 blok — quoting a value drawn from a closed set suggests the position accepts arbitrary text, when it accepts only the listed spellings (SYNTAX-STYLE RULE 2.4)
+Line 1: this position takes a BARE value: write figdown 0.1 <genre> — quoting a value drawn from a closed set suggests the position accepts arbitrary text, when it accepts only the listed spellings (SYNTAX-STYLE RULE 2.4)
+Line 9: this position takes a BARE value: write figdown 0.1 block — quoting a value drawn from a closed set suggests the position accepts arbitrary text, when it accepts only the listed spellings (SYNTAX-STYLE RULE 2.4)

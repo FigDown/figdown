@@ -1,0 +1,13 @@
+figdown 0.1 bitfield
+# `PRESENCE-CONDITION-EXPRESSION`: the positional PRESENCE FLAG is retired in both of its
+# spellings. `optional` (…0.1, and again 0.1 after `PRESENCE-FLAG-SPELLING` reverted
+# `PRESENCE-FLAG-SPELLING`) and `conditional` (0.1…0.1) are each a line error naming
+# their migration; the live construct is the option key `present=`, whose
+# VALUE is the presence condition. A bare flag could say only THAT a field
+# was conditional — never why — so the condition had to live in note=, where
+# neither the human nor the model could use it.
+bitfield a "A" numbering=msb0 word=32
+field "W" 16 present="C = 1"
+field "X" 16 optional
+field "Y" 16 conditional
+field "Z" 16 present=""

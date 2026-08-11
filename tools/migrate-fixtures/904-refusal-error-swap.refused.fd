@@ -1,0 +1,15 @@
+figdown 0.1 block
+# REFUSAL (c), the SECOND shape it takes, and the one worth freezing as a
+# golden. `w=`/`h=` were renamed `width=`/`height=` LANGUAGE-WIDE at
+# 0.1 — one rule, not one per directive — and on a `node` line BOTH
+# spellings are errors: extents live on `pin` (`ELEMENT-GEOMETRY-DIRECTIVE`, and on `size` before it).
+# So the rewrite swaps one line error for a DIFFERENT line error on the same
+# line, `introducedErrors` sees a message it has not seen before, and the file
+# is refused rather than half-migrated.
+#
+# That is the conservative direction and it is the right one here — moving an
+# extent onto a pin line is an author decision, not a rewrite. The fixture
+# exists so the behaviour is deliberate rather than accidental: if the refusal
+# is ever relaxed to compare error LINES instead of error MESSAGES, this goes
+# red, and so does 903, where the swap on one line is the whole defect.
+node a "A" width=120 height=60

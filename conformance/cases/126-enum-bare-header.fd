@@ -1,0 +1,12 @@
+figdown "0.1" block
+# `RULE-POSITION-ENUMERATION`: RULE 2.4's enum half at the two header positions
+# (vocabulary-sources.tsv `figdown.version`, `figdown.genre`). The quoting is
+# reported BEFORE the value and suppresses it for that token — one token, one
+# error, the convention every id position has followed. Both
+# values below are well spelled, so only the quoting is wrong; a QUOTED and
+# misspelled genre reports the quoting alone too.
+node a "A"
+figdown 0.1 "block"
+node b "B"
+figdown 0.1 "blok"
+node c "C"

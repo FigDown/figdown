@@ -1,0 +1,38 @@
+figdown 0.1 bitfield
+# `DECLARATION-ORDER-SEMANTICS`: the WORKED EXAMPLE for deriving bit numbers.
+#
+# Case 404 pins that the two numbering conventions differ in the model by
+# exactly one key. This case pins what a reader is entitled to COMPUTE from
+# that key, because the model itself carries no bit range: spec/core.md
+# §12.7 licenses the derivation and states why the ranges are not
+# materialized, and spec/genres/bitfield.md's semantic model is the
+# arithmetic. Both blocks below declare the SAME field list in the SAME
+# order, so the two models differ only in `numbering`, and the two
+# DRAWINGS are geometrically identical — FIRST leftmost, SECOND to its
+# right, under both values (`DECLARATION-ORDER-SEMANTICS`).
+#
+# Drawing position p_k = sum of the earlier widths (no `break` here, so it
+# is also the declared offset); column c = p_k mod word; row = p_k / word.
+#
+#   field    width   p_k   columns
+#   FIRST      4       0   0..3
+#   SECOND    12       4   4..15
+#
+# Bit number of column c: msb0 -> c ; lsb0 -> word-1-c (word = 16).
+#
+#   block      field    bit numbers          note
+#   reg_msb0   FIRST    0,1,2,3              ascending, left to right
+#   reg_msb0   SECOND   4..15                ascending, left to right
+#   reg_lsb0   FIRST    15,14,13,12          DESCENDING; highest bit at the left
+#   reg_lsb0   SECOND   11..0                DESCENDING, left to right
+#
+# So under lsb0 the FIRST-declared field is bits 15..12, not bits 0..3 —
+# and it is still the leftmost field drawn. A reader that reports 0..3 for
+# reg_lsb0 has read the declaration order as the bit numbering; that is the
+# misreading `DECLARATION-ORDER-SEMANTICS` exists to close.
+bitfield reg_msb0 "Control (RFC convention)" word=16 numbering=msb0
+field "FIRST" 4
+field "SECOND" 12
+bitfield reg_lsb0 "Control (register convention)" word=16 numbering=lsb0
+field "FIRST" 4
+field "SECOND" 12

@@ -1,0 +1,6 @@
+figdown 0.1 block
+class hot "Hot" fill=#dc2626
+node a "A" class=
+node b "B" class=hot,,deprecated
+node c "C" class=hot class=deprecated
+node d "D" class=9bad

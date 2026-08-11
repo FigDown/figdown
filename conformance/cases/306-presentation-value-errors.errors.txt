@@ -1,0 +1,6 @@
+Line 10: unknown color "#12" (#hex or CSS color name)
+Line 11: unknown plane "ghost"
+Line 12: unknown plane "ghost"
+Line 7: unknown color "notacolor" (#hex or CSS color name)
+Line 8: style must be solid|dashed|dotted
+Line 9: unknown color "nope" (#hex or CSS color name)

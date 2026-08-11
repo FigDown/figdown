@@ -1,0 +1,59 @@
+{
+  "header": {
+    "version": "0.1",
+    "genre": "timing"
+  },
+  "flow": "right",
+  "classes": [],
+  "planes": [
+    {
+      "id": "base",
+      "z": 0
+    }
+  ],
+  "nodes": [],
+  "groups": [],
+  "edges": [],
+  "ranks": [],
+  "pins": [],
+  "thresholds": [],
+  "bands": [],
+  "bundles": [],
+  "regions": [
+    {
+      "genre": "timing",
+      "id": "por",
+      "label": "Power-on reset",
+      "signals": [
+        {
+          "name": "clk",
+          "lane": "p......."
+        },
+        {
+          "name": "clkn",
+          "lane": "n......."
+        },
+        {
+          "name": "rst_n",
+          "lane": "0...1..."
+        },
+        {
+          "name": "data",
+          "lane": "x..=.=.x",
+          "data": [
+            "cfg",
+            "val"
+          ]
+        },
+        {
+          "name": "bits",
+          "lane": "0101...."
+        }
+      ],
+      "gaps": [
+        4
+      ],
+      "line": 2
+    }
+  ]
+}

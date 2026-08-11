@@ -1,0 +1,51 @@
+# FigDown — figures as text. Spec: https://github.com/FigDown/figdown
+
+figdown 0.1 bitfield
+# TCP Header — RFC 9293 §3.1, IETF MSB-0 bit numbering (bit 0 = leftmost).
+# The .fd is the machine-readable truth: field ORDER + WIDTH give every
+# bit its absolute offset, so a reader answers "which bits carry X?" from
+# text alone — no pixels, no OCR.
+title "TCP Header"
+
+class varword "Width is VARIABLE on the wire; the declared width is one representative word, not the field's length"
+
+bitfield tcp "TCP Header (RFC 9293)" word=32 numbering=msb0
+
+# Row 1: Source Port (16) + Destination Port (16) = 32 bits
+field "Source Port" 16
+field "Destination Port" 16
+
+# Row 2: Sequence Number = 32 bits
+field "Sequence Number" 32
+
+# Row 3: Acknowledgment Number = 32 bits
+field "Acknowledgment Number" 32
+
+# Row 4: Data Offset (4) + Reserved (4) + 8 control flags (1 bit each) + Window (16)
+field "Data Offset" 4 description="header length in 32-bit words; min 5 (=20 bytes), max 15 (=60 bytes)"
+field "Reserved" 4 description="must be zero"
+# The eight control bits are declared as individual 1-bit fields so a reader
+# can address each flag's exact bit position, not just the byte that holds them.
+# The first six use the COMPACT form: `name:width` pairs, comma-separated on one
+# `field` line, declare exactly the same six one-bit fields the long form would —
+# same model, same boxes, six lines saved. The compact form takes no option keys,
+# so SYN and FIN stay long-form: they carry a `fill=` that marks the two flags
+# this figure is highlighting.
+field CWR:1,ECE:1,URG:1,ACK:1,PSH:1,RST:1
+field "SYN" 1 fill=#fee2e2
+field "FIN" 1 fill=#fee2e2
+field "Window" 16 description="receive window size in bytes (subject to window scaling option)"
+
+# Row 5: Checksum (16) + Urgent Pointer (16) = 32 bits
+field "Checksum" 16
+field "Urgent Pointer" 16
+
+# Row 6+: Options — the dashed border marks conditional presence, and the
+# condition itself is now in the model and drawn as a caption; a reader
+# computing offsets past here MUST branch (`BITFIELD-CONDITIONAL-OFFSETS`). The WIDTH is 0-320 bits
+# (0-40 octets) on the wire: v0.1 has no range width (`BITFIELD-RANGE-WIDTH`) and `*` is
+# spent on Data, so 32 is one representative word, said in the class meaning.
+field "Options" 32 present="Data Offset > 5" class=varword description="0-320 bits (0-40 octets), always a multiple of 32, padded to a 32-bit boundary — RFC 9293 §3.1"
+
+# Payload — variable length, inferred from the IP total length, not a TCP field
+field "Data" * description="variable-length payload; length derived from the IP datagram, not carried in the TCP header"

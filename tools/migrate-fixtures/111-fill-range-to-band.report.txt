@@ -1,0 +1,1 @@
+  L7  [fill-range-band] the zone band spelled with the keyword `fill` became `band` — but 0.1 (`BAND-LABEL-STATUS`) also gave `band` a MANDATORY quoted label, written FIRST, and this form has no label to carry over. NON-MECHANICAL: the region's name is yours to supply. Write: band "<name>" 15-35% in=pool

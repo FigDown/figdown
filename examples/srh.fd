@@ -1,0 +1,107 @@
+# FigDown — figures as text. Spec: https://github.com/FigDown/figdown
+
+figdown 0.1 bitfield
+# IPv6 Segment Routing Header (SRH) — transcribed from the ASCII diagram in
+# RFC 8754 §2 (Filsfils et al., March 2020), including the Flags sub-diagram
+# the same section prints. https://www.rfc-editor.org/rfc/rfc8754.txt
+#
+# What this figure probes: a variable-COUNT repeating element. RFC 8754
+# draws Segment List[0], then a literal `...` row, then Segment List[n],
+# each a 128-bit IPv6 address, with the count carried by the Last Entry
+# field (there are Last Entry + 1 of them).
+#
+# THE LANGUAGE CAN SAY THIS NOW. `index=` declares that a field
+# is ONE ELEMENT of a repeated run and gives the run's index range, and the
+# engine draws the rest — `REPEATED-RUN-DRAWING` makes that the RFC's own
+# picture handed straight back: the first element, the elision, the last
+# element. The file below writes the element ONCE, with
+# `index="0..Last Entry"`, and the two things that used to be missing are no
+# longer missing:
+#   - the model records repetition as a KEY, not as bracket text a reader is
+#     forbidden to parse. A reading agent now learns that the list repeats
+#     from syntax;
+#   - the drawn `...` row of RFC 8754, and the two elements it sits between,
+#     are DERIVED from that key rather than being an ASCII device with no
+#     line to write it on.
+#
+# What is still open, and it is one thing rather than four: the LAST index is
+# prose. `Last Entry` is the name of a field eight lines up, and the language
+# has no way to resolve a name — so this run is INDETERMINATE, its element
+# count is not in the document, and every offset after it stays
+# indeterminate. That is now reached from SYNTAX (a prose last index) rather
+# than from reading a label, which is the whole difference: a reader is told
+# to withhold the number instead of computing a confidently wrong one. Had
+# the RFC fixed the count, `index=0..3` would have made the run determinate
+# and every later offset computable again.
+#
+# The remaining gap is therefore the locator problem alone — a value that
+# NAMES another field — and nothing else about repetition.
+#
+# Fidelity rule for this file: it carries exactly the fields RFC 8754 §2
+# draws. The SRH is itself an IPv6 Routing header, so it sits inside a
+# packet whose other headers are outside this diagram.
+title "IPv6 Segment Routing Header"
+
+# A class meaning is in the MODEL and core §12.7 licenses reading it, so this
+# sentence reaches a conforming reader as a category label. It no longer has
+# to carry the count rule on its own: `index=` states the repetition, and the
+# reversal below is what is left for prose to say.
+class seg "Segment List element — a 128-bit IPv6 address; the list is encoded in REVERSE order, so element 0 is the LAST segment of the SR Policy (RFC 8754 §2)"
+
+# msb0: bit 0 is the MSB, ruler 0…31 left to right, matching the
+# "0 1 2 3 / 0 1 2 3 4 5 …" scale RFC 8754 prints above the diagram.
+bitfield srh "Segment Routing Header (RFC 8754 §2)" word=32 numbering=msb0
+
+# Word 0 — 8 + 8 + 8 + 8 = 32 bits. All four are the generic IPv6 Routing
+# header fields of RFC 8200 §4.4.
+field "Next Header" 8 description="identifies the header immediately following the SRH — RFC 8200 §4.4"
+field "Hdr Ext Len" 8 description="length of the SRH in 8-octet units, not counting the first 8 octets — RFC 8200 §4.4"
+field "Routing Type" 8 description="= 4 for the SRH — RFC 8754 §2"
+field "Segments Left" 8 description="remaining route segments before the destination; mutable — RFC 8200 §4.4"
+
+# Word 1 — 8 + 8 + 16 = 32 bits.
+field "Last Entry" 8 description="zero-based index, in the Segment List, of the LAST element — so the list holds Last Entry + 1 addresses. It is the repeat count, and it is what the Segment List index range below names in prose"
+field "Flags" 8 description="8 bits of flags; all currently unused, see the flags block below — RFC 8754 §2 and §8.1"
+field "Tag" 16 description="tags the packet as part of a class or group of packets; zero when unused"
+
+# The Segment List: ONE element, declared once, repeated over the range the
+# RFC states. Each address is 128 bits, wider than word=32, so the element
+# spans FOUR rows and is still ONE field — and draws as one box with its name
+# written once. Before that the four rows were drawn fully boxed
+# with the name on each, directly above the elision strip below, so the figure
+# read as "elements 0,1,2,3 are drawn, more are elided" — asserting a count of
+# 4 that was 128/32, an artifact of word=, while this document records the run
+# as INDETERMINATE. This is the one place in the corpus where that spanning
+# rule and the repetition construct meet: two four-row occurrences with the
+# elision between them, each a single box named once.
+#
+# `index="0..Last Entry"` is the 0-based range RFC 8754 §2 gives: the last
+# index is the value of the Last Entry field, which this language cannot
+# resolve, so it stays as the author's prose and the run is indeterminate.
+# The two drawn occurrences and the elision between them are DERIVED from this
+# one key — there is no line to write for them and no option key that could
+# move them. Each occurrence carries its index APPENDED to the label written
+# here, "Segment List (128-bit IPv6 address) [0]", rather than inside it the
+# way the RFC prints it: the engine may not parse a label to find where a
+# bracket belongs, and the reader loses nothing by the move.
+field "Segment List (128-bit IPv6 address)" 128 index="0..Last Entry" class=seg fill=#dbeafe description="the SR Policy's segment list, one 128-bit IPv6 address per element, Last Entry + 1 of them; element 0 is the last segment of the policy and the highest-numbered element is the first one travelled (RFC 8754 §2)"
+
+# The RFC draws this last region between `//` rules rather than `+-+-+`
+# ones — its own mark for "variable length, elided". `*` is the language's
+# match for that: it says the length is NOT in the document, so a reader
+# must not report one. `present=` adds that the region may be absent
+# entirely, and states when: whenever Hdr Ext Len covers only the Segment
+# List. The condition draws as a caption under the block.
+field "Optional TLVs" * present="Hdr Ext Len exceeds the Segment List" description="Type-Length-Value objects, variable length, RFC 8754 §2.1 (Padding, HMAC); the count and the sizes are not in this figure"
+
+# The Flags octet, expanded — RFC 8754 §2 prints this eight-bit diagram
+# under the Flags field. A separate `bitfield` block with its own word= and
+# its own numbering=, so its ruler runs 0…7 rather than 0…31.
+bitfield srhflags "SRH Flags (RFC 8754 §2)" word=8 numbering=msb0
+# Eight one-bit fields, one per bit, so each bit has its own position rather
+# than being hidden inside one eight-bit cell. The compact form is the C
+# bit-field convention: one whitespace-free token, items comma-delimited.
+# All eight carry the same name because RFC 8754 draws them that way —
+# `|U U U U U U U U|`; the bit each one addresses comes from its position.
+# `description=` on the compact form is LINE-wide: one sentence for all eight.
+field U:1,U:1,U:1,U:1,U:1,U:1,U:1,U:1 description="U: unused and reserved for future use; MUST be 0 on transmission and ignored on receipt. RFC 8754 §8.1 opens an IANA registry for new flags"

@@ -1,0 +1,4 @@
+figdown 0.1 block
+node a "A"
+layout tier3
+pin a at=(0,0)

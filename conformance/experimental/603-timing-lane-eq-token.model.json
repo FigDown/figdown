@@ -1,0 +1,44 @@
+{
+  "header": {
+    "version": "0.1",
+    "genre": "timing"
+  },
+  "flow": "right",
+  "classes": [],
+  "planes": [
+    {
+      "id": "base",
+      "z": 0
+    }
+  ],
+  "nodes": [],
+  "groups": [],
+  "edges": [],
+  "ranks": [],
+  "pins": [],
+  "thresholds": [],
+  "bands": [],
+  "bundles": [],
+  "regions": [
+    {
+      "genre": "timing",
+      "id": "w",
+      "label": "Lane tokens may contain =",
+      "signals": [
+        {
+          "name": "data",
+          "lane": "x=1=x...",
+          "data": [
+            "a",
+            "b"
+          ]
+        },
+        {
+          "name": "clk",
+          "lane": "p......."
+        }
+      ],
+      "line": 2
+    }
+  ]
+}

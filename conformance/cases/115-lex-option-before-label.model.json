@@ -1,0 +1,101 @@
+{
+  "header": {
+    "version": "0.1",
+    "genre": "block"
+  },
+  "flow": "right",
+  "classes": [
+    {
+      "id": "c1",
+      "meaning": "Fabric",
+      "fill": "#e0f2fe",
+      "line": 14
+    }
+  ],
+  "planes": [
+    {
+      "id": "base",
+      "z": 0
+    },
+    {
+      "id": "L1",
+      "label": "Overlay",
+      "z": 2
+    }
+  ],
+  "nodes": [
+    {
+      "id": "a",
+      "label": "A",
+      "shape": "box",
+      "plane": "base",
+      "fill": "#fef9c3",
+      "line": 16
+    },
+    {
+      "id": "b",
+      "label": "B",
+      "shape": "box",
+      "plane": "base",
+      "line": 17
+    }
+  ],
+  "groups": [
+    {
+      "id": "g",
+      "label": "Pod",
+      "fill": "#f1f5f9",
+      "line": 18
+    }
+  ],
+  "externals": [
+    {
+      "id": "e",
+      "label": "Uplink",
+      "plane": "L1",
+      "line": 19
+    }
+  ],
+  "edges": [
+    {
+      "a": "a",
+      "op": "--",
+      "b": "b",
+      "plane": "base",
+      "line": 20
+    }
+  ],
+  "ranks": [],
+  "pins": [],
+  "thresholds": [
+    {
+      "label": "Threshold",
+      "in": "g",
+      "offset": 50,
+      "line": 22
+    }
+  ],
+  "bands": [
+    {
+      "label": "Shared",
+      "in": "g",
+      "from": 15,
+      "to": 35,
+      "extend": "up",
+      "fill": "#dcfce7",
+      "line": 23
+    }
+  ],
+  "bundles": [
+    {
+      "id": "t1",
+      "label": "LAG",
+      "members": [
+        "a--b"
+      ],
+      "stroke": "#0ea5e9",
+      "line": 21
+    }
+  ],
+  "regions": []
+}

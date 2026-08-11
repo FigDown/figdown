@@ -1,0 +1,54 @@
+# FigDown — figures as text. Spec: https://github.com/FigDown/figdown
+
+figdown 0.1 topology
+# TCP three-way handshake + data on the third segment (RFC 9293 §3.5).
+# Two endpoints, three directed segments carrying the connection-setup
+# exchange. Each segment's ordinal (1/2/3) is in its edge label.
+#
+# HONEST LIMIT (guide/expressing.md known limits — "strict message ordering"):
+# message ORDER is carried only by the 1/2/3 numbering convention in the
+# labels, a naming convention that `MEANING-RECOVERY-SOURCE` does not treat as first-class order.
+# The sequence genre (`FLOWCHART-GENRE-DESIGN`, v0.2) will make order first-class semantics;
+# until then a reader must trust the ordinal prefixes below.
+# Likewise, the canonical RFC 9293 figure carries the per-endpoint TCP
+# STATE (LISTEN, SYN-SENT, …) on the lifelines; the topology genre has no
+# lifeline-state construct, so the companion `table` block below carries
+# those states machine-readably — composition (multiple typed blocks in one
+# document, in document order) is the ruled interim until sequence lands.
+title "TCP Three-Way Handshake"
+
+# Semantic classes: the label states the MEANING; colour merely renders it,
+# and the legend derives automatically (spec §2.7). Each segment is classed
+# by what it does — a reader queries the class, not the arrow colour.
+class setup "Connection-setup segment — carries SYN and/or ACK control flags" stroke=#2563eb
+class data  "Segment that also carries application data (piggybacked on the ACK)" stroke=#16a34a
+
+node client "Client (active open)"
+node server "Server (passive open, LISTEN)"
+
+# left-to-right reading: client on the left issues the active open.
+flow right
+
+# Segment 1: client -> server, SYN, seq=x (flags: SYN)
+edge client -[1: SYN  seq=x]-> server class=setup
+
+# Segment 2: server -> client, SYN+ACK, seq=y ack=x+1 (flags: SYN, ACK)
+edge server -[2: SYN,ACK  seq=y ack=x+1]-> client class=setup
+
+# Segment 3: client -> server, ACK ack=y+1, carrying piggybacked data
+# (flags: ACK). One segment, so ONE edge; it is both an ACK and a data
+# carrier, so it is classed as data (the stronger claim). Detail in prose.
+edge client -[3: ACK  ack=y+1  (+ data)]-> server class=data
+
+# Hybrid panels: a second figdown section below (multi-section `MULTI-FIGURE-DOCUMENTS`),
+# not nested under the scene header. Each section has one genre (`GENRE-KEYWORD-ALLOWLIST`).
+
+# --- panel: separate genre section (main-standard hybrid = multi-section `MULTI-FIGURE-DOCUMENTS`) ---
+figdown 0.1 table
+table state "Endpoint state after each segment (RFC 9293 §3.3.2 state names)"
+| Segment            | Client state          | Server state              |
+|--------------------|-----------------------|---------------------------|
+| start              | CLOSED                | LISTEN                    |
+| 1: SYN →           | SYN-SENT              | SYN-RECEIVED on receipt   |
+| 2: SYN,ACK ←       | ESTABLISHED on receipt| SYN-RECEIVED              |
+| 3: ACK →           | ESTABLISHED           | ESTABLISHED on receipt    |

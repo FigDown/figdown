@@ -1,0 +1,42 @@
+# FigDown — figures as text. Spec: https://github.com/FigDown/figdown
+
+# Reference figure for genre `table` — EXPERIMENTAL constructs ONLY (`CONSTRUCT-STATUS-TIERS`).
+# `table` owns no experimental construct: `table`, the `|` row token, `cell`
+# and `width` are all normative, and so are the cell addresses, the
+# `highlight` flag, the span markers, the alignment colons and the column
+# widths. What is left is one keyword the genre HOSTS without owning
+# (`chart`, with its `type=`) and the two cross-namespace colour keys.
+# Every construct here is OUTSIDE the v0.1 conformance surface and OUTSIDE
+# the compatibility promise: the engine accepts it and renders it unchanged,
+# but it may change or be withdrawn in a later 0.x WITHOUT a migration entry.
+# A portable v0.1 table document uses none of it.
+# The normative surface is table.fd — kept separate so a reader can see
+# exactly where the promise ends.
+figdown 0.1 table
+title "Egress drops by sampling window (experimental constructs)"
+
+# `stroke=` (cell border colour) was EXPERIMENTAL until this release and is now
+# NORMATIVE (`STROKE-KEY-STATUS`); `color=` (text colour) was RETIRED in the same release
+# (`COLOUR-KEY-STATUS`), so the only experimental construct left in this file is `chart`.
+class hot "Above the drop watermark" fill=#fee2e2 stroke=#b91c1c
+
+# On the BLOCK `stroke=` is the default border for every cell of the grid.
+table drops "Drops per window" stroke=#a8a29e
+| Window | Q7 | Q3 | Q0 |
+|:-------|---:|---:|---:|
+| 00:00  |  4 | 31 | 64 |
+| 00:05  |  1 | 22 | 51 |
+# On a CELL `stroke=` colours that one cell's border, overriding the block
+# default. Written bare like this the mark carries no stated meaning;
+# `class=hot` on the line above is the form to prefer (`CATEGORICAL-MEANING-MAPPING`).
+cell (1,4) class=hot
+cell (2,4) stroke=#b45309
+
+# EXPERIMENTAL — `chart` reads the table AS the data: rows → X, columns → Y,
+# numeric cells → Z. It is the one keyword a pure `table` section may host
+# without owning it, and the only construct here that adds a second drawing
+# to the page rather than recolouring the first.
+# `type=bar3d` is the whole option surface — `bar3d` is its only value, so
+# `chart drops` alone means the same thing. It was spelled `plot` with
+# `kind=bars3d` until this release, and `level=` was DELETED.
+chart drops type=bar3d

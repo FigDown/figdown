@@ -1,0 +1,31 @@
+# FigDown — figures as text. Spec: https://github.com/FigDown/figdown
+
+figdown 0.1 flowchart
+title "Linear Flow with Two Sequential Decisions"
+
+# 0.1 (`FLOWCHART-ROLE-KEYWORDS`): the role vocabulary. `terminator`/`process`/`decision`
+# say what each step IS; the geometry (rounded/box/diamond) is derived from
+# the role, so no line writes shape= at all.
+terminator s   "Start"
+process    p1  "Step 1"
+decision   d1  "Check A?"
+process    p2  "Step 2"
+decision   d2  "Check B?"
+process    r1  "Result X"
+process    r2  "Result Y"
+process    r3  "Result Z"
+terminator e   "Done"
+
+flow down
+
+edge s  -> p1
+edge p1 -> d1
+edge d1 -[yes]-> p2
+edge d1 -[no]-> r1
+edge p2 -> d2
+edge d2 -[yes]-> r2
+edge d2 -[no]-> r3
+edge r1 -> e
+edge r2 -> e
+edge r3 -> e
+

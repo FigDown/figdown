@@ -1,0 +1,14 @@
+figdown 0.1 block
+# core §13.4: a document from ANY earlier version must reach the current one
+# in a SINGLE run. This is written in the oldest spellings the tool still
+# carries — six releases of them — and must land fully migrated after one pass.
+plane over "Overlay"
+node a "A" plane=over
+node b "B" shape=diamond
+node c "C"
+external e "Upstream"
+edge a -> b
+edge a -> e
+layout
+pin a at=(20,20)
+pin b width=100 height=40

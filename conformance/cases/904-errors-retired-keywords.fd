@@ -1,0 +1,17 @@
+figdown 0.1 block
+# Retired spellings report their migration by name (the `colw` -> `width`
+# precedent), so an authoring agent fixes each in one step.
+#
+# 0.1 (`EDGE-GEOMETRY-CONSTRUCTS`) put a SECOND shape in this fixture. `path` and `routing`
+# were WITHDRAWN, not renamed: their messages name no replacement spelling,
+# because there is none. `route` — renamed `path` — now states
+# the whole chain and ends in the withdrawal, so the two-hop lookup is still
+# one lookup even when the second hop is a deletion.
+node a "A"
+line "cap" in=a at=50%
+fill 15% in=a
+route a -> a via=(10,10)
+path a -> a points=(10,10)
+routing orthogonal
+colw auto
+render

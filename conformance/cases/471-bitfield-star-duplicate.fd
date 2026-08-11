@@ -1,0 +1,7 @@
+figdown 0.1 bitfield
+bitfield a numbering=msb0
+field "fixed" 8
+field "first" *
+field "second" *
+bitfield b numbering=msb0
+field x:8,y:*,z:*

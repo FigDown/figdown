@@ -1,0 +1,12 @@
+figdown 0.1 block
+# The value rules apply uniformly wherever an attribute is accepted:
+# the colour set, the style enum, and plane= naming a declared plane.
+group g "G"
+node a "A" in=g
+node b "B" in=g
+edge a -- b stroke=notacolor
+bundle bd "LAG" a--b style=bold
+threshold "cap" in=g offset=50% stroke=nope
+band "zone" 10% in=g stroke=#12 plane=ghost
+external w "ext" plane=ghost
+class c1 "Meaning" plane=ghost

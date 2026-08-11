@@ -1,0 +1,4 @@
+figdown 0.1 topology
+# Reported only under --flag-experimental (`CONSTRUCT-STATUS-TIERS`): the genre is outside the
+# v0.1 conformance surface.
+node a "A"

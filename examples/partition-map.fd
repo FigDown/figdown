@@ -1,0 +1,24 @@
+# FigDown — figures as text. Spec: https://github.com/FigDown/figdown
+
+figdown 0.1 block
+title "Partition map — a resource pool with global thresholds"
+
+# The GENERIC partition-and-threshold map: one pool, N groups, global
+# threshold lines shared by all (group-level scope; per-node scope exists
+# for figures whose semantics are per-column). Instances of this category:
+# buffer quotas, memory maps, watermark/level charts.
+group pool "Resource pool (units)" gap=0
+node g0 "Group 0" in=pool fill=transparent
+node g1 "Group 1" in=pool fill=transparent
+node g2 "Group 2" in=pool fill=transparent
+node g3 "Group 3" in=pool fill=transparent
+flow down
+rank g0,g1,g2,g3
+pin g0 width=120 height=190
+pin g1 width=120 height=190
+pin g2 width=120 height=190
+pin g3 width=120 height=190
+
+threshold "Max cap"  in=pool offset=80%
+threshold "Reserved" in=pool offset=15%
+band "Reserved" 15% in=pool fill=#a3c93a

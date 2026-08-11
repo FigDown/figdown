@@ -1,0 +1,4 @@
+figdown 0.1 bitfield
+bitfield h "H" word=32 numbering=lsb0
+field "A" 16 optional description="only when the K bit is set"
+field "B" 16

@@ -1,0 +1,11 @@
+figdown 0.1 block
+# 0.1 (RULE 1.3): `;` is RESERVED for a future statement separator.
+# Until this release it was an ordinary character — `node a ;` parsed and `;`
+# became the LABEL. Legal only inside the verbatim regions: a quoted string,
+# an [edge label], a comment, and a GFM pipe row.
+node a ";inside a label"          # legal: inside a string
+node b "B"                        # a ; in a comment is legal
+edge a -[has a ; inside]-> b      # legal: [ ] is the verbatim text region
+node c ;
+node d "D";
+rank a,b;

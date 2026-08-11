@@ -1,0 +1,1 @@
+Line 6: merge region is not rectangular (L-shaped or overlapping spans)

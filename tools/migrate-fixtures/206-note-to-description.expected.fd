@@ -1,0 +1,4 @@
+figdown 0.1 bitfield
+bitfield h "H" word=16 numbering=lsb0
+field "A" 8 description="the low half"
+field "B" 8

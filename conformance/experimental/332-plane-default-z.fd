@@ -1,0 +1,4 @@
+figdown 0.1 block
+plane first "First"
+plane pinned "Pinned" z-index=10
+plane second "Second"

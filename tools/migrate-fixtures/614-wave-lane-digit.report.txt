@@ -1,0 +1,1 @@
+  L4  [wave-lane-digit] wave lane digits 2-9 were retired (`TIMING-LANE-ALPHABET`) — WaveDrom reads them as "value with color N", the same brick as `=`; write `=` for each data cell and name it in `data=`. NON-MECHANICAL: the labels are yours to supply

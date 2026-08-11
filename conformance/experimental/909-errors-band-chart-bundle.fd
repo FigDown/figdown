@@ -1,0 +1,10 @@
+# Static err() coverage: band label + range, chart id, bundle members, and
+# the DELETED `chart level=` (`CHART-LEVEL-KEY`)
+figdown 0.1 topology
+node a "A"
+node b "B"
+edge a -- b
+band "z" in=a
+bundle empty
+chart
+chart t level=-1

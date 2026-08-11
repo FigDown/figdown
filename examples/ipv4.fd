@@ -1,0 +1,70 @@
+# FigDown — figures as text. Spec: https://github.com/FigDown/figdown
+
+figdown 0.1 bitfield
+# IPv4 header — transcribed from the ASCII diagram in RFC 791 §3.1
+# ("Example Internet Datagram Header", Figure 4, September 1981),
+# https://www.rfc-editor.org/rfc/rfc791.txt
+#
+# What this figure probes: the variable-length Options + Padding tail —
+# the `*` fill-the-remainder case.
+#
+# Fidelity rule for this file: it carries EXACTLY the fields RFC 791 §3.1
+# draws. The datagram's data follows on the wire but is outside that
+# diagram, so it is not a field here.
+title "IPv4 header"
+
+# msb0: bit 0 is the MSB, ruler 0…31 left to right — the numbering the
+# "0 1 2 3 / 0 1 2 3 4 5 6 7 8 9 0 1 …" scale in RFC 791 states, where the
+# RFC's own words are "each tick mark represents one bit position".
+bitfield ipv4 "IPv4 Header (RFC 791 §3.1)" word=32 numbering=msb0
+
+# Word 0 — 4 + 4 + 8 + 16 = 32 bits.
+field "Version" 4 description="= 4"
+field "IHL" 4 description="Internet Header Length in 32-bit words; minimum 5, so the fixed part is 20 octets"
+# RFC 791 §3.1 names bits 8–15 "Type of Service". RFC 2474 and RFC 3168
+# later redefined the same eight bits as DSCP (6) + ECN (2); this file
+# transcribes the RFC 791 diagram, and the redefinition rides in the note.
+field "Type of Service" 8 description="RFC 791 §3.1; redefined by RFC 2474 as DSCP (6 bits) + ECN (2 bits, RFC 3168)"
+field "Total Length" 16 description="length of the whole datagram in octets, header included; maximum 65535"
+
+# Word 1 — 16 + 3 + 13 = 32 bits.
+field "Identification" 16 description="identifying value assigned by the sender, to help reassemble fragments"
+field "Flags" 3 description="bit 0 reserved (0), bit 1 DF (Don't Fragment), bit 2 MF (More Fragments)"
+field "Fragment Offset" 13 description="position of this fragment in the datagram, in units of 8 octets"
+
+# Word 2 — 8 + 8 + 16 = 32 bits.
+field "Time to Live" 8 description="maximum remaining lifetime; decremented at each hop, datagram destroyed at zero"
+field "Protocol" 8 description="next-level protocol, from the IANA protocol-numbers registry"
+field "Header Checksum" 16 description="one's-complement checksum of the header only; recomputed at every hop because TTL changes"
+
+# Words 3 and 4.
+field "Source Address" 32 fill=#dbeafe
+field "Destination Address" 32 fill=#dbeafe
+
+# Word 5 — the variable tail. RFC 791 draws it as one representative row,
+# "|      Options      |   Padding   |", but its prose says "Options:
+# variable" and "Padding: variable": there may be zero or more options, and
+# the padding is however many zero bits it takes to finish the last word.
+#
+# `*` is the language's variable-length tail. It is an honest width: the
+# model records `width: "*"`, core §12.7 forbids reading the DRAWN width as
+# the field's length, and §12.6 makes every later declared offset
+# indeterminate. So a reader is stopped from producing a wrong number.
+# What it does NOT carry is the rest of what RFC 791 states — the 0–40
+# octet bound, and that the actual length is (IHL - 5) x 4 octets. No field
+# width in this document is derived from IHL; nothing links the two.
+# `present="IHL > 5"` adds that the region may be absent entirely — which it
+# is whenever IHL = 5 — and states the condition, so it draws as a caption.
+# The condition is prose: core §12.7 lets a reader quote it and forbids
+# resolving `IHL` against the `field "IHL"` above (`ANNOTATION-LOCATOR-SPLIT`).
+field "Options" * present="IHL > 5" description="zero or more options, 0–40 octets, actual length (IHL - 5) x 4 (RFC 791 §3.1, 'Options: variable')"
+# Padding is variable too — 0 to 24 zero bits, however many it takes to
+# finish the last 32-bit word. It cannot be written that way here: at most
+# one `*` is allowed per block and Options has it, so this width is a hard
+# 8 in the model, which is the one number in this figure a reader should
+# not trust. RFC 791's own diagram draws 8 as well; the truth is in
+# `description=`, which core §12.7 lets a reader quote but never act on.
+# The missing construct is a RANGE width (core §9 `BITFIELD-RANGE-WIDTH`).
+# Padding also lands on its own row instead of beside Options, because `*`
+# always runs to the end of the row it starts in.
+field "Padding" 8 present="" description="zero bits so that the header ends on a 32-bit word; variable, 0–24 bits in practice — the 8 declared here are the width RFC 791's diagram draws, not a fixed width on the wire"

@@ -1,0 +1,25 @@
+figdown 0.1 block
+# spec §12.3: absent is OMITTED, and an explicitly EMPTY label is a
+# WRITTEN value — a third state, recorded uniformly on all nine
+# label-bearing directives and on `title` (`EMPTY-LABEL-STATE`, 0.1;
+# DISCREPANCIES `EMPTY-LABEL-DIRECTIVE-COVERAGE` resolved). The companion fixture
+# 214-label-absent-vs-id freezes the absent half: read the two goldens
+# together and the rule is the contrast between them. The id
+# substitution is a RENDERING rule that applies only to absence, so
+# every label written below draws nothing at all.
+title ""
+plane over ""
+node a ""
+group g ""
+external x ""
+node b "" in=g
+edge a -> b
+bundle bl "" a--b
+bitfield hdr "" numbering=lsb0
+field "ver" 4
+table t ""
+| A |
+|---|
+| 1 |
+timing w ""
+signal clk 0101

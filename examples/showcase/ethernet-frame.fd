@@ -1,0 +1,36 @@
+# FigDown — figures as text. Spec: https://github.com/FigDown/figdown
+
+figdown 0.1 table
+# Ethernet II frame, byte-order-on-the-wire carried by CELL ORDER (the
+# `BYTE-UNIT-PACKET-BLOCKS` sanctioned pattern: a byte-unit packet is a single-row table, not
+# a bitfield — no misleading bit ruler). Left-to-right cell order IS the
+# order bytes appear on the wire; the strip test survives because that
+# order lives in the syntax, never in geometry.
+#
+# Two data rows = two frame variants: untagged (Ethernet II) and 802.1Q
+# tagged. The tag is INSERTED between Source MAC and EtherType — the class
+# marks exactly which column is the insertion point, so a reader sees it
+# without pixels.
+title "Ethernet II Frame — Untagged vs 802.1Q Tagged"
+
+# Semantic class: the 802.1Q tag and its insertion point. The label states
+# the MEANING; the legend derives from this line (spec §2.7).
+class tag "802.1Q VLAN tag (4 bytes), inserted after Source MAC; absent in an untagged frame" fill=#dbeafe
+
+table eth "Ethernet II frame — column order = wire order (byte counts in the second header tier)"
+| Variant  | Destination MAC | Source MAC | 802.1Q Tag  | EtherType | Payload         | FCS       |
+| (frame)  | (6 bytes)       | (6 bytes)  | (4 bytes)   | (2 bytes) | (46-1500 bytes) | (4 bytes) |
+|----------|-----------------|------------|-------------|-----------|-----------------|-----------|
+| Untagged | DA              | SA         | (none)      | Type      | Data            | CRC-32    |
+| Tagged   | DA              | SA         | TPID 0x8100 + PCP/DEI/VID | Type | Data       | CRC-32    |
+width 90,auto,auto,auto,auto,auto,auto
+cell (1,4) class=tag
+cell (2,4) class=tag
+
+# HONEST LIMIT (`CONTIGUOUS-RANGE-GROUPING`, span/coverage annotation): the FCS (CRC-32) is
+# computed over DA through Payload inclusive — a coverage span across a
+# CONTIGUOUS run of columns. FigDown has no construct to draw or annotate
+# such a span (curly-brace grouping over a contiguous field/cell range is
+# `CONTIGUOUS-RANGE-GROUPING`, v0.2; a `cell` note is not available in the table genre). Until it
+# lands, this fact rides on a source comment and the guide/showcase.md prose, never on
+# geometry — stated here so a reader recovers it from the text, not pixels.

@@ -1,0 +1,8 @@
+# 0.1 (`RULE-POSITION-ENUMERATION`): RULE 2.4's enum half. Stripping the quotes is a pure
+# spelling change — the value inside them was already the value the engine
+# used, so the model and the drawing are identical before and after.
+figdown "0.1" block
+flow "down"
+node a "A" shape="box"
+node b "B" style="dashed"
+edge a -> b style="dotted"

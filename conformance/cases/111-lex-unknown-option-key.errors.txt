@@ -1,0 +1,2 @@
+Line 2: unknown option "foo="
+Line 4: unknown option "foo="

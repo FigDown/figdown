@@ -1,0 +1,98 @@
+# FigDown — figures as text. Spec: https://github.com/FigDown/figdown
+
+# Telemetry export path — the ONE-DOCUMENT hybrid (`GENRE-COMPOSITION`, spec core §4).
+#
+# What this figure probes: a typed region NESTED INSIDE a scene document,
+# with NO second `figdown` header. FigDown has two ways to put a table (or a
+# bitfield, or a timing diagram) next to a box-and-wire figure, and this is
+# the one that had never been demonstrated in the corpus until this release:
+#
+#   `MULTI-FIGURE-DOCUMENTS`, multi-section — the file carries a second `figdown 0.1 table` header
+#     and the table is a SEPARATE DOCUMENT stacked below the first.
+#     See examples/evpn-fabric.fd and examples/pvlan-flows.fd.
+#
+#   `GENRE-COMPOSITION`, nested region (THIS FILE) — one header, one document. A `table`,
+#     `bitfield` or `timing` line opens a region governed by THAT genre's
+#     namespace, and the next top-level directive of the host genre closes
+#     it. No `end` keyword: scope is sticky, exactly as inside a genre's own
+#     document.
+#
+# The difference is not cosmetic. Under `MULTI-FIGURE-DOCUMENTS` the reader gets two documents with
+# two `sections` entries and no relation between them. Under `GENRE-COMPOSITION` it gets ONE
+# document whose region list stands in document order — still no declared
+# relation (that is `CROSS-BLOCK-REFERENCES`, v0.2), but one figure, one title, one artifact.
+# Reach for `GENRE-COMPOSITION` when the panel is PART OF the figure, and for `MULTI-FIGURE-DOCUMENTS` when it is a
+# second figure that merely travels with the first.
+#
+# Composition is NOT inheritance (core §4). This document is `block`, so
+# `node`/`edge`/`class` are its vocabulary; `|` rows, `cell` and `width` are
+# valid ONLY inside the `table` region below, and `field` would be a line
+# error anywhere in this file because no `bitfield` region is open.
+figdown 0.1 block
+title "Telemetry export path"
+
+class lossy "Lossy by design — this stage drops under back-pressure rather than blocking the datapath" stroke=#b91c1c style=dashed
+
+# ── Scene region: the export pipeline itself ─────────────────────────────
+external asic "from the forwarding ASIC"
+node sample "Sampler" shape=rounded
+node ring "Export ring" shape=cylinder class=lossy
+node enc "gRPC encoder" shape=box
+external coll "to the collector"
+
+edge asic -[1 in 2048]-> sample
+edge sample -> ring
+edge ring -[drop on full]-> enc class=lossy
+edge enc -> coll
+
+# `flow up`. The export path climbs OUT of the datapath: the ASIC is at the
+# bottom of the figure because it is at the bottom of the stack, and each
+# stage above it is further from the wire. Twelve figures in this corpus flow
+# `right` and twelve flow `down`; `up` and `left` had no demonstrator at all
+# before this release, so half of a four-value enum went into the freeze
+# untested by any figure. (`left` is in examples/rpf-check.fd.)
+flow up
+rank ring,enc
+
+# ── Nested table region — opens here, still the SAME document ────────────
+# The `table` keyword is in `block`'s top-level namespace precisely so a scene
+# can compose one. Everything from here to the next `block` directive reads
+# under the `table` genre: the `|` rows, `cell` and `width`.
+table budget "Per-stage export budget"
+| Stage        | Rate (pps) | Drops/min |
+|--------------|-----------:|----------:|
+| Sampler      |      12000 |         0 |
+| Export ring  |       9600 |       410 |
+| gRPC encoder |       9600 |         0 |
+# `cell` addresses the region's own grid — the region is a complete figure of
+# its genre, not a degraded fragment of one.
+cell (2,3) fill=#fee2e2
+width auto,90,90
+
+# ── Nested bitfield region — the SECOND composable genre, same document ──
+# `table` is not a special case: `bitfield` and `timing` open a region in a
+# scene document on exactly the same rule, and each is governed by its own
+# genre inside it. `field` is a line error anywhere above this line and legal
+# from here to the next `block` directive.
+#
+# The region's caption is written EMPTY (`EMPTY-LABEL-STATE`). The host figure has already
+# named this thing — it is the record `enc` writes into the export ring — so a
+# caption would repeat it, and the third label state exists precisely so the
+# author can record "none, deliberately" instead of omitting the key and
+# leaving a reader to wonder whether the caption was lost.
+bitfield rec "" word=32 numbering=msb0
+field "Version" 4
+field "Type" 4
+field "Length" 24
+field "Observation Domain" 32
+field "Records" *
+# `chart` is EXPERIMENTAL (core §4.4): it is outside the v0.1 compatibility
+# promise and may change or leave. It reads an existing table by id and draws
+# it, so it needs no data of its own — and it is listed in the `block` and
+# `topology` vocabularies exactly so a scene document can carry one over a
+# table it composed. That row had no demonstrator anywhere in the corpus
+# before this release, which is the whole reason this line is here. Every column
+# after the first must be numeric — a chart plots the numbers, and the label
+# column names the series, so the `Owner` column this table would otherwise
+# carry belongs in a `description` or a second table, not here.
+chart budget type=bar3d

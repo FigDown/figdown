@@ -1,0 +1,4 @@
+figdown 0.1 block
+node a "A"
+render
+pin a at=(20,20)

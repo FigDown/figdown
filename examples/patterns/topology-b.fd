@@ -1,0 +1,42 @@
+# FigDown — figures as text. Spec: https://github.com/FigDown/figdown
+
+figdown 0.1 topology
+title "Chain with redundant pair and link bundle"
+
+# Structural pattern abstracted from real topology figures:
+#   - Linear ingress → core → egress chain
+#   - A redundant device pair in the core (Device B1 + Device B2),
+#     each carrying one leg of the traffic
+#   - A link bundle grouping the two parallel legs between the
+#     upstream and downstream core nodes
+#   - Numbered port labels on each link
+
+node in1 "Ingress Node" shape=rounded fill=#f0fdf4
+node c1  "Core Node 1" shape=rounded fill=#eff6ff
+
+group pair "Redundant Pair"
+node b1  "Device B1" shape=rounded fill=#fef9c3 in=pair
+node b2  "Device B2" shape=rounded fill=#fef9c3 in=pair
+
+node c2  "Core Node 2" shape=rounded fill=#eff6ff
+node out1 "Egress Node" shape=rounded fill=#f0fdf4
+
+flow right
+rank b1,b2
+
+# ingress to first core node
+edge in1 [p1] -- [p1] c1
+
+# c1 fans into the redundant pair
+edge c1 [p2] -- [p1] b1
+edge c1 [p3] -- [p1] b2
+
+# redundant pair fans into second core node
+edge b1 [p2] -- [p1] c2
+edge b2 [p2] -- [p2] c2
+
+# egress
+edge c2 [p3] -- [p1] out1
+
+# link bundle: the two parallel legs through the redundant pair
+bundle bund1 "Link Bundle 1" c1--b1,c1--b2

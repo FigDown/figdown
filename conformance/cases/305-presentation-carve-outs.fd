@@ -1,0 +1,19 @@
+figdown 0.1 block
+# The §5 attributes an element cannot carry, because it draws no such
+# thing: a boundary is never drawn (only its label exists), and typed blocks
+# stack outside the scene (nothing to layer against) with per-item dashes
+# reserved for `conditional` fields. `band` left this list
+# (`BAND-LABEL-STATUS`): it gained a mandatory label, and the text channel came with it.
+external w "ext" fill=#ffffff stroke=#000000 style=dashed
+group g "G"
+node a "A" in=g
+bitfield bf "B" style=dashed plane=base
+field "one" 4 plane=base
+timing wv "W" style=dotted plane=base
+signal clk p... plane=base
+table t "T"
+| h |
+|---|
+| 1 |
+cell (1,1) fill=#fee2e2 plane=base
+table t2 "T2" style=solid plane=base

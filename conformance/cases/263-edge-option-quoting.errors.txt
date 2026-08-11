@@ -1,0 +1,2 @@
+Line 10: this position takes a BARE value: write style=zzz — quoting a value drawn from a closed set suggests the position accepts arbitrary text, when it accepts only the listed spellings (SYNTAX-STYLE RULE 2.4)
+Line 9: this position takes a BARE value: write style=dashed — quoting a value drawn from a closed set suggests the position accepts arbitrary text, when it accepts only the listed spellings (SYNTAX-STYLE RULE 2.4)

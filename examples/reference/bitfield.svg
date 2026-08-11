@@ -1,0 +1,152 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 764 952" width="764" height="952" font-family="system-ui,sans-serif"><defs><marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#555"/></marker><pattern id="hatch" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><line x1="0" y1="0" x2="0" y2="6" stroke="#bbb" stroke-width="2"/></pattern></defs><g transform="translate(18,6)"><text x="0" y="14" font-size="13" font-weight="600">Export header (on the wire)</text><text x="11.5" y="29" font-size="8.5" text-anchor="middle" fill="#6f6e69">0</text><text x="34.5" y="29" font-size="8.5" text-anchor="middle" fill="#6f6e69">1</text><text x="57.5" y="29" font-size="8.5" text-anchor="middle" fill="#6f6e69">2</text><text x="80.5" y="29" font-size="8.5" text-anchor="middle" fill="#6f6e69">3</text><text x="103.5" y="29" font-size="8.5" text-anchor="middle" fill="#6f6e69">4</text><text x="126.5" y="29" font-size="8.5" text-anchor="middle" fill="#6f6e69">5</text><text x="149.5" y="29" font-size="8.5" text-anchor="middle" fill="#6f6e69">6</text><text x="172.5" y="29" font-size="8.5" text-anchor="middle" fill="#6f6e69">7</text><text x="195.5" y="29" font-size="8.5" text-anchor="middle" fill="#6f6e69">8</text><text x="218.5" y="29" font-size="8.5" text-anchor="middle" fill="#6f6e69">9</text><text x="241.5" y="29" font-size="8.5" text-anchor="middle" fill="#6f6e69">10</text><text x="264.5" y="29" font-size="8.5" text-anchor="middle" fill="#6f6e69">11</text><text x="287.5" y="29" font-size="8.5" text-anchor="middle" fill="#6f6e69">12</text><text x="310.5" y="29" font-size="8.5" text-anchor="middle" fill="#6f6e69">13</text><text x="333.5" y="29" font-size="8.5" text-anchor="middle" fill="#6f6e69">14</text><text x="356.5" y="29" font-size="8.5" text-anchor="middle" fill="#6f6e69">15</text><text x="379.5" y="29" font-size="8.5" text-anchor="middle" fill="#6f6e69">16</text><text x="402.5" y="29" font-size="8.5" text-anchor="middle" fill="#6f6e69">17</text><text x="425.5" y="29" font-size="8.5" text-anchor="middle" fill="#6f6e69">18</text><text x="448.5" y="29" font-size="8.5" text-anchor="middle" fill="#6f6e69">19</text><text x="471.5" y="29" font-size="8.5" text-anchor="middle" fill="#6f6e69">20</text><text x="494.5" y="29" font-size="8.5" text-anchor="middle" fill="#6f6e69">21</text><text x="517.5" y="29" font-size="8.5" text-anchor="middle" fill="#6f6e69">22</text><text x="540.5" y="29" font-size="8.5" text-anchor="middle" fill="#6f6e69">23</text><text x="563.5" y="29" font-size="8.5" text-anchor="middle" fill="#6f6e69">24</text><text x="586.5" y="29" font-size="8.5" text-anchor="middle" fill="#6f6e69">25</text><text x="609.5" y="29" font-size="8.5" text-anchor="middle" fill="#6f6e69">26</text><text x="632.5" y="29" font-size="8.5" text-anchor="middle" fill="#6f6e69">27</text><text x="655.5" y="29" font-size="8.5" text-anchor="middle" fill="#6f6e69">28</text><text x="678.5" y="29" font-size="8.5" text-anchor="middle" fill="#6f6e69">29</text><text x="701.5" y="29" font-size="8.5" text-anchor="middle" fill="#6f6e69">30</text><text x="724.5" y="29" font-size="8.5" text-anchor="middle" fill="#6f6e69">31</text><rect x="0" y="34" width="92" height="30" fill="#fff" stroke="#555"/><text x="46" y="52.85" font-size="11" text-anchor="middle">Ver</text><rect x="92" y="34" width="138" height="30" fill="#fff" stroke="#555"><title>in 32-bit words; minimum 3</title></rect><text x="161" y="52.85" font-size="11" text-anchor="middle">Header Length</text><rect x="230" y="34" width="138" height="30" fill="#fff" stroke="#7c3aed"/><text x="299" y="52.85" font-size="11" text-anchor="middle">Flags</text><rect x="368" y="34" width="368" height="30" fill="#fef3c7" stroke="#555" stroke-dasharray="5 3"/><text x="552" y="52.85" font-size="11" text-anchor="middle">Checksum</text><rect x="0" y="64" width="736" height="30" fill="#fff" stroke="#555" stroke-dasharray="5 3"/><text x="368" y="82.85" font-size="11" text-anchor="middle">Sequence</text><rect x="0" y="94" width="736" height="60" fill="#dbeafe" stroke="#555"/><text x="368" y="127.85" font-size="11" text-anchor="middle">Export Timestamp</text><rect x="0" y="154" width="184" height="30" fill="#e7e5e4" stroke="#7c3aed"/><text x="92" y="172.85" font-size="11" text-anchor="middle">Pad</text><rect x="0" y="184" width="736" height="30" fill="#fff" stroke="#555"><title>record count derived from Header Length</title></rect><text x="368" y="202.85" font-size="11" text-anchor="middle">Records</text><text x="0" y="233" font-size="10.5" fill="#6f6e69">Checksum — present: the C flag is set</text><text x="0" y="278" font-size="13" font-weight="600">Export record (one entry of the Records region)</text><text x="11.5" y="293" font-size="8.5" text-anchor="middle" fill="#6f6e69">0</text><text x="34.5" y="293" font-size="8.5" text-anchor="middle" fill="#6f6e69">1</text><text x="57.5" y="293" font-size="8.5" text-anchor="middle" fill="#6f6e69">2</text><text x="80.5" y="293" font-size="8.5" text-anchor="middle" fill="#6f6e69">3</text><text x="103.5" y="293" font-size="8.5" text-anchor="middle" fill="#6f6e69">4</text><text x="126.5" y="293" font-size="8.5" text-anchor="middle" fill="#6f6e69">5</text><text x="149.5" y="293" font-size="8.5" text-anchor="middle" fill="#6f6e69">6</text><text x="172.5" y="293" font-size="8.5" text-anchor="middle" fill="#6f6e69">7</text><text x="195.5" y="293" font-size="8.5" text-anchor="middle" fill="#6f6e69">8</text><text x="218.5" y="293" font-size="8.5" text-anchor="middle" fill="#6f6e69">9</text><text x="241.5" y="293" font-size="8.5" text-anchor="middle" fill="#6f6e69">10</text><text x="264.5" y="293" font-size="8.5" text-anchor="middle" fill="#6f6e69">11</text><text x="287.5" y="293" font-size="8.5" text-anchor="middle" fill="#6f6e69">12</text><text x="310.5" y="293" font-size="8.5" text-anchor="middle" fill="#6f6e69">13</text><text x="333.5" y="293" font-size="8.5" text-anchor="middle" fill="#6f6e69">14</text><text x="356.5" y="293" font-size="8.5" text-anchor="middle" fill="#6f6e69">15</text><text x="379.5" y="293" font-size="8.5" text-anchor="middle" fill="#6f6e69">16</text><text x="402.5" y="293" font-size="8.5" text-anchor="middle" fill="#6f6e69">17</text><text x="425.5" y="293" font-size="8.5" text-anchor="middle" fill="#6f6e69">18</text><text x="448.5" y="293" font-size="8.5" text-anchor="middle" fill="#6f6e69">19</text><text x="471.5" y="293" font-size="8.5" text-anchor="middle" fill="#6f6e69">20</text><text x="494.5" y="293" font-size="8.5" text-anchor="middle" fill="#6f6e69">21</text><text x="517.5" y="293" font-size="8.5" text-anchor="middle" fill="#6f6e69">22</text><text x="540.5" y="293" font-size="8.5" text-anchor="middle" fill="#6f6e69">23</text><text x="563.5" y="293" font-size="8.5" text-anchor="middle" fill="#6f6e69">24</text><text x="586.5" y="293" font-size="8.5" text-anchor="middle" fill="#6f6e69">25</text><text x="609.5" y="293" font-size="8.5" text-anchor="middle" fill="#6f6e69">26</text><text x="632.5" y="293" font-size="8.5" text-anchor="middle" fill="#6f6e69">27</text><text x="655.5" y="293" font-size="8.5" text-anchor="middle" fill="#6f6e69">28</text><text x="678.5" y="293" font-size="8.5" text-anchor="middle" fill="#6f6e69">29</text><text x="701.5" y="293" font-size="8.5" text-anchor="middle" fill="#6f6e69">30</text><text x="724.5" y="293" font-size="8.5" text-anchor="middle" fill="#6f6e69">31</text><rect x="0" y="298" width="368" height="30" fill="#fff" stroke="#555"><title>flow entries in this record; the entries are numbered from 1</title></rect><text x="184" y="316.85" font-size="11" text-anchor="middle">Entry Count</text><rect x="368" y="298" width="368" height="30" fill="#fff" stroke="#555"/><text x="552" y="316.85" font-size="11" text-anchor="middle">Queue Depth [0]</text><rect x="368" y="344" width="368" height="30" fill="#fff" stroke="#555"/><text x="552" y="362.85" font-size="11" text-anchor="middle">Queue Depth [7]</text><rect x="0" y="374" width="736" height="30" fill="#fff" stroke="#555"/><text x="368" y="392.85" font-size="11" text-anchor="middle">Drop Count</text><rect x="0" y="404" width="736" height="60" fill="#fff" stroke="#555"/><text x="368" y="437.85" font-size="11" text-anchor="middle">Flow Entry [1]</text><rect x="0" y="480" width="736" height="60" fill="#fff" stroke="#555"/><text x="368" y="513.85" font-size="11" text-anchor="middle">Flow Entry [Entry Count]</text><rect x="0" y="540" width="736" height="30" fill="#fff" stroke="#7c3aed"/><text x="368" y="558.85" font-size="11" text-anchor="middle">Vendor Counter</text><line x1="368" y1="328" x2="368" y2="344" stroke="#555" stroke-dasharray="2 3"/><line x1="736" y1="328" x2="736" y2="344" stroke="#555" stroke-dasharray="2 3"/><text x="552" y="339.675" font-size="10.5" text-anchor="middle" fill="#6f6e69">…</text><text x="368" y="475.675" font-size="10.5" text-anchor="middle" fill="#6f6e69">…</text><text x="368" y="581.675" font-size="10.5" text-anchor="middle" fill="#6f6e69">…</text><text x="0" y="630" font-size="13" font-weight="600">tlv</text><text x="11.5" y="645" font-size="8.5" text-anchor="middle" fill="#6f6e69">0</text><text x="34.5" y="645" font-size="8.5" text-anchor="middle" fill="#6f6e69">1</text><text x="57.5" y="645" font-size="8.5" text-anchor="middle" fill="#6f6e69">2</text><text x="80.5" y="645" font-size="8.5" text-anchor="middle" fill="#6f6e69">3</text><text x="103.5" y="645" font-size="8.5" text-anchor="middle" fill="#6f6e69">4</text><text x="126.5" y="645" font-size="8.5" text-anchor="middle" fill="#6f6e69">5</text><text x="149.5" y="645" font-size="8.5" text-anchor="middle" fill="#6f6e69">6</text><text x="172.5" y="645" font-size="8.5" text-anchor="middle" fill="#6f6e69">7</text><text x="195.5" y="645" font-size="8.5" text-anchor="middle" fill="#6f6e69">8</text><text x="218.5" y="645" font-size="8.5" text-anchor="middle" fill="#6f6e69">9</text><text x="241.5" y="645" font-size="8.5" text-anchor="middle" fill="#6f6e69">10</text><text x="264.5" y="645" font-size="8.5" text-anchor="middle" fill="#6f6e69">11</text><text x="287.5" y="645" font-size="8.5" text-anchor="middle" fill="#6f6e69">12</text><text x="310.5" y="645" font-size="8.5" text-anchor="middle" fill="#6f6e69">13</text><text x="333.5" y="645" font-size="8.5" text-anchor="middle" fill="#6f6e69">14</text><text x="356.5" y="645" font-size="8.5" text-anchor="middle" fill="#6f6e69">15</text><text x="379.5" y="645" font-size="8.5" text-anchor="middle" fill="#6f6e69">16</text><text x="402.5" y="645" font-size="8.5" text-anchor="middle" fill="#6f6e69">17</text><text x="425.5" y="645" font-size="8.5" text-anchor="middle" fill="#6f6e69">18</text><text x="448.5" y="645" font-size="8.5" text-anchor="middle" fill="#6f6e69">19</text><text x="471.5" y="645" font-size="8.5" text-anchor="middle" fill="#6f6e69">20</text><text x="494.5" y="645" font-size="8.5" text-anchor="middle" fill="#6f6e69">21</text><text x="517.5" y="645" font-size="8.5" text-anchor="middle" fill="#6f6e69">22</text><text x="540.5" y="645" font-size="8.5" text-anchor="middle" fill="#6f6e69">23</text><text x="563.5" y="645" font-size="8.5" text-anchor="middle" fill="#6f6e69">24</text><text x="586.5" y="645" font-size="8.5" text-anchor="middle" fill="#6f6e69">25</text><text x="609.5" y="645" font-size="8.5" text-anchor="middle" fill="#6f6e69">26</text><text x="632.5" y="645" font-size="8.5" text-anchor="middle" fill="#6f6e69">27</text><text x="655.5" y="645" font-size="8.5" text-anchor="middle" fill="#6f6e69">28</text><text x="678.5" y="645" font-size="8.5" text-anchor="middle" fill="#6f6e69">29</text><text x="701.5" y="645" font-size="8.5" text-anchor="middle" fill="#6f6e69">30</text><text x="724.5" y="645" font-size="8.5" text-anchor="middle" fill="#6f6e69">31</text><rect x="0" y="650" width="184" height="30" fill="#fff" stroke="#555"/><text x="92" y="668.85" font-size="11" text-anchor="middle">type</text><rect x="184" y="650" width="184" height="30" fill="#fff" stroke="#555"/><text x="276" y="668.85" font-size="11" text-anchor="middle">length</text><rect x="368" y="650" width="184" height="30" fill="#fff" stroke="#555"/><text x="460" y="668.85" font-size="11" text-anchor="middle">flags</text><rect x="552" y="650" width="184" height="30" fill="#fff" stroke="#555"/><text x="644" y="668.85" font-size="11" text-anchor="middle">rsvd</text><rect x="0" y="680" width="368" height="30" fill="#fff" stroke="#555"/><text x="184" y="698.85" font-size="11" text-anchor="middle">Scope Count</text><rect x="368" y="680" width="368" height="30" fill="#fff" stroke="#555"/><text x="552" y="698.85" font-size="11" text-anchor="middle">Element Count</text><rect x="0" y="710" width="184" height="30" fill="#fff" stroke="#7c3aed"/><text x="92" y="728.85" font-size="11" text-anchor="middle">e1</text><rect x="184" y="710" width="184" height="30" fill="#fff" stroke="#7c3aed"/><text x="276" y="728.85" font-size="11" text-anchor="middle">e2</text><rect x="368" y="710" width="184" height="30" fill="#fff" stroke="#7c3aed"/><text x="460" y="728.85" font-size="11" text-anchor="middle">e3</text><rect x="552" y="710" width="184" height="30" fill="#fff" stroke="#7c3aed"/><text x="644" y="728.85" font-size="11" text-anchor="middle">e4</text><rect x="0" y="740" width="736" height="30" fill="#fff" stroke="#555"/><text x="368" y="758.85" font-size="11" text-anchor="middle">body</text><text x="0" y="814" font-size="13" font-weight="600">Exporter control register (0x40)</text><text x="14" y="829" font-size="8.5" text-anchor="middle" fill="#6f6e69">15</text><text x="42" y="829" font-size="8.5" text-anchor="middle" fill="#6f6e69">14</text><text x="70" y="829" font-size="8.5" text-anchor="middle" fill="#6f6e69">13</text><text x="98" y="829" font-size="8.5" text-anchor="middle" fill="#6f6e69">12</text><text x="126" y="829" font-size="8.5" text-anchor="middle" fill="#6f6e69">11</text><text x="154" y="829" font-size="8.5" text-anchor="middle" fill="#6f6e69">10</text><text x="182" y="829" font-size="8.5" text-anchor="middle" fill="#6f6e69">9</text><text x="210" y="829" font-size="8.5" text-anchor="middle" fill="#6f6e69">8</text><text x="238" y="829" font-size="8.5" text-anchor="middle" fill="#6f6e69">7</text><text x="266" y="829" font-size="8.5" text-anchor="middle" fill="#6f6e69">6</text><text x="294" y="829" font-size="8.5" text-anchor="middle" fill="#6f6e69">5</text><text x="322" y="829" font-size="8.5" text-anchor="middle" fill="#6f6e69">4</text><text x="350" y="829" font-size="8.5" text-anchor="middle" fill="#6f6e69">3</text><text x="378" y="829" font-size="8.5" text-anchor="middle" fill="#6f6e69">2</text><text x="406" y="829" font-size="8.5" text-anchor="middle" fill="#6f6e69">1</text><text x="434" y="829" font-size="8.5" text-anchor="middle" fill="#6f6e69">0</text><rect x="0" y="834" width="112" height="30" fill="#e7e5e4" stroke="#a8a29e"/><text x="56" y="852.85" font-size="11" text-anchor="middle">RSVD</text><rect x="112" y="834" width="84" height="30" fill="#fafaf9" stroke="#b45309"/><text x="154" y="852.85" font-size="11" text-anchor="middle">MODE</text><rect x="196" y="834" width="224" height="30" fill="#dbeafe" stroke="#a8a29e"/><text x="308" y="852.85" font-size="11" text-anchor="middle">INTERVAL</text><rect x="420" y="834" width="28" height="30" fill="#fafaf9" stroke="#a8a29e"><title>1 = exporter enabled</title></rect><text x="434" y="852.85" font-size="11" text-anchor="middle">EN</text><rect x="0" y="905" width="16" height="11" fill="#fff" stroke="#7c3aed"/><text x="21" y="914.5" font-size="11" fill="#1d1d1b">Vendor-defined — not interoperable</text><rect x="268.4" y="905" width="16" height="11" fill="#fef3c7" stroke="#555"/><text x="289.4" y="914.5" font-size="11" fill="#1d1d1b">Present only when the C flag is set</text><rect x="0" y="925" width="16" height="11" fill="#e7e5e4" stroke="#555"/><text x="21" y="934.5" font-size="11" fill="#1d1d1b">Reserved — senders write zero</text></g><metadata id="figdown-source" data-sha256="211e75c620d1550763c117543b3546f3b4a362ab5bf96e9dbc560c5a4ef5c3b7" data-engine-version="0.1.0"><![CDATA[
+# FigDown — figures as text. Spec: https://github.com/FigDown/figdown
+
+# Reference figure for genre `bitfield` — NORMATIVE surface only (spec/genres/bitfield.md).
+# Every construct here is inside the v0.1 conformance surface and the
+# compatibility promise. This genre reaches NO experimental construct at all
+# `stroke=` was promoted to NORMATIVE (`STROKE-KEY-STATUS`) and `color=`
+# was retired (`COLOUR-KEY-STATUS`), which were the only two it could ever reach, so
+# bitfield-experimental.fd was deleted rather than left empty.
+# The set demonstrates every FORM of every keyword, not just every keyword.
+# Coverage: node tools/reference-coverage.js --normative-only --strict bitfield
+figdown 0.1 bitfield
+title "Telemetry export framing"
+
+# `class` declares a meaning ONCE; elements join it with class=. The meaning
+# string is required — it is what a reading agent gets instead of a hex value.
+# `style=` is NOT among them here: it cannot reach a field by ANY route.
+# It left `field`'s own option list (`STYLE-KEY-SCOPE`), and a class that
+# declares it is silently ignored on a field member while the legend still
+# draws the dash — a swatch for ink no field can carry. `tools/legend-check.js`
+# is the gate for that; this class uses `stroke=`, which does reach.
+class vendor   "Vendor-defined — not interoperable"  stroke=#7c3aed
+class present  "Present only when the C flag is set" fill=#fef3c7
+class reserved "Reserved — senders write zero"       fill=#e7e5e4
+
+# `numbering=` is REQUIRED and has NO default (`UNSAFE-DEFAULT-ELIMINATION`). msb0 is the IETF packet
+# convention: bit 0 is the MSB, ruler 0…N-1 left to right. A defaulted
+# direction would render a ruler asserting something false, and a wrong ruler
+# looks exactly like a right one. `word=` is the row width in bits; 32 is also
+# the default, written here so the reader need not know that to read the rows.
+bitfield hdr "Export header (on the wire)" word=32 numbering=msb0
+# Classic form. The name is a WHITESPACE-delimited position, so `QUOTING-RULES` requires
+# quotes even when the name contains no space: `field Ver 4` is a line error.
+field "Ver" 4
+# `description=` is authored documentation prose (IEEE 1685's spelling; it was
+# `note=` until this release). It is in the MODEL but its only ink is an SVG
+# <title> tooltip, so a fact a human must SEE belongs in the label or in a
+# class meaning instead. §12.7 lets an agent quote or display it, never parse it.
+field "Header Length" 6 description="in 32-bit words; minimum 3"
+field "Flags" 6 class=vendor
+# `present=` is "present only if", not "variable width": the width is fixed and
+# only the presence is not, so a reader computing offsets ACROSS it must branch
+# and emit both offset sets (`BITFIELD-CONDITIONAL-OFFSETS`). The renderer dashes it, and a STATED
+# condition also draws a caption under the block. Both written forms are here:
+# `present="…"` (condition stated) on Checksum, `present=""` (conditional,
+# condition NOT stated — the author claimed nothing) on Sequence.
+field "Checksum" 16 present="the C flag is set" class=present
+# The dash IS `present=` and nothing can clear it: `style=` left `field`
+# entirely (`STYLE-KEY-SCOPE`) because `style=solid` used to erase the dash
+# while the model still recorded the field as conditionally present — one line,
+# two different figures for a human and for a reading agent (`PRESENTATION-AS-MEANING-CARRIER`).
+field "Sequence" 32 present=""
+# Wider than `word=`: the field spans the following rows automatically and is
+# still ONE field — one box, name written once. Splitting it into per-row
+# pieces would assert two fields on the wire that do not exist.
+field "Export Timestamp" 64 fill=#dbeafe
+# class= takes a comma-separated LIST. The channels apply left to right and
+# the later class wins per channel; here they touch different channels, so the
+# fill comes from `reserved` and the outline colour from `vendor`.
+field "Pad" 8 class=reserved,vendor
+# `break` ends the drawing row explicitly. It is presentation only: it adds,
+# skips and reorders no bits, and the blank cells it leaves are NOT bits. It
+# needs a field declared since the block opened or since the previous break.
+break
+# `*` fills the remainder of the current row — the variable-length tail. At
+# most one per block, and the budget is per BLOCK, so `tlv` below has its own.
+field "Records" * description="record count derived from Header Length"
+
+# The `Records` region above, expanded — one record, in a block of its own
+# with its own ruler; the same device examples/srh.fd uses for the SRH's
+# Flags octet. This block is where `index=` lives (`BITFIELD-REPETITION-CONSTRUCT`), and it
+# needs a repeated structure to live in: the key says a `field` is ONE
+# ELEMENT of a repeated run, and before it existed a run had to be written as
+# N literal `field` lines, which put N objects in the model and so ASSERTED a
+# cardinality the wire does not have. All three written forms are below, and
+# they are a tri-state with the same shape as `present=`'s: an ABSENT key
+# claims nothing at all — it is NOT a claim that the field occurs once —
+# `index=""` claims repetition and states no index, and a range states one.
+bitfield rec "Export record (one entry of the Records region)" word=32 numbering=msb0
+field "Entry Count" 16 description="flow entries in this record; the entries are numbered from 1"
+# DETERMINATE: both ends are literal integers, so the run is |last-first|+1 =
+# 8 elements and the count is IN the document. Quotes are inert here (RULE
+# 2.3) — `index="0..7"` says exactly what this line says, because determinacy
+# is decided by parsing both ends and never by quoting. Descent needs no key
+# of its own: `index=7..0` is the same eight gauges counted the other way.
+field "Queue Depth" 16 index=0..7
+# …and that is what a determinate run buys: this field's offset is still
+# computable — 16 + 8×16 = 144 bits in — even though only TWO of the eight
+# elements above are DRAWN (the first and the last, `REPEATED-RUN-DRAWING`). The elision strip
+# between them occupies NO bit positions, so a
+# reader who counts drawn cells is reading the drawing (`MEANING-RECOVERY-SOURCE`) and will get
+# this offset wrong; the count comes from `index=`, never from the picture.
+field "Drop Count" 32
+# PROSE last index: the count is in `Entry Count` on the wire and NOT in this
+# document, so the run is indeterminate and so is every offset after it — but
+# that is now reached from SYNTAX rather than from a reader recognising a
+# label. The prose is never parsed or resolved: an agent may quote and
+# display "Entry Count" and MUST NOT match it to the field of that name
+# (§12.7, the locator problem). `<first>` is ALWAYS a literal integer, and
+# that is what lets a 1-based run be drawn 1-based — the canonical form is
+# 0-based, from the C indexing semantics of the IEEE 1685 element this key is
+# borrowed from, but a format that numbers its entries from 1 says 1 rather
+# than being renumbered into a convention it does not follow.
+field "Flow Entry" 64 index="1..Entry Count"
+# `index=""`: it repeats, and nothing whatever about the indices is stated.
+# ONE occurrence draws, with a bare elision mark under it and no index on
+# either — the same ruling `present=""` gets for its caption. Two boxes would
+# assert a first and a last the author declined to state, and an invented
+# `[0] … [n-1]` would be the engine speaking for them.
+field "Vendor Counter" 32 index="" class=vendor
+
+# No label written: the model records it ABSENT and the renderer falls back to
+# the id (`OMITTED-LABEL-RECORDING`) — never invent a caption. No `word=` either, so the row is the
+# default 32 bits.
+bitfield tlv numbering=msb0
+# Compact form (the C bit-field convention): ONE whitespace-free token, items
+# comma-delimited. A name stays BARE here unless it contains whitespace, a
+# comma, a quote, a paren or `#` — the exact inverse of the classic form's
+# rule, because a comma-delimited element needs no quotes to terminate.
+field type:8,length:8,flags:8,rsvd:8
+# A compact name containing SPACES must be quoted: the list terminates at the
+# first whitespace, so an unquoted spaced name cannot be told from the next
+# item. A name containing a COMMA cannot be written compactly at all.
+field "Scope Count":16,"Element Count":16
+# Compact options are LINE-WIDE — one class covers all four items, exactly as
+# the classic form's single option set applies to its one field. All four
+# inherit `vendor`'s outline colour. Note what a class can NOT hand a field:
+# a DASH. Since `style=` left `field` (`STYLE-KEY-SCOPE`), `present=` is the
+# only source of one, and a class declaring `style=` reaches the legend and
+# nothing else. Line-wide is also why `index=` is NOT available here (`BITFIELD-REPETITION-CONSTRUCT`):
+# a line-wide range would say all four items repeat over the SAME indices,
+# which is not what any of them says. A repeated element is written in the
+# classic form, on a line of its own — `rec` above.
+field e1:8,e2:8,e3:8,e4:8 class=vendor
+field body:*   # `*` is available in the compact form too
+
+# lsb0 is the hardware-register convention: bit 0 is the LSB, so the ruler
+# runs N-1…0 left to right. `numbering=` relabels the RULER and nothing else —
+# placement is left to right in declaration order under either value — so a
+# register is written from its high end down, the way a datasheet prints it.
+# `fill=` and `stroke=` on the block are the DEFAULT cell fill and border; a
+# field's own fill=/stroke= wins. `stroke=` is NORMATIVE
+# (`STROKE-KEY-STATUS`) — an outline on a shape, and the whole line on an edge/bundle/
+# threshold, which is SVG's own asymmetry borrowed unaltered.
+bitfield ctl "Exporter control register (0x40)" word=16 numbering=lsb0 fill=#fafaf9 stroke=#a8a29e
+# Option position is free on every directive (`OPTION-POSITION-PARSING`) — before the name or after.
+field class=reserved "RSVD" 4
+field "MODE" 3 stroke=#b45309   # a field's own stroke= beats the block's
+field "INTERVAL" 8 fill=#dbeafe
+field "EN" 1 description="1 = exporter enabled"
+
+]]></metadata></svg>

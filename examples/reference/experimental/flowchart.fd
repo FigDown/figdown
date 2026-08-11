@@ -1,0 +1,129 @@
+# FigDown — figures as text. Spec: https://github.com/FigDown/figdown
+
+# Reference figure for genre `flowchart` — EXPERIMENTAL GENRE (spec/genres/flowchart.md).
+# Read that status first: `flowchart` is OUTSIDE the v0.1 conformance surface
+# and outside the compatibility promise (`CONSTRUCT-STATUS-TIERS`), so unlike block.fd there is no
+# normative/experimental split to make here — EVERY line below is outside the
+# promise *as written in a flowchart document*, including the ones whose own
+# status is NORMATIVE. What the split would separate is instead marked per line:
+# each construct's OWN status is noted where it first appears, because that is
+# what an author needs when carrying the same construct into `block`.
+# The set demonstrates every FORM of every keyword, not just every keyword.
+# Coverage: node tools/reference-coverage.js --strict flowchart
+figdown 0.1 flowchart
+title "Job dispatch"
+
+# `class` declares a meaning ONCE; elements join it with class=. The meaning
+# string is REQUIRED and it is what a reading agent gets instead of a hex value.
+class retry  "Retried — the step is re-entered after a backoff" stroke=#b45309 style=dashed
+class costly "Long-running — minutes, not seconds"              fill=#fef3c7
+# A class may declare that it claims NO meaning (`CLASS-EMPTY-MEANING`): the empty
+# string is a WRITTEN value, not an absent one. Such a class groups attributes
+# and draws NO legend entry — use it when the colour really is only colour.
+class tint   ""                                                 fill=#f8fafc
+
+# `external` is the outside world an edge enters from or leaves to. It is never
+# drawn as a shape (`EXTERNAL-EDGE-ENDPOINTS`). One at a SOURCE and one at a SINK, so both open ends
+# of the procedure are stated rather than left to the reader to assume.
+external queue "from the job queue"
+external audit "to the audit log"
+
+# ---- the role vocabulary (`FLOWCHART-ROLE-KEYWORDS`) -------------------------------
+# Why words and not shapes: a reader who has never opened the spec should get
+# most of a .fd from the syntax alone. `node q "Valid?" shape=diamond` needs
+# the drawing convention first; `decision q "Valid?"` is simply read. And the
+# convention does not even hold — of 216 question-labelled nodes measured in
+# the production corpus, 78% are diamond, 14% ellipse and 8% carry no shape,
+# so a reader applying it misreads about a fifth of them.
+# `terminator`, `process` and `decision` are `node` with a ROLE recorded. They
+# share the node id namespace and are addressable by edge/pin/rank exactly
+# like a node. The geometry is DERIVED from the role — rounded, box, diamond —
+# so a correct flowchart writes no shape= at all.
+terminator accept "Job accepted"
+process    parse  "Parse job descriptor"
+# A binary branch: the condition rides the EDGE's [mid] label (see below), and
+# the node's own label asks the question. Nothing else states the branch.
+decision   valid  "Descriptor valid?"
+terminator reject "Rejected"
+# `class=` takes a comma-separated LIST: channels apply left to right, later
+# wins per channel. These two touch different channels, so the fill comes from
+# `costly` and the dash from `retry`.
+process    fetch  "Fetch inputs" class=costly,retry
+
+# An n-way dispatch: ONE decision with more than two labelled exits. ISO 5807
+# §9.2.2.4 defines the symbol as "a single entry but where there may be a
+# number of alternative exits", so three or more is the same construct, not a
+# different one — and the exit VALUES ride the edges exactly as yes/no does.
+decision kind "Job kind?"
+
+# `group` is containment; membership is declared with in= on the member, never
+# inferred from geometry. One nesting level only. `gap=0` is exact member
+# spacing — flush, the one-frame-with-dividers look.
+group work "Per-kind work" fill=transparent style=dashed gap=0
+process build  "Compile artifacts" in=work class=costly
+process test   "Run test suite"    in=work class=costly
+process deploy "Roll out release"  in=work
+# A role line MAY still write `shape=` — it overrides the DRAWING only, for an
+# author who needs a particular picture. The role stays the model (§12.7:
+# presentation is not meaning on its own), so this is a `process` that happens
+# to be drawn as an ellipse, and an unfamiliar reader still recovers "process"
+# from the word rather than from the outline.
+process other  "Record unknown kind" shape=ellipse class=tint
+
+# A bare `node` under `flowchart` is ROLE-UNSTATED, and that is a FOURTH state,
+# not a defaulted `process` (`UNSAFE-DEFAULT-ELIMINATION` §3 — a default that can assert a falsehood is
+# not allowed). Waiting is not one of the three: ISO 5807 §9.2.1 defines
+# Process as a function "resulting in a change in value, form or location of
+# information", and a backoff changes none of them. So this line claims no
+# role rather than claim a wrong one — and a reading agent sees the difference
+# between "the author said nothing" and "the author said process".
+node backoff "Wait (exponential backoff)" shape=circle class=retry
+
+# `plane` (EXPERIMENTAL) is paint order, not containment: `z-index=` sets it
+# explicitly and the implicit `base` plane sits at the bottom. It is scene
+# vocabulary, legal here and identical under `block`/`topology`; a flowchart
+# rarely needs it, and it is exercised once so this file covers the surface.
+plane over "Overlay" z-index=1
+
+decision   ok   "All steps green?"
+terminator done "Released" plane=over
+
+flow down                # right|down|left|up — `down` is flowchart's default
+# `rank` states that these elements are PEERS — same position along the flow
+# axis. It is CONTENT ("these are alternatives"), not layout, so it survives
+# the `GUI-WRITEBACK-STRUCTURE` strip test the `layout` zone below does not.
+rank build,test,deploy
+
+edge queue -> accept
+edge accept -> parse
+edge parse -> valid
+# The branch condition rides the edge's [mid] label and NOTHING else — not the
+# shape, not the colour, not the rendered position (semantic model, `MEANING-RECOVERY-SOURCE`).
+edge valid -[no]-> reject
+edge valid -[yes]-> fetch
+edge fetch -> kind
+# Three value-labelled exits plus a fallback: the dispatch value is written on
+# each edge, so a reading agent can answer "what happens for a test job?".
+edge kind -[build]-> build
+edge kind -[test]-> test
+edge kind -[deploy]-> deploy
+edge kind -[other]-> other
+edge build -> ok
+edge test -> ok
+edge deploy -> ok
+edge other -> ok
+edge ok -[yes]-> done
+# The CYCLE. FigDown has no loop keyword and needs none: a plain back-edge to
+# an earlier step IS the loop, and its [mid] label is the loop condition. A
+# `loop`/`while` construct would state nothing these two lines do not.
+edge ok -[no]-> backoff class=retry
+edge backoff -> fetch class=retry
+edge done -> audit
+edge reject -> audit
+
+# Everything below is geometry with no meaning, and a reading agent skips it by
+# default (`CONTENT-LAYOUT-ZONE-SPLIT`/`GENRE-NAMESPACE`). Removing the whole zone leaves the same figure meaning.
+layout
+pin queue at=(150,0)              # an external is pinnable exactly like a node
+pin other width=130              # width only
+pin backoff width=120 height=40  # both

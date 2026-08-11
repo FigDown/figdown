@@ -1,0 +1,6 @@
+figdown 0.1 table
+table fib "FIB Table"
+| Prefix | Next Hop | Port |
+|--------|:--------:|------|
+| 10.0.0.0/8 | R2 | p1 |
+| 10.1.0.0/16 | R4 | p2 |

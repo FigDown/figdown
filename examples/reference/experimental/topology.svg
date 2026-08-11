@@ -1,0 +1,43 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 387 259" width="387" height="259" font-family="system-ui,sans-serif"><defs><marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#555"/></marker><pattern id="hatch" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><line x1="0" y1="0" x2="0" y2="6" stroke="#bbb" stroke-width="2"/></pattern></defs><g transform="translate(18,6)"><g data-group="spine" data-gx="0" data-gy="20" style="cursor:move"><rect x="66" y="34" width="240" height="78" rx="10" fill="#f6f5ef" stroke="#d6d4cc"/><text x="76" y="50" font-size="11.5" fill="#6f6e69">Spine</text></g><g data-group="leaf" data-gx="29.599999999999994" data-gy="104" style="cursor:move"><rect x="15.599999999999994" y="78" width="168.79999999999998" height="74" rx="10" fill="#f6f5ef" stroke="#d6d4cc"/><text x="25.599999999999994" y="94" font-size="11.5" fill="#6f6e69">Leaf</text></g><g data-group="peer" data-gx="256" data-gy="20" style="cursor:move"><rect x="242" y="-6" width="116.79999999999995" height="74" rx="10" fill="#f6f5ef" stroke="#d6d4cc"/><text x="252" y="10" font-size="11.5" fill="#6f6e69">Peers</text></g><line data-edge="23" x1="84.95238095238095" y1="100" x2="72" y2="108.34355828220859" stroke="#2563eb" stroke-width="1.6"/><line data-edge="24" x1="131.8095238095238" y1="100" x2="134.97142857142856" y2="104" stroke="#555" stroke-width="1.6"/><line data-edge="25" x1="220" y1="87.36842105263158" x2="72" y2="117.6608187134503" stroke="#555" stroke-width="1.6"/><line data-edge="26" x1="220" y1="94.15730337078652" x2="170.39999999999998" y2="113.66292134831461" stroke="#555" stroke-width="1.6"/><line data-edge="27" x1="50.8" y1="140" x2="50.8" y2="184" stroke="#555" stroke-width="1.6"/><line data-edge="28" x1="72" y1="122" x2="127.99999999999999" y2="122" stroke="#555" stroke-width="1.6"/><g data-node="s1" data-x="80" data-y="60" style="cursor:move"><rect x="80" y="60" width="72" height="40" rx="14" fill="#fff" stroke="#8a8880" stroke-width="1.8"/><text x="116" y="84.55" font-size="13" text-anchor="middle" fill="#1d1d1b">S1</text></g><g data-node="s2" data-x="220" data-y="60" style="cursor:move"><rect x="220" y="60" width="72" height="40" rx="14" fill="#fff" stroke="#8a8880" stroke-width="1.8"/><text x="256" y="84.55" font-size="13" text-anchor="middle" fill="#1d1d1b">S2</text></g><g data-node="l1" data-x="29.599999999999994" data-y="104" style="cursor:move"><rect x="29.599999999999994" y="104" width="42.4" height="36" fill="#fff" stroke="#8a8880"/><text x="50.8" y="126.55" font-size="13" text-anchor="middle" fill="#1d1d1b">L1</text></g><g data-node="l2" data-x="127.99999999999999" data-y="104" style="cursor:move"><rect x="127.99999999999999" y="104" width="42.4" height="36" fill="#fff" stroke="#8a8880"/><text x="149.2" y="126.55" font-size="13" text-anchor="middle" fill="#1d1d1b">L2</text></g><g data-node="p1" data-x="256" data-y="20" style="cursor:move"><rect x="256" y="20" width="42.4" height="36" fill="#fff" stroke="#64748b" stroke-dasharray="6 4"/><text x="277.2" y="42.55" font-size="13" text-anchor="middle" fill="#1d1d1b">P1</text></g><g data-node="p2" data-x="302.4" data-y="20" style="cursor:move"><rect x="302.4" y="20" width="42.4" height="36" fill="#fff" stroke="#8a8880"/><text x="323.59999999999997" y="42.55" font-size="13" text-anchor="middle" fill="#1d1d1b">P2</text></g><ellipse cx="100" cy="122" rx="46" ry="26" fill="transparent" stroke="#64748b" stroke-dasharray="6 4" stroke-width="1.6"/><text x="100" y="126" font-size="11.5" text-anchor="middle" fill="#fff" stroke="#fff" stroke-width="3" stroke-linejoin="round">multi-home</text><text x="100" y="126" font-size="11.5" text-anchor="middle" fill="#64748b">multi-home</text><text x="84.17523809523809" y="112.00061349693252" font-size="10" text-anchor="middle" fill="#fff" stroke="#fff" stroke-width="3" stroke-linejoin="round">e0/1</text><text x="84.17523809523809" y="112.00061349693252" font-size="10" text-anchor="middle" fill="#2563eb">e0/1</text><text x="73.55428571428571" y="101.84233128834356" font-size="10" text-anchor="middle" fill="#fff" stroke="#fff" stroke-width="3" stroke-linejoin="round">e0/1</text><text x="73.55428571428571" y="101.84233128834356" font-size="10" text-anchor="middle" fill="#2563eb">e0/1</text><text x="103.12173160173158" y="104.2" font-size="10" text-anchor="start" fill="#fff" stroke="#fff" stroke-width="3" stroke-linejoin="round">e0/2</text><text x="103.12173160173158" y="104.2" font-size="10" text-anchor="start" fill="#555">e0/2</text><text x="140.02285714285713" y="105.8" font-size="10" text-anchor="start" fill="#fff" stroke="#fff" stroke-width="3" stroke-linejoin="round">e0/1</text><text x="140.02285714285713" y="105.8" font-size="10" text-anchor="start" fill="#555">e0/1</text><text x="193.36" y="88.82105263157895" font-size="10" text-anchor="middle" fill="#fff" stroke="#fff" stroke-width="3" stroke-linejoin="round">e0/1</text><text x="193.36" y="88.82105263157895" font-size="10" text-anchor="middle" fill="#555">e0/1</text><text x="98.64" y="123.70818713450292" font-size="10" text-anchor="middle" fill="#fff" stroke="#fff" stroke-width="3" stroke-linejoin="round">e0/2</text><text x="98.64" y="123.70818713450292" font-size="10" text-anchor="middle" fill="#555">e0/2</text><text x="211.072" y="109.16831460674157" font-size="10" text-anchor="middle" fill="#fff" stroke="#fff" stroke-width="3" stroke-linejoin="round">e0/2</text><text x="211.072" y="109.16831460674157" font-size="10" text-anchor="middle" fill="#555">e0/2</text><text x="182.30399999999997" y="120.48157303370787" font-size="10" text-anchor="middle" fill="#fff" stroke="#fff" stroke-width="3" stroke-linejoin="round">e0/2</text><text x="182.30399999999997" y="120.48157303370787" font-size="10" text-anchor="middle" fill="#555">e0/2</text><path d="M50.8 184 L45.199999999999996 173.92 L56.4 173.92 z" fill="#555" stroke="none"/><text x="50.8" y="207" font-size="10" text-anchor="middle" fill="#fff" stroke="#fff" stroke-width="3" stroke-linejoin="round">WAN</text><text x="50.8" y="207" font-size="10" text-anchor="middle" fill="#555">WAN</text><rect x="0" y="232" width="16" height="11" fill="#fff" stroke="#2563eb"/><text x="21" y="241.5" font-size="11" fill="#1d1d1b">Fabric uplink</text></g><metadata id="figdown-source" data-sha256="e0e729316c7a1f5ec1672648f47ffa8144a35956178ce81aaa5a65eedcfce28f" data-engine-version="0.1.0"><![CDATA[
+# FigDown — figures as text. Spec: https://github.com/FigDown/figdown
+
+# Reference set for genre `topology` (EXPERIMENTAL).
+figdown 0.1 topology
+title "Reference: topology fabric"
+
+class uplink "Fabric uplink" stroke=#2563eb
+
+group spine "Spine"
+node s1 "S1" shape=rounded in=spine
+node s2 "S2" shape=rounded in=spine
+
+group leaf "Leaf"
+node l1 "L1" in=leaf
+node l2 "L2" in=leaf
+
+external wan "WAN"
+
+flow down
+rank s1,s2
+rank l1,l2
+
+edge s1 [e0/1] -- [e0/1] l1 class=uplink
+edge s1 [e0/2] -- [e0/1] l2
+edge s2 [e0/1] -- [e0/2] l1
+edge s2 [e0/2] -- [e0/2] l2
+edge l1 -> wan
+edge l1 -- l2
+
+bundle mh "multi-home" l1--l2
+
+plane tunnels "VXLAN overlay" z-index=1
+
+group peer "Peers" gap=4
+node p1 "P1" in=peer style=dashed stroke=#64748b
+node p2 "P2" in=peer
+
+layout
+pin s1 at=(80,40) width=72 height=40
+pin s2 at=(220,40) width=72 height=40
+
+]]></metadata></svg>

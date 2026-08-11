@@ -1,0 +1,70 @@
+{
+  "header": {
+    "version": "0.1",
+    "genre": "topology"
+  },
+  "flow": "right",
+  "classes": [],
+  "planes": [
+    {
+      "id": "base",
+      "z": 0
+    }
+  ],
+  "nodes": [
+    {
+      "id": "mac1",
+      "label": "MAC-1",
+      "shape": "box",
+      "plane": "base",
+      "line": 4
+    },
+    {
+      "id": "mac2",
+      "label": "MAC-2",
+      "shape": "box",
+      "plane": "base",
+      "line": 5
+    }
+  ],
+  "groups": [],
+  "externals": [
+    {
+      "id": "wire",
+      "label": "to wire",
+      "line": 3
+    }
+  ],
+  "edges": [
+    {
+      "a": "mac1",
+      "op": "--",
+      "b": "wire",
+      "plane": "base",
+      "line": 6
+    },
+    {
+      "a": "mac2",
+      "op": "--",
+      "b": "wire",
+      "plane": "base",
+      "line": 7
+    }
+  ],
+  "ranks": [],
+  "pins": [],
+  "thresholds": [],
+  "bands": [],
+  "bundles": [
+    {
+      "id": "lag1",
+      "label": "LAG-1",
+      "members": [
+        "mac1--wire",
+        "mac2--wire"
+      ],
+      "line": 8
+    }
+  ],
+  "regions": []
+}

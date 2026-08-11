@@ -1,0 +1,1 @@
+Line 4: figdown header requires a genre (block|topology|flowchart|bitfield|table|timing)

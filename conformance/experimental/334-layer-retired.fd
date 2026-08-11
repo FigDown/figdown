@@ -1,0 +1,10 @@
+figdown 0.1 block
+# `PLANE-KEYWORD-SPELLING`: `layer`/`layer=` became `plane`/`plane=`.
+# `LANE-ALPHABET-KEY-RESERVATION`: the stacking key `z=` became `z-index=`.
+# The retired spellings below are the SUBJECT of this fixture — do not rename
+# them to the current ones, that deletes the coverage rather than updating it.
+plane over "Overlay" z-index=2
+layer under "Underlay"
+node a "A" layer=over
+node b "B" plane=over
+plane deep "Deep" z=3

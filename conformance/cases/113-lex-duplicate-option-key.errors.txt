@@ -1,0 +1,2 @@
+Line 2: duplicate option "fill=" on one line
+Line 3: duplicate option "shape=" on one line

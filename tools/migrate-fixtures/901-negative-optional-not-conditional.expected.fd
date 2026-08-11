@@ -1,0 +1,10 @@
+figdown 0.1 bitfield
+# THE NEGATIVE FIXTURE. `PRESENCE-FLAG-SPELLING` REVERSED the direction
+# optional -> conditional, and the tool went on performing it for a full
+# release afterwards. `PRESENCE-CONDITION-EXPRESSION` settled the flag on present="".
+# If the reversed rule ever comes back, this fixture goes red twice: the
+# expected output no longer matches, and migrate-check's RETIRED_DIRECTIONS
+# assertion fires by name.
+bitfield h "H" word=32 numbering=lsb0
+field "A" 16 present=""
+field "B" 16

@@ -1,0 +1,8 @@
+figdown 0.1 table
+table t "T"
+| A |
+|---|
+# comment inside the block
+
+| 1 |
+| 2 |

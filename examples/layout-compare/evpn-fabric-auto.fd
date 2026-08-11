@@ -1,0 +1,53 @@
+# FigDown — figures as text. Spec: https://github.com/FigDown/figdown
+
+figdown 0.1 topology
+title "VXLAN/EVPN Leaf-Spine Fabric — topology with plane notes"
+
+# ── Semantic classes ─────────────────────────────────────────────────
+class underlay "Physical underlay link — eBGP/L3 transport between leaf and spine" stroke=#555
+class overlay  "Logical VXLAN overlay tunnel — rides on the physical underlay" style=dashed stroke=#dc2626
+
+# ── Topology ────────────────────────────────────────────────────────
+node sp1 "Spine-1" shape=rounded fill=#e0e7ff
+node sp2 "Spine-2" shape=rounded fill=#e0e7ff
+node lf1 "Leaf-1 (VTEP)" shape=rounded
+node lf2 "Leaf-2 (VTEP)" shape=rounded
+node lf3 "Leaf-3 (VTEP)" shape=rounded
+node h1 "VM-A (VLAN 10)"
+node h2 "VM-B (VLAN 10)"
+node h3 "VM-C (VLAN 20)"
+
+# underlay: every leaf peers with every spine
+edge sp1 -[eBGP]- lf1 class=underlay
+edge sp1 -- lf2 class=underlay
+edge sp1 -- lf3 class=underlay
+edge sp2 -- lf1 class=underlay
+edge sp2 -- lf2 class=underlay
+edge sp2 -- lf3 class=underlay
+edge lf1 -- h1 class=underlay
+edge lf2 -- h2 class=underlay
+edge lf3 -- h3 class=underlay
+
+# overlay: VXLAN tunnel between the two VTEPs sharing VNI 10010
+plane overlay "VXLAN tunnels" z-index=2
+edge lf1 <-[VXLAN VNI 10010]-> lf2 class=overlay plane=overlay
+
+# ── Supplementary knowledge ─────────────────────────────────────────
+
+# --- panel: separate genre section (main-standard hybrid = multi-section `MULTI-FIGURE-DOCUMENTS`) ---
+figdown 0.1 table
+table vni "VNI mapping"
+| Leaf   | VLAN | VNI   | Type |
+|--------|:----:|-------|------|
+| Leaf-1 | 10   | 10010 | L2   |
+| Leaf-2 | 10   | 10010 | L2   |
+| Leaf-3 | 20   | 10020 | L2   |
+cell (1,3) fill=#fee2e2
+cell (2,3) fill=#fee2e2
+
+table planes "Fabric planes"
+| Plane           | Protocol          | Role                      |
+|-----------------|-------------------|---------------------------|
+| Underlay        | eBGP              | loopback reachability     |
+| Overlay control | MP-BGP EVPN       | MAC/IP route distribution |
+| Overlay data    | VXLAN (UDP 4789)  | L2-in-L3 encapsulation    |

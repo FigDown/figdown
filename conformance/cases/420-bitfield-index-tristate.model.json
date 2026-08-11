@@ -1,0 +1,95 @@
+{
+  "header": {
+    "version": "0.1",
+    "genre": "bitfield"
+  },
+  "title": "Repetition tri-state",
+  "flow": "right",
+  "classes": [],
+  "planes": [
+    {
+      "id": "base",
+      "z": 0
+    }
+  ],
+  "nodes": [],
+  "groups": [],
+  "edges": [],
+  "ranks": [],
+  "pins": [],
+  "thresholds": [],
+  "bands": [],
+  "bundles": [],
+  "regions": [
+    {
+      "genre": "bitfield",
+      "id": "hdr",
+      "label": "Index tri-state",
+      "word": 32,
+      "numbering": "msb0",
+      "fields": [
+        {
+          "name": "Never repeats",
+          "width": 8,
+          "line": 19
+        },
+        {
+          "name": "Repeats",
+          "width": 8,
+          "index": {},
+          "line": 20
+        },
+        {
+          "name": "Descending",
+          "width": 16,
+          "index": {
+            "first": 53,
+            "last": 0
+          },
+          "line": 21
+        },
+        {
+          "break": true,
+          "line": 22
+        },
+        {
+          "name": "Literal run",
+          "width": 32,
+          "index": {
+            "first": 0,
+            "last": 7
+          },
+          "line": 23
+        },
+        {
+          "name": "Quoted literal run",
+          "width": 32,
+          "index": {
+            "first": 0,
+            "last": 7
+          },
+          "line": 24
+        },
+        {
+          "name": "Prose last index",
+          "width": 32,
+          "index": {
+            "first": 0,
+            "last": "Last Entry"
+          },
+          "line": 25
+        },
+        {
+          "name": "Whitespace is not significant",
+          "width": 32,
+          "index": {
+            "first": 0,
+            "last": 7
+          },
+          "line": 26
+        }
+      ],
+      "line": 18
+    }
+  ]
+}

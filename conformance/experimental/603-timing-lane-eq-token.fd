@@ -1,0 +1,4 @@
+figdown 0.1 timing
+timing w "Lane tokens may contain ="
+signal data x=1=x... data=a,b
+signal clk p.......

@@ -1,0 +1,263 @@
+# FigDown conformance — the REASON manifest for conformance/experimental/
+#
+# WHAT THIS IS
+# ------------
+# a fixture's status is decided by ONE thing and one
+# only: which directory it lives in.
+#
+#   conformance/cases/         the v0.1 conformance surface — NORMATIVE
+#   conformance/experimental/  outside it — EXPERIMENTAL
+#
+# This file no longer decides that. It records WHY each fixture in
+# `experimental/` is outside the surface, one line each, in one auditable
+# place. `conformance/run.js` validates the correspondence in BOTH
+# directions — a record naming a fixture that is not in `experimental/`
+# is a hard error, and a fixture in `experimental/` with no record is a
+# hard error — so neither list can silently rot.
+#
+# WHAT CHANGED, AND WHAT IT COST
+# --------------------------------------------
+# Until this release this file was a per-case TAG and the 52 fixtures named
+# below sat inside `cases/` alongside the normative ones. The reasoning
+# recorded here for that choice was explicit — a tag keeps every citation
+# by filename valid, while a directory move breaks them — and the
+# isolation ruling OVERRULES it: frozen and experimental material must be
+# separated at the FILE level, so that a user or an agent who wants
+# nothing experimental can ignore whole files rather than filter a list.
+# The cost the old note predicted is real and was paid: every citation of
+# a moved case by path (DISCREPANCIES.md, the R-entries,
+# `spec/migrations.md`, `conformance/README.md`) had to be updated in the
+# same batch, and a future status change is now a file move plus a line
+# edit rather than a line edit alone. The 0.1 MIGRATIONS entry
+# lists the moved names.
+#
+# The unification also ended a genuine inconsistency: `experimental/`
+# already held the `chart` fixtures (700, 701) under a SECOND mechanism —
+# a corpus the default run never executed at all. They now run with
+# everything else and carry a recorded reason like every other fixture,
+# which is why the default TOTAL RUN grew by two while the NORMATIVE
+# total did not move. (HISTORICAL, as of 0.1: TOTAL RUN 211 → 213,
+# NORMATIVE unchanged at 159. Those are the figures of that release and
+# are NOT the current ones — see NO COUNTS LIVE IN THIS FILE below.)
+#
+# NO COUNTS LIVE IN THIS FILE
+# ---------------------------
+# This file records REASONS, not totals. Every total the suite has — the
+# normative count, the experimental count, the total run, and the
+# by-genre / by-construct / both split — is computed from these records
+# and from the directory contents on EVERY invocation of:
+#
+#   node conformance/run.js
+#
+# Quote that output, never a number typed here. Hand-maintained tallies
+# in this file drifted for several releases in a row and were removed at
+# 0.1 rather than corrected again; where a number appears below it
+# is marked HISTORICAL and dated, and states what a past release CHANGED
+# rather than what is true now.
+#
+# WHAT WAS DEMOTED, AND BY WHAT
+# -----------------------------
+# `CONSTRUCT-STATUS-TIERS` made the genres `topology`, `flowchart` and `timing`
+# (spelled `wave` until this release, `TIMING-GENRE-NAMING`)
+# EXPERIMENTAL and demoted nine constructs (`threshold` — spelled `guide`
+# until this release — `band`, `bundle`,
+# `plane`, `path`, `routing`, `text=`, `stroke=`, `plane=`) to
+# EXPERIMENTAL. Four of those nine have since moved: `stroke=` was
+# promoted back to NORMATIVE (`STROKE-KEY-STATUS`), `text=`/`color=`
+# left the language altogether (`TEXT-COLOUR-KEY-NAMING`, `COLOUR-KEY-STATUS`), and `path`/`routing` were
+# WITHDRAWN outright (`EDGE-GEOMETRY-CONSTRUCTS`) — the first exercise of the
+# withdrawal path `CONSTRUCT-STATUS-TIERS` always allowed. The demoted set is now
+# five and none of them is a paint key. A second implementation may skip
+# all of that and still claim v0.1 conformance, so a fixture whose
+# SUBJECT is one of them must not be counted in the headline number.
+#
+# Nothing here changes what a fixture asserts: every fixture in
+# `experimental/` still RUNS on a default invocation and still has to
+# PASS. Its location decides which bucket it is COUNTED in, nothing else.
+#
+# THE DEFAULT
+# -----------
+# `default normative` states the rule for the OTHER directory: every
+# `cases/*.fd` is normative, with no per-file record needed. Everything
+# below names a fixture in `experimental/`.
+#
+# THE CRITERION (maintainer ruling)
+# ---------------------------------
+# A fixture's status follows what it TESTS, not what it happens to USE.
+#
+#   * A case is EXPERIMENTAL if its header genre is experimental — an
+#     implementation restricted to the normative genre surface cannot
+#     parse the fixture AT ALL, so it cannot be asked to.
+#   * A case is EXPERIMENTAL if it is a dedicated test of a demoted
+#     keyword: the demoted construct is the thing under test.
+#   * A fixture that merely USES a demoted construct while testing
+#     something normative stays NORMATIVE — it stays in `cases/`. Twelve
+#     are in this position
+#     (112, 115, 209, 214, 215, 233, 259, 301, 304, 305, 306, 307 —
+#     115 runs `bundle`, `threshold`, `band` and `plane` through
+#     the generic option-before-label rule (`OPTION-POSITION-PARSING`), which is core lexing;
+#     the others are presentation and lexical sweeps touching
+#     `extend=`, `plane=`, `z=`, or running `threshold`/`band`/
+#     `bundle`/`plane`/`timing` through a generic check; 259 is nonetheless
+#     experimental below, by its `topology` header). Six more embed a
+#     `timing` block, itself EXPERIMENTAL, inside a normative-genre document
+#     (112, 214, 215, 304, 305, 414). Moving any of them would drag
+#     normative coverage of `fill=`, `style=`, the label absent/empty
+#     states and the cross-kind id rules out of the surface with them.
+#   * `904-errors-retired-keywords` is NORMATIVE, and stayed normative when
+#     `path` and `routing` were withdrawn: §10 classifies a
+#     retired registration as NORMATIVE (diagnostic), a WITHDRAWN spelling is a
+#     retired registration like any other, and the fixture writes the retired
+#     spellings in order to be told so. `913-withdrawn-edge-geometry-keys` is
+#     normative for the same reason, and it MOVED into `cases/`
+#     — it was `913-retired-path-option-keys` in `experimental/`, where it sat
+#     only because it hosted the retired keys on a `path` line. With `path`
+#     gone the keys have no acceptor at all, the host is a plain `node`, and
+#     nothing experimental is left in the fixture. `914-retired-guide-keyword` is EXPERIMENTAL by the
+#     opposite reading: it is a dedicated test of the demoted construct's
+#     own retirement, and it WRITES `guide` at line start.
+#   * `915-retired-chart-level` is EXPERIMENTAL: `chart` is outside the
+#     v0.1 conformance surface entirely (§4.4), so its option key's
+#     deletion diagnostic is too.
+#   * `387`, `388`, `389`, `395`, `396` are NORMATIVE. They sit in the
+#     `38x`/`39x` bands but exercise the `layout` zone itself with `pin`
+#     — both core, both normative.
+#   * The `bundle`/`plane` demotion (same batch as the rest
+#     of `CONSTRUCT-STATUS-TIERS`) moved THREE cases and only three: `331`, `332` and `333`
+#     are dedicated `plane` tests written under a `block` header, so
+#     nothing but the construct criterion reaches them. The other seven
+#     dedicated `bundle`/`plane` cases (`271`, `330`, `390`–`394`) were
+#     already experimental by their `topology` header and gained a
+#     `construct=` reason without changing status, exactly as
+#     `330-plane-paint-order` carries both. `271`'s subject is read here as the
+#     `bundle` member rule (an external id resolving as a member); read
+#     as an `external` test instead it would lose the `construct=` half
+#     and keep its bucket either way — a one-line edit.
+#
+# FORMAT
+# ------
+#   <fixture-basename>  <reason>[,<reason>...]  <note — rest of line>
+#
+# Blank lines and lines starting with `#` are ignored. Fields are
+# whitespace-separated; the note is rest-of-line. (Until this release this
+# read "lexed the way FigDown itself lexes `title`"; `title` now takes a
+# quoted string, so the comparison no longer holds and the note format is
+# stated on its own terms.) Reasons:
+#
+#   genre=<g>       the header genre is EXPERIMENTAL (spec §10, `CONSTRUCT-STATUS-TIERS`)
+#   construct=<k>   the case is a dedicated test of a demoted keyword, OR
+# of an EXPERIMENTAL genre-owned keyword —
+#                   `construct=role` is the flowchart role vocabulary (`FLOWCHART-ROLE-KEYWORDS`),
+#                   which is experimental because its genre is. 224 carries
+#                   the reason alone: its four headers are block/topology/
+#                   bitfield/flowchart, so the genre criterion does not reach
+#                   it, but its SUBJECT is the experimental keyword.
+#
+# Changing a fixture's status is now a FILE MOVE between the two
+# directories plus the matching line edit here. That is more expensive
+# than the one-line edit this file used to be, and it is the price of
+# file-level isolation; it is stated rather than hidden.
+
+default normative
+
+# --- A. header genre is EXPERIMENTAL --------------------------------------
+# (Size of this set, and of B and A ∩ B: `node conformance/run.js` prints it
+#  as `(N by genre, N by demoted construct, N both)`. It reads these very
+#  records, so it cannot disagree with them.)
+# flowchart
+011-header-genre-flowchart-flow   genre=flowchart   the flowchart genre header itself
+210-shape-diamond-geometry        genre=flowchart   diamond geometry scenario, authored as flowchart
+213-shape-back-edge-side-channel  genre=flowchart   square-on touch-down scenario, authored as flowchart
+220-flowchart-roles               genre=flowchart,construct=role  the three role keywords and the geometry derived from each (`FLOWCHART-ROLE-KEYWORDS`)
+221-flowchart-role-shape-override genre=flowchart,construct=role  shape= on a role line overrides the drawing only; the role stays the model
+222-flowchart-role-unstated       genre=flowchart,construct=role  a bare `node` under flowchart is role-UNSTATED, never a defaulted process (`UNSAFE-DEFAULT-ELIMINATION` §3)
+223-flowchart-role-errors         genre=flowchart,construct=role  every `node` rule governs a role line unchanged (id, label quoting, shape enum, options)
+224-flowchart-roles-genre-scoped  construct=role    the role keywords are rejected under block/topology/bitfield by `GENRE-NAMESPACE`'s allowlist (no per-keyword code)
+# topology
+251-edge-labels-three-positions   genre=topology    three edge-label positions, authored as topology
+258-edge-options                  genre=topology    edge option keys, authored as topology
+909-errors-band-chart-bundle      genre=topology,construct=chart error strings for band/chart/bundle under topology
+259-edge-order-preserved          genre=topology    written edge order, authored as topology
+264-edge-plane-quoted-id          genre=topology,construct=plane  both: a topology header AND a live `plane` declaration; pins the one id position that tolerated a quoted id (`RULE-POSITION-ENUMERATION`)
+265-enum-bare-experimental        construct=band,construct=chart  the two EXPERIMENTAL enum positions RULE 2.4 now reaches: `extend=` on a band, `type=` on a chart (`RULE-POSITION-ENUMERATION`)
+271-external-bundle-member        genre=topology,construct=bundle both: a topology header AND the bundle member-rule test
+330-plane-paint-order             genre=topology,construct=plane  both: a topology header AND the plane paint-order test
+390-bundle-basic                  genre=topology,construct=bundle both: a topology header AND the bundle test
+391-bundle-member-errors          genre=topology,construct=bundle both: bundle member errors
+392-bundle-parallel-ambiguous     genre=topology,construct=bundle both: ambiguous parallel bundle member
+393-bundle-duplicate-id-rejected  genre=topology,construct=bundle both: duplicate bundle id
+394-bundle-member-reverse         genre=topology,construct=bundle both: reversed bundle member
+# timing  (the genre was spelled `wave` until this release, `TIMING-GENRE-NAMING`)
+600-timing-alphabet               genre=timing      the timing signal alphabet
+601-timing-child-errors           genre=timing      timing child errors
+602-timing-no-signals             genre=timing      a timing block with no signals
+603-timing-lane-eq-token          genre=timing      `=` inside a timing lane token
+604-timing-data-gap-errors        genre=timing      data= count / empty / gap range (`TYPED-BLOCK-SILENT-FALLBACK`)
+605-timing-lane-retired-digits    genre=timing      lane digits 2-9 retirement diagnostic (`TIMING-LANE-ALPHABET`)
+606-timing-labels-retired         genre=timing      labels= → data= retirement diagnostic (`SIGNAL-DATA-KEY-SPELLING`)
+916-retired-wave-genre            genre=timing      the genre `wave` → `timing` retirement diagnostic (`TIMING-GENRE-NAMING`), in both positions: the header genre token and the block opener
+
+# --- B. dedicated test of a demoted keyword, or of an experimental
+# ---    genre-owned keyword. Some are listed under A above too, where
+# ---    the genre reason comes first; the runner prints how many ---------
+# role (220-223 are listed under A above; 224 is here only)
+# threshold / band   (`threshold` was spelled `guide` until this release, `THRESHOLD-KEYWORD-SPELLING`)
+370-threshold-basic               construct=threshold threshold, basic forms
+371-threshold-errors              construct=threshold threshold errors
+372-band-forms                    construct=band    band, the three forms
+373-band-errors                   construct=band    band errors
+374-threshold-percent-required    construct=threshold threshold requires a percentage offset=
+376-threshold-offset              construct=threshold 0.1: at= renamed offset= (no key with two value shapes)
+375-threshold-node-target         construct=threshold a threshold may target a node, not only a group
+914-retired-guide-keyword         construct=threshold guide → threshold retirement diagnostic (`THRESHOLD-KEYWORD-SPELLING`), plus the two-hop line → threshold
+# path / routing — NO RECORDS BELOW, deliberately
+# `EDGE-GEOMETRY-CONSTRUCTS` WITHDREW both keywords from the language, so there is no demoted
+# construct left for a fixture to be a dedicated test OF. HISTORICAL, at
+# 0.1: TEN fixtures were deleted (380, 381, 382, 383, 384, 385, 386,
+# 397, 398, 399) and ONE moved to `cases/` (913, renamed
+# `913-withdrawn-edge-geometry-keys`): its subject is a retirement
+# diagnostic, which §10 has always classified NORMATIVE. Eleven fixtures left this
+# directory in that release; ten of them left the suite.
+# This is what a WITHDRAWAL costs the suite, stated rather than absorbed:
+# 22 files removed from `experimental/` (ten `.fd` plus their goldens, and
+# the two files of the fixture that moved out), carrying 81 non-comment
+# lines of fixture input — none of which any second implementation was ever
+# obliged to run.
+# plane  (330 is listed under A above — it is in both sets)
+331-plane-errors                  construct=plane                 duplicate plane id, and plane= naming no declared plane
+332-plane-default-z               construct=plane                 the 1-based default z and an explicit z= override
+124-plane-z-index                 construct=plane                 0.1: z= renamed z-index= (CSS's own spelling, RULE 4.2)
+333-plane-z-nonnumeric            construct=plane                 a non-integer z= is a line error
+334-layer-retired                 construct=plane                 layer/layer= → plane/plane= (`PLANE-KEYWORD-SPELLING`) and z= → z-index= (`LANE-ALPHABET-KEY-RESERVATION`) retirement diagnostics; WRITES the retired spellings, do not migrate it
+# chart (outside the conformance surface, §4.4; 909 is listed under A above)
+915-retired-chart-level           construct=chart   chart level= deletion diagnostic (`CHART-LEVEL-KEY`)
+700-chart-basic                   construct=chart   the chart block itself — held in this directory since before this release, under the SECOND mechanism the isolation ruling removed; it now runs on a default invocation like every other fixture
+701-chart-errors                  construct=chart   chart error strings — same history as 700
+# bundle (271 and 390-394 are listed under A above — all of them are in both sets)
+
+# A ∪ B is the whole of `conformance/experimental/`, and `cases/` is the
+# normative surface. For the sizes of A, B, A ∩ B and both corpora, run
+# `node conformance/run.js` — it derives all of them from the records above
+# and the directory contents. The A ∩ B MEMBERS are marked in place: every
+# record carrying both a `genre=` and a `construct=` reason is in it.
+#
+# (Until this release a tally lived here. It was wrong in four ways at once —
+# it enumerated `381`, `398` and `399` as members of A ∩ B twenty lines
+# after recording their deletion — which is why the tally is gone rather
+# than corrected: a number no mechanism checks will drift again.)
+#
+# HISTORICAL — what past releases CHANGED, not what is true now:
+# 0.1 moved the 52 then-tagged fixtures out of `cases/` and added the
+# two `chart` fixtures (700, 701) that had been in this directory all along
+# under the second mechanism, taking B from 38 to 40 and the union from 52 to
+# 54. No fixture changed STATUS: what changed is where it lives and whether a
+# default run executes it. TOTAL RUN went 211 → 213; NORMATIVE stayed at 159.
+# 0.1 added four cases (419, 479, 520 normative; 916 experimental by
+# genre) and renamed six (476 and 600-606), so both totals grew and no case
+# changed bucket.
+# Only 331, 332 and 333 changed bucket when `bundle`/`plane` were demoted;
+# the other five additions to B were already experimental by genre. At
+# 0.1 the six new cases split 5 experimental (220-224, the role
+# vocabulary) and 1 normative (478 — `style=` leaving field/cell/signal is a
+# change to the NORMATIVE bitfield/table surface; only its `timing` third is
+# experimental, and a case's status follows what it TESTS).

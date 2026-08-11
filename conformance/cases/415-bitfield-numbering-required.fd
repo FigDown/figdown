@@ -1,0 +1,8 @@
+figdown 0.1 bitfield
+# `numbering=` is REQUIRED on every bitfield (`UNSAFE-DEFAULT-ELIMINATION`): the ruler
+# direction is meaning, and meaning comes from syntax, never from a silent
+# default (`MEANING-RECOVERY-SOURCE`). An unknown value keeps its own message.
+bitfield a "No numbering"
+field "One" 8
+bitfield b "Bad numbering" numbering=middle
+field "Two" 8

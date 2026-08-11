@@ -1,0 +1,14 @@
+# FigDown — figures as text. Spec: https://github.com/FigDown/figdown
+
+figdown 0.1 bitfield
+# Hardware control register — single 32-bit word, lsb0 numbering (ruler 31..0)
+title "Control Register Pattern"
+
+bitfield ctrl_reg "Control Register" word=32 numbering=lsb0
+# Row 0: flag cluster at high bits + wide mode field + small type nibble + reserved low bits
+field "Reserved" 4
+field "TYPE" 4
+field "FIELD_A" 8
+field "MODE" 6
+field "Reserved" 6
+field FC:1,FB:1,FA:1,EN:1  # FC=FLAG_C FB=FLAG_B FA=FLAG_A EN=Enable

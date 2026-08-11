@@ -1,0 +1,1 @@
+  L4  [band-needs-label] `band` gained a MANDATORY quoted label (`BAND-LABEL-STATUS`), written FIRST: band "<name>" 10..20% … . Until now `band` had no label slot at all, so stripping `fill=` (which §5/`PRESENTATION-AS-MEANING-CARRIER` entitle a reader to discard) left it asserting nothing whatsoever. NON-MECHANICAL: the region's name is yours to supply.

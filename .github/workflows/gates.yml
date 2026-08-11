@@ -1,0 +1,115 @@
+# FigDown — the full gate set, on every push and pull request.
+#
+# THE GATE LIST HAS EXACTLY ONE HOME: the `gate:*` scripts in package.json.
+# This workflow does not restate it. The `list` job reads it out of
+# package.json and hands it to a matrix, so `npm test` and CI consume the
+# same list by construction and cannot drift apart — which is the failure
+# this file exists to prevent.
+#
+# There is nothing to install: every gate is plain Node against files in the
+# repository, there are no dependencies and no lockfile, so there is no
+# `npm ci` step (one would fail on the missing lockfile) and no npm cache.
+#
+# No secrets, no external services, no network access.
+
+name: gates
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  # ── 1. Read the one list ────────────────────────────────────────────────
+  list:
+    name: enumerate gates
+    runs-on: ubuntu-latest
+    outputs:
+      gates: ${{ steps.read.outputs.gates }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Read gate list from package.json
+        id: read
+        env:
+          GATES_JSON: '1'
+        run: |
+          set -euo pipefail
+          gates="$(npm run --silent gates:list)"
+          echo "$gates"
+          # `gates:list` already exits 2 on an empty list; belt and braces,
+          # because an empty matrix produces zero jobs and zero jobs look green.
+          node -e 'const g=JSON.parse(process.argv[1]);if(!Array.isArray(g)||!g.length){console.error("empty gate list");process.exit(1);}console.error("gates: "+g.length)' "$gates"
+          echo "gates=$gates" >> "$GITHUB_OUTPUT"
+
+  # ── 2. One job per gate, so a failure names itself ──────────────────────
+  gate:
+    name: ${{ matrix.gate }}
+    needs: list
+    runs-on: ubuntu-latest
+    strategy:
+      # The whole picture in one run: a red gate must not hide the gates
+      # after it.
+      fail-fast: false
+      matrix:
+        gate: ${{ fromJSON(needs.list.outputs.gates) }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Run ${{ matrix.gate }}
+        # The matrix value goes through the environment, never through shell
+        # interpolation.
+        env:
+          GATE: ${{ matrix.gate }}
+        run: npm run --silent "$GATE"
+
+  # ── 3. The same list through the local entry point, on the declared
+  #      minimum Node (package.json `engines`: >=18) ────────────────────────
+  entrypoint:
+    name: npm test (node 18)
+    needs: list
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+      - name: npm test
+        run: npm test
+
+  # ── 4. The verdict. Branch protection points HERE ───────────────────────
+  verdict:
+    name: all gates green
+    needs: [list, gate, entrypoint]
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - name: Aggregate
+        env:
+          LIST: ${{ needs.list.result }}
+          GATE: ${{ needs.gate.result }}
+          ENTRYPOINT: ${{ needs.entrypoint.result }}
+        run: |
+          set -uo pipefail
+          echo "list       : $LIST"
+          echo "gate       : $GATE"   # aggregate of every matrix job
+          echo "entrypoint : $ENTRYPOINT"
+          # A matrix job's result is `success` only when EVERY instance
+          # succeeded; it is `failure` if any did, and `skipped` when the
+          # matrix was empty or `list` failed. Anything but `success` is red.
+          fail=0
+          for r in "$LIST" "$GATE" "$ENTRYPOINT"; do
+            [ "$r" = "success" ] || fail=1
+          done
+          if [ "$fail" -ne 0 ]; then
+            echo "FAIL — see the red job(s) above; each gate names itself."
+            exit 1
+          fi
+          echo "ALL GATES GREEN"

@@ -1,0 +1,20 @@
+# Two rules on one directive. (1) `pin` is single-valued per id, and since
+# 0.1 that one rule covers the position and the extent together.
+# (2) The DOMAIN is split: at= applies to nodes, groups and externals,
+# while width=/height= apply to NODES only — a group sizes to its members,
+# and an external endpoint or a typed block derives its geometry from its
+# content. Each rejection names its own subject.
+figdown 0.1 block
+node a "A"
+group g "G"
+node b "B" in=g
+external w "to the wire"
+edge a -> w
+bitfield hdr "Header" word=32 numbering=msb0
+field "flags" 32
+layout
+pin a width=10 height=3
+pin a width=99
+pin g at=(0,0) width=800 height=600
+pin w width=12
+pin hdr width=200

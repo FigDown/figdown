@@ -1,0 +1,88 @@
+# FigDown — figures as text. Spec: https://github.com/FigDown/figdown
+
+figdown 0.1 table
+title "VXLAN Overview — MAC-in-UDP encapsulation"
+
+# ── Why this figure is tables, not pinned nodes ─────────────────────
+# What a packet-header figure MEANS is the on-the-wire ORDER of the
+# fields. An earlier revision drew each field as a free `node` and put
+# the order into `pin` x-coordinates only: strip the layout lines and
+# the order was gone (meaning-in-geometry, which `MEANING-RECOVERY-SOURCE` forbids).
+# In a `table` the order IS the model: genres/table.md, "Semantic
+# model" — the logical grid is derived from the declared rows and cell
+# order, never from rendered geometry. So the byte order survives with
+# ZERO layout lines. This document contains no flow/rank/pin/
+# routing/path line and no `layout` zone at all, so the `GUI-WRITEBACK-STRUCTURE` strip test
+# is a no-op on it. This is also what guide/authoring.md's pitfall table
+# prescribes: a byte-block header sequence with no bit scale belongs in
+# a single-row `table`, not in a `bitfield` and not in free nodes.
+
+# ── Semantic classes (`MEANING-RECOVERY-SOURCE`: the meaning rides on the element) ────────
+class outer  "Outer header added by the ingress VTEP (50B total)" fill=#fcd34d
+class vni    "VLAN ID 12-bit → VNI 24-bit: the identifier VXLAN widens" fill=#fcd34d stroke=#ea580c
+class inner  "Original L2 frame field — carried verbatim as VXLAN payload" fill=#bae6fd
+class opaque "Upper-layer payload — opaque to the VTEP" fill=#9aa2ad
+class oldfcs "Original FCS — dropped at encapsulation, not carried" fill=#93c5fd
+class newfcs "New FCS — recomputed over the outer frame" fill=#bbf7d0 stroke=#16a34a
+
+# ── Classical Ethernet frame ────────────────────────────────────────
+# One data row: cell order left to right IS the on-the-wire byte order.
+# The header tier groups the fields into header / data / trailer.
+table eth "Classical Ethernet frame — cells left to right are on-the-wire order"
+| Ethernet header |||| Data | Trailer |
+|---------|---------|-----------|----------|------------------|--------|
+| DMAC 6B | SMAC 6B | 802.1Q 4B | Etype 2B | Payload 46–1500B | FCS 4B |
+cell (1,1) class=inner
+cell (1,2) class=inner
+cell (1,3) class=vni
+cell (1,4) class=inner
+cell (1,5) class=opaque
+cell (1,6) class=oldfcs
+
+# ── VXLAN-encapsulated frame ────────────────────────────────────────
+# Same rule: cell order is byte order — Outer MAC, Outer IP, UDP,
+# VXLAN, then the original L2 frame verbatim, then a recomputed FCS.
+# NESTING, stated honestly: the table genre expresses containment as a
+# header-tier span — columns 5–8 sit under "Original L2 frame", which
+# says those four cells are one nested unit. That is one level only;
+# the genre has no recursive sub-table, so "a frame inside a frame" is
+# carried by the span plus the `inner` class meaning, not by a nested
+# construct. The inner frame has no 802.1Q cell on purpose: the VTEP
+# pops the tag and carries its value as the VNI.
+# The VLAN→VNI relation used to be an `edge` between two field nodes.
+# Edges cannot attach to table cells — cell anchors for edges are the
+# unresolved open question `CELL-EDGE-ANCHORS` (spec §5) — so the relation is
+# carried semantically by the shared `vni` class, whose label states
+# the 12-bit → 24-bit widening and which marks both the 802.1Q cell of
+# the classical frame and the VXLAN cell here.
+table vxlan "VXLAN-encapsulated frame — cells left to right are on-the-wire order"
+| Outer headers |||| Original L2 frame |||| New trailer |
+|---------------|--------------|--------------|----------|---------|---------|----------|------------------|--------------|
+| Outer MAC 14B | Outer IP 20B | Outer UDP 8B | VXLAN 8B | DMAC 6B | SMAC 6B | Etype 2B | Payload 46–1500B | FCS (new) 4B |
+cell (1,1) class=outer
+cell (1,2) class=outer
+cell (1,3) class=outer
+cell (1,4) class=vni
+cell (1,5) class=inner
+cell (1,6) class=inner
+cell (1,7) class=inner
+cell (1,8) class=opaque
+cell (1,9) class=newfcs
+
+# ── Supplementary knowledge ─────────────────────────────────────────
+table overhead "Encapsulation overhead (MAC-in-UDP)"
+| Segment    | Size | Notes                          |
+|------------|:----:|--------------------------------|
+| Outer MAC  | 14B  | new Ethernet header            |
+| Outer IP   | 20B  | VTEP-to-VTEP                   |
+| UDP        | 8B   | dst port 4789                  |
+| VXLAN      | 8B   | carries the 24-bit VNI         |
+| Total      | 50B  | added to every original frame  |
+cell 5 highlight
+
+table facts "Why VXLAN"
+| Fact                    | Value                    |
+|-------------------------|--------------------------|
+| VLAN address space      | 12 bits (4K segments)    |
+| VNI address space       | 24 bits (16M segments)   |
+| Encapsulation           | MAC-in-UDP               |

@@ -1,0 +1,6 @@
+Line 10: edge needs an operator: -> <- -- <-> (a [mid] label splits it: -[x]->)
+Line 11: unterminated [label] — for unbalanced brackets use ["..."]
+Line 12: expected - or -> to close the operator after [label]
+Line 13: edge needs a target id after the operator
+Line 8: edge needs <id> ->|<-|--|<-> <id>
+Line 9: edge needs an operator: -> <- -- <-> (a [mid] label splits it: -[x]->)

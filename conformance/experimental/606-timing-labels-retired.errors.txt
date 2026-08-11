@@ -1,0 +1,2 @@
+Line 3: timing has no signals
+Line 4: labels= has been renamed: use data= (WaveDrom's own key for exactly this is `data`, "an array of signal labels" — one per value cell of the lane) (MIGRATIONS)

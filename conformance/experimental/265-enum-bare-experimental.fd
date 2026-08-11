@@ -1,0 +1,12 @@
+figdown 0.1 topology
+# `RULE-POSITION-ENUMERATION`: RULE 2.4's enum half is language-wide, not
+# surface-wide — the two experimental enum positions are `extend=` on a
+# `band` and `type=` on a `chart`.
+node a "A"
+band "Zone" 15% in=a extend="up"
+figdown 0.1 table
+table t "T"
+| A | B |
+|---|---|
+| 1 | 2 |
+chart t type="bar3d"

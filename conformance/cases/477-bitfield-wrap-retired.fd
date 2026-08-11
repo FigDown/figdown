@@ -1,0 +1,7 @@
+figdown 0.1 bitfield
+# `ROW-BREAK-NAMING`: the `bitfield` child keyword `wrap` became `break`.
+bitfield a "A" numbering=msb0 word=16
+field "X" 16
+wrap
+field "Y" 16
+break

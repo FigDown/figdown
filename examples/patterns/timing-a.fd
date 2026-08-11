@@ -1,0 +1,8 @@
+# FigDown — figures as text. Spec: https://github.com/FigDown/figdown
+
+figdown 0.1 timing
+timing handshake "Clocked handshake: request / acknowledge"
+signal clk   pppppppppppppp
+signal req   00011111110000
+signal ack   00000111111000
+signal done  00000000001100

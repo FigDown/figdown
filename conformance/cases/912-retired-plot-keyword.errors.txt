@@ -1,0 +1,2 @@
+Line 7: plot has been renamed: use chart (plot reads as an imperative — the reason render was retired — while every other block opener is a noun; ECharts, Chart.js and Mermaid all name the object a chart) (MIGRATIONS)
+Line 8: kind= has been renamed: on a node use shape= (geometric; the label text carries the device semantics — MIGRATIONS 0.1), on a chart use type= (Vega, Chart.js and ECharts all spell the chart-type key "type" — MIGRATIONS 0.1). One spelling was retired on node and live on plot at the same time, inside one namespace; 0.1 closed that.

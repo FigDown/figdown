@@ -1,0 +1,1 @@
+  L6  [chart-kind] `kind=bars3d` became `type=bar3d` on `chart` (`CHART-BLOCK-NAMING`) — `kind=` also has a retired meaning on `node` (→ shape=), so this one is not rewritten automatically

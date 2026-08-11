@@ -1,0 +1,91 @@
+{
+  "header": {
+    "version": "0.1",
+    "genre": "block"
+  },
+  "flow": "right",
+  "classes": [],
+  "planes": [
+    {
+      "id": "base",
+      "z": 0
+    }
+  ],
+  "nodes": [
+    {
+      "id": "a",
+      "label": "CONTROL",
+      "shape": "box",
+      "group": "left",
+      "plane": "base",
+      "line": 8
+    },
+    {
+      "id": "b",
+      "label": "Control Logic",
+      "shape": "box",
+      "group": "right",
+      "plane": "base",
+      "fill": "#d9d9d9",
+      "line": 10
+    }
+  ],
+  "groups": [
+    {
+      "id": "left",
+      "label": "Host",
+      "gap": 0,
+      "line": 7
+    },
+    {
+      "id": "right",
+      "label": "Engine",
+      "gap": 0,
+      "line": 9
+    }
+  ],
+  "edges": [
+    {
+      "a": "a",
+      "op": "->",
+      "b": "b",
+      "plane": "base",
+      "line": 12
+    }
+  ],
+  "ranks": [],
+  "pins": [
+    {
+      "id": "left",
+      "x": 20,
+      "y": 55,
+      "line": 13
+    },
+    {
+      "id": "a",
+      "x": 0,
+      "y": 0,
+      "width": 175,
+      "height": 34,
+      "line": 14
+    },
+    {
+      "id": "right",
+      "x": 265,
+      "y": 15,
+      "line": 15
+    },
+    {
+      "id": "b",
+      "x": 0,
+      "y": 0,
+      "width": 480,
+      "height": 60,
+      "line": 16
+    }
+  ],
+  "thresholds": [],
+  "bands": [],
+  "bundles": [],
+  "regions": []
+}

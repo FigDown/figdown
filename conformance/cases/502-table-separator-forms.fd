@@ -1,0 +1,5 @@
+figdown 0.1 table
+table t "T"
+| L | C | R | D |
+|:--|:-:|-:|-|
+| a | b | c | d |

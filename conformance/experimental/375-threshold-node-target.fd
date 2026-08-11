@@ -1,0 +1,11 @@
+figdown 0.1 block
+# A threshold's scope follows the meaning (`AUTHORING-INTENT-OVER-RENDERING`, spec section 2.6): a GROUP when
+# the threshold is shared, a NODE when it is genuinely per-element. `band`
+# always took both; the marker (spelled `guide` in an earlier release)
+# was widened to match (`THRESHOLD-BAND-TARGET-MISMATCH`).
+group pool "Resource pool"
+node q0 "Q0" in=pool
+node q1 "Q1" in=pool
+threshold "Shared cap" in=pool offset=80%
+threshold "Q1 watermark" in=q1 offset=35% stroke=#a3c93a
+band "Q1 reserved" 35% in=q1 fill=#dcfce7

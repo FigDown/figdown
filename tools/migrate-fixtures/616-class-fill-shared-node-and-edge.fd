@@ -1,0 +1,5 @@
+figdown 0.1 block
+class hot "Congested" fill=#c00000
+node a "A" class=hot
+node b "B"
+edge a -> b class=hot

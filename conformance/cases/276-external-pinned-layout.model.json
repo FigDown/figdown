@@ -1,0 +1,89 @@
+{
+  "header": {
+    "version": "0.1",
+    "genre": "block"
+  },
+  "flow": "right",
+  "classes": [],
+  "planes": [
+    {
+      "id": "base",
+      "z": 0
+    }
+  ],
+  "nodes": [
+    {
+      "id": "ingress",
+      "label": "Ingress",
+      "shape": "box",
+      "plane": "base",
+      "line": 10
+    },
+    {
+      "id": "egress",
+      "label": "Egress",
+      "shape": "box",
+      "plane": "base",
+      "line": 11
+    }
+  ],
+  "groups": [],
+  "externals": [
+    {
+      "id": "src",
+      "label": "in",
+      "line": 8
+    },
+    {
+      "id": "dst",
+      "label": "out",
+      "line": 9
+    }
+  ],
+  "edges": [
+    {
+      "a": "src",
+      "op": "->",
+      "b": "ingress",
+      "plane": "base",
+      "line": 13
+    },
+    {
+      "a": "ingress",
+      "op": "->",
+      "b": "egress",
+      "plane": "base",
+      "line": 14
+    },
+    {
+      "a": "egress",
+      "op": "->",
+      "b": "dst",
+      "plane": "base",
+      "line": 15
+    }
+  ],
+  "ranks": [],
+  "pins": [
+    {
+      "id": "ingress",
+      "x": 82,
+      "y": 55,
+      "width": 175,
+      "height": 34,
+      "line": 17
+    },
+    {
+      "id": "egress",
+      "x": 82,
+      "y": 120,
+      "width": 175,
+      "height": 34,
+      "line": 18
+    }
+  ],
+  "thresholds": [],
+  "bands": [],
+  "bundles": [],
+  "regions": []
+}

@@ -1,0 +1,30 @@
+# FigDown — figures as text. Spec: https://github.com/FigDown/figdown
+
+figdown 0.1 block
+title "One source, two readers"
+
+# A single .fd file is the source of truth.
+# It feeds two completely different reading paths:
+#   (a) deterministic renderer  ->  SVG artifact  ->  human
+#   (b) AI agent reads the .fd directly for meaning
+
+node src  "ingress.fd\n(source of truth)"  shape=rounded  fill=#e0e7ff
+node rend "FigDown renderer\n(build-svg.js)"
+node svg  "ingress.svg\n(artifact)"        shape=rounded  fill=#dcfce7
+node human "human reader"                  shape=ellipse
+node agent "AI agent"                      shape=ellipse   fill=#fef9c3
+
+flow right
+rank svg,human
+
+edge src  -[deterministic build]->  rend
+edge rend -[stable SVG]->           svg
+edge svg  -[reads visually]->       human
+edge src  -[reads for meaning]->    agent
+
+layout
+pin src   at=(20,20)
+pin rend  at=(330,20)
+pin svg   at=(615,20)
+pin human at=(855,20)
+pin agent at=(110,150)

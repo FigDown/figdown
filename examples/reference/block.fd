@@ -1,0 +1,114 @@
+# FigDown — figures as text. Spec: https://github.com/FigDown/figdown
+
+# Reference figure for genre `block` — NORMATIVE surface only (spec/genres/block.md).
+# Every construct here is inside the v0.1 conformance surface and the
+# compatibility promise. Experimental constructs are in block-experimental.fd.
+# The set demonstrates every FORM of every keyword, not just every keyword.
+# Coverage: node tools/reference-coverage.js --normative-only --strict block
+figdown 0.1 block
+title "Metrics ingest datapath"
+
+# `class` declares a meaning ONCE; elements join it with class=. The meaning
+# string is required — it is what a reading agent gets instead of a hex value.
+class sampled "Sampled path — one point per second" stroke=#b91c1c
+class draft   "Provisional — not in production yet" style=dashed
+class audit   "Audited — 30 day retention"          fill=#fef3c7
+# A class MAY declare that it claims no meaning (`CLASS-EMPTY-MEANING`): the meaning string is
+# still REQUIRED, but written empty it says "this is pure attribute grouping —
+# one name applied to many members so a shared look is written once". The
+# difference is visible in the output: `tint` gets NO legend entry, because a
+# legend lists meanings and this class has declared it has none. Omitting the
+# string entirely is still a line error — silence and "nothing claimed" are
+# different statements, and only one of them is checkable.
+class tint    ""                                    fill=#f8fafc
+
+# `external` is the outside world an edge enters from or leaves to. It is never
+# drawn as a shape (`EXTERNAL-EDGE-ENDPOINTS`) and has no id fallback: all three label states below
+# draw no box, and only the first draws text.
+external wire "from the wire"
+external drop ""            # written empty label — deliberately textless (`EMPTY-LABEL-STATE`)
+external ops                # no label written — absent, not "ops" (`OMITTED-LABEL-RECORDING`)
+
+# `group` is containment; membership is declared with in= on the member, never
+# inferred from geometry. One level only — `group ... in=` is a line error.
+group ingest "Ingest" fill=transparent style=dashed
+# A `#` inside a QUOTED STRING is ordinary text (core §1) — `#0` is the ring
+# number and opens no comment. That holds in all four verbatim regions: a
+# quoted string, an `[edge label]` (`VERBATIM-REGION-SCOPE`), a comment, and a GFM pipe row.
+node rx "RX ring #0" shape=box style=solid in=ingest class=tint
+node dec "Decode" shape=rounded in=ingest class=tint
+# No label written: the model records it ABSENT and the renderer falls back to
+# the id (`OMITTED-LABEL-RECORDING`). This is how a shape whose caption you could not read is
+# transcribed — never invent one.
+node dedup in=ingest
+
+node gate "Drop?" shape=diamond
+# Written empty label: the model records "" and the renderer draws no text
+# (`EMPTY-LABEL-STATE`) — an unlabelled tap point, without inventing a word for it.
+node j "" shape=circle
+
+# No label on the group: the caption falls back to the id, as on a node.
+# gap=0 is exact member spacing — flush, the one-frame-with-dividers look.
+group store gap=0 fill=#eee
+node cache "Hot cache" shape=cylinder in=store
+node tsdb "Series store" shape=cylinder in=store
+
+# The third caption state, on a group this time (`EMPTY-LABEL-STATE`): `ingest` is captioned,
+# `store` writes no label and falls back to its id, and `""` is the author
+# saying there is no name for this grouping — a frame that claims only "these
+# belong together". Transcribe a source figure's unnamed box this way; naming
+# it "Group 1" asserts a category the original never claimed (`TRANSCRIPTION-FIDELITY-TIERS`).
+group tap "" style=dashed
+node span "SPAN copy" shape=box in=tap
+node sink "Mirror sink" shape=box in=tap
+
+# class= takes a comma-separated LIST. The channels apply left to right and the
+# later class wins per channel; here they touch different channels, so the fill
+# comes from `audit` and the dash from `draft`.
+node peer "Peer region" shape=ellipse class=audit,draft
+# Option position is free on every directive (`OPTION-POSITION-PARSING`) — before the label or after.
+# fill= takes #rgb, #rrggbb, a CSS colour name, or transparent.
+node fill=gainsboro cfg "Rule set"
+
+# Four operators — `->` `<-` `--` `<->` — each written bare below and again
+# with a [mid] label, which splits the operator into halves.
+edge wire [eth0] -> rx
+edge rx -> dec
+edge dec -[flags[3:0]]-> dedup     # balanced inner brackets nest verbatim
+edge dedup -> gate
+edge cfg -[rules]- gate style=dotted
+edge cfg -- dedup style=dotted
+edge drop <-[dropped]- gate
+edge gate -["keep\n(sampled)"]-> j  # quoted form: for \n, quotes, unbalanced [
+edge j -> cache class=sampled
+# The written form IS the model: `<-` runs second->first and is never rewritten
+# to `j -> tsdb`. Statement order is the author's focus, so it is preserved.
+edge tsdb <- j
+edge cache -> ops stroke=#2563eb     # an edge has no interior: stroke= is its line
+edge gate -[copy]-> span style=dotted
+edge span -> sink
+# All three label positions at once: near the tail, on the line, near the head.
+edge tsdb [1] <-[replicate]-> [N] peer class=draft
+edge cache <-> peer class=draft
+
+flow right   # right|down|left|up — one per document; `right` is block's default
+# `rank` states that these elements are PEERS — same position along the flow
+# axis (same column under `flow right`, same row under `flow down`). It is
+# CONTENT, not layout: "these are peers" survives the `GUI-WRITEBACK-STRUCTURE` strip test, `pin`
+# does not. The comma form is canonical; `rank cache tsdb`
+# still parses. Do NOT rank a chain that edges already order (rx -> dec ->
+# dedup): that flattens the mainline sideways. See guide/layout.md §8.
+rank cache,tsdb
+
+# Everything below is geometry with no meaning, and a reading agent skips it by
+# default (`CONTENT-LAYOUT-ZONE-SPLIT`/`GENRE-NAMESPACE`). Removing the whole zone leaves the same figure meaning —
+# that is the `GUI-WRITEBACK-STRUCTURE` invariant tools/strip-check.js tests. Pin only what auto-layout
+# gets wrong (`LAYOUT-STABILITY`): every pin is a promise later edits must keep.
+layout
+pin wire at=(0,80)       # anchors the left edge so the pins below hold still
+pin cfg at=(554,150)     # canvas px; inside a pinned group, member pins are group-local
+pin j at=(721,41)
+pin drop at=(713,140)    # an external is pinnable exactly like a node
+pin cache width=120              # width only
+pin tsdb width=120 height=46     # both
+pin peer height=46               # height only

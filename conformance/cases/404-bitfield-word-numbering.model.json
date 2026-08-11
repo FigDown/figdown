@@ -1,0 +1,74 @@
+{
+  "header": {
+    "version": "0.1",
+    "genre": "bitfield"
+  },
+  "flow": "right",
+  "classes": [],
+  "planes": [
+    {
+      "id": "base",
+      "z": 0
+    }
+  ],
+  "nodes": [],
+  "groups": [],
+  "edges": [],
+  "ranks": [],
+  "pins": [],
+  "thresholds": [],
+  "bands": [],
+  "bundles": [],
+  "regions": [
+    {
+      "genre": "bitfield",
+      "id": "reg_msb0",
+      "label": "Control (RFC convention)",
+      "word": 16,
+      "numbering": "msb0",
+      "fields": [
+        {
+          "name": "EN",
+          "width": 1,
+          "line": 7
+        },
+        {
+          "name": "MODE",
+          "width": 3,
+          "line": 8
+        },
+        {
+          "name": "ADDR",
+          "width": 12,
+          "line": 9
+        }
+      ],
+      "line": 6
+    },
+    {
+      "genre": "bitfield",
+      "id": "reg_lsb0",
+      "label": "Control (register convention)",
+      "word": 16,
+      "numbering": "lsb0",
+      "fields": [
+        {
+          "name": "EN",
+          "width": 1,
+          "line": 11
+        },
+        {
+          "name": "MODE",
+          "width": 3,
+          "line": 12
+        },
+        {
+          "name": "ADDR",
+          "width": 12,
+          "line": 13
+        }
+      ],
+      "line": 10
+    }
+  ]
+}

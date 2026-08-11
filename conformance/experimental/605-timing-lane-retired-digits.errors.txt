@@ -1,0 +1,3 @@
+Line 7: timing has no signals
+Line 8: timing lane digits 2-9 have been retired: write "=" for a data cell and name it in data= (WaveDrom defines 2..9 as "value with color N" and "=" as "value (default color 2)" — the same brick with a palette index, while FigDown drew the digit character itself as the box label and consumed no data entry, so the two readings of one lane differed silently) (MIGRATIONS)
+Line 9: timing lane digits 2-9 have been retired: write "=" for a data cell and name it in data= (WaveDrom defines 2..9 as "value with color N" and "=" as "value (default color 2)" — the same brick with a palette index, while FigDown drew the digit character itself as the box label and consumed no data entry, so the two readings of one lane differed silently) (MIGRATIONS)

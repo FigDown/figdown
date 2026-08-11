@@ -1,0 +1,23 @@
+# `STYLE-KEY-SCOPE`: `style=` LEAVES `field`, `cell` and `signal`. On a field
+# it was a correctness defect, not a tidy-up: `field "B" 8 present=""
+# style=solid` erased the dash that is conditional presence's only visual
+# carrier while the MODEL still recorded the field as conditionally present,
+# so one line produced two different figures — `PRESENTATION-AS-MEANING-CARRIER`'s exact prohibition.
+# (The flag was spelled `optional` until this release, `PRESENCE-CONDITION-EXPRESSION`.) The other two move with it as
+# one minimum set (11 in-repo uses, 0 downstream). `style=` stays live on
+# node/group/edge/class/bundle/threshold/band; only these three lost it.
+# Multi-section (`MULTI-FIGURE-DOCUMENTS`): one file, three genres, three diagnostics.
+figdown 0.1 bitfield
+bitfield b "B" word=8 numbering=msb0
+field "A" 8 present="" style=solid
+field "B" 8
+figdown 0.1 table
+table t "T"
+| a | b |
+|---|---|
+| 1 | 2 |
+cell (1,1) style=dashed
+figdown 0.1 timing
+timing w "W"
+signal clk pppp style=dotted
+signal en  01..
