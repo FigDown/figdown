@@ -1,6 +1,6 @@
 {
   "name": "figdown",
-  "version": "0.1.3",
+  "version": "0.1.5",
   "description": "Figures as text — one source, two readers: a closed, deterministic figure language for Markdown, readable by AI agents and humans alike",
   "license": "MIT",
   "author": "FigDown <hello@figdown.org>",
@@ -44,6 +44,7 @@
     "gate:registry": "node tools/registry-check.js --strict",
     "gate:capability": "node tools/capability-coverage.js --strict",
     "gate:archive": "node tools/archive-check.js --strict",
+    "gate:plugin": "node tools/plugin-check.js --strict",
     "gates:list": "node -e \"const s=require(process.cwd()+'/package.json').scripts||{};const g=Object.keys(s).filter(k=>k.startsWith('gate:'));if(!g.length){console.error('gates:list — no gate:* scripts found');process.exit(2);}if(process.env.GATES_JSON)console.log(JSON.stringify(g));else g.forEach(k=>console.log(k+'  ->  '+s[k]));\"",
     "test": "node -e \"const s=require(process.cwd()+'/package.json').scripts||{};const sp=require('child_process').spawnSync;const g=Object.keys(s).filter(k=>k.startsWith('gate:'));if(!g.length){console.error('npm test — no gate:* scripts found; refusing to report success');process.exit(2);}const bad=[];g.forEach(k=>{const a=s[k].split(' ');const bin=a[0]==='node'?process.execPath:a[0];console.log('');console.log('=== GATE '+k+'  ['+s[k]+'] ===');const r=sp(bin,a.slice(1),{stdio:'inherit'});if(r.error)console.error('    spawn error: '+r.error.message);const c=(r.status===null||r.status===undefined)?1:r.status;console.log('--- '+k+': '+(c===0?'PASS':'FAIL (exit '+c+')')+' ---');if(c!==0)bad.push(k+'  ['+s[k]+']  exit '+c);});console.log('');console.log('=== GATE SUMMARY: '+(g.length-bad.length)+'/'+g.length+' passed ===');if(bad.length){console.log('FAILED GATES:');bad.forEach(b=>console.log('  '+b));process.exit(1);}console.log('ALL GATES GREEN');\"",
     "gate:reference": "node tools/reference-gate.js"
@@ -60,6 +61,7 @@
     "figdown-svg": "skill/figdown/build-svg.js"
   },
   "files": [
+    ".claude-plugin/plugin.json",
     "dist/figdown.js",
     "dist/figdown.mjs",
     "skill/figdown/SKILL.md",

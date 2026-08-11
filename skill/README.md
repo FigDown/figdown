@@ -43,17 +43,39 @@ that the always-loaded file stays genre-independent.
 
 ## Install
 
-**Claude Code, available in every project (recommended):**
+Two paths, one bundle. The plugin is a **wrapper**, not a second copy:
+`.claude-plugin/plugin.json` at the repository root declares
+`"skills": "./skill/"`, so the plugin ships exactly the directory documented
+here. Nothing below is duplicated anywhere.
+
+**Claude Code plugin (recommended — installs and updates itself):**
+
+```sh
+/plugin marketplace add FigDown/figdown
+/plugin install figdown@figdown
+```
+
+`/plugin marketplace update figdown` refreshes the catalogue; the plugin is
+pinned to the `version` in its manifest, so a new release arrives when that
+number changes. No submission and no review are involved: the marketplace is
+[`.claude-plugin/marketplace.json`](../.claude-plugin/marketplace.json) in this
+repository.
+
+**Copy the directory (no plugin mechanism, every project):**
 
 ```sh
 cp -r skill/figdown ~/.claude/skills/figdown
 ```
 
-**Claude Code, one project only:**
+**Copy the directory (no plugin mechanism, one project only):**
 
 ```sh
 cp -r skill/figdown <your-repo>/.claude/skills/figdown
 ```
+
+The copy paths remain fully supported: the bundle is self-contained, so a
+`cp` of `skill/figdown` into any skills directory works with no network, no
+repository and no manifest.
 
 Then ask the agent for a figure ("draw the ingress datapath as a
 figure in docs/arch.md") — the skill triggers on diagram/figure work

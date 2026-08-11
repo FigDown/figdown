@@ -1,8 +1,8 @@
-// figdown.mjs — FigDown embeddable library (0.1.3)
+// figdown.mjs — FigDown embeddable library (0.1.5)
 // GENERATED FILE, DO NOT EDIT. Built from editor/figdown.html.
 // Regenerate with: node tools/make-lib.js
 'use strict';
-var VERSION = "0.1.3";
+var VERSION = "0.1.5";
 
 // ---- engine (extracted verbatim from editor/figdown.html) ----
 var __engine = (function () {
@@ -16,7 +16,7 @@ const SHAPES = ['box','rounded','circle','ellipse','diamond','cylinder'];
 // input to that promise, and under core §13 a 0.x renderer may differ from
 // the next — which makes the recorded version the only thing that can
 // explain a diff between two renderings of one source.
-const FIGDOWN_VERSION = '0.1.3';
+const FIGDOWN_VERSION = '0.1.5';
 // Retired shape VALUES keep a named diagnostic (PROCESS §5(d)), the same way
 // retired option keys do: `cloud` was the one value that named a domain
 // (the internet cloud) in an enum the language keeps purely geometric
@@ -3917,20 +3917,33 @@ function renderBitfield(b,y0){
   }
   for(const e of elis){
     const st=(b.stroke||'#555');
-    // `ELISION-MARK-EXTENT`: THE SIDE DOTS SAY WHICH COLUMNS ARE ELIDED, so a
-    // strip that already spans the whole word does not draw them. RFC 8754 §2
-    // prints its `...` row with NO `|` at either end — the box is simply open
-    // there — and an element occupying the full word needs no mark to say
-    // which columns it occupied, because it occupied all of them. The dots
-    // still carry information for a narrower element (reference/bitfield.fd's
-    // `Queue Depth` runs columns 16-31), where without them the strip's extent
-    // is guesswork. Derived from the geometry, never an option key: the same
-    // shape as `REPEATED-RUN-DRAWING`'s rule for the mark itself, which draws iff something is
-    // in fact undrawn.
-    if(e.w < b.word*cell){
-      svg.push('<line x1="'+e.x+'" y1="'+e.y+'" x2="'+e.x+'" y2="'+(e.y+EL_H)+'" stroke="'+st+'" stroke-dasharray="2 3"/>');
-      svg.push('<line x1="'+(e.x+e.w)+'" y1="'+e.y+'" x2="'+(e.x+e.w)+'" y2="'+(e.y+EL_H)+'" stroke="'+st+'" stroke-dasharray="2 3"/>');
-    }
+    // `ELISION-MARK-EXTENT`: THE SIDE DOTS ARE ALWAYS DRAWN. This reverses `ELISION-MARK-EXTENT`,
+    // which suppressed them when the strip already spanned the whole word.
+    //
+    // `ELISION-MARK-EXTENT`'s reasoning was sound and incomplete. It asked what the dots MEAN —
+    // which columns are elided — found that answer vacuous for an element
+    // occupying every column, and removed them. What it never asked is what
+    // the dots DO. They have a second job that was never written down: they
+    // make the gap read as part of the figure. Without them a full-word
+    // elision is two boxes with whitespace between and a 10.5px grey ellipsis
+    // floating in it, which reads as a rendering artefact rather than as a
+    // deliberate mark. That is the reading the maintainer had on seeing it,
+    // and the author of a convention misreading its own output is the
+    // strongest evidence available that the convention does not communicate.
+    //
+    // `ELISION-MARK-EXTENT` also copied RFC 8754 §2's `...` row, which indeed carries no `|`,
+    // without copying what makes it legible there: in a monospace block the
+    // lines above and below put `|` in the same two columns, so the eye reads
+    // one break in a continuous wall. This renderer is far sparser — bordered
+    // boxes with a 16px gap and no frame across it — so the same mark in the
+    // same place does not do the same work. A mark borrowed without its
+    // context is not the same mark.
+    //
+    // The general rule this leaves: before removing a mark because its stated
+    // meaning is redundant, establish that the stated meaning was its only
+    // job.
+    svg.push('<line x1="'+e.x+'" y1="'+e.y+'" x2="'+e.x+'" y2="'+(e.y+EL_H)+'" stroke="'+st+'" stroke-dasharray="2 3"/>');
+    svg.push('<line x1="'+(e.x+e.w)+'" y1="'+e.y+'" x2="'+(e.x+e.w)+'" y2="'+(e.y+EL_H)+'" stroke="'+st+'" stroke-dasharray="2 3"/>');
     let fs=10.5; const need=e.text.length*6.2;
     if(need>e.w-6) fs=Math.max(7,10.5*(e.w-6)/need);
     svg.push('<text x="'+(e.x+e.w/2)+'" y="'+(e.y+EL_H/2+fs*0.35)+'" font-size="'+fs+'" text-anchor="middle" fill="#6f6e69">'+esc(e.text)+'</text>');

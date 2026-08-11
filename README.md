@@ -307,7 +307,28 @@ Secondary routes, once you are past the first read:
 
 ## Install
 
-The renderer is published on npm under the MIT licence:
+**Into a coding agent.** The FigDown skill teaches an agent to author, build
+and read figures. As a Claude Code plugin:
+
+```sh
+/plugin marketplace add FigDown/figdown
+/plugin install figdown@figdown
+```
+
+Or copy the self-contained bundle into any skills directory, with no plugin
+mechanism involved:
+
+```sh
+cp -r skill/figdown ~/.claude/skills/figdown
+```
+
+Both paths install the same directory — the plugin manifest points at
+[`skill/figdown/`](skill/README.md) rather than copying it. See
+[`skill/README.md`](skill/README.md) for the project-scoped variant and for
+other agent frameworks.
+
+**Into a program or a build.** The renderer is published on npm under the MIT
+licence:
 
 ```sh
 npm install -g figdown
