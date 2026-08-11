@@ -36,6 +36,9 @@
   pre{margin:0;font-family:var(--mono);font-size:12.2px;line-height:1.55;background:var(--code);
       border:1px solid var(--line);border-radius:12px;padding:14px;overflow-x:auto;tab-size:4}
   code{font-family:var(--mono)}
+  figure.hero{margin:0 0 0}
+  .gallery figure{display:flex;flex-direction:column;gap:10px}
+  .gallery figcaption{margin:0}
   .cap{font-size:12.5px;color:var(--muted);margin:8px 0 0}
   .cap strong{color:var(--ink);font-weight:600}
   ul.router{list-style:none;margin:0;padding:0;display:grid;gap:10px}
@@ -69,52 +72,90 @@
   </ul>
 </section>
 
+<figure class="hero">
+  <img src="figures/one-source-two-readers.svg"
+       alt="One source, two readers: a .fd file feeds the FigDown renderer, which produces an SVG for a human reader; the same .fd is read directly for meaning by an AI agent.">
+</figure>
+<p class="cap">source:
+<a href="figures/one-source-two-readers.fd">figures/one-source-two-readers.fd</a>
+— <strong>this figure is FigDown</strong>.</p>
+
 <h2>The claim, shown rather than described</h2>
 <p class="lede">Below is one FigDown document in both of its forms. The picture on
 the left is what a human reads; the text on the right is what an agent reads. They
-are the same content, and the picture was rendered from that text by FigDown itself.</p>
+are the same content, the picture was rendered from that text by FigDown itself,
+and the text is <a href="examples/dns.fd"><code>examples/dns.fd</code></a> in
+full &mdash; 30 lines, nothing elided.</p>
 
 <div class="two">
   <figure>
-    <img src="figures/one-source-two-readers.svg"
-         alt="One source, two readers: ingress.fd feeds the FigDown renderer, which produces ingress.svg for a human reader; the same ingress.fd is read directly for meaning by an AI agent.">
+    <img src="examples/dns.svg"
+         alt="DNS message header from RFC 1035: six 16-bit words with a bit ruler numbered 0 to 15, the flags word split into QR, Opcode, AA, TC, RD, RA, Z and RCODE at their real bit widths, and a variable-length section below.">
   </figure>
   <div>
 <pre><code># FigDown — figures as text. Spec: https://github.com/FigDown/figdown
 
-figdown 0.1 block
-title "One source, two readers"
+figdown 0.1 bitfield
 
-# A single .fd file is the source of truth.
-# It feeds two completely different reading paths:
-#   (a) deterministic renderer  -&gt;  SVG artifact  -&gt;  human
-#   (b) AI agent reads the .fd directly for meaning
+# DNS Message Header — RFC 1035 §4.1.1
+# Each row is 16 bits, MSB-0 numbering (bit 0 at left).
 
-node src  "ingress.fd\n(source of truth)"  shape=rounded  fill=#e0e7ff
-node rend "FigDown renderer\n(build-svg.js)"
-node svg  "ingress.svg\n(artifact)"        shape=rounded  fill=#dcfce7
-node human "human reader"                  shape=ellipse
-node agent "AI agent"                      shape=ellipse   fill=#fef9c3
+bitfield dns "DNS Message Header (RFC 1035)" word=16 numbering=msb0
 
-flow right
-rank svg,human
+# Row 1: Transaction ID
+field "ID" 16 description="Identifier assigned by the program that generates the query; copied into the reply"
 
-edge src  -[deterministic build]-&gt;  rend
-edge rend -[stable SVG]-&gt;           svg
-edge svg  -[reads visually]-&gt;       human
-edge src  -[reads for meaning]-&gt;    agent
+# Row 2: Flags (QR + Opcode + AA + TC + RD + RA + Z + RCODE = 16 bits)
+field QR:1,Opcode:4,AA:1,TC:1,RD:1,RA:1,Z:3,RCODE:4
 
-layout
-pin src   at=(20,20)
-pin rend  at=(330,20)
-pin svg   at=(615,20)
-pin human at=(855,20)
-pin agent at=(110,150)</code></pre>
+# Row 3: Question Count
+field "QDCOUNT" 16 description="Number of entries in the question section"
+
+# Row 4: Answer Record Count
+field "ANCOUNT" 16 description="Number of resource records in the answer section"
+
+# Row 5: Authority Record Count
+field "NSCOUNT" 16 description="Number of name server resource records in the authority section"
+
+# Row 6: Additional Record Count
+field "ARCOUNT" 16 description="Number of resource records in the additional records section"
+
+# Variable-length sections (one representative row each)
+break
+field "Question / Answer / Authority / Additional sections" * description="Variable-length sections follow the header; see RFC 1035 §4.1.2–4.1.4"
+</code></pre>
   </div>
 </div>
-<p class="cap">source:
-<a href="figures/one-source-two-readers.fd">figures/one-source-two-readers.fd</a>
-— <strong>this figure is FigDown</strong>.</p>
+<p class="cap">source: <a href="examples/dns.fd">examples/dns.fd</a> &mdash; a bit
+ruler numbering 0&ndash;15, and a flags word split into eight sub-byte fields at
+their real widths. No Markdown-native diagram tool draws that. An agent reads the
+same facts off the text: <code>RCODE</code> is the low four bits of the second
+16-bit word, and the sections after the header have a width the document
+deliberately declines to give.</p>
+
+<h2>One document, several coordinated forms</h2>
+<p class="lede">A <code>.fd</code> is not one picture per file. Two examples,
+shown small &mdash; the source is behind each link, because their point is range
+and range needs more room than a side-by-side view gives.</p>
+
+<div class="two gallery">
+  <figure>
+    <a href="examples/vxlan-encap.fd"><img src="examples/vxlan-encap.svg"
+       alt="VXLAN encapsulation: the Ethernet frame before encapsulation and the VXLAN-encapsulated frame after it, an overhead table, and a legend derived from the class declarations."></a>
+    <figcaption class="cap"><a href="examples/vxlan-encap.fd">examples/vxlan-encap.fd</a>
+    &mdash; the frame layout before and after encapsulation, side by side in one
+    document, plus the encapsulation overhead. The legend is derived from the
+    <code>class</code> declarations; nobody drew it.</figcaption>
+  </figure>
+  <figure>
+    <a href="examples/pvlan-flows.fd"><img src="examples/pvlan-flows.svg"
+       alt="Private VLAN: a topology of promiscuous, community and isolated ports, a derived legend, and two rule tables."></a>
+    <figcaption class="cap"><a href="examples/pvlan-flows.fd">examples/pvlan-flows.fd</a>
+    &mdash; one document producing a topology, a derived legend and two rule
+    tables, because the prohibitions that define a private VLAN cannot be drawn
+    as arrows and have to be written down.</figcaption>
+  </figure>
+</div>
 
 <hr>
 

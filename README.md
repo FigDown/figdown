@@ -34,50 +34,89 @@ The figure above is the whole idea, and it is itself a FigDown figure: one
 `.fd` is the source of truth, a deterministic renderer turns it into the SVG a
 human sees, and an agent reads the same `.fd` directly for meaning.
 
-Here is what that source looks like. This is a complete FigDown document —
-nothing has been elided.
+Here is what that source looks like. This document is
+[`examples/dns.fd`](examples/dns.fd) in full — 30 lines, nothing has been
+elided.
 
 ```figdown
-figdown 0.1 block
-title "Ingress datapath (excerpt)"
-group ing "Ingress Pipeline"
-node mac "MAC RX" in=ing
-node parser "Parser" in=ing
-node l2 "L2 Lookup" in=ing
-node l3 "L3 Lookup" in=ing fill=#d1fae5
-node acl "ACL" in=ing
-node mmu "MMU / Buffer"
-flow right
-edge mac -> parser
-edge parser -> l2
-edge l2 -[L3 hit]-> l3
-edge l2 -[miss]-> acl style=dashed
-edge l3 -> mmu
-edge acl -> mmu
+# FigDown — figures as text. Spec: https://github.com/FigDown/figdown
+
+figdown 0.1 bitfield
+
+# DNS Message Header — RFC 1035 §4.1.1
+# Each row is 16 bits, MSB-0 numbering (bit 0 at left).
+
+bitfield dns "DNS Message Header (RFC 1035)" word=16 numbering=msb0
+
+# Row 1: Transaction ID
+field "ID" 16 description="Identifier assigned by the program that generates the query; copied into the reply"
+
+# Row 2: Flags (QR + Opcode + AA + TC + RD + RA + Z + RCODE = 16 bits)
+field QR:1,Opcode:4,AA:1,TC:1,RD:1,RA:1,Z:3,RCODE:4
+
+# Row 3: Question Count
+field "QDCOUNT" 16 description="Number of entries in the question section"
+
+# Row 4: Answer Record Count
+field "ANCOUNT" 16 description="Number of resource records in the answer section"
+
+# Row 5: Authority Record Count
+field "NSCOUNT" 16 description="Number of name server resource records in the authority section"
+
+# Row 6: Additional Record Count
+field "ARCOUNT" 16 description="Number of resource records in the additional records section"
+
+# Variable-length sections (one representative row each)
+break
+field "Question / Answer / Authority / Additional sections" * description="Variable-length sections follow the header; see RFC 1035 §4.1.2–4.1.4"
 ```
 
 It renders to this, deterministically — same source, same bytes, every time:
 
-![Ingress datapath (excerpt)](figures/ingress.svg)
+![DNS message header (RFC 1035)](examples/dns.svg)
 
-<sub>source: [figures/ingress.fd](figures/ingress.fd) — this figure is FigDown</sub>
+<sub>source: [examples/dns.fd](examples/dns.fd) — this figure is FigDown</sub>
 
-An agent handed the text above can say which stages are inside the ingress
-pipeline, that an L2 miss goes to the ACL stage, and that both branches
-converge on the MMU. It can say all of it without seeing the picture. That is
-the whole idea.
+Look at what the picture had to carry: a bit ruler numbering 0–15 across the
+top, and a flags word split into eight sub-byte fields — `QR | Opcode | AA |
+TC | RD | RA | Z | RCODE` — drawn at their real widths, four bits for `Opcode`
+and one for `AA`. No Markdown-native diagram tool draws that.
+
+An agent handed the text says the same things without the picture: that
+`RCODE` is the low four bits of the second 16-bit word, that a DNS header is
+six 16-bit words, that what follows it is variable-length and the document
+declines to give a width for it. It can say all of it without seeing the
+picture. That is the whole idea.
 
 In a Markdown document you embed the artifact and point at the source:
 
 ```markdown
-![Ingress datapath](figures/ingress.svg)
+![DNS message header](examples/dns.svg)
 
-<sub>source: [figures/ingress.fd](figures/ingress.fd)</sub>
+<sub>source: [examples/dns.fd](examples/dns.fd)</sub>
 ```
 
 The SVG is what humans see; the `source:` footer is what agents follow. Each
 generated SVG also embeds its own source text and a SHA-256 of it, so a figure
 that gets separated from its `.fd` can always be recovered and reopened.
+
+### One document, several coordinated forms
+
+A `.fd` is not one picture per file. Two examples, shown small — the source is
+behind each link, because their point is range and range needs more room than a
+side-by-side fence gives:
+
+<a href="examples/vxlan-encap.fd"><img src="examples/vxlan-encap.svg" width="46%" alt="VXLAN encapsulation: the Ethernet frame before encapsulation and the VXLAN-encapsulated frame after it, an overhead table, and a legend derived from the class declarations"></a>
+<a href="examples/pvlan-flows.fd"><img src="examples/pvlan-flows.svg" width="46%" alt="Private VLAN: a topology of promiscuous, community and isolated ports, a derived legend, and two rule tables"></a>
+
+- **[`examples/vxlan-encap.fd`](examples/vxlan-encap.fd)** — the frame layout
+  before and after encapsulation, side by side in one document, plus the
+  encapsulation overhead. The legend is derived from the `class` declarations;
+  nobody drew it.
+- **[`examples/pvlan-flows.fd`](examples/pvlan-flows.fd)** — one document
+  producing a topology, a derived legend and two rule tables, because the
+  prohibitions that define a private VLAN cannot be drawn as arrows and have to
+  be written down.
 
 ---
 

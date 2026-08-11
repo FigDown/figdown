@@ -52,6 +52,50 @@ Recover from there. On hash mismatch the `.fd` is truth: rebuild. If the hash
 matches but your drawing differs, compare `data-engine-version` — that is the
 other half of "same source → same SVG".
 
+## When the figure comes from a source
+
+Drawing is step 5 of 6. The steps before it decide what is true; the step after
+it is how you find out you were wrong.
+
+**1 — Get the structure out, don't look at the picture.** Containers ship a
+drawing twice: the editable object and a flat render of it. The render is not
+the source. Open the container, take the object, and read nodes, edges and
+labels from it. Vision is for flat pixels with no structure left, and
+everything it produces is a hypothesis until checked.
+
+**2 — Let the extraction pick the genre.** Many text shapes and no connectors
+is not a graph: it is a `table`. Conditions with one outcome per combination is
+a `table`, not a `flowchart` — drawn as a chart it buys crossing edges and
+nothing else. Two mirrored mechanisms are two figures. A run in which most of a
+page's figures become tables is a correct run.
+
+**3 — Separate what the source states from what you concluded.** Write the
+stated thing; for the rest, leave a `#` comment at the point of doubt and list
+it where the host document can count it. A length the source does not give
+stays the unresolved marker its genre provides, a condition the source states
+goes in the genre's own condition key rather than into a label, and a value it
+words in prose stays worded — resolving any of them is fabrication with a
+plausible face.
+
+**4 — Keep the original.** Store it beside the `.fd` and never delete it: a
+later reader may find a misread, and the fix needs the ground truth. After
+that, the `.fd` changes only when understanding changes.
+
+**5 — Draw.**
+
+**6 — Verify, and be able to fail.** Diff your `.fd` against the extracted
+structure: same node set, same edge set, same labels. This is what catches an
+invented node and a dropped edge — neither is visible in a picture that looks
+fine. Then build and **look at the render**. Lint and crossing counts are a
+smoke alarm, not a judge. A figure is not done because the file exists; it is
+done when it has been compared and seen.
+
+**Across a corpus:** one figure per session, one tool call per figure; never
+read a large extraction whole; two failures on a step means halve the step;
+keep progress in a file, not in the session. Check once per corpus that every
+figure has both `.fd` and `.svg`, that every embed resolves, and that every
+recorded uncertainty is still recorded.
+
 ## Load only what you need
 
 This file is the whole genre-independent language. **Everything else is one
