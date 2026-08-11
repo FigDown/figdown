@@ -14,19 +14,28 @@ different things from it:
   a plain program — no model in the rendering path — and the artifact travels
   with the document, viewable in any Markdown viewer.
 
+![One source, two readers](figures/one-source-two-readers.svg)
+
+<sub>source: [figures/one-source-two-readers.fd](figures/one-source-two-readers.fd) — this figure is FigDown</sub>
+
 Think of it as the figure layer of Markdown: what Mermaid did for flowcharts,
 extended to the diagram families Mermaid cannot express — annotated block
 architectures, protocol headers, lookup tables, packet walks — with **layout
 treated as part of the knowledge** rather than as something the renderer is
 free to rearrange.
 
-**[Try it live — the editor runs in your browser, no install.](https://figdown.github.io/figdown/)**
+**[Try it live — the editor runs in your browser, no install.](https://figdown.org/editor/figdown.html)**
 
 ---
 
 ## Fifteen seconds
 
-This is a complete FigDown document. Nothing has been elided.
+The figure above is the whole idea, and it is itself a FigDown figure: one
+`.fd` is the source of truth, a deterministic renderer turns it into the SVG a
+human sees, and an agent reads the same `.fd` directly for meaning.
+
+Here is what that source looks like. This is a complete FigDown document —
+nothing has been elided.
 
 ```figdown
 figdown 0.1 block
@@ -215,7 +224,11 @@ Two consequences worth planning around:
   tag and one immutable, self-contained engine page. A user who wants to stay
   on a language version always can, by running the release that implemented it
   — and that does not depend on any future engine still understanding old
-  documents.
+  documents. For `v0.1.0` that page is
+  [`archive/0.1/figdown.html`](archive/0.1/figdown.html): open it in any
+  browser, paste a `figdown 0.1` document in, and it renders exactly as
+  `v0.1.0` rendered it. The live editor is a tool and tracks the current
+  state; only the versioned `archive/` path is promised never to change.
 - **Expect one migration at `figdown 1.0`, and none after it** — until a
   `figdown 2.0`, which is the only place a removal may occur and which arrives
   with its own migration.

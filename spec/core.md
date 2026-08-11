@@ -4216,6 +4216,43 @@ newer engine (that is what the archive is for). **Available** is the one
 unconditional commitment 0.x can make, and §13.5 is why it can be made
 unconditionally.
 
+#### 13.0.4 What the source version string does between releases
+
+The table above says `vX.Y.Z` is written in three places. Between two
+releases the repository is at none of them, and this states what each
+one carries meanwhile.
+
+| where | between releases | at a release |
+|---|---|---|
+| the **git tag** | none exists for the working state | `vX.Y.Z` is created |
+| **`package.json`** | still names the **last** release; it is not the state of the tree | bumped to the new `vX.Y.Z` **by the release act** |
+| the engine's version constant, stamped into `data-engine-version` | a **dev increment** `X.Y-dev.N` | rewritten to `X.Y.Z` at publish |
+
+**The dev counter does not reset and does not adopt the release
+number.** `N` counts source states of the engine and only ever
+increases: `v0.1.0` was published from 0.1, and the next source
+state is 0.1, then 0.1. A reset would make `N`
+ambiguous across releases, and adopting `X.Y.Z` early would put a
+release number on an engine no tag names. Only the release act writes a
+release number, and it writes it in `package.json`.
+
+**The mapping to `vX.Y.Z` happens once, at publish.** The published
+engine's version constant — and therefore the `data-engine-version` of
+every artifact built from it (§7) — reads `X.Y.Z`, matching the tag and
+`package.json`. Both readings of that attribute are therefore true and
+distinguishable:
+
+- **`X.Y.Z`** — a released engine. A tag names it and an archived page
+  runs it (§13.5).
+- **`X.Y-dev.N`** — an unreleased source engine. **No tag and no
+  archived page exists for it, and none is owed**; `RENDERING-DETERMINISM`'s reproducibility
+  still holds for it, but only against that exact source state.
+
+A reader who meets `X.Y-dev.N` in an artifact is looking at output from
+between two releases. It is not a version of the **language** — the
+language number is still `figdown X.Y` (§13.0) — and nothing about
+`figdown X.Y` compatibility turns on it.
+
 ### 13.1 0.x is a preview, and it is NOT stable
 
 FigDown 0.x — both the language `figdown 0.y` and the releases `v0.y.z`

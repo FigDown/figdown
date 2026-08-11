@@ -1,0 +1,34 @@
+# archive/MANIFEST.tsv — the immutability manifest.
+#
+# Per RELEASED version core.md §13.5 commits to a git tag and a runnable
+# engine page, "neither ever rewritten". This file is what "never rewritten"
+# is checked against: one row per archived file, hashed at release.
+#
+# Columns (tab-separated):  release  file  bytes  sha256
+#
+# APPEND ONLY. A row is written once, by `node tools/archive-check.js --write
+# <release>`, and never edited afterwards. If the bytes on disk stop matching
+# a row, the bytes are wrong, not the row. `node tools/archive-check.js`
+# (gate:archive) fails on modification, on deletion, and on an unlisted file
+# appearing under an archived prefix.
+#
+# What is archived, and why each:
+#   archive/<X.Y>/figdown.html   the engine as USERS RAN IT for that release —
+#                                the published artifact, not the source engine
+#                                at the tag. Only that file reproduces the
+#                                picture (§13.0.2 limit 2).
+#   read/<X.Y>/**.md             the reading contract for language `figdown
+#                                X.Y`. The language version is frozen, so what
+#                                it means is frozen with it; a later release
+#                                writes read/<X.Y+1>/ rather than editing this.
+0.1	archive/0.1/figdown.html	326199	8c0c19c0101efbd9600600993668907e9370cf5cc269415b46f97e0fe546c708
+0.1	read/0.1/bitfield.md	6376	0a233b461cecb4f44bf5f4376927252b43a24d8daace177b110632228c594068
+0.1	read/0.1/experimental/constructs.md	3416	2c613732a39ef5e4c70f40e3d8eda6f492dc6088b3ba50db2d1b882cf1bad4c3
+0.1	read/0.1/experimental/flowchart.md	2218	0feb9452217df8bef917e23a92e5a3710ba0a334fc2d40117ce6d2bafa35a2bf
+0.1	read/0.1/experimental/timing.md	1446	ff55f6dbb04c93f8c71057a98a6550bc8a88b338f0f32e0fb00b708f45246b59
+0.1	read/0.1/experimental/topology.md	1373	cd5ceb33efa8a038fa6a8852c7335b8074c2057620a4ffa58f4ab544be7249aa
+0.1	read/0.1/layout.md	3244	f56ae273ce2bb2b727ee1dd8d9b5f6f499630a4bc697ad27605830413dec0793
+0.1	read/0.1/reading.md	6755	72543701bbf9fb8ceedd5a26774fb250a1f8441c21733d8c0a833f6aff15ebc9
+0.1	read/0.1/scene.md	4917	f492fe0967b5063a216b3327d6ee00234b8121c6931800cc703c6b991004c94c
+0.1	read/0.1/table.md	2692	c62618a026aca4443aae02f2a6f33153cc69b80acd39f7628390d303f2d5f7f7
+0.1	read/0.1/transcribe.md	2508	dbde592c33eeae17f3ff546f217b9fc7a0d641121462584236ca5b999ae9f206

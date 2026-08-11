@@ -47,8 +47,49 @@ follows the link.
 
 The pre-release increments are not releases and are not narrated here;
 this log begins at the first released language version. `0.1` is the
-first release the archive obligation attaches to, and the first entry
-that will carry those two links.
+first release the archive obligation attaches to, and its entry is the
+next section.
+
+## 0.1  (2026-08-10, released as `v0.1.0`)
+
+The first released language version. There is nothing to migrate **to**
+`figdown 0.1`: it is where the log begins, and every dev increment below
+it squashes into it.
+
+**The archive (§13.5).**
+
+| | |
+|---|---|
+| **tag** | [`v0.1.0`](https://github.com/FigDown/figdown/releases/tag/v0.1.0) |
+| **runnable page** | [`archive/0.1/figdown.html`](../archive/0.1/figdown.html) — served at `https://figdown.org/archive/0.1/figdown.html` |
+
+Open the page in any browser, paste a `figdown 0.1` document into it, and
+it renders exactly as `v0.1.0` rendered it. It is a single self-contained
+HTML file: no network, no install, no server.
+
+**Which bytes the page is, and why it matters.** The archived page is the
+engine **as users ran it** — the published `v0.1.0` artifact, which stamps
+`data-engine-version="0.1.0"`. It is *not* the engine in the source tree at
+tag `v0.1.0`, which stamps 0.1 (§13.0.4). Recovering a figure needs
+the engine the reader had, and a differently-stamped engine would emit a
+different `data-engine-version` and therefore different SVG bytes — which is
+the one thing `RENDERING-DETERMINISM` reproducibility is about.
+
+**The page is not the editor.** `editor/figdown.html` tracks the current
+source state and changes with every increment; it is a tool, not an archive.
+Only the versioned `archive/<X.Y>/` path is promised never to change.
+
+**What else is frozen at `0.1`.** [`read/0.1/`](../read/0.1/reading.md), the
+reading contract for this language version, was published with `v0.1.0` and
+is archived on the same terms. `figdown 0.1` is frozen, so what its
+constructs *mean* is frozen with it; a later release that needs to say
+something different writes `read/0.2/`.
+
+Both are held byte-unchanged by `gate:archive`
+([`tools/archive-check.js`](../tools/archive-check.js), against
+[`archive/MANIFEST.tsv`](../archive/MANIFEST.tsv)), which fails on
+modification, on deletion, and on a file appearing under an archived prefix
+that the release did not ship — over every archived version, every run.
 
 ## Entry format
 

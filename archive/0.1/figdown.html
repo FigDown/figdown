@@ -1,19 +1,116 @@
-// figdown.js — FigDown embeddable library (0.1.1)
-// GENERATED FILE, DO NOT EDIT. Built from editor/figdown.html.
-// Regenerate with: node tools/make-lib.js
-(function (root, factory) {
-  'use strict';
-  if (typeof module === 'object' && typeof module.exports === 'object') {
-    module.exports = factory();               // CommonJS / Node
-  } else {
-    root.figdown = factory();                 // script tag: globalThis.figdown
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>FigDown PoC — deterministic text→SVG renderer (draft v0.0)</title>
+<style>
+  :root{
+    --bg:#fcfcfb; --panel:#ffffff; --ink:#1d1d1b; --muted:#6f6e69;
+    --line:#e3e1d9; --hair:#d6d4cc; --code:#f6f5ef; --err:#dc2626;
+    --sans:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;
+    --mono:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
   }
-}(typeof globalThis !== 'undefined' ? globalThis : this, function () {
-  'use strict';
-var VERSION = "0.1.1";
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);line-height:1.5}
+  .wrap{max-width:1400px;margin:0 auto;padding:22px 20px 50px}
+  header h1{font-size:20px;font-weight:600;margin:0 0 3px;letter-spacing:-.01em}
+  header p{margin:0;color:var(--muted);font-size:13px}
+  .bar{display:flex;align-items:center;gap:9px;margin:14px 0 12px;flex-wrap:wrap}
+  .bar label{font-size:13px;color:var(--muted)}
+  select,button{font:inherit;font-size:13.5px;padding:6px 10px;border:1px solid var(--hair);border-radius:8px;background:var(--panel);color:var(--ink);cursor:pointer}
+  button:hover{border-color:var(--muted)}
+  .main{display:grid;grid-template-columns:minmax(340px,0.9fr) minmax(420px,1.1fr);gap:14px;align-items:start}
+  @media (max-width:980px){ .main{grid-template-columns:1fr} }
+  textarea{width:100%;min-height:520px;font-family:var(--mono);font-size:12.8px;line-height:1.55;
+    padding:12px 14px;border:1px solid var(--line);border-radius:12px;background:var(--panel);color:var(--ink);
+    resize:vertical;white-space:pre;tab-size:4}
+  textarea:focus{outline:2px solid #bfdbfe;outline-offset:-1px}
+  .preview{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:14px;min-height:520px;overflow:auto}
+  .errors{font-family:var(--mono);font-size:12.5px;color:var(--err);white-space:pre-wrap;margin:0}
+  .ok{color:var(--muted);font-size:12px;margin:0 0 8px}
+  svg{max-width:100%;height:auto;display:block}
+  footer{margin-top:18px;color:var(--muted);font-size:12px}
+  a{color:inherit}
+  details#svgbox,details#imgbox{margin-top:14px;border-top:1px solid var(--line);padding-top:8px}
+  details#svgbox summary,details#imgbox summary{font-size:12px;color:var(--muted);cursor:pointer;user-select:none}
+  #imgwrap{margin-top:8px;border:1px dashed var(--hair);border-radius:8px;padding:10px;background:#fff}
+  #svgimg{max-width:100%;display:block}
+  #svgsrc{font-family:var(--mono);font-size:11.5px;line-height:1.5;background:var(--code);
+    border:1px solid var(--line);border-radius:8px;padding:10px 12px;margin:8px 0 0;
+    max-height:280px;overflow:auto;white-space:pre-wrap;word-break:break-all}
+  .fname{font-family:var(--mono);font-size:12px;color:var(--muted);padding:0 4px}
+  .sep{display:inline-block;width:1px;height:18px;background:var(--line);margin:0 4px;vertical-align:middle}
+  .errline{cursor:pointer}
+  .errline:hover{text-decoration:underline}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+  <h1>FigDown PoC <span style="color:var(--muted);font-weight:400">— deterministic text→SVG, draft v0.0</span></h1>
+  <p>Figures as text — one source, two readers. Edit left, render right. Same source → same SVG, bit-level.</p>
+</header>
 
-// ---- engine (extracted verbatim from editor/figdown.html) ----
-var __engine = (function () {
+<div class="bar">
+  <button id="newdoc" title="new blank document">New</button>
+  <button id="open" title="open a .fd (or a generated .svg) — Ctrl+O">Open…</button>
+  <button id="save" title="save the .fd — Ctrl+S (saves back to the opened file)">Save</button>
+  <button id="saveas" title="save the .fd under a new name — Ctrl+Shift+S">As…</button>
+  <button id="dl" title="export the SVG artifact (source + SHA-256 embedded)">SVG ⬇</button>
+  <span id="fname" class="fname"></span>
+  <button id="undobtn" disabled title="undo the last edit — Ctrl+Z (outside the text pane)">↶</button>
+  <button id="redobtn" disabled title="redo — Ctrl+Shift+Z">↷</button>
+  <span class="sep"></span>
+  <label>Example</label>
+  <select id="examples"></select>
+  <select id="newkind" title="shape for new nodes"><option>box</option><option>rounded</option><option>circle</option><option>ellipse</option><option>diamond</option><option>cylinder</option></select>
+  <button id="addnode" title="insert a node line (or double-click the canvas)">+ Node</button>
+  <button id="linkmode" title="click two nodes to write an edge line">Link</button>
+  <button id="groupmode" title="drag a box around nodes to write a group line">⬚ Group</button>
+  <button id="pinall" title="materialize all auto positions into pin lines (first section)">Pin all</button>
+  <label>fill <input type="color" id="fillpick" value="#ffffff" disabled></label>
+  <button id="raise" disabled title="paint later = move its line down in the text">Raise ↑</button>
+  <button id="lower" disabled title="paint earlier = move its line up in the text">Lower ↓</button>
+  <button id="delnode" disabled title="delete the node and its pins/edges — Del">Delete</button>
+  <input type="file" id="loadfile" accept=".fd,.svg,.txt" style="display:none">
+  <span id="status" style="font-size:12px;color:var(--muted)"></span>
+</div>
+<p style="margin:0 0 10px;font-size:12px;color:var(--muted)">
+Every GUI action rewrites the text: double-click empty canvas → new <code>node</code> + <code>pin</code> ·
+drag a node → <code>pin at=</code> · arrow keys nudge (Shift = ×10) · drag the corner handle → <code>pin width=/height=</code> ·
+<strong>Pin all</strong> freezes the live layout into <code>pin</code> lines ·
+double-click a node → rename · Del → delete ·
+fill color → <code>fill=</code> · Link → <code>edge</code> · ⬚ Group → <code>group</code> ·
+multi-section files: layout edits stay in the <em>first</em> section (before the next <code>figdown</code>) ·
+Ctrl+S save · Ctrl+O open · autosave on.</p>
+
+<div class="main">
+  <textarea id="src" spellcheck="false"></textarea>
+  <div class="preview">
+    <p class="ok" id="okline"></p>
+    <pre class="errors" id="errs"></pre>
+    <div id="out"></div>
+    <details id="imgbox" open>
+      <summary>Artifact preview — the .svg file as an image (what a Markdown reader shows)</summary>
+      <div id="imgwrap"><img id="svgimg" alt="SVG artifact preview"></div>
+    </details>
+    <details id="svgbox">
+      <summary>Generated SVG source</summary>
+      <pre id="svgsrc"></pre>
+    </details>
+  </div>
+</div>
+
+<footer>FigDown draft v0.0 PoC — core scene (node/group/edge/plane, flow/rank/pin) + bitfield + table + timing.
+Closed grammar: unknown lines are errors with line numbers. No LLM, no dependencies, no network.</footer>
+</div>
+
+<script>
+'use strict';
+// ============================================================
+// 1. PARSER — closed, line-oriented grammar (draft v0.0)
+// ============================================================
 const SHAPES = ['box','rounded','circle','ellipse','diamond','cylinder'];
 // The engine's own version string, and the SINGLE source of it: it sits
 // INSIDE the extracted engine region, so tools/make-lib.js (dist/) and
@@ -24,7 +121,7 @@ const SHAPES = ['box','rounded','circle','ellipse','diamond','cylinder'];
 // input to that promise, and under core §13 a 0.x renderer may differ from
 // the next — which makes the recorded version the only thing that can
 // explain a diff between two renderings of one source.
-const FIGDOWN_VERSION = '0.1.1';
+const FIGDOWN_VERSION = '0.1.0';
 // Retired shape VALUES keep a named diagnostic (PROCESS §5(d)), the same way
 // retired option keys do: `cloud` was the one value that named a domain
 // (the internet cloud) in an enum the language keeps purely geometric
@@ -4145,116 +4242,1271 @@ function renderTiming(w,y0){
 }
 
 // ============================================================
-return { parse: parse, render: render, stackSectionSvgs: stackSectionSvgs };
-})();
+// 3. UI + SVG export with embedded source (`MARKDOWN-EMBEDDING-CONVENTION`)
+// ============================================================
+const EXAMPLES={
+'blank canvas (start drawing!)':
+`# FigDown — figures as text. Spec: https://github.com/FigDown/figdown
 
-// ---- minimal synchronous SHA-256 (FIPS 180-4), hex output ----
-// Dependency-free so artifact() works in browsers and Node alike.
-var __SHA_K = [
-0x428a2f98,0x71374491,0xb5c0fbcf,0xe9b5dba5,0x3956c25b,0x59f111f1,0x923f82a4,0xab1c5ed5,
-0xd807aa98,0x12835b01,0x243185be,0x550c7dc3,0x72be5d74,0x80deb1fe,0x9bdc06a7,0xc19bf174,
-0xe49b69c1,0xefbe4786,0x0fc19dc6,0x240ca1cc,0x2de92c6f,0x4a7484aa,0x5cb0a9dc,0x76f988da,
-0x983e5152,0xa831c66d,0xb00327c8,0xbf597fc7,0xc6e00bf3,0xd5a79147,0x06ca6351,0x14292967,
-0x27b70a85,0x2e1b2138,0x4d2c6dfc,0x53380d13,0x650a7354,0x766a0abb,0x81c2c92e,0x92722c85,
-0xa2bfe8a1,0xa81a664b,0xc24b8b70,0xc76c51a3,0xd192e819,0xd6990624,0xf40e3585,0x106aa070,
-0x19a4c116,0x1e376c08,0x2748774c,0x34b0bcb5,0x391c0cb3,0x4ed8aa4a,0x5b9cca4f,0x682e6ff3,
-0x748f82ee,0x78a5636f,0x84c87814,0x8cc70208,0x90befffa,0xa4506ceb,0xbef9a3f7,0xc67178f2];
-function __sha256hex(text) {
-  var b = [], i, c;
-  for (i = 0; i < text.length; i++) {           // UTF-8 encode
-    c = text.codePointAt(i); if (c > 0xffff) i++;
-    if (c < 0x80) b.push(c);
-    else if (c < 0x800) b.push(0xc0 | (c >> 6), 0x80 | (c & 63));
-    else if (c < 0x10000) b.push(0xe0 | (c >> 12), 0x80 | ((c >> 6) & 63), 0x80 | (c & 63));
-    else b.push(0xf0 | (c >> 18), 0x80 | ((c >> 12) & 63), 0x80 | ((c >> 6) & 63), 0x80 | (c & 63));
+figdown 0.1 topology
+title "Untitled"
+# Pick a kind, press "+ Node", drag things around, Link two nodes -
+# every action writes a line below. This text IS your file.`,
+
+'block-architecture (census #2)':
+`figdown 0.1 block
+title "Ingress datapath (excerpt)"
+group ing "Ingress Pipeline"
+node mac "MAC RX" in=ing
+node parser "Parser" in=ing
+node l2 "L2 Lookup" in=ing
+node l3 "L3 Lookup" in=ing fill=#d1fae5
+node acl "ACL" in=ing
+node mmu "MMU / Buffer"
+flow right
+edge mac -> parser
+edge parser -> l2
+edge l2 -[L3 hit]-> l3
+edge l2 -[miss]-> acl style=dashed
+edge l3 -> mmu
+edge acl -> mmu`,
+
+'flowchart roles':
+`figdown 0.1 flowchart
+title "Packet ingress (roles)"
+terminator rx "Frame received"
+process    l2 "Read the L2 header"
+decision   et "EtherType?" shape=ellipse
+process    ipv4 "Check IPv4 header"
+process    arp "Answer or relay ARP"
+process    vlan "Pop one VLAN tag"
+terminator drop "Drop"
+terminator fwd "Forward"
+rank ipv4,arp,drop,vlan
+edge rx -> l2
+edge l2 -> et
+edge et -[0x0800 IPv4]-> ipv4
+edge et -[0x0806 ARP]-> arp
+edge et -[other]-> drop
+edge et -[0x8100 VLAN]-> vlan
+edge vlan -[re-read]-> et
+edge ipv4 -> fwd
+edge arp -> fwd`,
+
+'bitfield (census #1)':
+`figdown 0.1 bitfield
+bitfield gre "GRE Header (RFC 2784/2890)" word=32 numbering=msb0
+field "C" 1
+field "R" 1
+field "K" 1
+field "S" 1
+field "s" 1
+field "Recur" 3
+field "Flags" 5
+field "Ver" 3
+field "Protocol Type" 16 fill=#dbeafe
+field "Checksum" 16 present="C = 1"
+field "Offset" 16 present="C = 1"
+field "Key" 32 present="K = 1" fill=#fef9c3
+field "Sequence Number" 32 present="S = 1"`,
+
+'table (census #3)':
+`figdown 0.1 table
+table fib "FIB (excerpt)"
+| Route          || Forwarding    ||
+| Prefix | Next Hop | Port | VRF   |
+|--------|:--------:|------|-------|
+| 10.0.0.0/8  | R2  | p1  | default |
+| 10.1.0.0/16 | R4  | p2  | default |
+| 0.0.0.0/0   | R3  | p2  | default |
+cell 2 highlight
+cell (3,2) fill=#dbeafe`,
+
+'timing (census #4)':
+`figdown 0.1 timing
+timing por "Power-on reset sequencing"
+signal clk    pppppppp
+signal rst_n  00011111
+signal cfg_ok 00000111
+signal data   xxx=..=x data=CFG,GO`,
+
+'topology + pin (stability demo)':
+`figdown 0.1 topology
+title "Leaf-spine, monitor pinned top-right"
+node sp1 "Spine-1" shape=rounded fill=#e0e7ff
+node sp2 "Spine-2" shape=rounded fill=#e0e7ff
+node lf1 "Leaf-1" shape=rounded
+node lf2 "Leaf-2" shape=rounded
+node h1 "Host-A"
+node h2 "Host-B"
+node mon "Monitor" fill=#fef9c3
+flow down
+rank sp1,sp2
+edge sp1 -- lf1
+edge sp1 -- lf2
+edge sp2 -- lf1
+edge sp2 -- lf2
+edge lf1 -- h1
+edge lf2 -- h2
+edge mon -[telemetry]- sp2 style=dotted
+pin mon at=(340,0)`,
+
+'EVPN fabric (topology + supplementary tables)':
+`figdown 0.1 topology
+title "VXLAN/EVPN Leaf-Spine Fabric — topology with plane notes"
+
+# ── Topology ────────────────────────────────────────────────────────
+node sp1 "Spine-1" shape=rounded fill=#e0e7ff
+node sp2 "Spine-2" shape=rounded fill=#e0e7ff
+node lf1 "Leaf-1 (VTEP)" shape=rounded
+node lf2 "Leaf-2 (VTEP)" shape=rounded
+node lf3 "Leaf-3 (VTEP)" shape=rounded
+node h1 "VM-A (VLAN 10)"
+node h2 "VM-B (VLAN 10)"
+node h3 "VM-C (VLAN 20)"
+flow down
+rank sp1,sp2
+rank lf1,lf2,lf3
+
+# underlay: every leaf peers with every spine
+edge sp1 -[eBGP]- lf1
+edge sp1 -- lf2
+edge sp1 -- lf3
+edge sp2 -- lf1
+edge sp2 -- lf2
+edge sp2 -- lf3
+edge lf1 -- h1
+edge lf2 -- h2
+edge lf3 -- h3
+
+# overlay: VXLAN tunnel between the two VTEPs sharing VNI 10010
+plane overlay "VXLAN tunnels" z-index=2
+edge lf1 <-[VXLAN VNI 10010]-> lf2 style=dashed stroke=#dc2626 plane=overlay
+
+# ── Supplementary knowledge ─────────────────────────────────────────
+table vni "VNI mapping"
+| Leaf   | VLAN | VNI   | Type |
+|--------|:----:|-------|------|
+| Leaf-1 | 10   | 10010 | L2   |
+| Leaf-2 | 10   | 10010 | L2   |
+| Leaf-3 | 20   | 10020 | L2   |
+cell (1,3) fill=#fee2e2
+cell (2,3) fill=#fee2e2
+
+table planes "Fabric planes"
+| Plane           | Protocol          | Role                      |
+|-----------------|-------------------|---------------------------|
+| Underlay        | eBGP              | loopback reachability     |
+| Overlay control | MP-BGP EVPN       | MAC/IP route distribution |
+| Overlay data    | VXLAN (UDP 4789)  | L2-in-L3 encapsulation    |`,
+
+'EVPN-VXLAN IRB (vendor-style, hand-pinned)':
+`figdown 0.1 topology
+title "EVPN-VXLAN IRB — leaves with IP-VRF and bridge domains"
+
+# Complex vendor-style figure, fully hand-laid-out (tier 3, PIN-COORDINATE-SCOPE two-level
+# coordinates): each group is anchored once; members are group-local, so
+# moving a leaf = editing one pin line.
+
+# ── Overlay cloud + spines ─────────────────────────────────────────
+node cloud "EVPN-VXLAN" shape=ellipse fill=#cfe8f7 stroke=#7fb8d8
+pin  cloud at=(330,90) width=620 height=110
+node sp1 "Spine-1" shape=rounded fill=#9aa2ad
+pin  sp1 at=(480,0)
+node sp2 "Spine-2" shape=rounded fill=#9aa2ad
+pin  sp2 at=(700,0)
+
+# ── Leaves: group = leaf box; members = IP-VRF badge + bridge domains
+group leaf2 "SRL LEAF-2"
+pin  leaf2 at=(90,235)
+node vrf2 "IP-VRF-10\\nRD1/RT10\\nVNI10" in=leaf2 fill=#1e3a8a
+pin  vrf2 at=(80,0)
+node bd2  "BD2\\nRD41/RT2\\nVNI2"   in=leaf2 style=dashed stroke=#1d4ed8
+pin  bd2 at=(0,85)
+node bd24a "BD24\\nRD22/RT24\\nVNI24" in=leaf2 style=dashed stroke=#1d4ed8
+pin  bd24a at=(160,85)
+
+group leaf4 "SRL LEAF-4"
+pin  leaf4 at=(540,235)
+node vrf4 "IP-VRF-10\\nRD1/RT10\\nVNI10" in=leaf4 fill=#1e3a8a
+pin  vrf4 at=(80,0)
+node bd24b "BD24\\nRD41/RT24\\nVNI24" in=leaf4 style=dashed stroke=#1d4ed8
+pin  bd24b at=(0,85)
+node bd4  "BD4\\nRD42/RT4\\nVNI4"  in=leaf4 style=dashed stroke=#1d4ed8
+pin  bd4 at=(160,85)
+
+group leaf3 "SRL LEAF-3"
+pin  leaf3 at=(1040,235)
+node vrf3 "IP-VRF-10\\nRD1/RT10\\nVNI10" in=leaf3 fill=#1e3a8a
+pin  vrf3 at=(0,0)
+node bd3  "BD3\\nRD31/RT3\\nVNI3"  in=leaf3 style=dashed stroke=#1d4ed8
+pin  bd3 at=(0,85)
+
+# ── Edge devices and hosts ──────────────────────────────────────────
+node ce3 "CE-3\\nIP-20.1.1.3/24\\nMAC-00:01:03:FF:00:0B" shape=rounded
+pin  ce3 at=(0,430)
+node h2  "HOST-2\\nIP-101.1.1.2/24\\nMAC-00:00:00:00:00:02" fill=#bae6fd
+pin  h2 at=(180,500)
+node srv "SERVER-1\\nHOST-12  IP-101.1.1.1/24\\nMAC-00:00:64:01:01:01"
+pin  srv at=(390,500)
+node h4  "HOST-4\\nIP-104.1.1.1/24\\nMAC-00:00:00:00:00:04" fill=#bae6fd
+pin  h4 at=(660,500)
+node h3  "HOST-3\\nIP-103.1.1.1/24\\nMAC-00:00:00:00:00:03" shape=rounded
+pin  h3 at=(1020,500)
+
+# fabric attachment
+edge sp1 -- cloud
+edge sp2 -- cloud
+edge cloud ["irb0.24\\nAnycast-IP .254"] -- vrf2
+edge cloud -- vrf4
+edge cloud -- vrf3
+
+# PE-CE and access links, port labels at the endpoints
+edge bd2 -["PE-CE\\nBGP IPv4"]- [20.1.1.2/24] ce3 style=dashed stroke=#1d4ed8
+edge bd2 [e1/12.24] -- h2
+edge bd24a [lag1.24] -- srv
+edge bd24b [lag1.24] -- srv
+
+# multi-homing: declare the SEMANTICS (these links form one bundle) and
+# the renderer derives the dashed ring — it follows the nodes wherever
+# they move; no coordinates involved
+bundle es1 "ES-1 / LAG-1" bd24a--srv,bd24b--srv stroke=#0ea5e9
+edge bd4 [e1/13.4] -- h4
+edge bd3 [e1/2.3] -- h3`,
+
+'VXLAN encapsulation (frames + tables)':
+`figdown 0.1 table
+title "VXLAN Overview — MAC-in-UDP encapsulation"
+
+# Cell order IS byte order — no pin/rank/flow needed (GUI-WRITEBACK-STRUCTURE-safe).
+# VLAN→VNI relation carried by the shared vni class (edges cannot
+# attach to table cells: CELL-EDGE-ANCHORS).
+
+# ── Semantic classes (MEANING-RECOVERY-SOURCE: the meaning rides on the element) ────────
+class outer  "Outer header added by the ingress VTEP (50B total)" fill=#fcd34d
+class vni    "VLAN ID 12-bit → VNI 24-bit: the identifier VXLAN widens" fill=#fcd34d stroke=#ea580c
+class inner  "Original L2 frame field — carried verbatim as VXLAN payload" fill=#bae6fd
+class opaque "Upper-plane payload — opaque to the VTEP" fill=#9aa2ad
+class oldfcs "Original FCS — dropped at encapsulation, not carried" fill=#93c5fd
+class newfcs "New FCS — recomputed over the outer frame" fill=#bbf7d0 stroke=#16a34a
+
+# ── Classical Ethernet frame ────────────────────────────────────────
+table eth "Classical Ethernet frame — cells left to right are on-the-wire order"
+| Ethernet header |||| Data | Trailer |
+|---------|---------|-----------|----------|------------------|--------|
+| DMAC 6B | SMAC 6B | 802.1Q 4B | Etype 2B | Payload 46–1500B | FCS 4B |
+cell (1,1) class=inner
+cell (1,2) class=inner
+cell (1,3) class=vni
+cell (1,4) class=inner
+cell (1,5) class=opaque
+cell (1,6) class=oldfcs
+
+# ── VXLAN-encapsulated frame ────────────────────────────────────────
+table vxlan "VXLAN-encapsulated frame — cells left to right are on-the-wire order"
+| Outer headers |||| Original L2 frame |||| New trailer |
+|---------------|--------------|--------------|----------|---------|---------|----------|------------------|--------------|
+| Outer MAC 14B | Outer IP 20B | Outer UDP 8B | VXLAN 8B | DMAC 6B | SMAC 6B | Etype 2B | Payload 46–1500B | FCS (new) 4B |
+cell (1,1) class=outer
+cell (1,2) class=outer
+cell (1,3) class=outer
+cell (1,4) class=vni
+cell (1,5) class=inner
+cell (1,6) class=inner
+cell (1,7) class=inner
+cell (1,8) class=opaque
+cell (1,9) class=newfcs
+
+# ── Supplementary knowledge ─────────────────────────────────────────
+table overhead "Encapsulation overhead (MAC-in-UDP)"
+| Segment    | Size | Notes                          |
+|------------|:----:|--------------------------------|
+| Outer MAC  | 14B  | new Ethernet header            |
+| Outer IP   | 20B  | VTEP-to-VTEP                   |
+| UDP        | 8B   | dst port 4789                  |
+| VXLAN      | 8B   | carries the 24-bit VNI         |
+| Total      | 50B  | added to every original frame  |
+cell 5 highlight
+
+table facts "Why VXLAN"
+| Fact                    | Value                    |
+|-------------------------|--------------------------|
+| VLAN address space      | 12 bits (4K segments)    |
+| VNI address space       | 24 bits (16M segments)   |
+| Encapsulation           | MAC-in-UDP               |`,
+
+'partition map (pool + global thresholds)':
+`figdown 0.1 block
+title "Partition map — a resource pool with global thresholds"
+
+# The GENERIC partition-and-threshold map: one pool, N groups, global
+# threshold lines shared by all (group-level scope; per-node scope exists
+# for figures whose semantics are per-column). Instances of this category:
+# buffer quotas, memory maps, watermark/level charts.
+group pool "Resource pool (units)" gap=0
+node g0 "Group 0" in=pool fill=transparent
+node g1 "Group 1" in=pool fill=transparent
+node g2 "Group 2" in=pool fill=transparent
+node g3 "Group 3" in=pool fill=transparent
+flow down
+rank g0,g1,g2,g3
+pin g0 width=120 height=190
+pin g1 width=120 height=190
+pin g2 width=120 height=190
+pin g3 width=120 height=190
+
+threshold "Max cap"                 in=pool offset=80%
+threshold "Reserved"  in=pool offset=15%
+band "Reserved" 15% in=pool fill=#a3c93a`,
+
+'table data -> heatmap + bar3d chart':
+`figdown 0.1 table
+title "Per-(port, queue) occupancy — one table, two projections"
+
+table hm "Queue occupancy counters"
+| Port\\Q | Q0 | Q1 | Q2 | Q3 | Q4 | Q5 |
+|--------|:--:|:--:|:--:|:--:|:--:|:--:|
+| P0     | 12 | 55 | 31 |  8 | 72 | 19 |
+| P1     | 44 | 90 | 22 | 61 | 15 | 38 |
+| P2     |  5 | 27 | 83 | 47 | 33 | 96 |
+| P3     | 68 | 14 | 40 | 29 | 51 |  7 |
+# heatmap marks: light red = over 40, strong red = over 80
+cell (1,3) fill=#fecaca
+cell (1,6) fill=#fca5a5
+cell (2,2) fill=#fecaca
+cell (2,3) fill=#fca5a5
+cell (2,5) fill=#fecaca
+cell (3,4) fill=#fca5a5
+cell (3,5) fill=#fecaca
+cell (3,7) fill=#fca5a5
+cell (4,2) fill=#fecaca
+cell (4,6) fill=#fecaca
+
+# the same table data, charted on X-Y-Z axes (rows=X, columns=Y, values=Z)
+chart hm`,
+
+// Hybrid panels: multi-section `MULTI-FIGURE-DOCUMENTS` (main standard). Nested typed regions
+// under one scene header still parse (legacy) but are not the taught path.
+'mixed document':
+`figdown 0.1 block
+title "CPU tag insertion"
+node cpu "CPU"
+node tagger "Tag Insert" fill=#fee2e2
+node port "Egress Port"
+flow right
+edge cpu -[DSA tag]-> tagger
+edge tagger -> port
+
+# --- panel: separate genre section (multi-section MULTI-FIGURE-DOCUMENTS) ---
+figdown 0.1 bitfield
+bitfield tag "CPU Tag" word=16 numbering=msb0
+field "Op" 2
+field "Prio" 3
+field "RSVD" 3
+field "Dest Port" 8
+
+# --- panel: separate genre section (multi-section MULTI-FIGURE-DOCUMENTS) ---
+figdown 0.1 table
+table map "Op encoding"
+| Op | Meaning  | Notes  |
+|----|----------|--------|
+| 0  | From CPU | DSA v1 |
+| 1  | To CPU   | ^^     |
+| 2  | Mirror         ||
+cell 2 highlight
+cell (3,1) fill=#fee2e2`
+};
+
+const $=id=>document.getElementById(id);
+const sel=$('examples');
+Object.keys(EXAMPLES).forEach(k=>{const o=document.createElement('option');o.textContent=k;sel.appendChild(o);});
+sel.onchange=()=>{
+  if(isDirty() && !confirm('Discard unsaved changes in '+fileName+'?')){ return; }
+  fdHandle=null; fileName='untitled.fd'; savedText=null; selectedId=null;
+  $('src').value=EXAMPLES[sel.value]; refresh();
+};
+$('src').addEventListener('input',refresh);
+
+let lastSVG='', lastMeta=null, lastPad={x:0,y:0}, lastDoc=null;
+
+// ---- direct manipulation: every GUI action is a text edit ----
+// CONTENT_KW = semantic / content-zone directives. New nodes and edges
+// insert AFTER the last of these and BEFORE any layout zone (`CONTENT-LAYOUT-ZONE-SPLIT`).
+// pin/layout are layout-zone only — they must never
+// be treated as "last scene line" (P0: drag then +Node was writing
+// into the layout zone → "node is a semantic directive" white screen).
+const CONTENT_KW=/^(figdown|title|node|group|external|edge|plane|flow|rank|threshold|band|bundle|class)\b/;
+const ID_DECL_KW=/^(node|group|external|bundle|class|plane|bitfield|table|timing)\s+(\S+)/;
+function lastContentLineIdx(lines){
+  let last=-1;
+  const layoutIdx=lines.findIndex(l=>l.trim()==='layout');
+  const limit=layoutIdx>=0?layoutIdx:lines.length;
+  for(let i=0;i<limit;i++){
+    if(CONTENT_KW.test(lines[i].trim())) last=i;
   }
-  var len = b.length, hi = Math.floor(len / 0x20000000), lo = (len << 3) >>> 0;
-  b.push(0x80);
-  while (b.length % 64 !== 56) b.push(0);
-  b.push(hi >>> 24 & 255, hi >>> 16 & 255, hi >>> 8 & 255, hi & 255,
-         lo >>> 24 & 255, lo >>> 16 & 255, lo >>> 8 & 255, lo & 255);
-  var H = [0x6a09e667,0xbb67ae85,0x3c6ef372,0xa54ff53a,0x510e527f,0x9b05688c,0x1f83d9ab,0x5be0cd19];
-  var w = new Array(64), r = function (x, n) { return (x >>> n) | (x << (32 - n)); };
-  for (var off = 0; off < b.length; off += 64) {
-    for (i = 0; i < 16; i++)
-      w[i] = (b[off+4*i] << 24) | (b[off+4*i+1] << 16) | (b[off+4*i+2] << 8) | b[off+4*i+3];
-    for (i = 16; i < 64; i++)
-      w[i] = (w[i-16] + (r(w[i-15],7) ^ r(w[i-15],18) ^ (w[i-15] >>> 3))
-            + w[i-7]  + (r(w[i-2],17) ^ r(w[i-2],19)  ^ (w[i-2] >>> 10))) | 0;
-    var a=H[0],bb=H[1],cc=H[2],d=H[3],e=H[4],f=H[5],g=H[6],hh=H[7];
-    for (i = 0; i < 64; i++) {
-      var t1 = (hh + (r(e,6)^r(e,11)^r(e,25)) + ((e & f) ^ (~e & g)) + __SHA_K[i] + w[i]) | 0;
-      var t2 = ((r(a,2)^r(a,13)^r(a,22)) + ((a & bb) ^ (a & cc) ^ (bb & cc))) | 0;
-      hh=g; g=f; f=e; e=(d+t1)|0; d=cc; cc=bb; bb=a; a=(t1+t2)|0;
+  if(last<0){
+    for(let i=0;i<lines.length;i++) if(/^figdown\b/.test(lines[i].trim())) last=i;
+  }
+  return last;
+}
+// Split a source line into code + trailing # comment so option rewrites
+// never swallow the comment (P0: `node a # note` + fill= → fill= into comment).
+function splitLineComment(line){
+  const hi=findComment(line);
+  if(hi<0) return {code:line, comment:''};
+  return {code:line.slice(0,hi).replace(/\s+$/,''), comment:line.slice(hi)};
+}
+function joinCodeComment(code, comment){
+  if(!comment) return code;
+  return code + (code.endsWith(' ')?'':' ') + comment;
+}
+function escapeFdString(s){
+  return String(s).replace(/\\/g,'\\\\').replace(/"/g,'\\"').replace(/\n/g,'\\n').replace(/\r/g,'');
+}
+function nextFreeId(lines, prefix){
+  const used=new Set();
+  for(const l of lines){
+    const m=ID_DECL_KW.exec(l.trim());
+    if(m) used.add(m[2]);
+  }
+  let i=1; while(used.has(prefix+i)) i++;
+  return prefix+i;
+}
+// HANDOFF editor non-P0: blank +Node × N + drag produced a pure-pinned canvas
+// (pins only, no flow) so the strip test left orphan geometry. Genre default flow
+// is content-zone meaning for reading order — write it when the first scene
+// element appears via GUI, not only when the author types it.
+function ensureFlowLine(lines){
+  if(lines.some(l=>/^flow\b/.test(l.trim()))) return lines;
+  let genre='block';
+  for(const l of lines){
+    const m=/^figdown\s+0\.1\s+(\S+)/.exec(l.trim());
+    if(m){ genre=m[1]; break; }
+  }
+  // pure typed genres have no scene layout axis
+  if(genre==='bitfield'||genre==='table'||genre==='timing') return lines;
+  const dir=genre==='flowchart'?'down':'right';
+  let insertAt=lines.findIndex(l=>/^figdown\b/.test(l.trim()));
+  if(insertAt<0){
+    lines.unshift('figdown 0.1 block');
+    insertAt=0;
+  }
+  for(let i=insertAt+1;i<lines.length;i++){
+    const t=lines[i].trim();
+    if(/^title\b/.test(t)) insertAt=i;
+    else if(t===''||t.startsWith('#')) continue;
+    else break;
+  }
+  const bounds=firstSectionBounds(lines);
+  let layoutIdx=-1;
+  for(let i=bounds.start;i<bounds.end;i++) if(lines[i].trim()==='layout'){ layoutIdx=i; break; }
+  if(layoutIdx>=0 && insertAt>=layoutIdx) insertAt=layoutIdx-1;
+  lines.splice(insertAt+1,0,'flow '+dir);
+  return lines;
+}
+// Multi-section `MULTI-FIGURE-DOCUMENTS`: layout-zone writes (`pin`) MUST stay inside
+// the first figdown section — never after a later `figdown 0.1 table` panel.
+function firstSectionBounds(lines){
+  let start=-1;
+  for(let i=0;i<lines.length;i++){
+    if(/^figdown\b/.test(lines[i].trim())){ start=i; break; }
+  }
+  if(start<0) return {start:0, end:lines.length};
+  let end=lines.length;
+  for(let i=start+1;i<lines.length;i++){
+    if(/^figdown\b/.test(lines[i].trim())){ end=i; break; }
+  }
+  return {start, end};
+}
+/** Ensure `layout` exists in section 0; returns {lines, layoutIdx, end}. */
+function ensureLayoutMarker(lines){
+  const b=firstSectionBounds(lines);
+  for(let i=b.start;i<b.end;i++){
+    if(lines[i].trim()==='layout') return {lines, layoutIdx:i, end:b.end};
+  }
+  lines.splice(b.end, 0, 'layout');
+  return {lines, layoutIdx:b.end, end:b.end+1};
+}
+/** Insert or replace a layout-zone line inside the first section (after `layout`). */
+function upsertLayoutDirective(lines, matchRe, newLine){
+  const st=ensureLayoutMarker(lines);
+  lines=st.lines;
+  const b=firstSectionBounds(lines);
+  let idx=-1;
+  for(let i=st.layoutIdx+1;i<b.end;i++){
+    if(matchRe.test(lines[i])){ idx=i; break; }
+  }
+  // also scan whole first section (pins may sit after other pins)
+  if(idx<0){
+    for(let i=b.start;i<b.end;i++){
+      if(matchRe.test(lines[i])){ idx=i; break; }
     }
-    H[0]=(H[0]+a)|0; H[1]=(H[1]+bb)|0; H[2]=(H[2]+cc)|0; H[3]=(H[3]+d)|0;
-    H[4]=(H[4]+e)|0; H[5]=(H[5]+f)|0; H[6]=(H[6]+g)|0; H[7]=(H[7]+hh)|0;
   }
-  var out = '';
-  for (i = 0; i < 8; i++) out += ('00000000' + (H[i] >>> 0).toString(16)).slice(-8);
-  return out;
+  if(idx>=0) lines[idx]=newLine;
+  else lines.splice(b.end, 0, newLine);
+  return lines;
+}
+// `ELEMENT-GEOMETRY-DIRECTIVE`: `pin` carries at=, width= and height= on ONE line, so
+// the drag emitter and the resize emitter now write to the SAME line and each
+// must preserve what the other wrote. Rebuilding the line from a patch — key
+// order fixed, trailing comment carried — is the only way that stays true for
+// both directions; a plain overwrite silently deleted the other emitter's keys
+// (the class of defect editor-check exists to catch, and the one `applyPins`
+// would have introduced the first time a user dragged a resized node).
+const PIN_KEYS=['at','width','height'];
+function mergePinKeys(oldLine, id, patch){
+  const cur={};
+  let comment=null;
+  if(oldLine!=null){
+    const sp=splitLineComment(oldLine);
+    comment=sp.comment;
+    for(const k of PIN_KEYS){
+      const m=new RegExp('\\b'+k+'=(\\S+)').exec(sp.code);
+      if(m) cur[k]=m[1];
+    }
+  }
+  for(const k of PIN_KEYS) if(patch[k]!==undefined) cur[k]=patch[k];
+  let code='pin '+id;
+  for(const k of PIN_KEYS) if(cur[k]!==undefined) code+=' '+k+'='+cur[k];
+  return comment?joinCodeComment(code, comment):code;
+}
+/** Insert or patch the ONE `pin <id>` line of the first section. */
+function upsertPin(lines, id, patch){
+  const pinRe=new RegExp('^\\s*pin\\s+'+id+'\\b');
+  const b=firstSectionBounds(lines);
+  let old=null;
+  for(let i=b.start;i<b.end;i++) if(pinRe.test(lines[i])){ old=lines[i]; break; }
+  return upsertLayoutDirective(lines, pinRe, mergePinKeys(old, id, patch));
+}
+function applyPins(pins){ // pins: array of [id, px, py] — one text update, one refresh
+  let lines=$('src').value.split('\n');
+  lines=ensureFlowLine(lines);
+  for(const [id,px,py] of pins){
+    lines=upsertPin(lines, id, {at:'('+px+','+py+')'});
+  }
+  $('src').value=lines.join('\n'); refresh();
+}
+// `PIN-COORDINATE-SCOPE` two-level pins: collect the full pin set for the current picture.
+// overrides = {id:{x,y}} absolute-canvas coords for items being moved
+// (for a group id, the new origin). Group members are written relative
+// to their group's origin, so later group moves edit ONE line.
+//
+// Snapshot the INTENDED absolute-canvas position of every node and every
+// group origin from the current render, applying any overrides. Kept
+// separate from pin emission so the same absolute targets can be re-emitted
+// against a DIFFERENT frame (see materializePins: the pinned re-render has
+// its own left/top because back-edge routing — hence chShift — changes once
+// the scene is pinned).
+function snapshotAbs(overrides){
+  const svg=$('out').querySelector('svg'); if(!svg||!lastDoc) return null;
+  const groups={}, nodes={};
+  svg.querySelectorAll('[data-group]').forEach(g=>{
+    const gid=g.dataset.group;
+    groups[gid]=(overrides&&overrides[gid])||{x:+g.dataset.gx, y:+g.dataset.gy};
+  });
+  svg.querySelectorAll('[data-node]').forEach(g=>{
+    const id=g.dataset.node;
+    nodes[id]=(overrides&&overrides[id])||{x:+g.dataset.x, y:+g.dataset.y};
+  });
+  return {groups,nodes};
+}
+// Emit [id,px,py] pin rows for a snapshot, relative to a given frame
+// {left,top}. Members are written group-local (relative to their group's
+// snapshotted origin); ungrouped nodes and group origins are canvas px.
+function emitPins(snap, frame){
+  const left=frame.left||0, top=frame.top||0, pins=[];
+  for(const gid in snap.groups){
+    const o=snap.groups[gid];
+    pins.push([gid, Math.round(o.x-left), Math.round(o.y-top)]);
+  }
+  for(const id in snap.nodes){
+    const abs=snap.nodes[id];
+    const nd=lastDoc.nodes.find(n=>n.id===id);
+    const o=nd&&nd.group?snap.groups[nd.group]:null;
+    if(o) pins.push([id, Math.round(abs.x-o.x), Math.round(abs.y-o.y)]);
+    else  pins.push([id, Math.round(abs.x-left), Math.round(abs.y-top)]);
+  }
+  return pins;
+}
+// Build the source text that applyPins(pins) would produce, WITHOUT touching
+// the textarea or re-rendering — used to probe the pinned-regime frame headlessly.
+function textWithPins(baseText, pins){
+  let lines=baseText.split('\n');
+  for(const [id,px,py] of pins){
+    lines=upsertPin(lines, id, {at:'('+px+','+py+')'});
+  }
+  return lines.join('\n');
+}
+// Back-compat shim: one-pass collect+emit against the current frame.
+function collectPins(overrides){
+  const snap=snapshotAbs(overrides); if(!snap) return [];
+  return emitPins(snap, {left:lastMeta.left, top:lastMeta.top});
+}
+// True when every scene node AND every group already carries a pin line, so
+// the scene is fully materialized and a drag is a single-line pin update
+// (the current, correct behaviour — no re-materialization needed).
+function scenePinnedComplete(){
+  if(!lastDoc) return false;
+  const P=lastDoc.pins||{};
+  const scene=lastDoc.nodes.filter(n=>!n.boundary);
+  if(!scene.length) return false;
+  return scene.every(n=>P[n.id]!==undefined)
+      && (lastDoc.groups||[]).every(g=>P[g.id]!==undefined);
+}
+// Axiom-3 materialization. On the FIRST touch of an unpinned (or partially
+// pinned) scene, freeze EVERY node/group at its current rendered position so
+// the one dragged element moves and nothing else does. A single pass is not
+// enough: writing pins flips back-edges from return-rings to straight edges,
+// which collapses chShift and moves the whole figure's origin (meta.top). So
+// we snapshot the intended ABSOLUTE targets first, materialize once to reach
+// the pinned regime (which fixes the final frame), then re-emit the SAME
+// absolute targets against that final frame. The pinned regime is a fixed
+// point, so pass 2 round-trips to the pixel and a third pass would be a no-op.
+function materializePins(overrides){
+  if(scenePinnedComplete()){ applyPins(collectPins(overrides)); return; }
+  const snap=snapshotAbs(overrides); if(!snap){ return; }
+  // Pass 1 is a HEADLESS probe (parse+render, no DOM/textarea write) purely to
+  // learn the pinned-regime frame; only pass 2 actually edits the textarea, so
+  // the whole materialization is a single undo step.
+  let frame={left:lastMeta.left, top:lastMeta.top};
+  try{
+    const probeText=textWithPins($('src').value, emitPins(snap, frame));
+    const pr=parse(probeText);
+    const pdoc=(pr.docs&&pr.docs[0])||pr.doc;
+    if(!(pr.errs&&pr.errs.length)&&!(pr.errors&&pr.errors.length)){
+      const rr=render(pdoc,{title:true}); if(rr.sceneMeta) frame=rr.sceneMeta;
+    }
+  }catch(e){ /* fall back to single-frame emit if the probe fails */ }
+  applyPins(emitPins(snap, frame));
+}
+function setNodeLabel(id,label){
+  // Preserve options (class=/shape=/in=/…) and trailing comments; support
+  // unlabeled `node a` and multi-line labels via \n escape (P0).
+  const lines=$('src').value.split('\n');
+  const idx=nodeLineIdx(lines,id); if(idx<0) return;
+  const {code,comment}=splitLineComment(lines[idx]);
+  const re=new RegExp('^(\\s*node\\s+'+id+')(?:\\s+("(?:\\\\.|[^"\\\\])*"|\\S+))?(.*)$');
+  const m=re.exec(code);
+  if(!m) return;
+  lines[idx]=joinCodeComment(m[1]+' "'+escapeFdString(label)+'"'+(m[3]||''), comment);
+  $('src').value=lines.join('\n'); refresh();
+}
+function installDirectEdit(){
+  const svg=$('out').querySelector('svg');
+  if(!svg||!lastMeta) return;
+  const toModel=ev=>{
+    const pt=new DOMPoint(ev.clientX,ev.clientY).matrixTransform(svg.getScreenCTM().inverse());
+    return {x:pt.x-lastPad.x, y:pt.y-lastPad.y};
+  };
+  // 0.1 (`EDGE-GEOMETRY-CONSTRUCTS`): Route mode and the Ortho toggle were the GUI half of
+  // `path` and `routing`. Both are gone with the constructs — an editor button
+  // that writes a line the parser now rejects is the drift `editor-check.js`
+  // exists to catch, so the emitter and its fixture were deleted together.
+  // group drag: move the container AND all member nodes together
+  svg.querySelectorAll('[data-group]').forEach(gg=>{
+    gg.addEventListener('pointerdown',ev=>{
+      ev.preventDefault(); ev.stopPropagation();
+      const gid=gg.dataset.group, start=toModel(ev);
+      const memberIds=lastDoc.nodes.filter(n=>n.group===gid).map(n=>n.id);
+      const memberGs=memberIds.map(id=>svg.querySelector('[data-node="'+id+'"]')).filter(Boolean);
+      let dx=0,dy=0,moved=false;
+      const mv=e=>{ const p=toModel(e); dx=p.x-start.x; dy=p.y-start.y;
+        if(Math.abs(dx)+Math.abs(dy)>2) moved=true;
+        const t='translate('+dx+','+dy+')';
+        gg.setAttribute('transform',t); memberGs.forEach(m=>m.setAttribute('transform',t)); };
+      const up=()=>{ window.removeEventListener('pointermove',mv); window.removeEventListener('pointerup',up);
+        if(!moved){ gg.removeAttribute('transform'); memberGs.forEach(m=>m.removeAttribute('transform')); return; }
+        // `PIN-COORDINATE-SCOPE`: move the group's ORIGIN; members are (or become) group-local,
+        // so future drags of this group edit a single pin line
+        const overrides={ [gid]: {x:+gg.dataset.gx+dx, y:+gg.dataset.gy+dy} };
+        memberGs.forEach(m=>{ overrides[m.dataset.node]={x:+m.dataset.x+dx, y:+m.dataset.y+dy}; });
+        materializePins(overrides);
+        $('status').textContent='group drag → moved origin of "'+gid+'" (members ride along as group-local pins)'; };
+      window.addEventListener('pointermove',mv); window.addEventListener('pointerup',up);
+    });
+    gg.addEventListener('dblclick',ev=>{
+      ev.preventDefault(); ev.stopPropagation();
+      const gid=gg.dataset.group;
+      const gr=lastDoc.groups.find(x=>x.id===gid);
+      const nv=prompt('Label for group "'+gid+'":', (gr&&gr.label)||'');
+      if(nv!==null && nv!==''){
+        const lines=$('src').value.split('\n');
+        const idx=lines.findIndex(l=>new RegExp('^\\s*group\\s+'+gid+'\\b').test(l));
+        if(idx>=0){
+          const {code,comment}=splitLineComment(lines[idx]);
+          const re=new RegExp('^(\\s*group\\s+'+gid+')(?:\\s+("(?:\\\\.|[^"\\\\])*"|\\S+))?(.*)$');
+          const m=re.exec(code);
+          if(m){
+            lines[idx]=joinCodeComment(m[1]+' "'+escapeFdString(nv)+'"'+(m[3]||''), comment);
+            $('src').value=lines.join('\n'); refresh();
+            $('status').textContent='double-click → rewrote group '+gid+' label (GUI action = text edit)';
+          }
+        }
+      }
+    });
+  });
+  // table cells: click to color with the current picker value
+  svg.querySelectorAll('[data-cell]').forEach(rc=>{
+    rc.addEventListener('click',ev=>{
+      ev.preventDefault();
+      const [tid,r,c]=rc.dataset.cell.split(':');
+      setCellColor(tid,+r,+c,$('fillpick').value);
+    });
+  });
+  // double-click empty canvas = create a node right there (draw.io habit)
+  svg.addEventListener('dblclick',ev=>{
+    if(ev.target.closest('[data-node],[data-group],[data-cell],[data-gline],.rsz')) return;
+    ev.preventDefault();
+    const p=toModel(ev);
+    addNodeAt(Math.round(p.x), Math.round(p.y));
+  });
+  // marquee group creation (armed by the ⬚ Group button)
+  svg.addEventListener('pointerdown',ev=>{
+    if(!groupArm) return;
+    if(ev.target.closest('[data-node],[data-group]')) return;
+    ev.preventDefault();
+    const start=toModel(ev);
+    const NS='http://www.w3.org/2000/svg';
+    const band=document.createElementNS(NS,'rect');
+    band.setAttribute('fill','rgba(37,99,235,.08)');
+    band.setAttribute('stroke','#2563eb'); band.setAttribute('stroke-dasharray','4 3');
+    svg.appendChild(band);
+    let x0=start.x,y0=start.y,x1=x0,y1=y0;
+    const draw=()=>{ band.setAttribute('x',Math.min(x0,x1)+lastPad.x); band.setAttribute('y',Math.min(y0,y1)+lastPad.y);
+      band.setAttribute('width',Math.abs(x1-x0)); band.setAttribute('height',Math.abs(y1-y0)); };
+    const mv=e=>{ const p=toModel(e); x1=p.x; y1=p.y; draw(); };
+    const up=()=>{ window.removeEventListener('pointermove',mv); window.removeEventListener('pointerup',up);
+      band.remove(); groupArm=false; $('groupmode').style.fontWeight='';
+      const [mx0,mx1]=[Math.min(x0,x1),Math.max(x0,x1)], [my0,my1]=[Math.min(y0,y1),Math.max(y0,y1)];
+      const ids=[];
+      svg.querySelectorAll('[data-node]').forEach(g=>{
+        const nd=lastDoc.nodes.find(n=>n.id===g.dataset.node);
+        if(nd&&nd.group) return;                     // one nesting level only
+        const cx=+g.dataset.x, cy=+g.dataset.y;
+        if(cx>=mx0&&cx<=mx1&&cy>=my0&&cy<=my1) ids.push(g.dataset.node);
+      });
+      if(ids.length) createGroup(ids);
+      else $('status').textContent='marquee selected no ungrouped nodes'; };
+    window.addEventListener('pointermove',mv); window.addEventListener('pointerup',up);
+  });
+  // threshold markers: vertical drag rewrites the offset=% on that source
+  // line. The `data-gline` attribute name predates the line -> guide ->
+  // threshold renames and is deliberately unchanged: it is emitted into every
+  // rendered SVG, so touching it would move artifact bytes for a purely
+  // cosmetic reason.
+  svg.querySelectorAll('[data-gline]').forEach(gL=>{
+    gL.addEventListener('pointerdown',ev=>{
+      ev.preventDefault(); ev.stopPropagation();
+      const srcLine=+gL.dataset.gline, top=+gL.dataset.gtop, bot=+gL.dataset.gbot;
+      const start=toModel(ev); let dy=0;
+      const mv=e=>{ dy=toModel(e).y-start.y; gL.setAttribute('transform','translate(0,'+dy+')'); };
+      const up=()=>{ window.removeEventListener('pointermove',mv); window.removeEventListener('pointerup',up);
+        const lines=$('src').value.split('\n');
+        const cur=/offset=(\d+(?:\.\d+)?)%?/.exec(lines[srcLine-1]||'');
+        if(!cur){ gL.removeAttribute('transform'); return; }
+        const ly0=bot-(bot-top)*(+cur[1])/100;
+        let pct=Math.round((bot-(ly0+dy))/(bot-top)*100);
+        pct=Math.max(0,Math.min(100,pct));
+        // 0.1: `threshold at=` -> `offset=`.
+        lines[srcLine-1]=lines[srcLine-1].replace(/offset=\d+(?:\.\d+)?%?/,'offset='+pct+'%');
+        $('src').value=lines.join('\n'); refresh();
+        $('status').textContent='threshold drag → rewrote offset='+pct+'% (GUI action = text edit)'; };
+      window.addEventListener('pointermove',mv); window.addEventListener('pointerup',up);
+    });
+  });
+  svg.querySelectorAll('[data-node]').forEach(g=>{
+    g.addEventListener('pointerdown',ev=>{
+      ev.preventDefault();
+      const id=g.dataset.node, x0=+g.dataset.x, y0=+g.dataset.y, start=toModel(ev);
+      let dx=0,dy=0,moved=false;
+      const mv=e=>{ const p=toModel(e); dx=p.x-start.x; dy=p.y-start.y;
+        if(Math.abs(dx)+Math.abs(dy)>2) moved=true;
+        g.setAttribute('transform','translate('+dx+','+dy+')'); };
+      const up=()=>{ window.removeEventListener('pointermove',mv); window.removeEventListener('pointerup',up);
+        if(!moved){ g.removeAttribute('transform');
+          if(linkArm!==null){
+            if(linkArm===undefined){ linkArm=id; $('status').textContent='Link mode: now click the target node'; return; }
+            if(linkArm!==id){
+              let lines=$('src').value.split('\n');
+              lines=ensureFlowLine(lines);
+              const last=lastContentLineIdx(lines);
+              lines.splice(last+1,0,'edge '+linkArm+' -> '+id);
+              $('src').value=lines.join('\n'); refresh();
+              $('status').textContent='link → wrote "edge '+linkArm+' -> '+id+'" (GUI action = text edit)';
+            }
+            linkArm=null; $('linkmode').style.fontWeight='';
+            return;
+          }
+          select(id); return; }
+        // pin-on-first-touch: the first drag freezes everything (groups get
+        // an origin pin; members become group-local) — then applies the drag
+        materializePins({ [id]: {x:x0+dx, y:y0+dy} });
+        const nd=lastDoc.nodes.find(n=>n.id===id);
+        $('status').textContent='drag → wrote pin for '+id+
+          (nd&&nd.group?' (group-local, relative to "'+nd.group+'")':' (canvas px)')+
+          ' — GUI action = text edit'; };
+      window.addEventListener('pointermove',mv); window.addEventListener('pointerup',up);
+    });
+    g.addEventListener('dblclick',ev=>{
+      ev.preventDefault();
+      const id=g.dataset.node;
+      const nd=lastDoc.nodes.find(n=>n.id===id);
+      const nv=prompt('Label for node "'+id+'":', (nd&&nd.label)||'');
+      if(nv!==null && nv!==''){ setNodeLabel(id,nv);
+        $('status').textContent='double-click → rewrote node '+id+' label (GUI action = text edit)'; }
+    });
+  });
+}
+let selectedId=null, linkArm=null;
+function nodeLineIdx(lines,id){ return lines.findIndex(l=>new RegExp('^\\s*node\\s+'+id+'\\b').test(l)); }
+function setNodeOption(id,key,val){
+  // Rewrite/append the option on the CODE side of any trailing comment (P0).
+  const lines=$('src').value.split('\n');
+  const idx=nodeLineIdx(lines,id); if(idx<0) return;
+  const {code,comment}=splitLineComment(lines[idx]);
+  const re=new RegExp('\\b'+key+'=\\S+');
+  const next=re.test(code) ? code.replace(re,key+'='+val) : code+' '+key+'='+val;
+  lines[idx]=joinCodeComment(next, comment);
+  $('src').value=lines.join('\n'); refresh();
+}
+function deleteNode(id){
+  // edges / paths / thresholds / bands via the parsed doc (line numbers);
+  // rank and bundle member lists are rewritten so the document still
+  // parses after the delete (P0: orphaned refs were left behind).
+  const d=lastDoc;
+  const drop=new Set();
+  if(d){
+    for(const e of d.edges||[]) if(e.a===id||e.b===id) drop.add(e.line);
+    for(const p of d.paths||[]) if(p.a===id||p.b===id) drop.add(p.line);
+    for(const g of d.thresholds||[]) if(g.target===id) drop.add(g.line);
+    for(const b of d.bands||[]) if(b.target===id) drop.add(b.line);
+  }
+  const lines=$('src').value.split('\n').map((l,li)=>{
+    if(drop.has(li+1)) return null;
+    const t=l.trim();
+    if(new RegExp('^(node|pin)\\s+'+id+'\\b').test(t)) return null;
+    // 0.1: `rank` is ONE comma-delimited token. This rewrite used to
+    // both READ and WRITE the retired space form, so deleting a node from a
+    // ranked scene produced a document the engine now refuses.
+    const rm=/^rank\s+(\S+)\s*$/.exec(t);
+    if(rm && rm[1].split(',').includes(id)){
+      const rest=rm[1].split(',').filter(x=>x!==id&&x!=='');
+      if(rest.length<2) return null;
+      return 'rank '+rest.join(',');
+    }
+    // bundle <id> ["label"] a--b, c--d …
+    const bm=/^(bundle\s+\S+(?:\s+"[^"]*")?)\s+(.+)$/.exec(t);
+    if(bm){
+      const members=bm[2].split(',').map(s=>s.trim()).filter(Boolean);
+      const kept=members.filter(m=>{
+        const p=m.split('--');
+        return p[0]!==id && p[1]!==id;
+      });
+      if(!kept.length) return null;
+      if(kept.length!==members.length) return bm[1]+' '+kept.join(', ');
+    }
+    // threshold/band with in=<id> (fallback if parse missed)
+    if(/^(threshold|band)\b/.test(t) && new RegExp('\\bin='+id+'\\b').test(t)) return null;
+    return l;
+  }).filter(l=>l!==null);
+  selectedId=null;
+  $('src').value=lines.join('\n'); refresh();
+}
+function moveNodeLine(id,dir){ // dir +1 = later line = painted on top
+  const lines=$('src').value.split('\n');
+  const idx=nodeLineIdx(lines,id); if(idx<0) return;
+  const isNode=l=>/^\s*node\s+/.test(l);
+  let j=idx+dir;
+  while(j>=0&&j<lines.length&&!isNode(lines[j])) j+=dir;
+  if(j<0||j>=lines.length) { $('status').textContent='already at the '+(dir>0?'top':'bottom')+' of paint order'; return; }
+  [lines[idx],lines[j]]=[lines[j],lines[idx]];
+  $('src').value=lines.join('\n'); refresh();
+  $('status').textContent=(dir>0?'raised':'lowered')+' '+id+' — its line moved '+(dir>0?'down':'up')+' in the text (line order = paint order)';
+}
+function select(id){
+  selectedId=id;
+  const has=id!==null && lastDoc && lastDoc.nodes.some(n=>n.id===id);
+  ['fillpick','delnode','raise','lower'].forEach(b=>$(b).disabled=!has);
+  if(has){
+    const nd=lastDoc.nodes.find(n=>n.id===id);
+    if(nd.fill&&/^#([0-9a-fA-F]{6})$/.test(nd.fill)) $('fillpick').value=nd.fill;
+    highlightSelection();
+  }
+  drawResizeHandle();
+}
+// corner handle on the selected node: dragging it writes width=/height= onto
+// the node's `pin` line (`ELEMENT-GEOMETRY-DIRECTIVE`, 0.1 — it wrote a separate `size` line
+// until the merge). `at=` on that line, if the node has been dragged, is
+// preserved.
+function setSize(id,w,h){
+  let lines=$('src').value.split('\n');
+  lines=upsertPin(lines, id, {width:String(w), height:String(h)});
+  const nl=lines.find(l=>new RegExp('^\\s*pin\\s+'+id+'\\b').test(l))||('pin '+id+' width='+w+' height='+h);
+  $('src').value=lines.join('\n'); refresh(); select(id);
+  $('status').textContent='resize → wrote "'+nl.trim()+'" (GUI action = text edit)';
+}
+function drawResizeHandle(){
+  const svg=$('out').querySelector('svg'); if(!svg) return;
+  svg.querySelectorAll('.rsz').forEach(x=>x.remove());
+  if(!selectedId) return;
+  const g=svg.querySelector('[data-node="'+selectedId+'"]'); if(!g) return;
+  const sh=g.querySelector('rect,polygon,ellipse'); if(!sh) return;
+  const b=sh.getBBox();
+  const NS='http://www.w3.org/2000/svg';
+  const hd=document.createElementNS(NS,'rect');
+  hd.setAttribute('class','rsz');
+  hd.setAttribute('x',b.x+b.width-5); hd.setAttribute('y',b.y+b.height-5);
+  hd.setAttribute('width',10); hd.setAttribute('height',10);
+  hd.setAttribute('fill','#2563eb'); hd.setAttribute('stroke','#fff');
+  hd.style.cursor='nwse-resize';
+  svg.appendChild(hd);
+  hd.addEventListener('pointerdown',ev=>{
+    ev.preventDefault(); ev.stopPropagation();
+    const id=selectedId, w0=b.width, h0=b.height;
+    const pt0=new DOMPoint(ev.clientX,ev.clientY).matrixTransform(svg.getScreenCTM().inverse());
+    const NS2='http://www.w3.org/2000/svg';
+    const ghost=document.createElementNS(NS2,'rect');
+    ghost.setAttribute('x',b.x); ghost.setAttribute('y',b.y);
+    ghost.setAttribute('fill','none'); ghost.setAttribute('stroke','#2563eb');
+    ghost.setAttribute('stroke-dasharray','4 3');
+    svg.appendChild(ghost);
+    let nw=w0, nh=h0;
+    const mv=e=>{
+      const p=new DOMPoint(e.clientX,e.clientY).matrixTransform(svg.getScreenCTM().inverse());
+      nw=Math.max(24,Math.round(w0+p.x-pt0.x)); nh=Math.max(18,Math.round(h0+p.y-pt0.y));
+      ghost.setAttribute('width',nw); ghost.setAttribute('height',nh);
+      hd.setAttribute('x',b.x+nw-5); hd.setAttribute('y',b.y+nh-5);
+    };
+    const up=()=>{ window.removeEventListener('pointermove',mv); window.removeEventListener('pointerup',up);
+      ghost.remove();
+      if(nw!==Math.round(w0)||nh!==Math.round(h0)) setSize(id,nw,nh);
+    };
+    window.addEventListener('pointermove',mv); window.addEventListener('pointerup',up);
+  });
+}
+function highlightSelection(){
+  const svg=$('out').querySelector('svg'); if(!svg||!selectedId) return;
+  const g=svg.querySelector('[data-node="'+selectedId+'"]'); if(!g) return;
+  const sh=g.querySelector('rect,polygon'); if(!sh) return;
+  sh.setAttribute('stroke','#2563eb'); sh.setAttribute('stroke-width','2.5');
+}
+// click a table cell -> write/update `cell r,c fill=` inside that block
+function setCellColor(tid,r,c,color){
+  const lines=$('src').value.split('\n');
+  const start=lines.findIndex(l=>new RegExp('^\\s*table\\s+'+tid+'\\b').test(l));
+  if(start<0) return;
+  let end=start+1;
+  while(end<lines.length){
+    const t=lines[end].trim();
+    if(t===''||t.startsWith('|')||t.startsWith('#')||/^cell\b/.test(t)){ end++; continue; }
+    break;
+  }
+  const re=new RegExp('^\\s*cell\\s+\\('+r+','+c+'\\)');
+  const newLine='cell ('+r+','+c+') fill='+color;
+  let idx=-1;
+  for(let i=start+1;i<end;i++) if(re.test(lines[i])){ idx=i; break; }
+  if(idx>=0) lines[idx]=newLine; else lines.splice(end,0,newLine);
+  $('src').value=lines.join('\n'); refresh();
+  $('status').textContent='cell click → wrote "'+newLine+'" (GUI action = text edit)';
+}
+// marquee -> write a group line + in= on each enclosed node line
+let groupArm=false;
+function createGroup(ids){
+  const lines=$('src').value.split('\n');
+  const gid=nextFreeId(lines,'g');
+  const gnum=gid.slice(1);
+  let firstIdx=lines.length;
+  for(const id of ids){
+    const idx=nodeLineIdx(lines,id);
+    if(idx<0) continue;
+    if(!/\bin=/.test(lines[idx])){
+      const {code,comment}=splitLineComment(lines[idx]);
+      lines[idx]=joinCodeComment(code+' in='+gid, comment);
+    }
+    firstIdx=Math.min(firstIdx,idx);
+  }
+  lines.splice(firstIdx,0,'group '+gid+' "Group '+gnum+'"');
+  $('src').value=lines.join('\n'); refresh();
+  $('status').textContent='marquee → wrote "group '+gid+'" and tagged '+ids.length+' node(s) with in='+gid;
+}
+function pinAll(){
+  if(!lastDoc||!lastMeta) return;
+  const snap=snapshotAbs({});
+  if(!snap||(!Object.keys(snap.nodes).length&&!Object.keys(snap.groups).length)){ $('status').textContent='nothing to pin'; return; }
+  const count=Object.keys(snap.nodes).length+Object.keys(snap.groups).length;
+  materializePins({});   // two-pass so the frozen figure matches the live one to the pixel
+  $('status').textContent='froze layout: '+count+' pin line(s) (groups anchored, members group-local) — future edits stay local';
 }
 
-// ---- public API ----
-// parse(text) -> { doc, errors, docs }
-//   errors: "Line N: message"
-//   docs: one entry per figdown section (length 1 for ordinary files)
-//   doc: docs[0] (compat for single-section callers)
-function parse(text) {
-  var p = __engine.parse(String(text));
-  var docs = p.docs && p.docs.length ? p.docs : (p.doc ? [p.doc] : []);
-  return { doc: p.doc, errors: p.errs, docs: docs };
-}
-// Stack multi-section SVGs (MULTI-FIGURE-DOCUMENTS): one .fd → one .svg, sections top-to-bottom.
-function __stackSectionSvgs(results) {
-  if (typeof __engine.stackSectionSvgs === 'function')
-    return __engine.stackSectionSvgs(results);
-  // fallback if engine build is older
-  return results[0] && results[0].svg;
-}
-// render(text, opts) -> { svg, errors }  svg is null when there are errors
-// (determinism over convenience: no partial renders of invalid input).
-// opts (presentation, renderer tier): { title: true } draws the title;
-// the default does NOT (embedded figures almost always sit under the
-// host document's caption — the majority case).
-// Multi-section sources are stacked vertically into a single SVG (MULTI-FIGURE-DOCUMENTS).
-function render(text, opts) {
-  var p = parse(text);
-  if (p.errors.length) return { svg: null, errors: p.errors };
-  if (p.docs.length > 1) {
-    var rs = p.docs.map(function (d) { return __engine.render(d, opts); });
-    return { svg: __engine.stackSectionSvgs(rs), errors: [] };
+function refresh(){
+  const text=$('src').value;
+  // undo history: every change funnels through here (GUI actions = one
+  // snapshot each; typing coalesces within 800ms)
+  if(!restoring && lastText!==null && text!==lastText){
+    const now=Date.now();
+    if(now-lastPush>800 || !undoStack.length){ undoStack.push(lastText); if(undoStack.length>200) undoStack.shift(); lastPush=now; }
+    redoStack.length=0;
   }
-  return { svg: __engine.render(p.doc, opts).svg, errors: [] };
-}
-// renderDoc(doc, opts) -> svg string, for an already-validated doc from parse().
-// For multi-section, pass parse().docs to renderDocs instead.
-function renderDoc(doc, opts) {
-  return __engine.render(doc, opts).svg;
-}
-function renderDocs(docs, opts) {
-  if (!docs || !docs.length) return '';
-  if (docs.length === 1) return __engine.render(docs[0], opts).svg;
-  return __engine.stackSectionSvgs(docs.map(function (d) { return __engine.render(d, opts); }));
-}
-// artifact(text) -> { svg, errors }  svg is the full self-carrying SVG:
-// the render plus a <metadata id="figdown-source"> block embedding the
-// source text, the SHA-256 OF THAT SOURCE, and the engine version that
-// rendered it (same convention as tools/build-svg.js; spec core §7).
-// svg is null when there are errors.
-function artifact(text, opts) {
-  var src = String(text);
-  var p = render(src, opts);
-  if (p.errors.length) return { svg: null, errors: p.errors };
-  // The artifact records the SHA-256 OF THE SOURCE, the ENGINE VERSION that
-  // rendered it, and any non-default render option (core §7) — together they
-  // keep third-party rebuilds bit-identical and give a diff somewhere to point
-  var optAttr = (opts && opts.title === true) ? ' data-render-options="with-title"' : '';
-  var meta = '<metadata id="figdown-source" data-sha256="' + __sha256hex(src) + '"'
-    + ' data-engine-version="' + VERSION + '"' + optAttr + '><![CDATA[\n'
-    + src.replace(/]]>/g, ']]]]><![CDATA[>') + '\n]]></metadata>';
-  return { svg: p.svg.replace(/<\/svg>$/, meta + '</svg>'), errors: [] };
+  lastText=text;
+  try{ localStorage.setItem('figdown.autosave',text); localStorage.setItem('figdown.autosave.name',fileName); }catch(e){}
+  updateFileUI();
+  const {doc,errs,docs}=parse(text);
+  const out=$('out'), eEl=$('errs'), ok=$('okline');
+  if(errs.length){
+    eEl.innerHTML=errs.map(x=>{
+      const m=/^Line (\d+):/.exec(x);
+      return '<div class="errline"'+(m?' data-line="'+m[1]+'"':'')+'>'+esc(x)+'</div>';
+    }).join('');
+    ok.textContent=''; out.innerHTML=''; lastSVG='';
+    $('svgsrc').textContent=''; $('svgimg').removeAttribute('src');
+    $('status').textContent=errs.length+' error(s) — nothing rendered (determinism over convenience)';
+    return;
+  }
+  eEl.textContent='';
+  // Multi-section `MULTI-FIGURE-DOCUMENTS`: stack independent section SVGs into one preview.
+  // GUI direct-edit attaches to the first section's doc only.
+  let r;
+  if(docs && docs.length>1){
+    const parts=docs.map(d=>render(d,{title:true}));
+    r={svg:stackSectionSvgs(parts), sceneMeta:parts[0].sceneMeta, pad:parts[0].pad};
+  } else {
+    r=render(doc,{title:true});
+  }
+  lastSVG=r.svg; lastMeta=r.sceneMeta; lastPad=r.pad; lastDoc=doc;
+  out.innerHTML=r.svg;
+  installDirectEdit();
+  select(selectedId);
+  // pretty-print for display only (the artifact itself stays single-line deterministic)
+  $('svgsrc').textContent=r.svg.replace(/></g,'>\n<');
+  updateArtifactPreview(text, r.svg);
+  const n=doc.nodes.length, b=doc.blocks.length;
+  const secN=docs&&docs.length>1?docs.length:1;
+  ok.textContent='OK — '+(secN>1?secN+' sections, ':'')+n+' node(s), '+doc.edges.length+' edge(s), '+b+' typed block(s). Same source → same SVG.';
+  $('status').textContent='';
 }
 
-  return { parse: parse, render: render, renderDoc: renderDoc, renderDocs: renderDocs, artifact: artifact, version: VERSION };
-}));
+async function svgArtifact(src, svg){
+  // the exact bytes the downloaded .svg would contain: source + SHA-256 embedded
+  const buf=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(src));
+  const hash=[...new Uint8Array(buf)].map(x=>x.toString(16).padStart(2,'0')).join('');
+  // data-sha256 is the hash OF THE SOURCE; data-engine-version names the
+  // engine that rendered it (core §7) — the other half of `RENDERING-DETERMINISM`'s promise.
+  const meta='<metadata id="figdown-source" data-sha256="'+hash+'" data-engine-version="'+FIGDOWN_VERSION+'" data-render-options="with-title"><![CDATA[\n'+src.replace(/]]>/g,']]]]><![CDATA[>')+'\n]]></metadata>';
+  return svg.replace(/<\/svg>$/, meta+'</svg>');
+}
+let previewSeq=0;
+async function updateArtifactPreview(src, svg){
+  const seq=++previewSeq;
+  const art=await svgArtifact(src, svg);
+  if(seq!==previewSeq) return;   // a newer edit superseded this one
+  $('svgimg').src='data:image/svg+xml;charset=utf-8,'+encodeURIComponent(art);
+}
+
+$('dl').onclick=async ()=>{
+  if(!lastSVG){ $('status').textContent='fix errors first'; return; }
+  const svg=await svgArtifact($('src').value, lastSVG);
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(new Blob([svg],{type:'image/svg+xml'}));
+  a.download=fileName.replace(/\.fd$/,'')+'.svg'; a.click(); URL.revokeObjectURL(a.href);
+  $('status').textContent='SVG saved — source + SHA-256 embedded (self-carrying artifact, `MARKDOWN-EMBEDDING-CONVENTION`)';
+};
+
+$('pinall').onclick=pinAll;
+$('fillpick').oninput=()=>{ if(selectedId) setNodeOption(selectedId,'fill',$('fillpick').value); };
+$('delnode').onclick=()=>{ if(selectedId) deleteNode(selectedId); };
+$('raise').onclick=()=>{ if(selectedId) moveNodeLine(selectedId,+1); };
+$('lower').onclick=()=>{ if(selectedId) moveNodeLine(selectedId,-1); };
+function insertNodeLine(){
+  let lines=$('src').value.split('\n');
+  lines=ensureFlowLine(lines);
+  const nid=nextFreeId(lines,'n');
+  const nnum=nid.slice(1);
+  const last=lastContentLineIdx(lines);
+  const kk=$('newkind').value;
+  lines.splice(last+1,0,'node '+nid+' "Node '+nnum+'"'+(kk!=='box'?' shape='+kk:''));
+  $('src').value=lines.join('\n'); refresh();
+  return nid;
+}
+$('addnode').onclick=()=>{
+  const id=insertNodeLine(); select(id);
+  $('status').textContent='+ Node → wrote "node '+id+'" line — drag it into place';
+};
+function addNodeAt(x,y){
+  const id=insertNodeLine();
+  // place its center at the double-click point (default box ≈ 100×40)
+  materializePins({[id]:{x:x-50, y:y-20}});
+  select(id);
+  $('status').textContent='double-click → wrote node '+id+' + pin at the click point (GUI action = text edit)';
+}
+$('groupmode').onclick=()=>{
+  groupArm=!groupArm;
+  $('groupmode').style.fontWeight=groupArm?'700':'';
+  $('status').textContent=groupArm?'Group mode: drag a box around the nodes to enclose':'Group mode off';
+};
+$('linkmode').onclick=()=>{
+  if(linkArm===null && $('linkmode').style.fontWeight!=='700'){
+    $('linkmode').style.fontWeight='700'; linkArm=undefined;
+    $('status').textContent='Link mode: click the source node';
+  } else { linkArm=null; $('linkmode').style.fontWeight=''; $('status').textContent='Link mode off'; }
+};
+
+// ============================================================
+// 4. FILE OPS + UNDO + KEYBOARD (the daily-driver layer)
+// ============================================================
+// File handles use the File System Access API where available (Chrome/
+// Edge: open once, Ctrl+S writes back to the same file); elsewhere we
+// fall back to a file picker + download. Unsaved work survives in
+// localStorage autosave either way.
+let fdHandle=null, fileName='untitled.fd', savedText=null;
+let undoStack=[], redoStack=[], lastText=null, lastPush=0, restoring=false;
+const isDirty=()=>savedText!==null && $('src').value!==savedText;
+function updateFileUI(){
+  $('fname').textContent=fileName+(isDirty()?' •':'');
+  document.title=(isDirty()?'• ':'')+fileName+' — FigDown';
+  $('undobtn').disabled=!undoStack.length;
+  $('redobtn').disabled=!redoStack.length;
+}
+function undo(){
+  if(!undoStack.length) return;
+  redoStack.push($('src').value);
+  restoring=true; $('src').value=undoStack.pop(); refresh(); restoring=false;
+  $('status').textContent='undo';
+}
+function redo(){
+  if(!redoStack.length) return;
+  undoStack.push($('src').value);
+  restoring=true; $('src').value=redoStack.pop(); refresh(); restoring=false;
+  $('status').textContent='redo';
+}
+$('undobtn').onclick=undo; $('redobtn').onclick=redo;
+
+// Load a .fd file, or a generated .svg — the artifact carries its own
+// source (metadata figdown-source), so the roundtrip needs no sidecar:
+// export SVG today, drop it back in tomorrow, tweak, export again.
+async function loadText(name, text){
+  if(name.endsWith('.svg') || text.trimStart().startsWith('<')){
+    const m=/<metadata id="figdown-source" data-sha256="([0-9a-f]{64})"[^>]*><!\[CDATA\[\n([\s\S]*?)\n\]\]><\/metadata>/.exec(text);
+    if(!m){ $('status').textContent='no embedded FigDown source in this SVG'; return false; }
+    const src=m[2].replace(/\]\]\]\]><!\[CDATA\[>/g,']]>');
+    const buf=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(src));
+    const hash=[...new Uint8Array(buf)].map(x=>x.toString(16).padStart(2,'0')).join('');
+    fileName=name.replace(/\.svg$/,'.fd'); fdHandle=null; savedText=null;  // recovered → not yet saved as .fd
+    $('src').value=src; refresh();
+    $('status').textContent = hash===m[1]
+      ? 'source recovered from SVG — integrity verified (SHA-256 matches)'
+      : '⚠ source recovered, but SHA-256 does not match — the SVG was edited after generation';
+  } else {
+    fileName=name; fdHandle=null; savedText=text;
+    $('src').value=text; refresh();
+    $('status').textContent='loaded '+name;
+  }
+  return true;
+}
+async function openFile(){
+  if(isDirty() && !confirm('Discard unsaved changes in '+fileName+'?')) return;
+  if(window.showOpenFilePicker){
+    let h;
+    try{
+      [h]=await window.showOpenFilePicker({types:[
+        {description:'FigDown / SVG',accept:{'text/plain':['.fd','.txt'],'image/svg+xml':['.svg']}}]});
+    }catch(e){ return; }  // cancelled
+    const f=await h.getFile();
+    const ok=await loadText(f.name, await f.text());
+    if(ok && !f.name.endsWith('.svg')) fdHandle=h;   // Ctrl+S writes back here
+    updateFileUI();
+  } else $('loadfile').click();
+}
+async function saveFile(as){
+  const text=$('src').value;
+  if(window.showSaveFilePicker){
+    try{
+      if(as||!fdHandle){
+        fdHandle=await window.showSaveFilePicker({suggestedName:fileName,
+          types:[{description:'FigDown',accept:{'text/plain':['.fd']}}]});
+        fileName=fdHandle.name;
+      }
+      const w=await fdHandle.createWritable(); await w.write(text); await w.close();
+      savedText=text; updateFileUI();
+      $('status').textContent='saved '+fileName;
+    }catch(e){ if(!e||e.name!=='AbortError') $('status').textContent='save failed: '+(e&&e.message||e); }
+  } else {
+    const a=document.createElement('a');
+    a.href=URL.createObjectURL(new Blob([text],{type:'text/plain'}));
+    a.download=fileName; a.click(); URL.revokeObjectURL(a.href);
+    savedText=text; updateFileUI();
+    $('status').textContent='downloaded '+fileName+' (this browser has no File System Access API)';
+  }
+}
+$('open').onclick=openFile;
+$('save').onclick=()=>saveFile(false);
+$('saveas').onclick=()=>saveFile(true);
+$('newdoc').onclick=()=>{
+  if(isDirty() && !confirm('Discard unsaved changes in '+fileName+'?')) return;
+  const blankKey=Object.keys(EXAMPLES).find(k=>/blank/.test(k))||Object.keys(EXAMPLES)[0];
+  fdHandle=null; fileName='untitled.fd'; savedText=null; selectedId=null;
+  $('src').value=EXAMPLES[blankKey]; refresh();
+  $('status').textContent='new document';
+};
+$('loadfile').onchange=async e=>{
+  const f=e.target.files[0]; if(!f) return;
+  loadText(f.name, await f.text()); e.target.value='';
+};
+document.addEventListener('dragover',e=>e.preventDefault());
+document.addEventListener('drop',async e=>{
+  e.preventDefault();
+  const f=e.dataTransfer.files[0]; if(f) loadText(f.name, await f.text());
+});
+window.addEventListener('beforeunload',e=>{ if(isDirty()){ e.preventDefault(); e.returnValue=''; } });
+
+// clicking an error jumps to (and selects) the offending line
+$('errs').addEventListener('click',e=>{
+  const d=e.target.closest('.errline'); if(!d||!d.dataset.line) return;
+  const n=+d.dataset.line, lines=$('src').value.split('\n');
+  const start=lines.slice(0,n-1).join('\n').length+(n>1?1:0);
+  const ta=$('src'); ta.focus(); ta.setSelectionRange(start,start+(lines[n-1]||'').length);
+});
+
+// arrow-key nudge writes pins, exactly like a drag would
+function nudge(id,dx,dy){
+  const g=$('out').querySelector('[data-node="'+id+'"]'); if(!g) return;
+  materializePins({[id]:{x:+g.dataset.x+dx, y:+g.dataset.y+dy}});
+  select(id);
+  $('status').textContent='nudge → rewrote pin for '+id+' (GUI action = text edit)';
+}
+document.addEventListener('keydown',e=>{
+  const mod=e.ctrlKey||e.metaKey;
+  const inText=/^(INPUT|TEXTAREA|SELECT)$/.test((e.target&&e.target.tagName)||'');
+  if(mod && e.key.toLowerCase()==='s'){ e.preventDefault(); saveFile(e.shiftKey); return; }
+  if(mod && e.key.toLowerCase()==='o'){ e.preventDefault(); openFile(); return; }
+  if(mod && !inText && e.key.toLowerCase()==='z'){ e.preventDefault(); e.shiftKey?redo():undo(); return; }
+  if(mod && !inText && e.key.toLowerCase()==='y'){ e.preventDefault(); redo(); return; }
+  if(inText) return;
+  if(e.key==='Escape'){
+    select(null); linkArm=null; groupArm=false;
+    $('linkmode').style.fontWeight=''; $('groupmode').style.fontWeight='';
+    $('status').textContent=''; return;
+  }
+  if(!selectedId) return;
+  if(e.key==='Delete'||e.key==='Backspace'){ e.preventDefault(); deleteNode(selectedId); return; }
+  const step=e.shiftKey?10:1;
+  const d={ArrowLeft:[-step,0],ArrowRight:[step,0],ArrowUp:[0,-step],ArrowDown:[0,step]}[e.key];
+  if(d){ e.preventDefault(); nudge(selectedId,d[0],d[1]); }
+});
+
+// startup: restore autosaved work from the last session, else first example
+(function(){
+  let auto=null, autoName=null;
+  try{ auto=localStorage.getItem('figdown.autosave'); autoName=localStorage.getItem('figdown.autosave.name'); }catch(e){}
+  const first=EXAMPLES[Object.keys(EXAMPLES)[0]];
+  if(auto && auto!==first){
+    $('src').value=auto; if(autoName) fileName=autoName;
+    refresh();
+    $('status').textContent='restored unsaved work from the last session (autosave) — Ctrl+S to save it to a file';
+  } else {
+    $('src').value=first;
+    refresh();
+  }
+})();
+</script>
+</body>
+</html>

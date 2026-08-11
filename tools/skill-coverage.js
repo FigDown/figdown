@@ -815,6 +815,75 @@ function main() {
   }
   if (!leaks) console.log('  every frozen genre is complete with reference/experimental/ deleted');
 
+  // ── 7. LINKS ───────────────────────────────────────────────────────────────
+  // Every relative link inside the bundle must resolve RELATIVE TO THE BUNDLE
+  // ROOT, because `skill/figdown/` is copied standalone into
+  // `~/.claude/skills/figdown` (skill/README.md) and that copy has no
+  // repository above it. A link that resolves only because this repository
+  // happens to sit above the bundle is exactly the defect: green here, dangling
+  // for every installed user.
+  //
+  // WHY HERE AND NOT IN isolation-check.js. `gate:isolation` answers a
+  // different question — does the FROZEN file set survive deletion of the
+  // EXPERIMENTAL one — and it excludes `skill/` by name (isolation-check.js
+  // header, "THE TEACHING AND guide/authoring.md GUIDES"). Its `resolveTarget` is also
+  // rooted at the REPOSITORY, which is the wrong root for a bundle; teaching it
+  // a second root would fork its resolution model for one directory. This tool
+  // already owns the bundle: `BUNDLE`, `bundleFiles()`, the vendored-copy
+  // comparison (check 0) and the router's own "names a missing file" test all
+  // resolve against the bundle root already. So the check goes where the root
+  // is already right, and no nineteenth gate is added.
+  //
+  // A link inside a fence is a SAMPLE, not a reference — the same rule
+  // isolation-check.js applies ("a link inside a fence is a sample"). Samples
+  // are skipped here too; the way to keep a sample honest is to write it with a
+  // placeholder basename, not to make the checker chase it.
+  console.log('\n[links]');
+  {
+    const linkRe = /\[([^\]\n]*)\]\(\s*<?([^)<>\s]+)>?(?:\s+"[^"\n]*")?\s*\)/g;
+    let checked = 0;
+    for (const f of bundleFiles()) {
+      const lines = fs.readFileSync(f, 'utf8').split(/\r?\n/);
+      let inFence = false;
+      for (let i = 0; i < lines.length; i++) {
+        const raw = lines[i];
+        if (/^\s*```/.test(raw)) { inFence = !inFence; continue; }
+        if (inFence) continue;
+        let m;
+        linkRe.lastIndex = 0;
+        while ((m = linkRe.exec(raw))) {
+          let t = m[2].trim();
+          if (!t || t.startsWith('#')) continue;
+          if (/^[a-z][a-z0-9+.\-]*:/i.test(t)) continue;   // http:, mailto:, …
+          const hash = t.indexOf('#');
+          if (hash >= 0) t = t.slice(0, hash);
+          if (!t) continue;
+          try { t = decodeURIComponent(t); } catch (e) { /* leave as written */ }
+          // Bundle root, not repo root: `/x` and `../x` both leave the installed
+          // copy, so both are defects even when the repository can satisfy them.
+          const abs = t.startsWith('/')
+            ? path.resolve(BUNDLE, '.' + t)
+            : path.resolve(path.dirname(f), t);
+          const inside = abs === BUNDLE || abs.startsWith(BUNDLE + path.sep);
+          checked++;
+          if (!inside)
+            fail('LINK ESCAPES THE BUNDLE  ' + path.relative(BUNDLE, f) + ':' +
+              (i + 1) + '  `' + m[2] + '` resolves outside skill/figdown/ — an ' +
+              'installed copy has no repository above it, so this link dangles ' +
+              'for every user who followed skill/README.md');
+          else if (!fs.existsSync(abs))
+            fail('DANGLING LINK IN THE BUNDLE  ' + path.relative(BUNDLE, f) + ':' +
+              (i + 1) + '  `' + m[2] + '` does not exist relative to the bundle ' +
+              'root — either ship the file inside skill/figdown/ or write the ' +
+              'reference as an example rather than a link');
+        }
+      }
+    }
+    if (!failed)
+      console.log('  every link in the bundle resolves inside the bundle (' +
+        checked + ' checked)');
+  }
+
   console.log('\n' + (failed ? 'FAIL  ' + failed + ' finding(s)' : 'OK  the skill teaches the whole registry'));
   if (args.strict && failed) process.exit(1);
 }
