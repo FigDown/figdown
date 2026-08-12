@@ -65,6 +65,45 @@ Statuses referred to above are defined in [`spec/README.md`](spec/README.md).
 
 Nothing yet.
 
+## v0.1.8 — 2026-08-11
+
+**Language version: `0.1`.** Patch. No language change.
+
+FigDown documents are UTF-8, and the conformance suite carries Chinese
+precisely to prove non-ASCII is supported — but the engine sized every text
+box by counting characters and multiplying by one constant. That constant is
+a Latin average: about 0.554 em per character. A Chinese character advances a
+full em. So a Chinese label was given a box a little over half the width it
+needs, and the engine drew the text outside the box it had just sized for it.
+`node a "封包進入交換器的轉發流程"` asked for a 114 px box and needed 184,
+overhanging roughly 35 px past each wall. The suite's own UTF-8 case was
+drawing its label outside its box, through every release since the first.
+
+Text is now measured with a script-aware advance. The width classes come from
+Unicode East Asian Width — a fixed character property, so the measurement is a
+lookup by codepoint range: no font-metrics library, no measurement at draw
+time, and the same answer on every machine. The weights are measured rather
+than chosen, by rendering probe strings in the font stack the engine actually
+names and reading back the advance: an ideograph, kana, bopomofo, a fullwidth
+letter and the ideographic space all come to exactly one em; emoji to 1.245
+em; combining marks and zero-width formatting characters to zero. Characters
+whose width is *ambiguous* under that standard — the section sign, the em
+dash, arrows, the check mark — stay narrow, which is the conventional reading
+outside an East Asian context.
+
+The same measurement is now used everywhere text is sized: node labels and
+their shrink-to-fit, edge labels, table cells, bitfield field captions,
+timing signal names, legend rows and the title. A fix in one place would have
+left the defect alive where it is less visible.
+
+Every character below U+0300 weighs exactly one, so an all-ASCII string
+measures exactly as it did before. No figure in this repository changes its
+drawing; all 55 artifacts are regenerated and differ only in the engine
+version they record.
+
+This makes the measurement true. It does not wrap lines — a long label is
+still one line, now in a box the right size for it.
+
 ## v0.1.7 — 2026-08-11
 
 **Language version: `0.1`.** Patch. No language change.

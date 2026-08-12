@@ -1,8 +1,8 @@
-// figdown.mjs — FigDown embeddable library (0.1.7)
+// figdown.mjs — FigDown embeddable library (0.1.8)
 // GENERATED FILE, DO NOT EDIT. Built from editor/figdown.html.
 // Regenerate with: node tools/make-lib.js
 'use strict';
-var VERSION = "0.1.7";
+var VERSION = "0.1.8";
 
 // ---- engine (extracted verbatim from editor/figdown.html) ----
 var __engine = (function () {
@@ -16,7 +16,7 @@ const SHAPES = ['box','rounded','circle','ellipse','diamond','cylinder'];
 // input to that promise, and under core §13 a 0.x renderer may differ from
 // the next — which makes the recorded version the only thing that can
 // explain a diff between two renderings of one source.
-const FIGDOWN_VERSION = '0.1.7';
+const FIGDOWN_VERSION = '0.1.8';
 // Retired shape VALUES keep a named diagnostic (PROCESS §5(d)), the same way
 // retired option keys do: `cloud` was the one value that named a domain
 // (the internet cloud) in an enum the language keeps purely geometric
@@ -2350,6 +2350,80 @@ function findComment(s){
 // 2. LAYOUT + RENDER (deterministic; no randomness, no Date)
 // ============================================================
 const FONT=13, CH=7.2, PADX=14, NH=36, GAPX=56, GAPY=44;
+
+// ---- cw(): script-aware advance width --------------------------------
+// Every px-per-character constant in this file — CH here, and its siblings at
+// the other font sizes (8.6 title, 6.6 legend, 6.5 edge label, 6.3/6.2 bitfield
+// caption) — is calibrated on LATIN, where one character advances ~0.554 em.
+// That is a claim about SCRIPT, not about font: a CJK ideograph advances a full
+// em, so counting characters undersizes a Chinese label by 45% and the engine
+// draws the text outside the box it has just sized for it. cw() is the measure
+// those constants multiply — a string's advance in Latin units. Every codepoint
+// below U+0300 weighs exactly 1, so an all-ASCII string returns exactly its
+// .length and every figure that was already right stays byte-identical.
+//
+// The classes are Unicode East Asian Width (UAX #11), a fixed character
+// property: a lookup by codepoint range, deterministic, no font-metrics library
+// and no canvas measurement at render time. The WEIGHTS are measured, not
+// chosen — probe strings rendered through librsvg at font-size 13 in the
+// engine's own stack (font-family="system-ui,sans-serif" → Noto Sans + Noto
+// Sans CJK), advance recovered as the slope of ink extent over repeat count:
+//   ideograph 封 一 㐀, kana あ ア, bopomofo ㄅ, fullwidth Ａ ，, U+3000  13.000px = 1.000em
+//   emoji U+1F600 U+1F680 (Noto Color Emoji)                          16.188px = 1.245em
+//   combining U+0301 standalone, U+200B, U+FEFF                        0.000px = 0.000em
+//   Latin — the calibration these constants already carry               7.200px = 0.554em
+// hence WIDE = 1.000/0.554 = 1.806, rounded UP to 1.81 so a wide glyph is never
+// UNDER-measured at the node-label site, and EMOJI = 1.245/0.554 = 2.25.
+// Halfwidth katakana (U+FF61..FF9F) measured 0.500 em: it stays in the default
+// class, which over-measures it by 11% — the safe direction.
+//
+// EAW *Ambiguous* — §, —, –, →, ←, ✓, ≤, •, the only non-ASCII this
+// repository's figures actually draw — is deliberately NARROW, the
+// wcwidth/POSIX reading for a non-East-Asian context. Measured, an em dash is
+// a full em in this font, so a label carrying one is still under-measured by
+// 0.45 unit; that is a different question from this defect (it needs a
+// context rule, not a table) and is not decided here.
+const CW_ZERO=[[0x0300,0x036F],[0x0483,0x0489],[0x0591,0x05BD],[0x0610,0x061A],
+  [0x064B,0x065F],[0x0670,0x0670],[0x06D6,0x06DC],[0x0711,0x0711],[0x0730,0x074A],
+  [0x07A6,0x07B0],[0x0816,0x0819],[0x093C,0x093C],[0x0951,0x0954],[0x0E31,0x0E31],
+  [0x0E34,0x0E3A],[0x0E47,0x0E4E],[0x1AB0,0x1AFF],[0x1DC0,0x1DFF],[0x200B,0x200F],
+  [0x2060,0x2064],[0x20D0,0x20F0],[0xFE00,0xFE0F],[0xFE20,0xFE2F],[0xFEFF,0xFEFF]];
+const CW_EMOJI=[[0x1F004,0x1F0CF],[0x1F18E,0x1F19A],[0x1F300,0x1F5FF],
+  [0x1F600,0x1F64F],[0x1F680,0x1F6FF],[0x1F7E0,0x1F7EB],[0x1F900,0x1F9FF],
+  [0x1FA70,0x1FAFF]];
+const CW_WIDE=[[0x1100,0x115F],[0x2E80,0x303E],[0x3041,0x33FF],[0x3400,0x4DBF],
+  [0x4E00,0x9FFF],[0xA000,0xA4CF],[0xA960,0xA97F],[0xAC00,0xD7A3],[0xF900,0xFAFF],
+  [0xFE10,0xFE19],[0xFE30,0xFE6F],[0xFF01,0xFF60],[0xFFE0,0xFFE6],
+  [0x17000,0x18AFF],[0x1B000,0x1B2FF],[0x20000,0x3FFFD]];
+// ranges are sorted and disjoint, so the scan stops at the first range that
+// starts above the codepoint
+function cwIn(cp,rs){
+  for(let i=0;i<rs.length;i++){ if(cp<rs[i][0]) return false; if(cp<=rs[i][1]) return true; }
+  return false;
+}
+function cwOf(cp){
+  if(cp<0x0300) return 1;              // ASCII and Latin-1: the calibrated case
+  if(cwIn(cp,CW_ZERO)) return 0;
+  if(cwIn(cp,CW_EMOJI)) return 2.25;
+  if(cwIn(cp,CW_WIDE)) return 1.81;
+  return 1;
+}
+// Iterate CODEPOINTS, not UTF-16 units: an astral character is one advance,
+// not two. A ZWJ emoji sequence still counts each codepoint, so it is
+// over-measured — the safe direction, and the only way to avoid it is a
+// grapheme segmenter this engine will not carry.
+function cw(s){
+  s=String(s); let w=0;
+  for(let i=0;i<s.length;i++){
+    const cp=s.codePointAt(i);
+    if(cp>0xFFFF) i++;
+    w+=cwOf(cp);
+  }
+  return w;
+}
+// the widest line of a multi-line string, in Latin units
+function cwMax(s){ return Math.max(...String(s).split('\n').map(cw)); }
+
 // §5 style= → SVG dash pattern. `def` is the construct's conventional
 // default (the bundle ring and the threshold line are dashed by convention);
 // an explicit style= always wins.
@@ -2359,7 +2433,7 @@ function dashOf(style,def){
 }
 function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
 function tw(s){
-  const longest=Math.max(...String(s).split('\n').map(l=>l.length));
+  const longest=cwMax(s);
   return Math.max(30,longest*CH+2*PADX);
 }
 // ---- shape geometry (one source of truth for size and for clipping) ----
@@ -2478,7 +2552,7 @@ function inscribedHalfW(g,v){
 const LBLPADX=6, LBLPADY=4;
 function labelBox(label){
   const ls=String(label).split('\n');
-  return [Math.max(...ls.map(l=>l.length))*CH+2*LBLPADX,
+  return [Math.max(...ls.map(cw))*CH+2*LBLPADX,
           ((ls.length-1)*1.3+1.2)*FONT+2*LBLPADY];
 }
 // fitOutline: grow the box by the smallest factor that pulls an iw x ih box,
@@ -2570,7 +2644,7 @@ function render(doc,ropts){
   }
   const parts=[]; let y=0, maxW=0;
   if(doc.title && RO.title===true){ parts.push('<text x="0" y="16" font-size="15" font-weight="600">'+esc(doc.title)+'</text>'); y=30;
-    maxW=Math.max(maxW, doc.title.length*8.6); }  // canvas must fit the title
+    maxW=Math.max(maxW, cw(doc.title)*8.6); }  // canvas must fit the title
   let sceneMeta=null;
   if(doc.nodes.length||doc.edges.length||(doc.boundaries||[]).length){
     const s=renderScene(doc,y); parts.push(s.svg); y=s.y; maxW=Math.max(maxW,s.w);
@@ -2608,7 +2682,7 @@ function render(doc,ropts){
     // `style`) is drawn, so "declared but not shown" is now unreachable.
     for(const c of legendCls){
       const paints=c.fill!==undefined||c.stroke!==undefined||c.style!==undefined;
-      const tw=String(c.label).length*6.6+(paints?30:9);
+      const tw=cw(c.label)*6.6+(paints?30:9);
       if(lx>0 && lx+tw>wrapW){ lx=0; ly+=rowH; }
       if(paints){
         const dash=c.style==='dashed'?' stroke-dasharray="6 4"':(c.style==='dotted'?' stroke-dasharray="2 4"':'');
@@ -2721,7 +2795,7 @@ function renderScene(doc,y0){
   // ALL nodes participate in auto layout (pinned ones hold their slot so
   // that pinning X never reflows Y); pins override coordinates afterwards.
   const horiz=(doc.flow==='right'||doc.flow==='left');
-  const lblPx=s=>Math.max(...String(s).split('\n').map(l=>l.length))*6.5;
+  const lblPx=s=>cwMax(s)*6.5;
   const lay=[...nodes];                    // layout participants
   const chains=new Map();                  // edge -> [A, ...waypoints, B]
   for(const e of doc.edges){
@@ -3405,7 +3479,7 @@ function renderScene(doc,y0){
     const CLAMP=t=>Math.max(0.06,Math.min(0.94,t));
     const cand=(r,t,side)=>{
       const lines=String(r.text).split('\n'), n=lines.length;
-      const w=Math.max(...lines.map(l=>l.length))*6.5*r.fs/11;
+      const w=Math.max(...lines.map(cw))*6.5*r.fs/11;
       const lh=r.fs*1.3, h=(n-1)*lh+r.fs*1.1;
       const up=(n-1)*lh/2+r.fs*0.85;          // baseline y = box top + up
       const mx=r.p[0]+(r.q[0]-r.p[0])*t, my=r.p[1]+(r.q[1]-r.p[1])*t;
@@ -3511,7 +3585,7 @@ function renderScene(doc,y0){
     // label with shrink-to-fit when size is rigid (`UNDECLARED-ATTRIBUTE-BEHAVIOUR`); multi-line via "\n"
     let fs=FONT;
     const nl=String(n.label).split('\n');
-    const need=Math.max(...nl.map(l=>l.length))*CH;
+    const need=Math.max(...nl.map(cw))*CH;
     // budget = the width the OUTLINE offers at the label's own height, minus
     // 8 px clearance each side. For a box that is n.w-16, exactly as before;
     // for a rhombus or an ellipse it is the inscribed width, so a rigid
@@ -4055,7 +4129,7 @@ function renderBitfield(b,y0){
       const cap=bi===0?String(f.name)+suffix:CONT;
       let lead=bx[0]; for(const s of bx) if(s.w>lead.w) lead=s;
       const ly=flat ? bx[0].y+bx.length*rh/2 : lead.y+rh/2;
-      let fs=11; const need=cap.length*6.2;
+      let fs=11; const need=cw(cap)*6.2;
       // The font shrinks to fit the segment that carries it, floor 7px — the
       // rule a too-narrow one-row field has always had. Below the floor the
       // caption overflows its box rather than vanishing: a name half outside
@@ -4149,7 +4223,7 @@ function renderBitfield(b,y0){
     // job.
     svg.push('<line x1="'+e.x+'" y1="'+e.y+'" x2="'+e.x+'" y2="'+(e.y+EL_H)+'" stroke="'+st+'" stroke-dasharray="2 3"/>');
     svg.push('<line x1="'+(e.x+e.w)+'" y1="'+e.y+'" x2="'+(e.x+e.w)+'" y2="'+(e.y+EL_H)+'" stroke="'+st+'" stroke-dasharray="2 3"/>');
-    let fs=10.5; const need=e.text.length*6.2;
+    let fs=10.5; const need=cw(e.text)*6.2;
     if(need>e.w-6) fs=Math.max(7,10.5*(e.w-6)/need);
     svg.push('<text x="'+(e.x+e.w/2)+'" y="'+(e.y+EL_H/2+fs*0.35)+'" font-size="'+fs+'" text-anchor="middle" fill="#6f6e69">'+esc(e.text)+'</text>');
   }
@@ -4169,7 +4243,7 @@ function renderBitfield(b,y0){
     for(const f of capt){
       const s=f.name+' — present: '+f.present;
       svg.push('<text x="0" y="'+(yb+9)+'" font-size="10.5" fill="#6f6e69">'+esc(s)+'</text>');
-      wb=Math.max(wb, s.length*6.3+2); yb+=14;
+      wb=Math.max(wb, cw(s)*6.3+2); yb+=14;
     }
     yb+=2;
   }

@@ -46,16 +46,21 @@ function loadEngine() {
   const start = h.indexOf('const SHAPES');
   const end   = h.indexOf('// 3. UI');
   if (start < 0 || end < 0) throw new Error('cannot locate engine in ' + enginePath);
-  const factory = new Function(h.slice(start, end) + '\nreturn {parse, render};');
+  // cw is taken FROM the engine, never restated here: this check re-derives a
+  // label's width from the drawn SVG, and a second copy of the advance table
+  // would let the two disagree about any non-Latin label.
+  const factory = new Function(h.slice(start, end) + '\nreturn {parse, render, cw};');
   const api = factory();
   api.path = enginePath;
+  ENG = api;
   return api;
 }
+let ENG = null;                                   // set by loadEngine; carries cw
 
 // ── tolerances ────────────────────────────────────────────────────────────────
 const TEXT_TOL = 1.0;    // norm ceiling for a label corner (1.0 = the outline)
 const END_TOL  = 0.02;   // endpoint norm must be 1 +/- this (2% of the radius)
-const CH       = 7.2;    // engine's glyph-width estimate at font-size 13
+const CH       = 7.2;    // engine's advance per LATIN unit at font-size 13
 const FONT     = 13;
 
 // ── outline algebra ───────────────────────────────────────────────────────────
@@ -106,7 +111,7 @@ function labelBoxOf(inner) {
   const lines = body.includes('<tspan')
     ? [...body.matchAll(/<tspan[^>]*>([\s\S]*?)<\/tspan>/g)].map(x => x[1])
     : [body];
-  const chars = Math.max(...lines.map(l => l.replace(/&[a-z]+;/g, 'x').length));
+  const chars = Math.max(...lines.map(l => ENG.cw(l.replace(/&[a-z]+;/g, 'x'))));
   // the drawn y is the baseline of the FIRST line (textEl centres the block);
   // the ink box runs from cap height above it to the descender below the last
   const w = chars * CH * (fsz / FONT);
