@@ -442,9 +442,10 @@ that need deliberate arranging is unaffected — the ratio is what this
 paragraph is for.)
 
 **Long back-edges and bypasses read as detours — say what they are.** An edge
-that skips several ranks is routed out to the canvas margin and picks up a
-bend per rank crossed; on a large figure that reads as a staircase, and a
-reader who cannot tell *why* a line is out there reads it as noise. Until this release the taught answer was a hand-written waypoint; `path` is withdrawn
+that skips several ranks is routed through the gaps and keeps a bend only
+where something is actually in the way (it used to pick up
+a bend per rank crossed and read as a staircase); but however clean the line,
+a reader who cannot tell *why* a line is out there reads it as noise. Until this release the taught answer was a hand-written waypoint; `path` is withdrawn
 and there is no replacement, so the answer moves into the content zone, where
 it arguably belonged: name the bypass so the detour is legible as a bypass.
 

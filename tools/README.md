@@ -956,7 +956,7 @@ norm `<= 1.0`, an endpoint at `1.00 +/- 0.02`.
 Reported but **not** asserted: co-located edges on the same node pair,
 which the renderer deliberately fans out sideways (± 7 px per lane) —
 their endpoints are offset from the outline by design. They appear in
-the `fanned` column. Self-loops draw their own arc and are skipped.
+the `fanned` column. Self-loops draw a small side loop on their own node and are skipped.
 
 `--verbose` prints the per-node and per-endpoint norms (the numbers to
 quote in a review); `--strict` exits 1 on any failure. Deterministic;

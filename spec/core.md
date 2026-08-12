@@ -2090,7 +2090,7 @@ alone. Recorded as an open question in §9.
   and it belongs in `tools/`, not in the engine — filed in
   `decisions/registry.md`. v0.2.
 - OQ-S42: **several INDEPENDENT cells cannot be marked as one thing**
-  (2026-08-11, R144). `class=` attaches to one `cell` and to one `field`, so
+  (2026-08-11). `class=` attaches to one `cell` and to one `field`, so
   four adjacent cells that share a class draw **four separate rings**, not one
   frame around the four. A MERGED region does not have this problem — it is one
   cell, and the engine draws its mark as one ring around the whole region — so the

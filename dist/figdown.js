@@ -1,4 +1,4 @@
-// figdown.js — FigDown embeddable library (0.1.6)
+// figdown.js — FigDown embeddable library (0.1.7)
 // GENERATED FILE, DO NOT EDIT. Built from editor/figdown.html.
 // Regenerate with: node tools/make-lib.js
 (function (root, factory) {
@@ -10,7 +10,7 @@
   }
 }(typeof globalThis !== 'undefined' ? globalThis : this, function () {
   'use strict';
-var VERSION = "0.1.6";
+var VERSION = "0.1.7";
 
 // ---- engine (extracted verbatim from editor/figdown.html) ----
 var __engine = (function () {
@@ -24,7 +24,7 @@ const SHAPES = ['box','rounded','circle','ellipse','diamond','cylinder'];
 // input to that promise, and under core §13 a 0.x renderer may differ from
 // the next — which makes the recorded version the only thing that can
 // explain a diff between two renderings of one source.
-const FIGDOWN_VERSION = '0.1.6';
+const FIGDOWN_VERSION = '0.1.7';
 // Retired shape VALUES keep a named diagnostic (PROCESS §5(d)), the same way
 // retired option keys do: `cloud` was the one value that named a domain
 // (the internet cloud) in an enum the language keeps purely geometric
@@ -3112,6 +3112,45 @@ function renderScene(doc,y0){
     const halo=' paint-order="stroke" stroke="#fff" stroke-width="3"';
     const seg=(p,q,t,lbl,fs)=>reqLabel({p,q,t0:t,text:lbl,fs,col:ecol,halo,e,A,B,kind:'end'});
     if(isBack.has(e)&&!pinned(e.a)&&!pinned(e.b)){
+      // ── ROUTING-CHANGE ARCHITECTURE NOTE ──────────
+      // Edge labels are DEFERRED: every label is registered against its
+      // FINAL segment geometry (reqLabel/lblReq above) and placed by ONE
+      // greedy pass after all edges are drawn; arrowheads are computed from
+      // final terminal points (arrowTri). Therefore a routing change made
+      // HERE — upstream of reqLabel/noteSegs/arrowTri — gets label and
+      // arrowhead re-placement for free. A change spliced into the emitted
+      // SVG downstream, or made outside the engine, will strand both.
+      // Two prototype rounds re-derived this the hard way (floating
+      // arrowheads, orphaned labels): that was external splicing, not an
+      // engine gap. Patch routing here; do not "fix" the label machinery.
+      if(A===B){
+        // Self-transition: a small side loop on the node, the
+        // convention of every drawing tool — never a lap of the figure
+        // through the back-edge channel. Side order r,l,b,t; first side
+        // whose loop box overlaps no other node wins (deterministic).
+        const scy=A.y+A.h/2, scx=A.x+A.w/2;
+        const mkLoop=sd=>sd==='r'?[[A.x+A.w,scy-8],[A.x+A.w+20,scy-8],[A.x+A.w+20,scy+8],[A.x+A.w,scy+8]]
+          :sd==='l'?[[A.x,scy-8],[A.x-20,scy-8],[A.x-20,scy+8],[A.x,scy+8]]
+          :sd==='b'?[[scx-8,A.y+A.h],[scx-8,A.y+A.h+20],[scx+8,A.y+A.h+20],[scx+8,A.y+A.h]]
+          :[[scx-8,A.y],[scx-8,A.y-20],[scx+8,A.y-20],[scx+8,A.y]];
+        const loopHit=pp=>{
+          const x0=Math.min(...pp.map(p=>p[0]))-2, x1=Math.max(...pp.map(p=>p[0]))+2;
+          const z0=Math.min(...pp.map(p=>p[1]))-2, z1=Math.max(...pp.map(p=>p[1]))+2;
+          return nodes.some(n=>n!==A&&!n.boundary&&n.x<x1&&n.x+n.w>x0&&n.y<z1&&n.y+n.h>z0);
+        };
+        let sp=null;
+        for(const sd of ['r','l','b','t']){ const pp=mkLoop(sd); if(!loopHit(pp)){ sp=pp; break; } }
+        if(!sp) sp=mkLoop('r');
+        for(const p of sp){ W=Math.max(W,p[0]+4); Hh=Math.max(Hh,p[1]+16-y0-20); }
+        esvg.push('<path data-edge="'+e.line+'" d="'+roundPath(sp)+'" fill="none" stroke="'+col+'" stroke-width="1.6"'+dash+'/>');
+        noteSegs(e,sp);
+        if(e.mid) reqLabel({p:sp[1],q:sp[2],text:e.mid,fs:11,col:lcol,halo,e,A,B,kind:'mid',first:false});
+        if(e.tail) seg(sp[0],sp[1],0.5,e.tail,10);
+        if(e.head) seg(sp[3],sp[2],0.5,e.head,10);
+        if(wantsStart) arrowTri(sp[0],sp[1],col);
+        if(wantsEnd)   arrowTri(sp[sp.length-1],sp[sp.length-2],col);
+        continue;
+      }
       // back-edge (retry loop): polyline through a side channel beyond the
       // occupied lanes instead of a straight line hidden under the spine,
       // using the nested slot from the channel plan. Ring-eligible loops
@@ -3238,6 +3277,50 @@ function renderScene(doc,y0){
       // their neighbours turns a 40-point staircase into the 2–4 bends a
       // dummy-vertex chain should have, without moving the drawn line.
       simplifyPts(pts);
+      // Waypoint prune: after collinear simplification a
+      // chain can still carry a staircase of near-collinear jogs — the drift
+      // clamp allows only a few px of sideways movement per rank, so a run
+      // that wants to move 35px sideways alternates short diagonals and
+      // verticals that Douglas-Peucker cannot collapse (each angle differs).
+      // The rule: an interior waypoint SURVIVES only if removing it would
+      // make the edge pierce something. Obstacles are the same set the
+      // straight-edge router uses below: non-incident nodes, plus group
+      // boxes when NEITHER endpoint lies inside (a run through a group
+      // interior asserts membership the figure does not declare). Fixed
+      // left-to-right scan to fixpoint — deterministic. Endpoints are then
+      // re-derived so the edge leaves its node facing the first bend, and
+      // each re-derived terminal segment is re-checked: if it would hit an
+      // obstacle the old endpoint stays.
+      {
+        const pobs=nodes.filter(n=>n!==A&&n!==B&&!n.boundary).map(n=>({x:n.x,y:n.y,w:n.w,h:n.h}));
+        const ep0=pts[0], ep1=pts[pts.length-1];
+        for(const k in gBox){
+          const b=gBox[k];
+          const inG=(px,py)=>px>b.x0&&px<b.x1&&py>b.yA&&py<b.yB;
+          if(!inG(ep0[0],ep0[1])&&!inG(ep1[0],ep1[1]))
+            pobs.push({x:b.x0,y:b.yA,w:b.x1-b.x0,h:b.yB-b.yA});
+        }
+        let ch=true, pruned=false;
+        while(ch){ ch=false;
+          for(let i=1;i+1<pts.length;i++)
+            if(!segHitsObs(pts[i-1],pts[i+1],pobs)){ pts.splice(i,1); ch=true; pruned=true; i--; }
+        }
+        // untouched chains stay byte-identical: endpoints and the label
+        // segment are only re-derived when the prune removed a waypoint
+        if(pruned){
+        const nb0=borderPoint(A,pts[1][0],pts[1][1]);
+        if(!segHitsObs(nb0,pts[1],pobs)) pts[0]=nb0;
+        const nb1=borderPoint(B,pts[pts.length-2][0],pts[pts.length-2][1]);
+        if(!segHitsObs(nb1,pts[pts.length-2],pobs)) pts[pts.length-1]=nb1;
+        if(midSeg){ let bi=0,bl=-1;
+          for(let i=0;i+1<pts.length;i++){
+            const l=Math.hypot(pts[i+1][0]-pts[i][0],pts[i+1][1]-pts[i][1]);
+            if(l>bl){ bl=l; bi=i; }
+          }
+          midSeg=[pts[bi],pts[bi+1]];
+        }
+        }
+      }
       esvg.push('<path data-edge="'+e.line+'" d="'+roundPath(pts)+'" fill="none" stroke="'+col+'" stroke-width="1.6"'+dash+'/>');
       noteSegs(e,pts);
       if(midSeg) reqLabel({p:midSeg[0],q:midSeg[1],text:e.mid,fs:11,col:lcol,halo,e,A,B,kind:'mid',first:false});

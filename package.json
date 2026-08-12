@@ -1,6 +1,6 @@
 {
   "name": "figdown",
-  "version": "0.1.6",
+  "version": "0.1.7",
   "description": "Figures as text — one source, two readers: a closed, deterministic figure language for Markdown, readable by AI agents and humans alike",
   "license": "MIT",
   "author": "FigDown <hello@figdown.org>",

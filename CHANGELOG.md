@@ -65,6 +65,37 @@ Statuses referred to above are defined in [`spec/README.md`](spec/README.md).
 
 Nothing yet.
 
+## v0.1.7 — 2026-08-11
+
+**Language version: `0.1`.** Patch. No language change.
+
+Two drawing conventions the auto-layout was violating are corrected; the
+engine owns drawing conventions, so no document changes and no keyword
+appears.
+
+A self-transition — an edge from a state to itself — was routed through the
+same side channel as long return edges, so it could lap the entire figure:
+the turnstile example drew LOCKED's `push` loop around both states, asserting
+a path the machine does not take. It is now what every drawing tool draws: a
+small loop on one side of its own state, label beside it, on the first side
+(right, left, bottom, top) where it overlaps nothing.
+
+An edge that crosses several ranks used to pick up a bend at every rank — a
+drift clamp allows only a few pixels of sideways travel per rank, so a run
+that wanted to move 35 px sideways drew a nine-segment staircase. An interior
+bend now survives only if removing it would make the edge pierce a node, or a
+group box the edge neither starts nor ends inside. A line through a group
+interior would assert a membership the figure does not declare, which is why
+the group clause is part of the rule and not an optimisation.
+
+Six figures redraw (the turnstile statechart, three flowcharts, the packet
+ingress pipeline, and the auto-layout fabric comparison), with fewer bends
+and no new line through anything; the remaining artifacts change only in the
+engine version they record. Routing changes of this kind are placed upstream
+of the engine's label and arrowhead machinery, which places both from final
+geometry — the reason labels and arrows follow their edges through this
+change.
+
 ## v0.1.6 — 2026-08-11
 
 **Language version: `0.1`.** Patch. No language change.
