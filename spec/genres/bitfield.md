@@ -343,6 +343,25 @@ no option key for it.
   engine speaking for the author.
 - key absent → solid, no caption.
 
+**Where the dash actually lands.** A field's boundary is
+*shared* with its neighbour, and the renderer draws each boundary exactly once.
+An edge is dashed **iff at least one of the two fields touching it carries
+`present=`** — so a conditional field is enclosed by a dashed outline even
+where the field on the other side is unconditional. Before this release each
+field was stroked as its own box and the second painting won, which meant a
+plain neighbour could overwrite a conditional field's dash back to solid and
+silently delete the only carrier of conditional presence (`STYLE-KEY-SCOPE`).
+Two consequences an author should know:
+
+- `stroke=` no longer travels on the boundary. A field's class colour is drawn
+  as a solid full-weight ring **inside** the field. A field carrying both
+  `stroke=` and `present=` therefore shows a dashed boundary **and** a separate
+  coloured ring, not a coloured dash: the two marks answer different questions.
+- A dashed edge between a conditional field and a plain one can be read locally
+  as if the plain field were conditional too. This ambiguity is **known, not
+  solved** — the older drawing had it too whenever the dash happened to win the
+  overwrite. The caption line and the model remain authoritative.
+
 **The `BITFIELD-CONDITIONAL-OFFSETS` tension, stated so it is not misread as a reversal.** `BITFIELD-CONDITIONAL-OFFSETS` rejected
 encoding conditionality as `note=` prose because that would "demote
 machine-readable conditionality into free text… meaning derivable from syntax

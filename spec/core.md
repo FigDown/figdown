@@ -2089,6 +2089,26 @@ alone. Recorded as an open question in §9.
   signature of a half-padded row. It is a diagnostic, not a language change,
   and it belongs in `tools/`, not in the engine — filed in
   `decisions/registry.md`. v0.2.
+- OQ-S42: **several INDEPENDENT cells cannot be marked as one thing**
+  (2026-08-11, R144). `class=` attaches to one `cell` and to one `field`, so
+  four adjacent cells that share a class draw **four separate rings**, not one
+  frame around the four. A MERGED region does not have this problem — it is one
+  cell, and the engine draws its mark as one ring around the whole region — so the
+  gap is precisely: the language can say "these squares are ONE CELL" and can
+  say "this cell means X", and cannot say "these several cells, still
+  themselves, are one thing". The workaround is to merge them, which asserts a
+  structural fact that may be false, or to accept the repeated ring, which
+  reads as N marks rather than one. **This is a language gap, not a rendering
+  defect**, and it is filed on that basis and deliberately not designed:
+  nothing in the corpus has yet asked for it, and a construct for "these
+  several things are one thing" is exactly the kind that gets invented once and
+  spelled three ways. **It is the same shape as `BITFIELD-REPETITION-CONSTRUCT`'s open half** (a
+  `bitfield` cannot say that a run of fields is one repeating RECORD) and as
+  **`CONTIGUOUS-RANGE-GROUPING`** (curly-brace grouping over a contiguous range); whoever designs
+  one should be shown all three, because one construct plausibly answers them
+  and three separate ones would be the drift this project keeps paying for.
+  **What would reopen it:** a measured figure in the production corpus that
+  needs the outer frame and cannot honestly merge. v0.2.
 - **A presence condition cannot reference a field** — `present="C = 1"`
   names `C`, and the language cannot resolve that to the `field "C"` three
   lines up: a bitfield field name is a **label**, not an id, and `class=` /

@@ -65,6 +65,49 @@ Statuses referred to above are defined in [`spec/README.md`](spec/README.md).
 
 Nothing yet.
 
+## v0.1.6 — 2026-08-11
+
+**Language version: `0.1`.** Patch. No language change.
+
+Table cells and bitfield fields were each drawn as their own stroked box, so
+every interior boundary was painted twice and whichever paint came second won.
+That made a boundary's appearance an accident of document order, and it cost
+more than tidiness: a conditional field's dashed boundary was overwritten solid
+by an ordinary neighbour, and the dash is the only thing that says a field is
+conditionally present. A figure was quietly disagreeing with its own source.
+
+The grid is now emitted edge by edge, once per edge, and each edge is decided
+by the cells on both sides of it. An edge is dashed if either neighbour is
+conditional. A cell's own colour is drawn as a solid ring inside that cell
+instead of on the boundary, so two adjacent marked cells both keep their
+colour, and a field carrying both a colour and a condition shows a dashed
+boundary and a separate coloured ring rather than a coloured dash. Ring ends
+pull in only where the cell that owns them actually stops, so a mark spanning
+several cells draws as one unbroken ring and never protrudes past its own cell.
+
+Giving each side half the boundary was tried first and measured at the size
+figures are read at, not zoomed: at 1× two half-width strokes land on
+quarter-pixel offsets and average into one muddy pixel, losing one of the two
+colours outright. The inset rings land on whole pixels and every colour
+survives.
+
+One ambiguity is left rather than claimed solved: a dashed edge between a
+conditional field and a plain one reads locally as if both were conditional.
+The previous drawing had the same ambiguity whenever the dash happened to win.
+Every figure containing a table or a bitfield redraws — 27 of them — and the
+remaining artifacts change only in the engine version they record.
+
+Separately, the QUIC example was drawing a false offset map and is corrected.
+A QUIC long header is not word-aligned: Version begins at bit offset 8. The
+figure ended the drawing row after the first byte, which left 24 bits blank and
+pushed every offset below it 24 bits too high — a reader computed DCID Length
+at byte 8 when it is at byte 5. The row break is removed. Blank space is not a
+placeholder: the same figure fabricates six widths and declares that it does,
+in the model, where a reader can discount it, whereas empty cells inside a
+header row declare nothing and are simply believed. Five fields now wrap with a
+continuation mark, which is what a format that is not word-aligned looks like
+on a fixed word grid.
+
 ## v0.1.5 — 2026-08-11
 
 **Language version: `0.1`.** Patch. No language change.

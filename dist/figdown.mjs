@@ -1,8 +1,8 @@
-// figdown.mjs — FigDown embeddable library (0.1.5)
+// figdown.mjs — FigDown embeddable library (0.1.6)
 // GENERATED FILE, DO NOT EDIT. Built from editor/figdown.html.
 // Regenerate with: node tools/make-lib.js
 'use strict';
-var VERSION = "0.1.5";
+var VERSION = "0.1.6";
 
 // ---- engine (extracted verbatim from editor/figdown.html) ----
 var __engine = (function () {
@@ -16,7 +16,7 @@ const SHAPES = ['box','rounded','circle','ellipse','diamond','cylinder'];
 // input to that promise, and under core §13 a 0.x renderer may differ from
 // the next — which makes the recorded version the only thing that can
 // explain a diff between two renderings of one source.
-const FIGDOWN_VERSION = '0.1.5';
+const FIGDOWN_VERSION = '0.1.6';
 // Retired shape VALUES keep a named diagnostic (PROCESS §5(d)), the same way
 // retired option keys do: `cloud` was the one value that named a domain
 // (the internet cloud) in an enum the language keeps purely geometric
@@ -3577,6 +3577,89 @@ function routeAround(p,q,obs){
   return pts.length>2?pts:null;
 }
 
+// ---- shared-edge grid (0.1.6) ----
+// A boundary between two cells belongs to BOTH of them. Drawing each cell as a
+// stroked rect drew that boundary twice, and the second painting won: a marked
+// cell's colour, or a conditional field's dash, was whatever the neighbour
+// happened to paint last. So the grid is now emitted edge-by-edge, each edge
+// exactly once, and its appearance is decided by its (at most two) owners.
+//
+// WHAT THE OLD DRAWING DESTROYED. A `present=` field's shared edge was
+// overwritten solid by a plain neighbour. `STYLE-KEY-SCOPE` rules that the dash IS
+// conditional presence and that nothing else can set or clear it — so the
+// model's flag was being silently erased at render time. This is a
+// correctness fix, not a cosmetic one.
+//
+// WHY NOT HALF-WIDTH. The obvious alternative gives each owner half the
+// boundary: two 0.5px bands, one per side. Point-sampled at 1× — the size a
+// figure is actually read at — a shared edge between an orange mark and a
+// green one reads #2E6E34: one muddy pixel with the orange unrecoverable,
+// because half-width strokes sit at quarter-pixel offsets and the rasteriser
+// averages them. The bands here land on integer pixels and every colour
+// survives exactly. A zoomed crop hides this entirely, which is why the
+// decision was made at 1× and must be re-checked at 1× if it is revisited.
+//
+// THE RESIDUAL AMBIGUITY, stated rather than hidden. A dashed edge between a
+// conditional field and a plain one can be read locally as if the plain one
+// were conditional too. Today's drawing has the same ambiguity whenever the
+// dash happens to win the overwrite; this is strictly better, not solved.
+//
+// WHAT IT COSTS. Two adjacent marked cells put 3px of ink at their shared
+// boundary (ring + line + ring) against 1px elsewhere: the grid stays even,
+// but that region reads heavier. Four differently marked cells meeting at a
+// point give four ring corners around one crossing — busy at 8×, invisible
+// at 1×.
+//
+// `edges` are runs produced by edgeRuns(); `def` is the block's grid colour.
+function edgeSvg(edges, def){
+  const W=1, out=[];
+  const L=(v,p,s,e,col,dash,w)=>'<line x1="'+(v?p:s)+'" y1="'+(v?s:p)+'" x2="'+(v?p:e)+'" y2="'+(v?e:p)
+    +'" stroke="'+col+'"'+(w!==1?' stroke-width="'+w+'"':'')+(dash?' stroke-dasharray="5 3"':'')+'/>';
+  for(const g of edges){
+    const A=g.a, B=g.b;
+    // The shared line: default colour, full weight, dashed iff EITHER owner
+    // carries `present=`. A field with both `stroke=` and `present=` therefore
+    // gets a dashed boundary AND a separate coloured ring, not a coloured
+    // dash — the two marks answer different questions and must not merge.
+    out.push(L(g.v, g.p, g.s, g.e, def, (A&&A.d)||(B&&B.d), W));
+    // The class marks: solid, full weight, inset INSIDE their own cell. An end
+    // pulls in by W/2 where the owner stops and the ring turns the corner;
+    // it is left long where the owner continues past that end and the next run
+    // carries on, so a run that ends only because the NEIGHBOUR changed joins
+    // with no seam and no ring protrudes past its own cell. The test is the
+    // ownership map (does this cell own the next unit too?), not the geometry.
+    if(A&&A.c) out.push(L(g.v, g.p-W, g.s+(g.ca0?0:W/2), g.e-(g.ca1?0:W/2), A.c, false, W));
+    if(B&&B.c) out.push(L(g.v, g.p+W, g.s+(g.cb0?0:W/2), g.e-(g.cb1?0:W/2), B.c, false, W));
+  }
+  return out.join('');
+}
+// Walk one grid line unit by unit and merge collinear units that have the same
+// pair of owners into a single run. `v` is 1 for a vertical line, `p` its fixed
+// coordinate; `n` units; `span(i)` -> [start,end]; `ownAt(i)` -> [before,after]
+// where an owner is {id, c:colour|null, d:dashed}. A unit with no owner, or
+// with the SAME owner on both sides (a merged/spanning cell's interior), draws
+// nothing at all — which is where the doubled interior lines went.
+function edgeRuns(v, p, n, span, ownAt){
+  const out=[]; let run=null;
+  const sid=(o)=>o?o.id:null;
+  const cont=(i,k,o)=>!!o && sid((ownAt(i)||[])[k])===o.id;
+  for(let i=0;i<n;i++){
+    const o=ownAt(i)||[], a=o[0]||null, b=o[1]||null;
+    const skip=(!a&&!b)||(a&&b&&a.id===b.id);
+    const key=skip?null:JSON.stringify([a&&[a.c,a.d], b&&[b.c,b.d]]);
+    const sp=span(i);
+    if(run && run.key===key && run.e===sp[0]){ run.e=sp[1]; run.i1=i; continue; }
+    if(run){ out.push(run); run=null; }
+    if(!skip) run={v:v,p:p,s:sp[0],e:sp[1],key:key,a:a,b:b,i0:i,i1:i};
+  }
+  if(run) out.push(run);
+  for(const r of out){
+    r.ca0=cont(r.i0-1,0,r.a); r.ca1=cont(r.i1+1,0,r.a);
+    r.cb0=cont(r.i0-1,1,r.b); r.cb1=cont(r.i1+1,1,r.b);
+  }
+  return out;
+}
+
 // ---- bitfield ----
 function renderBitfield(b,y0){
   const cell=Math.max(18,Math.min(28,Math.floor(760/b.word))), rh=30, ruler=16;
@@ -3769,9 +3852,11 @@ function renderBitfield(b,y0){
   // one edge a per-row rect cannot leave out: a rect strokes four sides or
   // none, and "none" would also lose the two verticals that must continue.
   // Fill stays a single closed region, so `fill=` paints the field once with
-  // no seam, and the stroke carries `present=`'s dash around the whole
-  // outline instead of around each row (`STYLE-KEY-SCOPE`: the dash IS conditional
-  // presence, and nothing else may set or clear it).
+  // no seam. Since 0.1.6 the path is unstroked and the boundary comes from the
+  // shared-edge grid instead; the internal boundary is still never drawn,
+  // because both of its sides are owned by the same field and edgeRuns() skips
+  // a unit whose two owners are one (`STYLE-KEY-SCOPE`: the dash IS conditional presence,
+  // and nothing else may set or clear it).
   const boxOutline=(bx)=>{
     const bands=[];
     for(const s of bx){
@@ -3793,6 +3878,11 @@ function renderBitfield(b,y0){
     }
     return 'M'+pts.map(p=>p[0]+' '+p[1]).join(' L')+' Z';
   };
+  // Shared-edge grid (0.1.6): field fills carry no stroke of their own. Every
+  // bit column of every row records which field owns it, and the grid is
+  // emitted once, edge by edge, after the fields — see edgeSvg() above.
+  const BOWN=new Map(), BDEF=b.stroke||'#555';
+  const bkey=(rw,cl)=>rw+':'+cl; let BOXN=0;
   let pos=0; // bit cursor
   for(const f of b.fields){
     if(f.wrap){ pos=Math.ceil((pos||1)/b.word)*b.word; continue; }
@@ -3818,9 +3908,11 @@ function renderBitfield(b,y0){
     // `PRESENCE-CONDITION-EXPRESSION`: the carrier is now `present=`, and BOTH of its
     // written forms dash — `present=""` claims conditional presence just as
     // `present="C = 1"` does; only the caption below distinguishes them.
-    const dash=f.present!==undefined?' stroke-dasharray="5 3"':'';
+    // 0.1.6: the dash and the class colour no longer ride on the box's own
+    // stroke — they are properties of the shared boundary and of the ring
+    // inside the cell respectively, recorded per bit below and drawn once.
     const cfill=f.fill||b.fill||'#fff';
-    const paint=' fill="'+cfill+'" stroke="'+(f.stroke||b.stroke||'#555')+'"'+dash;
+    const paint=' fill="'+cfill+'" stroke="none"';
     // Draw one occurrence. `suffix` is the derived index label — '' for a
     // field that is not one element of a run, ' [0]' / ' [n]' for the two
     // occurrences `REPEATED-RUN-DRAWING` draws. It is APPENDED to the author's label, and the
@@ -3855,6 +3947,13 @@ function renderBitfield(b,y0){
         ? '<rect x="'+bx[0].x+'" y="'+bx[0].y+'" width="'+bx[0].w+'" height="'+(bx.length*rh)+'"'+paint
         : '<path d="'+boxOutline(bx)+'"'+paint;
       const tag=flat?'rect':'path';
+      // Record ownership per BIT, one entry per (row, column) this occurrence
+      // covers. Every occurrence of a repeated field is its own owner id, so
+      // the boundary between two occurrences is a real boundary and is drawn.
+      const bid=b.id+'_'+(BOXN++);
+      const brec={id:bid, c:f.stroke||null, d:f.present!==undefined};
+      bx.forEach(function(s){ const c0=Math.round(s.x/cell), n=Math.round(s.w/cell);
+        for(let k=0;k<n;k++) BOWN.set(bkey(s.row,c0+k), brec); });
       svg.push(desc?shape+'>'+desc+'</'+tag+'>':shape+'/>');
       // ONE caption per box: the NAME on the first box, CONT on every later
       // one. The first box, not the widest — reading order is the order the
@@ -3915,6 +4014,29 @@ function renderBitfield(b,y0){
       }
     }
   }
+  // The shared-edge grid for the bitfield: one pass over every vertical bit
+  // boundary and every horizontal row boundary, each emitted once.
+  let maxRow=-1;
+  BOWN.forEach(function(v,k){ const r=+k.split(':')[0]; if(r>maxRow) maxRow=r; });
+  const yrow=(r)=>y+r*rh+shiftFor(r);
+  const at=(r,c)=>(r<0||r>maxRow||c<0||c>=b.word)?null:(BOWN.get(bkey(r,c))||null);
+  const BE=[];
+  for(let c=0;c<=b.word;c++)
+    BE.push.apply(BE, edgeRuns(1, c*cell, maxRow+1,
+      i=>[yrow(i), yrow(i)+rh], i=>[at(i,c-1), at(i,c)]));
+  // A horizontal boundary is a row's TOP, shared with the row above when the
+  // two are vertically adjacent. A row also needs a bottom of its own when the
+  // row below is not adjacent — an elision strip has been inserted between
+  // them, and shiftFor() has pushed it down.
+  const hb=[];
+  for(let r=0;r<=maxRow;r++){
+    hb.push({y:yrow(r), ar:(r>0 && yrow(r-1)+rh===yrow(r))?r-1:-1, br:r});
+    if(r===maxRow || yrow(r+1)!==yrow(r)+rh) hb.push({y:yrow(r)+rh, ar:r, br:-1});
+  }
+  for(const hbe of hb)
+    BE.push.apply(BE, edgeRuns(0, hbe.y, b.word,
+      i=>[i*cell, (i+1)*cell], i=>[hbe.ar<0?null:at(hbe.ar,i), hbe.br<0?null:at(hbe.br,i)]));
+  svg.push(edgeSvg(BE, BDEF));
   for(const e of elis){
     const st=(b.stroke||'#555');
     // `ELISION-MARK-EXTENT`: THE SIDE DOTS ARE ALWAYS DRAWN. This reverses `ELISION-MARK-EXTENT`,
@@ -4010,6 +4132,14 @@ function renderTable(t,y0){
   // cell marks: h1..hN address header tiers top-down, r>=1 the data rows
   const markOf=(r,c)=>(t.marks||[]).find(mk=>(mk.hdr?mk.r-1:H+mk.r-1)===r&&mk.c===c+1);
   const yTop=y+4;
+  // Shared-edge grid (0.1.6): cell fills carry no stroke of their own. Every
+  // grid cell records its owning (anchor) cell, and the grid is emitted once,
+  // edge by edge, after the cells — see edgeSvg() above. Table cells have no
+  // conditional-presence mark, so `d` is always false here; the dash branch
+  // exists for the bitfield and is kept common so both genres draw alike.
+  const NC=t.cols.length, DEF=t.stroke||'#c9c7bf';
+  const OWN=grid.map(()=>new Array(NC).fill(null));
+  const xAt=[0]; for(let i=0;i<NC;i++) xAt.push(xAt[i]+widths[i]);
   for(let r=0;r<grid.length;r++){
     for(let c=0;c<grid[r].length;c++){
       const cell=grid[r][c];
@@ -4025,7 +4155,11 @@ function renderTable(t,y0){
       // addressable cells carry table-id:row:col (row 0 = bottom header tier)
       const addrR = r>=H ? (r-H+1) : (r===H-1 ? 0 : null);
       const addr = addrR===null ? '' : ' data-cell="'+t.id+':'+addrR+':'+(c+1)+'" style="cursor:pointer"';
-      svg.push('<rect x="'+x+'" y="'+yy+'" width="'+wsum+'" height="'+h+'" fill="'+fill+'" stroke="'+((mk&&mk.stroke)||t.stroke||'#c9c7bf')+'"'+addr+'/>');
+      // A merged cell owns every grid square it spans, so its internal
+      // boundaries have the same owner on both sides and are never drawn.
+      const rec={id:'c'+r+'_'+c, c:(mk&&mk.stroke)||null, d:false};
+      for(let rr=r;rr<r+rs;rr++) for(let cc=c;cc<c+cs;cc++) if(OWN[rr]) OWN[rr][cc]=rec;
+      svg.push('<rect x="'+x+'" y="'+yy+'" width="'+wsum+'" height="'+h+'" fill="'+fill+'" stroke="none"'+addr+'/>');
       // alignment: headers centered; data follows GFM colon alignment (default left)
       const al=cell.hdr?'center':(alignOf(c)||'left');
       const tx=al==='center'?x+wsum/2:(al==='right'?x+wsum-7:x+7);
@@ -4041,6 +4175,16 @@ function renderTable(t,y0){
       }
     }
   }
+  // Each edge drawn exactly once, owned by the (at most two) cells it divides.
+  const EDG=[];
+  const cellAt=(r,c)=>(r<0||r>=grid.length||c<0||c>=NC)?null:OWN[r][c];
+  for(let c=0;c<=NC;c++)
+    EDG.push.apply(EDG, edgeRuns(1, xAt[c], grid.length,
+      i=>[yTop+yAt[i], yTop+yAt[i+1]], i=>[cellAt(i,c-1), cellAt(i,c)]));
+  for(let r=0;r<=grid.length;r++)
+    EDG.push.apply(EDG, edgeRuns(0, yTop+yAt[r], NC,
+      i=>[xAt[i], xAt[i+1]], i=>[cellAt(r-1,i), cellAt(r,i)]));
+  svg.push(edgeSvg(EDG, DEF));
   const yEnd=yTop+yAt[grid.length];
   return {svg:svg.join(''), y:yEnd+6, w:totalW+2};
 }

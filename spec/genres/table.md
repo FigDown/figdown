@@ -212,6 +212,14 @@ is normative: the cell addresses, the `highlight` flag and the span markers,
 which carry the grid's meaning, and the column widths and alignment, which
 are presentation but have converged just as firmly.
 
+**How a cell's border draws.** A boundary between two cells
+belongs to both of them and is drawn **exactly once**, in the block's `stroke=`
+colour at full weight. A `cell`'s own `stroke=` (or the one it inherits from a
+`class=`) is drawn as a solid full-weight ring **inside** that cell, so a marked
+cell can no longer overwrite its neighbour's boundary and two adjacent marks
+both survive. A merged cell has no interior lines at all: both sides of every
+boundary it spans have the same owner, so nothing is emitted there.
+
 Retired language-wide (`COLOUR-KEY-STATUS`): `color=`. It set the FILL
 before this release and the LABEL, and no engine can tell the
 two source files apart — so its diagnostic names BOTH eras and hands the

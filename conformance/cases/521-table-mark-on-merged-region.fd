@@ -1,0 +1,42 @@
+figdown 0.1 table
+# A CLASS MARK ON A MERGED REGION FRAMES THE REGION, NOT ITS PIECES.
+# Standing regression item for the shared-edge grid: a
+# merged cell owns every grid square it spans, so both sides of every boundary
+# INSIDE it have the same owner and nothing is drawn there, and its mark is one
+# ring around the whole region rather than one ring per square. The four
+# combinations below are ordered by how hard the ownership decision is.
+#
+#   1. COLSPAN. `b1` spans B…C on row 1. One ring, four sides, 2 columns wide.
+#   2. ROWSPAN. `b2` spans rows 2…3 of column B. One ring, 2 rows tall.
+#   3. COLSPAN + ROWSPAN. `b4` spans B…C over rows 4…5 — a 2x2 region with no
+#      interior line at all.
+#   4. A MARKED CELL DIRECTLY BESIDE A MERGED ONE. `d4`/`d5` carry a DIFFERENT
+#      class, so the boundary between the 2x2 region and column D has two
+#      differently-marked owners. That is the hardest case in the language:
+#      the shared edge is drawn once in the default grid colour, and each side
+#      keeps its own colour on its own side of it. Before this release one of the two
+#      marks was overwritten by the other and the figure lost it.
+#
+# WHAT THE GOLDEN PINS, AND WHAT IT CANNOT. The model records STRUCTURE —
+# which cells merge, which class each marked cell joins — and not geometry
+# (core §12.7), the same limit case 424 documents for spanning fields. So the
+# golden below pins the merge markers, the cell addresses and the class names;
+# it cannot pin that the ring is one ring. That is the renderer reading the
+# structure, and it is held by the runner's determinism self-check plus the
+# rendered reference figures. A second implementation owes the model, and
+# SHOULD draw a merged region's mark as one frame around the whole region.
+class mk  "marked"                 stroke=#e07b00
+class mk2 "marked, second meaning" stroke=#2f8132
+table t "Marks on merged regions"
+| A | B | C | D |
+|---|---|---|---|
+| a1 | b1 || d1 |
+| a2 | b2 | c2 | d2 |
+| a3 | ^^ | c3 | d3 |
+| a4 | b4 || d4 |
+| a5 | ^^ | ^^ | d5 |
+cell (1,2) class=mk
+cell (2,2) class=mk
+cell (4,2) class=mk
+cell (4,4) class=mk2
+cell (5,4) class=mk2

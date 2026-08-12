@@ -23,9 +23,24 @@ bitfield quic_initial "QUIC Long Header — Initial Packet (RFC 9000)" word=32 n
 # Abbreviated labels for 1-bit/2-bit cells (each cell is 1/32 of row width):
 #   H=Header Form  F=Fixed Bit  PT=Long Packet Type  Rs=Reserved  PN=Pkt Num Len
 field H:1,F:1,PT:2,Rs:2,PN:2
-break
 
-# ── Version (32 bits) ────────────────────────────────────────────────────────
+# NO `break` HERE, AND THIS IS LOAD-BEARING. A QUIC long header is not
+# word-aligned: Version begins at bit offset 8, immediately after the first
+# byte, and every field below it starts at an offset that is not a multiple of
+# 32. A `break` after the first byte would end the drawing row and leave bits
+# 8..31 blank. The language is right that those blank cells are not bits — but
+# a reader does not read the source, and 24 blank cells inside a header row
+# read as padding. That is a FALSE STATEMENT ABOUT THE WIRE, and it is a
+# different thing from the `varlen` fiction below: `varlen` declares its
+# placeholder in the model, whereas blank space declares nothing and is simply
+# believed. Until this release this file had the break, so every offset in the
+# figure was 24 bits too high — a reader computed DCID Length at byte 8 when
+# it is at byte 5. Do not re-add it.
+
+# ── Version (32 bits, starting at bit 8) ─────────────────────────────────────
+# Spans the end of the first 32-bit word: bits 8..39. The renderer draws a
+# wrapping field as the name on the first row and `(cont.)` on the next, which
+# is the RFC's own convention for a field that does not fit the remaining row.
 field "Version" 32 fill=#dbeafe description="0x00000001 = QUIC v1"
 
 # ── Destination Connection ID ─────────────────────────────────────────────────
@@ -45,5 +60,10 @@ field "Length (8/16/32/64 bits, varint)" 16 class=varlen description="RFC 9000 �
 field "Packet Number (8-32 bits, 1-4 octets)" 16 fill=#d1fae5 class=varlen description="length is 1 + the two-bit Packet Number Length in the first byte — RFC 9000 §17.2"
 
 # ── Payload ───────────────────────────────────────────────────────────────────
-break
+# No `break` here either, for the same reason. It used to be harmless — with
+# the break above, the cursor happened to land on a word edge here, so it
+# added nothing. Once the first break went, this one became the same defect
+# moved down the figure: it would leave the 24 bits after the Packet Number
+# blank. The payload begins immediately after the packet number, so `*` fills
+# the remainder of THIS row and says so.
 field "Payload" * description="protected"
