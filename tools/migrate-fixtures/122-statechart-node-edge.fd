@@ -1,0 +1,11 @@
+# 0.2 (`GENRE-NODE-SPELLING`): under `statechart` a node is a `state` and a connector
+# is a `transition`. Both renames are scoped by the header genre.
+figdown 0.2 statechart
+title "Turnstile"
+class mode "A mode" fill=#e0e7ff
+node locked "LOCKED" class=mode
+node unlocked "UNLOCKED" class=mode
+edge locked -[coin]-> unlocked
+edge unlocked -[push]-> locked
+rank locked,unlocked
+flow right

@@ -141,7 +141,7 @@ endpoint's TCP state segment by segment.
 ![L2 forwarding logic](../examples/showcase/l2-forwarding-logic.svg)
 
 ```figdown
-figdown 0.1 flowchart
+figdown 0.2 flowchart
 title "L2 Switch Forwarding Decision"
 
 class forward "Forward — send the frame out the single learned egress port" fill=#16a34a
@@ -160,13 +160,13 @@ node flt    "Filter (drop):\nsame-port destination"        shape=rounded class=f
 
 flow down
 
-edge wire   -> learn
-edge learn  -> lookup
-edge lookup -> hit
-edge hit  -[no]->  fld
-edge hit  -[yes]-> same
-edge same -[yes]-> flt
-edge same -[no]->  fwd
+flowline wire   -> learn
+flowline learn  -> lookup
+flowline lookup -> hit
+flowline hit  -[no]->  fld
+flowline hit  -[yes]-> same
+flowline same -[yes]-> flt
+flowline same -[no]->  fwd
 ```
 
 **Human sees:** a frame from the ingress port → source-MAC learning →
@@ -292,59 +292,59 @@ prose rather than on an edge of its own.
 
 ---
 
-## 6. TCP connection state machine — every state, every transition (`flowchart`)
+## 6. TCP connection state machine — every state, every transition (`statechart`)
 
 ![TCP state machine](../examples/showcase/tcp-state-machine.svg)
 
 ```figdown
-figdown 0.1 flowchart
+figdown 0.2 statechart
 title "TCP Connection State Machine (RFC 9293, Figure 5)"
 
-class states  "A node IS a TCP state (RFC 9293 §3.3.2); the two CLOSED nodes are one state drawn twice — only this label says so" fill=#eef2ff
+class states  "A state IS a TCP connection state (RFC 9293 §3.3.2); the two CLOSED states are one state drawn twice — only this label says so" fill=#eef2ff
 class setup   "Connection-setup transition — opening the connection (OPEN, SYN exchange, first ACK)" stroke=#2563eb
 class client  "Active-close path (typically the client) — calls CLOSE first: FIN-WAIT-1 → FIN-WAIT-2 / CLOSING → TIME-WAIT → CLOSED" stroke=#dc2626
 class server  "Passive-close path (typically the server) — receives the peer's FIN first: CLOSE-WAIT → LAST-ACK → CLOSED" stroke=#16a34a
 class rare    "Rare / simultaneous transition — simultaneous open or close, or a reset/abort (RST, close from a half-open state)" stroke=#9333ea style=dashed
 
-node closed "CLOSED"        shape=rounded class=states
-node listen "LISTEN"        shape=rounded class=states
-node synsent "SYN-SENT"     shape=rounded class=states
-node synrcvd "SYN-RECEIVED" shape=rounded class=states
-node estab  "ESTABLISHED"   shape=rounded class=states
-node fw1    "FIN-WAIT-1"    shape=rounded class=states
-node fw2    "FIN-WAIT-2"    shape=rounded class=states
-node closing "CLOSING"      shape=rounded class=states
-node closewait "CLOSE-WAIT" shape=rounded class=states
-node lastack "LAST-ACK"     shape=rounded class=states
-node timewait "TIME-WAIT"   shape=rounded class=states
-node closed2 "CLOSED"       shape=rounded class=states
+state closed "CLOSED"        shape=rounded class=states
+state listen "LISTEN"        shape=rounded class=states
+state synsent "SYN-SENT"     shape=rounded class=states
+state synrcvd "SYN-RECEIVED" shape=rounded class=states
+state estab  "ESTABLISHED"   shape=rounded class=states
+state fw1    "FIN-WAIT-1"    shape=rounded class=states
+state fw2    "FIN-WAIT-2"    shape=rounded class=states
+state closing "CLOSING"      shape=rounded class=states
+state closewait "CLOSE-WAIT" shape=rounded class=states
+state lastack "LAST-ACK"     shape=rounded class=states
+state timewait "TIME-WAIT"   shape=rounded class=states
+state closed2 "CLOSED"       shape=rounded class=states
 
 flow down
 
-edge closed -[passive OPEN / create TCB]-> listen class=setup
-edge closed -[active OPEN / create TCB, snd SYN]-> synsent class=setup
-edge listen -[SEND / snd SYN]-> synsent class=setup
-edge listen -[rcv SYN / snd SYN,ACK]-> synrcvd class=setup
-edge synsent -[rcv SYN / snd SYN,ACK]-> synrcvd class=rare
-edge synsent -[rcv SYN,ACK / snd ACK]-> estab class=setup
-edge synrcvd -[rcv ACK of SYN / x]-> estab class=setup
+transition closed -[passive OPEN / create TCB]-> listen class=setup
+transition closed -[active OPEN / create TCB, snd SYN]-> synsent class=setup
+transition listen -[SEND / snd SYN]-> synsent class=setup
+transition listen -[rcv SYN / snd SYN,ACK]-> synrcvd class=setup
+transition synsent -[rcv SYN / snd SYN,ACK]-> synrcvd class=rare
+transition synsent -[rcv SYN,ACK / snd ACK]-> estab class=setup
+transition synrcvd -[rcv ACK of SYN / x]-> estab class=setup
 
-edge listen -[CLOSE / delete TCB]-> closed class=rare
-edge synsent -[CLOSE / delete TCB]-> closed class=rare
-edge synrcvd -[rcv RST (note 1) / x]-> listen class=rare
+transition listen -[CLOSE / delete TCB]-> closed class=rare
+transition synsent -[CLOSE / delete TCB]-> closed class=rare
+transition synrcvd -[rcv RST (note 1) / x]-> listen class=rare
 
-edge synrcvd -[CLOSE / snd FIN]-> fw1 class=client
-edge estab -[CLOSE / snd FIN]-> fw1 class=client
-edge fw1 -[rcv ACK of FIN / x]-> fw2 class=client
-edge fw1 -[rcv FIN / snd ACK]-> closing class=client
-edge fw1 -[rcv FIN,ACK / snd ACK]-> timewait class=rare
-edge fw2 -[rcv FIN / snd ACK]-> timewait class=client
-edge closing -[rcv ACK of FIN / x]-> timewait class=client
-edge timewait -[Timeout=2MSL / delete TCB]-> closed2 class=client
+transition synrcvd -[CLOSE / snd FIN]-> fw1 class=client
+transition estab -[CLOSE / snd FIN]-> fw1 class=client
+transition fw1 -[rcv ACK of FIN / x]-> fw2 class=client
+transition fw1 -[rcv FIN / snd ACK]-> closing class=client
+transition fw1 -[rcv FIN,ACK / snd ACK]-> timewait class=rare
+transition fw2 -[rcv FIN / snd ACK]-> timewait class=client
+transition closing -[rcv ACK of FIN / x]-> timewait class=client
+transition timewait -[Timeout=2MSL / delete TCB]-> closed2 class=client
 
-edge estab -[rcv FIN / snd ACK]-> closewait class=server
-edge closewait -[CLOSE / snd FIN]-> lastack class=server
-edge lastack -[rcv ACK of FIN / x]-> closed2 class=server
+transition estab -[rcv FIN / snd ACK]-> closewait class=server
+transition closewait -[CLOSE / snd FIN]-> lastack class=server
+transition lastack -[rcv ACK of FIN / x]-> closed2 class=server
 
 layout
 pin closed    at=(394,20)
@@ -365,7 +365,8 @@ The `pin` block reproduces the canonical Figure 5 arrangement so a
 reader who knows the RFC diagram recognises it — but it is **presentation
 only** (`strip-check --strict` passes): strip every line after `layout` and all
 11 states, all 21 transitions and their `event / action` labels survive on the
-`node`/`edge`/`class` lines. All meaning is in the edges; the pins are layout.
+`state`/`transition`/`class` lines. All meaning is in the transitions; the pins
+are layout.
 
 Three `path … points=` lines used to sit under those pins, bowing the active  <!-- fence-check: skip -->
 OPEN and the two aborts out to the margins. `EDGE-GEOMETRY-CONSTRUCTS` **withdrew the construct from
@@ -389,14 +390,14 @@ arrow carrying its `event / action`.
 **An agent answers from the text alone:**
 
 - *Q: What event takes ESTABLISHED to CLOSE-WAIT, and what does the endpoint
-  send?* A: `rcv FIN / snd ACK` — one edge label
-  (`edge estab -[rcv FIN / snd ACK]-> closewait`).
+  send?* A: `rcv FIN / snd ACK` — one transition label
+  (`transition estab -[rcv FIN / snd ACK]-> closewait`).
 - *Q: From FIN-WAIT-1, how many ways lead to TIME-WAIT and under what
   conditions?* A: three. (1) Directly: `rcv FIN,ACK / snd ACK` (the RFC Note-2
   transition, `fw1 -> timewait`). (2) Via FIN-WAIT-2: `rcv ACK of FIN / x` then
   `rcv FIN / snd ACK` (`fw1 -> fw2 -> timewait`). (3) Via CLOSING:
   `rcv FIN / snd ACK` then `rcv ACK of FIN / x` (`fw1 -> closing -> timewait`).
-  All read off the edges.
+  All read off the transitions.
 - *Q: How long does TIME-WAIT last and what happens after?* A: `Timeout=2MSL`,
   then `delete TCB` → CLOSED (`timewait -[Timeout=2MSL / delete TCB]-> closed2`).
 - *Q: Which transitions belong to the typical server (passive-close) path?*
@@ -430,12 +431,17 @@ The Ethernet frame uses the **`BYTE-UNIT-PACKET-BLOCKS`** byte-unit workaround (
 not `bitfield`) so byte order rides on cell order, and one of its facts — the
 FCS **coverage span** over a contiguous run of columns (DA through Payload) —
 has no annotation construct yet (**`CONTIGUOUS-RANGE-GROUPING`**), so it rides on a source comment
-and prose. The TCP state machine meets two more: **state-ness is not first-class**
-— a node *is* a state carries as the `states` class label until the state genre
-lands (the `GENRE-EARNING-THRESHOLD` §6 candidate) — and CLOSED is drawn **twice** because FigDown has
+and prose. The TCP state machine meets one more, and **has just stopped meeting
+the other**: state-ness IS first-class since `STATECHART-GENRE-SCOPE` — line 1 reads
+`figdown 0.2 statechart`, so "this is a state" is now declared by the word
+`state` itself (`GENRE-NODE-SPELLING`) rather than carried by the `states` class
+label, and the label stays only because it says
+something more specific about the two CLOSED nodes. The genre is EXPERIMENTAL
+and may be withdrawn. What remains is that CLOSED is drawn **twice** because
+FigDown has
 no **node-identity/alias** construct (**`IDENTITY-ASSERTION`**) to declare two nodes the same
-entity; the shared class label asserts it instead. Every state and every labelled
-transition still rides on an edge, so those two are the *only* facts the figure
+entity; the shared class label asserts it instead. So those two are the *only*
+facts the figure
 cannot carry that the canonical drawing implies. All are documented in
 [expressing.md](expressing.md)'s "Known limits".
 That a figure format states its own limits — and that a reading agent recovers

@@ -1,0 +1,5 @@
+# engine-backlog 29: the two cases the tool must NOT guess at. Quoting either
+# blind would change the RENDERED TEXT, so each is reported for a human.
+figdown 0.1 block
+title The "Fast" Path
+node a "A"

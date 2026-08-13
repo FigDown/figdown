@@ -12,7 +12,7 @@
       "name": "figdown",
       "source": "./",
       "description": "Figures as text: create and maintain documentation figures as FigDown .fd sources with deterministic SVG artifacts embedded in Markdown — block diagrams, topologies, flowcharts, bit-level layouts, tables, timing waveforms.",
-      "version": "0.1.8",
+      "version": "0.2.0",
       "author": {
         "name": "FigDown",
         "email": "hello@figdown.org",

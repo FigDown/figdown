@@ -1,0 +1,122 @@
+{
+  "header": {
+    "version": "0.2",
+    "genre": "flowchart"
+  },
+  "title": "Flowline is the connector",
+  "flow": "down",
+  "classes": [
+    {
+      "id": "fail",
+      "meaning": "Failure path",
+      "stroke": "#dc2626",
+      "line": 7
+    }
+  ],
+  "planes": [
+    {
+      "id": "base",
+      "z": 0
+    }
+  ],
+  "nodes": [
+    {
+      "id": "start",
+      "label": "Request received",
+      "role": "terminator",
+      "shape": "rounded",
+      "plane": "base",
+      "line": 8
+    },
+    {
+      "id": "valid",
+      "label": "Schema valid?",
+      "role": "decision",
+      "shape": "diamond",
+      "plane": "base",
+      "line": 9
+    },
+    {
+      "id": "apply",
+      "label": "Apply change",
+      "role": "process",
+      "shape": "box",
+      "plane": "base",
+      "line": 10
+    },
+    {
+      "id": "store",
+      "label": "Audit store",
+      "shape": "cylinder",
+      "plane": "base",
+      "line": 11
+    },
+    {
+      "id": "done",
+      "label": "Response sent",
+      "role": "terminator",
+      "shape": "rounded",
+      "plane": "base",
+      "line": 12
+    }
+  ],
+  "groups": [],
+  "edges": [
+    {
+      "a": "start",
+      "op": "->",
+      "b": "valid",
+      "plane": "base",
+      "line": 13
+    },
+    {
+      "a": "valid",
+      "op": "->",
+      "b": "apply",
+      "mid": "yes",
+      "plane": "base",
+      "line": 14
+    },
+    {
+      "a": "valid",
+      "op": "->",
+      "b": "store",
+      "mid": "no",
+      "plane": "base",
+      "class": [
+        "fail"
+      ],
+      "line": 15
+    },
+    {
+      "a": "apply",
+      "op": "->",
+      "b": "done",
+      "plane": "base",
+      "line": 16
+    },
+    {
+      "a": "store",
+      "op": "--",
+      "b": "done",
+      "tail": "copy",
+      "head": "kept",
+      "plane": "base",
+      "style": "dotted",
+      "line": 17
+    },
+    {
+      "a": "apply",
+      "op": "<->",
+      "b": "store",
+      "plane": "base",
+      "line": 18
+    }
+  ],
+  "ranks": [],
+  "pins": [],
+  "thresholds": [],
+  "bands": [],
+  "bundles": [],
+  "regions": []
+}

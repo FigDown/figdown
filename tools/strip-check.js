@@ -46,7 +46,7 @@
 // assertion: this figure carries no knowledge that must survive the strip test.
 // It was spelled `# r25: decorative` until this release, which dropped the
 // internal-code prefix: it is the one place the standard asked an author to
-// type a project item code into their own document (MIGRATIONS).
+// type a project item code into their own document (MIGRATIONS 0.1).
 //
 // Usage:
 //   node tools/strip-check.js [--strict] [<file.fd | dir> ...]

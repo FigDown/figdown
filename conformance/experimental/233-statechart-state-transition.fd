@@ -1,0 +1,14 @@
+# `GENRE-NODE-SPELLING`: `state` and `transition` are the statechart vocabulary.
+# `state` is `node` renamed for this genre — same option keys, same id space,
+# same `shape=box` default, `role` still absent (a statechart has exactly one
+# kind of node, so there is no role to state). `transition` is the connector.
+figdown 0.2 statechart
+title "Turnstile"
+class mode "A mode of the mechanism" fill=#e0e7ff
+state locked "LOCKED" class=mode
+state unlocked "UNLOCKED" class=mode
+transition locked -[coin]-> unlocked
+transition unlocked -[push]-> locked
+transition locked -[push]-> locked
+rank locked,unlocked
+flow right

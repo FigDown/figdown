@@ -1,0 +1,5 @@
+# engine-backlog 29: `title` has taken a QUOTED string since
+# 0.1, and a document transcribed before that does not build at all.
+figdown 0.1 block
+title Figure 5-3 VP-based SH Group Filtering   # a trailing comment survives
+node a "A"

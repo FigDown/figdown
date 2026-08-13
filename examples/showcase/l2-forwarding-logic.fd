@@ -1,6 +1,6 @@
 # FigDown — figures as text. Spec: https://github.com/FigDown/figdown
 
-figdown 0.1 flowchart
+figdown 0.2 flowchart
 # The classic learning-bridge / L2 switch forwarding decision (IEEE 802.1D).
 # A frame arrives; the switch learns the source, looks up the destination,
 # and takes one of three actions. The LOGIC is machine-readable: a reader
@@ -32,12 +32,12 @@ terminator flt "Filter (drop):\nsame-port destination"        class=filter
 # top-to-bottom reading order for the decision process.
 flow down
 
-edge wire   -> learn
-edge learn  -> lookup
-edge lookup -> hit
+flowline wire   -> learn
+flowline learn  -> lookup
+flowline lookup -> hit
 # Miss (unknown unicast, or broadcast/multicast) -> flood.
-edge hit  -[no]->  fld
-edge hit  -[yes]-> same
+flowline hit  -[no]->  fld
+flowline hit  -[yes]-> same
 # Hit, but destination is behind the ingress port -> filter; else forward.
-edge same -[yes]-> flt
-edge same -[no]->  fwd
+flowline same -[yes]-> flt
+flowline same -[no]->  fwd

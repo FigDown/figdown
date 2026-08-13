@@ -1,1 +1,1 @@
-Line 5: wrap has been renamed: use break (in CSS and typography `wrap` is AUTOMATIC reflow — a mode — while this directive is an EXPLICIT row break, an event; CSS Fragmentation calls it "a forced break … explicitly indicated by the … author", HTML spells it `br`) (MIGRATIONS)
+Line 5: wrap has been renamed: use break (in CSS and typography `wrap` is AUTOMATIC reflow — a mode — while this directive is an EXPLICIT row break, an event; CSS Fragmentation calls it "a forced break … explicitly indicated by the … author", HTML spells it `br`) (MIGRATIONS 0.1)

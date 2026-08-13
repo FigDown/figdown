@@ -1,2 +1,2 @@
-  L2  [color-text-both] this file writes BOTH color= and text=, which no version of the language accepts — classify it by hand before migrating (MIGRATIONS)
-  L3  [color-text-both] this file writes BOTH color= and text=, which no version of the language accepts — classify it by hand before migrating (MIGRATIONS)
+  L2  [color-text-both] this file writes BOTH color= and text=, which no version of the language accepts — classify it by hand before migrating (MIGRATIONS 0.1)
+  L3  [color-text-both] this file writes BOTH color= and text=, which no version of the language accepts — classify it by hand before migrating (MIGRATIONS 0.1)

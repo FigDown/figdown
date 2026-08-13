@@ -4,10 +4,10 @@
 # figure would catch. The model therefore OMITS `role` on `store` and `hint`,
 # and a reading agent can tell "the author said nothing" from "the author said
 # process" — which is the distinction the whole vocabulary buys.
-figdown 0.1 flowchart
+figdown 0.2 flowchart
 process step "Write the record"
 node    store "Journal" shape=cylinder
 node    hint
 flow down
-edge step -> store
-edge store -> hint
+flowline step -> store
+flowline store -> hint

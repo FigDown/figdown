@@ -2,6 +2,39 @@
 // layout-lint.js — render-quality linter for FigDown figures
 // Loads the FigDown engine the same way build-svg.js does, renders each .fd in
 // memory, extracts geometry from the SVG, and reports layout defects.
+//
+// IT RECURSES, AND IT ALWAYS STATES ITS COVERAGE.
+// Until 0.2.0 it did neither. `collectFd` was a single non-recursive
+// `readdirSync`, and the default search paths were the hard-coded list
+// `examples/`, `examples/patterns/`, `figures/` — so `examples/statechart/`,
+// `examples/showcase/`, `examples/reference/` and `examples/layout-compare/`
+// were never opened by this gate at all. Twenty-two files were tabled out of
+// fifty-five that exist, and the run reported "0 skips" because it had never
+// counted the thirty-three it could not see. Separately, fifteen of the
+// twenty-two it DID open were dropped on a bare `continue` when nodeCount and
+// edgeCount were both zero, and the parse/render error counters printed only
+// when non-zero — so a figure the tool could not read produced output
+// byte-identical to a figure with no defects.
+//
+// The rule this file now follows (.github/CONTRIBUTING.md §3.1(d), and the same rule
+// artifact-check.js states in its own header): a gate that does not recurse is
+// a gate that lies, and a gate that skips silently is a gate that reports
+// success for work it never did. Every run therefore prints a coverage line —
+// considered / scored / skipped, broken down by reason — WHETHER OR NOT ANY
+// COUNT IS NON-ZERO, and prints which roots were searched and which were
+// deliberately not.
+//
+// Usage:
+//   node tools/layout-lint.js [--strict] [--verbose] [--max-score=N] [<file.fd | dir> ...]
+//
+//   default paths: examples/  figures/  (recursive, resolved from the project
+//                  root, independent of CWD)
+//   --strict       exit 1 if any figure could not be SCORED for a reason that
+//                  means "the tool could not read it" (see STRICT_SKIPS)
+//   --verbose      name every skipped file, not just the counts
+//   --max-score=N  exit 1 if any scored figure exceeds N
+//
+// Exit codes: 0 clean · 1 over --max-score, or unscored under --strict · 2 tool error.
 'use strict';
 
 const fs   = require('fs');
@@ -24,8 +57,12 @@ function loadEngine(enginePath) {
   const end   = h.indexOf('// 3. UI');
   if (start < 0 || end < 0)
     throw new Error('Cannot locate engine boundaries in ' + enginePath);
+  // FIGDOWN_VERSION is reported so a run says WHICH engine judged the figures.
+  // The engine exists in four copies (PROCESS §3.1(a)); this tool reads the
+  // one hand-edited copy, `editor/figdown.html`, and never a generated one.
   // eslint-disable-next-line no-new-func
-  const factory = new Function(h.slice(start, end) + '\nreturn {parse, render};');
+  const factory = new Function(
+    h.slice(start, end) + '\nreturn {parse, render, FIGDOWN_VERSION};');
   return factory();
 }
 
@@ -456,7 +493,7 @@ function renderWithRetry(engine, src, fdPath) {
     const { doc, errs } = engine.parse(src);
     if (errs.length) return { ok: false, errs };
     const result = engine.render(doc);
-    return { ok: true, svg: result.svg };
+    return { ok: true, svg: result.svg, doc };
   }
   try {
     return attempt();
@@ -491,21 +528,86 @@ function analyzeSvg(svgText) {
 
 // ── File collection ───────────────────────────────────────────────────────────
 
-function collectFd(arg) {
+// Directory names never descended into, whatever root is given. Each one is
+// named with its reason so the exclusion is VISIBLE in the run header rather
+// than implied by a file simply not appearing in the table.
+const PRUNED_DIRS = {
+  'node_modules': 'third-party packages',
+  '.git':         'version-control internals',
+};
+
+// Roots this gate deliberately does not judge by default. Printed on every run
+// so "absent from the table" is never the only evidence of an exclusion.
+const NOT_JUDGED = [
+  ['conformance/',          'error-model fixtures — most are INVALID on purpose'],
+  ['tools/migrate-fixtures/', 'migration fixtures — inputs are pre-migration by design'],
+  ['archive/', 'frozen releases'],
+  ['read/',    'frozen releases'],
+];
+
+// collectFd RECURSES. See the file header for what the non-recursive version
+// cost. `skips` accumulates {file, reason} for anything named but not usable.
+function collectFd(arg, skips) {
   const resolved = path.resolve(arg); // resolve relative to CWD
   if (!fs.existsSync(resolved)) {
-    console.error('warning: path not found: ' + arg);
+    skips.push({ file: arg, reason: 'not-found' });
     return [];
   }
-  const st = fs.statSync(resolved);
-  if (st.isDirectory()) {
-    return fs.readdirSync(resolved)
-      .filter(f => f.endsWith('.fd'))
-      .sort()
-      .map(f => path.join(resolved, f));
+  if (!fs.statSync(resolved).isDirectory()) {
+    // An explicitly named file. It must actually BE a .fd: handing this tool
+    // an `.svg` used to feed SVG markup straight to the FigDown parser, which
+    // answered with a genuine-looking parse error about line 1 of a file that
+    // was never FigDown source. The tool's own input is checked here instead.
+    if (!resolved.endsWith('.fd')) {
+      skips.push({ file: arg, reason: 'not-a-fd-file' });
+      return [];
+    }
+    return [resolved];
   }
-  return [resolved];
+  const out = [];
+  (function walk(dir) {
+    for (const e of fs.readdirSync(dir, { withFileTypes: true })
+                      .sort((a, b) => a.name.localeCompare(b.name))) {
+      const p = path.join(dir, e.name);
+      if (e.isDirectory()) {
+        if (Object.prototype.hasOwnProperty.call(PRUNED_DIRS, e.name)) continue;
+        walk(p);
+      } else if (e.name.endsWith('.fd')) {
+        out.push(p);
+      }
+    }
+  })(resolved);
+  return out;
 }
+
+// ── Skip taxonomy ─────────────────────────────────────────────────────────────
+// Every reason a `.fd` can be considered and not scored. The coverage line
+// prints ALL of these on every run, zero or not — a reason that appears only
+// when non-zero is a reason nobody knows the tool has.
+const SKIP_REASONS = [
+  ['parse-error',            'the engine rejected the source'],
+  ['render-error',           'render() threw'],
+  ['geometry-error',         'the SVG reader failed on the output'],
+  ['no-scene-in-scene-genre','scene genre rendered 0 nodes and 0 edges'],
+  ['unreadable',             'file could not be read'],
+  ['not-a-fd-file',          'named on the command line but not a .fd'],
+  ['not-found',              'path does not exist'],
+  ['no-scene-genre',         'bitfield/table/timing/chart — nothing to measure'],
+];
+
+// Reasons that mean "the tool could not read this figure". These fail --strict:
+// an unscored figure is otherwise indistinguishable from a clean one. The one
+// reason NOT in this set is `no-scene-genre`, which is a correct answer rather
+// than a failure to answer — a bitfield has no edges to cross. It is still
+// counted and named on every run, so it is no longer silent either.
+const STRICT_SKIPS = new Set([
+  'parse-error', 'render-error', 'geometry-error',
+  'no-scene-in-scene-genre', 'unreadable', 'not-a-fd-file', 'not-found',
+]);
+
+// Genres whose figures HAVE scene geometry (engine: GENRE_NODE_KW plus
+// statechart). Used only to classify an empty render.
+const SCENE_GENRES = new Set(['block', 'topology', 'flowchart', 'statechart']);
 
 // ── Formatting helpers ────────────────────────────────────────────────────────
 
@@ -529,22 +631,27 @@ function main() {
 
   // Parse flags
   let maxScore = Infinity;
+  let strict = false, verbose = false;
   const inputs = [];
   for (const a of argv) {
     const ms = a.match(/^--max-score=(\d+)$/);
     if (ms) { maxScore = parseInt(ms[1], 10); continue; }
+    if (a === '--strict')  { strict  = true; continue; }
+    if (a === '--verbose') { verbose = true; continue; }
     if (a.startsWith('--')) { console.error('unknown flag: ' + a); process.exit(2); }
     inputs.push(a);
   }
 
   // Default search paths when none given — resolved relative to the project
   // root (one level up from this script) so the tool works from any CWD.
+  // Both are walked RECURSIVELY; `examples/patterns` no longer needs naming
+  // because it is reached by the walk, and so are the four sibling directories
+  // the old hard-coded list silently omitted.
   const projectRoot = path.join(__dirname, '..');
   const searchPaths = inputs.length
     ? inputs
     : [
         path.join(projectRoot, 'examples'),
-        path.join(projectRoot, 'examples', 'patterns'),
         path.join(projectRoot, 'figures'),
       ];
 
@@ -563,50 +670,67 @@ function main() {
   }
 
   // Collect all .fd files
+  const skips = [];                   // {file, reason, detail}
   const files = [];
   for (const sp of searchPaths) {
-    for (const f of collectFd(sp)) {
+    for (const f of collectFd(sp, skips)) {
       if (!files.includes(f)) files.push(f);
     }
   }
 
-  if (!files.length) {
-    console.error('No .fd files found in the given paths.');
-    process.exit(0);
+  const collectSkipCount = skips.length;   // not-found / not-a-fd-file, from the walk
+
+  console.log('layout-lint  engine=' + path.relative(projectRoot, enginePath)
+              + ' (' + (engine.FIGDOWN_VERSION || 'unknown') + ')'
+              + '  files=' + files.length);
+  console.log('  ' + (inputs.length ? 'given:              ' : 'searched (recursive):') + ' '
+              + searchPaths.map(p => path.relative(projectRoot, p) || '.').join('  '));
+  if (!inputs.length) {
+    console.log('  not judged by default, by design:');
+    for (const [root, why] of NOT_JUDGED)
+      console.log('    ' + pad(root, 26) + why);
   }
+  console.log('');
 
   const rows = [];
-  let parseErrors = 0, renderErrors = 0;
 
   for (const fdPath of files) {
+    const rel = path.relative(process.cwd(), fdPath);
     let src;
     try { src = fs.readFileSync(fdPath, 'utf8'); }
-    catch (e) { console.error('Cannot read ' + fdPath + ': ' + e.message); continue; }
+    catch (e) { skips.push({ file: rel, reason: 'unreadable', detail: e.message }); continue; }
 
     const result = renderWithRetry(engine, src, fdPath);
     if (!result.ok) {
-      if (result.errs[0] && result.errs[0].startsWith('render threw:')) renderErrors++;
-      else parseErrors++;
-      console.error('skip ' + path.relative(process.cwd(), fdPath) + ': ' + result.errs[0]);
+      const detail = result.errs[0];
+      const reason = (detail && detail.startsWith('render threw:'))
+        ? 'render-error' : 'parse-error';
+      skips.push({ file: rel, reason, detail });
       continue;
     }
 
     let metrics;
     try { metrics = analyzeSvg(result.svg); }
     catch (e) {
-      console.error('geometry error on ' + fdPath + ': ' + e.message);
+      skips.push({ file: rel, reason: 'geometry-error', detail: e.message });
       continue;
     }
 
-    if (metrics.nodeCount === 0 && metrics.edgeCount === 0) continue; // skip silently
+    if (metrics.nodeCount === 0 && metrics.edgeCount === 0) {
+      // No scene geometry. For bitfield/table/timing/chart that is the CORRECT
+      // outcome — those genres have no nodes or edges to measure — so it is
+      // reported and not failed. For a scene genre it means the tool rendered
+      // the figure and found nothing, which is a defect and IS failed.
+      const genre = (result.doc && result.doc.genre) || 'unknown';
+      skips.push({
+        file: rel,
+        reason: SCENE_GENRES.has(genre) ? 'no-scene-in-scene-genre' : 'no-scene-genre',
+        detail: 'genre=' + genre,
+      });
+      continue;
+    }
 
-    const rel = path.relative(process.cwd(), fdPath);
     rows.push({ file: rel, ...metrics, score: score(metrics) });
-  }
-
-  if (!rows.length) {
-    console.log('No scene figures found (all skipped).');
-    process.exit(0);
   }
 
   // Sort worst-first by weighted score.
@@ -614,7 +738,7 @@ function main() {
 
   // Print aligned table.
   const COL = {
-    file:       30,
+    file:       50,   // paths are now up to `examples/reference/experimental/…`
     nodes:       5,
     edges:       5,
     cross:       5,
@@ -643,6 +767,7 @@ function main() {
   console.log(sep);
   console.log(header);
   console.log(sep);
+  if (!rows.length) console.log('(no figure was scored)');
 
   let anyFail = false;
   for (const r of rows) {
@@ -664,8 +789,46 @@ function main() {
   }
 
   console.log(sep);
-  if (parseErrors)  console.log('parse errors (skipped): ' + parseErrors);
-  if (renderErrors) console.log('render errors (skipped): ' + renderErrors);
+
+  // ── COVERAGE. Printed on EVERY run, every reason, zero or not. ─────────────
+  // The old tail printed error counts only when non-zero and dropped empty
+  // renders on a bare `continue`, so "clean" and "I could not read any of
+  // them" were the same output. They are now different by construction.
+  const byReason = new Map(SKIP_REASONS.map(([r]) => [r, []]));
+  for (const s of skips) {
+    if (!byReason.has(s.reason)) byReason.set(s.reason, []);
+    byReason.get(s.reason).push(s);
+  }
+  // "considered" = every path this run looked at: the .fd files the walk found,
+  // plus the paths named on the command line that could not become one.
+  const considered = files.length + collectSkipCount;
+
+  console.log('considered ' + considered
+            + '  scored ' + rows.length
+            + '  skipped ' + skips.length);
+  for (const [reason, why] of SKIP_REASONS) {
+    const hits = byReason.get(reason) || [];
+    console.log('  ' + pad(reason, 26) + lpad(hits.length, 3)
+              + '   ' + why + (STRICT_SKIPS.has(reason) ? '  [fails --strict]' : ''));
+    if (hits.length && (verbose || STRICT_SKIPS.has(reason))) {
+      for (const h of hits)
+        console.log('      ' + h.file + (h.detail ? ' — ' + h.detail : ''));
+    }
+  }
+
+  const unread = skips.filter(s => STRICT_SKIPS.has(s.reason));
+  if (unread.length) {
+    console.log('');
+    console.log((strict ? 'FAIL' : 'WARN') + '  ' + unread.length
+              + ' figure(s) were considered and NOT scored for a reason that means'
+              + ' the tool could not read them.');
+    if (!strict) console.log('      (run with --strict to make this an exit-1 failure)');
+    if (strict) anyFail = true;
+  } else {
+    console.log('');
+    console.log('OK  every figure the gate judges was either scored or is a'
+              + ' non-scene genre with nothing to measure');
+  }
 
   process.exit(anyFail ? 1 : 0);
 }

@@ -1,7 +1,10 @@
 # FigDown — figures as text. Spec: https://github.com/FigDown/figdown
 
 # DHCP client finite-state machine (RFC 2131 §4.4, simplified).
-# Interim: block. Planned: statechart genre.
+# Genre: statechart — EXPERIMENTAL, and it needs `figdown 0.2` (`STATECHART-GENRE-SCOPE`). The two
+# companion TABLE sections below stay `figdown 0.1`: the version a section
+# declares is the surface that section needs, and a table needs nothing from
+# 0.2. Sections are separate documents (`MULTI-FIGURE-DOCUMENTS`), so the versions may differ.
 #
 # MULTI-LINE guide/authoring.md DEMO:
 #   1) node labels:  "NAME\nshort role"     → wraps on canvas
@@ -11,7 +14,7 @@
 #
 # Why some paths used to look "unlabeled": SVG only shows mid labels, not
 # # comments. Every edge mid is now two lines: reason + action/outcome.
-figdown 0.1 block
+figdown 0.2 statechart
 title "DHCP client statechart (RFC 2131)\nmulti-line authoring sample"
 
 class mode "DHCP client protocol state" fill=#e0e7ff
@@ -20,36 +23,36 @@ class mode "DHCP client protocol state" fill=#e0e7ff
 # STATES — multi-line canvas label + multi-line # narrative
 # ═══════════════════════════════════════════════════════════════════
 
-node init "INIT\nno lease" class=mode
+state init "INIT\nno lease" class=mode
 # No usable IPv4 lease on the interface.
 # Next step is usually broadcast DISCOVER, unless a stored lease
 # steers the client into INIT-REBOOT instead.
 
-node selecting "SELECTING\ncollect OFFERs" class=mode
+state selecting "SELECTING\ncollect OFFERs" class=mode
 # One or more DHCPOFFER frames have arrived.
 # Client has not yet committed to a server / address.
 
-node requesting "REQUESTING\nawait ACK/NAK" class=mode
+state requesting "REQUESTING\nawait ACK/NAK" class=mode
 # DHCPREQUEST outstanding (selecting an OFFER, or confirming
 # a remembered address on the reboot path).
 
-node bound "BOUND\nlease active" class=mode
+state bound "BOUND\nlease active" class=mode
 # Address in use (yiaddr / assigned).
 # T1 and T2 timers run; data plane may use the lease.
 
-node renewing "RENEWING\nT1 unicast" class=mode
+state renewing "RENEWING\nT1 unicast" class=mode
 # T1 fired. Client unicasts DHCPREQUEST to the server
 # that granted the current lease.
 
-node rebinding "REBINDING\nT2 broadcast" class=mode
+state rebinding "REBINDING\nT2 broadcast" class=mode
 # T2 fired (or renew path gave up). Client broadcasts
 # DHCPREQUEST so any server may extend the lease.
 
-node init_reboot "INIT-REBOOT\nstored lease" class=mode
+state init_reboot "INIT-REBOOT\nstored lease" class=mode
 # Power-on (or restart) with a previously allocated address
 # still believed valid; confirm before using it.
 
-node rebooting "REBOOTING\nconfirm lease" class=mode
+state rebooting "REBOOTING\nconfirm lease" class=mode
 # Confirmation REQUEST in flight for the remembered address.
 
 # ═══════════════════════════════════════════════════════════════════
@@ -58,68 +61,68 @@ node rebooting "REBOOTING\nconfirm lease" class=mode
 # ═══════════════════════════════════════════════════════════════════
 
 # --- acquire ---
-edge init -["need address\nsnd DISCOVER"]-> selecting
+transition init -["need address\nsnd DISCOVER"]-> selecting
 # trigger: begin acquire (no stored lease, or policy chooses discover)
 # effect:  broadcast DHCPDISCOVER; start collecting DHCPOFFER
 
-edge selecting -["offer chosen\nsnd REQUEST"]-> requesting
+transition selecting -["offer chosen\nsnd REQUEST"]-> requesting
 # trigger: client picks one OFFER
 # effect:  broadcast DHCPREQUEST with server-id + requested-ip
 
-edge requesting -["server grants\nACK → use IP"]-> bound
+transition requesting -["server grants\nACK → use IP"]-> bound
 # trigger: DHCPACK
 # effect:  install address; arm T1/T2; interface up for that lease
 
-edge requesting -["REQUEST failed\nNAK/timeout → INIT"]-> init
+transition requesting -["REQUEST failed\nNAK/timeout → INIT"]-> init
 # trigger: DHCPNAK, or retries exhausted
 # effect:  discard candidate; return to INIT
 # note:    individual REQUEST retransmits are collapsed (not drawn)
 
 # --- renew / rebind ---
-edge bound -["T1: renew time\nunicast REQUEST"]-> renewing
+transition bound -["T1: renew time\nunicast REQUEST"]-> renewing
 # trigger: T1 (renewal time)
 # effect:  unicast DHCPREQUEST to binding server
 
-edge renewing -["lease extended\nACK → BOUND"]-> bound
+transition renewing -["lease extended\nACK → BOUND"]-> bound
 # trigger: DHCPACK from binding server
 # effect:  refresh lease timers; stay configured
 
-edge renewing -["server refuses\nNAK → drop IP"]-> init
+transition renewing -["server refuses\nNAK → drop IP"]-> init
 # trigger: DHCPNAK
 # effect:  stop using address; rediscover
 
-edge renewing -["T2: rebind time\nbcast REQUEST"]-> rebinding
+transition renewing -["T2: rebind time\nbcast REQUEST"]-> rebinding
 # trigger: T2 (rebinding time) while still unacked
 # effect:  broaden REQUEST to broadcast
 
-edge rebinding -["any server OK\nACK → BOUND"]-> bound
+transition rebinding -["any server OK\nACK → BOUND"]-> bound
 # trigger: DHCPACK from any willing server
 # effect:  new binding parameters; back to BOUND
 
-edge rebinding -["no lease left\nNAK / expiry"]-> init
+transition rebinding -["no lease left\nNAK / expiry"]-> init
 # trigger: DHCPNAK, or lease lifetime ends
 # effect:  must not use address; INIT
 
 # --- reboot path ---
-edge init -["remembered lease\n→ confirm path"]-> init_reboot
+transition init -["remembered lease\n→ confirm path"]-> init_reboot
 # trigger: non-volatile lease remembered across restart
 # else:    remain INIT and take DISCOVER path
 
-edge init_reboot -["confirm stored lease\nsnd REQUEST (bcast)"]-> rebooting
+transition init_reboot -["confirm stored lease\nsnd REQUEST (bcast)"]-> rebooting
 # trigger: start confirmation of remembered address
 # effect:  broadcast DHCPREQUEST for that address
 # (this is the INIT-REBOOT → REBOOTING arc — pinned on its own row below)
 
-edge rebooting -["lease confirmed\nACK → BOUND"]-> bound
+transition rebooting -["lease confirmed\nACK → BOUND"]-> bound
 # trigger: server confirms stored address
 # effect:  configure interface; arm timers (same as acquire ACK)
 
-edge rebooting -["cannot confirm\nNAK/timeout → INIT"]-> init
+transition rebooting -["cannot confirm\nNAK/timeout → INIT"]-> init
 # trigger: refusal or no answer
 # effect:  forget stored lease; full rediscover
 
 # --- release / loss ---
-edge bound -["give up / lost lease\nRELEASE → INIT"]-> init
+transition bound -["give up / lost lease\nRELEASE → INIT"]-> init
 # trigger: DHCPRELEASE, or lease lost without renew
 # effect:  optional DHCPRELEASE; clear configuration
 

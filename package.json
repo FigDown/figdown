@@ -1,6 +1,6 @@
 {
   "name": "figdown",
-  "version": "0.1.8",
+  "version": "0.2.0",
   "description": "Figures as text — one source, two readers: a closed, deterministic figure language for Markdown, readable by AI agents and humans alike",
   "license": "MIT",
   "author": "FigDown <hello@figdown.org>",
@@ -32,7 +32,7 @@
     "gate:page": "node tools/page-check.js",
     "gate:shape": "node tools/shape-check.js --strict",
     "gate:strip": "node tools/strip-check.js --strict",
-    "gate:layout": "node tools/layout-lint.js",
+    "gate:layout": "node tools/layout-lint.js --strict",
     "gate:artifact": "node tools/artifact-check.js --strict",
     "gate:dist": "node tools/dist-check.js --strict",
     "gate:isolation": "node tools/isolation-check.js --strict",

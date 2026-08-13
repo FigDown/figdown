@@ -1,5 +1,5 @@
-Line 10: band needs a quoted "<label>" first: band "<name>" <a>..<b>% in=<node-or-group-id> (a band with no label asserts nothing a reader may keep — fill= is presentation, and §5 forbids meaning riding on colour alone) (MIGRATIONS)
-Line 12: the hyphen range "15-35%" is no longer the spelling: write band "R" 15..35% in=… — FigDown has ONE range grammar, "..", and a hyphen between two numbers reads as subtraction (MIGRATIONS)
+Line 10: band needs a quoted "<label>" first: band "<name>" <a>..<b>% in=<node-or-group-id> (a band with no label asserts nothing a reader may keep — fill= is presentation, and §5 forbids meaning riding on colour alone) (MIGRATIONS 0.1)
+Line 12: the hyphen range "15-35%" is no longer the spelling: write band "R" 15..35% in=… — FigDown has ONE range grammar, "..", and a hyphen between two numbers reads as subtraction (MIGRATIONS 0.1)
 Line 3: band range needs 0 <= from < to <= 100
 Line 4: from=/to= retired — write the range positionally: band "<label>" 15% or band "<label>" 15..35%
 Line 5: band needs in=<node-or-group-id>

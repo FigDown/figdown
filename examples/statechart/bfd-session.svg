@@ -1,0 +1,271 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1245 915" width="1245" height="915" font-family="system-ui,sans-serif"><g transform="translate(0,0)"><defs><marker id="s0_arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#555"/></marker><pattern id="s0_hatch" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><line x1="0" y1="0" x2="0" y2="6" stroke="#bbb" stroke-width="2"/></pattern></defs><g transform="translate(18,6)"><line data-edge="145" x1="123.84722222222223" y1="72" x2="78.31944444444443" y2="116" stroke="#16a34a" stroke-width="1.6"/><path data-edge="149" d="M150.57398164084913 72 L141.65616579916914 212" fill="none" stroke="#16a34a" stroke-width="1.6"/><line data-edge="153" x1="75.4079861111111" y1="168" x2="116.00868055555556" y2="212" stroke="#16a34a" stroke-width="1.6"/><path data-edge="160" d="M83.417 142 L1020.917 142 Q1030.917 142 1030.917 132 L1030.917 56 Q1030.917 46 1020.917 46 L182.75 46" fill="none" stroke="#dc2626" stroke-width="1.6"/><path data-edge="167" d="M172 238 L483.917 238 Q493.917 238 493.917 228 L493.917 56 Q493.917 46 483.917 46 L182.75 46" fill="none" stroke="#dc2626" stroke-width="1.6"/><path data-edge="175" d="M182.01190476190476 72 L177.29047619047617 308" fill="none" stroke="#9333ea" stroke-width="1.6" stroke-dasharray="6 4"/><path data-edge="176" d="M56.67923884634086 168 L119.92164785143491 308" fill="none" stroke="#9333ea" stroke-width="1.6" stroke-dasharray="6 4"/><line data-edge="177" x1="137.74305555555554" y1="264" x2="133.92361111111111" y2="308" stroke="#9333ea" stroke-width="1.6" stroke-dasharray="6 4"/><path data-edge="184" d="M178.067 334 L778.417 334 Q788.417 334 788.417 324 L788.417 56 Q788.417 46 778.417 46 L182.75 46" fill="none" stroke="#9333ea" stroke-width="1.6" stroke-dasharray="6 4"/><path data-edge="190" d="M182.75 38 L196.35 38 Q202.75 38 202.75 44.4 L202.75 47.6 Q202.75 54 196.35 54 L182.75 54" fill="none" stroke="#64748b" stroke-width="1.6" stroke-dasharray="2 4"/><path data-edge="205" d="M83.417 134 L97.017 134 Q103.417 134 103.417 140.4 L103.417 143.6 Q103.417 150 97.017 150 L83.417 150" fill="none" stroke="#64748b" stroke-width="1.6" stroke-dasharray="2 4"/><path data-edge="210" d="M172 230 L185.6 230 Q192 230 192 236.4 L192 239.6 Q192 246 185.6 246 L172 246" fill="none" stroke="#64748b" stroke-width="1.6" stroke-dasharray="2 4"/><path data-edge="215" d="M178.067 326 L191.667 326 Q198.067 326 198.067 332.4 L198.067 335.6 Q198.067 342 191.667 342 L178.067 342" fill="none" stroke="#64748b" stroke-width="1.6" stroke-dasharray="2 4"/><g data-node="down" data-x="118.75" data-y="20" style="cursor:move"><rect x="118.75" y="20" width="64" height="52" rx="14" fill="#eef2ff" stroke="#8a8880" stroke-width="1.8"/><text x="150.75" y="42.099999999999994" font-size="13" text-anchor="middle" fill="#1d1d1b"><tspan x="150.75" dy="0">DOWN</tspan><tspan x="150.75" dy="16.900000000000002">Sta=1</tspan></text></g><g data-node="init" data-x="19.416666666666657" data-y="116" style="cursor:move"><rect x="19.416666666666657" y="116" width="64" height="52" rx="14" fill="#eef2ff" stroke="#8a8880" stroke-width="1.8"/><text x="51.41666666666666" y="138.10000000000002" font-size="13" text-anchor="middle" fill="#1d1d1b"><tspan x="51.41666666666666" dy="0">INIT</tspan><tspan x="51.41666666666666" dy="16.900000000000002">Sta=2</tspan></text></g><g data-node="up" data-x="108" data-y="212" style="cursor:move"><rect x="108" y="212" width="64" height="52" rx="14" fill="#eef2ff" stroke="#8a8880" stroke-width="1.8"/><text x="140" y="234.10000000000002" font-size="13" text-anchor="middle" fill="#1d1d1b"><tspan x="140" dy="0">UP</tspan><tspan x="140" dy="16.900000000000002">Sta=3</tspan></text></g><g data-node="admindown" data-x="85.26666666666667" data-y="308" style="cursor:move"><rect x="85.26666666666667" y="308" width="92.8" height="52" rx="14" fill="#eef2ff" stroke="#8a8880" stroke-width="1.8"/><text x="131.66666666666666" y="330.1" font-size="13" text-anchor="middle" fill="#1d1d1b"><tspan x="131.66666666666666" dy="0">ADMINDOWN</tspan><tspan x="131.66666666666666" dy="16.900000000000002">Sta=0</tspan></text></g><text x="101.08333333333333" y="88.25" font-size="11" text-anchor="middle" fill="#fff" stroke="#fff" stroke-width="3" stroke-linejoin="round">rx Down</text><text x="101.08333333333333" y="88.25" font-size="11" text-anchor="middle" fill="#16a34a">rx Down</text><path d="M78.31944444444443 116 L81.6759994942202 104.9682305046822 L89.4593155516713 113.02180059190587 z" fill="#16a34a" stroke="none"/><text x="95.68521162101072" y="128.5" font-size="11" text-anchor="start" fill="#fff" stroke="#fff" stroke-width="3" stroke-linejoin="round">rx Init</text><text x="95.68521162101072" y="128.5" font-size="11" text-anchor="start" fill="#16a34a">rx Init</text><path d="M141.65616579916914 212 L136.7082764638849 201.58439674690993 L147.88562325202 202.29637903444694 z" fill="#16a34a" stroke="none"/><text x="3.5804166666666646" y="198.57999999999998" font-size="11" text-anchor="start" fill="#fff" stroke="#fff" stroke-width="3" stroke-linejoin="round">rx Init, rx Up</text><text x="3.5804166666666646" y="198.57999999999998" font-size="11" text-anchor="start" fill="#16a34a">rx Init, rx Up</text><path d="M116.00868055555556 212 L105.05736860129375 208.38957530469858 L113.2885367172392 200.79432208659958 z" fill="#16a34a" stroke="none"/><text x="1124.6666666666667" y="90.14999999999999" font-size="11" text-anchor="middle" fill="#fff" stroke="#fff" stroke-width="3" stroke-linejoin="round"><tspan x="1124.6666666666667" dy="0">rx AdminDown</tspan><tspan x="1124.6666666666667" dy="14.3">Detect expired, Echo failed</tspan></text><text x="1124.6666666666667" y="90.14999999999999" font-size="11" text-anchor="middle" fill="#dc2626"><tspan x="1124.6666666666667" dy="0">rx AdminDown</tspan><tspan x="1124.6666666666667" dy="14.3">Detect expired, Echo failed</tspan></text><path d="M182.75 46 L192.83 40.4 L192.83 51.6 z" fill="#dc2626" stroke="none"/><text x="587.6666666666667" y="161.19" font-size="11" text-anchor="middle" fill="#fff" stroke="#fff" stroke-width="3" stroke-linejoin="round"><tspan x="587.6666666666667" dy="0">rx Down, rx AdminDown</tspan><tspan x="587.6666666666667" dy="14.3">Detect expired, Echo failed</tspan></text><text x="587.6666666666667" y="161.19" font-size="11" text-anchor="middle" fill="#dc2626"><tspan x="587.6666666666667" dy="0">rx Down, rx AdminDown</tspan><tspan x="587.6666666666667" dy="14.3">Detect expired, Echo failed</tspan></text><path d="M182.75 46 L192.83 40.4 L192.83 51.6 z" fill="#dc2626" stroke="none"/><text x="185.65119047619046" y="193.29999999999998" font-size="11" text-anchor="start" fill="#fff" stroke="#fff" stroke-width="3" stroke-linejoin="round">admin disable</text><text x="185.65119047619046" y="193.29999999999998" font-size="11" text-anchor="start" fill="#9333ea">admin disable</text><path d="M177.29047619047617 308 L171.89321720468823 297.81000513050515 L183.09097652114045 298.03402809988086 z" fill="#9333ea" stroke="none"/><text x="5.3895324294991696" y="258.1" font-size="11" text-anchor="start" fill="#fff" stroke="#fff" stroke-width="3" stroke-linejoin="round">admin disable</text><text x="5.3895324294991696" y="258.1" font-size="11" text-anchor="start" fill="#9333ea">admin disable</text><path d="M119.92164785143491 308 L110.6685005549036 301.11918136347896 L120.87539717861549 296.50840471383964 z" fill="#9333ea" stroke="none"/><text x="141.83333333333331" y="289.3" font-size="11" text-anchor="start" fill="#fff" stroke="#fff" stroke-width="3" stroke-linejoin="round">admin disable</text><text x="141.83333333333331" y="289.3" font-size="11" text-anchor="start" fill="#9333ea">admin disable</text><path d="M133.92361111111111 308 L129.2163130534511 297.4734742200311 L140.37435289383038 298.4420540672862 z" fill="#9333ea" stroke="none"/><text x="794.4166666666667" y="193.29999999999998" font-size="11" text-anchor="start" fill="#fff" stroke="#fff" stroke-width="3" stroke-linejoin="round">admin enable</text><text x="794.4166666666667" y="193.29999999999998" font-size="11" text-anchor="start" fill="#9333ea">admin enable</text><path d="M182.75 46 L192.83 40.4 L192.83 51.6 z" fill="#9333ea" stroke="none"/><text x="270.5" y="42.15" font-size="11" text-anchor="middle" fill="#fff" stroke="#fff" stroke-width="3" stroke-linejoin="round"><tspan x="270.5" dy="0">rx Up, rx AdminDown</tspan><tspan x="270.5" dy="14.3">Detect expired</tspan></text><text x="270.5" y="42.15" font-size="11" text-anchor="middle" fill="#64748b"><tspan x="270.5" dy="0">rx Up, rx AdminDown</tspan><tspan x="270.5" dy="14.3">Detect expired</tspan></text><path d="M182.75 54 L192.83 48.4 L192.83 59.6 z" fill="#64748b" stroke="none"/><text x="109.41666666666666" y="145.29999999999998" font-size="11" text-anchor="start" fill="#fff" stroke="#fff" stroke-width="3" stroke-linejoin="round">rx Down</text><text x="109.41666666666666" y="145.29999999999998" font-size="11" text-anchor="start" fill="#64748b">rx Down</text><path d="M83.41666666666666 150 L93.49666666666666 144.4 L93.49666666666666 155.6 z" fill="#64748b" stroke="none"/><text x="198" y="241.29999999999998" font-size="11" text-anchor="start" fill="#fff" stroke="#fff" stroke-width="3" stroke-linejoin="round">rx Init, rx Up</text><text x="198" y="241.29999999999998" font-size="11" text-anchor="start" fill="#64748b">rx Init, rx Up</text><path d="M172 246 L182.08 240.4 L182.08 251.6 z" fill="#64748b" stroke="none"/><text x="204.06666666666666" y="337.3" font-size="11" text-anchor="start" fill="#fff" stroke="#fff" stroke-width="3" stroke-linejoin="round">any packet: discarded</text><text x="204.06666666666666" y="337.3" font-size="11" text-anchor="start" fill="#64748b">any packet: discarded</text><path d="M178.06666666666666 342 L188.14666666666668 336.4 L188.14666666666668 347.6 z" fill="#64748b" stroke="none"/><rect x="0" y="381" width="16" height="11" fill="#eef2ff" stroke="#555"/><text x="21" y="390.5" font-size="11" fill="#1d1d1b">A state IS a BFD session state (RFC 5880 §6.2); the local value of bfd.SessionState</text><rect x="0" y="401" width="16" height="11" fill="#fff" stroke="#16a34a"/><text x="21" y="410.5" font-size="11" fill="#1d1d1b">Session-establishment transition — the three-way handshake climbing Down → Init → Up (RFC 5880 §6.8.6)</text><rect x="0" y="421" width="16" height="11" fill="#fff" stroke="#dc2626"/><text x="21" y="430.5" font-size="11" fill="#1d1d1b">Session teardown on failure — peer signalled Down/AdminDown, Detection Time expired, or the Echo function failed (RFC 5880 §6.8.4, §6.8.5, §6.8.6)</text><rect x="0" y="441" width="16" height="11" fill="#fff" stroke="#9333ea" stroke-dasharray="6 4"/><text x="21" y="450.5" font-size="11" fill="#1d1d1b">Administrative control — an operator action from outside BFD, not a received packet (RFC 5880 §6.8.16)</text><rect x="0" y="461" width="16" height="11" fill="#fff" stroke="#64748b" stroke-dasharray="2 4"/><text x="21" y="470.5" font-size="11" fill="#1d1d1b">No state change: the event has a defined outcome and that outcome is to stay put (RFC 5880 §6.8.6)</text></g></g><g transform="translate(0,516)"><defs><marker id="s1_arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#555"/></marker><pattern id="s1_hatch" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><line x1="0" y1="0" x2="0" y2="6" stroke="#bbb" stroke-width="2"/></pattern></defs><g transform="translate(18,6)"><text x="0" y="14" font-size="13" font-weight="600">RFC 5880 §6.8.6 transition function — every (state, event) pair has a defined outcome</text><rect x="0" y="22" width="143.2" height="26" fill="#eeede6" stroke="none" data-cell="transitions:0:1" style="cursor:pointer"/><text x="71.6" y="39.3" font-size="12" text-anchor="middle" font-weight="600">bfd.SessionState</text><rect x="143.2" y="22" width="157.6" height="26" fill="#eeede6" stroke="none" data-cell="transitions:0:2" style="cursor:pointer"/><text x="222" y="39.3" font-size="12" text-anchor="middle" font-weight="600">rx Sta=0 AdminDown</text><rect x="300.79999999999995" y="22" width="121.60000000000001" height="26" fill="#eeede6" stroke="none" data-cell="transitions:0:3" style="cursor:pointer"/><text x="361.59999999999997" y="39.3" font-size="12" text-anchor="middle" font-weight="600">rx Sta=1 Down</text><rect x="422.4" y="22" width="121.60000000000001" height="26" fill="#eeede6" stroke="none" data-cell="transitions:0:4" style="cursor:pointer"/><text x="483.2" y="39.3" font-size="12" text-anchor="middle" font-weight="600">rx Sta=2 Init</text><rect x="544" y="22" width="107.2" height="26" fill="#eeede6" stroke="none" data-cell="transitions:0:5" style="cursor:pointer"/><text x="597.6" y="39.3" font-size="12" text-anchor="middle" font-weight="600">rx Sta=3 Up</text><rect x="651.2" y="22" width="229.6" height="26" fill="#eeede6" stroke="none" data-cell="transitions:0:6" style="cursor:pointer"/><text x="766" y="39.3" font-size="12" text-anchor="middle" font-weight="600">Detect Time expired (§6.8.4)</text><rect x="0" y="48" width="143.2" height="39" fill="#fff" stroke="none" data-cell="transitions:1:1" style="cursor:pointer"/><text x="7" y="71.8" font-size="12" text-anchor="start">DOWN (1)</text><rect x="143.2" y="48" width="157.6" height="39" fill="#fff" stroke="none" data-cell="transitions:1:2" style="cursor:pointer"/><text x="150.2" y="63.7" font-size="12" text-anchor="start" fill="#1d1d1b"><tspan x="150.2" dy="0">stay DOWN</tspan><tspan x="150.2" dy="15.600000000000001">(guarded: no diag)</tspan></text><rect x="300.79999999999995" y="48" width="121.60000000000001" height="39" fill="#fff" stroke="none" data-cell="transitions:1:3" style="cursor:pointer"/><text x="307.79999999999995" y="71.8" font-size="12" text-anchor="start">→ INIT</text><rect x="422.4" y="48" width="121.60000000000001" height="39" fill="#fff" stroke="none" data-cell="transitions:1:4" style="cursor:pointer"/><text x="429.4" y="71.8" font-size="12" text-anchor="start">→ UP</text><rect x="544" y="48" width="107.2" height="39" fill="#fff" stroke="none" data-cell="transitions:1:5" style="cursor:pointer"/><text x="551" y="71.8" font-size="12" text-anchor="start">stay DOWN</text><rect x="651.2" y="48" width="229.6" height="39" fill="#fff" stroke="none" data-cell="transitions:1:6" style="cursor:pointer"/><text x="658.2" y="63.7" font-size="12" text-anchor="start" fill="#1d1d1b"><tspan x="658.2" dy="0">stay DOWN</tspan><tspan x="658.2" dy="15.600000000000001">(timer runs only in Init/Up)</tspan></text><rect x="0" y="87" width="143.2" height="39" fill="#fff" stroke="none" data-cell="transitions:2:1" style="cursor:pointer"/><text x="7" y="110.8" font-size="12" text-anchor="start">INIT (2)</text><rect x="143.2" y="87" width="157.6" height="39" fill="#fff" stroke="none" data-cell="transitions:2:2" style="cursor:pointer"/><text x="150.2" y="102.7" font-size="12" text-anchor="start" fill="#1d1d1b"><tspan x="150.2" dy="0">→ DOWN</tspan><tspan x="150.2" dy="15.600000000000001">diag 3</tspan></text><rect x="300.79999999999995" y="87" width="121.60000000000001" height="39" fill="#fff" stroke="none" data-cell="transitions:2:3" style="cursor:pointer"/><text x="307.79999999999995" y="110.8" font-size="12" text-anchor="start">stay INIT</text><rect x="422.4" y="87" width="121.60000000000001" height="39" fill="#fff" stroke="none" data-cell="transitions:2:4" style="cursor:pointer"/><text x="429.4" y="110.8" font-size="12" text-anchor="start">→ UP</text><rect x="544" y="87" width="107.2" height="39" fill="#fff" stroke="none" data-cell="transitions:2:5" style="cursor:pointer"/><text x="551" y="110.8" font-size="12" text-anchor="start">→ UP</text><rect x="651.2" y="87" width="229.6" height="39" fill="#fff" stroke="none" data-cell="transitions:2:6" style="cursor:pointer"/><text x="658.2" y="102.7" font-size="12" text-anchor="start" fill="#1d1d1b"><tspan x="658.2" dy="0">→ DOWN</tspan><tspan x="658.2" dy="15.600000000000001">diag 1</tspan></text><rect x="0" y="126" width="143.2" height="39" fill="#fff" stroke="none" data-cell="transitions:3:1" style="cursor:pointer"/><text x="7" y="149.8" font-size="12" text-anchor="start">UP (3)</text><rect x="143.2" y="126" width="157.6" height="39" fill="#fff" stroke="none" data-cell="transitions:3:2" style="cursor:pointer"/><text x="150.2" y="141.7" font-size="12" text-anchor="start" fill="#1d1d1b"><tspan x="150.2" dy="0">→ DOWN</tspan><tspan x="150.2" dy="15.600000000000001">diag 3</tspan></text><rect x="300.79999999999995" y="126" width="121.60000000000001" height="39" fill="#fff" stroke="none" data-cell="transitions:3:3" style="cursor:pointer"/><text x="307.79999999999995" y="141.7" font-size="12" text-anchor="start" fill="#1d1d1b"><tspan x="307.79999999999995" dy="0">→ DOWN</tspan><tspan x="307.79999999999995" dy="15.600000000000001">diag 3</tspan></text><rect x="422.4" y="126" width="121.60000000000001" height="39" fill="#fff" stroke="none" data-cell="transitions:3:4" style="cursor:pointer"/><text x="429.4" y="149.8" font-size="12" text-anchor="start">stay UP</text><rect x="544" y="126" width="107.2" height="39" fill="#fff" stroke="none" data-cell="transitions:3:5" style="cursor:pointer"/><text x="551" y="149.8" font-size="12" text-anchor="start">stay UP</text><rect x="651.2" y="126" width="229.6" height="39" fill="#fff" stroke="none" data-cell="transitions:3:6" style="cursor:pointer"/><text x="658.2" y="141.7" font-size="12" text-anchor="start" fill="#1d1d1b"><tspan x="658.2" dy="0">→ DOWN</tspan><tspan x="658.2" dy="15.600000000000001">diag 1</tspan></text><rect x="0" y="165" width="143.2" height="26" fill="#fff" stroke="none" data-cell="transitions:4:1" style="cursor:pointer"/><text x="7" y="182.3" font-size="12" text-anchor="start">ADMINDOWN (0)</text><rect x="143.2" y="165" width="157.6" height="26" fill="#fff" stroke="none" data-cell="transitions:4:2" style="cursor:pointer"/><text x="150.2" y="182.3" font-size="12" text-anchor="start">discard</text><rect x="300.79999999999995" y="165" width="121.60000000000001" height="26" fill="#fff" stroke="none" data-cell="transitions:4:3" style="cursor:pointer"/><text x="307.79999999999995" y="182.3" font-size="12" text-anchor="start">discard</text><rect x="422.4" y="165" width="121.60000000000001" height="26" fill="#fff" stroke="none" data-cell="transitions:4:4" style="cursor:pointer"/><text x="429.4" y="182.3" font-size="12" text-anchor="start">discard</text><rect x="544" y="165" width="107.2" height="26" fill="#fff" stroke="none" data-cell="transitions:4:5" style="cursor:pointer"/><text x="551" y="182.3" font-size="12" text-anchor="start">discard</text><rect x="651.2" y="165" width="229.6" height="26" fill="#fff" stroke="none" data-cell="transitions:4:6" style="cursor:pointer"/><text x="658.2" y="182.3" font-size="12" text-anchor="start">stay ADMINDOWN</text><line x1="0" y1="22" x2="0" y2="191" stroke="#c9c7bf"/><line x1="143.2" y1="22" x2="143.2" y2="191" stroke="#c9c7bf"/><line x1="300.79999999999995" y1="22" x2="300.79999999999995" y2="191" stroke="#c9c7bf"/><line x1="422.4" y1="22" x2="422.4" y2="191" stroke="#c9c7bf"/><line x1="544" y1="22" x2="544" y2="191" stroke="#c9c7bf"/><line x1="651.2" y1="22" x2="651.2" y2="191" stroke="#c9c7bf"/><line x1="880.8000000000001" y1="22" x2="880.8000000000001" y2="191" stroke="#c9c7bf"/><line x1="0" y1="22" x2="880.8000000000001" y2="22" stroke="#c9c7bf"/><line x1="0" y1="48" x2="880.8000000000001" y2="48" stroke="#c9c7bf"/><line x1="0" y1="87" x2="880.8000000000001" y2="87" stroke="#c9c7bf"/><line x1="0" y1="126" x2="880.8000000000001" y2="126" stroke="#c9c7bf"/><line x1="0" y1="165" x2="880.8000000000001" y2="165" stroke="#c9c7bf"/><line x1="0" y1="191" x2="880.8000000000001" y2="191" stroke="#c9c7bf"/></g></g><g transform="translate(0,775)"><defs><marker id="s2_arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#555"/></marker><pattern id="s2_hatch" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><line x1="0" y1="0" x2="0" y2="6" stroke="#bbb" stroke-width="2"/></pattern></defs><g transform="translate(18,6)"><text x="0" y="14" font-size="13" font-weight="600">Administrative control (RFC 5880 §6.8.16) — outside the packet-reception rules</text><rect x="0" y="22" width="136" height="26" fill="#eeede6" stroke="none" data-cell="admin:0:1" style="cursor:pointer"/><text x="68" y="39.3" font-size="12" text-anchor="middle" font-weight="600">Action</text><rect x="136" y="22" width="128.8" height="26" fill="#eeede6" stroke="none" data-cell="admin:0:2" style="cursor:pointer"/><text x="200.4" y="39.3" font-size="12" text-anchor="middle" font-weight="600">From</text><rect x="264.8" y="22" width="92.8" height="26" fill="#eeede6" stroke="none" data-cell="admin:0:3" style="cursor:pointer"/><text x="311.2" y="39.3" font-size="12" text-anchor="middle" font-weight="600">To</text><rect x="357.6" y="22" width="352" height="26" fill="#eeede6" stroke="none" data-cell="admin:0:4" style="cursor:pointer"/><text x="533.6" y="39.3" font-size="12" text-anchor="middle" font-weight="600">Also</text><rect x="0" y="48" width="136" height="26" fill="#fff" stroke="none" data-cell="admin:1:1" style="cursor:pointer"/><text x="7" y="65.3" font-size="12" text-anchor="start">enable session</text><rect x="136" y="48" width="128.8" height="26" fill="#fff" stroke="none" data-cell="admin:1:2" style="cursor:pointer"/><text x="143" y="65.3" font-size="12" text-anchor="start">ADMINDOWN</text><rect x="264.8" y="48" width="92.8" height="26" fill="#fff" stroke="none" data-cell="admin:1:3" style="cursor:pointer"/><text x="271.8" y="65.3" font-size="12" text-anchor="start">DOWN</text><rect x="357.6" y="48" width="352" height="26" fill="#fff" stroke="none" data-cell="admin:1:4" style="cursor:pointer"/><text x="364.6" y="65.3" font-size="12" text-anchor="start">the only exit from ADMINDOWN</text><rect x="0" y="74" width="136" height="26" fill="#fff" stroke="none" data-cell="admin:2:1" style="cursor:pointer"/><text x="7" y="91.3" font-size="12" text-anchor="start">disable session</text><rect x="136" y="74" width="128.8" height="26" fill="#fff" stroke="none" data-cell="admin:2:2" style="cursor:pointer"/><text x="143" y="91.3" font-size="12" text-anchor="start">DOWN, INIT, UP</text><rect x="264.8" y="74" width="92.8" height="26" fill="#fff" stroke="none" data-cell="admin:2:3" style="cursor:pointer"/><text x="271.8" y="91.3" font-size="12" text-anchor="start">ADMINDOWN</text><rect x="357.6" y="74" width="352" height="26" fill="#fff" stroke="none" data-cell="admin:2:4" style="cursor:pointer"/><text x="364.6" y="91.3" font-size="12" text-anchor="start">set LocalDiag; cease sending BFD Echo packets</text><line x1="0" y1="22" x2="0" y2="100" stroke="#c9c7bf"/><line x1="136" y1="22" x2="136" y2="100" stroke="#c9c7bf"/><line x1="264.8" y1="22" x2="264.8" y2="100" stroke="#c9c7bf"/><line x1="357.6" y1="22" x2="357.6" y2="100" stroke="#c9c7bf"/><line x1="709.6" y1="22" x2="709.6" y2="100" stroke="#c9c7bf"/><line x1="0" y1="22" x2="709.6" y2="22" stroke="#c9c7bf"/><line x1="0" y1="48" x2="709.6" y2="48" stroke="#c9c7bf"/><line x1="0" y1="74" x2="709.6" y2="74" stroke="#c9c7bf"/><line x1="0" y1="100" x2="709.6" y2="100" stroke="#c9c7bf"/></g></g><metadata id="figdown-source" data-sha256="148e0cf73eab3d75ce46b72963465b7e172920cdd0ade0584ac9e54f9394bc13" data-engine-version="0.2.0"><![CDATA[
+# FigDown — figures as text. Spec: https://github.com/FigDown/figdown
+
+# Genre: statechart — EXPERIMENTAL, and it needs `figdown 0.2` (`STATECHART-GENRE-SCOPE`). The two
+# companion TABLE sections below stay `figdown 0.1`: the version a section
+# declares is the surface that section needs, and a table needs nothing from
+# 0.2. Sections are separate documents (`MULTI-FIGURE-DOCUMENTS`), so the versions may differ.
+figdown 0.2 statechart
+title "BFD Session State Machine (RFC 5880 §6.2)"
+
+# ── What this figure is ─────────────────────────────────────────────
+# The BFD session state machine transcribed from RFC 5880 (Katz & Ward,
+# June 2010) — from the RFC ITSELF, §6.2's own ASCII diagram plus the
+# normative prose, not from any vendor restatement of it.
+#
+# WHY THAT PROVENANCE IS WORTH A COMMENT. Downstream transcriptions of
+# this machine circulate with THREE states (Down, Init, Up), treating
+# AdminDown only as a value that can arrive in a received packet.
+# RFC 5880 §6.2 is explicit that there are FOUR: "There are three states
+# through which a session normally proceeds: two for establishing a
+# session (Init and Up) and one for tearing down a session (Down) …
+# A fourth state (AdminDown) exists so that a session can be
+# administratively put down indefinitely." AdminDown is BOTH a local
+# session state and a value carried in the State (Sta) field — §4.1
+# encodes Sta as 0=AdminDown, 1=Down, 2=Init, 3=Up — and conflating the
+# two is exactly the error this figure exists to not repeat.
+#
+# WHICH TEXT GOVERNS. §6.2's diagram is a summary and says so: it notes
+# "Transitions involving AdminDown state are deleted for clarity (but
+# are fully specified in sections 6.8.6 and 6.8.16)." So the diagram is
+# transcribed here for its three states' arcs, and §6.8.6 (Reception of
+# BFD Control Packets), §6.8.4/§6.8.5 (detection-time and Echo failure)
+# and §6.8.16 (Administrative Control) supply the rest. Where the two
+# disagree, the prose wins; see the DOWN self-loop note below, which is
+# the one place they do.
+#
+# Notation on every transition label follows the RFC's own: the arc
+# names the state of the REMOTE system as received in the State field,
+# or the expiry of the Detection Timer. `rx X` = a BFD Control packet
+# arrived carrying Sta = X.
+
+# HONEST LIMIT (guide/expressing.md known limits — "closed-world readings"; the
+# genre's own reading rule 5, spec/genres/experimental/statechart.md):
+# the transition function is TOTAL and this figure cannot say so.
+# RFC 5880 §6.8.6 defines an outcome for EVERY (local state, received
+# Sta) pair — sixteen of them, plus a defined outcome for the Detection
+# Timer in every state. Nothing is left to the implementer. That
+# TOTALITY is a fact about the machine, and it is the fact a decision
+# table asserts structurally: every cell is filled, so a reader can see
+# at a glance that nothing was forgotten.
+#
+# A transition graph with merged triggers cannot assert it. The
+# statechart genre's reading rules say a reader may conclude that "the
+# state set is closed as drawn", but adds in the same breath that
+# "absence is still not prohibition — a transition not drawn is not
+# stated to be forbidden". That is the gap, stated by the genre itself:
+# there is NO construct — no keyword, no option key, no annotation —
+# that lets an author claim "the pairs not drawn here are not missing;
+# they are the pairs whose defined outcome is no state change". A
+# reading agent therefore cannot distinguish a deliberately-omitted
+# pair from a forgotten one, and neither can a human.
+#
+# What this figure does INSTEAD, and it is a workaround, not the
+# construct: (a) it draws the three no-change self-loops the RFC's own
+# diagram draws, plus the fourth (AdminDown) that the RFC omits for
+# clarity, so every state visibly answers for the events that leave it
+# unmoved; and (b) it carries the full 4×5 decision table as a
+# companion `table` section below — composition, the same interim
+# `tcp-handshake.fd` uses to carry lifeline state that `topology` has
+# no construct for. The table asserts totality by being complete. The
+# statechart above does not assert it at all; a reader gets it from the
+# panel or from the prose, never from the model.
+
+# ── Semantic classes — meaning first, colour is only render ──────────
+class states  "A state IS a BFD session state (RFC 5880 §6.2); the local value of bfd.SessionState" fill=#eef2ff
+class advance "Session-establishment transition — the three-way handshake climbing Down → Init → Up (RFC 5880 §6.8.6)" stroke=#16a34a
+class fail    "Session teardown on failure — peer signalled Down/AdminDown, Detection Time expired, or the Echo function failed (RFC 5880 §6.8.4, §6.8.5, §6.8.6)" stroke=#dc2626
+class admin   "Administrative control — an operator action from outside BFD, not a received packet (RFC 5880 §6.8.16)" stroke=#9333ea style=dashed
+class hold    "No state change: the event has a defined outcome and that outcome is to stay put (RFC 5880 §6.8.6)" stroke=#64748b style=dotted
+
+# ── The four states (RFC 5880 §6.2; Sta encoding from §4.1) ──────────
+state down "DOWN\nSta=1" shape=rounded class=states
+# Session is down, or has just been created. §6.2: it remains Down until
+# the remote system agrees the session is down by sending State other
+# than Up. Semantically the forwarding path is unavailable. A system MAY
+# hold a session here indefinitely by simply refusing to advance.
+
+state init "INIT\nSta=2" shape=rounded class=states
+# The remote system is communicating and the local system wants the
+# session up, but the remote system does not yet realise it. §6.2.
+
+state up "UP\nSta=3" shape=rounded class=states
+# The session is established; connectivity between the systems is
+# working. §6.2.
+
+state admindown "ADMINDOWN\nSta=0" shape=rounded class=states
+# Held administratively down. §6.2: this causes the REMOTE system to
+# enter Down and remain there until the local system leaves AdminDown,
+# and it has no semantic implication for the availability of the
+# forwarding path. §6.8.6 discards every received packet while here, so
+# no arriving packet can move the session out — only §6.8.16 can.
+
+# `down` rather than the genre default `right`: this machine climbs
+# Down → Init → Up and falls back the same way, so the reading axis is
+# the ladder. `flow right` was tried and rejected on the render — it
+# packs all four states into one row and the merged trigger labels pile
+# up on each other around INIT.
+flow down
+
+# NO LAYOUT ZONE, AND THAT IS A FORCED CHOICE, NOT A PREFERENCE.
+# Every RFC-faithful FSM figure in this repository is hand-pinned, and
+# this one cannot be: the engine draws a self-transition as a small side
+# loop ONLY when neither endpoint is pinned. Pin any state here and its
+# self-transition degenerates to a zero-length line at the state's
+# centre, with the trigger label printed on top of the state's own name
+# — all four self-loops vanish and all four state names are obliterated.
+# That was built and looked at before this comment was written. Since
+# all four states carry a self-transition, there is no partial pinning
+# that escapes it, so the figure takes the automatic layout and the
+# render defects noted at the foot of this file.
+
+# ═══════════════════════════════════════════════════════════════════
+# TRANSITIONS — triggers MERGED onto shared arcs
+# ═══════════════════════════════════════════════════════════════════
+# The point of the graph over the table: §6.8.6 has fewer distinct
+# state changes than the table has cells. Of the totality table's
+# twenty cells (four states × five events), NINE are state changes —
+# and those nine collapse onto FIVE arcs, plus the four no-change
+# self-loops that carry the other eleven cells, because several events
+# share one outcome: "rx AdminDown", "Detect Time expired" and "Echo
+# failed" all mean Up → Down, and the RFC writes them in three separate
+# sections. The four ADMINISTRATIVE arcs below are not among those
+# twenty cells at all — §6.8.16 sits outside the packet-reception rules
+# and has its own table. Thirteen `transition` lines in total: 5 + 4
+# state-changing, 4 self-loops.
+#
+# WHY "Echo failed" IS DRAWN ON TWO ARCS AND HAS NO COLUMN. It is
+# §6.8.5, and the Echo function is not active in every state, so the RFC
+# defines no outcome for it in every row. A totality table asserts
+# totality by having every cell filled, and a column whose cells the RFC
+# leaves undefined would break exactly the claim the table exists to
+# make. So Echo failure rides on the teardown arcs, where §6.8.5 does
+# define it, and the table stays the grid it can honestly fill.
+
+# ── Climbing: the three-way handshake (§6.8.6) ──────────────────────
+transition down -[rx Down]-> init class=advance
+# §6.8.6: "If bfd.SessionState is Down / If received State is Down /
+# Set bfd.SessionState to Init". The peer agrees the session is down.
+
+transition down -[rx Init]-> up class=advance
+# §6.8.6: "Else if received State is Init / Set bfd.SessionState to Up".
+# The peer is already one step ahead, so Down goes straight to Up.
+
+transition init -[rx Init, rx Up]-> up class=advance
+# §6.8.6: "Else if bfd.SessionState is Init / If received State is Init
+# or Up / Set bfd.SessionState to Up". Two triggers, one outcome —
+# merged onto one arc rather than drawn twice. Matches the RFC diagram's
+# own arc label "INIT, UP".
+
+# ── Falling: teardown (§6.8.4, §6.8.5, §6.8.6) ──────────────────────
+transition init -["rx AdminDown\nDetect expired, Echo failed"]-> down class=fail
+# Three sources, one arc. §6.8.6: received AdminDown while
+# bfd.SessionState is not Down sets LocalDiag 3 (Neighbor signaled
+# session down) and the state to Down. §6.8.4: Detection Time passes
+# without a packet while the state is Init or Up — LocalDiag 1 (Control
+# Detection Time Expired). §6.8.5: Echo function failed — LocalDiag 2.
+
+transition up -["rx Down, rx AdminDown\nDetect expired, Echo failed"]-> down class=fail
+# The same three, plus received Down: §6.8.6 "Else (bfd.SessionState is
+# Up) / If received State is Down / Set bfd.LocalDiag to 3 … Set
+# bfd.SessionState to Down". Four triggers, one arc. The RFC diagram
+# writes this arc "ADMIN DOWN, DOWN, TIMER"; Echo failure is §6.8.5,
+# which the diagram does not cover at all.
+
+# ── Administrative control (§6.8.16) — not a received packet ────────
+transition down -[admin disable]-> admindown class=admin
+transition init -[admin disable]-> admindown class=admin
+transition up -[admin disable]-> admindown class=admin
+# §6.8.16: "Else / Set bfd.SessionState to AdminDown / Set
+# bfd.LocalDiag to an appropriate value / Cease the transmission of BFD
+# Echo packets". Drawn from all three other states because the RFC puts
+# no precondition on it. These are the arcs §6.2's diagram deletes for
+# clarity, and the reason a three-state transcription looks complete.
+
+transition admindown -[admin enable]-> down class=admin
+# §6.8.16: "If enabling session / Set bfd.SessionState to Down". The
+# ONLY way out of AdminDown — §6.8.6 discards every received packet
+# while the session is AdminDown, so no peer can lift it.
+
+# ── No-change self-loops: the defined outcome is "stay put" ─────────
+transition down -["rx Up, rx AdminDown\nDetect expired"]-> down class=hold
+# The RFC diagram draws this self-loop and labels it exactly
+# "UP, ADMIN DOWN, TIMER".
+#
+# WHERE THE DIAGRAM AND THE PROSE DISAGREE, AND THE PROSE WINS. The
+# diagram's self-loop suggests an event with an effect. §6.8.6 says
+# otherwise for all three: received Up while Down falls through every
+# branch (Down handles only received Down and received Init), received
+# AdminDown is guarded by "If bfd.SessionState is not Down" and so does
+# nothing at all here — not even the LocalDiag write — and §6.8.4 arms
+# the timer only when the state is Init or Up. So all three are
+# genuinely no-ops, and this arc is drawn to say that they are DEFINED
+# no-ops rather than gaps. This is the one place the summary diagram
+# and the normative text read differently.
+
+transition init -[rx Down]-> init class=hold
+# §6.8.6's Init branch handles received Init and Up only; received Down
+# falls through, so the session stays in Init. The RFC diagram draws
+# this self-loop and labels it "DOWN".
+
+transition up -[rx Init, rx Up]-> up class=hold
+# §6.8.6's Up branch handles received Down only; Init and Up fall
+# through. The RFC diagram draws this self-loop and labels it
+# "INIT, UP".
+
+transition admindown -[any packet: discarded]-> admindown class=hold
+# §6.8.6, first clause after the header checks: "If bfd.SessionState is
+# AdminDown / Discard the packet". Every received Sta value, and the
+# Detection Timer too (§6.8.4 fires only in Init or Up). The RFC's
+# diagram cannot show this — it deletes AdminDown entirely — so this
+# arc is present here and absent there, deliberately.
+
+# ── RENDER DEFECTS PRESENT IN THE PUBLISHED ARTIFACT ────────────────
+# Recorded rather than papered over. These are engine render defects,
+# not limits of the language, and the figure ships with them visible:
+#
+#  1. SELF-LOOP LABEL STRUCK BY ITS OWN LOOP. The trigger label of a
+#     self-transition is centred on the loop's outer stroke, so the loop
+#     draws through the text. Visible on INIT ("rx Down"), on UP
+#     ("rx Init, rx Up") and on ADMINDOWN ("any packet: discarded").
+#     The DOWN self-loop escapes it only because its label is two lines.
+#  2. UP's self-loop label is struck a SECOND time, by the long
+#     Up → Down teardown edge running horizontally through it.
+#  3. The three back edges into DOWN (from INIT, from UP, from
+#     ADMINDOWN) route out to a side channel far to the right, so their
+#     labels sit a long way from the states they connect. Correct, and
+#     hard to follow.
+#  4. Crowding at INIT: the "rx Init" label of Down → Up lands against
+#     INIT's box edge and immediately above INIT's own self-loop label.
+#
+# Nothing below this line changes any of that; see the `flow` note above
+# for why the usual fix (pin the states) is unavailable here.
+
+# ═══════════════════════════════════════════════════════════════════
+# COMPANION TABLE — the totality the statechart cannot assert
+# ═══════════════════════════════════════════════════════════════════
+# Sections are separate documents, so this one declares the version its
+# own surface needs: a table needs nothing from 0.2.
+#
+# Read this as the structural claim the figure above cannot make: every
+# cell is filled, therefore §6.8.6 leaves no pair undefined. Twenty
+# cells; nine of them are state changes and eleven are defined no-ops.
+# Delete this section and the machine above is unchanged — and the
+# assertion "nothing is missing" is gone with it.
+figdown 0.1 table
+table transitions "RFC 5880 §6.8.6 transition function — every (state, event) pair has a defined outcome"
+| bfd.SessionState | rx Sta=0 AdminDown | rx Sta=1 Down | rx Sta=2 Init | rx Sta=3 Up | Detect Time expired (§6.8.4) |
+|------------------|--------------------|---------------|---------------|-------------|------------------------------|
+| DOWN (1)         | stay DOWN<br>(guarded: no diag) | → INIT | → UP | stay DOWN | stay DOWN<br>(timer runs only in Init/Up) |
+| INIT (2)         | → DOWN<br>diag 3 | stay INIT | → UP | → UP | → DOWN<br>diag 1 |
+| UP (3)           | → DOWN<br>diag 3 | → DOWN<br>diag 3 | stay UP | stay UP | → DOWN<br>diag 1 |
+| ADMINDOWN (0)    | discard | discard | discard | discard | stay ADMINDOWN |
+
+figdown 0.1 table
+table admin "Administrative control (RFC 5880 §6.8.16) — outside the packet-reception rules"
+| Action           | From                  | To         | Also                                             |
+|------------------|-----------------------|------------|--------------------------------------------------|
+| enable session   | ADMINDOWN             | DOWN       | the only exit from ADMINDOWN                     |
+| disable session  | DOWN, INIT, UP        | ADMINDOWN  | set LocalDiag; cease sending BFD Echo packets     |
+
+]]></metadata></svg>

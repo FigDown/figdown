@@ -1,19 +1,19 @@
 # FigDown — figures as text. Spec: https://github.com/FigDown/figdown
 
-figdown 0.1 flowchart
+figdown 0.2 statechart
 title "3-State Cycle with Conditional Transitions"
 
-node idle   "IDLE"    shape=rounded fill=#dbeafe
-node active "ACTIVE"  shape=rounded
-node wait   "WAIT"    shape=rounded
+state idle   "IDLE"    shape=rounded fill=#dbeafe
+state active "ACTIVE"  shape=rounded
+state wait   "WAIT"    shape=rounded
 
 flow down
 
-edge idle -[cond1]-> active
-edge active -[cond2]-> wait
-edge wait -[reset]-> idle
-edge wait -[retry]-> active
-edge active -[abort]-> idle
+transition idle -[cond1]-> active
+transition active -[cond2]-> wait
+transition wait -[reset]-> idle
+transition wait -[retry]-> active
+transition active -[abort]-> idle
 
 layout
 # Triangular arrangement so cycle edges are spatially distinct from back-edges.

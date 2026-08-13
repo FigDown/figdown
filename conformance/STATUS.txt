@@ -173,6 +173,19 @@ default normative
 222-flowchart-role-unstated       genre=flowchart,construct=role  a bare `node` under flowchart is role-UNSTATED, never a defaulted process (`UNSAFE-DEFAULT-ELIMINATION` §3)
 223-flowchart-role-errors         genre=flowchart,construct=role  every `node` rule governs a role line unchanged (id, label quoting, shape enum, options)
 224-flowchart-roles-genre-scoped  construct=role    the role keywords are rejected under block/topology/bitfield by `GENRE-NAMESPACE`'s allowlist (no per-keyword code)
+225-flowchart-flowline            genre=flowchart,construct=connector  `flowline` is the flowchart connector; every `edge` rule governs it unchanged (`GENRE-CONNECTOR-SPELLING`)
+226-flowchart-edge-rejected       genre=flowchart,construct=connector  `edge` and `state` under flowchart are NAMED line errors, not `unrecognized line` (`GENRE-CONNECTOR-SPELLING`; header is 0.2 since `KEYWORD-RENAME-SCOPE` gated the rename to the version)
+235-flowchart-edge-legal-at-0-1   genre=flowchart,construct=connector  `edge` under `figdown 0.1 flowchart` STAYS legal — the rename is gated by the declared version (`KEYWORD-RENAME-SCOPE`)
+236-flowchart-flowline-requires-0-2  genre=flowchart,construct=connector  `flowline` under `figdown 0.1` is a line error NAMING the version, not a silent alias (`KEYWORD-RENAME-SCOPE`)
+237-mixed-version-sections        genre=flowchart,construct=connector  one file, `figdown 0.1` and `figdown 0.2` sections — the gate is PER SECTION (`KEYWORD-RENAME-SCOPE`, core `GENRE-NAMESPACE`)
+238-mixed-version-wrong-section   genre=flowchart,construct=connector  each spelling written in the wrong section: both are errors, each naming its own section's version (`KEYWORD-RENAME-SCOPE`)
+227-connector-words-genre-scoped  construct=connector  `flowline`/`transition`/`state` are rejected under block by the same allowlist, both directions (`GENRE-CONNECTOR-SPELLING`/`GENRE-NODE-SPELLING`)
+# statechart
+230-statechart-header             genre=statechart  the statechart genre header itself, and the scene default flow it does NOT override (`STATECHART-GENRE-SCOPE`)
+231-statechart-requires-0-2       genre=statechart  `figdown 0.1 statechart` is a NAMED version error, not `unknown genre` (core §13.7, `STATECHART-GENRE-SCOPE`)
+232-statechart-vocabulary-scoped  genre=statechart  the allowlist is the scene host set: flowchart's role keywords are rejected under it (`STATECHART-GENRE-SCOPE`)
+233-statechart-state-transition   genre=statechart,construct=connector  `state` and `transition` are the statechart vocabulary; `state` is `node` renamed (`GENRE-NODE-SPELLING`)
+234-statechart-old-spellings-rejected  genre=statechart,construct=connector  `node` and `edge` under statechart are NAMED line errors (`GENRE-NODE-SPELLING`)
 # topology
 251-edge-labels-three-positions   genre=topology    three edge-label positions, authored as topology
 258-edge-options                  genre=topology    edge option keys, authored as topology

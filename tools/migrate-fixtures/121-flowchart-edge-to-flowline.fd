@@ -1,0 +1,9 @@
+# 0.2 (`GENRE-CONNECTOR-SPELLING`): under `flowchart` the connector is `flowline`.
+figdown 0.1 flowchart
+title "Ingress"
+terminator rx "Frame received"
+decision acl "ACL match?"
+process fwd "Forward"
+edge rx -> acl
+edge acl -[deny]-> fwd   # a trailing comment survives the rewrite
+edge acl [a] -- [b] fwd style=dotted

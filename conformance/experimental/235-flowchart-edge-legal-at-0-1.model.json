@@ -1,0 +1,56 @@
+{
+  "header": {
+    "version": "0.1",
+    "genre": "flowchart"
+  },
+  "flow": "down",
+  "classes": [],
+  "planes": [
+    {
+      "id": "base",
+      "z": 0
+    }
+  ],
+  "nodes": [
+    {
+      "id": "a",
+      "label": "Step",
+      "role": "process",
+      "shape": "box",
+      "plane": "base",
+      "line": 6
+    },
+    {
+      "id": "q",
+      "label": "Ok?",
+      "role": "decision",
+      "shape": "diamond",
+      "plane": "base",
+      "line": 7
+    }
+  ],
+  "groups": [],
+  "edges": [
+    {
+      "a": "a",
+      "op": "->",
+      "b": "q",
+      "plane": "base",
+      "line": 8
+    },
+    {
+      "a": "q",
+      "op": "->",
+      "b": "a",
+      "mid": "yes",
+      "plane": "base",
+      "line": 9
+    }
+  ],
+  "ranks": [],
+  "pins": [],
+  "thresholds": [],
+  "bands": [],
+  "bundles": [],
+  "regions": []
+}

@@ -135,7 +135,7 @@ diagnostics name.
 
 **The genre token is REQUIRED (`HEADER-GENRE-REQUIREMENT`).** The header names the
 document's genre: `block` | `topology` | `flowchart` | `bitfield` |
-`table` | `timing`. A header with no genre is a line error. `bitfield`,
+`table` | `timing` — and, at `figdown 0.2` only, `statechart` (`STATECHART-GENRE-SCOPE`). A header with no genre is a line error. `bitfield`,
 `table` and `timing` documents also declare their kind in their content
 (they contain the typed block), but `block`, `topology` and `flowchart`
 share the SAME vocabulary — `node`, `edge`, `group` — and differ only in
@@ -143,25 +143,57 @@ default flow, so the header is the only place such a document states
 which kind of figure it is. Omitting it destroys that distinction with
 no recoverable fallback.
 
+**The genre set is indexed by the LANGUAGE VERSION (`STATECHART-GENRE-SCOPE`).** The
+version token on the header line is not decoration: it selects the genre set
+the second token is resolved against. `statechart` exists at `figdown 0.2`
+and not at `figdown 0.1`, so `figdown 0.1 statechart` is a line error — and
+a **named** one, `genre "statechart" requires figdown 0.2 (this document
+declares 0.1) — write: figdown 0.2 statechart`, not `unknown genre`, because
+the author's fix is to raise the header and not to hunt a typo, and the
+message spells that fix out rather than leaving it to be derived. §13.7 is why an engine may not simply read the
+document as `0.2` instead: guessing a version produces a figure that looks
+right and means something else. `Y` never removes (§13.0), so the genre set
+at a version is always a superset of the set below it, and a document
+declaring `figdown 0.1` resolves against exactly the six it always did.
+**Sections carry the version independently.** A multi-section file (`MULTI-FIGURE-DOCUMENTS`) is a
+sequence of documents, each with its own header, so one file may legitimately
+hold a `figdown 0.2 statechart` section beside a `figdown 0.1 table` section.
+Declare, per section, the **lowest** version that carries what that section
+needs: a higher declaration narrows the set of engines that will read it and
+buys nothing.
+
 **The genre is a namespace (`GENRE-NAMESPACE`).** The genre names three things: the
 document's **keyword namespace**, its **defaults**, and its **validation
 profile**.
 
-- **`GENRE-NAMESPACE`.** The header genre determines the keyword namespace of
-  the document's TOP-LEVEL lines, **except for the layout zone, which is a
-  namespace of its own (`LAYOUT-ZONE-NAMESPACE`)**. The carve-out is stated here because it would
-  otherwise be missed: layout-zone lines ARE top-level lines, so without it
-  `GENRE-NAMESPACE` would hand the genre a zone that `LAYOUT-ZONE-NAMESPACE` says no genre owns.
+- **`GENRE-NAMESPACE`.** A header genre determines the keyword namespace of
+  **that SECTION's** top-level lines, **except for the layout zone, which is
+  a namespace of its own (`LAYOUT-ZONE-NAMESPACE`)**. The carve-out is stated here because it
+  would otherwise be missed: layout-zone lines ARE top-level lines, so
+  without it `GENRE-NAMESPACE` would hand the genre a zone that `LAYOUT-ZONE-NAMESPACE` says no genre owns.
+  **Per SECTION, not per file.** A multi-section file (`MULTI-FIGURE-DOCUMENTS`, §2.9) is a
+  sequence of documents, and each `figdown <version> <genre>` header opens a
+  new one — with its own genre, its own version (see §1 above), its own id
+  space and its own layout zone. **The genres may differ**, and a file
+  holding a `figdown 0.1 block` section and a `figdown 0.2 flowchart` section
+  is ordinary, not exotic: `edge` is the connector in the first and
+  `flowline` in the second, in the same file, because each section resolves
+  against its own header. What stays one-to-one is the ARTIFACT: one `.fd`
+  renders to one `.svg` (§7), whatever it holds. Earlier wording said "the
+  document's top-level lines", which read as a per-file namespace and
+  prohibited something the language has always supported.
 - **`GENRE-VOCABULARY-OBLIGATION`.** A genre MAY define keywords of its own,
   and MAY reuse a spelling with a different meaning and different defaults
   from another genre's. In exchange it MUST document its complete
   vocabulary — every keyword, option key, enum value and default — in its
   own document under [genres/](genres/README.md), which is normative for
   that genre.
-- **`GENRE-COMPOSITION`.** A document may COMPOSE genres. A nested genre
+- **`GENRE-COMPOSITION`.** A section may COMPOSE genres. A nested genre
   region (in v0.1: a `bitfield`, `table` or `timing` block) is governed by
   THAT genre's namespace; its child keywords belong to it and are NOT valid
-  at the document's top level. Composition is not inheritance: the header
+  at the enclosing section's top level. (Composition is the NESTED case;
+  a second `figdown` header is the SECTION case, `GENRE-NAMESPACE` — they are different
+  mechanisms and a file may use both.) Composition is not inheritance: the header
   genre does not acquire the nested genre's vocabulary. See §4.
 - **`PER-GENRE-DEFAULTS`.** A genre's defaults need no justification
   beyond that genre's own census statistics (`DEFAULT-VALUE-SELECTION` read per bucket).
@@ -191,7 +223,12 @@ profile**.
   The zone opened by `layout` (§3) constitutes its own namespace, and
   **every member of it is genre-independent**: no genre may define,
   redefine or extend a keyword inside it. `GENRE-VOCABULARY-OBLIGATION` does not reach into the
-  zone. **(`EDGE-GEOMETRY-CONSTRUCTS`) its membership is `pin` (NORMATIVE) and
+  zone. **The zone is per SECTION** (`GENRE-NAMESPACE`): each section opens at most one
+  `layout` zone, and that zone's `pin` lines address that section's ids and
+  no other's — a `pin` naming an id declared in a different section is
+  `pin of unknown id "<id>"`, verified, not assumed. Genre-independence is
+  about which WORDS may appear in a zone, and is unaffected: `pin` means the
+  same thing in every zone of every section under every genre. **(`EDGE-GEOMETRY-CONSTRUCTS`) its membership is `pin` (NORMATIVE) and
   nothing else**; `path` and `routing` were members until then and are
   WITHDRAWN from the language (§10). **The clause does not change — only
   its membership does**, and it still governs every keyword any future
@@ -1087,7 +1124,7 @@ transient). Deferred until the static core ships.
   their own `title`, their own `flow`, their own `layout` zone, and a
   `pin` for the same id. Last-one-wins would be a silent failure:
   the document says two things and the reader is never told which one
-  was dropped. Messages: `duplicate title line`, `duplicate flow line`,
+  was dropped. Messages: `duplicate title line`, `duplicate flow directive`,
   `duplicate layout line`, `duplicate pin for "<id>"`.
 - A document with errors renders nothing (no partial/best-effort output —
   determinism over convenience).
@@ -1664,6 +1701,29 @@ alone. Recorded as an open question in §9.
   mechanisms in modelling languages (UML's object identity across views,
   SysML parts), and how ERD tools handle the same entity appearing in
   multiple diagrams. All v0.2; pending frequency measurement.
+  **Where else this one gap is filed (`OPEN-QUESTION-CITATION-STATUS`).** It is ONE primitive with
+  three faces, and until this release none of the three named the others:
+  (1) this entry, the MODEL-side statement; (2)
+  the project’s working record — ISO 5807's **Connector**, in the *"Not
+  in this repository's record of the standard"* table, status **unknown**
+  (§9.4.1 was never read). That is not a second requirement: the Connector
+  is `flowchart`'s **drawing** of the model fact this entry describes — a
+  marked continuation rather than a second symbol — so a decision here
+  decides how the drawing is spelled, not whether it is needed; (3)
+  `examples/showcase/tcp-state-machine.fd` — the live instance. It draws
+  CLOSED twice because RFC 9293's Figure 5 does, so under `statechart`,
+  whose premise is that one `state` is one state, a reading agent counts
+  **12 states where TCP has 11**; only a `class` legend line says
+  otherwise. Merging the two nodes was tried and REJECTED on readability
+  evidence (the terminal edges struck the setup/abort labels around a
+  single CLOSED), so that figure is evidence that the primitive is
+  MISSING, not that a workaround exists.
+  `spec/genres/experimental/statechart.md` states what a reader may and may
+  not conclude from two identically-labelled states meanwhile. Note that
+  `statechart` has **no UML clause** to borrow for this: UML 2.5.1 §14 has
+  no "same state drawn twice", so this gap is NOT covered by any claim that
+  the genre's unexpressible items are §14 surface deliberately not
+  borrowed.
 - `BITFIELD-UNION-VARIANTS`: **union/case bitfields** (`PRODUCTION-CORPUS-MEASUREMENT`, 2026-07-30) — CORRECTNESS trap:
   `break` rows currently read as one contiguous bit sequence, so a
   register whose bits have mutually exclusive encodings (e.g. eight
@@ -2959,9 +3019,10 @@ addition and to the hundredth alike.
 document       = *insignificant header *line
 insignificant  = comment-line / blank-line
 header         = "figdown" SP version SP genre eol
-version        = "0.1"                    ; wire major.minor token only
+version        = "0.1" / "0.2"            ; wire major.minor token only
 genre          = "block" / "topology" / "flowchart"
                / "bitfield" / "table" / "timing"
+               / "statechart"             ; version "0.2" only (STATECHART-GENRE-SCOPE)
 line           = directive-line / table-row / insignificant
 directive-line = keyword *(SP argument) [SP comment] eol
 argument       = qstring / option / bare-token
@@ -3131,8 +3192,8 @@ exceptions rather than unconditionally.
 
 | key | type | present | meaning |
 |---|---|---|---|
-| `version` | string | always | the wire-grammar version from the header line. v0.1 implementations accept exactly `"0.1"` (§1), so in this version it is a constant — **a v0.1 engine emits the literal string `"0.1"` and never copies the source token**, because the source token is the only spelling the grammar accepts. It is NOT the dev increment (0.1), which appears in a rendered artifact's `data-engine-version` and never in the model (§12.6). Stated normatively at 0.1; it was a hard-coded constant in `conformance/normalize.js` and nowhere else |
-| `genre` | string | always | one of the six genre tokens (§1). REQUIRED in the source since 0.1, so it can be absent only from a document that failed to parse. Since `GENRE-NAMESPACE` it also names the NAMESPACE the document's top-level keywords belong to — a consumer resolves every non-core keyword against it (§1 `GENRE-NAMESPACE`, §12.7) |
+| `version` | string | always | the wire-grammar version **as the document declared it** — `"0.1"` or `"0.2"` (§1). It stopped being a constant at `STATECHART-GENRE-SCOPE`: while exactly one version existed, "emit the literal `\"0.1\"`" and "copy the source token" were the same instruction, and they are not any more. **An engine MUST emit the token the header declared**, never the newest version it implements and never the one it would have preferred — the declared version is the contract the author wrote against, and §13.7 forbids a reader inferring it from anything else. It is NOT the dev increment (0.1), which appears in a rendered artifact's `data-engine-version` and never in the model (§12.6). Stated normatively at 0.1; it was a hard-coded constant in `conformance/normalize.js` until `STATECHART-GENRE-SCOPE` |
+| `genre` | string | always | one of the genre tokens legal at `version` (§1) — the six of `figdown 0.1`, or those plus `statechart` at `figdown 0.2`. REQUIRED in the source since 0.1, so it can be absent only from a document that failed to parse. Since `GENRE-NAMESPACE` it also names the NAMESPACE the document's top-level keywords belong to — a consumer resolves every non-core keyword against it (§1 `GENRE-NAMESPACE`, §12.7) |
 
 **Class** — `class` (§2.7).
 
@@ -4516,6 +4577,51 @@ still runnable for anyone who chooses not to move.
   their corpus. Stating the release version `vX.Y.Z` alone does not
   satisfy this; the accepted `figdown X.Y` set is what an author's
   document is checked against.
+
+- **The reference engine's accepted set, stated (`STATECHART-GENRE-SCOPE`).**
+  `editor/figdown.html` and everything generated from it — `dist/`,
+  `skill/figdown/figdown.html`, `tools/build-svg.js` — accept **`figdown
+  0.1` and `figdown 0.2`**, and nothing else. Any other version token is
+  `unsupported version "<token>" (expected 0.1 or 0.2)`. The set lives in
+  one constant, `LANG_VERSIONS`, so this sentence and the code cannot
+  drift. The **archived** `v0.1.0` engine (`archive/0.1/figdown.html`)
+  accepts `figdown 0.1` alone, which is §13.0.1's `Y` < `y` branch working
+  as specified: it rejects a `0.2` document by name rather than guessing.
+
+#### 13.7.1 The first `Y`, and what it did and did not owe
+
+`v0.2.0` is the project's first `Y` release, and the policy above had
+never been exercised. What it did:
+
+- **It added and removed nothing.** Every construct, genre and diagnostic
+  of `figdown 0.1` is unchanged, and every `figdown 0.1` document produces
+  the same model it produced under `v0.1.8`. That is `Y`'s definition
+  (§13.0), and it is checked rather than asserted: the conformance suite's
+  `figdown 0.1` goldens all pass unmodified.
+- **It honoured §13.0.1 voluntarily.** §13.0.2 limit 1 says `figdown 0.1`
+  → `figdown 0.2` is **not** covered during 0.x. It was honoured anyway,
+  which is §13.4's rehearsal rule — follow the `v1.0.0` rules without
+  being bound by them — and the result is that the first `Y` cost
+  downstream nothing at all.
+- **It owed no migration rewrite.** A migration entry is written (tier 1),
+  but `tools/migrate-figdown.js` gains **no rule**: nothing was renamed,
+  retired or moved, so there is no document the tool could correctly
+  change. A cumulative migration tool with an empty hop for a `Y` that
+  removed nothing is the correct outcome, not a gap.
+- **It did NOT owe version dispatch in the parser or a per-version
+  conformance partition.** §13.8 defers both until they are owed, and
+  they become owed at `v1.0.0`. A single golden set still covers both
+  language versions, because `Y` compatibility means the `0.1` goldens
+  *are* `0.2` goldens.
+- **It DID owe a new `read/<X.Y>/`.** The reading contract is indexed by
+  language version, `read/0.1/` is frozen in `archive/MANIFEST.tsv`, and
+  the new genre's reading rule had to go somewhere. `read/0.2/` is that
+  somewhere, and it is the live contract from `v0.2.0` on.
+- **It owes an `archive/0.2/figdown.html` at publish, not before.** §13.5
+  archives the engine *as users ran it* — the published engine stamped
+  `0.2.0`, which does not exist until the release act. `archive/0.2/` and
+  the `0.2` rows of `archive/MANIFEST.tsv` (which cover `read/0.2/` too)
+  are written then, by `node tools/archive-check.js --write 0.2`.
 
 ### 13.8 What tier 2 costs, stated honestly
 

@@ -10,7 +10,7 @@
 # what an author needs when carrying the same construct into `block`.
 # The set demonstrates every FORM of every keyword, not just every keyword.
 # Coverage: node tools/reference-coverage.js --strict flowchart
-figdown 0.1 flowchart
+figdown 0.2 flowchart
 title "Job dispatch"
 
 # `class` declares a meaning ONCE; elements join it with class=. The meaning
@@ -72,11 +72,26 @@ process other  "Record unknown kind" shape=ellipse class=tint
 
 # A bare `node` under `flowchart` is ROLE-UNSTATED, and that is a FOURTH state,
 # not a defaulted `process` (`UNSAFE-DEFAULT-ELIMINATION` §3 — a default that can assert a falsehood is
-# not allowed). Waiting is not one of the three: ISO 5807 §9.2.1 defines
-# Process as a function "resulting in a change in value, form or location of
-# information", and a backoff changes none of them. So this line claims no
-# role rather than claim a wrong one — and a reading agent sees the difference
-# between "the author said nothing" and "the author said process".
+# not allowed). It says ONE thing: THE SOURCE DOES NOT STATE THE ROLE. Here the
+# procedure says only "wait and retry", and no clause of it classifies the
+# stage: ISO 5807 §9.2.1 defines Process as a function "resulting in a change
+# in value, form or location of information", which a backoff is not, and which
+# ISO symbol a wait belongs to is not settled in this repository (the standard
+# was readable only to p. 8 of 25). So this line claims no role rather than
+# claim a wrong one — and a reading agent sees the difference between "the
+# author said nothing" and "the author said process".
+#
+# What a bare `node` is NOT: a place to park a symbol this genre cannot spell.
+# Nine ISO stage symbols have no word here (Data, Stored data, Predefined
+# process, Preparation, Manual operation, Manual input, Document, Parallel
+# mode, Loop limit), and that is a COVERAGE GAP in FigDown, not a fact about
+# the figure. When the source DOES state one of them, the interim is `node`
+# PLUS a comment naming the ISO symbol, so the classification survives as text
+# a reader can quote:
+#
+#     node cfg "Read config file"   # ISO 5807 Data (input/output) — no role
+#
+# and the gap gets reported — the project’s working record keeps it.
 node backoff "Wait (exponential backoff)" shape=circle class=retry
 
 # `plane` (EXPERIMENTAL) is paint order, not containment: `z-index=` sets it
@@ -94,32 +109,32 @@ flow down                # right|down|left|up — `down` is flowchart's default
 # the `GUI-WRITEBACK-STRUCTURE` strip test the `layout` zone below does not.
 rank build,test,deploy
 
-edge queue -> accept
-edge accept -> parse
-edge parse -> valid
+flowline queue -> accept
+flowline accept -> parse
+flowline parse -> valid
 # The branch condition rides the edge's [mid] label and NOTHING else — not the
 # shape, not the colour, not the rendered position (semantic model, `MEANING-RECOVERY-SOURCE`).
-edge valid -[no]-> reject
-edge valid -[yes]-> fetch
-edge fetch -> kind
+flowline valid -[no]-> reject
+flowline valid -[yes]-> fetch
+flowline fetch -> kind
 # Three value-labelled exits plus a fallback: the dispatch value is written on
 # each edge, so a reading agent can answer "what happens for a test job?".
-edge kind -[build]-> build
-edge kind -[test]-> test
-edge kind -[deploy]-> deploy
-edge kind -[other]-> other
-edge build -> ok
-edge test -> ok
-edge deploy -> ok
-edge other -> ok
-edge ok -[yes]-> done
+flowline kind -[build]-> build
+flowline kind -[test]-> test
+flowline kind -[deploy]-> deploy
+flowline kind -[other]-> other
+flowline build -> ok
+flowline test -> ok
+flowline deploy -> ok
+flowline other -> ok
+flowline ok -[yes]-> done
 # The CYCLE. FigDown has no loop keyword and needs none: a plain back-edge to
 # an earlier step IS the loop, and its [mid] label is the loop condition. A
 # `loop`/`while` construct would state nothing these two lines do not.
-edge ok -[no]-> backoff class=retry
-edge backoff -> fetch class=retry
-edge done -> audit
-edge reject -> audit
+flowline ok -[no]-> backoff class=retry
+flowline backoff -> fetch class=retry
+flowline done -> audit
+flowline reject -> audit
 
 # Everything below is geometry with no meaning, and a reading agent skips it by
 # default (`CONTENT-LAYOUT-ZONE-SPLIT`/`GENRE-NAMESPACE`). Removing the whole zone leaves the same figure meaning.

@@ -246,7 +246,7 @@ The member list is ONE comma-delimited token, so it
 terminates at whitespace instead of resting on the `A--B` shape test alone.
 The whitespace-separated form (`bd24a--srv, bd24b--srv`) was **RETIRED** (`COMMA-LIST-WHITESPACE`/`POSITIONAL-LIST-SPELLING`) and is now the line error `bundle members take ONE
 comma-delimited token: write bundle b1 "LAG" a--c,b--c — the space form is
-retired (MIGRATIONS)`. One policy governs every comma list in the
+retired (MIGRATIONS 0.1)`. One policy governs every comma list in the
 language — a list is ONE whitespace-free token — because it is the only
 policy under which a positional list terminates, leaving the rest of the
 line reservable for future `key=` options; `bundle` is held to it exactly as

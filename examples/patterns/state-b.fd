@@ -1,21 +1,21 @@
 # FigDown — figures as text. Spec: https://github.com/FigDown/figdown
 
-figdown 0.1 flowchart
+figdown 0.2 statechart
 title "Hub Pattern: Multiple States Converging to Reset"
 
-node idle    "IDLE"     shape=rounded fill=#dbeafe
-node state_a "STATE_A"  shape=rounded
-node state_b "STATE_B"  shape=rounded
-node state_c "STATE_C"  shape=rounded
-node state_d "STATE_D"  shape=rounded
+state idle    "IDLE"     shape=rounded fill=#dbeafe
+state state_a "STATE_A"  shape=rounded
+state state_b "STATE_B"  shape=rounded
+state state_c "STATE_C"  shape=rounded
+state state_d "STATE_D"  shape=rounded
 
 flow down
 
-edge idle -[cond1]-> state_a
-edge idle -[cond2]-> state_b
-edge idle -[cond3]-> state_c
-edge idle -[cond4]-> state_d
-edge state_a -[reset]-> idle
-edge state_b -[reset]-> idle
-edge state_c -[reset]-> idle
-edge state_d -[reset]-> idle
+transition idle -[cond1]-> state_a
+transition idle -[cond2]-> state_b
+transition idle -[cond3]-> state_c
+transition idle -[cond4]-> state_d
+transition state_a -[reset]-> idle
+transition state_b -[reset]-> idle
+transition state_c -[reset]-> idle
+transition state_d -[reset]-> idle

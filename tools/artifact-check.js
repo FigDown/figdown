@@ -50,7 +50,7 @@
 //                elsewhere). Same severity as engine-lag.
 //   no-version   an artifact predating 0.1 carries no
 //                `data-engine-version` at all. The absence is itself the
-//                information (MIGRATIONS): NO version is inferred
+//                information (MIGRATIONS 0.1): NO version is inferred
 //                for it and it is neither warned nor failed — it is counted
 //                on its own line so the number is visible.
 //   skip         reported with counts, never silently omitted:
@@ -143,7 +143,7 @@ function readMeta(svgPath) {
 // ── Version ordering ─────────────────────────────────────────────────────────
 
 /**
- * 0.1 < `0.1` < `0.2-0.1` < `1.0`. A released version outranks
+ * 0.1 < `0.1` < 0.2 < `1.0`. A released version outranks
  * every dev increment that led to it, which is what `dev: Infinity` encodes.
  * An unparseable version is not guessed at: the artifact is reported as
  * unknown-version rather than silently compared under some other reading
@@ -302,7 +302,7 @@ function main() {
 
   if (noVer.length)
     console.log('  no-engine-version: built before this release, which is where the attribute ' +
-      'was added; no version is inferred for them (MIGRATIONS).');
+      'was added; no version is inferred for them (MIGRATIONS 0.1).');
   for (const s of skipped.noMeta)
     console.log('  skip (no figdown-source metadata): ' + s.rel);
   for (const s of skipped.noSource)

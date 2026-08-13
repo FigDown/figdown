@@ -1,0 +1,17 @@
+# `KEYWORD-RENAME-SCOPE` + core §1/`GENRE-NAMESPACE`: a multi-section file carries the VERSION and the GENRE per
+# SECTION, so the connector gate is evaluated per section too. Section 1 is a
+# `figdown 0.1 flowchart` and spells the line `edge`; section 2 is a
+# `figdown 0.2 flowchart` in the SAME FILE and spells it `flowline`. Both are
+# legal, and each section resolves against its own header — this is the case
+# that proves the gate is not a per-file switch.
+figdown 0.1 flowchart
+title "Section 1 — 0.1 vocabulary"
+process a "Step"
+process b "Step 2"
+edge a -> b
+
+figdown 0.2 flowchart
+title "Section 2 — 0.2 vocabulary"
+process c "Step"
+process d "Step 2"
+flowline c -> d

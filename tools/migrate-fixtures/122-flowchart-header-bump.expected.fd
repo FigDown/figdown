@@ -1,0 +1,17 @@
+# 0.2 (`KEYWORD-RENAME-SCOPE`): the header moves WITH the keyword. `flowline` is 0.2
+# vocabulary, so a rewritten flowchart section must declare `figdown 0.2` — a
+# tool that emits `figdown 0.1 flowchart` + `flowline` emits a document that
+# does not parse. This input is the corpus case: a document a PREVIOUS run
+# rewrote to `flowline` and left at 0.1.
+figdown 0.2 flowchart
+title "Already renamed, header left behind"
+process a "Step"
+process b "Step 2"
+flowline a -> b
+
+# A second section that is NOT a flowchart keeps its own version: the bump is
+# per section and only where the vocabulary requires it.
+figdown 0.1 block
+node x "X"
+node y "Y"
+edge x -> y

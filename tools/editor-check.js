@@ -102,8 +102,11 @@ const EMITTERS = [
     // keyword into `pin`; if `size` ever reappears here, or `pin` drops out,
     // a delete leaves a `pin of unknown id` behind and the document stops
     // parsing. There is no emitted line to check, only the pattern.
+    // GENRE-NODE-SPELLING added `state`: under `statechart` that is the node
+    // spelling, and a delete that did not recognise it left the node line
+    // behind while removing its pin.
     what: 'deleteNode — the node/pin line-removal pattern',
-    emits: "new RegExp('^(node|pin)",
+    emits: "new RegExp('^(node|state|pin)",
   },
   {
     what: 'cell click — table cell fill',
@@ -118,8 +121,11 @@ const EMITTERS = [
     doc: ['figdown 0.1 block', 'node a "A"', 'node b "B"', '@'],
   },
   {
+    // GENRE-CONNECTOR-SPELLING/GENRE-NODE-SPELLING: the button writes the DOCUMENT'S node word, so the emitter
+    // is `guiNodeKw(lines)` rather than a literal. A GUI action is a text
+    // edit, and a text edit that spells the wrong genre's word is a line error.
     what: 'new node button',
-    emits: "lines.splice(last+1,0,'node '+nid+' \"Node '+nnum+'\"'+(kk!=='box'?' shape='+kk:''));",
+    emits: "lines.splice(last+1,0,guiNodeKw(lines)+' '+nid+' \"Node '+nnum+'\"'+(kk!=='box'?' shape='+kk:''));",
     sample: 'node n1 "Node 1" shape=rounded',
     doc: ['figdown 0.1 block', '@'],
   },
@@ -130,10 +136,42 @@ const EMITTERS = [
     doc: ['figdown 0.1 block', '@'],
   },
   {
-    what: 'link arm — new edge',
-    emits: "lines.splice(last+1,0,'edge '+linkArm+' -> '+id);",
+    what: 'link arm — new connector',
+    emits: "lines.splice(last+1,0,ck+' '+linkArm+' -> '+id);",
     sample: 'edge a -> b',
     doc: ['figdown 0.1 block', 'node a "A"', 'node b "B"', '@'],
+  },
+  {
+    // GENRE-CONNECTOR-SPELLING/GENRE-NODE-SPELLING: the same two emitters under a genre that renames both words.
+    // A sample is all this file can check mechanically; the emitters above
+    // are the ones that would silently regress to `node`/`edge`.
+    what: 'link arm — statechart spells it `transition`',
+    emits: "const guiConnKw=lines=>connectorKwAt(guiGenre(lines), guiVersion(lines))||'edge';",
+    sample: 'transition a -> b',
+    doc: ['figdown 0.2 statechart', 'state a "A"', 'state b "B"', '@'],
+  },
+  {
+    // KEYWORD-RENAME-SCOPE: the connector word is version-gated, so the GUI has
+    // to read the DECLARED VERSION as well as the genre. Inserting `flowline`
+    // into a `figdown 0.1 flowchart` document would make the editor author a
+    // line error, so the same emitter must produce `edge` there and
+    // `flowline` one version up. Both directions are sampled.
+    what: 'link arm — flowchart at 0.1 still spells it `edge`',
+    emits: "const guiConnKw=lines=>connectorKwAt(guiGenre(lines), guiVersion(lines))||'edge';",
+    sample: 'edge a -> b',
+    doc: ['figdown 0.1 flowchart', 'node a "A"', 'node b "B"', '@'],
+  },
+  {
+    what: 'link arm — flowchart at 0.2 spells it `flowline`',
+    emits: "const guiConnKw=lines=>connectorKwAt(guiGenre(lines), guiVersion(lines))||'edge';",
+    sample: 'flowline a -> b',
+    doc: ['figdown 0.2 flowchart', 'node a "A"', 'node b "B"', '@'],
+  },
+  {
+    what: 'new node button — statechart spells it `state`',
+    emits: "const guiNodeKw=lines=>GENRE_NODE_KW[guiGenre(lines)]||'node';",
+    sample: 'state n1 "Node 1"',
+    doc: ['figdown 0.2 statechart', '@'],
   },
   {
     what: 'threshold drag — offset rewritten in place',
@@ -148,7 +186,7 @@ const EMITTERS = [
   // orthogonal`) went with them; it never had a fixture, which is its own
   // small lesson about what this file covers.
   {
-    what: 'ensureFlowLine — header inserted for a bare document',
+    what: 'ensureFlowDirective — header inserted for a bare document',
     emits: "lines.unshift('figdown 0.1 block');",
     sample: 'node a "A"',
     doc: ['figdown 0.1 block', '@'],

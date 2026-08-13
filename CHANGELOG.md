@@ -65,6 +65,262 @@ Statuses referred to above are defined in [`spec/README.md`](spec/README.md).
 
 Nothing yet.
 
+## v0.2.0 — 2026-08-12
+
+**Language version: `0.2`.** The first minor release, and the first time the
+language number has moved. It **adds** and removes nothing: every document
+that declares `figdown 0.1` parses to exactly the same model under this
+release as under v0.1.8, and every `figdown 0.1` conformance golden passes
+unmodified. Nothing needs rewriting.
+
+**Language — the `statechart` genre, EXPERIMENTAL.** A figure whose nodes are
+*states* — modes a machine is in — and whose edges are *transitions* can now
+say so on line 1:
+
+    figdown 0.2 statechart
+
+The genre uses the same `group`, `class`, `flow` and `rank` every scene figure
+uses, with the same meanings and the same default left-to-right flow. What it
+adds is a **reading**: under `statechart`, a node is a state rather than a
+step, a connector is a transition on an event, its label is that transition's
+trigger and guard as free text, and a self-loop means the event happens and
+the machine stays where it is. Under `flowchart` that same self-loop means
+something else entirely — "not ready, check again" — and that difference is
+the reason the genre exists.
+
+**Each scene genre now uses its own domain's words for the two things every
+figure is made of.** A figure is nodes and the lines between them, and the
+word for each depends on what kind of figure it is:
+
+| genre | the thing | the line |
+|---|---|---|
+| `block`, `topology` | `node` | `edge` |
+| `flowchart` (at `figdown 0.2`) | `node` | `flowline` |
+| `statechart` | `state` | `transition` |
+
+`block` and `topology` are unchanged at every version. In the other two, the
+word being replaced is an error that tells you which word to write and why —
+you cannot get this wrong silently. Everything else is identical: the same
+operators, the same labels, the same options, the same meaning. ISO 5807 calls
+a flowchart's connecting line a *flowline*; UML calls a state machine's arc a
+*transition*. Those are the words the people who read these figures already
+use. The mechanical rewrite and its diagnostics are in
+[`spec/migrations.md`](spec/migrations.md).
+
+**The flowchart rename is gated by the language version, and the promise this
+release makes was deliberately kept rather than quietly broken.** An earlier
+step in this cycle applied the rename to *the language* instead of to a version
+of it, which stopped documents that were legal at v0.1.8 from parsing. That was
+a compatibility break in a `Y` release, and it is corrected here:
+
+| declares | `edge` | `flowline` |
+|---|---|---|
+| `figdown 0.1 flowchart` | **legal** | version error, naming the fix |
+| `figdown 0.2 flowchart` | wrong-word error | **legal** |
+
+`statechart` needs no gate: the genre itself requires `figdown 0.2`, so its
+vocabulary is unreachable from `0.1`. Writing `flowline` in a `figdown 0.1`
+document reports that it requires `figdown 0.2`, that `figdown 0.1 flowchart`
+spells this `edge`, and that the fix is to raise the header or write `edge` —
+a one-step repair, named in the message.
+
+Why not accept both spellings under one version? Because two forms of one
+construct are justified only when each accepts input the other cannot express.
+`edge` and `flowline` accept exactly the same input, so under a single version
+one of them is a spelling variant and must be retired — and a retired spelling
+becomes a line error that names its migration entry, so neither silent
+acceptance nor silent rejection is available. Two spellings across *different
+versions* is not a variant at all; it is ordinary language evolution, and each
+version accepts exactly one.
+
+**`edge` under `figdown 0.1 flowchart` goes away at v1.0, and not before.**
+Only a major version may remove, so the dual support ends by version rather
+than by mood: no `0.x` release may drop it, and when it goes it goes as a
+scheduled act with its own migration entry and a named diagnostic. Write
+nothing new against it — a new flowchart figure should declare `figdown 0.2`
+and spell the connector `flowline`. Thirteen documents in this repository were
+raised to `figdown 0.2` accordingly, plus eleven documentation fences.
+
+**`node` stays in `flowchart`, and that is not an inconsistency.** A statechart
+has exactly one kind of node, so `state` gives up nothing. A flowchart has
+many, so it keeps a word for the stage whose kind is not stated. Two domains,
+two different facts, the same rule.
+
+**But what that word means has been corrected, and the old reason is
+withdrawn.** Since `process`, `decision` and `terminator` were adopted, a bare
+`node` in a flowchart was justified as the spelling for a symbol FigDown has
+no word for. That was wrong, and it was wrong in a way this project refuses
+everywhere else. ISO 5807 is a complete symbol set — this repository's own
+record enumerates sixteen of its names, twelve stage symbols and four line
+symbols, not the "around ten" previously claimed — so "none of the three" is
+not a fact about your figure. It is a **coverage gap in FigDown**, and
+recording it as a bare `node` disguised a gap as an authorial judgement.
+
+A bare `node` under `flowchart` now has exactly one meaning: **the source does
+not state the role.** That is permanent, it is the transcriber's honest case,
+and it is the same rule as `*` for an unstated length — ISO is a drawing
+standard with no "unspecified", but FigDown separates role from geometry and
+so is able to say "I was not told, and I must not invent one."
+
+**In a flowchart, prefer a role**, and write `node` only when the source
+genuinely does not say. When you write `node` because FigDown has no word for
+the symbol you are transcribing, do three things: write `node`; name the ISO
+symbol in a `#` comment on the same line, which is never parsed and never a
+second channel of meaning —
+
+    node cfg "Read config file"   # ISO 5807 Data (input/output) — no FigDown role
+
+— and report the gap, so it is counted rather than absorbed. Of the eighteen
+flowchart documents in this repository, not one such comment existed before
+this release.
+
+**No new role was added, and the bar for adding one is stated rather than
+felt.** The two live candidates are ISO's *Stored data* and a comment or
+annotation symbol; each names the measurement that would settle it. Every
+other symbol was measured and argues against itself — twenty-three
+preparation-shaped stages are all drawn as plain steps, and across 3266 nodes
+and 2684 edges there is not one fork, join or merge.
+
+**What this costs, said plainly.** Reclassifying a flowchart as a statechart
+used to be a one-line edit. It now rewrites every connector line. That was a
+deliberate trade: the one-line convenience was bought by having two genres
+spell two different things with one word. `tools/migrate-figdown.js` does the
+rewrite for you, scoped by each document's declared genre, so your `block` and
+`topology` figures are left untouched.
+
+**One error message changed wording.** A second `flow` line used to report
+`duplicate flow line`, which now reads like "a duplicate flowline" — a thing
+that is not an error at all. It reports `duplicate flow directive` instead.
+
+**Why the header and not the drawing.** The obvious alternative is to
+recognise a state machine by its shape, and it was tried and measured. Every
+state machine in this project's corpus contains a cycle — and so do half the
+figures that are not state machines; in a larger production corpus only about
+one in four cyclic flowcharts is a state machine. Self-loops appear in one
+figure out of five. Worse, the figure the shape test most reliably
+misclassifies is a retry loop, which is exactly the figure a state-machine
+reading would get wrong. The title does not help either: "State Machine" in a
+title is routinely a polling flowchart. Only the author can say which kind of
+figure this is, and line 1 is where they say it.
+
+**Deliberately not included.** There is no vocabulary for an initial state, a
+final state or a state hierarchy, and no reader may infer one from a figure's
+shape. There is no change to how anything is laid out or drawn: the five
+figures in this repository that became statecharts render identically to
+before. This release makes the distinction *expressible*, and stops there.
+
+**No `start` keyword, and the usual argument for one rests on a false
+premise.** It is often said that `terminator` names the *end* and so leaves
+the start unspelled. ISO 5807 says otherwise: its Terminator is an exit to or
+an entry from the outside of the procedure — a start, an end, or a halt — one
+symbol for both ends, told apart by its label text. So there is no word to
+borrow, and this project does not coin one. A reader without the word answers
+"unstated", which is safe rather than wrong. What would reopen it is measured
+evidence that readers name the *wrong* terminator as the start; that it would
+be convenient, or that other tools have one, would not.
+
+**Two states with the same label are two states, and the language cannot yet
+say otherwise.** FigDown has no way to assert that two elements are the same
+entity — `class` asserts a shared category, not an identity — and that gap
+had been filed separately in three places that did not name each other. They
+now cross-reference, and the `statechart` genre gains a reading rule for it:
+a reader must report two states, may note that the labels match and that a
+comment or class meaning claims they are one, must attribute that claim to the
+prose rather than to the model, and must neither merge them nor read distinct
+ids as states known to be *different*. The showcase TCP figure is the live
+instance — it declares twelve `state` lines for TCP's eleven states because
+the RFC's own figure draws CLOSED twice. Merging them was tried and rejected
+on readability evidence, so that figure is recorded as evidence the primitive
+is missing, not as a workaround that makes it unnecessary. The question stays
+open; this release only stops it being answered by accident.
+
+**Marked experimental, and here is the honest reason.** Three documents out
+of ninety-one in the production corpus are state machines. That is a thin
+basis for a genre, and this is the first one this project has added ahead of
+its evidence. Experimental status is what makes that reversible: withdrawing
+it would cost a document its two renamed words and its header line, which
+`tools/migrate-figdown.js` can undo as mechanically as it applied them, and
+nothing else in the language would have to change. If a re-measurement shows
+those figures were not representative, withdrawal is the right answer.
+
+**Reading `figdown 0.1` documents.** They are unaffected and should stay as
+they are. Declare `figdown 0.2` only in a document that needs `statechart` —
+a lower declaration is read by more engines. In a file with several sections,
+each section declares its own version, so a `statechart` section can sit
+beside a `figdown 0.1 table` section in the same file.
+
+**An engine that only knows `figdown 0.1`** — including the archived v0.1.0
+page — will reject a `figdown 0.2` document by name rather than guess at it.
+
+**A multi-genre file was always legal, and three normative sentences said it
+was not.** `spec/core.md`'s genre-namespace guarantees G1, G3 and G7 said
+"document" where the language means "section". Read literally, G1 gave a file
+one keyword namespace and so prohibited something the engine has always
+accepted: a `figdown 0.1 block` section followed by a `figdown 0.1 flowchart`
+section builds clean and reports one artifact. All three now read per section.
+G3 additionally names the two mechanisms apart — **composition** is the nested
+genre case, a second `figdown` header is the **section** case, and one file may
+use both. G7 states that the layout zone is per section, so a `pin` naming an
+id declared in another section answers `pin of unknown id "<id>"`.
+
+Nothing to rewrite: the correction removes a prohibition and adds none. It is
+recorded rather than fixed silently because a normative sentence that forbids
+supported behaviour is the same class of defect as a wrong diagnostic — an
+author who believes it writes two files where one would do, and an implementer
+who reads it may enforce it. `.fd` → `.svg` stays one-to-one whatever the file
+holds.
+
+**Added — `title` now migrates mechanically.** `title` has required a quoted
+string for many increments, so a figure transcribed before that does not build
+at all, and until now the entry that retired the bare form left the repair to
+the author. `tools/migrate-figdown.js` does it: it takes the line's text after
+`title` as the engine saw it — comments are scanned first, so a trailing
+`# note` stays a comment and is never pulled inside the quotes — and wraps
+that in `"`. Unlike a bare block label there is nothing to arbitrate, because
+`title` takes one positional string and no option keys, so the whole remainder
+of the line is the title.
+
+    title TCP Header        →  title "TCP Header"
+    title A # note          →  title "A" # note
+
+**It refuses rather than guesses** when the bare argument contains a `"` or a
+`\`. Quoting either blind changes the rendered text — an inner quote has to be
+escaped or dropped, and a backslash starts an escape — so the tool reports the
+line and names the entry to read, and leaves the file alone.
+
+**Fixed — two checks were reporting success for work they had not done.**
+
+**The engine's version constant is correct again.** The engine stamps its
+version into every artifact it builds, and that attribute is the only
+machine-readable handle a reader has on which engine reproduces a figure. The
+constant had been left three source states behind — one of which changed
+parsing outright — so all 56 shipped artifacts named an engine that would not
+necessarily have produced them, and nothing failed: every existing check
+compared the engine copies against each other, and none against the tree. A new
+check now holds it to the newest migration entry and requires all four engine
+copies to agree. **It runs in the development repository and is not among the
+gates here**: the constant is rewritten to the release number when this tree is
+built, so the rule it enforces — the constant equals the newest entry the log
+reached — is true only where the engine is edited.
+
+`gate:layout` now recurses and always states its coverage. It searched a
+hard-coded list of directories, so `examples/statechart/`, `examples/showcase/`,
+`examples/reference/` and `examples/layout-compare/` were never opened by it at
+all — it scored 22 figures out of the 56 that exist and reported no skips,
+because it had never counted the 34 it could not see. Fifteen more of the 22 it
+did open were dropped silently, so a figure the tool could not read produced
+output identical to a figure with no defects. It now walks recursively from the
+project root, names the roots it searched and the roots it deliberately does not
+judge, prints considered/scored/skipped with a reason breakdown whether or not
+any count is zero, refuses a non-`.fd` path by name instead of parsing markup as
+FigDown, and runs strict.
+
+**Also.** `read/0.2/` is the reading contract for the new language version
+and is now the live one; `read/0.1/` stays exactly as v0.1.0 published it.
+
+**Nothing moved on the canvas.** Every figure this release rewrote renders
+byte-for-byte as it did before — the words changed, the drawings did not.
+
 ## v0.1.8 — 2026-08-11
 
 **Language version: `0.1`.** Patch. No language change.

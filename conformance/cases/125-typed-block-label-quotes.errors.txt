@@ -1,4 +1,4 @@
-Line 12: bitfield label must be quoted: bitfield b1 "Hdr" — whitespace also separates positionals, so a bare token cannot express a phrase (MIGRATIONS)
-Line 13: table label must be quoted: table t1 "Caption" — whitespace also separates positionals, so a bare token cannot express a phrase (MIGRATIONS)
-Line 14: timing label must be quoted: timing w1 "Lane" — whitespace also separates positionals, so a bare token cannot express a phrase (MIGRATIONS)
-Line 15: table label must be quoted: table t2 "My" — whitespace also separates positionals, so a bare token cannot express a phrase (MIGRATIONS)
+Line 12: bitfield label must be quoted: bitfield b1 "Hdr" — whitespace also separates positionals, so a bare token cannot express a phrase (MIGRATIONS 0.1)
+Line 13: table label must be quoted: table t1 "Caption" — whitespace also separates positionals, so a bare token cannot express a phrase (MIGRATIONS 0.1)
+Line 14: timing label must be quoted: timing w1 "Lane" — whitespace also separates positionals, so a bare token cannot express a phrase (MIGRATIONS 0.1)
+Line 15: table label must be quoted: table t2 "My" — whitespace also separates positionals, so a bare token cannot express a phrase (MIGRATIONS 0.1)

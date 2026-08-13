@@ -1,0 +1,63 @@
+{
+  "header": {
+    "version": "0.2",
+    "genre": "statechart"
+  },
+  "flow": "right",
+  "classes": [],
+  "planes": [
+    {
+      "id": "base",
+      "z": 0
+    }
+  ],
+  "nodes": [
+    {
+      "id": "locked",
+      "label": "LOCKED",
+      "shape": "box",
+      "plane": "base",
+      "line": 8
+    },
+    {
+      "id": "unlocked",
+      "label": "UNLOCKED",
+      "shape": "box",
+      "plane": "base",
+      "line": 9
+    }
+  ],
+  "groups": [],
+  "edges": [
+    {
+      "a": "locked",
+      "op": "->",
+      "b": "unlocked",
+      "mid": "coin",
+      "plane": "base",
+      "line": 10
+    },
+    {
+      "a": "unlocked",
+      "op": "->",
+      "b": "locked",
+      "mid": "push",
+      "plane": "base",
+      "line": 11
+    },
+    {
+      "a": "locked",
+      "op": "->",
+      "b": "locked",
+      "mid": "push",
+      "plane": "base",
+      "line": 12
+    }
+  ],
+  "ranks": [],
+  "pins": [],
+  "thresholds": [],
+  "bands": [],
+  "bundles": [],
+  "regions": []
+}

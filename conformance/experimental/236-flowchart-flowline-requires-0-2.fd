@@ -1,0 +1,9 @@
+# `KEYWORD-RENAME-SCOPE`: the gate cuts BOTH ways. `flowline` is 0.2 vocabulary, so writing it in
+# a document that declares 0.1 is a line error NAMING THE VERSION — the same
+# shape as `genre "statechart" requires figdown 0.2`. Two spellings inside ONE
+# version is a SPELLING VARIANT, which SYNTAX-STYLE RULE 5 forbids; two spellings
+# across VERSIONS is ordinary language evolution, each version accepting one.
+figdown 0.1 flowchart
+process a "Step"
+process b "Step 2"
+flowline a -> b

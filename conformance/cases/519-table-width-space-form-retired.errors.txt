@@ -1,2 +1,2 @@
-Line 14: width takes ONE comma-delimited token: write width auto,90,25% — the space form is retired (MIGRATIONS)
-Line 9: width takes ONE comma-delimited token: write width auto,90,25% — the space form is retired (MIGRATIONS)
+Line 14: width takes ONE comma-delimited token: write width auto,90,25% — the space form is retired (MIGRATIONS 0.1)
+Line 9: width takes ONE comma-delimited token: write width auto,90,25% — the space form is retired (MIGRATIONS 0.1)

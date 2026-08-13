@@ -1,6 +1,7 @@
 # FigDown genre documents
 
-> Navigation index for the six v0.1 genres (`GENRE-DOCUMENT-CONTRACT` documentation contract).
+> Navigation index for the seven genres (`GENRE-DOCUMENT-CONTRACT` documentation contract) — the
+> six of `figdown 0.1`, plus `statechart`, which needs `figdown 0.2` (`STATECHART-GENRE-SCOPE`).
 >
 > **Spec split:** the cross-genre framework is [../core.md](../core.md)
 > (formerly `spec/core.md`). Each file below is the **only** normative
@@ -8,8 +9,8 @@
 >
 > **Frozen and experimental are separated at the FILE level.**
 > The three NORMATIVE genres — `block`, `bitfield`, `table` — are the `.md`
-> files in this directory. The three EXPERIMENTAL ones — `topology`,
-> `flowchart`, `timing` — are in [experimental/](experimental/). A reader or
+> files in this directory. The FOUR EXPERIMENTAL ones — `topology`,
+> `flowchart`, `timing`, `statechart` — are in [experimental/](experimental/). A reader or
 > an agent that wants nothing outside the v0.1 conformance surface can
 > ignore that subdirectory whole, and this index and the frozen genre
 > documents stay complete without it: nothing frozen is DEFINED there, and no
@@ -91,18 +92,20 @@ doc's prose.
 |---|---:|---|---|---|---|---|
 | `block` | 24.3% | scene namespace | NORMATIVE | none — OPEN (`DOMAIN-VOCABULARY-PREFERENCE` §4) | [complete vocabulary](block.md#complete-vocabulary-normative) | [block.md](block.md) |
 | `topology` | 5.0% | scene namespace | **EXPERIMENTAL** | `bundle` only, itself **EXPERIMENTAL** — OPEN (`DOMAIN-VOCABULARY-PREFERENCE` §4) | [complete vocabulary](experimental/topology.md#complete-vocabulary-normative) | [experimental/topology.md](experimental/topology.md) |
-| `flowchart` | 8.3% | scene namespace | **EXPERIMENTAL** | `process`, `decision`, `terminator` (`FLOWCHART-ROLE-KEYWORDS`) — the **first exercise of `GENRE-VOCABULARY-OBLIGATION`** by any genre; each itself **EXPERIMENTAL** | [complete vocabulary](experimental/flowchart.md#complete-vocabulary-normative) | [experimental/flowchart.md](experimental/flowchart.md) |
+| `flowchart` | 8.3% | scene namespace | **EXPERIMENTAL** | `process`, `decision`, `terminator` (`FLOWCHART-ROLE-KEYWORDS`) — the **first exercise of `GENRE-VOCABULARY-OBLIGATION`** by any genre; plus `flowline` (`GENRE-CONNECTOR-SPELLING`), which **replaces** the scene `edge` here rather than adding to it; each itself **EXPERIMENTAL** | [complete vocabulary](experimental/flowchart.md#complete-vocabulary-normative) | [experimental/flowchart.md](experimental/flowchart.md) |
 | `bitfield` | 23.7% | nested genre | NORMATIVE | `bitfield`, `field`, `break` | [complete vocabulary](bitfield.md#complete-vocabulary-normative) | [bitfield.md](bitfield.md) |
 | `table` | 9.6% | nested genre | NORMATIVE | `table`, `\|` rows, `cell`, `width` | [complete vocabulary](table.md#complete-vocabulary-normative) | [table.md](table.md) |
 | `timing` | 7.2% | nested genre | **EXPERIMENTAL** | `timing`, `signal`, `gap` | [complete vocabulary](experimental/timing.md#complete-vocabulary-normative) | [experimental/timing.md](experimental/timing.md) |
+| `statechart` | 3 of 91 production docs | scene namespace | **EXPERIMENTAL** | `state`, `transition` (`GENRE-NODE-SPELLING`, OMG UML 2.5.1 §14) — they **replace** the scene `node` and `edge` here; needs `figdown 0.2` | [complete vocabulary](experimental/statechart.md#complete-vocabulary-normative) | [experimental/statechart.md](experimental/statechart.md) |
 
 **Genre status (`CONSTRUCT-STATUS-TIERS`, core doc §10).** each genre carries a
-status, and the six split three and three:
+status. The six of `figdown 0.1` split three and three; `statechart` (`STATECHART-GENRE-SCOPE`)
+made the experimental side four:
 
 | Status | Genres | What it means |
 |---|---|---|
 | **NORMATIVE** (NORMATIVE) | `block`, `bitfield`, `table` | Inside the v0.1 **conformance surface** and inside the **compatibility promise**. A conforming implementation MUST support the genre; it changes only through a migration entry (`VERSION-MIGRATION-MODEL`). |
-| **EXPERIMENTAL** (EXPERIMENTAL) | `topology`, `flowchart`, `timing` | The reference engine accepts the genre and its documents keep working — but it is **outside** both. It may change or be withdrawn in a later `0.x` **without a migration entry**, and a document written in it is not a portable v0.1 document. |
+| **EXPERIMENTAL** (EXPERIMENTAL) | `topology`, `flowchart`, `timing`, `statechart` | The reference engine accepts the genre and its documents keep working — but it is **outside** both. It may change or be withdrawn in a later `0.x` **without a migration entry**, and a document written in it is not a portable v0.1 document. |
 
 The demotion is documentation only. The engine accepts all six genres
 unchanged, every existing document parses and renders exactly as before, and
@@ -218,12 +221,16 @@ defect, but fixing it is not a promotion. The normative treatment is
 
 Two families, one language:
 
-- **Scene namespace** (`block`, `topology`, `flowchart`) share one
-  vocabulary — `node`, `edge`, `group` and the rest of §2 — and differ only
-  in defaults. `flowchart` defaults to `flow down`; the other two to
-  `flow right`. Because the namespace is identical, the header is the ONLY
-  place such a document states which kind of figure it is; that is why the
-  genre token is required.
+- **Scene namespace** (`block`, `topology`, `flowchart`, `statechart`) share
+  one vocabulary — `group`, `class`, `flow`, `rank` and the rest of §2 — and
+  differ in defaults and in **what each calls the thing and the line**
+  (`GENRE-CONNECTOR-SPELLING`/`GENRE-NODE-SPELLING`): `block`/`topology` write `node`/`edge`,
+  `flowchart` writes `node`/`flowline`, `statechart` writes
+  `state`/`transition`. Each takes the term its own domain uses; the
+  constructs, grammar and model are identical. `flowchart` defaults to
+  `flow down`; the others to `flow right`. Because the *constructs* are
+  identical, the header is still the ONLY place such a document states which
+  kind of figure it is; that is why the genre token is required.
 - **Nested genres** (`bitfield`, `table`, `timing`) each own a closed
   sub-grammar and declare their kind in their content as well as in the
   header.
@@ -300,7 +307,20 @@ what `GENRE-DOCUMENT-CONTRACT` §3 asks completeness to be achieved through.
 keyword and is counted as one — registry row: core §10 (c′), definition
 §4.4, vocabulary row in [table.md](table.md).
 
-**Planned (not in engine):** `statechart` — finite-state / Harel-style
-statechart figures; design draft only, EXPERIMENTAL when landed. See
-decisions/registry.md.
-Header `figdown 0.1 statechart` is not accepted yet.  <!-- fence-check: skip -->
+**`statechart` LANDED (`STATECHART-GENRE-SCOPE`)** as an EXPERIMENTAL genre, and it
+is the reason the language number moved: it is surface `figdown 0.1` does not
+have, so it requires `figdown 0.2` and `figdown 0.1 statechart` stays a line
+error. When it landed it added **no keywords** — the header token, the scene
+allowlist and a reading rule were the whole increment. **0.2 (`GENRE-NODE-SPELLING`)
+gave it its two:** `state` and `transition`, taken whole from OMG UML 2.5.1
+§14, replacing `node` and `edge` here (which are now named line errors). That
+also made reclassifying a figure cost every connector line rather than line 1
+— a cost accepted deliberately, and paid by `tools/migrate-figdown.js`. The design record is
+decisions/registry.md;
+the normative document is
+[experimental/statechart.md](experimental/statechart.md).
+
+**Deferred, and named so it is not mistaken for an oversight:** `initial`,
+`final` and `mode` (draft §5.2) are NOT in the language, gated on `NEW-CONSTRUCT-EVIDENCE-GATE`
+evidence. A reader may not infer an initial or final state from a figure's
+shape.

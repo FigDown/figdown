@@ -91,6 +91,44 @@ Both are held byte-unchanged by `gate:archive`
 modification, on deletion, and on a file appearing under an archived prefix
 that the release did not ship — over every archived version, every run.
 
+## 0.2  (2026-08-12, releasing as `v0.2.0`)
+
+The second released language version, and the project's **first `Y`**. It
+adds `statechart` (an EXPERIMENTAL genre requiring `figdown 0.2`) and
+**removes nothing**: every `figdown 0.1` document parses to the same model
+under this release as under `v0.1.8`, and every `figdown 0.1` conformance
+golden passes unmodified. The full account, with the rewrite that is not
+owed, is the `0.1 → 0.2` entry at the end of this log.
+
+**The reading contract.** [`read/0.2/`](../read/0.2/reading.md) is the
+reading contract for `figdown 0.2` and is the **live** one from this release
+on: `read/0.1/` is frozen at the bytes `v0.1.0` shipped and is never edited
+again, which is exactly the version-directory mechanism `0.1`'s entry above
+predicted would be used. `read/0.2/` carries `figdown 0.1`'s reading
+unchanged plus the new genre's, because `Y` removes nothing.
+
+**The archive (§13.5).**
+
+| | |
+|---|---|
+| **tag** | `v0.2.0` — created by the release act |
+| **runnable page** | `archive/0.2/figdown.html` — written at **publish**, from the published engine stamped `0.2.0` |
+
+Both are **owed at the release act and not before**, for the reason `0.1`'s
+entry states: the archived page is the engine *as users ran it*, and that
+artifact does not exist until `publish.py` stamps it. `node
+tools/archive-check.js --write 0.2` then appends the `0.2` rows — covering
+`archive/0.2/figdown.html` and every file under `read/0.2/` — to
+[`archive/MANIFEST.tsv`](../archive/MANIFEST.tsv), after which `gate:archive`
+holds them byte-frozen forever on the same terms as `0.1`.
+
+**An engine that accepts only `figdown 0.1`** — including
+[`archive/0.1/figdown.html`](../archive/0.1/figdown.html) — rejects a
+`figdown 0.2` document by name (`unsupported version "0.2" (expected 0.1)`)
+rather than guessing. That is core §13.0.1's `Y` < `y` branch working as
+specified, and it is why a document should declare the **lowest** version
+that carries what it needs.
+
 ## Entry format
 
 ```
@@ -104,33 +142,109 @@ Example: before → after
 `<decision ref>` cites a decision ID defined in
 [`decisions/registry.md`](../decisions/registry.md).
 
----
+## 0.1 → 0.2  (2026-08-12, what a document must change to declare `figdown 0.2`)
+Change:  **NOTHING IS FORCED. A `figdown 0.1` document does not have to
+         move.** Every document that was legal at `v0.1.8` parses to the
+         same model under this release — `figdown 0.1 flowchart` writing
+         `edge` included, and deliberately so. That is `core.md` §13.0
+         keeping its first real test: only a MAJOR version may remove, so
+         **no `0.x` release may drop it**. It is supported until v1.0,
+         where removing it would be a scheduled act with its own entry in
+         this log and a named diagnostic. Nothing in this entry is owed by
+         a document that stays where it is.
 
-## 0.1 — first released language version
+         The rest of this entry answers one question: **what must change
+         in a document whose header you want to read `figdown 0.2`?**
 
-Language `figdown 0.1` is the first released version, so **there is no earlier
-released version to migrate from and this log has no entry before it.**
+         **One word, in one genre.** Under `flowchart`, `figdown 0.2`
+         spells the connector `flowline`, so a section that raises its
+         header rewrites its connector lines with it. The two move
+         together or the section does not parse, and each version accepts
+         exactly one spelling: `edge` under `figdown 0.2 flowchart` is a
+         line error naming the word to write, and `flowline` under
+         `figdown 0.1 flowchart` is a line error naming the version that
+         carries it.
 
-The language was developed through a series of pre-release increments. Those
-were never published, no document was ever written against one outside the
-project, and their hop-by-hop rewrite rules are development history rather than
-anything a reader of this repository can act on. They are not reproduced here.
+         | genre | under `figdown 0.1` | under `figdown 0.2` |
+         |---|---|---|
+         | `block`, `topology` | `edge` | `edge` |
+         | `flowchart` | `edge` | `flowline` |
+         | `statechart` | the genre requires `figdown 0.2` | `transition` |
 
-**What this means in practice:**
+         **`block` and `topology` keep `edge` at every version, and
+         `node` is unchanged in every genre that has it.** The rename is
+         per genre, not language-wide, and `edge` is not retired: a
+         `figdown 0.2 block` or `figdown 0.2 topology` section writes
+         `edge` exactly as it did before, and writing `flowline` there is
+         a line error of its own. Do not migrate them by analogy — one
+         genre's connector word moved, and only at `figdown 0.2`.
 
-- **A document declaring `figdown 0.1` needs no migration.** It is written
-  against the first released version.
-- **The next entry will be the first change to the language**, carrying the
-  mechanical rewrite rule, the named diagnostic, and the matching rewrite in
-  `tools/migrate-figdown.js`, exactly as the policy above requires.
-- **`tools/migrate-figdown.js` is still cumulative and idempotent**
-  ([core.md §13.4](core.md#134-0x-is-a-rehearsal--what-that-means)). It retains
-  every rewrite the project has ever shipped, including the pre-release ones
-  this log does not narrate. Running it on a `figdown 0.1` document changes
-  nothing, which is the correct result rather than an absence of one.
-  `tools/migrate-check.js` is the suite that proves it.
+         **`statechart` becomes available, and it is a capability rather
+         than an obligation.** `figdown 0.2` adds an EXPERIMENTAL genre
+         for state machines
+         ([`genres/experimental/statechart.md`](genres/experimental/statechart.md)),
+         reachable only from `figdown 0.2` — `figdown 0.1 statechart` is
+         a line error naming the version. No existing document has to
+         become one, and moving a document to `figdown 0.2` does not
+         start the question. Reclassifying is an AUTHOR judgement and
+         never a mechanical one: do it when the nodes are modes the
+         machine is IN rather than steps it performs, and not because the
+         figure has cycles or self-loops, neither of which identifies a
+         state machine. A figure that does move writes `state` and
+         `transition` where it wrote `node` and `edge`, and
+         `tools/migrate-figdown.js` rewrites those two words once the
+         header names the genre; the reverse costs the same.
 
-If you hold a document written against a pre-release engine, it is not a
-`figdown 0.1` document and this log cannot tell you how to convert it. Run
-`tools/migrate-figdown.js` over it: the tool reports anything it cannot do
-mechanically.
+         **Nothing else changes.** The declared version reaches exactly
+         two decisions in the engine — which genres a header may name,
+         and which word `flowchart` spells its connector with. Every
+         other keyword, option key, default, diagnostic and model field
+         is identical under `figdown 0.1` and `figdown 0.2`.
+
+Rule:    **MECHANICAL, scoped BY GENRE and BY VERSION, and the header
+         moves with the keyword.** `tools/migrate-figdown.js` performs
+         all of it. Read the genre and the version from each
+         `figdown <ver> <genre>` header, then, on **line-initial keyword
+         position only** (never inside a label, a comment or an option
+         value):
+
+           genre `flowchart`, section declaring 0.1, section writes a
+           connector:      ^(\s*)figdown(\s+)0\.1(\s)  → $1figdown$20.2$3
+                           ^(\s*)edge\b                → $1flowline
+           genre `block`, `topology`, any non-scene genre, or a
+           `flowchart` section writing no connector:      NO CHANGE
+           before the first header (genre unknown):       NO CHANGE
+
+         **The bump is per SECTION and happens only where a connector
+         actually appears.** In a multi-section file each `figdown` header
+         re-scopes the rule for the lines that follow it, so a
+         `figdown 0.1 flowchart` section carrying connector lines comes
+         out `figdown 0.2 flowchart` while a `figdown 0.1 block` section
+         in the same file keeps its version AND keeps `edge`. Declaring
+         the LOWEST version that carries what the section needs is the
+         rule: a higher declaration narrows the set of engines that will
+         read it and buys nothing. A `flowchart` section that draws no
+         connector needs no `0.2` vocabulary and is left where it is.
+
+         Idempotent by construction — no output spelling appears in a
+         source position of the table, and a section already declaring
+         `figdown 0.2` is left alone. A document that an earlier run
+         rewrote to `flowline` and left at `figdown 0.1` has its header
+         raised on the next run, which is the corpus case fixture 122
+         pins; fixture 123 asserts that a `block` + `topology` document
+         comes out byte-identical.
+
+Example: `figdown 0.1 flowchart` → `figdown 0.2 flowchart`
+         `edge acl -[deny]-> fwd` → `flowline acl -[deny]-> fwd`
+         (`tools/migrate-fixtures/121-flowchart-edge-to-flowline.fd`; the
+         drawing is unchanged)
+
+Classification: COMPATIBLE — `figdown 0.2` ADDS and removes nothing.
+         Every `figdown 0.1` document parses to the same model as it did
+         at `v0.1.8`, every `figdown 0.1` conformance golden passes
+         unmodified, and nothing becomes UNAVAILABLE:
+         [`archive/0.1/figdown.html`](../archive/0.1/figdown.html) and
+         [`read/0.1/`](../read/0.1/reading.md) are byte-untouched and
+         `gate:archive` holds them so.
+
+Ruling:  `STATECHART-GENRE-SCOPE`, `GENRE-CONNECTOR-SPELLING`, `GENRE-NODE-SPELLING`, `KEYWORD-RENAME-SCOPE`.

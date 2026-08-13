@@ -186,7 +186,7 @@ allowed in genre block` (the genre allowlist, not a reservation
 diagnostic). The reserved mark was an ordinary character that was
 sometimes an error by accident.
 
-**(`SEMICOLON-STATUS`)** a `;` is a line error wherever it is part of the
+**A `;` is a line error** (`SEMICOLON-STATUS`) wherever it is part of the
 grammar, with a diagnostic that names the reservation. It stays legal in
 all four verbatim regions: inside a quoted string, inside an `[edge
 label]`, inside a comment, and inside a GFM pipe row. `core.md`'s
@@ -983,8 +983,8 @@ the absence, so nothing untrue is claimed.
 These are not new rules; they are the consistency the language has already
 achieved. A proposal must not break them. Each was verified against the
 parser. The maintainer-ruling item codes cited in the table (`OMITTED-LABEL-RECORDING`, `REPEATED-DIRECTIVE-HANDLING`,
-`EMPTY-LABEL-STATE`) are defined in the
-A-code registry.
+`EMPTY-LABEL-STATE`) are defined in
+[`decisions/registry.md`](../decisions/registry.md).
 
 | Invariant | Evidence (verified) |
 |---|---|
@@ -997,7 +997,7 @@ A-code registry.
 | **Absent, `""` and `"x"` are three distinct label states (`OMITTED-LABEL-RECORDING`/`EMPTY-LABEL-STATE`).** | `node a` → `"label": null`; `node a ""` → `"label": ""`. figdown.html:1021, 1039, 1060, 1003 |
 | **Every retired spelling carries a named diagnostic naming its migration.** | `color=` :329; `w=`/`h=`/`dir=` :342-346; `kind=` :1010; `label=` family :551; `from=`/`to=` :1169; `shape=cloud` :123; `colw` :727; `line`/`fill`/`route`/`render` :750-753 |
 | **One id namespace for nodes, groups, boundaries and typed blocks.** `class`, `layer` and `bundle` keep their own. | `node a` + `group a` → `duplicate id "a"`; `node a` + `bitfield a …` → `duplicate id "a"`; `class c "x"` + `layer c` → parses. figdown.html:508 |
-| **Repeating a single-valued directive is an error on the second occurrence (`REPEATED-DIRECTIVE-HANDLING`).** | `duplicate title line`, `duplicate flow line`, `duplicate pin for "a"`, `duplicate layout line` — all verified. figdown.html:1385, 1531, 1774, 1779. (`duplicate size for "a"` was one instance until 0.1 retired the keyword; `duplicate pin for "a"` now covers the merged geometry line. `duplicate routing line` was another until 0.1 **withdrew** `routing`, `EDGE-GEOMETRY-CONSTRUCTS` — the citation is removed rather than left pointing at deleted code, and the "at most one `path` per edge" duplicate check went with it. Four live instances still carry the invariant.) |
+| **Repeating a single-valued directive is an error on the second occurrence (`REPEATED-DIRECTIVE-HANDLING`).** | `duplicate title line`, `duplicate flow directive`, `duplicate pin for "a"`, `duplicate layout line` — all verified. figdown.html:1385, 1531, 1774, 1779. (`duplicate size for "a"` was one instance until 0.1 retired the keyword; `duplicate pin for "a"` now covers the merged geometry line. `duplicate routing line` was another until 0.1 **withdrew** `routing`, `EDGE-GEOMETRY-CONSTRUCTS` — the citation is removed rather than left pointing at deleted code, and the "at most one `path` per edge" duplicate check went with it. Four live instances still carry the invariant.) |
 | **The grammar is closed.** Every non-blank non-comment line must begin with a registered token. Under a DECLARED genre the message names the genre (`"zzz" is not allowed in genre block`); `unrecognized line` is what an implementation must produce when no valid genre is in force. core §0.1 states both from 0.1. | the genre allowlist, and `unrecognized line` in the switch default |
 | **Comma within a value, whitespace between positionals.** No construct uses whitespace as an intra-value delimiter, and no construct uses a comma as a positional separator. Since 0.1 (`COMMA-LIST-WHITESPACE`) this is exact rather than nearly-true: a comma list is ONE whitespace-free token everywhere. | The comma appears only inside `at=`, `class=`, `labels=`, `rank`, `width`, `bundle`, `field` compact and `cell` — always within one value. Verified across all eight. (It was ten until 0.1: `via=` and the `src=`/`dst=` pair, counted as one carrier each, went with the `path` directive under `EDGE-GEOMETRY-CONSTRUCTS`. 10 − 2 = 8.) |
 
@@ -1279,7 +1279,7 @@ Documentation corrections in the same release, all done:
 - `via=`'s value shape was recorded in its **retired** pre-0.1 form
   `x,y;x,y;…` in all three scene genre docs; all three were corrected to
   `via=(x,y),(x,y)`. *(Same fate: the key was renamed `points=`
-  And withdrawn with `path`.)*
+  and withdrawn with `path`.)*
 - `plot` had no vocabulary row anywhere. **Ruling: the allowlist is right
   and the tables were incomplete.** `plot` is defined by its reference to
   a `table` id, and `table` is a legal host keyword in every scene genre,
@@ -1411,7 +1411,7 @@ engine.
 ## 11. The machine-readable companion
 
 [vocabulary-sources.tsv](vocabulary-sources.tsv) carries one row per
-option key, per positional value shape, per keyword spelling, and — — **per lexical MARK**, with the
+option key, per positional value shape, per keyword spelling, and — **per lexical MARK**, with the
 source standard, that standard's own spelling, the value shape, the
 accepted syntax **as derived from the parser**, the `CONSTRUCT-STATUS-TIERS` status, any
 foreign standard that conflicts, and — non-empty only where the row breaks
@@ -1475,5 +1475,5 @@ and `Z-ORDER-KEY-NAMING` decides it once the clause is read.
 **Cross-references.** [.github/CONTRIBUTING.md](../.github/CONTRIBUTING.md) (the gate and the change
 obligations) · [core.md](core.md) §1 (lexical rules), §10 (the registry) ·
 [migrations.md](migrations.md) (every retirement's rewrite rule) ·
-requirements-notes.md `PRIOR-ART-BORROWING`, `NEW-CONSTRUCT-EVIDENCE-GATE`, `SPELLING-LENGTH-VS-FREQUENCY`,
+[`decisions/registry.md`](../decisions/registry.md) `PRIOR-ART-BORROWING`, `NEW-CONSTRUCT-EVIDENCE-GATE`, `SPELLING-LENGTH-VS-FREQUENCY`,
 `REVERSE-ARROW-OPERATOR`, `UNSAFE-DEFAULT-ELIMINATION`, `HEADER-GENRE-REQUIREMENT`, `CONSTRUCT-STATUS-TIERS`, `PAINT-KEY-NAMING`, `SHAPE-ENUM-VOCABULARY`, `OPTION-POSITION-PARSING`, `LANE-ALPHABET-KEY-RESERVATION`, `POSITIONAL-LIST-SPELLING`, `SIZE-AND-DIRECTION-KEY-NAMING`, `TABLE-ROW-SYNTAX`.

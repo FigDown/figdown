@@ -1,2 +1,7 @@
-figdown 0.2 block
+# `STATECHART-GENRE-SCOPE`: this fixture read `figdown 0.2 block` until the language
+# number moved and `0.2` became a version the engine accepts. Its SUBJECT is
+# unchanged — an unknown MINOR version is a line error, not a lenient parse
+# (`UNKNOWN-MINOR-VERSION`) — so the fixture keeps its name and its citation, and moves to the
+# next minor the engine does not implement.
+figdown 0.3 block
 node a "A"

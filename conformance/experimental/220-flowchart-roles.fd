@@ -4,7 +4,7 @@
 # the model as the resolved value, exactly as `node`'s materialized default
 # does. The role shares the node id namespace and is addressable by edge,
 # rank and pin like any node.
-figdown 0.1 flowchart
+figdown 0.2 flowchart
 title "Roles"
 terminator start "Begin"
 process     step "Do the work"
@@ -12,10 +12,10 @@ decision    gate "Continue?"
 terminator  stop "End"
 flow down
 rank step,gate
-edge start -> step
-edge step -> gate
-edge gate -[yes]-> stop
-edge gate -[no]-> step
+flowline start -> step
+flowline step -> gate
+flowline gate -[yes]-> stop
+flowline gate -[no]-> step
 layout
 pin start at=(10,10)
 pin step width=90 height=30

@@ -1,2 +1,2 @@
-Line 8: field: the item list is ONE comma-delimited token — unexpected argument "Length:16" (write field a:1,b:2 with no space after the comma; quote a name that contains whitespace: "Long Name":16) (MIGRATIONS)
+Line 8: field: the item list is ONE comma-delimited token — unexpected argument "Length:16" (write field a:1,b:2 with no space after the comma; quote a name that contains whitespace: "Long Name":16) (MIGRATIONS 0.1)
 Line 9: bad item "Fragment" (expected name:width; quote a name that contains spaces: "Long Name":16)

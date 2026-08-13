@@ -1,0 +1,11 @@
+# `GENRE-CONNECTOR-SPELLING`/`GENRE-NODE-SPELLING`: the scoping runs in BOTH directions. A flowchart's word and a
+# statechart's word are line errors under `block`, by the same allowlist that
+# makes `edge` a line error under those two — no per-keyword code, and the
+# same named diagnostic pointing at the word this genre does use.
+figdown 0.1 block
+node a "A"
+node b "B"
+flowline a -> b
+transition a -> b
+state c "C"
+edge a -> b

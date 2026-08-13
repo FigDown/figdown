@@ -262,7 +262,7 @@ contain them, and the edges that relate them.
   (`rank a,b,c`); the space form `rank a b c` was RETIRED at  <!-- fence-check: skip -->
   0.1 (`POSITIONAL-LIST-SPELLING`) and is now the line error `rank takes ONE
   comma-delimited token: write rank a,b,c — the space form is retired
-  (MIGRATIONS)`. Reserving the rest of a `rank` line for future
+  (MIGRATIONS 0.1)`. Reserving the rest of a `rank` line for future
   `key=` options is exactly what forces this: a positional list that runs on
   past whitespace never terminates, so there is nowhere for an option to
   begin. `POSITIONAL-LIST-SPELLING` had ruled the space form "NOT deprecated" on migration cost,

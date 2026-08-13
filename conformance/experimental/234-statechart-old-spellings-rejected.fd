@@ -1,0 +1,10 @@
+# `GENRE-NODE-SPELLING`: under `statechart`, `node` and `edge` are LINE ERRORS with the named
+# diagnostic. This is the asymmetry with `flowchart`, where `node` STAYS legal:
+# there a stage can have a role THE SOURCE DOES NOT STATE, and a bare `node` is
+# the only spelling for that (`BARE-NODE-MEANING`) — a statechart has one kind of node, so
+# nothing is left for `node` to mean and it is simply the old word.
+figdown 0.2 statechart
+node locked "LOCKED"
+state unlocked "UNLOCKED"
+edge locked -[coin]-> unlocked
+transition unlocked -[push]-> locked

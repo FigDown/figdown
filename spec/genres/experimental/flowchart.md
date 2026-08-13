@@ -99,7 +99,7 @@ under `SIZE-AND-DIRECTION-KEY-NAMING`/`GENRE-DOCUMENT-CONTRACT` §6(b). See *Sou
 
 Option keys are **identical to `node`**: `shape` `fill` `stroke` `style`
 `class` `in` `plane`. A role line shares the node / group / external /
-typed-block **id namespace** and is addressable by `edge`, `pin` and
+typed-block **id namespace** and is addressable by `flowline`, `pin` and
 `rank` exactly like a `node`. Every rule that governs `node` — id spelling,
 label quoting, duplicate ids, the `shape=` enum, `width=`/`height=` rejection
 (`<node|process|decision|terminator> does not take width=/height= — use a
@@ -123,6 +123,73 @@ A role line declares a **node bearing a `role`**:
 `decision` is the one role that carries a **semantic constraint beyond
 naming**: its exits are mutually exclusive. A `process` with several outgoing
 edges remains as ambiguous as any other fan-out (see *Semantic model*).
+
+#### Which of the four to write
+
+**Prefer one of the three ISO roles — `process`, `decision`, `terminator`.
+Write `node` only when the source does not state which.** They are not four
+equal spellings: the roles are the first choice and `node` is the fallback.
+
+**What `node` means here, exactly: THE SOURCE DOES NOT STATE THE ROLE.** That
+is its only legitimate use, and it is a permanent one. ISO 5807 is a standard
+for **drawing** flowcharts: an author with a pen must put *some* symbol on the
+paper, so the standard has no way to say "unclassified" and a genuine
+flowchart stage always has an ISO classification. FigDown separates role from
+geometry, which lets it say the thing ISO cannot — **the source does not state
+the role, and I must not invent one.** That is this project's own rule, not a
+flowchart special case: it is `*` for a length the document does not carry,
+`present=` for a condition the document does state, and a prose value that
+must not be resolved into a number. The corpus is transcription-heavy, and a
+transcriber genuinely unable to tell a Process from a Predefined process is
+the case this spelling exists to serve.
+
+**What `node` does NOT mean: "an ISO symbol this genre has not implemented."**
+That case is real, but it is not a property of the figure — it is a **coverage
+gap in FigDown**. A stage ISO classifies as Data is a Data stage whether or
+not this genre can spell it, so writing a bare `node` there records an absence
+the author does not have. Worse, it records it **silently, in a spelling that
+looks like a deliberate authorial choice**: the reader sees "role unstated"
+and the truth is "the language ran out of words". Do not let a gap disguise
+itself as a judgement.
+
+**When the source states a role `flowchart` cannot spell, do three things:**
+
+1. **Write `node`.** It is still the only legal spelling — `process` would be
+   a false claim, and one no inspection of the figure could catch.
+2. **Comment the line with the ISO symbol name**, so the information survives
+   in text a reader can quote even though the model cannot carry it:
+
+   ```figdown
+   node cfg "Read config file"   # ISO 5807 Data (input/output) — no FigDown role
+   ```
+
+   A comment is not a second semantic channel and a reading agent must not
+   parse it (`MEANING-RECOVERY-SOURCE`). It is the honest interim: quotable prose beside a model
+   that says less than the author knows.
+3. **Report the gap.** It belongs in the ISO 5807 coverage ledger in
+   the project’s working record,
+   which records every symbol in this repository's record of the standard as
+   *spelled*, *partial* or *gap*, with whatever evidence exists for needing
+   it. A gap with a real figure behind it is evidence; a gap nobody reports is
+   invisible, and invisible gaps do not get closed.
+
+**How wide the gap is, measured rather than gestured at.** This repository's
+own record of ISO 5807 lists **sixteen** symbol names — twelve stage symbols
+and four line symbols (`spec/vocabulary-sources.tsv`). This genre spells
+**three** stage roles and **one** line (`flowline`); `style=dashed` carries a
+fourth as presentation only. Nine stage symbols have no word here: Predefined
+process, Manual operation, Preparation, Parallel mode, Loop limit, Data,
+Stored data, Manual input, Document. Each is a gap in the ledger with its own
+evidence, not a licence to write `node` and move on. (Earlier drafts of this
+document said *"around ten symbol kinds"*; that understated the repository's
+own record and is corrected here.)
+
+So the two authors who both write `node` are doing different things, and a
+reader is entitled to tell them apart: one read a source that did not state
+the role; the other did not think. The language cannot distinguish them —
+which is exactly why no check flags a bare `node` here, and why the burden is
+on the author. If the stage **is** an operation, a test, or an entry/exit,
+write the word for it.
 
 **A bare `node` under `flowchart` is ROLE-UNSTATED — it is NOT a `process`.**
 The model OMITS `role` there, and that omission is a fourth state, readable
@@ -159,22 +226,85 @@ The converse also holds and is the reason the vocabulary exists:
 `node q "Valid?" shape=diamond` carries **no role**. It is a legal figure and
 a pre-migration one.
 
-### No new edge vocabulary
+### The connector is `flowline` (`GENRE-CONNECTOR-SPELLING`) — under `figdown 0.2` (`KEYWORD-RENAME-SCOPE`)
 
-Branch conditions continue to ride the edge's `[mid]` label, and the release
-adds no edge keyword, no guard syntax and no branch marker. Every surveyed
+**The spelling is GATED BY THE DECLARED LANGUAGE VERSION**, and that gate is
+part of the rule, not a footnote to it:
+
+| header | the connector | the other word |
+|---|---|---|
+| `figdown 0.1 flowchart` | **`edge`** — exactly as at `v0.1.8` | `flowline` is a line error **naming the version** |
+| `figdown 0.2 flowchart` | **`flowline`** | `edge` is the named wrong-word line error |
+
+`GENRE-CONNECTOR-SPELLING` as shipped applied the rename to the **language** rather than to a version
+of it, so `figdown 0.1 flowchart` + `edge` — legal at `v0.1.8` — stopped
+parsing, with nothing recording that as a decision. **`KEYWORD-RENAME-SCOPE` gates it**: core
+§13.0 lets only a MAJOR version remove, so a `figdown 0.1` document keeps the
+spelling it was written with. Two spellings inside **one** version would be a
+spelling variant, which SYNTAX-STYLE RULE 5 forbids (*two forms of one
+construct are justified ONLY when each accepts input the other cannot express*
+— `edge` and `flowline` accept the same input, so one MUST be retired, and
+RULE 6.2 makes the retired one a line error naming its MIGRATIONS entry); two
+spellings across **versions** is ordinary
+language evolution, and each version accepts exactly one — which is why
+`flowline` under `figdown 0.1` is an error rather than a silent synonym:
+
+```
+"flowline" requires figdown 0.2 (this document declares 0.1): under figdown 0.1
+genre flowchart spells this "edge". The rename is gated by the language version
+— a figdown 0.1 document keeps the spelling it was written with (core §13.0:
+only a MAJOR version removes) — so raise the header to figdown 0.2 or write
+"edge" (MIGRATIONS 0.2)
+```
+
+**`edge` here is supported until v1.0 and no `0.x` may drop it.** The removal
+is a scheduled act with its own MIGRATIONS entry, not a judgement that 0.1
+feels old. Write new flowcharts as `figdown 0.2` with `flowline`;
+`tools/migrate-figdown.js` raises the header **with** the keyword, because a
+rewrite that produces `figdown 0.1` + `flowline` produces a document that does
+not parse. `statechart` needs no gate of its own: the **genre** requires
+`figdown 0.2`, so its vocabulary cannot be reached from a 0.1 document.
+
+**Under `figdown 0.2 flowchart` the line between two steps is spelled
+`flowline`, and `edge` is a line error.** ISO 5807's own term for the connecting symbol is a
+*flowline*; a flowchart is a procedure, not a graph, and `edge` was the graph
+word borrowed from DOT before this genre had a vocabulary of its own. Nothing
+else changes: `flowline` takes the same operators, the same `[tail]`/`[mid]`/
+`[head]` label positions, the same option keys and the same model as `edge`.
+The five 0.2.0 corpus figures re-rendered **byte-identically** under the new
+spelling — it is a rename, and only a rename.
+
+**The verification status is the same as `terminator`'s and is recorded, not
+claimed away.** ISO 5807 was readable only to p. 8 of 25, so the clause
+defining the linking symbol was not read. The criterion the maintainer applied
+is **the term the domain actually uses**, corroborated across independent
+sources, *not* RULE 4.1's requirement of the standard's exact orthography — so
+the ISO-spelling debt does not decide this word. If the purchased clause spells
+it otherwise, `Z-ORDER-KEY-NAMING` renames it with a MIGRATIONS entry and a named diagnostic.
+
+**The cost, accepted deliberately.** Before this release, reclassifying a
+flowchart as a statechart changed **line 1 only** — that is how the five corpus
+figures migrated at `STATECHART-GENRE-SCOPE`. With per-genre connectors it now rewrites **every
+connector line**. The maintainer judged that the one-line convenience was
+bought with an imprecision he is not willing to keep; `tools/migrate-figdown.js`
+carries the mechanical rule, so the cost is machine-paid, not author-paid.
+
+### No new branch vocabulary
+
+Branch conditions continue to ride the flowline's `[mid]` label, and the
+release adds no branch keyword, no guard syntax and no branch marker. Every surveyed
 system does the same: ISO 5807 §9.2.2.4 — *"the appropriate results of the
 evaluation may be written adjacent to the lines representing the paths"*;
 UML's bracketed guard on the outgoing edge; PlantUML's `then (yes)`; BPMN,
 whose gateway markers are derived from the outgoing sequence flows'
-conditions. An edge role family (`mainline` / `exception` / `loop-back`) is
+conditions. A connector role family (`mainline` / `exception` / `loop-back`) is
 recorded in `LOGIC-FLOWCHART-GENRE-SCOPE` and guide/layout.md §9 and is entangled with the logic genre;
 `class main/retry/fail` is the taught interim.
 
 ### Source: why ISO 5807 and not UML
 
 ISO 5807 is a **role** standard, not a geometry one — the opposite of what
-`decisions/registry.md` originally claimed, and the correction is
+the project’s working record originally claimed, and the correction is
 annotated there in place. Its own definitions are of the **referent**:
 
 - §3.3 *flowchart*: "…in which **symbols are used to represent operations,
@@ -222,6 +352,14 @@ The set is deliberately three. Every candidate below was considered and is
 recorded as **not shipped**, with its evidence, so that adding one later is a
 decision rather than a rediscovery.
 
+This table records **decisions**. The symbol-by-symbol **coverage** view —
+every name in this repository's record of ISO 5807 marked *spelled*, *partial*
+or *gap*, with the measurement that would close each gap — is the ledger in
+the project’s working record.
+It lives there because it changes whenever a measurement lands or a paywalled
+clause is read, and because it has to be able to say *"unknown"* about the
+standard itself.
+
 | Excluded | Reason |
 |---|---|
 | `predefined process`, `parallel mode`, `loop limit` | ISO's names are **two words**; `GENRE-DOCUMENT-CONTRACT` §6(a) requires one lowercase word, and `SIZE-AND-DIRECTION-KEY-NAMING` forbids substituting a one-word synonym from another source. If evidence later forces them, this is a filed **naming problem**, not a silent rename. |
@@ -264,7 +402,8 @@ experimental members until `EDGE-GEOMETRY-CONSTRUCTS` withdrew them);
 **S** = the scene namespace shared with
 `block` and `topology`; **F** = **`flowchart`'s OWN vocabulary** — legal
 under this genre and no other (`FLOWCHART-ROLE-KEYWORDS`; the first exercise of
-`GENRE-NAMESPACE` `GENRE-VOCABULARY-OBLIGATION` by any genre); **N** = a nested-genre opener — composition, not
+`GENRE-NAMESPACE` `GENRE-VOCABULARY-OBLIGATION` by any genre — joined, `GENRE-CONNECTOR-SPELLING`, by `flowline`, which
+**replaces** the scene-namespace `edge` here rather than adding to it); **N** = a nested-genre opener — composition, not
 `flowchart` vocabulary (§4, `GENRE-COMPOSITION`).
 
 **Status** = the `CONSTRUCT-STATUS-TIERS` status (§10): **NORMATIVE** = NORMATIVE, inside the v0.1
@@ -286,7 +425,7 @@ carrying the same construct into `block`.
 | `terminator` | `terminator <id> ["label"]` | **F** | **EXPERIMENTAL** | `shape` `fill` `stroke` `style` `class` `in` `plane` | `role="terminator"`, `shape=rounded` DERIVED; spelling PENDING VERIFICATION (§Roles) |
 | `group` | `group <id> ["label"]` | S | NORMATIVE | `fill` `stroke` `style` `class` `plane` `gap` | one nesting level; `plane` absent |
 | `external` | `external <id> ["label"]` | S | NORMATIVE | `plane` | never drawn (`EXTERNAL-EDGE-ENDPOINTS`); since 0.1 it takes NO paint key at all — `color=` was its only one and it is retired (`COLOUR-KEY-STATUS`) |
-| `edge` | `edge <a> [tail] <op> [head] <b>` | S | NORMATIVE | `stroke` `style` `class` `plane` | op is written form; `[mid]` splits the operator; all three labels take the line's colour (`LABEL-COLOUR-SOURCE`) |
+| `flowline` | `flowline <a> [tail] <op> [head] <b>` | **F** | **EXPERIMENTAL** | `stroke` `style` `class` `plane` | **`edge` under this genre is a line error (`GENRE-CONNECTOR-SPELLING`)**; op is written form; `[mid]` splits the operator; all three labels take the line's colour (`LABEL-COLOUR-SOURCE`) |
 | `bundle` | `bundle <id> ["label"] <a>--<b>,<c>--<d>` | S | **EXPERIMENTAL** | `stroke` `style` `plane` | ring drawn dashed; member list is ONE whitespace-free comma-delimited token (the space form was RETIRED at 0.1); no `fill=` — a ring has no interior (§8.4) |
 | `class` | `class <id> "<meaning>"` | S | NORMATIVE | `fill` `stroke` `style` `plane` | the meaning FIELD is REQUIRED, its VALUE may be `""` (= no meaning claimed, no legend entry — `CLASS-EMPTY-MEANING`); a class an `edge` joins MUST declare `stroke=` or `style=` (`INTERIOR-LESS-ELEMENT-PAINT`/`CLASS-PAINT-REQUIREMENT`) |
 | `plane` | `plane <id> ["label"]` | S | **EXPERIMENTAL** | `z-index` | model `z` = 1-based declaration index; implicit `base` is `z` = 0 |
@@ -404,14 +543,29 @@ Today the only difference is a default. `flowchart` shares the scene namespace
 with `block` and `topology` and every entry above is identical under all
 three, except:
 
-| | `block` | `topology` | `flowchart` |
-|---|---|---|---|
-| `flow` default | `right` | `right` | **`down`** |
-| Own keywords (`GENRE-NAMESPACE` `GENRE-VOCABULARY-OBLIGATION`) | none | none | **`process` `decision` `terminator`** |
-| Genre status (`CONSTRUCT-STATUS-TIERS`) | NORMATIVE | EXPERIMENTAL | **EXPERIMENTAL** |
+| | `block` | `topology` | `flowchart` | `statechart` |
+|---|---|---|---|---|
+| `flow` default | `right` | `right` | **`down`** | `right` |
+| the thing | `node` | `node` | `node` | **`state`** |
+| the line | `edge` | `edge` | **`flowline`** | **`transition`** |
+| Own keywords (`GENRE-NAMESPACE` `GENRE-VOCABULARY-OBLIGATION`) | none | none | **`process` `decision` `terminator` `flowline`** | **`state` `transition`** |
+| Genre status (`CONSTRUCT-STATUS-TIERS`) | NORMATIVE | EXPERIMENTAL | **EXPERIMENTAL** | **EXPERIMENTAL** (needs `figdown 0.2`) |
 
-The middle row is new and is the first real difference: under
-`block` or `topology` those three spellings are line errors. The status row
+The role row is new and was the first real difference: under
+`block` or `topology` those three spellings are line errors. The two
+vocabulary rows are new (`GENRE-CONNECTOR-SPELLING`/`GENRE-NODE-SPELLING`) and cut in both directions —
+`edge` is now a line error *here*, and `flowline` is one under `block`.
+
+**Why `node` stays here but not in `statechart`**, since the two rulings look
+inconsistent until the reason is stated: under `flowchart` a stage can have a
+role the **source does not state**, and `node` is the only spelling for that —
+remove it and a transcriber who cannot tell a Process from a Predefined
+process must guess, in a spelling that asserts the guess. `statechart` has
+**exactly one** kind of node, so `state` loses nothing: with one role there is
+nothing to leave unstated. (The reason is *not* the coverage argument this
+paragraph used to give — "ISO has ~ten kinds and we carry three". That is a
+gap in FigDown, not a fourth state of the figure; see §Roles, *Which of the
+four to write*.) The status row
 is a statement about convergence rather than about syntax — `block` is the
 scene genre v0.1 freezes on, and `flowchart` is still held back because one
 tranche of vocabulary is not a converged set (§Roles, *What is excluded*).
@@ -428,8 +582,8 @@ selects the namespace in which `decision` is a keyword rather than an error.
 
 Two conventions matter for reading procedures:
 
-- **Branch conditions ride the edge, not the node.** An edge's `[mid]` label
-  is where the condition goes: `edge q -[yes]-> commit`. A branch whose
+- **Branch conditions ride the flowline, not the node.** A flowline's `[mid]`
+  label is where the condition goes: `flowline q -[yes]-> commit`. A branch whose
   condition is unwritten is a branch a reading agent cannot follow. This is
   scene-namespace behaviour, not `flowchart` behaviour.
 - **`shape=diamond` is geometry, not a role.** Drawing a decision as a
@@ -440,8 +594,8 @@ Two conventions matter for reading procedures:
 
 ## Semantic model (normative — reading rule, `MEANING-RECOVERY-SOURCE`)
 
-A flowchart's meaning is a **directed procedure**: nodes are steps, edges
-are transitions, and an edge's mid label is the condition under which the
+A flowchart's meaning is a **directed procedure**: nodes are steps, flowlines
+are transitions, and a flowline's mid label is the condition under which the
 transition is taken.
 
 - A node names one step. Its label states what happens there (`FIDELITY-TARGET`).
@@ -449,10 +603,10 @@ transition is taken.
   §Roles). The role is a claim about the step, not about its drawing, and it
   is the model. **An absent role is absent**, not `process`: it means the
   author did not state one.
-- An edge names one transition. Direction comes from the operator; endpoint
+- A flowline names one transition. Direction comes from the operator; endpoint
   order and operator token are preserved as written (§2.3, `READ-SIDE-DETERMINISM`).
-- A node with several outgoing edges is a branch point. Which branch fires
-  is stated by the edge labels and by nothing else — not by shape, not by
+- A node with several outgoing flowlines is a branch point. Which branch fires
+  is stated by the flowline labels and by nothing else — not by shape, not by
   colour, not by rendered position.
 - Whether a fan-out means "all branches fire" or "exactly one fires" is
   **not expressible in v0.1 for a node with no role**; a reading agent MUST
@@ -471,10 +625,28 @@ Its validation profile is the core profile: unknown keyword, unknown or
 inapplicable option, unknown `shape`, duplicate id, dangling edge endpoint,
 `in=` cycle, and the single-valued-directive rules of §8 — all line errors.
 
-The one genre-scoped error: `process` / `decision` / `terminator` written
-under a genre other than `flowchart` is `"<keyword>" is not allowed in genre
-<g>`, from the header genre's allowlist (core §1, `GENRE-NAMESPACE`). No per-keyword code
-produces it.
+The genre-scoped errors, both from the header genre's allowlist (core §1, `GENRE-NAMESPACE`)
+and neither needing per-keyword code:
+
+1. `process` / `decision` / `terminator` written under a genre other than
+   `flowchart` is `"<keyword>" is not allowed in genre <g>`.
+2. **0.2 (`GENRE-CONNECTOR-SPELLING`):** `edge` written under `flowchart` — and `state`,
+   `flowline` or `transition` written under a genre that does not use them —
+   is a **NAMED** line error, not `unrecognized line` and not the bare
+   allowlist message:
+
+   ```
+   "edge" is not the word genre flowchart uses for this — write "flowline":
+   the connecting line in a flowchart is a FLOWLINE — the term ISO 5807 uses
+   for it. Each scene genre takes the term its own domain uses (block/topology
+   `node` `edge`, flowchart `node` `flowline`, statechart `state`
+   `transition`) — run tools/migrate-figdown.js to rewrite it
+   (MIGRATIONS 0.2)
+   ```
+
+   The author has written a **real construct under the wrong spelling**, which
+   is a different situation from an unknown word, so the message names the word
+   this genre uses, says why, and names the tool that rewrites the document.
 
 ## What this genre does NOT own (yet)
 
@@ -504,17 +676,17 @@ FigDown's role vocabulary is words, and the geometry is derived from them.
 ## Example
 
 ```figdown
-figdown 0.1 flowchart
+figdown 0.2 flowchart
 title "Ingress ACL Decision"
 terminator start "Frame received"
 process    parse "Parse headers"
 decision   acl   "ACL match?"
 terminator drop  "Drop + increment counter"
 process    fwd   "Forward to L2 lookup"
-edge start -> parse
-edge parse -> acl
-edge acl -[no match]-> fwd
-edge acl -[deny rule]-> drop
+flowline start -> parse
+flowline parse -> acl
+flowline acl -[no match]-> fwd
+flowline acl -[deny rule]-> drop
 ```
 
 The same figure written before this release — `node acl "ACL match?"

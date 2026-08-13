@@ -1,1 +1,1 @@
-Line 9: description= must be quoted: description="unquoted" — whitespace also separates positionals, so a bare token cannot express a phrase (MIGRATIONS)
+Line 9: description= must be quoted: description="unquoted" — whitespace also separates positionals, so a bare token cannot express a phrase (MIGRATIONS 0.1)

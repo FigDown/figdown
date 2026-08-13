@@ -111,6 +111,7 @@ so you know which file you need before you need it.
 | `table` — config, state, memory maps | `reference/table.md` | `reference/experimental/constructs.md` |
 | `topology` | `reference/scene.md`, `reference/layout.md` | `reference/experimental/topology.md`, `reference/experimental/constructs.md` |
 | `flowchart` | `reference/scene.md`, `reference/layout.md` | `reference/experimental/flowchart.md`, `reference/experimental/constructs.md` |
+| `statechart` | `reference/scene.md`, `reference/layout.md` | `reference/experimental/statechart.md`, `reference/experimental/constructs.md` |
 | `timing` | — | `reference/experimental/timing.md` |
 
 Two more files answer a **task** rather than a genre:
@@ -125,6 +126,26 @@ Two more files answer a **task** rather than a genre:
 Pick the genre by what the figure IS, not by its subject: the left-hand
 column above says what each is for. Prefer the first three — they are the
 portable ones.
+
+**Load the genre file BEFORE you write line 2, not only when something
+fails.** A scene genre may spell the thing and the line with **its own
+domain's words**, and it may rank its keywords — preferring a precise one and
+keeping a general one as the honest fallback. Neither is guessable from this
+file, and neither is optional: the wrong spelling is a line error, and the
+lazy spelling is a claim you did not mean to make. The genre file states both
+in its first screen.
+
+**Where a genre ranks its keywords, the general one means "the source does not
+state this" — and nothing else.** It is the transcriber's honest line for a
+source that leaves something unsaid, not a shrug and not a shortcut. It is
+**not** the spelling for something FigDown cannot express: that is a **coverage
+gap in the language**, and burying it in the general keyword makes the
+language's hole look like your judgement, in a spelling no reader can tell
+apart from a real decision. When your source states something no keyword
+carries: write the general keyword, **name the missing thing in a `#` comment
+on the same line**, and report the gap. The comment is text a reader can quote
+and it survives every re-render; it is never parsed and never a second
+semantic channel. Each genre file names its own ranking and its own fallback.
 
 ## The document skeleton
 
@@ -146,6 +167,11 @@ figdown 0.1 block           # REQUIRED first significant line; comments and
                             # A later `figdown 0.1 <genre>` starts a new
                             # section with its own genre; one file still
                             # renders to one SVG.
+                            # The VERSION is `0.1` or `0.2`. Write the LOWEST
+                            # one that carries what the figure needs — `0.2`
+                            # only for `statechart`, which does not exist at
+                            # `0.1`. Sections may differ; each declares its
+                            # own.
 title "Some Title"          # optional; the quotes are REQUIRED
 # comments start with '#'; inside quotes the only escapes are \n \" \\
 class hot "Congested path" stroke=#dc2626   # meaning + style, declared once

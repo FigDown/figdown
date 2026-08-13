@@ -1,0 +1,3 @@
+Line 10: "terminator" is not allowed in genre statechart
+Line 8: "decision" is not allowed in genre statechart
+Line 9: "process" is not allowed in genre statechart

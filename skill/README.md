@@ -29,9 +29,9 @@ reference/experimental/flowchart.md      EXPERIMENTAL genres, kept in files of
 reference/experimental/timing.md         their own so they can be ignored
 ```
 
-The `reference/` files are a generated copy of [`read/0.1/`](../read/0.1/reading.md),
+The `reference/` files are a generated copy of [`read/0.2/`](../read/0.2/reading.md),
 which is the source of truth; see "Keeping the bundle fresh" below. If you only
-want to READ a `.fd` from this repository, go to `read/0.1/` and install
+want to READ a `.fd` from this repository, go to `read/0.2/` and install
 nothing.
 
 An agent *reading* a figure loads `SKILL.md` + `reference/reading.md`
@@ -93,7 +93,7 @@ it teaches no syntax, because this bundle owns that.
 `figdown/figdown.html`, `figdown/build-svg.js` and everything under
 `figdown/reference/` are **build artifacts** regenerated from their single
 sources (`editor/figdown.html`, `tools/build-svg.js`, and — since `GENRE-REFERENCE-ADDRESS` —
-[`read/0.1/`](../read/0.1/reading.md)) — never edited by hand:
+[`read/0.2/`](../read/0.2/reading.md)) — never edited by hand:
 
 ```sh
 node tools/make-skill.js
@@ -102,9 +102,9 @@ node tools/make-skill.js
 `SKILL.md` is the one hand-maintained source left in the bundle;
 `make-skill.js` does not own it and does not delete it.
 
-**Why `reference/` is vendored rather than linked.** `read/0.1/` is where a
+**Why `reference/` is vendored rather than linked.** `read/0.2/` is where a
 reader of this repository is sent — nothing to install. This directory is
 copied out of the repository into `~/.claude/skills/`, so a path pointing back
-at `read/0.1/` would dangle the moment it is installed. The copy is therefore
+at `read/0.2/` would dangle the moment it is installed. The copy is therefore
 generated, and `node tools/skill-coverage.js --strict` fails on any byte of
-difference (check 0, VENDOR). Edit `read/0.1/`, then re-run `make-skill.js`.
+difference (check 0, VENDOR). Edit `read/0.2/`, then re-run `make-skill.js`.

@@ -3,12 +3,12 @@
 # so every node below still carries its role while carrying a shape the role
 # would not have derived. The reverse also holds: `node … shape=diamond` has
 # NO role, which is the whole reason the vocabulary exists.
-figdown 0.1 flowchart
+figdown 0.2 flowchart
 decision  wide  "Which case?" shape=ellipse
 process   round "Normalize"   shape=rounded
 terminator boxy "Halt"        shape=box
 node      plain "Look-alike"  shape=diamond
 flow down
-edge wide -[a]-> round
-edge wide -[b]-> boxy
-edge round -> plain
+flowline wide -[a]-> round
+flowline wide -[b]-> boxy
+flowline round -> plain

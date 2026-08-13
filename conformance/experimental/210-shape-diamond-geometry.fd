@@ -4,10 +4,10 @@
 # corners are empty space. The parse model is unaffected by either; this
 # case pins down the parse of the scenario tools/shape-check.js asserts the
 # geometry for (long label + two diagonally incident edges).
-figdown 0.1 flowchart
+figdown 0.2 flowchart
 node q "Retry limit reached?" shape=diamond
 node a "Alert the operator"
 node b "Continue"
 flow down
-edge q -[yes]-> a
-edge q -[no]-> b
+flowline q -[yes]-> a
+flowline q -[no]-> b

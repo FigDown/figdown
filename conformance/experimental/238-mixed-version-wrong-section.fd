@@ -1,0 +1,13 @@
+# `KEYWORD-RENAME-SCOPE`: the same file, with each spelling written in the WRONG section. Both
+# lines are errors, and each names the version its own section declared — the
+# 0.1 section may not borrow section 2's vocabulary, and the 0.2 section does
+# not accept the retired one. Per-section, not per-file, in both directions.
+figdown 0.1 flowchart
+process a "Step"
+process b "Step 2"
+flowline a -> b
+
+figdown 0.2 flowchart
+process c "Step"
+process d "Step 2"
+edge c -> d

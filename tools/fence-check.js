@@ -38,6 +38,7 @@
 // Every root except `.` is walked RECURSIVELY for *.md.  A gate that does not
 // recurse is a gate that lies (.github/CONTRIBUTING.md §3.1(d)), so the run states the
 // number of files it scanned; cross-check it against the corpus when the roots
+// change.  Archival subdirectories (dist/ and
 // any dot-directory) are never searched by the default roots.
 //
 // Opt-out markers
@@ -155,7 +156,7 @@
 //                          "… has been WITHDRAWN from the language"
 //   a retired option key   "unknown option \"x=\"", "… does not take x="
 //   a retired form         every migration diagnostic carries its own citation,
-//                          "(MIGRATIONS)" — the space-form bundle
+//                          "(MIGRATIONS 0.1)" — the space-form bundle
 //                          list, the paren point, the quoted title, …
 //   a bad enum value       "unknown shape/genre/color/escape …",
 //                          "numbering must be lsb0 or msb0"
@@ -373,22 +374,59 @@ function makeKeywordOracle(engine) {
 // `cell` / `field` / `width` / `signal` / `gap` / `break` are typed-block
 // children: without a block above them the engine can only say so.
 
-const INLINE_CONTEXTS = [
-  ['block',     'figdown 0.1 block\n'],
-  ['topology',  'figdown 0.1 topology\n'],
-  ['flowchart', 'figdown 0.1 flowchart\n'],
-  ['table',     'figdown 0.1 table\ntable __fc "T"\n| A | B |\n|---|---|\n| x | y |\n'],
-  ['bitfield',  'figdown 0.1 bitfield\nbitfield __fc "B" numbering=msb0\nfield __f 8\n'],
-  ['timing',    'figdown 0.1 timing\ntiming __fc "M"\nsignal __s "S" wave=hlh\n'],
+// A CONTEXT NAMES A LANGUAGE VERSION, AND THERE IS NOW MORE THAN ONE OF THOSE.
+// Every scaffold below declared `figdown 0.1`, which was every version there
+// was.  Once a keyword is gated on the version -- `flowline`, `state` and
+// `transition` require `figdown 0.2` -- a span written in the CURRENT
+// vocabulary parses under no scaffold at all, and the genre documents' own
+// correct examples are read as bad spellings.  Each genre is therefore offered
+// at 0.1 and at the version this engine implements, taken FROM the engine
+// rather than written here, so a later `X.Y` needs no edit and neither does a
+// genre introduced at one.
+const GENRE_SCAFFOLD = [
+  ['block',      ''],
+  ['topology',   ''],
+  ['flowchart',  ''],
+  ['statechart', ''],
+  ['table',      'table __fc "T"\n| A | B |\n|---|---|\n| x | y |\n'],
+  ['bitfield',   'bitfield __fc "B" numbering=msb0\nfield __f 8\n'],
+  ['timing',     'timing __fc "M"\nsignal __s "S" wave=hlh\n'],
 ];
+const INLINE_CONTEXTS = [];
+function buildInlineContexts(engine) {
+  const lang = (/^(\d+\.\d+)/.exec(String(engine.FIGDOWN_VERSION || '')) || [])[1] || '0.1';
+  const versions = lang === '0.1' ? ['0.1'] : ['0.1', lang];
+  INLINE_CONTEXTS.length = 0;
+  for (const v of versions)
+    for (const [g, body] of GENRE_SCAFFOLD)
+      INLINE_CONTEXTS.push([g + '@' + v, 'figdown ' + v + ' ' + g + '\n' + body]);
+}
+
+// A context that answers "that word belongs to a different genre" has not READ
+// the span -- it has declined to.  Three wordings say it: the older two, and
+// the per-genre connector message, which names the word this genre uses and
+// cites the migration entry.  That citation is what puts it in the
+// bad-spelling family, and under the wrong genre it does not belong there: the
+// spelling is not retired, it is somewhere else.  Excluding these contexts is
+// what lets `flowline` be judged by `flowchart`, while `rank hit punt` -- a
+// retired FORM, which every genre that knows the keyword rejects as retired --
+// still fails, because its contexts are declining the form and not the word.
+const GENRE_MISMATCH_RE =
+  /is not allowed in genre|unknown keyword|is not the word genre \S+ uses for this/;
+
+// The same shape, one axis over: the context declined on its VERSION.  A
+// scaffold declaring `figdown 0.1` answers a `0.2` word with "requires figdown
+// 0.2", which is the version gate working -- not evidence about the spelling,
+// which the scaffold at that version judges instead.
+const VERSION_GATE_RE = /requires figdown \d+\.\d+/;
 
 // ── The bad-spelling family (see the header comment for the rationale) ────────
-// Every alternative is the engine's OWN wording.  `(MIGRATIONS)` is the
+// Every alternative is the engine's OWN wording.  `(MIGRATIONS <version>` is the
 // citation the engine appends to every migration diagnostic, so it covers the
 // retired FORMS (space-delimited bundle list, bare-comma cell address / pin
 // point, unquoted title, …) without this file having to enumerate them.
 const BAD_SPELLING_RE = new RegExp([
-  '\\(MIGRATIONS\\)',
+  '\\(MIGRATIONS \\d',
   'has been renamed',
   'has been retired',
   'has been WITHDRAWN',
@@ -427,7 +465,7 @@ function selfTestMigrationCitation(engine) {
     'width auto 90',            // the space form, retired 0.1
   ].join('\n');
   const errs = engine.parse(probe).errs || [];
-  const cited = errs.filter(e => /\(MIGRATIONS\)/.test(e));
+  const cited = errs.filter(e => /\(MIGRATIONS /.test(e));
   if (!cited.length) {
     console.error('fence-check SELF-TEST FAILED: the engine emitted no migration '
       + 'diagnostic for a known retired form. Errors were:\n  ' + errs.join('\n  '));
@@ -533,7 +571,7 @@ function checkInlineSpan(engine, text) {
   //
   // (Getting this backwards made `rank hit punt` — the retired space form —
   //  come out `unverified`, which is the exact defect this check exists for.)
-  let best = null;
+  let best = null, declined = null;
   for (const [name, wrap] of INLINE_CONTEXTS) {
     const n = wrap.split('\n').length - 1;
     const { errs } = engine.parse(wrap + text + '\n');
@@ -542,12 +580,19 @@ function checkInlineSpan(engine, text) {
       return m && +m[1] > n;                      // drop the scaffold's own lines
     });
     const bad = relevant.filter(e => BAD_SPELLING_RE.test(e));
+    // This context declined to read the span rather than judging it.
+    if (relevant.length && relevant.every(e => GENRE_MISMATCH_RE.test(e) || VERSION_GATE_RE.test(e))) {
+      if (!declined) declined = { verdict: 'unverified', errors: relevant, context: name };
+      continue;
+    }
     if (bad.length) return { verdict: 'fail', errors: bad, context: name };
     const verdict = relevant.length ? 'unverified' : 'ok';
     if (!best || RANK[verdict] < RANK[best.verdict])
       best = { verdict, errors: relevant, context: name };
   }
-  return best;
+  // Every context declined: no genre at any version claims the word, so there
+  // is nothing to verify and nothing to fail.
+  return best || declined;
 }
 
 // ── Inline-span extraction ────────────────────────────────────────────────────
@@ -923,6 +968,7 @@ function main() {
   let engine;
   try {
     engine = loadEngine(enginePath);
+    buildInlineContexts(engine);
   } catch (err) {
     process.stderr.write('Failed to load engine: ' + err.message + '\n');
     process.exit(2);

@@ -630,6 +630,47 @@ function quoteBlockLabel(line) {
   return { text: line.slice(0, idx) + '"' + pos[1].text + '"' + line.slice(idx + pos[1].text.length) };
 }
 
+/**
+ * 0.2 (engine-backlog 29): quote a bare `title` argument.
+ *
+ *   title Figure 5-3 VP-based SH Group Filtering
+ *   → title "Figure 5-3 VP-based SH Group Filtering"
+ *
+ * `title` has taken a QUOTED string, and a document
+ * transcribed before that reports `title needs a quoted string` and does not
+ * build at all — so this is not cosmetic, it is the difference between a
+ * figure and a parse error. The production corpus still carries them.
+ *
+ * Unlike a typed-block label this is UNAMBIGUOUS and therefore mechanical:
+ * `title` takes exactly ONE positional string and NO option keys, so the whole
+ * remainder of the code portion IS the title and there is no "label plus a
+ * surplus argument" reading for the author to arbitrate. A trailing comment is
+ * spliced back untouched.
+ *
+ * Hands off, with a report rather than a guess, when the argument carries a
+ * `"` or a `\`: both need an ESCAPING decision (§2.2's escape set), and
+ * inventing one would silently change the rendered text.
+ */
+function quoteBareTitle(line) {
+  const code = stripComment(line);
+  const m = /^(\s*)title(\s+)(\S[\s\S]*?)\s*$/.exec(code);
+  if (!m) return null;
+  const arg = m[3];
+  if (arg.startsWith('"')) return null;              // already quoted — or the author's business
+  if (arg.includes('"')) {
+    return { report: '`title` argument is bare AND contains a double quote — ' + arg +
+      '. Quote it yourself: the inner quote has to be escaped (\\") or dropped, and only you ' +
+      'know which was meant (MIGRATIONS 0.1)' };
+  }
+  if (arg.includes('\\')) {
+    return { report: '`title` argument is bare AND contains a backslash — ' + arg +
+      '. Quote it yourself: inside a quoted string a backslash starts an ESCAPE (§2.2), so ' +
+      'quoting this blind would change the rendered text (MIGRATIONS 0.1)' };
+  }
+  const start = m[1].length + 'title'.length + m[2].length;
+  return { text: line.slice(0, start) + '"' + arg + '"' + line.slice(start + arg.length) };
+}
+
 // `RULE-POSITION-ENUMERATION`: every LIVE enum-valued OPTION key (SYNTAX-STYLE RULE
 // 2.4 / vocabulary-sources.tsv `shape = enum`). The positional enum
 // positions are handled by their own patterns below.
@@ -786,7 +827,7 @@ function migrateText(text, colorMeans) {
   //                                  guess, and that is the same position it
   //                                  takes when it refuses.
   //
-  // The version numbers that remain in this family are `(MIGRATIONS)`
+  // The version numbers that remain in this family are `(MIGRATIONS 0.1)`
   // citations: a fact about THIS repository's history, which the reader can
   // look up, not a classification they are asked to perform.
   const evFill = 'this file also writes fill=, a key that did not exist while color= meant the FILL';
@@ -797,7 +838,7 @@ function migrateText(text, colorMeans) {
   // said "this file".
   const evFill2 = evFill.replace(/^this file /, 'it ');
   const evOld2 = evOld.replace(/^this file /, 'it ');
-  const COLOUR_WHERE = ' (MIGRATIONS)';
+  const COLOUR_WHERE = ' (MIGRATIONS 0.1)';
   // Which class ids are referenced from an edge line, and which from a node
   // line — the §8.4 class check below needs both to say whether the fix is
   // mechanical.
@@ -812,6 +853,32 @@ function migrateText(text, colorMeans) {
   const reports = [];
   const changes = [];
   const lines = text.split('\n');
+  // 0.2 (`KEYWORD-RENAME-SCOPE`): the flowchart connector rename is GATED BY THE LANGUAGE
+  // VERSION, so the HEADER moves with the keyword or this tool emits a document
+  // that does not parse — which is worse than emitting nothing. `flowline` is
+  // 0.2 vocabulary; a section that will end up writing it must declare 0.2.
+  //
+  // It is a PRE-PASS because the header is written before the connector lines
+  // that decide it, and `lines.map` cannot go back. A section already at 0.2 is
+  // left alone, and a section that writes no connector is left at 0.1 — the
+  // version is raised only where the vocabulary actually requires it (core
+  // §13.0: `Y` adds, so the lowest version that carries the figure is correct).
+  const bumpHeader = new Set();
+  {
+    let hdrLine = -1, hdrGenre = null, hdrVer = null, needs = false;
+    const close = () => {
+      if (needs && hdrLine > 0 && hdrGenre === 'flowchart' && hdrVer === '0.1') bumpHeader.add(hdrLine);
+    };
+    lines.forEach((line, i) => {
+      const bare = stripComment(line).trim();
+      const hm2 = /^figdown\s+(0\.\d+)(?:\s+(\S+))?/.exec(bare);
+      if (hm2) { close(); hdrLine = i + 1; hdrVer = hm2[1]; hdrGenre = hm2[2] || null; needs = false; return; }
+      // `edge` becomes `flowline` below; `flowline` may already be there, in a
+      // document a previous run of this tool rewrote without moving the header.
+      if (/^(edge|flowline)(\s|$)/.test(bare)) needs = true;
+    });
+    close();
+  }
   let genre = null;
   let inBitfield = false;
   let starCount = 0;
@@ -884,6 +951,23 @@ function migrateText(text, colorMeans) {
           return after;
         }
       }
+      // `KEYWORD-RENAME-SCOPE`: raise `figdown 0.1` to `figdown 0.2` on a flowchart
+      // section that carries a connector, because `flowline` is 0.2 vocabulary
+      // and `edge` is 0.1's. This runs BEFORE the reports below so the genre
+      // reports still fire on the same line.
+      let headerLine = line;
+      if (bumpHeader.has(n)) {
+        const after = headerLine.replace(/^(\s*figdown\s+)0\.1(\s)/, '$10.2$2');
+        if (after !== headerLine) {
+          changes.push({
+            line: n,
+            rule: 'flowchart header 0.1→0.2 (flowline is 0.2 vocabulary)',
+            before: trim,
+            after: stripComment(after).trim(),
+          });
+          headerLine = after;
+        }
+      }
       if (!genre) {
         reports.push({ line: n, code: 'missing-genre', msg: 'header has no genre token' });
       } else if (/^(topology|flowchart|timing)$/.test(genre)) {
@@ -893,7 +977,7 @@ function migrateText(text, colorMeans) {
           msg: 'genre `' + genre + '` is EXPERIMENTAL (`CONSTRUCT-STATUS-TIERS`) — prefer block/bitfield/table when portable',
         });
       }
-      return line;
+      return headerLine;
     }
 
     // close typed region on top-level keyword
@@ -1007,6 +1091,46 @@ function migrateText(text, colorMeans) {
       }
     }
 
+    // ---- 0.2 (`GENRE-CONNECTOR-SPELLING`/`GENRE-NODE-SPELLING`): the PER-GENRE node and connector words ----
+    //
+    // MECHANICAL, and the only rename in this tool that is SCOPED BY GENRE.
+    // `edge` is not retired — it is exactly as live as it ever was under
+    // `block` and `topology` — so a blind line-initial rename would corrupt
+    // every portable document in the corpus. What moved is the SPELLING each
+    // scene genre uses, and the header three words up is the only thing that
+    // says which:
+    //
+    //   flowchart   edge -> flowline
+    //   statechart  edge -> transition ,  node -> state
+    //
+    // `genre` is tracked by the header branch above and is null before the
+    // first header, so a headerless fragment is left alone rather than
+    // guessed at. Idempotent by construction: the output spellings are not
+    // in any source position of the table.
+    //
+    // WHY THE TOOL OWES THIS AT ALL. A rename is precisely the case core
+    // §13.4 makes mechanical, and this one has to be: reclassifying a figure
+    // used to be a one-line edit and now rewrites every connector line. That
+    // cost was accepted deliberately (`GENRE-CONNECTOR-SPELLING`) on the condition that the tool,
+    // not the author, pays it.
+    {
+      const GENRE_WORDS = {
+        flowchart: [[/^(\s*)edge(\b)/, '$1flowline$2', 'flowchart edge→flowline']],
+        statechart: [
+          [/^(\s*)edge(\b)/, '$1transition$2', 'statechart edge→transition'],
+          [/^(\s*)node(\b)/, '$1state$2', 'statechart node→state'],
+        ],
+      };
+      for (const [re, rep, label] of (GENRE_WORDS[genre] || [])) {
+        if (!re.test(stripComment(next))) continue;
+        const after = next.replace(re, rep);
+        if (after !== next) {
+          changes.push({ line: n, rule: label, before: trim, after: stripComment(after).trim() });
+          next = after;
+        }
+      }
+    }
+
     // legacy `fill <range> in=` as band keyword (not fill= option)
     //
     // REPORT-ONLY, and it used to be a rewrite. The rewrite
@@ -1074,7 +1198,7 @@ function migrateText(text, colorMeans) {
             msg: 'this field was `optional` and carries prose alongside it: ' + dm[1] +
                  '. NON-MECHANICAL: if that prose states the PRESENCE CONDITION, move it into present="…" ' +
                  '(and shorten or drop the description=); if it says anything else, leave both alone. ' +
-                 'The tool never lifts it and never invents one (MIGRATIONS)',
+                 'The tool never lifts it and never invents one (MIGRATIONS 0.1)',
           });
         }
       }
@@ -1132,7 +1256,7 @@ function migrateText(text, colorMeans) {
       if (/(^|\s)(color|text)\s*=/.test(stripComment(next))) {
         reports.push({
           line: n, code: 'color-text-both',
-          msg: 'this file writes BOTH color= and text=, which no version of the language accepts — classify it by hand before migrating (MIGRATIONS)',
+          msg: 'this file writes BOTH color= and text=, which no version of the language accepts — classify it by hand before migrating (MIGRATIONS 0.1)',
         });
       }
     } else if (fileMode === 'refuse-fill') {
@@ -1417,6 +1541,19 @@ function migrateText(text, colorMeans) {
       }
     }
 
+    // Backlog 29: `title Bare Words` → `title "Bare Words"`.
+    // Idempotent by construction: the rewrite ADDS the quotes its own pattern
+    // requires to be absent.
+    {
+      const after = quoteBareTitle(next);
+      if (after && after.text) {
+        changes.push({ line: n, rule: 'title quoted', before: trim, after: stripComment(after.text).trim() });
+        next = after.text;
+      } else if (after && after.report) {
+        reports.push({ line: n, code: 'title-bare-unquotable', msg: after.report });
+      }
+    }
+
     // ---- 0.1 (`RULE-POSITION-ENUMERATION`): RULE 2.4's enum half. A quoted enum value is a
     // line error now, and stripping the quotes is a pure spelling change —
     // the value inside them was already the value the engine used, so the
@@ -1554,7 +1691,7 @@ function migrateText(text, colorMeans) {
            'those rewrites would delete — migrate the older spellings first and --color-means ' +
            'has nothing left to refuse, so it would delete a FILL and report success. Settle ' +
            'color= (--color-means=fill|text, or by hand) and re-run; everything else then ' +
-           'migrates in the same pass (MIGRATIONS)',
+           'migrates in the same pass (MIGRATIONS 0.1)',
     });
   }
   if (unresolvedColor) {

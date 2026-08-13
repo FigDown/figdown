@@ -553,7 +553,7 @@ below; each carries its resolution note.
   error fixture.
 - **Resolved (maintainer ruling `REPEATED-DIRECTIVE-HANDLING`):** engine fixed — the
   SECOND occurrence is a line error, worded like the existing `render`
-  message: `duplicate title line`, `duplicate flow line`,
+  message: `duplicate title line`, `duplicate flow directive`,
   `duplicate pin for "<id>"`. `pin` is keyed per node id, so `pin a` +
   `pin b` stays legal. Spec §8 states the rule; MIGRATIONS
   `0.1` ships the mechanical rewrite (keep the last

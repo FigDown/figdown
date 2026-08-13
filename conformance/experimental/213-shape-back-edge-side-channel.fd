@@ -12,11 +12,11 @@
 # deleted with the shape, not lost: no registered shape is drawn outside its
 # box any more, so there is nothing left to assert. The half that survives is
 # the back edge and its square-on touch-down, which no other case covers.
-figdown 0.1 flowchart
+figdown 0.2 flowchart
 node ce "CE router"
 node net "Transit provider\nbackbone" shape=ellipse
 node pe "PE router"
 flow down
-edge ce -> net
-edge net -> pe
-edge pe -> net
+flowline ce -> net
+flowline net -> pe
+flowline pe -> net

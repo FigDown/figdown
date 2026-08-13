@@ -174,16 +174,16 @@ Wrap long chains: one `rank` per stage row, let auto-layout stack the rows.
 ### Decision flowchart — main path on one axis
 
 ```figdown
-figdown 0.1 flowchart
+figdown 0.2 flowchart
 terminator start "Start"
 decision   check "Header valid?"
 process    proc  "Process"
 terminator drop  "Drop"
 terminator done  "Done"
-edge start -> check
-edge check -[yes]-> proc
-edge check -[no]->  drop
-edge proc  -> done
+flowline start -> check
+flowline check -[yes]-> proc
+flowline check -[no]->  drop
+flowline proc  -> done
 flow down
 rank start,check,proc,done
 ```
@@ -285,7 +285,7 @@ pin tx      at=(120,0)
 ```
 author semantics
   → build:  node tools/build-svg.js X.fd
-  → judge:  eyeball + node tools/layout-lint.js X.svg  (6 metrics; --max-score gate)
+  → judge:  eyeball + node tools/layout-lint.js X.fd   (6 metrics; --max-score gate)
   → if not clear: add ONE rung (§2) and repeat
   → stop when it reads well
 ```
@@ -515,13 +515,13 @@ better (backlog item #4) makes a layered drawing tidier; it never turns it into
 a ring.
 
 There is a second cause, and it is in the language rather than the engine.
-Every flowchart edge today is a generic `edge`. The renderer cannot tell the
-mainline from an exception branch from a retry loop — and those distinctions
+Every flowchart connector today is a plain `flowline` (spelled `edge` before this release, `GENRE-CONNECTOR-SPELLING` — the rename gave the genre its own word, not a role). The
+renderer cannot tell the mainline from an exception branch from a retry loop — and those distinctions
 are *exactly* what human flowchart routing conventions are made of.
 0.1 (`FLOWCHART-ROLE-KEYWORDS`) gave the genre role vocabulary for its NODES — `process`,
 `decision`, `terminator` — which is why the sketches below use it, and the
 renderer already consults it (a short branch marker sits near its
-`decision`, not near any diamond). **EDGE roles are still missing**
+`decision`, not near any diamond). **CONNECTOR roles are still missing**
 (`mainline` / `exception` / `loop-back`, recorded in `LOGIC-FLOWCHART-GENRE-SCOPE` and excluded from
 the 0.1 tranche), so for routing the author still has to supply by
 arrangement what the source cannot state. `class main/retry/fail`, used
@@ -562,7 +562,7 @@ the axis. Note that it needs **no layout zone at all** — with the spine
 declared and the exits ranked off it, the figure lints at 0:
 
 ```figdown
-figdown 0.1 flowchart
+figdown 0.2 flowchart
 title "Session establishment with bounded retry"
 
 class main  "Mainline — the path a successful call takes" stroke=#555
@@ -579,12 +579,12 @@ terminator give  "Give up"
 flow down
 rank ok,cnt
 
-edge start -> send        class=main
-edge send  -> ok          class=main
-edge ok  -[yes]-> done    class=main
-edge ok  -[no]->  cnt     class=fail
-edge cnt -[yes]-> send    class=retry
-edge cnt -[no]->  give    class=fail
+flowline start -> send        class=main
+flowline send  -> ok          class=main
+flowline ok  -[yes]-> done    class=main
+flowline ok  -[no]->  cnt     class=fail
+flowline cnt -[yes]-> send    class=retry
+flowline cnt -[no]->  give    class=fail
 ```
 
 Note what the `class` declarations are doing: they are not decoration and not a

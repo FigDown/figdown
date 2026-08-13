@@ -26,6 +26,7 @@
 |---|---|---|
 | Turnstile | Textbook FSM (coin / push) — the minimal state figure | [turnstile.fd](turnstile.fd) · [svg](turnstile.svg) |
 | DHCP client | RFC 2131 client FSM; **multi-line demo** (`\n` labels, `["…\n…"]` edge mids, `#` blocks, `<br>` table cells) | [dhcp-client.fd](dhcp-client.fd) · [svg](dhcp-client.svg) |
+| BFD session | RFC 5880 §6.2/§6.8.6, all **four** states including AdminDown; **merged triggers** on shared transitions, and the totality the genre cannot assert carried by a companion table | [bfd-session.fd](bfd-session.fd) · [svg](bfd-session.svg) |
 
 ```bash
 node tools/build-svg.js examples/statechart

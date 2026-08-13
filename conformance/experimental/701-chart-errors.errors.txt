@@ -1,4 +1,4 @@
-Line 10: level= has been DELETED, not renamed: it drew a reference plane through a 3-D bar chart, has zero uses in either downstream corpus and zero 3-D bar charts to draw it on, was the only construct whose caption the ENGINE wrote rather than the author, and its parseFloat grammar uniquely accepted 1e3 where every other number in the language is \d+(\.\d+)? — delete the key (MIGRATIONS)
+Line 10: level= has been DELETED, not renamed: it drew a reference plane through a 3-D bar chart, has zero uses in either downstream corpus and zero 3-D bar charts to draw it on, was the only construct whose caption the ENGINE wrote rather than the author, and its parseFloat grammar uniquely accepted 1e3 where every other number in the language is \d+(\.\d+)? — delete the key (MIGRATIONS 0.1)
 Line 6: chart data must be numeric (row value "abc")
 Line 7: chart references unknown table "ghost"
 Line 8: unknown chart type "pie" (bar3d)

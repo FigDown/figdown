@@ -278,9 +278,14 @@ function region(b) {
 function normalize(doc) {
   const byLine = (a, b) => (a.line - b.line);
   const model = {};
-  // The engine accepts exactly wire-grammar version 0.1; the version is
-  // therefore a constant of this projection.
-  model.header = o([['version', '0.1'], ['genre', doc.genre]]);
+  // STATECHART-GENRE-SCOPE: the version stopped being a constant of this
+  // projection. It was one while the engine accepted exactly one wire-grammar
+  // version; the engine now accepts `0.1` and `0.2`, and which one a document
+  // DECLARED is meaning — it is the contract the author wrote against, and
+  // §13.7 forbids a reader inferring it from anything else. The fallback is
+  // for a document whose header itself errored, where no version was
+  // successfully declared; every fixture that parses carries its own.
+  model.header = o([['version', doc.version || '0.1'], ['genre', doc.genre]]);
   // EMPTY-LABEL-STATE/EMPTY-LABEL-STATE: absence, not truthiness — `title ""` is a written value and must
   // stay distinguishable from a document with no `title` line.
   if (doc.title !== null && doc.title !== undefined) model.title = doc.title;

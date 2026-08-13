@@ -1,0 +1,10 @@
+# 0.2: `node` and `edge` are NOT retired. Under `block` — and under
+# `topology` — they are exactly as live as before, and the genre-scoped
+# rename must leave this file byte-identical.
+figdown 0.1 block
+node a "A"
+node b "B"
+edge a -> b
+figdown 0.1 topology
+node r1 "R1"
+edge r1 -- r1

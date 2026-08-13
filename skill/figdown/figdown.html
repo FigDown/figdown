@@ -121,13 +121,30 @@ const SHAPES = ['box','rounded','circle','ellipse','diamond','cylinder'];
 // input to that promise, and under core §13 a 0.x renderer may differ from
 // the next — which makes the recorded version the only thing that can
 // explain a diff between two renderings of one source.
-const FIGDOWN_VERSION = '0.1.8';
+const FIGDOWN_VERSION = '0.2.0';
+// `STATECHART-GENRE-SCOPE`: the language number moved for the first time. The dev
+// counter does NOT reset (core §13.0.4 — `N` counts source states of the
+// engine and only ever increases), so 0.1 is followed by
+// 0.2, not by 0.2.
+//
+// LANGUAGE VERSIONS THIS ENGINE ACCEPTS (core §13.7 second bullet: an engine
+// MUST state this, and stating the release version alone does not satisfy
+// it). Declared here, in ONE place, so the header check and the documented
+// interface cannot drift:
+const LANG_VERSIONS = ['0.1', '0.2'];
+// Genres per declared language version. `Y` never removes (core §13.0), so
+// each row is a superset of the one above it, and `figdown 0.1 <anything>`
+// resolves against exactly the list it resolved against before `STATECHART-GENRE-SCOPE`.
+const GENRES_BY_VERSION = {
+  '0.1': ['block','topology','flowchart','bitfield','table','timing'],
+  '0.2': ['block','topology','flowchart','bitfield','table','timing','statechart']
+};
 // Retired shape VALUES keep a named diagnostic (PROCESS §5(d)), the same way
 // retired option keys do: `cloud` was the one value that named a domain
 // (the internet cloud) in an enum the language keeps purely geometric
 // (`SHAPE-ENUM-VOCABULARY`/`EXTERNAL-EDGE-ENDPOINTS`), so it was removed rather than demoted.
 const RETIRED_SHAPES = {
-  cloud: 'shape=cloud has been retired: use shape=ellipse and put the meaning in the label or a class= (shapes are pure geometry, `SHAPE-ENUM-VOCABULARY`) (MIGRATIONS)'
+  cloud: 'shape=cloud has been retired: use shape=ellipse and put the meaning in the label or a class= (shapes are pure geometry, `SHAPE-ENUM-VOCABULARY`) (MIGRATIONS 0.1)'
 };
 // Colors are CSS hex (#rgb / #rrggbb) or CSS named colors (spec §1) — the
 // 147 CSS/SVG color keywords (lowercase) plus `transparent`. Anything else
@@ -382,9 +399,17 @@ const DIRECTIVE_OPTS={
   process:['shape','fill','stroke','style','class','in','plane','width','height'],
   decision:['shape','fill','stroke','style','class','in','plane','width','height'],
   terminator:['shape','fill','stroke','style','class','in','plane','width','height'],
+  // `GENRE-NODE-SPELLING`: `state` IS `node` under `statechart` — a rename, not a
+  // new directive, so it takes `node`'s keys exactly and nothing more.
+  state:['shape','fill','stroke','style','class','in','plane','width','height'],
   group:['fill','stroke','style','gap','class','plane'],
   external:['plane'],
   edge:['style','class','fill','stroke','plane','label','taillabel','headlabel'],
+  // `GENRE-CONNECTOR-SPELLING`/`GENRE-NODE-SPELLING`: same rename argument — the connector's option set is one set
+  // under three spellings, listed three times only because the tables are
+  // keyed by the surface word an author actually wrote.
+  flowline:['style','class','fill','stroke','plane','label','taillabel','headlabel'],
+  transition:['style','class','fill','stroke','plane','label','taillabel','headlabel'],
   plane:['z','z-index'], flow:[], rank:[],
   bundle:['fill','stroke','style','plane'],
   threshold:['in','at','offset','fill','stroke','style','plane'],
@@ -467,10 +492,10 @@ const ENUM_OPT_KEYS=['shape','style','numbering','extend','type'];
 // `color=` sets the TEXT — and once `color=` is live again the engine can no
 // longer diagnose a pre-0.1 document at all.
 const RETIRED_OPT_KEYS={
-  w:'w= has been renamed: use width= (SVG, CSS, DOT, mxGraph and D2 all spell it in full — no standard abbreviates it) (MIGRATIONS)',
-  h:'h= has been renamed: use height= (SVG, CSS, DOT, mxGraph and D2 all spell it in full — no standard abbreviates it) (MIGRATIONS)',
-  dir:'dir= has been renamed: use extend= (HTML\'s dir= is text writing direction; this one says which way the band extends from its anchor) (MIGRATIONS)',
-  text:'text= has been retired: v0.1 has NO label-colour key — the label colour is DERIVED from the fill it sits on (core §5), and the owner-level key that could replace it would colour an edge\'s [tail]/[mid]/[head] labels identically, which is the wrong shape (core §9 `ANNOTATION-LOCATOR-SPLIT`). Delete the key; if the distinction was knowledge, write it in the label or a class= meaning (§5, `PRESENTATION-AS-MEANING-CARRIER`) (MIGRATIONS)',
+  w:'w= has been renamed: use width= (SVG, CSS, DOT, mxGraph and D2 all spell it in full — no standard abbreviates it) (MIGRATIONS 0.1)',
+  h:'h= has been renamed: use height= (SVG, CSS, DOT, mxGraph and D2 all spell it in full — no standard abbreviates it) (MIGRATIONS 0.1)',
+  dir:'dir= has been renamed: use extend= (HTML\'s dir= is text writing direction; this one says which way the band extends from its anchor) (MIGRATIONS 0.1)',
+  text:'text= has been retired: v0.1 has NO label-colour key — the label colour is DERIVED from the fill it sits on (core §5), and the owner-level key that could replace it would colour an edge\'s [tail]/[mid]/[head] labels identically, which is the wrong shape (core §9 `ANNOTATION-LOCATOR-SPLIT`). Delete the key; if the distinction was knowledge, write it in the label or a class= meaning (§5, `PRESENTATION-AS-MEANING-CARRIER`) (MIGRATIONS 0.1)',
   // `COLOUR-KEY-STATUS`. This is the ONLY key in the language whose diagnostic
   // must name two eras and refuse to choose between them: the same six
   // characters meant the FILL before this release and the LABEL after
@@ -489,10 +514,10 @@ const RETIRED_OPT_KEYS={
   // those observables, says plainly when a file has neither, and cites the
   // release only as a MIGRATIONS lookup. Same rule as the migration tool's
   // `color=` family, which reads the same evidence to decide its refusals.
-  color:'color= has been retired: the same six characters set the box FILL in one era of this language and the LABEL colour in another, and this line does not say which — which is why the key is gone rather than renamed. READ IT OFF THE REST OF THE DOCUMENT. A file that also writes fill= cannot be from the FILL era (the two keys never coexisted), so its color= was a LABEL colour: delete it and let the derived default apply (core §5). A file still writing the spellings that were retired before the LABEL era (w= h= unit= via= dir= kind= layer= boundary wrap optional) cannot be from that era, so its color= was a FILL: write fill= instead. A file with NEITHER carries no evidence at all, and the two readings then differ only in what was DRAWN — as a FILL the value painted the box interior, as a LABEL colour it painted only the text. If the colour carried meaning, put that meaning in the label or a class= (§5, `PRESENTATION-AS-MEANING-CARRIER`). tools/migrate-figdown.js reads this evidence for you and REFUSES the wrong --color-means=fill|text (MIGRATIONS)',
+  color:'color= has been retired: the same six characters set the box FILL in one era of this language and the LABEL colour in another, and this line does not say which — which is why the key is gone rather than renamed. READ IT OFF THE REST OF THE DOCUMENT. A file that also writes fill= cannot be from the FILL era (the two keys never coexisted), so its color= was a LABEL colour: delete it and let the derived default apply (core §5). A file still writing the spellings that were retired before the LABEL era (w= h= unit= via= dir= kind= layer= boundary wrap optional) cannot be from that era, so its color= was a FILL: write fill= instead. A file with NEITHER carries no evidence at all, and the two readings then differ only in what was DRAWN — as a FILL the value painted the box interior, as a LABEL colour it painted only the text. If the colour carried meaning, put that meaning in the label or a class= (§5, `PRESENTATION-AS-MEANING-CARRIER`). tools/migrate-figdown.js reads this evidence for you and REFUSES the wrong --color-means=fill|text (MIGRATIONS 0.1)',
   kind:'kind= has been renamed: on a node use shape= (geometric; the label text carries the device semantics — MIGRATIONS 0.1), on a chart use type= (Vega, Chart.js and ECharts all spell the chart-type key "type" — MIGRATIONS 0.1). One spelling was retired on node and live on plot at the same time, inside one namespace; 0.1 closed that.',
-  layer:'layer= has been renamed: use plane= (mxGraph makes a layer a containment parent that establishes coordinates; Inkscape layers can carry a transform; OGC WMS layers carry an SRS; CSS @layer is cascade priority. None of those is what this key does, and SVG has no layer at all) (MIGRATIONS)',
-  labels:'labels= has been renamed: use data= (WaveDrom\'s own key for exactly this is `data`, "an array of signal labels" — one per value cell of the lane) (MIGRATIONS)',
+  layer:'layer= has been renamed: use plane= (mxGraph makes a layer a containment parent that establishes coordinates; Inkscape layers can carry a transform; OGC WMS layers carry an SRS; CSS @layer is cascade priority. None of those is what this key does, and SVG has no layer at all) (MIGRATIONS 0.1)',
+  labels:'labels= has been renamed: use data= (WaveDrom\'s own key for exactly this is `data`, "an array of signal labels" — one per value cell of the lane) (MIGRATIONS 0.1)',
   // 0.1 (`EDGE-GEOMETRY-CONSTRUCTS`). These six keys end in a WITHDRAWAL, not a rename, so
   // their messages have a shape no earlier retirement in this table has: they
   // name no replacement spelling, because there is none. `via=`/`src=`/`dst=`
@@ -506,28 +531,28 @@ const RETIRED_OPT_KEYS={
   tailport:'tailport= has been WITHDRAWN with the `path` directive (`EDGE-GEOMETRY-CONSTRUCTS`): the construct is removed from the language, not renamed, so there is no spelling to migrate to. Attachment to a named site addressed by semantic role IS inside the stable prior-art intersection; FigDown\'s realisation was not (a fraction on the EDGE is mxGraph-only, and written-order attachment has zero prior art in any surveyed system). Restoring it needs an edge-identity construct first. Delete the line; the edge draws under auto layout. The decision and its evidence: MIGRATIONS 0.1, core §9 `EDGE-IDENTITY-AND-GEOMETRY`, decisions/registry.md',
   headport:'headport= has been WITHDRAWN with the `path` directive (`EDGE-GEOMETRY-CONSTRUCTS`): the construct is removed from the language, not renamed, so there is no spelling to migrate to. Attachment to a named site addressed by semantic role IS inside the stable prior-art intersection; FigDown\'s realisation was not (a fraction on the EDGE is mxGraph-only, and written-order attachment has zero prior art in any surveyed system). Restoring it needs an edge-identity construct first. Delete the line; the edge draws under auto layout. The decision and its evidence: MIGRATIONS 0.1, core §9 `EDGE-IDENTITY-AND-GEOMETRY`, decisions/registry.md',
   routing:'routing= has been WITHDRAWN with the `path` directive (`EDGE-GEOMETRY-CONSTRUCTS`): the construct is removed from the language, not renamed, so there is no spelling to migrate to. The per-edge routing SCOPE was inside the stable prior-art intersection and is deliberately lost with its host line — an override needs an edge to address, and FigDown has no edge-identity construct. Delete the line. The decision and its evidence: MIGRATIONS 0.1, core §9 `EDGE-IDENTITY-AND-GEOMETRY`, decisions/registry.md',
-  unit:'unit= has been renamed: use word= (RFC 2360 §3.1: "a sequence of long words in network byte order, with each word horizontal on the page"; RFC 791 §3.1 measures the header in "32 bit words". Mermaid names the identical setting bitsPerRow — semantically right, camelCase barred. `unit=32` also inverts count-vs-unit, reading as "the unit is 32", and C\'s "unit" is the addressable storage unit, not the row width) (MIGRATIONS)',
-  z:'z= has been renamed: use z-index= (CSS spells the stacking concept z-index, and RULE 4.2 takes the standard spelling in full; a single-letter key is structurally risky next to the closed timing lane alphabet, `LANE-ALPHABET-KEY-RESERVATION`) (MIGRATIONS)',
+  unit:'unit= has been renamed: use word= (RFC 2360 §3.1: "a sequence of long words in network byte order, with each word horizontal on the page"; RFC 791 §3.1 measures the header in "32 bit words". Mermaid names the identical setting bitsPerRow — semantically right, camelCase barred. `unit=32` also inverts count-vs-unit, reading as "the unit is 32", and C\'s "unit" is the addressable storage unit, not the row width) (MIGRATIONS 0.1)',
+  z:'z= has been renamed: use z-index= (CSS spells the stacking concept z-index, and RULE 4.2 takes the standard spelling in full; a single-letter key is structurally risky next to the closed timing lane alphabet, `LANE-ALPHABET-KEY-RESERVATION`) (MIGRATIONS 0.1)',
   // `DESCRIPTION-KEY-SPELLING`. The spelling leaves the LANGUAGE, so the message fires
   // wherever it appears (the `w=`/`h=`/`unit=` placement test, RULE 6.2).
-  note:'note= has been renamed: use description= (IEEE 1685-2022 spells this channel `description`; SystemRDL\'s `desc` is barred by RULE 4.2 as an abbreviation. The rename is defensive: `ANNOTATION-LOCATOR-SPLIT` files `note` as the highest-demand v0.2 annotation construct — ~66 figure-identities, 20 independent reinventions — and that one will be a DRAWN callout, so a never-drawing `note=` beside an always-drawing `note` would be one spelling with two opposite behaviours) (MIGRATIONS)',
-  level:'level= has been DELETED, not renamed: it drew a reference plane through a 3-D bar chart, has zero uses in either downstream corpus and zero 3-D bar charts to draw it on, was the only construct whose caption the ENGINE wrote rather than the author, and its parseFloat grammar uniquely accepted 1e3 where every other number in the language is \\d+(\\.\\d+)? — delete the key (MIGRATIONS)'
+  note:'note= has been renamed: use description= (IEEE 1685-2022 spells this channel `description`; SystemRDL\'s `desc` is barred by RULE 4.2 as an abbreviation. The rename is defensive: `ANNOTATION-LOCATOR-SPLIT` files `note` as the highest-demand v0.2 annotation construct — ~66 figure-identities, 20 independent reinventions — and that one will be a DRAWN callout, so a never-drawing `note=` beside an always-drawing `note` would be one spelling with two opposite behaviours) (MIGRATIONS 0.1)',
+  level:'level= has been DELETED, not renamed: it drew a reference plane through a 3-D bar chart, has zero uses in either downstream corpus and zero 3-D bar charts to draw it on, was the only construct whose caption the ENGINE wrote rather than the author, and its parseFloat grammar uniquely accepted 1e3 where every other number in the language is \\d+(\\.\\d+)? — delete the key (MIGRATIONS 0.1)'
 };
 // `PLANE-KEYWORD-SPELLING`: the keyword `plane`/`plane=` was spelled `layer`/`layer=`.
-const RETIRED_LAYER='layer has been renamed: use plane (in mxGraph — the geometry model FigDown adopted — a layer is a CONTAINMENT PARENT that establishes coordinates, so layer=overlay reads as "reparent and re-origin this element", which FigDown does not do; Inkscape layers are <g> and may carry a transform, OGC WMS layers each carry an SRS, and CSS @layer is cascade priority with no visual meaning. SVG has no layer concept at all. `plane` is claimed by no standard for a conflicting meaning and removes the layout/layer near-miss) (MIGRATIONS)';
+const RETIRED_LAYER='layer has been renamed: use plane (in mxGraph — the geometry model FigDown adopted — a layer is a CONTAINMENT PARENT that establishes coordinates, so layer=overlay reads as "reparent and re-origin this element", which FigDown does not do; Inkscape layers are <g> and may carry a transform, OGC WMS layers each carry an SRS, and CSS @layer is cascade priority with no visual meaning. SVG has no layer concept at all. `plane` is claimed by no standard for a conflicting meaning and removes the layout/layer near-miss) (MIGRATIONS 0.1)';
 // `THRESHOLD-KEYWORD-SPELLING`: the scene keyword `guide` became `threshold`.
-const RETIRED_GUIDE='guide has been renamed: use threshold (in Illustrator, Inkscape, Figma and draw.io a "guide" is an author-only construction line that is NEVER rendered, while FigDown\'s is drawn output — an INVERTED name, which `UNSAFE-DEFAULT-ELIMINATION` rates worse than an unfamiliar one, and no counter-example was found where "guide" names rendered output. `guide` was also a FigDown coinage, and `SIZE-AND-DIRECTION-KEY-NAMING` makes coining a last resort; `threshold` comes whole from Grafana, whose "Show thresholds" render option offers "As lines", "As filled regions" and "As filled regions and lines" — FigDown\'s marker + region pair, split the same way — with IETF RED/AQM as the secondary source (RFC 2309: "Two RED parameters, minth (minimum threshold) and maxth (maximum threshold)"; RFC 7567: "an AQM algorithm configured with a threshold"). 78% of the measured corpus marks are thresholds; target/mean/reference marks: 0) (MIGRATIONS)';
+const RETIRED_GUIDE='guide has been renamed: use threshold (in Illustrator, Inkscape, Figma and draw.io a "guide" is an author-only construction line that is NEVER rendered, while FigDown\'s is drawn output — an INVERTED name, which `UNSAFE-DEFAULT-ELIMINATION` rates worse than an unfamiliar one, and no counter-example was found where "guide" names rendered output. `guide` was also a FigDown coinage, and `SIZE-AND-DIRECTION-KEY-NAMING` makes coining a last resort; `threshold` comes whole from Grafana, whose "Show thresholds" render option offers "As lines", "As filled regions" and "As filled regions and lines" — FigDown\'s marker + region pair, split the same way — with IETF RED/AQM as the secondary source (RFC 2309: "Two RED parameters, minth (minimum threshold) and maxth (maximum threshold)"; RFC 7567: "an AQM algorithm configured with a threshold"). 78% of the measured corpus marks are thresholds; target/mean/reference marks: 0) (MIGRATIONS 0.1)';
 // `EXTERNAL-ENDPOINT-NAMING`: the scene keyword `boundary` became `external`.
-const RETIRED_BOUNDARY='boundary has been renamed: use external (it declares an external I/O endpoint — the spec\'s own words — while UML\'s «boundary» is an INTERNAL interface object, C4\'s System_Boundary is a dashed grouping container FigDown already spells `group`, and BPMN\'s Boundary Event is a third meaning) (MIGRATIONS)';
+const RETIRED_BOUNDARY='boundary has been renamed: use external (it declares an external I/O endpoint — the spec\'s own words — while UML\'s «boundary» is an INTERNAL interface object, C4\'s System_Boundary is a dashed grouping container FigDown already spells `group`, and BPMN\'s Boundary Event is a third meaning) (MIGRATIONS 0.1)';
 // `ROW-BREAK-NAMING`: the `bitfield` child keyword `wrap` became `break`.
-const RETIRED_WRAP='wrap has been renamed: use break (in CSS and typography `wrap` is AUTOMATIC reflow — a mode — while this directive is an EXPLICIT row break, an event; CSS Fragmentation calls it "a forced break … explicitly indicated by the … author", HTML spells it `br`) (MIGRATIONS)';
+const RETIRED_WRAP='wrap has been renamed: use break (in CSS and typography `wrap` is AUTOMATIC reflow — a mode — while this directive is an EXPLICIT row break, an event; CSS Fragmentation calls it "a forced break … explicitly indicated by the … author", HTML spells it `br`) (MIGRATIONS 0.1)';
 // `PRESENCE-FLAG-SPELLING`: the 0.1 rename `optional` -> `conditional` (`PRESENCE-FLAG-SPELLING`)
 // is REVERTED. `conditional` has zero attestation as a wire-format field
 // marker and zero uses in the downstream corpus, while "optional" appears in
 // 34 downstream field LABELS — authors wrote the word in the label precisely
 // because the keyword no longer said it. The MODEL key moves with the surface
 // (`NORMATIVE-SEMANTIC-MODEL`): it is `optional` again on both sides.
-const RETIRED_FIELD_CONDITIONAL='the field flag "conditional" has been retired: write present="<the condition>" (or present="" if the condition is not stated). "conditional" was attested as a wire-format field marker nowhere — zero hits in RFC 2784, ASN.1 X.680, draft-mcquistin-augmented-ascii-diagrams, SystemRDL, IP-XACT, Kaitai Struct and protobuf — and the flag it briefly replaced, "optional", is retired too: an option key carrying the CONDITION says what a bare flag could not (MIGRATIONS)';
+const RETIRED_FIELD_CONDITIONAL='the field flag "conditional" has been retired: write present="<the condition>" (or present="" if the condition is not stated). "conditional" was attested as a wire-format field marker nowhere — zero hits in RFC 2784, ASN.1 X.680, draft-mcquistin-augmented-ascii-diagrams, SystemRDL, IP-XACT, Kaitai Struct and protobuf — and the flag it briefly replaced, "optional", is retired too: an option key carrying the CONDITION says what a bare flag could not (MIGRATIONS 0.1)';
 // `PRESENCE-CONDITION-EXPRESSION`: the positional flag `optional` becomes the option key
 // `present=`, whose VALUE is the presence condition. A bare flag could say
 // only THAT a field is conditional; every RFC that draws one also states WHY
@@ -536,7 +561,7 @@ const RETIRED_FIELD_CONDITIONAL='the field flag "conditional" has been retired: 
 // prose the model may not read. `present` is the attested spelling: X.680
 // PRESENT, IP-XACT isPresent, SystemRDL ispresent, RFC 2784 "present only
 // if", draft-mcquistin "present only when".
-const RETIRED_FIELD_OPTIONAL='the field flag "optional" has been retired and replaced by an option key that carries the CONDITION: write present="<the condition>" (e.g. field "Checksum" 16 present="C = 1"), or present="" when the condition is not stated. The bare flag could say only THAT the field was conditional, so the condition had to live in note= — invisible to the human reading the figure, and prose the model may not parse (`BITFIELD-CONDITIONAL-OFFSETS`). present= DRAWS: the field stays dashed and a stated condition becomes a caption under the block (MIGRATIONS)';
+const RETIRED_FIELD_OPTIONAL='the field flag "optional" has been retired and replaced by an option key that carries the CONDITION: write present="<the condition>" (e.g. field "Checksum" 16 present="C = 1"), or present="" when the condition is not stated. The bare flag could say only THAT the field was conditional, so the condition had to live in note= — invisible to the human reading the figure, and prose the model may not parse (`BITFIELD-CONDITIONAL-OFFSETS`). present= DRAWS: the field stays dashed and a stated condition becomes a caption under the block (MIGRATIONS 0.1)';
 // `TIMING-GENRE-NAMING`: the EXPERIMENTAL genre `wave` became `timing`, both as
 // the header genre token and as the block opener. The old name was WaveDrom's
 // MEMBER KEY, not its figure name: in WaveJSON `signal` is the root object and
@@ -553,8 +578,8 @@ const RETIRED_FIELD_OPTIONAL='the field flag "optional" has been retired and rep
 // to know that the keys survive unchanged and only their carrier moved.
 // RULE 6.2 placement: the spelling left the LANGUAGE, so this fires wherever
 // it appears at line start, in every genre, ahead of the `GENRE-KEYWORD-ALLOWLIST` allowlist.
-const RETIRED_SIZE='size has been retired: its keys moved onto pin — write pin <id> width=<px> height=<px> (one directive carries an element\'s whole declared geometry: at= places it, width=/height= extend it; all three keys are optional and a pin with none of them declares nothing) (MIGRATIONS)';
-const RETIRED_WAVE='wave has been renamed: use timing (in WaveJSON `signal` is the root object and `wave` is a PROPERTY of one signal — its lane activity string — so `wave` named a member key, not a figure kind; WaveDrom\'s own name for the figure is "Digital Timing Diagram", "timing diagram" is the datasheet/JEDEC term for it, and UML 2.5.1\'s Timing Diagram is the same concept. The rename frees `wave` for the lane) (MIGRATIONS)';
+const RETIRED_SIZE='size has been retired: its keys moved onto pin — write pin <id> width=<px> height=<px> (one directive carries an element\'s whole declared geometry: at= places it, width=/height= extend it; all three keys are optional and a pin with none of them declares nothing) (MIGRATIONS 0.1)';
+const RETIRED_WAVE='wave has been renamed: use timing (in WaveJSON `signal` is the root object and `wave` is a PROPERTY of one signal — its lane activity string — so `wave` named a member key, not a figure kind; WaveDrom\'s own name for the figure is "Digital Timing Diagram", "timing diagram" is the datasheet/JEDEC term for it, and UML 2.5.1\'s Timing Diagram is the same concept. The rename frees `wave` for the lane) (MIGRATIONS 0.1)';
 // `EDGE-GEOMETRY-CONSTRUCTS`: `path` and `routing` are WITHDRAWN from the language.
 // These two diagnostics are a NEW SHAPE for this table. Every retirement
 // before them named a replacement spelling — `size` named `pin`, `guide` named
@@ -572,15 +597,15 @@ const WITHDRAWN_WHERE=' The decision and its evidence: MIGRATIONS 0.1, core §9 
 const RETIRED_PATH='path has been WITHDRAWN from the language (`EDGE-GEOMETRY-CONSTRUCTS`) — removed, not renamed, so there is no replacement spelling. A prior-art study of Visio, draw.io/mxGraph, Graphviz and ELK found author waypoints OUTSIDE the stable intersection: only 2 of the 4 model them, and those 2 disagree on what happens when an endpoint moves. The dock realisation was outside it too — written-order attachment has zero prior art in any surveyed system. Delete the line: the edge draws under auto layout, and `rank`, `flow`, declaration order and `pin` are the content-zone means of shaping it.'+WITHDRAWN_WHERE;
 const RETIRED_ROUTING='routing has been WITHDRAWN from the language (`EDGE-GEOMETRY-CONSTRUCTS`) — removed, not renamed, so there is no replacement spelling. Two routing modes and two scopes ARE inside the stable prior-art intersection, so the need is recognised and its shape is known; what is missing is the evidence and the implementation (6 of the 8 in-repo `routing=orthogonal` writings were provable no-ops, and downstream adoption was zero), and the per-edge scope cannot be restored without an edge-identity construct FigDown does not have. Delete the line; the edges draw straight.'+WITHDRAWN_WHERE;
 // `TIMING-LANE-ALPHABET`: the timing lane digits `2`-`9` left the closed alphabet.
-const RETIRED_LANE_DIGIT='timing lane digits 2-9 have been retired: write "=" for a data cell and name it in data= (WaveDrom defines 2..9 as "value with color N" and "=" as "value (default color 2)" — the same brick with a palette index, while FigDown drew the digit character itself as the box label and consumed no data entry, so the two readings of one lane differed silently) (MIGRATIONS)';
+const RETIRED_LANE_DIGIT='timing lane digits 2-9 have been retired: write "=" for a data cell and name it in data= (WaveDrom defines 2..9 as "value with color N" and "=" as "value (default color 2)" — the same brick with a palette index, while FigDown drew the digit character itself as the box label and consumed no data entry, so the two readings of one lane differed silently) (MIGRATIONS 0.1)';
 // 0.1 (§8.4): `edge`, `threshold` and `bundle` have NO interior, so
 // `fill=` and `stroke=` named the SAME channel and `stroke=` won silently —
 // two keys for one channel, resolved by an undocumented precedence that
 // produced a legal, wrong figure whenever both were written (16 lines in
 // this repository, 3 of them writing both on one line). Same defect shape as
 // the retired `color=`; same cure, a named diagnostic.
-const NO_INTERIOR=new Set(['edge','threshold','bundle']);
-const FILL_NO_INTERIOR=k=>k+' has no interior, so fill= and stroke= name the same channel (stroke= won silently) — write stroke= (MIGRATIONS)';
+const NO_INTERIOR=new Set(['edge','flowline','transition','threshold','bundle']);
+const FILL_NO_INTERIOR=k=>k+' has no interior, so fill= and stroke= name the same channel (stroke= won silently) — write stroke= (MIGRATIONS 0.1)';
 // `STYLE-KEY-SCOPE`: `style=` left these three directives (it stays live on
 // node/group/edge/class/bundle/threshold/band). The generic
 // "<directive> does not take style=" would be true but would not say why, and
@@ -591,8 +616,8 @@ const FILL_NO_INTERIOR=k=>k+' has no interior, so fill= and stroke= name the sam
 // are closed here the way every other one-channel-two-keys collision in this
 // language was closed — a named line error, not a precedence rule. A
 // precedence rule is what `STYLE-KEY-SCOPE` had just finished removing from `field`.
-const CELL_HL_ON_CELL='highlight is a ROW mark and takes the single-valued row form (cell <row> highlight) — on a cell address it was SILENTLY DISCARDED and never reached the model, while the cell fill drew. A row tint and a cell fill paint the same channel, so writing both for one cell has no honest resolution: tint the row (cell <row> highlight) or paint the cell (cell (<row>,<col>) fill=…/class=…), not both (MIGRATIONS)';
-const CELL_HL_ROW_CONFLICT=(r,c)=>'cell ('+r+','+c+') resolves to a fill on row '+r+', which is highlighted — the cell fill overrides the row tint, so the model says "row '+r+' is highlighted" while the drawing shows only part of the row tinted (`PRESENTATION-AS-MEANING-CARRIER`: presentation may render meaning, never delete it). Drop the row highlight, or move the cell fill to a row that carries none (MIGRATIONS)';
+const CELL_HL_ON_CELL='highlight is a ROW mark and takes the single-valued row form (cell <row> highlight) — on a cell address it was SILENTLY DISCARDED and never reached the model, while the cell fill drew. A row tint and a cell fill paint the same channel, so writing both for one cell has no honest resolution: tint the row (cell <row> highlight) or paint the cell (cell (<row>,<col>) fill=…/class=…), not both (MIGRATIONS 0.1)';
+const CELL_HL_ROW_CONFLICT=(r,c)=>'cell ('+r+','+c+') resolves to a fill on row '+r+', which is highlighted — the cell fill overrides the row tint, so the model says "row '+r+' is highlighted" while the drawing shows only part of the row tinted (`PRESENTATION-AS-MEANING-CARRIER`: presentation may render meaning, never delete it). Drop the row highlight, or move the cell fill to a row that carries none (MIGRATIONS 0.1)';
 const NO_ITEM_STYLE=new Set(['field','cell','signal']);
 const STYLE_NO_ITEM=k=>k+' does not take style= — '+(k==='field'
   ? 'on a field the dash IS conditional presence (`present=`, spelled `optional` until this release), and style=solid erased it while the model still recorded the field as conditionally present (`PRESENTATION-AS-MEANING-CARRIER`: presentation may render meaning, never be its only carrier)'
@@ -604,7 +629,7 @@ const STYLE_NO_ITEM=k=>k+' does not take style= — '+(k==='field'
   // human, which is the same defect `STYLE-KEY-SCOPE` exists to close. The two channels
   // that DRAW are the name/label and a `class` meaning (which also earns a
   // legend entry).
-  +'. Delete the key; if the distinction is knowledge, write it in the name/label or in a class= meaning — both of which DRAW; description= is documentation prose and produces no ink beyond a tooltip (MIGRATIONS)';
+  +'. Delete the key; if the distinction is knowledge, write it in the name/label or in a class= meaning — both of which DRAW; description= is documentation prose and produces no ink beyond a tooltip (MIGRATIONS 0.1)';
 function splitOpts(toks, laneMode){
   // a repeated option key on one line is a line error, never
   // silent last-wins. `dup` names the first key that appeared twice.
@@ -654,7 +679,7 @@ const ID_RE=/^[A-Za-z_][A-Za-z0-9_-]*$/;
 // `a`+`x--b`) and the greedy member regex silently committed to the first,
 // making the second unreachable and undiagnosed — RULE 6.3 says malformed
 // input is an error, never a guess. Zero ids in either corpus contain `--`.
-const DD_ID='"--" is not allowed inside an id — it is the link operator (edge a -- b, bundle t1 a--b); write a single "-" or "_" (MIGRATIONS)';
+const DD_ID='"--" is not allowed inside an id — it is the link operator (edge a -- b, bundle t1 a--b); write a single "-" or "_" (MIGRATIONS 0.1)';
 // `QUOTED-IDS`: ONE wording for every id position. It covers both
 // halves of the defect it closes — a needlessly quoted legal id
 // (`node "a"`, silently accepted before) and a quoted token that is not a
@@ -673,7 +698,7 @@ const DD_ID='"--" is not allowed inside an id — it is the link operator (edge 
 // old failure named the wrong thing (`node a Cache miss` reported
 // `unexpected argument "miss"` — a surplus argument, when the defect was a
 // missing quote).
-const Q_WHY='whitespace also separates positionals, so a bare token cannot express a phrase (MIGRATIONS)';
+const Q_WHY='whitespace also separates positionals, so a bare token cannot express a phrase (MIGRATIONS 0.1)';
 const ID_RULE='ids are bare and match [A-Za-z_][A-Za-z0-9_-]* — text with spaces or punctuation belongs in the label: node <id> "your text"';
 // isId: the whole id test, used at every id position in the language.
 const isId=v=>typeof v==='string'&&ID_RE.test(v)&&!v.includes('--');
@@ -861,7 +886,9 @@ function parseIndexRange(v){
 const CORE_KW=['figdown','title','layout'];
 const LAYOUT_KW=['pin'];                       // `LAYOUT-ZONE-NAMESPACE`, NORMATIVE — the whole namespace
 const GENRE_FREE_KW=CORE_KW.concat(LAYOUT_KW);
-const SCENE_KW_TOP=['node','group','external','edge','class','flow','rank'];
+// `GENRE-CONNECTOR-SPELLING`/`GENRE-NODE-SPELLING`: the NODE and CONNECTOR spellings are per genre, so
+// they are NOT in the shared list — every scene genre concats its own two.
+const SCENE_KW_TOP=['group','external','class','flow','rank'];
 const SCENE_EXP_KW=['threshold','band','bundle','plane'];
 const SCENE_HOST_KW=GENRE_FREE_KW.concat(SCENE_KW_TOP, SCENE_EXP_KW, ['bitfield','table','timing','chart']);
 // `FLOWCHART-ROLE-KEYWORDS`: the flowchart ROLE vocabulary — the FIRST exercise of
@@ -877,10 +904,88 @@ const FLOWCHART_ROLE_KW=['process','decision','terminator'];
 // only its default drawing, and `shape=` on the same line overrides the
 // drawing without touching the role (§12.7).
 const ROLE_SHAPE={process:'box',decision:'diamond',terminator:'rounded'};
+
+// `GENRE-CONNECTOR-SPELLING`/`GENRE-NODE-SPELLING`: PER-GENRE NODE AND CONNECTOR SPELLINGS.
+// Each scene genre takes the word its own domain uses for the line between
+// two things, and for the thing itself. The criterion is THE TERM THE DOMAIN
+// ACTUALLY USES, not the standard's exact orthography (see the vocabulary
+// rows: `flowline` carries the same ISO-clause verification debt
+// `terminator` does, recorded rather than claimed away).
+//
+//   block / topology  node   edge        (DOT, unchanged)
+//   flowchart         node   flowline    (ISO 5807)
+//   statechart        state  transition  (OMG UML 2.5.1 §14)
+//
+// The ASYMMETRY is deliberate and is the whole of `GENRE-CONNECTOR-SPELLING` vs `GENRE-NODE-SPELLING`: `node`
+// STAYS in `flowchart`, because there a stage can have a role THE SOURCE
+// DOES NOT STATE, and `node` is the only spelling for that — forcing
+// `process` would make the transcriber assert what the source never said.
+// `statechart` has exactly ONE kind of node, so nothing can be left unstated
+// and `state` loses nothing. `BARE-NODE-MEANING` CORRECTS the reason this
+// comment used to give ("ISO has ~ten symbol kinds and we carry three"): a
+// symbol this genre cannot spell is a COVERAGE GAP in FigDown, not a state
+// of the figure, and `node` is not its spelling — see
+// the project’s working record for the coverage ledger.
+const GENRE_NODE_KW={block:'node',topology:'node',flowchart:'node',statechart:'state'};
+const GENRE_CONNECTOR_KW={block:'edge',topology:'edge',flowchart:'flowline',statechart:'transition'};
+const NODE_SPELLINGS=new Set(['node','state']);
+const CONNECTOR_SPELLINGS=new Set(['edge','flowline','transition']);
+// `KEYWORD-RENAME-SCOPE`: the flowchart rename is GATED BY THE DECLARED LANGUAGE
+// VERSION, because `GENRE-CONNECTOR-SPELLING` applied it to `figdown 0.1` and that BROKE documents
+// legal at v0.1.8 — `figdown 0.1 flowchart` + `edge` stopped parsing, with
+// nothing recording the break as a decision. Under core §13.0 only X removes,
+// so 0.1 keeps its spelling:
+//
+//   figdown 0.1 flowchart   `edge` legal, `flowline` is a VERSION error
+//   figdown 0.2 flowchart   `flowline` legal, `edge` is the WRONG_WORD error
+//
+// Two spellings inside ONE version is what the no-alias rule (`IDENTITY-ASSERTION`)
+// forbids; two spellings across VERSIONS is ordinary language evolution, and
+// each version accepts exactly one. `statechart` needs no gate of its own —
+// the GENRE requires 0.2 (GENRES_BY_VERSION), so `state`/`transition` cannot
+// be reached from a 0.1 document at all.
+const GENRE_CONNECTOR_KW_AT={
+  '0.1':{block:'edge',topology:'edge',flowchart:'edge'},
+  '0.2':GENRE_CONNECTOR_KW
+};
+const connectorKwAt=(genre,ver)=>
+  ((GENRE_CONNECTOR_KW_AT[ver]||GENRE_CONNECTOR_KW)[genre])||undefined;
+// The version a connector spelling FIRST becomes legal in, so the diagnostic
+// can name it the way the genre gate already names `figdown 0.2`.
+const CONNECTOR_MIN_VERSION={flowline:'0.2',transition:'0.2'};
+const WRONG_VERSION_WORD=(surf,want,genre,need,have)=>
+  '"'+surf+'" requires figdown '+need+' (this document declares '+have+'): '+
+  'under figdown '+have+' genre '+genre+' spells this "'+want+'". The rename is '+
+  'gated by the language version — a figdown '+have+' document keeps the spelling it '+
+  'was written with (core §13.0: only a MAJOR version removes) — so raise the header '+
+  'to figdown '+need+' or write "'+want+'" (MIGRATIONS 0.2)';
+// Why each genre's word is its word — quoted in the diagnostic, because
+// "not allowed in genre X" tells an author nothing about what to write.
+const WORD_WHY={
+  edge:'a block or topology figure is a graph, and `edge` is the graph word (DOT)',
+  flowline:'the connecting line in a flowchart is a FLOWLINE — the term ISO 5807 uses for it',
+  transition:'the connecting line in a statechart is a TRANSITION — the term UML 2.5.1 §14 uses for it',
+  node:'this genre has more kinds of thing than it has words for, so `node` is the general one',
+  state:'a statechart has exactly ONE kind of node and it is a STATE (UML 2.5.1 §14)'
+};
+// The named diagnostic `GENRE-CONNECTOR-SPELLING`/`GENRE-NODE-SPELLING` owe: it says WHICH word this genre uses and
+// WHY, and it names the migration, because every connector line in a
+// reclassified document has to be rewritten (the cost `GENRE-CONNECTOR-SPELLING` accepted).
+const WRONG_WORD=(surf,want,genre)=>
+  '"'+surf+'" is not the word genre '+genre+' uses for this — write "'+want+'": '+WORD_WHY[want]+
+  '. Each scene genre takes the term its own domain uses (block/topology `node` `edge`, flowchart `node` `flowline`, statechart `state` `transition`) — run tools/migrate-figdown.js to rewrite it (MIGRATIONS 0.2)';
 const GENRE_KW={
-  block:new Set(SCENE_HOST_KW),
-  topology:new Set(SCENE_HOST_KW),
-  flowchart:new Set(SCENE_HOST_KW.concat(FLOWCHART_ROLE_KW)),
+  block:new Set(SCENE_HOST_KW.concat(['node','edge'])),
+  topology:new Set(SCENE_HOST_KW.concat(['node','edge'])),
+  flowchart:new Set(SCENE_HOST_KW.concat(['node','flowline'], FLOWCHART_ROLE_KW)),
+  // `STATECHART-GENRE-SCOPE`: `statechart` added no keyword of its own — it was the
+  // scene host set and nothing else. `GENRE-NODE-SPELLING` gives it its two: the
+  // scene host set with `state` and `transition` in the slots `node` and
+  // `edge` occupy elsewhere. It still does NOT inherit `process`/`decision`/
+  // `terminator`: those are flowchart's words (`GENRE-NAMESPACE` `GENRE-VOCABULARY-OBLIGATION`), and a `decision` in a
+  // statechart is a category error, not a shorthand. The allowlist is what
+  // makes that a line error with no extra code.
+  statechart:new Set(SCENE_HOST_KW.concat(['state','transition'])),
   bitfield:new Set(GENRE_FREE_KW.concat(['class','bitfield'])),
   // chart is experimental and attaches to a table id in the same document
   table:new Set(GENRE_FREE_KW.concat(['class','table','chart'])),
@@ -983,8 +1088,13 @@ function parseOne(text){
   // operator into halves: -[x]-  -[x]->  <-[x]-  <-[x]->. Bracket content:
   // balanced brackets nest verbatim ([flags[3:0]] just works); ["..."] takes
   // the standard quoted-string escapes for unbalanced brackets / \n.
-  function parseEdgeLine(s,n){
-    let i=4; // past 'edge'
+  // `GENRE-CONNECTOR-SPELLING`/`GENRE-NODE-SPELLING`: `kw` is the SURFACE spelling the author wrote —
+  // `edge`, `flowline` or `transition`. One scanner, three words: every
+  // message names the word on the line, and nothing downstream of here knows
+  // the difference (the model records a connector, not a spelling).
+  function parseEdgeLine(s,n,kw){
+    kw=kw||'edge';
+    let i=kw.length; // past the connector keyword
     const ws=()=>{ while(i<s.length&&/\s/.test(s[i])) i++; };
     // `LINK-OPERATOR-IN-IDS`: a hyphen is an id character only when it is NOT
     // followed by a second one, because `--` is the link operator. This is
@@ -1032,7 +1142,7 @@ function parseOne(text){
     ws();
     if(s[i]==='"'){ err(n,ID_RULE); return; }
     const a=readId();
-    if(!a){ err(n, idHere()?ID_RULE:'edge needs <id> ->|<-|--|<-> <id>'); return; }
+    if(!a){ err(n, idHere()?ID_RULE:kw+' needs <id> ->|<-|--|<-> <id>'); return; }
     if(idHere()){ err(n,ID_RULE); return; }
     ws(); let tail=null;
     if(s[i]==='['){ const r=readLbl(); if(r.error){ err(n,r.error); return; } tail=r.v; }
@@ -1040,7 +1150,7 @@ function parseOne(text){
     let lh=null;
     if(s.startsWith('<-',i)){ lh='<-'; i+=2; }
     else if(s[i]==='-'){ lh='-'; i++; }
-    else { err(n,'edge needs an operator: -> <- -- <-> (a [mid] label splits it: -[x]->)'); return; }
+    else { err(n,kw+' needs an operator: -> <- -- <-> (a [mid] label splits it: -[x]->)'); return; }
     let mid=null, op=null;
     if(s[i]==='['){
       const r=readLbl(); if(r.error){ err(n,r.error); return; } mid=r.v;
@@ -1052,14 +1162,14 @@ function parseOne(text){
     } else {
       if(s[i]==='-'){ op='--'; i++; }
       else if(s[i]==='>'){ op='->'; i++; }
-      else { err(n,'edge needs an operator: -> <- -- <->'); return; }
+      else { err(n,kw+' needs an operator: -> <- -- <->'); return; }
     }
     ws(); let head=null;
     if(s[i]==='['){ const r=readLbl(); if(r.error){ err(n,r.error); return; } head=r.v; }
     ws();
     if(s[i]==='"'){ err(n,ID_RULE); return; }
     const b=readId();
-    if(!b){ err(n, idHere()?ID_RULE:'edge needs a target id after the operator'); return; }
+    if(!b){ err(n, idHere()?ID_RULE:kw+' needs a target id after the operator'); return; }
     if(idHere()){ err(n,ID_RULE); return; }
     const tk2=tokenize(s.slice(i).trim());
     if(tk2.error){ err(n,tk2.error); return; }
@@ -1073,10 +1183,10 @@ function parseOne(text){
     for(const rk in RETIRED_OPT_KEYS)
       if(o2[rk]!==undefined){ err(n,RETIRED_OPT_KEYS[rk]); return; }
     for(const k in o2)
-      if(!DIRECTIVE_OPTS.edge.includes(k)){ err(n,'edge does not take '+k+'='); return; }
+      if(!DIRECTIVE_OPTS[kw].includes(k)){ err(n,kw+' does not take '+k+'='); return; }
     for(const k of ['label','taillabel','headlabel'])
-      if(o2[k]!==undefined){ err(n,k+'= is retired — write the label inline: edge A [tail] -[mid]-> [head] B (MIGRATIONS)'); return; }
-    if(o2.fill!==undefined){ err(n,FILL_NO_INTERIOR('edge')); return; }
+      if(o2[k]!==undefined){ err(n,k+'= is retired — write the label inline: '+kw+' A [tail] -[mid]-> [head] B (MIGRATIONS 0.1)'); return; }
+    if(o2.fill!==undefined){ err(n,FILL_NO_INTERIOR(kw)); return; }
     for(const k of ['fill','stroke'])
       if(o2[k]!==undefined && !isColor(o2[k])){ err(n,'unknown color "'+o2[k]+'" (#hex or CSS color name)'); return; }
     // `RULE-POSITION-ENUMERATION`: `edge` was the ONE id position in the language that
@@ -1178,17 +1288,41 @@ function parseOne(text){
     if(findReservedSemi(raw)>=0){ err(n,RESERVED_SEMI); continue; }
     // edge lines carry inline [labels] with free text — dedicated scanner,
     // not the generic tokenizer
-    if(/^edge(\s|$)/.test(raw.trim())){
+    // `GENRE-CONNECTOR-SPELLING`/`GENRE-NODE-SPELLING`: all THREE connector spellings are scanned here.
+    // The wrong one for the genre must reach the named diagnostic below, so
+    // the dispatch cannot be narrowed to the genre's own word — a `flowline`
+    // under `block` would then fall through to `unrecognized line`, which is
+    // exactly the answer these rulings owe an author better than.
+    const mConn=/^(edge|flowline|transition)(\s|$)/.exec(raw.trim());
+    if(mConn){
+      const ckw=mConn[1];
       if(firstContent){ firstContent=false; err(n,'first line must be "figdown 0.1 <genre>"'); }
       cur=null;
-      // `CONTENT-LAYOUT-ZONE-SPLIT`: `edge` is a semantic directive, and it is dispatched here —
+      // `CONTENT-LAYOUT-ZONE-SPLIT`: a connector is a semantic directive, and it is dispatched here —
       // before the generic layout-zone gate below — so it needs its own copy
       // of that gate, or it is the one semantic line that escapes the zone.
-      if(sawLayout){ err(n,'"edge" is a semantic directive — it must appear before the layout zone (`CONTENT-LAYOUT-ZONE-SPLIT`)'); continue; }
-      // `GENRE-KEYWORD-ALLOWLIST`: edge is scene vocabulary only
-      if(sawHeader && doc.genre && GENRE_KW[doc.genre] && !GENRE_KW[doc.genre].has('edge')){
-        err(n,'"edge" is not allowed in genre '+doc.genre); continue; }
-      parseEdgeLine(raw.trim(),n);
+      if(sawLayout){ err(n,'"'+ckw+'" is a semantic directive — it must appear before the layout zone (`CONTENT-LAYOUT-ZONE-SPLIT`)'); continue; }
+      // `GENRE-KEYWORD-ALLOWLIST`: a connector is scene vocabulary only — and in a scene genre it is
+      // THAT genre's connector word (`GENRE-CONNECTOR-SPELLING`/`GENRE-NODE-SPELLING`), not any of the three.
+      // `KEYWORD-RENAME-SCOPE`: the word this genre uses is read AT THE DECLARED VERSION, not
+      // at the newest one. A genre with no connector at all (bitfield, table,
+      // timing) still gets the allowlist message.
+      if(sawHeader && doc.genre && GENRE_KW[doc.genre]){
+        const want=connectorKwAt(doc.genre, doc.version);
+        if(!want){ err(n,'"'+ckw+'" is not allowed in genre '+doc.genre); continue; }
+        if(ckw!==want){
+          const need=CONNECTOR_MIN_VERSION[ckw];
+          // The author wrote a word this genre really does use — just not in
+          // the version they declared. That is a different mistake from the
+          // wrong domain's word, and it has a different one-step fix.
+          if(need && doc.version && need>doc.version &&
+             GENRE_CONNECTOR_KW[doc.genre]===ckw)
+            err(n, WRONG_VERSION_WORD(ckw,want,doc.genre,need,doc.version));
+          else
+            err(n, WRONG_WORD(ckw,want,doc.genre));
+          continue; }
+      }
+      parseEdgeLine(raw.trim(),n,ckw);
       continue;
     }
     const tk=tokenize(raw.trim());
@@ -1300,25 +1434,53 @@ function parseOne(text){
         // line. So the quoting check runs first and suppresses the value
         // check for that token, exactly as `badOpts` does for `shape=`.
         const hq1=!!posq[1], hq2=!!posq[2];
+        // `STATECHART-GENRE-SCOPE`: the language version is now a SET, not a constant, so every
+        // message that echoes a corrected header echoes the version the
+        // author actually declared — an author on `0.2` must not be shown a
+        // `0.1` example. An unrecognised version falls back to `0.1` for the
+        // purpose of these examples only; it has already errored on its own.
+        const verOK=!hq1 && LANG_VERSIONS.includes(pos[1]);
+        const ver=verOK?pos[1]:'0.1';
         if(hq1) err(n,ENUM_BARE('figdown '+pos[1]+' <genre>'));
-        else if(hq2) err(n,ENUM_BARE('figdown 0.1 '+pos[2]));
-        if(!hq1 && pos[1]!=='0.1') err(n,'unsupported version "'+(pos[1]||'')+'" (expected 0.1)');
-        const GENRES=['block','topology','flowchart','bitfield','table','timing'];
+        else if(hq2) err(n,ENUM_BARE('figdown '+ver+' '+pos[2]));
+        if(!hq1 && !LANG_VERSIONS.includes(pos[1])) err(n,'unsupported version "'+(pos[1]||'')+'" (expected '+LANG_VERSIONS.join(' or ')+')');
         // 0.1: the genre token is REQUIRED. `bitfield`/`table`/`timing`
         // documents declare their kind in their content, but `block`,
         // `topology` and `flowchart` share the SAME vocabulary
         // (node/edge/group) and differ only in default flow — so the header
         // is the ONLY place such a document states which kind of figure it
         // is, and omitting it destroys the distinction with no recoverable
-        // fallback. The message lists the six legal values so an authoring
-        // agent fixes it in one step.
-        if(pos[2]===undefined) err(n,'figdown header requires a genre (block|topology|flowchart|bitfield|table|timing)');
+        // fallback. The message lists the legal values so an authoring
+        // agent fixes it in one step — the values legal AT THE DECLARED
+        // VERSION, since listing `statechart` to a `figdown 0.1` author would
+        // name a genre that document may not use.
+        const GENRES=GENRES_BY_VERSION[ver];
+        const GLIST='('+GENRES.join('|')+')';
+        if(pos[2]===undefined) err(n,'figdown header requires a genre '+GLIST);
         else if(hq2){ /* the quoting error above is this token's one error */ }
         else if(pos[2]==='wave') err(n,RETIRED_WAVE);
-        else if(!GENRES.includes(pos[2])) err(n,'unknown genre "'+pos[2]+'" (block|topology|flowchart|bitfield|table|timing)');
+        else if(!GENRES.includes(pos[2])){
+          // A genre that exists but only LATER is its own diagnostic, not
+          // `unknown genre`. core §13.7 forbids guessing a version, and the
+          // author's one-step fix is to raise the header — which the message
+          // SPELLS OUT, because "unknown genre statechart" would send them
+          // looking for a typo that is not there. The trailing `— write: …`
+          // is the same shape WRONG_VERSION_WORD ends with: name the fix, do
+          // not leave the author to derive it.
+          const later=Object.keys(GENRES_BY_VERSION).sort()
+            .find(v=>v>ver && GENRES_BY_VERSION[v].includes(pos[2]));
+          if(later) err(n,'genre "'+pos[2]+'" requires figdown '+later+' (this document declares '+ver+') — write: figdown '+later+' '+pos[2]);
+          else err(n,'unknown genre "'+pos[2]+'" '+GLIST);
+        }
         else{ doc.genre=pos[2];
+          // The DECLARED language version is part of the model (core §12.5
+          // `header.version`): a reader must be able to tell what contract
+          // the author wrote against without re-reading the source.
+          doc.version=ver;
           // genre defaults (`GENRE-NAMESPACE`/`DEFAULT-VALUE-SELECTION`): flowchart figures flow down —
-          // the census-dominant direction; an explicit flow line overrides
+          // the census-dominant direction; an explicit `flow` directive overrides.
+          // `statechart` takes the SCENE default (`right`) and adds no rule
+          // of its own — `STATECHART-GENRE-SCOPE` lands a dispatch point, not a layout.
           if(pos[2]==='flowchart') doc.flow='down'; }
         // §1: a directive line carrying positional arguments its grammar does
         // not accept MUST be rejected — the header is a directive like any other
@@ -1362,19 +1524,19 @@ function parseOne(text){
     // the first entries in it that name NO replacement. `route`'s own message
     // has to change with them: it pointed at `path`, which no longer exists,
     // so it now states the whole chain and ends where the others end.
-    if(kw==='line'){ err(n,'line has been renamed: use threshold (a labelled reference value drawn across the target'+"'"+'s box; "line" now only names a source line number, and the 0.1 replacement `guide` was itself retired) (MIGRATIONS)'); continue; }
+    if(kw==='line'){ err(n,'line has been renamed: use threshold (a labelled reference value drawn across the target'+"'"+'s box; "line" now only names a source line number, and the 0.1 replacement `guide` was itself retired) (MIGRATIONS 0.1)'); continue; }
     if(kw==='fill'){ err(n,'fill has been renamed: use band (a range band; the KEYWORD is retired — fill= is the presentation option key)'); continue; }
     if(kw==='route'){ err(n,'route has been WITHDRAWN: it was renamed path, and path was withdrawn from the language (`EDGE-GEOMETRY-CONSTRUCTS`). There is no replacement spelling. Delete the line: the edge draws under auto layout.'+WITHDRAWN_WHERE); continue; }
     if(kw==='path'){ err(n,RETIRED_PATH); continue; }
     if(kw==='routing'){ err(n,RETIRED_ROUTING); continue; }
-    if(kw==='render'){ err(n,'render has been renamed: use layout (the zone takes only pin — geometry, not presentation) (MIGRATIONS)'); continue; }
+    if(kw==='render'){ err(n,'render has been renamed: use layout (the zone takes only pin — geometry, not presentation) (MIGRATIONS 0.1)'); continue; }
     if(kw==='wrap'){ err(n,RETIRED_WRAP); continue; }
     if(kw==='boundary'){ err(n,RETIRED_BOUNDARY); continue; }
     if(kw==='layer'){ err(n,RETIRED_LAYER); continue; }
     if(kw==='guide'){ err(n,RETIRED_GUIDE); continue; }
     if(kw==='wave'){ err(n,RETIRED_WAVE); continue; }
     if(kw==='size'){ err(n,RETIRED_SIZE); continue; }
-    if(kw==='plot'){ err(n,'plot has been renamed: use chart (plot reads as an imperative — the reason render was retired — while every other block opener is a noun; ECharts, Chart.js and Mermaid all name the object a chart) (MIGRATIONS)'); continue; }
+    if(kw==='plot'){ err(n,'plot has been renamed: use chart (plot reads as an imperative — the reason render was retired — while every other block opener is a noun; ECharts, Chart.js and Mermaid all name the object a chart) (MIGRATIONS 0.1)'); continue; }
 
     // typed-block children
     if(cur && ['field','break','cell','width','signal','gap'].includes(kw)){
@@ -1452,7 +1614,7 @@ function parseOne(text){
         if(opts.index!==undefined){
           err(n,'index= is not available on the compact field form — the range would apply LINE-wide, saying that every item repeats over the same indices. Write the repeated element in the classic form on its own line: field "<name>" <width> index=0..7'); continue; }
         if(items0.length>1){
-          err(n,'field: the item list is ONE comma-delimited token — unexpected argument "'+items0[1]+'" (write field a:1,b:2 with no space after the comma; quote a name that contains whitespace: "Long Name":16) (MIGRATIONS)'); continue; }
+          err(n,'field: the item list is ONE comma-delimited token — unexpected argument "'+items0[1]+'" (write field a:1,b:2 with no space after the comma; quote a name that contains whitespace: "Long Name":16) (MIGRATIONS 0.1)'); continue; }
         let bad=null; const parsed=[];
         for(const el of splitList(posT[1],0)){
           const it=el.v; if(!it) continue;
@@ -1517,7 +1679,7 @@ function parseOne(text){
         // `POSITIONAL-LIST-SPELLING`: comma form only; the space form is retired.
         const wtoks=pos.slice(1);
         if(wtoks.length>1){
-          err(n,'width takes ONE comma-delimited token: write width '+joinListForm(wtoks)+' — the space form is retired (MIGRATIONS)'); continue; }
+          err(n,'width takes ONE comma-delimited token: write width '+joinListForm(wtoks)+' — the space form is retired (MIGRATIONS 0.1)'); continue; }
         const vals=wtoks.length?splitList(posT[1],0).map(e=>e.v):[];
         if(!vals.length){ err(n,'width needs one value per column (auto | <px> | <n>%)'); continue; }
         let badw=null;
@@ -1546,7 +1708,7 @@ function parseOne(text){
         // stays bare, exactly as `threshold offset=50%` does.
         const cadr=pos[1]||'';
         if(/^h?\d+,\d+$/.test(cadr)){
-          err(n,'cell address is now a paren point: cell ('+cadr+') — a bare comma pair is a list of two numbers, not an address (MIGRATIONS)'); continue; }
+          err(n,'cell address is now a paren point: cell ('+cadr+') — a bare comma pair is a list of two numbers, not an address (MIGRATIONS 0.1)'); continue; }
         const rc=/^\((h?)(\d+),(\d+)\)$/.exec(cadr)||/^(h?)(\d+)$/.exec(cadr);
         // `RULE-POSITION-ENUMERATION`: `highlight` is a bare keyword FLAG
         // (vocabulary-sources.tsv `cell.highlight`), so RULE 2.4 governs it
@@ -1641,7 +1803,16 @@ function parseOne(text){
     // must be in the header genre allowlist. Child keywords still use the
     // "needs a bitfield/table/timing above" path when they appear with no cur.
     if(sawHeader && doc.genre && GENRE_KW[doc.genre] && !CHILD_KW.has(kw) && !GENRE_KW[doc.genre].has(kw)){
-      err(n,'"'+kw+'" is not allowed in genre '+doc.genre);
+      // `GENRE-NODE-SPELLING`: a word this genre SPELLS DIFFERENTLY is not an
+      // unknown word, and "not allowed in genre statechart" would send an
+      // author looking for a construct they cannot have instead of the one
+      // they already wrote. The named diagnostic says which word and why.
+      // (`edge`/`flowline`/`transition` never reach here — they are
+      // dispatched by their own scanner above.)
+      if(NODE_SPELLINGS.has(kw) && GENRE_NODE_KW[doc.genre])
+        err(n, WRONG_WORD(kw, GENRE_NODE_KW[doc.genre], doc.genre));
+      else
+        err(n,'"'+kw+'" is not allowed in genre '+doc.genre);
       continue;
     }
     if(badOpts(kw)) continue;
@@ -1667,7 +1838,7 @@ function parseOne(text){
         // meaning: the token is a normal quoted string and the generic
         // tokenizer above has already resolved its escapes.
         const t0=tk.toks[1];
-        if(!t0||!t0.q){ err(n,'title needs a quoted string: title "<text>" (MIGRATIONS)'); break; }
+        if(!t0||!t0.q){ err(n,'title needs a quoted string: title "<text>" (MIGRATIONS 0.1)'); break; }
         if(tk.toks.length>2){ err(n,'unexpected argument "'+tk.toks[2].v+'"'); break; }
         doc.title=t0.v; sawTitle=true; break;
       }
@@ -1729,9 +1900,15 @@ function parseOne(text){
       // being wrong is harmless, and a flowchart node may be a datastore, an
       // annotation or a state, so `role:"process"` by default would let the
       // model assert a falsehood the figure cannot be inspected to catch.
+      // `GENRE-NODE-SPELLING`: `state` joins the same case. It is `node` renamed
+      // for one genre, not a role — a statechart node has exactly one kind,
+      // so there is no role to record and `role` stays null, exactly as a
+      // bare `node` does. The DRAWING is unchanged too (`shape=box` default),
+      // which is what let the five corpus figures migrate byte-identically.
       case 'process': case 'decision': case 'terminator':
+      case 'state':
       case 'node': {
-        const role=kw==='node'?null:kw;
+        const role=(kw==='node'||kw==='state')?null:kw;
         const id=pos[1];
         { const e=idErr(id,posq[1],kw+' needs an id'); if(e){ err(n,e); break; } }
         if(dupId(id)){ err(n,'duplicate id "'+id+'"'); break; }
@@ -1800,7 +1977,7 @@ function parseOne(text){
         break;
       }
       case 'flow': {
-        if(sawFlow){ err(n,'duplicate flow line'); break; }
+        if(sawFlow){ err(n,'duplicate flow directive'); break; }
         // `RULE-POSITION-ENUMERATION`: `flow.direction` is an enum position — bare.
         if(posq[1]){ err(n,ENUM_BARE('flow '+pos[1])); break; }
         if(!['right','down','left','up'].includes(pos[1])){ err(n,'flow needs right|down|left|up'); break; }
@@ -1833,7 +2010,7 @@ function parseOne(text){
         // could not even detect a half-converted line.
         const rtoks=pos.slice(1), rT=posT.slice(1);
         if(rtoks.length>1){
-          err(n,'rank takes ONE comma-delimited token: write rank '+joinListForm(rtoks)+' — the space form is retired (MIGRATIONS)'); break; }
+          err(n,'rank takes ONE comma-delimited token: write rank '+joinListForm(rtoks)+' — the space form is retired (MIGRATIONS 0.1)'); break; }
         const rels=rtoks.length?splitList(rT[0],0):[];
         let badr=null;
         for(const e of rels){
@@ -1873,7 +2050,7 @@ function parseOne(text){
         // is now detectable — a second positional token after the label is
         // the half-converted line the old tolerance could not report.
         if(restT.length>1){
-          err(n,'bundle members take ONE comma-delimited token: write bundle '+id+(tlabel===null?'':' "'+tlabel+'"')+' '+joinListForm(restT.map(t=>t.v))+' — the space form is retired (MIGRATIONS)'); break; }
+          err(n,'bundle members take ONE comma-delimited token: write bundle '+id+(tlabel===null?'':' "'+tlabel+'"')+' '+joinListForm(restT.map(t=>t.v))+' — the space form is retired (MIGRATIONS 0.1)'); break; }
         const pairs=[]; let badp=null;
         outerB:
         for(const t of restT){
@@ -1923,7 +2100,7 @@ function parseOne(text){
         // percentage" `offset` (on <stop>), which is the same source the
         // paint keys come from, so nothing is invented.
         if(opts.at!==undefined){
-          err(n,'threshold at= has been renamed: use offset=<0..100>% (at= is the pin POINT in canvas px; SVG spells a position along an extent "offset") (MIGRATIONS)'); break; }
+          err(n,'threshold at= has been renamed: use offset=<0..100>% (at= is the pin POINT in canvas px; SVG spells a position along an extent "offset") (MIGRATIONS 0.1)'); break; }
         const m=/^(\d+(?:\.\d+)?)%$/.exec(opts.offset||'');   // % is mandatory (`BARE-FRACTION-VALUES`)
         if(!m||+m[1]<0||+m[1]>100){ err(n,'threshold needs offset=<0..100>% (with the % sign)'); break; }
         // §5: `stroke=` is the marker colour, `color=` the label colour,
@@ -1974,7 +2151,7 @@ function parseOne(text){
         // reads the same way. `OPTION-POSITION-PARSING` quotedness is `pos`-aligned, so an option
         // may still precede it.
         const flabel=posq[1]?pos[1]:null;
-        if(flabel===null){ err(n,'band needs a quoted "<label>" first: band "<name>" <a>..<b>% in=<node-or-group-id> (a band with no label asserts nothing a reader may keep — fill= is presentation, and §5 forbids meaning riding on colour alone) (MIGRATIONS)'); break; }
+        if(flabel===null){ err(n,'band needs a quoted "<label>" first: band "<name>" <a>..<b>% in=<node-or-group-id> (a band with no label asserts nothing a reader may keep — fill= is presentation, and §5 forbids meaning riding on colour alone) (MIGRATIONS 0.1)'); break; }
         if(!opts['in']){ err(n,'band needs in=<node-or-group-id>'); break; }
         // 0.1: the `%` is MANDATORY, matching `threshold offset=` (`BARE-FRACTION-VALUES`).
         // `band 15`, `band 15-35` and `band 15%-35` all parsed before (the
@@ -1989,7 +2166,7 @@ function parseOne(text){
         // cited by `bitfield`. `band` is EXPERIMENTAL (`CONSTRUCT-STATUS-TIERS`), so no
         // compatibility promise is owed; the diagnostic is owed anyway.
         if(/^(\d+(?:\.\d+)?)-(\d+(?:\.\d+)?)%$/.test(pos[2]||'')){
-          err(n,'the hyphen range "'+pos[2]+'" is no longer the spelling: write band "'+flabel+'" '+String(pos[2]).replace('-','..')+' in=… — FigDown has ONE range grammar, "..", and a hyphen between two numbers reads as subtraction (MIGRATIONS)'); break; }
+          err(n,'the hyphen range "'+pos[2]+'" is no longer the spelling: write band "'+flabel+'" '+String(pos[2]).replace('-','..')+' in=… — FigDown has ONE range grammar, "..", and a hyphen between two numbers reads as subtraction (MIGRATIONS 0.1)'); break; }
         const m=/^(\d+(?:\.\d+)?)%$|^(\d+(?:\.\d+)?)\.\.(\d+(?:\.\d+)?)%$/.exec(pos[2]||'');
         if(!m){ err(n,'band needs a range with the % sign: band "<label>" <pct>% or band "<label>" <a>..<b>%'); break; }
         if(pos.length>3){ err(n,'unexpected argument "'+pos[3]+'"'); break; }
@@ -2022,7 +2199,7 @@ function parseOne(text){
         if(!id){ err(n,PIN_SHAPE); break; }
         // 0.1 (RULE 1.1a): the pair is PARENTHESISED — at=(x,y).
         if(at!==undefined&&/^-?\d+(?:\.\d+)?,-?\d+(?:\.\d+)?$/.test(at)){
-          err(n,'pin at= now takes a paren point: at=('+at+') — a bare comma pair is a list of two numbers, not a point (MIGRATIONS)'); break; }
+          err(n,'pin at= now takes a paren point: at=('+at+') — a bare comma pair is a list of two numbers, not a point (MIGRATIONS 0.1)'); break; }
         const m=at===undefined?null:/^\((-?\d+(?:\.\d+)?),(-?\d+(?:\.\d+)?)\)$/.exec(at);
         // A WRITTEN `at=` that does not parse is its own error, never the
         // whole-line shape message: the author declared a point and got the
@@ -2231,9 +2408,9 @@ function parseOne(text){
       if(!c||c.stroke!==undefined) continue;
       if(c.fill===undefined&&c.style!==undefined) continue;
       if(c.fill!==undefined)
-        errs.push('Line '+e.line+': class "'+cid+'" sets fill= but no stroke=, and an edge has no interior — add stroke= to the class (it paints the edge; fill= keeps painting members that have an interior) (MIGRATIONS)');
+        errs.push('Line '+e.line+': class "'+cid+'" sets fill= but no stroke=, and an edge has no interior — add stroke= to the class (it paints the edge; fill= keeps painting members that have an interior) (MIGRATIONS 0.1)');
       else
-        errs.push('Line '+e.line+': class "'+cid+'" declares no channel an edge has — add stroke= (an edge has only stroke= and style=: no interior, and v0.1 has no label-colour key). Without one the edge takes the default colour and the class shows nothing in the legend (MIGRATIONS)');
+        errs.push('Line '+e.line+': class "'+cid+'" declares no channel an edge has — add stroke= (an edge has only stroke= and style=: no interior, and v0.1 has no label-colour key). Without one the edge takes the default colour and the class shows nothing in the legend (MIGRATIONS 0.1)');
     }
   }
   { // class references must resolve (closed grammar)
@@ -2410,7 +2587,7 @@ function findReservedSemi(s){
   }
   return -1;
 }
-const RESERVED_SEMI='";" is reserved for a future statement separator and has no meaning in v0.1 — write one directive per line; a literal ";" belongs inside a quoted string, an [edge label] or a comment (MIGRATIONS)';
+const RESERVED_SEMI='";" is reserved for a future statement separator and has no meaning in v0.1 — write one directive per line; a literal ";" belongs inside a quoted string, an [edge label] or a comment (MIGRATIONS 0.1)';
 
 function findComment(s){
   // '#' starts a comment only at line start or after whitespace,
@@ -4586,7 +4763,7 @@ edge l3 -> mmu
 edge acl -> mmu`,
 
 'flowchart roles':
-`figdown 0.1 flowchart
+`figdown 0.2 flowchart
 title "Packet ingress (roles)"
 terminator rx "Frame received"
 process    l2 "Read the L2 header"
@@ -4597,15 +4774,15 @@ process    vlan "Pop one VLAN tag"
 terminator drop "Drop"
 terminator fwd "Forward"
 rank ipv4,arp,drop,vlan
-edge rx -> l2
-edge l2 -> et
-edge et -[0x0800 IPv4]-> ipv4
-edge et -[0x0806 ARP]-> arp
-edge et -[other]-> drop
-edge et -[0x8100 VLAN]-> vlan
-edge vlan -[re-read]-> et
-edge ipv4 -> fwd
-edge arp -> fwd`,
+flowline rx -> l2
+flowline l2 -> et
+flowline et -[0x0800 IPv4]-> ipv4
+flowline et -[0x0806 ARP]-> arp
+flowline et -[other]-> drop
+flowline et -[0x8100 VLAN]-> vlan
+flowline vlan -[re-read]-> et
+flowline ipv4 -> fwd
+flowline arp -> fwd`,
 
 'bitfield (census #1)':
 `figdown 0.1 bitfield
@@ -4950,7 +5127,11 @@ let lastSVG='', lastMeta=null, lastPad={x:0,y:0}, lastDoc=null;
 // be treated as "last scene line" (P0: drag then +Node was writing
 // into the layout zone → "node is a semantic directive" white screen).
 const CONTENT_KW=/^(figdown|title|node|group|external|edge|plane|flow|rank|threshold|band|bundle|class)\b/;
-const ID_DECL_KW=/^(node|group|external|bundle|class|plane|bitfield|table|timing)\s+(\S+)/;
+// `GENRE-CONNECTOR-SPELLING`/`GENRE-NODE-SPELLING`: `state` is a node-declaring keyword under
+// `statechart`, so an id it declares must count as USED here or the GUI
+// hands out a colliding id. The list is spellings, not per-genre legality —
+// the parser owns legality.
+const ID_DECL_KW=/^(node|state|group|external|bundle|class|plane|bitfield|table|timing)\s+(\S+)/;
 function lastContentLineIdx(lines){
   let last=-1;
   const layoutIdx=lines.findIndex(l=>l.trim()==='layout');
@@ -4990,11 +5171,37 @@ function nextFreeId(lines, prefix){
 // (pins only, no flow) so the strip test left orphan geometry. Genre default flow
 // is content-zone meaning for reading order — write it when the first scene
 // element appears via GUI, not only when the author types it.
-function ensureFlowLine(lines){
+// `GENRE-CONNECTOR-SPELLING`/`GENRE-NODE-SPELLING`: every GUI action is a TEXT EDIT, so it has to
+// write the word the document's own genre uses. These read the header the
+// same way ensureFlowDirective does; the engine tables above are the authority.
+function guiGenre(lines){
+  for(const l of lines){
+    const m=/^figdown\s+\d+\.\d+\s+(\S+)/.exec(l.trim());
+    if(m) return m[1];
+  }
+  return 'block';
+}
+const guiNodeKw=lines=>GENRE_NODE_KW[guiGenre(lines)]||'node';
+function guiVersion(lines){
+  for(const l of lines){
+    const m=/^figdown\s+(\d+\.\d+)\b/.exec(l.trim());
+    if(m) return m[1];
+  }
+  return '0.1';
+}
+// `KEYWORD-RENAME-SCOPE`: the GUI writes the word legal AT THE DECLARED VERSION — inserting
+// `flowline` into a `figdown 0.1 flowchart` document would make the editor
+// author a line error.
+const guiConnKw=lines=>connectorKwAt(guiGenre(lines), guiVersion(lines))||'edge';
+const NODE_LINE_RE=new RegExp('^\\s*(?:'+[...NODE_SPELLINGS].join('|')+')\\s+');
+function ensureFlowDirective(lines){
   if(lines.some(l=>/^flow\b/.test(l.trim()))) return lines;
   let genre='block';
   for(const l of lines){
-    const m=/^figdown\s+0\.1\s+(\S+)/.exec(l.trim());
+    // `STATECHART-GENRE-SCOPE`: any declared language version, not `0.1` alone — a `figdown 0.2`
+    // document read by a `0\.1`-only regex fell through to the `block`
+    // default and got the wrong axis written into it.
+    const m=/^figdown\s+\d+\.\d+\s+(\S+)/.exec(l.trim());
     if(m){ genre=m[1]; break; }
   }
   // pure typed genres have no scene layout axis
@@ -5094,7 +5301,7 @@ function upsertPin(lines, id, patch){
 }
 function applyPins(pins){ // pins: array of [id, px, py] — one text update, one refresh
   let lines=$('src').value.split('\n');
-  lines=ensureFlowLine(lines);
+  lines=ensureFlowDirective(lines);
   for(const [id,px,py] of pins){
     lines=upsertPin(lines, id, {at:'('+px+','+py+')'});
   }
@@ -5342,11 +5549,12 @@ function installDirectEdit(){
             if(linkArm===undefined){ linkArm=id; $('status').textContent='Link mode: now click the target node'; return; }
             if(linkArm!==id){
               let lines=$('src').value.split('\n');
-              lines=ensureFlowLine(lines);
+              lines=ensureFlowDirective(lines);
               const last=lastContentLineIdx(lines);
-              lines.splice(last+1,0,'edge '+linkArm+' -> '+id);
+              const ck=guiConnKw(lines);
+              lines.splice(last+1,0,ck+' '+linkArm+' -> '+id);
               $('src').value=lines.join('\n'); refresh();
-              $('status').textContent='link → wrote "edge '+linkArm+' -> '+id+'" (GUI action = text edit)';
+              $('status').textContent='link → wrote "'+ck+' '+linkArm+' -> '+id+'" (GUI action = text edit)';
             }
             linkArm=null; $('linkmode').style.fontWeight='';
             return;
@@ -5372,7 +5580,7 @@ function installDirectEdit(){
   });
 }
 let selectedId=null, linkArm=null;
-function nodeLineIdx(lines,id){ return lines.findIndex(l=>new RegExp('^\\s*node\\s+'+id+'\\b').test(l)); }
+function nodeLineIdx(lines,id){ return lines.findIndex(l=>new RegExp('^\\s*(?:node|state)\\s+'+id+'\\b').test(l)); }
 function setNodeOption(id,key,val){
   // Rewrite/append the option on the CODE side of any trailing comment (P0).
   const lines=$('src').value.split('\n');
@@ -5398,7 +5606,7 @@ function deleteNode(id){
   const lines=$('src').value.split('\n').map((l,li)=>{
     if(drop.has(li+1)) return null;
     const t=l.trim();
-    if(new RegExp('^(node|pin)\\s+'+id+'\\b').test(t)) return null;
+    if(new RegExp('^(node|state|pin)\\s+'+id+'\\b').test(t)) return null;
     // 0.1: `rank` is ONE comma-delimited token. This rewrite used to
     // both READ and WRITE the retired space form, so deleting a node from a
     // ranked scene produced a document the engine now refuses.
@@ -5429,7 +5637,7 @@ function deleteNode(id){
 function moveNodeLine(id,dir){ // dir +1 = later line = painted on top
   const lines=$('src').value.split('\n');
   const idx=nodeLineIdx(lines,id); if(idx<0) return;
-  const isNode=l=>/^\s*node\s+/.test(l);
+  const isNode=l=>NODE_LINE_RE.test(l);
   let j=idx+dir;
   while(j>=0&&j<lines.length&&!isNode(lines[j])) j+=dir;
   if(j<0||j>=lines.length) { $('status').textContent='already at the '+(dir>0?'top':'bottom')+' of paint order'; return; }
@@ -5632,18 +5840,18 @@ $('raise').onclick=()=>{ if(selectedId) moveNodeLine(selectedId,+1); };
 $('lower').onclick=()=>{ if(selectedId) moveNodeLine(selectedId,-1); };
 function insertNodeLine(){
   let lines=$('src').value.split('\n');
-  lines=ensureFlowLine(lines);
+  lines=ensureFlowDirective(lines);
   const nid=nextFreeId(lines,'n');
   const nnum=nid.slice(1);
   const last=lastContentLineIdx(lines);
   const kk=$('newkind').value;
-  lines.splice(last+1,0,'node '+nid+' "Node '+nnum+'"'+(kk!=='box'?' shape='+kk:''));
+  lines.splice(last+1,0,guiNodeKw(lines)+' '+nid+' "Node '+nnum+'"'+(kk!=='box'?' shape='+kk:''));
   $('src').value=lines.join('\n'); refresh();
   return nid;
 }
 $('addnode').onclick=()=>{
   const id=insertNodeLine(); select(id);
-  $('status').textContent='+ Node → wrote "node '+id+'" line — drag it into place';
+  $('status').textContent='+ Node → wrote "'+guiNodeKw($('src').value.split('\n'))+' '+id+'" line — drag it into place';
 };
 function addNodeAt(x,y){
   const id=insertNodeLine();

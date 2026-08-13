@@ -1,3 +1,3 @@
-Line 12: rank takes ONE comma-delimited token: write rank a,b — the space form is retired (MIGRATIONS)
-Line 13: bundle members take ONE comma-delimited token: write bundle t1 "LAG" a--b,a--c — the space form is retired (MIGRATIONS)
+Line 12: rank takes ONE comma-delimited token: write rank a,b — the space form is retired (MIGRATIONS 0.1)
+Line 13: bundle members take ONE comma-delimited token: write bundle t1 "LAG" a--b,a--c — the space form is retired (MIGRATIONS 0.1)
 Line 14: class= must not contain empty members

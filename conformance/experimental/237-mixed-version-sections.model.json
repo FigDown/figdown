@@ -1,0 +1,102 @@
+{
+  "sections": [
+    {
+      "header": {
+        "version": "0.1",
+        "genre": "flowchart"
+      },
+      "title": "Section 1 — 0.1 vocabulary",
+      "flow": "down",
+      "classes": [],
+      "planes": [
+        {
+          "id": "base",
+          "z": 0
+        }
+      ],
+      "nodes": [
+        {
+          "id": "a",
+          "label": "Step",
+          "role": "process",
+          "shape": "box",
+          "plane": "base",
+          "line": 9
+        },
+        {
+          "id": "b",
+          "label": "Step 2",
+          "role": "process",
+          "shape": "box",
+          "plane": "base",
+          "line": 10
+        }
+      ],
+      "groups": [],
+      "edges": [
+        {
+          "a": "a",
+          "op": "->",
+          "b": "b",
+          "plane": "base",
+          "line": 11
+        }
+      ],
+      "ranks": [],
+      "pins": [],
+      "thresholds": [],
+      "bands": [],
+      "bundles": [],
+      "regions": []
+    },
+    {
+      "header": {
+        "version": "0.2",
+        "genre": "flowchart"
+      },
+      "title": "Section 2 — 0.2 vocabulary",
+      "flow": "down",
+      "classes": [],
+      "planes": [
+        {
+          "id": "base",
+          "z": 0
+        }
+      ],
+      "nodes": [
+        {
+          "id": "c",
+          "label": "Step",
+          "role": "process",
+          "shape": "box",
+          "plane": "base",
+          "line": 3
+        },
+        {
+          "id": "d",
+          "label": "Step 2",
+          "role": "process",
+          "shape": "box",
+          "plane": "base",
+          "line": 4
+        }
+      ],
+      "groups": [],
+      "edges": [
+        {
+          "a": "c",
+          "op": "->",
+          "b": "d",
+          "plane": "base",
+          "line": 5
+        }
+      ],
+      "ranks": [],
+      "pins": [],
+      "thresholds": [],
+      "bands": [],
+      "bundles": [],
+      "regions": []
+    }
+  ]
+}

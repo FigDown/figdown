@@ -1,0 +1,85 @@
+{
+  "header": {
+    "version": "0.2",
+    "genre": "statechart"
+  },
+  "title": "Turnstile",
+  "flow": "right",
+  "classes": [
+    {
+      "id": "mode",
+      "meaning": "A mode of the mechanism",
+      "fill": "#e0e7ff",
+      "line": 7
+    }
+  ],
+  "planes": [
+    {
+      "id": "base",
+      "z": 0
+    }
+  ],
+  "nodes": [
+    {
+      "id": "locked",
+      "label": "LOCKED",
+      "shape": "box",
+      "plane": "base",
+      "class": [
+        "mode"
+      ],
+      "line": 8
+    },
+    {
+      "id": "unlocked",
+      "label": "UNLOCKED",
+      "shape": "box",
+      "plane": "base",
+      "class": [
+        "mode"
+      ],
+      "line": 9
+    }
+  ],
+  "groups": [],
+  "edges": [
+    {
+      "a": "locked",
+      "op": "->",
+      "b": "unlocked",
+      "mid": "coin",
+      "plane": "base",
+      "line": 10
+    },
+    {
+      "a": "unlocked",
+      "op": "->",
+      "b": "locked",
+      "mid": "push",
+      "plane": "base",
+      "line": 11
+    },
+    {
+      "a": "locked",
+      "op": "->",
+      "b": "locked",
+      "mid": "push",
+      "plane": "base",
+      "line": 12
+    }
+  ],
+  "ranks": [
+    {
+      "ids": [
+        "locked",
+        "unlocked"
+      ],
+      "line": 13
+    }
+  ],
+  "pins": [],
+  "thresholds": [],
+  "bands": [],
+  "bundles": [],
+  "regions": []
+}

@@ -1,2 +1,2 @@
-Line 10: field: the item list is ONE comma-delimited token — unexpected argument "8," (write field a:1,b:2 with no space after the comma; quote a name that contains whitespace: "Long Name":16) (MIGRATIONS)
-Line 12: field: the item list is ONE comma-delimited token — unexpected argument "b:2" (write field a:1,b:2 with no space after the comma; quote a name that contains whitespace: "Long Name":16) (MIGRATIONS)
+Line 10: field: the item list is ONE comma-delimited token — unexpected argument "8," (write field a:1,b:2 with no space after the comma; quote a name that contains whitespace: "Long Name":16) (MIGRATIONS 0.1)
+Line 12: field: the item list is ONE comma-delimited token — unexpected argument "b:2" (write field a:1,b:2 with no space after the comma; quote a name that contains whitespace: "Long Name":16) (MIGRATIONS 0.1)

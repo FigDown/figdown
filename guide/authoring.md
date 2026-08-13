@@ -8,9 +8,9 @@
 ## Field-tested pitfalls (quick reference)
 
 For the full explanation of each entry see the per-genre reading files: scene
-pitfalls in [read/0.1/scene.md](../read/0.1/scene.md), bit-numbering in
-[read/0.1/bitfield.md](../read/0.1/bitfield.md), arrangement in
-[read/0.1/layout.md](../read/0.1/layout.md).
+pitfalls in [read/0.2/scene.md](../read/0.2/scene.md), bit-numbering in
+[read/0.2/bitfield.md](../read/0.2/bitfield.md), arrangement in
+[read/0.2/layout.md](../read/0.2/layout.md).
 
 | Symptom | Correct spelling |
 |---|---|
@@ -44,7 +44,7 @@ such as SVG/EMF — extract text and geometry structurally, infer topology
 from geometry, use vision only for the residue; Tier 3: raster-only —
 vision is legitimate but last resort and must be verified); state the tier
 in the provenance comment. The full check is
-[`read/0.1/transcribe.md`](../read/0.1/transcribe.md).
+[`read/0.2/transcribe.md`](../read/0.2/transcribe.md).
 
 ## Step 2 — Pick the genre (main standard first)
 
@@ -55,6 +55,7 @@ in the provenance comment. The full check is
 | components, containment, dataflow — box-and-wire | `block` | **MAIN STANDARD** (NORMATIVE) |
 | devices and the links between them | `topology` | EXPERIMENTAL — prefer `block` when portable |
 | steps, decisions, and control flow | `flowchart` (defaults `flow down`; owns `process` / `decision` / `terminator`) | EXPERIMENTAL — prefer `block` + `flow down` when portable |
+| states a machine is IN, and transitions between them | `statechart` (**needs `figdown 0.2`**; a node is a `state`, a connector a `transition`) | EXPERIMENTAL — prefer `block` when portable. Choose it only when a node is a **mode endured**, not a step performed: a retry loop is a `flowchart` however its title reads |
 | signals changing over time cycles | `timing` | EXPERIMENTAL |
 
 **Prefer the three main-standard genres** (`block`, `bitfield`, `table`)

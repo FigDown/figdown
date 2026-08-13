@@ -1,4 +1,4 @@
-figdown 0.1 flowchart
+figdown 0.2 flowchart
 node a "Start"
 node b "End"
-edge a -> b
+flowline a -> b

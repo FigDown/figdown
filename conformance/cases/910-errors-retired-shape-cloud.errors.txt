@@ -1,2 +1,2 @@
-Line 10: shape=cloud has been retired: use shape=ellipse and put the meaning in the label or a class= (shapes are pure geometry, `SHAPE-ENUM-VOCABULARY`) (MIGRATIONS)
+Line 10: shape=cloud has been retired: use shape=ellipse and put the meaning in the label or a class= (shapes are pure geometry, `SHAPE-ENUM-VOCABULARY`) (MIGRATIONS 0.1)
 Line 13: unknown shape "hexagon" (box|rounded|circle|ellipse|diamond|cylinder)

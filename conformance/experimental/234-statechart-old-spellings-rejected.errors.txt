@@ -1,0 +1,3 @@
+Line 10: unknown endpoint "locked"
+Line 7: "node" is not the word genre statechart uses for this — write "state": a statechart has exactly ONE kind of node and it is a STATE (UML 2.5.1 §14). Each scene genre takes the term its own domain uses (block/topology `node` `edge`, flowchart `node` `flowline`, statechart `state` `transition`) — run tools/migrate-figdown.js to rewrite it (MIGRATIONS 0.2)
+Line 9: "edge" is not the word genre statechart uses for this — write "transition": the connecting line in a statechart is a TRANSITION — the term UML 2.5.1 §14 uses for it. Each scene genre takes the term its own domain uses (block/topology `node` `edge`, flowchart `node` `flowline`, statechart `state` `transition`) — run tools/migrate-figdown.js to rewrite it (MIGRATIONS 0.2)

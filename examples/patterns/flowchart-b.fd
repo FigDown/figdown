@@ -1,6 +1,6 @@
 # FigDown — figures as text. Spec: https://github.com/FigDown/figdown
 
-figdown 0.1 flowchart
+figdown 0.2 flowchart
 title "Flow with Retry Loop"
 
 # 0.1 (`FLOWCHART-ROLE-KEYWORDS`): roles, not shapes. The retry is a plain back-edge
@@ -15,12 +15,12 @@ terminator e   "Done"
 
 flow down
 
-edge s  -> p1
-edge p1 -> d1
-edge d1 -[yes]-> p2
-edge d1 -[no]-> e
-edge p2 -> d2
-edge d2 -[yes]-> p3
-edge d2 -[no]-> p1
-edge p3 -> e
+flowline s  -> p1
+flowline p1 -> d1
+flowline d1 -[yes]-> p2
+flowline d1 -[no]-> e
+flowline p2 -> d2
+flowline d2 -[yes]-> p3
+flowline d2 -[no]-> p1
+flowline p3 -> e
 

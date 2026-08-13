@@ -5,7 +5,7 @@
 # IS in a word — `terminator`, `process`, `decision` — so a reader who has
 # never opened the FigDown spec can follow it from the syntax alone. The
 # drawing is derived from those words and carries none of the meaning.
-figdown 0.1 flowchart
+figdown 0.2 flowchart
 title "Packet ingress path"
 
 class dropped "Dropped — the packet leaves the pipeline here" fill=#fee2e2 stroke=#dc2626
@@ -48,27 +48,27 @@ flow down
 # The five dispatch outcomes are PEERS — one of them fires, never two.
 rank ipv4,ipv6,arp,ignore,vlan
 
-edge port -> rx
-edge rx -> l2
-edge l2 -> ethertype
+flowline port -> rx
+flowline rx -> l2
+flowline l2 -> ethertype
 
 # Five exits, each labelled with the VALUE that selects it, plus a fallback.
 # The labels are the only thing that says which branch fires — not the shape,
 # not the colour, not where the box landed on the canvas.
-edge ethertype -[0x0800 IPv4]-> ipv4
-edge ethertype -[0x86dd IPv6]-> ipv6
-edge ethertype -[0x0806 ARP]-> arp
-edge ethertype -[other]-> ignore
-edge ethertype -[0x8100 VLAN]-> vlan
+flowline ethertype -[0x0800 IPv4]-> ipv4
+flowline ethertype -[0x86dd IPv6]-> ipv6
+flowline ethertype -[0x0806 ARP]-> arp
+flowline ethertype -[other]-> ignore
+flowline ethertype -[0x8100 VLAN]-> vlan
 
 # The loop: after popping a tag the EtherType is read again, which is how a
 # double-tagged frame unwinds. A plain back-edge IS the loop — FigDown has no
 # loop keyword, and one would state nothing this line does not.
-edge vlan -[re-read]-> ethertype
+flowline vlan -[re-read]-> ethertype
 
-edge ipv4 -> csum
-edge csum -[no]-> drop
-edge csum -[yes]-> forward
-edge ipv6 -> forward
-edge arp -> forward
-edge forward -> stage
+flowline ipv4 -> csum
+flowline csum -[no]-> drop
+flowline csum -[yes]-> forward
+flowline ipv6 -> forward
+flowline arp -> forward
+flowline forward -> stage
