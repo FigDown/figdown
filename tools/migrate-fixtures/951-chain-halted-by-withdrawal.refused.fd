@@ -1,0 +1,20 @@
+figdown 0.1 block
+# The COMPANION to 950, and the limit of core §13.4's promise. This document
+# is the same six-release chain, plus one construct that was WITHDRAWN rather
+# than renamed (`layer`, whose target `plane` went, `PAINT-ORDER-CONSTRUCT`).
+# §13.4 promises mechanical migration for FROZEN constructs; `plane` was
+# EXPERIMENTAL, so none was owed. The chain therefore HALTS: the withdrawn
+# lines are reported and left alone, which strands `node a` — an erroring line
+# declares no id — so the rewritten `pin a` line is a NEW error and refusal (c)
+# refuses the whole file rather than write it. A human deletes the two lines
+# and re-runs; that is the cost `PAINT-ORDER-CONSTRUCT` accepted, priced here rather than assumed.
+layer over "Overlay"
+node a "A" layer=over
+node b "B" shape=diamond
+node c "C"
+external e "Upstream"
+edge a -> b
+edge a -> e
+layout
+pin a at=(20,20)
+pin b width=100 height=40

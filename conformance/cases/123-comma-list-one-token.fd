@@ -10,5 +10,17 @@ node c "C"
 edge a -- b
 edge a -- c
 rank a, b
-bundle t1 "LAG" a--b, a--c
 node d "D" class=x, y
+
+figdown 0.1 topology
+# Section 2: the `bundle` member list. `bundle t1 "LAG" a--b,
+# a--c` stood after the `rank` line until `SCENE-KEYWORD-MEMBERSHIP` withdrew `bundle` from
+# `block`; it moved to the genre that still declares it rather than being
+# deleted, because a member list is one of the five comma lists the ONE
+# policy is a policy about, and dropping it would pin the rule on two.
+node a "A"
+node b "B"
+node c "C"
+edge a -- b
+edge a -- c
+bundle t1 "LAG" a--b, a--c

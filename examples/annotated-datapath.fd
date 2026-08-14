@@ -1,0 +1,44 @@
+# FigDown — figures as text. Spec: https://github.com/FigDown/figdown
+
+# Demonstrator for the DRAWN annotation, `note=` (MIGRATIONS 0.3).
+# It exercises all four acceptor kinds in one figure: a note on a `node`, on a
+# `group`, on an `edge`, and the figure-level note on `title`.
+#
+# `note=` is not `description=`. The two keys divide by AUDIENCE: `description=`
+# reaches the reading agent as an SVG <title> and puts no ink on the page, while
+# `note=` is an explanation the human must SEE. Neither is a fallback for the
+# other, and writing both on one element is legal.
+#
+# The author never places the box (`DOMAIN-CONVENTION-DIRECTIVES`): there is no at=, no side=, no
+# left of/right of. The engine chooses adjacency where it can and reaches for a
+# leader line only when adjacency fails.
+figdown 0.3 block
+
+# The figure-level note — `title`'s first option key. It carries the class of
+# annotation that names no single element, which is 14% of the measured demand.
+title "Ingress datapath — pause/PFC handling" note="Rates are per port, not per lane. Link speed is fixed at 25G."
+
+class dropped "Frames discarded here" stroke=#b91c1c
+
+external wire "from the wire"
+
+# A note on a GROUP — the largest single class of measured targets. Half the
+# demand annotates a region rather than a box.
+group mac "MAC layer" fill=transparent style=dashed note="Runs on the recovered RX clock, not the core clock."
+node rx "RX ring" shape=box in=mac
+node fcs "FCS check" shape=rounded in=mac
+
+# A note on a NODE.
+node pause "Pause / PFC" shape=diamond note="Only valid while the port is up."
+node fwd "Forward" shape=rounded
+node drop "Discard" shape=box class=dropped
+
+edge wire [eth0] -> rx
+edge rx -> fcs
+# A note on an EDGE. This is the acceptor that decides the shape: a connector
+# has no id, so an attribute is the only form that can reach it at all.
+edge fcs -> pause note="250 MHz, 64b datapath"
+edge pause -[pass]-> fwd
+edge pause -[assert]-> drop
+
+flow right

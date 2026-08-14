@@ -32,7 +32,7 @@ bitfield hdr "Export header (on the wire)" word=32 numbering=msb0
 # quotes even when the name contains no space: `field Ver 4` is a line error.
 field "Ver" 4
 # `description=` is authored documentation prose (IEEE 1685's spelling; it was
-# `note=` until this release). It is in the MODEL but its only ink is an SVG
+# `note=` until 0.1). It is in the MODEL but its only ink is an SVG
 # <title> tooltip, so a fact a human must SEE belongs in the label or in a
 # class meaning instead. §12.7 lets an agent quote or display it, never parse it.
 field "Header Length" 6 description="in 32-bit words; minimum 3"

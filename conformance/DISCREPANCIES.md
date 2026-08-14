@@ -54,7 +54,7 @@ Engine decisions the goldens freeze although the spec text neither
 requires nor forbids them (audit round 2, items a–f):
 
 - **Inconsistent emptiness policy** — `bitfield` with no fields and
-  `timing` (spelled `wave` until this release, `TIMING-GENRE-NAMING`) with no signals are
+  `timing` (spelled `wave` until 0.1, `TIMING-GENRE-NAMING`) with no signals are
   block-level errors
   (`406-bitfield-no-fields`, `602-timing-no-signals`), while a head-only
   `table` with no data rows is accepted (`513-table-head-only`). §8
@@ -67,7 +67,7 @@ requires nor forbids them (audit round 2, items a–f):
   `bad width "120px" — write the number without a unit: 120 (auto | <px> | <n>%)`,
   and `509-table-width` carries bare numbers. The item's own example also
   used the SPACE form, itself retired (`POSITIONAL-LIST-SPELLING`), so the sentence had
-  two retired spellings in it. (The directive was spelled `colw` until this release.)
+  two retired spellings in it. (The directive was spelled `colw` until 0.1.)
 - **Double error for one malformed delimiter row** — a delimiter row with
   the wrong column count yields both `delimiter row has 3 columns, expected 2`
   (on the row) and `table has no |---| delimiter row` (attributed to
@@ -76,7 +76,7 @@ requires nor forbids them (audit round 2, items a–f):
 - **Zero-width `band` range rejected** — `band "R" 15..15%` fails the
   engine's strict `0 <= from < to <= 100` rule (`373-band-errors`);
   the spec never states whether an empty range is legal. (The directive
-  was spelled `fill` until this release; the quoted label became mandatory
+  was spelled `fill` until 0.1; the quoted label became mandatory
   and moved to the FRONT, `BAND-LABEL-STATUS`.)
 - **Smaller unstated strictness** — `rank` requires ≥ 2 ids
   (`351-layout-errors`); `field "X" 0` is rejected only by falling
@@ -133,14 +133,14 @@ the genre-less header — left the strictness list; see
   text and the fixture record agree; core §8's list keeps the entry as the
   *category* it reserves, marked with the same reason.
 - **Per-genre "validation profile" (§1)** — the spec says a genre names
-  a namespace, defaults and a validation profile (`GENRE-NAMESPACE`; before this release it said "defaults and a validation profile only"), but it
+  a namespace, defaults and a validation profile (`GENRE-NAMESPACE`; before 0.1 it said "defaults and a validation profile only"), but it
   defines no per-genre validation rule and the engine applies none. The one
   genre-specific rule that IS tested is `bitfield`'s required `numbering=`
   (case `415-bitfield-numbering-required`). (The header token was called a
-  *template* until this release.)
+  *template* until 0.1.)
 
   **The *namespace* half stopped being untestable (`GENRE-KEYWORD-ALLOWLIST`), and
-  this item said otherwise until this release.** It read *"no genre yet owns
+  this item said otherwise until 0.1.** It read *"no genre yet owns
   a keyword the others lack … all six genres accept all 21 top-level
   keywords"*, and both halves were false: `flowchart` owns `process`,
   `decision` and `terminator`; per-genre allowlists are ENFORCED
@@ -259,6 +259,16 @@ below; each carries its resolution note.
 - **Resolved:** engine fixed — `z must be a number` (integer) is a line
   error. Case flipped to an error golden; a `null` can no longer occur
   in any golden (see also `NON-NUMERIC-EXTENT`).
+- **The case is GONE (`PAINT-ORDER-CONSTRUCT`), and the invariant it defended is
+  not.** `333-plane-z-nonnumeric` — the fixture's name after the
+  `layer` → `plane` rename — was DELETED with the construct: `plane` was
+  withdrawn from the language, so `z-index=` has no acceptor and
+  `z-index must be a number` can no longer be produced by any document.
+  The GENERAL invariant this item established is still live and still
+  enforced by `NON-NUMERIC-EXTENT`'s half of the family (`pin width=`/`height=`): a
+  non-numeric value is a line error, and no golden may contain a `null`.
+  That is checkable at any time — `grep -l null conformance/*/*.model.json`
+  returns nothing.
 
 ## `NON-NUMERIC-EXTENT` — non-numeric `size` dimension silently becomes NaN
 
@@ -267,7 +277,7 @@ below; each carries its resolution note.
   into `pin`, so the value now rides on `pin width=`)
 - Same family as `NON-NUMERIC-Z-VALUE`: `size a w=wide h=20` parses clean; `w` is NaN  <!-- fence-check: skip -->
   (`null` in the golden) and only `h` survives. `group gap=` and
-  `bitfield word=` (spelled `unit=` until this release), by contrast, do validate.
+  `bitfield word=` (spelled `unit=` until 0.1), by contrast, do validate.
 - **Resolved:** engine fixed — `w must be a number` / `h must be a
   number` are line errors. Case flipped to an error golden
   (`365-size-nonnumeric-rejected`, renamed again).
@@ -348,7 +358,7 @@ below; each carries its resolution note.
   `unknown option "foo="` line error on every directive; inside timing
   `signal` lanes, bare tokens containing `=` remain positional (lane
   text) as before. Golden 111 regenerated; new case
-  `603-timing-lane-eq-token` (the genre was spelled `wave` until this release, `TIMING-GENRE-NAMING`) freezes the lane behavior.
+  `603-timing-lane-eq-token` (the genre was spelled `wave` until 0.1, `TIMING-GENRE-NAMING`) freezes the lane behavior.
 
 ## `PERCENT-VALUES-LOST` — `size` percentage values lose their `%`
 
@@ -408,7 +418,7 @@ below; each carries its resolution note.
 
 - Cases: `210-shape-diamond-geometry`, `211-shape-ellipse-geometry`,
   `212-shape-circle-geometry`, `213-shape-back-edge-side-channel`
-  (`213` was `213-shape-cloud-geometry` until this release)
+  (`213` was `213-shape-cloud-geometry` until 0.1)
 - Spec §2.1: `shape=` is **purely geometric** — the shape is the whole
   of what the keyword promises. §3: a renderer MUST be deterministic
   and "a local edit must change only the corresponding local region";
@@ -615,6 +625,18 @@ below; each carries its resolution note.
   with an explicit `z=10` in the middle position, so the golden now
   proves the "does not shift its neighbours" half of the rule
   (`z` = 1, 10, 3).
+- **The case is GONE (`PAINT-ORDER-CONSTRUCT`), and so is the rule.** `PAINT-ORDER-CONSTRUCT`
+  withdrew `plane` from the language: no document can declare one, so no
+  declared plane can take a default `z`, and `332-plane-default-z` — the
+  fixture's name after the `layer` → `plane` rename — was DELETED with the
+  construct. Spec §2.4's normative sentence goes with it. What SURVIVES is
+  the one clause this item did not create: the implicit
+  `planes[0] = {id:"base", z:0}` is still projected into every model, and
+  paint order is now document order — a later line paints on top. The
+  lesson the item taught outlives both: a paint order a second
+  implementation could not reproduce from the spec was a real hole, and it
+  was closed by writing the rule down rather than by leaving the golden to
+  imply it.
 
 ## `THRESHOLD-BAND-TARGET-MISMATCH` — the scalar marker accepted only a group, while a band accepted a group or a node
 
@@ -872,6 +894,20 @@ below; each carries its resolution note.
   unreachable from the form that 53 downstream documents and 24 local
   documents use — not by intent, by an accident of which string the
   branch read.
+  - *Note added 0.3 (`DRAWN-ANNOTATION-FORM`), annotating the sentence above rather
+    than rewriting it.* The `note=` named there is the 0.1 one —
+    the machine-facing tooltip key, which still exists and is still
+    spelled `description=`. The SPELLING `note=` was **revived** under [SYNTAX-STYLE](../spec/syntax-style.md) RULE 4.9,
+    for a different thing: the DRAWN annotation, refused on `field` at
+    every version and accepted on
+    `node`/`process`/`decision`/`terminator`/`state`/`group`/`edge`/
+    `flowline`/`transition`/`title` under `figdown 0.3`. `DESCRIPTION-KEY-SPELLING` retired the
+    name *in order to reserve it*, so the revival cashes a reservation
+    rather than reversing a decision. Nothing about `COMPACT-FORM-OPTIONS` changes: the
+    compact `field` form still carries `description=` line-wide, and a
+    `note=` written on a `field` line — compact or classic — is a line
+    error (`803-note-on-field-refused`, `479-bitfield-note-retired`).
+    Read every `note=` in this entry as the pre-0.1 tooltip key.
 - Severity: ACTIVE. It forced authors of the dominant form to fall back
   to the classic form line-by-line to get any presentation at all.
 - **Resolved (`POSITIONAL-LIST-SPELLING`):** ENGINE + SPEC. The list is read from

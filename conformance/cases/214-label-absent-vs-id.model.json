@@ -1,139 +1,183 @@
 {
-  "header": {
-    "version": "0.1",
-    "genre": "block"
-  },
-  "flow": "right",
-  "classes": [],
-  "planes": [
+  "sections": [
     {
-      "id": "base",
-      "z": 0
-    },
-    {
-      "id": "over",
-      "z": 1
-    }
-  ],
-  "nodes": [
-    {
-      "id": "a",
-      "shape": "box",
-      "plane": "base",
-      "line": 3
-    },
-    {
-      "id": "b",
-      "label": "b",
-      "shape": "box",
-      "plane": "base",
-      "line": 4
-    },
-    {
-      "id": "c",
-      "label": "C",
-      "shape": "box",
-      "group": "g",
-      "plane": "base",
-      "line": 7
-    }
-  ],
-  "groups": [
-    {
-      "id": "g",
-      "line": 5
-    },
-    {
-      "id": "h",
-      "label": "h",
-      "line": 6
-    }
-  ],
-  "externals": [
-    {
-      "id": "x",
-      "line": 8
-    }
-  ],
-  "edges": [
-    {
-      "a": "a",
-      "op": "->",
-      "b": "c",
-      "plane": "base",
-      "line": 9
-    }
-  ],
-  "ranks": [],
-  "pins": [],
-  "thresholds": [],
-  "bands": [],
-  "bundles": [
-    {
-      "id": "bl",
-      "members": [
-        "a--c"
-      ],
-      "line": 10
-    }
-  ],
-  "regions": [
-    {
-      "genre": "bitfield",
-      "id": "hdr",
-      "word": 32,
-      "numbering": "lsb0",
-      "fields": [
+      "header": {
+        "version": "0.1",
+        "genre": "block"
+      },
+      "flow": "right",
+      "classes": [],
+      "planes": [
         {
-          "name": "ver",
-          "width": 4,
+          "id": "base",
+          "z": 0
+        }
+      ],
+      "nodes": [
+        {
+          "id": "a",
+          "shape": "box",
+          "plane": "base",
+          "line": 9
+        },
+        {
+          "id": "b",
+          "label": "b",
+          "shape": "box",
+          "plane": "base",
+          "line": 10
+        },
+        {
+          "id": "c",
+          "label": "C",
+          "shape": "box",
+          "group": "g",
+          "plane": "base",
+          "line": 13
+        }
+      ],
+      "groups": [
+        {
+          "id": "g",
+          "line": 11
+        },
+        {
+          "id": "h",
+          "label": "h",
           "line": 12
         }
       ],
-      "line": 11
-    },
-    {
-      "genre": "table",
-      "id": "t",
-      "heads": [
-        [
-          {
-            "v": "A"
-          },
-          {
-            "v": "B"
-          }
-        ]
-      ],
-      "aligns": [
-        "none",
-        "none"
-      ],
-      "rows": [
+      "externals": [
         {
-          "cells": [
+          "id": "x",
+          "line": 14
+        }
+      ],
+      "edges": [
+        {
+          "a": "a",
+          "op": "->",
+          "b": "c",
+          "plane": "base",
+          "line": 15
+        }
+      ],
+      "ranks": [],
+      "pins": [],
+      "thresholds": [],
+      "bands": [],
+      "bundles": [],
+      "regions": [
+        {
+          "genre": "bitfield",
+          "id": "hdr",
+          "word": 32,
+          "numbering": "lsb0",
+          "fields": [
             {
-              "v": "1"
-            },
-            {
-              "v": "2"
+              "name": "ver",
+              "width": 4,
+              "line": 17
             }
           ],
           "line": 16
+        },
+        {
+          "genre": "table",
+          "id": "t",
+          "heads": [
+            [
+              {
+                "v": "A"
+              },
+              {
+                "v": "B"
+              }
+            ]
+          ],
+          "aligns": [
+            "none",
+            "none"
+          ],
+          "rows": [
+            {
+              "cells": [
+                {
+                  "v": "1"
+                },
+                {
+                  "v": "2"
+                }
+              ],
+              "line": 21
+            }
+          ],
+          "line": 18
+        },
+        {
+          "genre": "timing",
+          "id": "w",
+          "signals": [
+            {
+              "name": "clk",
+              "lane": "0101"
+            }
+          ],
+          "line": 22
         }
-      ],
-      "line": 13
+      ]
     },
     {
-      "genre": "timing",
-      "id": "w",
-      "signals": [
+      "header": {
+        "version": "0.1",
+        "genre": "topology"
+      },
+      "flow": "right",
+      "classes": [],
+      "planes": [
         {
-          "name": "clk",
-          "lane": "0101"
+          "id": "base",
+          "z": 0
         }
       ],
-      "line": 17
+      "nodes": [
+        {
+          "id": "a",
+          "shape": "box",
+          "plane": "base",
+          "line": 2
+        },
+        {
+          "id": "c",
+          "shape": "box",
+          "plane": "base",
+          "line": 3
+        }
+      ],
+      "groups": [],
+      "edges": [
+        {
+          "a": "a",
+          "op": "->",
+          "b": "c",
+          "plane": "base",
+          "line": 4
+        }
+      ],
+      "ranks": [],
+      "pins": [],
+      "thresholds": [],
+      "bands": [],
+      "bundles": [
+        {
+          "id": "bl",
+          "members": [
+            "a--c"
+          ],
+          "line": 5
+        }
+      ],
+      "regions": []
     }
   ]
 }

@@ -9,19 +9,25 @@
 > read that genre.
 >
 > **This file is FROZEN material, and it defines nothing experimental
->.** The four EXPERIMENTAL constructs — `plane`, `bundle`,
-> `threshold`, `band` — are DEFINED in
-> [experimental.md](experimental.md), and the three EXPERIMENTAL genres in
+>.** The three EXPERIMENTAL constructs — `bundle`,
+> `threshold`, `band` — are DECLARED by the genre that has each:
+> `threshold` and `band` by [genres/block.md](genres/block.md), `bundle` by
+> [genres/experimental/topology.md](genres/experimental/topology.md), with
+> [experimental.md](experimental.md) holding their status, model and
+> history; the three EXPERIMENTAL genres are in
 > [genres/experimental/](genres/experimental/). This file still **names**
 > them, in §10's registry and in marked cross-references, because a closed
 > language has to say what exists; it does not depend on them. (There were
-> six until this release, when `EDGE-GEOMETRY-CONSTRUCTS` **WITHDREW `path` and `routing`** — and
+> six until 0.1, when `EDGE-GEOMETRY-CONSTRUCTS` **WITHDREW `path` and `routing`** — and
 > their option keys `points=`, `tailport=`, `headport=`, `routing=` — from
-> the language outright. Both were EXPERIMENTAL and outside the freeze
-> scope, so no compatibility promise is broken; the need they served is on
-> file as §9 **`EDGE-IDENTITY-AND-GEOMETRY`**.) Delete the
-> experimental file set and what remains here is complete — the criterion
-> `tools/isolation-check.js --strict` tests on every run.
+> the language outright; and four until this release, when `PAINT-ORDER-CONSTRUCT` **WITHDREW
+> `plane`** — and its option keys `plane=` and `z-index=`. All three
+> withdrawals took EXPERIMENTAL constructs outside the freeze scope, so no
+> compatibility promise is broken; the need `path`/`routing` served is on
+> file as §9 **`EDGE-IDENTITY-AND-GEOMETRY`**, and `plane`'s reservation is `RESERVED-SPELLINGS`'s `network`,
+> RFC 8345 §4.1/§6.1, held against a layering relation and not spent.)
+> Delete the experimental file set and what remains here is complete — the
+> criterion `tools/isolation-check.js --strict` tests on every run.
 >
 > **Adopting FigDown? Read [§13 Stability and versioning](#13-stability-and-versioning-normative)
 > first.** It is the shortest section and the one an adopter most needs:
@@ -81,7 +87,7 @@ line ends at **LF (`%x0A`) or CRLF (`%x0D %x0A`)**; both are accepted and a
 document written either way yields the **same model**. A **bare CR** is
 **not** a line terminator — a CR-only file is one line, and the reference
 engine reports a line error on it rather than parsing it. The §11 ABNF
-declared `CR` as a third form until this release; no implementation ever
+declared `CR` as a third form until 0.1; no implementation ever
 provided it and no fixture pinned it, so the grammar was corrected to the
 two forms that work. A **U+FEFF byte order mark at the very start of the
 document is IGNORED** — it is stripped before the first-significant-line
@@ -135,7 +141,9 @@ diagnostics name.
 
 **The genre token is REQUIRED (`HEADER-GENRE-REQUIREMENT`).** The header names the
 document's genre: `block` | `topology` | `flowchart` | `bitfield` |
-`table` | `timing` — and, at `figdown 0.2` only, `statechart` (`STATECHART-GENRE-SCOPE`). A header with no genre is a line error. `bitfield`,
+`table` | `timing` — and, from `figdown 0.2`, `statechart` (`STATECHART-GENRE-SCOPE`). `figdown 0.3` adds **no genre**: it carries one option key
+(`note=`, `DRAWN-ANNOTATION-FORM`) and one resolver widening (`MARKER-TARGET-KINDS`), so its genre set is
+`0.2`'s exactly. A header with no genre is a line error. `bitfield`,
 `table` and `timing` documents also declare their kind in their content
 (they contain the typed block), but `block`, `topology` and `flowchart`
 share the SAME vocabulary — `node`, `edge`, `group` — and differ only in
@@ -171,7 +179,7 @@ profile**.
   a namespace of its own (`LAYOUT-ZONE-NAMESPACE`)**. The carve-out is stated here because it
   would otherwise be missed: layout-zone lines ARE top-level lines, so
   without it `GENRE-NAMESPACE` would hand the genre a zone that `LAYOUT-ZONE-NAMESPACE` says no genre owns.
-  **Per SECTION, not per file.** A multi-section file (`MULTI-FIGURE-DOCUMENTS`, §2.9) is a
+  **Per SECTION, not per file.** A multi-section file (`MULTI-FIGURE-DOCUMENTS`, §1) is a
   sequence of documents, and each `figdown <version> <genre>` header opens a
   new one — with its own genre, its own version (see §1 above), its own id
   space and its own layout zone. **The genres may differ**, and a file
@@ -188,6 +196,29 @@ profile**.
   vocabulary — every keyword, option key, enum value and default — in its
   own document under [genres/](genres/README.md), which is normative for
   that genre.
+  **A spelling accepted by more than one genre is MORE THAN ONE
+  DECLARATION, never one declaration inherited** (`SUBJECT-VOCABULARY-SCOPE`). No
+  genre's vocabulary is defined by reference to another's, and there is
+  **no section of this specification that declares a keyword for several
+  genres at once**. Two genres' declarations agreeing today creates no
+  obligation that they agree tomorrow: either genre may withdraw, rename
+  or constrain its own without touching the other's, and neither one's
+  declaration is authority for the other's. This is the exchange above
+  read strictly rather than a new rule — a genre that took its words from
+  a neighbour's document would be documenting an INCOMPLETE vocabulary,
+  which is the one thing the exchange forbids. It is also the clause that
+  tells a future editor not to re-create a shared section for
+  convenience; §1's category text below states the same rule from the
+  other end, and `topology`'s own document said the quiet part out loud
+  before the correction — *"Distinguished from `block` not by vocabulary
+  — it shares all of it"* — which is a genre document declaring that it
+  does not contain its own vocabulary.
+  **What this bites on is SUBJECT vocabulary** — the words that say what
+  a figure is *of*, and therefore the words a genre's readers arrive
+  carrying a domain meaning for. Styling declaration (`class`) and layout
+  intent (`flow`, `rank`) name no referent, so no genre's domain holds a
+  competing meaning for one; this clause does not settle whether they are
+  genre vocabulary at all (see the category text below).
 - **`GENRE-COMPOSITION`.** A section may COMPOSE genres. A nested genre
   region (in v0.1: a `bitfield`, `table` or `timing` block) is governed by
   THAT genre's namespace; its child keywords belong to it and are NOT valid
@@ -201,7 +232,7 @@ profile**.
   `title`, `layout`** — three keywords (`LAYOUT-ZONE-NAMESPACE`; it was five
   until then, and the two that left, `pin` and `size`, did not leave the
   language: `size` merged into `pin` under `ELEMENT-GEOMETRY-DIRECTIVE` and `pin` moved to the
-  layout namespace of `LAYOUT-ZONE-NAMESPACE` below. `path` and `routing` were members until this release, were demoted to EXPERIMENTAL then, and were WITHDRAWN from
+  layout namespace of `LAYOUT-ZONE-NAMESPACE` below. `path` and `routing` were members until 0.1, were demoted to EXPERIMENTAL then, and were WITHDRAWN from
   the language, `EDGE-GEOMETRY-CONSTRUCTS` — §10).
   **What core means.** *Wherever a core keyword appears, its meaning is
   fixed, and no genre may redefine it.* Core is a **fixity** guarantee.
@@ -239,7 +270,7 @@ profile**.
   withdrawn before v1 (§10). Genre-independence is a statement about
   **belonging** — no genre owns the spelling or may give it a second
   meaning. A construct can be both, and `path` and `routing` were: while
-  they lived they were EXPERIMENTAL *and* genre-independent. Until this release §10 read their demotion as also releasing them to `GENRE-VOCABULARY-OBLIGATION`, which
+  they lived they were EXPERIMENTAL *and* genre-independent. Until 0.1 §10 read their demotion as also releasing them to `GENRE-VOCABULARY-OBLIGATION`, which
   is the confusion this clause removed; the distinction stands on its own
   and applies to the next experimental member the zone acquires.
   **Why the zone needs this and not merely a fixed `layout`.** `GENRE-NAMESPACE`'s
@@ -264,7 +295,7 @@ profile**.
   reasoning here rather than have to reconstruct it. The standing
   principle it follows from is SYNTAX-STYLE RULE 4.7: *absent necessity,
   do not spend the same spelling in more than one namespace.* The bill
-  this clause ran up was larger until this release: it also spent `path`
+  this clause ran up was larger until 0.1: it also spent `path`
   and `routing` — two ordinary, general-purpose words that many future
   genres could want — and that exposure was filed as **`EDGE-GEOMETRY-CONSTRUCTS`** (§9).
   `EDGE-GEOMETRY-CONSTRUCTS` **CLOSES `EDGE-GEOMETRY-CONSTRUCTS` by releasing both spellings**: they are no longer
@@ -295,25 +326,82 @@ profile**.
 
 What a genre still MUST NOT do: silently reinterpret ANOTHER genre's
 document. The header names exactly one genre, and a document is read under
-that genre's namespace and no other (the surviving half of `FIGURE-TYPE-MECHANISM`/`GENRE-NAMESPACE`). Within
-one namespace a genre never restricts explicit syntax either — the three
-scene genres share one namespace today, so directed, coloured edges work
-under `topology` exactly as under `block` (field feedback: a downstream
-transcription lost direction semantics because an earlier draft of this
-paragraph implied otherwise). A new genre requires corpus evidence AND
-semantic impossibility (`NEW-CONSTRUCT-EVIDENCE-GATE`).
+that genre's namespace and no other (the surviving half of `FIGURE-TYPE-MECHANISM`/`GENRE-NAMESPACE`). Nor
+may a genre declare a keyword and then quietly withhold part of its
+syntax: **where a genre declares a construct, it declares the whole of
+it.** `topology` declares `edge`, so directed, coloured edges work under
+`topology` exactly as under `block` — not because the two share a
+namespace (they do not; each declares `edge` for itself, `GENRE-VOCABULARY-OBLIGATION`), but because
+each genre's own declaration of `edge` is the whole of `edge`, arrowheads
+and `stroke=` included. **Field feedback F1**: a downstream transcription
+lost direction semantics because an earlier draft of this paragraph
+implied otherwise. The lesson survives the dissolved shared namespace
+unchanged, and 0.3 sharpens it — a genre that means to admit less
+must **withdraw the word** (`SCENE-KEYWORD-MEMBERSHIP`), which is a visible act with a named
+per-genre diagnostic, not a silent narrowing of a word it still accepts.
+The earlier wording carried the lesson on the premise that "the three
+scene genres share one namespace today", and that premise is gone. A new
+genre requires corpus evidence AND semantic impossibility (`NEW-CONSTRUCT-EVIDENCE-GATE`).
 
 **What v0.1 actually delivers (updated 0.1; 0.1).** `GENRE-NAMESPACE` is
 **enforced**
 at the top level (`GENRE-KEYWORD-ALLOWLIST`): each header genre has an allowlist of legal
 top-level keywords. `UNIVERSAL-CORE-KEYWORDS` core (`figdown` `title` `layout`) and the layout
 namespace's normative member `pin` (`LAYOUT-ZONE-NAMESPACE`) are in every allowlist. The pure
-genres `bitfield` / `table` / `timing` reject
-scene keywords (`node`, `edge`, …). The scene genres `block` /
-`topology` / `flowchart` share the scene vocabulary, may open nested
-`bitfield`/`table`/`timing` regions (`GENRE-COMPOSITION`), and still accept the experimental
-scene keywords (`threshold` `band` `bundle` `plane`)
-without promoting them to the taught main standard. The layout namespace
+genres `bitfield` / `table` / `timing` declare no subject vocabulary at
+all and reject every scene genre's: `node`, `edge`, `state` and
+`flowline` are each a line error under `figdown 0.1 bitfield`.
+
+The four scene genres — `block`, `topology`, `flowchart`, `statechart` —
+**each declare their own subject vocabulary**, and each may open nested
+`bitfield`/`table`/`timing` regions (`GENRE-COMPOSITION`).
+
+**Where several scene genres accept the same keyword, that is an
+INTERSECTION and not a shared surface** (`SUBJECT-VOCABULARY-SCOPE`). Each genre
+declared the word independently, in its own document under
+[genres/](genres/README.md), and each declaration is independently earned
+and independently revisable: a genre may withdraw, rename or constrain a
+word it declared without touching any other genre's, and one genre's
+declaration is never authority for another's. The word is spelled the
+same because each genre's domain uses it, not because the language hands
+it down — and a common word may already carry a precise and DIFFERENT
+meaning inside a genre's domain, which is why the domain meaning wins:
+readers arrive carrying domain knowledge, not this specification. Only
+**core** (`UNIVERSAL-CORE-KEYWORDS`) is cross-genre by definition, and core is `figdown`
+`title` `layout` — a **fixity** guarantee about what a word MEANS
+wherever it appears, never a statement that a word is AVAILABLE
+everywhere (the same distinction `UNIVERSAL-CORE-KEYWORDS` draws for itself).
+
+The visible consequence is already in the language, at `GENRE-CONNECTOR-SPELLING`/`GENRE-NODE-SPELLING`: `block` and `topology` spell the connector `edge`,
+`flowchart` spells it `flowline`, `statechart` spells it `transition` —
+**four independent declarations, three spellings**, stated in four genre
+documents rather than in one shared one. The experimental constructs are
+declared per genre on the same terms, and none of them
+is shared: `threshold` and `band` are `block`'s alone, `bundle` is
+`topology`'s alone, `flowchart` and `statechart` declare none, and
+`plane` is **WITHDRAWN from the language** (`PAINT-ORDER-CONSTRUCT`, §10). Being on a
+genre's allowlist has never promoted a construct to the taught main
+standard — that is [experimental.md](experimental.md)'s line, not the
+allowlist's.
+
+**The scope of all this is SUBJECT vocabulary**: the words that say what
+the figure is *of*. `class` declares styling meaning, and `flow` and
+`rank` declare layout intent; none of the three describes a referent, so
+no genre's domain holds a competing meaning for one and no genre can
+independently earn or lose one. They stay legal in all four scene genres,
+and where they properly belong — nearer `LAYOUT-ZONE-NAMESPACE`'s genre-independent namespace
+than `GENRE-VOCABULARY-OBLIGATION` — is a question this text does not open. The `GENRE-COMPOSITION` region openers
+`bitfield`/`table`/`timing`/`chart` are composition, not subject
+vocabulary, and are out of it for the same reason.
+
+*Until this release this paragraph read that the scene genres "share the
+scene vocabulary", and it was wrong three times over: it named three
+genres when `STATECHART-GENRE-SCOPE`/`GENRE-NODE-SPELLING` had made four; it recorded an INTERSECTION as if it
+were a namespace, which is the defect `SUBJECT-VOCABULARY-SCOPE` exists to correct; and it had
+been false in its own terms since `GENRE-CONNECTOR-SPELLING`/`GENRE-NODE-SPELLING`, because the scene genres do
+not share `node`/`edge`.*
+
+The layout namespace
 has no experimental members (`EDGE-GEOMETRY-CONSTRUCTS` withdrew `path` and
 `routing`); while it had, their presence on the scene allowlists only was a
 **status** fact and not a namespace one, because `LAYOUT-ZONE-NAMESPACE` fixes what a
@@ -354,15 +442,16 @@ Lexical rules:
     takes **MANDATORY** quotes. Whitespace is also the positional separator,
     so a bare token cannot express a phrase;
   - an **id** or a **reference** — every declaration id, every endpoint,
-    `in=`, `plane=`, `class=` and `rank`/`bundle` members — is **BARE**. A
-    quoted token there is a line error;
+    `in=`, `class=` and `rank`/`bundle` members — is **BARE**. A
+    quoted token there is a line error. (`plane=` was the fourth key on
+    this list until this release, `PAINT-ORDER-CONSTRUCT`.);
   - an **enum value** or a **bare keyword flag** — `shape=` `style=`
     `numbering=` `extend=` `type=`, the `figdown` version and genre, the
     `flow` direction, `cell … highlight` — is **BARE**, for the same reason:
     the position accepts a closed set of spellings, and quoting one suggests
     it accepts arbitrary text;
   - a **number**, a **point**, a **percentage** or a **range** — `gap=`,
-    `z-index=`, `word=`, `at=`, `pin width=`/`height=`, a `cell` address, a
+    `word=`, `at=`, `pin width=`/`height=`, a `cell` address, a
     `field` width, a table `width` element, `index=` — tolerates redundant
     quotes: they are **INERT** and change nothing in the model. `index=`'s
     inertness is load-bearing (§12.7). Two word-shaped spellings sit inside
@@ -398,10 +487,16 @@ Lexical rules:
   `\\` literal backslash. Any other escape is a line error. Quotes also
   work inside option values: `description="on miss"`. (Pipe rows additionally
   use `\|` and `\^^`, §4.2.)
-- `title` takes exactly **one quoted string**: `title "TCP Header"`. It
+- `title` takes exactly **one quoted positional argument**:
+  `title "TCP Header"`. It
   is an ordinary quoted token — the escapes above apply, a `#` inside it
   is literal, and a second positional argument is `unexpected argument`
-  like everywhere else. `title TCP Header` is a line error naming <!-- fence-check: skip -->
+  like everywhere else. It also takes **one option key,
+  `note=`** (§2.9, §10):
+  `title "TCP Header" note="RFC 9293 Figure 3"` is legal at `figdown 0.3`
+  and a line error before it. That
+  is `title`'s first option of any kind, and it is not a change to what
+  `title` MEANS, which is what `UNIVERSAL-CORE-KEYWORDS` fixes. `title TCP Header` is a line error naming <!-- fence-check: skip -->
   migration 0.1. Until that entry `title` consumed the rest of
   its line, which made it the only directive accepting an unquoted string
   with spaces and made three things impossible or ambiguous: a title
@@ -453,9 +548,12 @@ Lexical rules:
 | Flowchart defaults (`flow down`) | [genres/experimental/flowchart.md](genres/experimental/flowchart.md) |
 | Composition with typed regions (`GENRE-COMPOSITION`) | §4 below |
 | Layout zone (`layout` opener; `pin` — its whole membership since 0.1) | §3 below |
+| Drawn annotations (`note=`) and their placement contract | §2.9 below |
 
 Subsection numbers **§2.1–§2.8 are retained** so existing citations keep
-working; each is a pointer only.
+working; each is a pointer only. **§2.9 is the exception**: `note=` is
+accepted across three namespaces and by the `UNIVERSAL-CORE-KEYWORDS` core `title`, so no genre
+document can own it and its contract is stated here (`DRAWN-ANNOTATION-FORM`).
 
 ### 2.1 Nodes
 
@@ -490,24 +588,42 @@ Normative: [genres/block.md](genres/block.md). Operators `->` `<-` `--`
 `<->` — **four**, and `--` is the most used of them; edge labels and
 options. (Earlier revisions of this line listed three and omitted `--`.)
 
-### 2.4 Planes (`PRESENTATION-CONTROL-TIERS`) — EXPERIMENTAL / EXPERIMENTAL
+### 2.4 Paint order — the EXPERIMENTAL `plane` keyword is WITHDRAWN (`PAINT-ORDER-CONSTRUCT`)
 
-**EXPERIMENTAL (`CONSTRUCT-STATUS-TIERS`).** Definition: [experimental.md](experimental.md) §E1.
-Registry row: §10 (b), (b′). `plane` and `plane=` were spelled
-`layer`/`layer=` until this release (`PLANE-KEYWORD-SPELLING`, §10). What is NOT experimental and
-stays here: the implicit `base` plane and the `planes` array (§12.2, §12.4)
-— every document has `planes[0] = {id:"base", z:0}` and every `node` and
-`edge` reports `plane: "base"`, so a normative-surface reader needs no new
-case.
+**There is no `plane` directive, no `plane=` and no `z-index=`.** All
+three were EXPERIMENTAL and all three left the language; the
+engine rejects each with a diagnostic that names **no replacement**,
+because there is none, and `plane` is swept ahead of the genre allowlist
+so it fires under every genre. Registry rows, kept as withdrawn
+diagnostics: §10 (b), (b′). The spellings were `layer`/`layer=` until 0.1 (`PLANE-KEYWORD-SPELLING`), so the retirement chain a reader may arrive on is
+`layer` → `plane` → withdrawn, and the diagnostics state it whole rather
+than sending an author to a word that is itself a line error.
 
-### 2.5 Semantic annotations: `bundle` (topology vocabulary) — EXPERIMENTAL / EXPERIMENTAL
+**What stays, and it is now the whole of the construct: paint order is
+DOCUMENT ORDER.** A later line paints on top (closer to the viewer). The
+implicit `base` plane and the `planes` array are NORMATIVE and unchanged
+(§12.2, §12.4) — every document has `planes[0] = {id:"base", z:0}` and
+every `node` and `edge` reports `plane: "base"` — so a reader loses no
+case and gains none.
+
+**Why the withdrawal was free, measured.** Stripping the declared plane
+and its `plane=` from `examples/evpn-fabric.fd`, the most realistic
+figure in the tree that used one, and rebuilding gives an SVG of the same
+**12449 bytes**: of 198 markup tokens exactly one differs, and it is an
+edge index. The overlay's whole visual identity came from `class=overlay`,
+which the figure already declared — a `class` states what the elements
+MEAN, and a plane stated only what order to paint them in.
+[experimental.md](experimental.md) §E0 carries the full measurement, and
+§9 records the reserved alternative (`RESERVED-SPELLINGS`) with what would reopen it.
+
+### 2.5 Semantic annotations: `bundle` (topology vocabulary) — EXPERIMENTAL
 
 **EXPERIMENTAL (`CONSTRUCT-STATUS-TIERS`), with the `topology` genre.** Definition:
 [experimental.md](experimental.md) §E2. Genre document:
 [genres/experimental/topology.md](genres/experimental/topology.md), itself
 EXPERIMENTAL. Registry row: §10 (b), (b′).
 
-### 2.6 Thresholds and zone bands: `threshold`, `band` (generic markers) — EXPERIMENTAL / EXPERIMENTAL
+### 2.6 Thresholds and zone bands: `threshold`, `band` (generic markers) — EXPERIMENTAL
 
 **EXPERIMENTAL scene markers (`CONSTRUCT-STATUS-TIERS`).** Definition:
 [experimental.md](experimental.md) §E3, which also records why they stay
@@ -560,7 +676,7 @@ indistinguishable from `fill=white stroke=#555`; a class whose meaning is
 are the same rule read on two axes — **the legend draws what the author
 declared, and nothing the author did not.** Every channel a class can
 still declare (`fill`, `stroke`, `style`) is drawn there, so "declared but
-not shown" is unreachable — which it was not before this release, when a
+not shown" is unreachable — which it was not before 0.1, when a
 class whose only channel was the label colour rendered an empty swatch in
 the legend the language derives FOR its meaning.
 
@@ -580,8 +696,77 @@ the legend the language derives FOR its meaning.
 ### 2.8 External endpoints: `external`
 
 Normative: [genres/block.md](genres/block.md). Open-ended edges; never a
-drawn shape. The keyword was spelled `boundary` until this release (`EXTERNAL-ENDPOINT-NAMING`,
+drawn shape. The keyword was spelled `boundary` until 0.1 (`EXTERNAL-ENDPOINT-NAMING`,
 §10).
+
+### 2.9 Drawn annotations: `note=` (`DRAWN-ANNOTATION-FORM`)
+
+**`note=` is the DRAWN annotation channel, and it requires `figdown 0.3`.**
+It carries authored prose the human reader must SEE — the aside a figure
+needs and its labels have nowhere to put — and it is written as an option
+on the annotated element's **own line**, with no id, no target key and no
+locator. Attachment is by **syntactic position**, which is what makes it
+unambiguous when three elements carry the same label.
+
+**The ten acceptors** are `node` and its `flowchart` role siblings
+`process` / `decision` / `terminator`, the `statechart` `state`, `group`,
+and the three connector spellings `edge` / `flowline` / `transition`, plus
+`title`. Everything else refuses it, and each refusal is a named line
+error rather than `unknown option`: `field` refuses at every version and
+its message states the AUDIENCE division rather than offering a
+replacement (§10 — `description=` is not a replacement, it reaches a
+different reader), and `cell`, `external`, `threshold`, `band`, `bundle`
+and `class` get the generic *`<directive>` does not take `note=`*.
+(`plane` was on this list until `PAINT-ORDER-CONSTRUCT` withdrew it; a withdrawn keyword's
+line never reaches an option check, so the entry had nowhere to fire.)
+The acceptor set is measured, not guessed: of 70 annotation instances
+across 23 figures of a 643-file corpus, **75.7% are about exactly one
+element** and **14.3% about the figure with no element** — which is what
+`title` covers — while the connectors are in the set for a structural
+reason rather than a numeric one, because **a connector has no id, so an
+attribute is the only form that can reach it at all**. The residual is
+§9 `ANNOTATION-LOCATOR-SPLIT`.
+
+**The author does not place the box (`DOMAIN-CONVENTION-DIRECTIVES`).** `note=` accepts **no `at=`,
+no `side=` and no `left of` / `right of`** — no positioning channel of any
+kind, present or future, is part of this key. Placement is the renderer's,
+exactly as rank assignment, obstacle detours and the derived legend are
+(§12.6). What the author writes is *this element has this aside*; where
+the aside sits is a drawing convention.
+
+**Four placement rules are NORMATIVE, and they are here rather than in the
+engine because two engines must agree on them.** A note whose box lands
+somewhere else is not a cosmetic difference: it is a different figure, and
+`RENDERING-DETERMINISM`'s byte-reproducibility promise (§7) reaches the SVG, not only the model.
+
+1. **Notes register LAST**, after every node, group rect, edge label and
+   arrowhead has taken its space. **A note yields, and nothing yields to a
+   note.** The asymmetry has a reason: a label is *on* the thing it names
+   and an arrowhead *is* part of the connector, whereas a note is *beside*
+   what it is about, so it is the one element that can move without
+   changing what the picture says.
+2. **Candidates are generated around the carrier's FINAL geometry** — the
+   node box, the group rect, the edge's segment list — and scored by the
+   same overlap function every other deferred label is scored by. A note
+   is never placed against a provisional position.
+3. **A leader line is drawn only when adjacency fails**, and it is drawn
+   after placement, so it is correct by construction rather than by
+   correction. A note that could sit beside its carrier takes no leader.
+4. **A `note=` written on `title` has no geometry to sit beside.** It is the
+   figure-level note: it draws with the caption, at the foot of the
+   canvas, and it **never takes a leader** — there is nothing for a leader
+   to point at.
+
+**Determinism**: one greedy pass, no iteration, registration order =
+**document order**. Two engines given the same source therefore reach the
+same placement in the same order, which is what makes rule 1 checkable
+rather than aspirational.
+
+**The drawn form is the UML note symbol** — a box with a folded corner —
+under SYNTAX-STYLE RULE 4.1's borrow-the-standard's-own-form rule. The
+author chooses no colour, no side and no offset, so `note=` adds no
+presentation surface and `GUI-WRITEBACK-STRUCTURE`/`PRESENTATION-AS-MEANING-CARRIER` are untouched: deleting every
+presentation key still leaves the note's TEXT in the document.
 
 ## 3. Layout control — the three tiers (`PRESENTATION-CONTROL-TIERS`, `LAYOUT-STABILITY`)
 
@@ -631,7 +816,7 @@ attribute-happy". The keyword is bare deliberately: it names a boundary,
 and a boundary has nothing to configure.
 
 `pin` is the zone's only directive. It admitted the EXPERIMENTAL `routing` and
-`path` directives until this release, when `EDGE-GEOMETRY-CONSTRUCTS` withdrew both from the
+`path` directives until 0.1, when `EDGE-GEOMETRY-CONSTRUCTS` withdrew both from the
 language; §9 **`EDGE-IDENTITY-AND-GEOMETRY`** carries the requirement they served, and §10 the
 diagnostics their spellings still fire.
 
@@ -760,7 +945,7 @@ Normative rules:
   Layout directives (`pin`) MAY appear
   before `layout` for documents that do not use the zone separator; a
   document with no `layout` line is valid. The zone opener was spelled
-  `render` until this release; it was renamed because the zone admits only
+  `render` until 0.1; it was renamed because the zone admits only
   geometry, not presentation — and
   because `render` collided with the renderer and the render options of
   §7. `layout` is also the cross-tool word for this half of a diagram
@@ -834,7 +1019,7 @@ treat the one-line summaries as a second source of truth.
 
 ### 4.3 `timing` — timing / waveform — EXPERIMENTAL GENRE
 
-**EXPERIMENTAL (`CONSTRUCT-STATUS-TIERS`).** Spelled `wave` until this release (`TIMING-GENRE-NAMING`). Normative-for-the-genre document: [genres/experimental/timing.md](genres/experimental/timing.md). Outside the v0.1 conformance
+**EXPERIMENTAL (`CONSTRUCT-STATUS-TIERS`).** Spelled `wave` until 0.1 (`TIMING-GENRE-NAMING`). Normative-for-the-genre document: [genres/experimental/timing.md](genres/experimental/timing.md). Outside the v0.1 conformance
 surface; see §10.
 
 ### 4.4 `chart` — charts from table data (EXPERIMENTAL)
@@ -842,7 +1027,7 @@ surface; see §10.
 `chart <table-id> …` maps an existing `table` to a chart. Not a
 genre; experimental, outside the v0.1 conformance surface (§10).
 Principle: chart features SHOULD reuse table blocks as data (`NEW-CONSTRUCT-EVIDENCE-GATE`).
-The opener was spelled `plot` and its type option `kind=` until this release (`CHART-BLOCK-NAMING`, §10). Its second option, `level=` (a reference plane
+The opener was spelled `plot` and its type option `kind=` until 0.1 (`CHART-BLOCK-NAMING`, §10). Its second option, `level=` (a reference plane
 drawn through the bars), was **deleted** (`CHART-LEVEL-KEY`): zero uses
 corpus-wide, zero 3-D bar charts, zero requests, and it was the only
 construct in the language whose caption the engine wrote rather than the
@@ -859,8 +1044,11 @@ classifiable diagrams (census.md).
 ## 5. Presentation attributes (`PRESENTATION-CONTROL-TIERS`)
 
 Optional on any element: `fill=` (the interior), `stroke=` (the outline of
-a shape and the whole of a line), `style=solid|dashed|dotted`, `plane=`;
-`gap=` on groups. **There are exactly two paint channels, and they are
+a shape and the whole of a line), `style=solid|dashed|dotted`;
+`gap=` on groups. **`plane=` was a fourth until this release**, when `PAINT-ORDER-CONSTRUCT`
+withdrew it with the `plane` keyword that declared its only legal values;
+this section's tables lost every row that named it. **There are exactly
+two paint channels, and they are
 SVG's own two.** A label's colour is not a third one: v0.1 has no
 label-colour key, and the default is derived (below).
 
@@ -871,7 +1059,7 @@ rule, not an exception.** On anything with an interior — a `node`, a
 `threshold` there is no interior: the construct IS a line, so `stroke=`
 is the whole of it and `fill=` is a line error naming `stroke=` (the
 carve-out table below and the §10 registry row; `INTERIOR-LESS-ELEMENT-PAINT` — the citation read
-"§8.4" until this release and §8 has no subsections). This is SVG's asymmetry borrowed unaltered — `<rect stroke>` is a
+"§8.4" until 0.1 and §8 has no subsections). This is SVG's asymmetry borrowed unaltered — `<rect stroke>` is a
 border, `<line stroke>` is the line — and every surveyed system reads it
 the same way: mxGraph's `strokeColor` applies to vertices and edges
 alike, D2's `style.stroke` is documented as applying "to shapes and
@@ -889,9 +1077,13 @@ element's outline is drawn with, and a line is all outline.*
 > promotion. Documents that were not portable v0.1 documents while it was
 > demoted — including this repository's own `examples/reference/block.fd`,
 > `README.md`, `guide/showcase.md` and `guide/layout.md` — became portable with
-> no edit. `plane=` stays EXPERIMENTAL, because the `plane` keyword that
-> declares its only legal values is demoted (§10 (b′)); see §10 for the
-> status rule. (`plane=` was spelled `layer=` until this release, `PLANE-KEYWORD-SPELLING`.)
+> no edit. `plane=` stayed EXPERIMENTAL at that release, because the
+> `plane` keyword that declared its only legal values was demoted
+> (§10 (b′)); the same coupling took it out of the language
+> altogether with that keyword (`PAINT-ORDER-CONSTRUCT`, §2.4). The sentence is kept because
+> it is the record of the status rule working, and the rule is unchanged:
+> a key and its only declaration point move together, whichever way they
+> move. (`plane=` was spelled `layer=` until 0.1, `PLANE-KEYWORD-SPELLING`.)
 
 > **`color=` is RETIRED language-wide (`COLOUR-KEY-STATUS`), and nothing
 > replaces it.** The same six characters meant two opposite things in two
@@ -958,14 +1150,14 @@ spacing are; what this section fixes is the *choice between them*. The
 reference engine uses `#ffffff` as the light ink and its per-context
 default text colour as the dark one.
 
-> **The edge-label split this closed.** Until this release an edge's `[mid]`
+> **The edge-label split this closed.** Until 0.1 an edge's `[mid]`
 > label followed the line colour while its `[tail]`/`[head]` labels did
 > not — one construct, two undocumented defaults, so a `stroke=#0f766e`
 > edge drew a teal mid label and two grey endpoint labels. All three now
 > follow the line.
 
 Dimensions belong exclusively to the `pin` directive's `width=`/`height=`
-keys (a separate `size` directive until this release, `ELEMENT-GEOMETRY-DIRECTIVE`) — `width=`/`height=`
+keys (a separate `size` directive until 0.1, `ELEMENT-GEOMETRY-DIRECTIVE`) — `width=`/`height=`
 on a node line is an error (one mechanism, not two). The abbreviations
 `w=`/`h=` were retired and are a line error wherever they
 appear (`UNSAFE-DEFAULT-ELIMINATION`: SVG, CSS, DOT, mxGraph and D2 all spell these in full, and
@@ -1005,25 +1197,26 @@ grammar is closed (§10):
 > *named* one; the buffer-region figure that motivated this was forced to
 > carry its names in three `class` declarations all spelled "region".
 
-`plane=` is stated honestly: it is accepted on `node`, `group` and
-`external` and recorded in the model, but the only pass that acts on
-a plane's `z` as paint order is the annotation pass — edges, bundle rings,
-threshold lines and zone bands. Nodes and groups are painted by the scene
-pass in document order whatever their plane says. The attribute is kept
-on them because it is *organizational* (it names the plane an element
-belongs to, and `class … plane=` can default it), and because rejecting
-it on three of the elements that carry every other §5 attribute would be
-a worse rule than saying plainly what it does.
+**`plane=`'s honesty note is discharged by `PAINT-ORDER-CONSTRUCT`, and the finding that
+forced it is why the withdrawal was easy to argue.** Until this release
+this section had to record that the key was accepted on `node`, `group`
+and `external` and put in the model, while the only pass that acted on a
+plane's `z` as paint order was the annotation pass — edges, bundle rings,
+threshold lines and zone bands; nodes and groups were painted by the
+scene pass in document order whatever their plane said. A key that three
+of its acceptors recorded and did not obey is a key that was already
+mostly organizational, and `class` is the construct for saying what
+elements have in common. The key is gone (§2.4) and the note goes with
+it; paint order is document order everywhere, with no acceptor exempt.
 
 Value rules are uniform wherever an attribute is accepted: colors are
-`#rgb`/`#rrggbb` or a CSS named color (plus `transparent`), `style` is
-one of `solid|dashed|dotted`, and `plane=` MUST name a plane the
-document declares — a `plane=` naming no declared plane is a line error
-on every directive that takes it.
+`#rgb`/`#rrggbb` or a CSS named color (plus `transparent`), and `style`
+is one of `solid|dashed|dotted`. The third clause here required
+`plane=` to name a declared plane, and went with the key at `PAINT-ORDER-CONSTRUCT`.
 
 Normative boundary (the presentation-ignorable invariant, extending
 `GUI-WRITEBACK-STRUCTURE`): removing all presentation-only attributes (`fill`, `stroke`,
-`style`, `gap`, `z`) and layout directives (`pin`)
+`style`, `gap`) and layout directives (`pin`)
 and the `layout` zone-opener line MUST NOT change the document's semantic structure;
 semantic consumers MAY ignore them. Consequently **color and style MUST NOT be the sole
 carrier of meaning** — if color/dash denotes state, role, plane or
@@ -1049,7 +1242,7 @@ The same law applied to position is what `MEANINGFUL-ARRANGEMENT` (§9) has to c
 
 `page`, `set` and `pulse` are reserved keywords — the three the sketch
 below actually uses, and the whole reserved set (§10). `step` was reserved
-until this release and has been RELEASED: it appeared in no sketch, no genre
+until 0.1 and has been RELEASED: it appeared in no sketch, no genre
 claimed it, and a word reserved against nothing costs authors a name for
 nothing. Sketch (non-normative):
 
@@ -1134,7 +1327,7 @@ transient). Deferred until the static core ships.
   holds uniformly for **every directive that takes an option**, frozen or
   experimental, without being restated on each — verified on `node`,
   `edge`, `class`, `pin`, `bitfield` and `table`. It was **stated only in
-  [syntax-style.md](syntax-style.md) §7 (I5) until this release**, a
+  [syntax-style.md](syntax-style.md) §7 (I5) until 0.1**, a
   document whose own opening says it is normative for the DESIGN of the
   language and is not an authoring guide, and whose evidence cites engine
   line numbers an implementer is not supposed to read. Same key on
@@ -1147,7 +1340,7 @@ transient). Deferred until the static core ships.
   clean and produce the same model as the same document written in
   declaration-first order. A single-pass resolver that rejects a forward
   reference is **not conforming**, however many fixtures it passes. Stated
-  And pinned by `021-forward-references`; before that no
+  and pinned by `021-forward-references`; before that no
   normative fixture exercised one, so a single-pass implementation could
   pass the whole suite while rejecting legal documents.
 
@@ -1180,7 +1373,7 @@ wrong, so they are stated rather than left to inference:
 
 The two per-table errors above are listed in the [table genre's Errors
 table](genres/table.md#errors); they were golden-pinned but absent from it
-until this release.
+until 0.1.
 
 ### 8.2 The error-message catalogue: where it is, and what is missing
 
@@ -1344,6 +1537,18 @@ alone. Recorded as an open question in §9.
   annotation design session: the solution must give annotations a
   first-class identity that is syntactically distinct from participants,
   not merely a styling convention that a reader must learn to ignore.
+  **That severity note is DISCHARGED (`DRAWN-ANNOTATION-FORM`), and the interim
+  it describes is WITHDRAWN.** `note=` gives the aside exactly the
+  first-class identity the note demanded: it is an option on the annotated
+  element rather than an element of its own, so there is no second `node`
+  to miscount, `nodes` still holds participants and only participants
+  (§12.7), and `tools/strip-check.js` no longer sees an orphan to warn
+  about. An author writing a callout today writes
+  `node cache "L2 cache" note="write-back, 64 B lines"` — not a detached
+  dashed node — and the topology-count corruption this entry recorded has
+  no way to arise. **The CALLOUT half of `ROW-INDEX-GUTTER` is therefore SOLVED**; the
+  entry stays open for its **gutter** half, which is a locator problem
+  (§9 `ANNOTATION-LOCATOR-SPLIT`) and is untouched by this release.
   **The spelling half was PRE-EMPTED (`BITFIELD-REPETITION-CONSTRUCT`), and this entry no
   longer names `index=` as its candidate.** `index=` is now spent in
   `bitfield`'s namespace as the repetition range on `field`, so the gutter
@@ -1385,6 +1590,12 @@ alone. Recorded as an open question in §9.
   `CONTIGUOUS-RANGE-GROUPING` covers contiguous field/row/node ranges only and receives no
   expansion. All v0.2; part of the holistic annotation/targeting design
   session.
+  **STILL OPEN.** The annotation half of that session
+  landed (`note=`, `DRAWN-ANNOTATION-FORM`) and the locator half did **not**: the coordinate
+  grammar was designed and deliberately not built (`ANNOTATION-LOCATOR-SPLIT` disposition), so
+  a range over fields, rows or nodes still has nothing to name its ends
+  with. `note=` does not reach this — it attaches to one whole element by
+  position, which is the opposite of naming a range.
 - `CELL-EDGE-ANCHORS`: **table/grid cell anchors for edges** — edges can attach to
   nodes and external endpoints, but not to a named cell within a `table`
   block. Pointer/linked-list figures (descriptor rings, free-list
@@ -1394,6 +1605,11 @@ alone. Recorded as an open question in §9.
   figures (re-scored baseline 2026-07-26, supersedes the "pending"
   status from `ELECTRICAL-SCHEMATIC-SCOPE`). Sanctioned workaround: use a whole-table relation
   and note the targeted cell in an edge label or `description=`. All v0.2.
+  **STILL OPEN**, for the same reason as `CONTIGUOUS-RANGE-GROUPING`: the
+  locator coordinate grammar was deliberately not built (`ANNOTATION-LOCATOR-SPLIT`
+  disposition). The workaround gains one option — the aside may now be a
+  drawn `note=` on the edge rather than prose only a machine reads — and
+  that is an ergonomic improvement, not the anchor this entry asks for.
 - `FLOWCHART-GENRE-DESIGN`: **flowchart genre design** — flowchart ruled a genre under
   `LOGIC-FLOWCHART-GENRE-SCOPE` (2026-07-25). Components (decision, process, terminal, …) have
   definite meanings that a `shape=diamond` spelling forced readers to
@@ -1440,6 +1656,16 @@ alone. Recorded as an open question in §9.
   (bus topologies flattened to star = semantic error; mid-wire taps
   modelled as duplicate edges = semantic error); intermediate-bus-node
   workaround sanctioned (`EDGE-ENDPOINT-ELIGIBILITY` 2026-07-27).
+  **STILL OPEN, and the release cuts exactly one of its
+  four cases.** *Annotation leaders targeting an edge region* no longer
+  needs an edge locator to be readable: `note=` is accepted on `edge`,
+  `flowline` and `transition`, and it is accepted there for this entry's
+  own structural reason — **a connector has no id**, so an attribute is
+  the only form that can reach one at all. That is a whole-edge aside, not
+  a mid-edge point: the tap, the junction and packet-view extraction all
+  still require stable edge identity plus the locator grammar, which was
+  deliberately not built (`ANNOTATION-LOCATOR-SPLIT` disposition). Frequency and priority are
+  unchanged.
 - `CROSS-BLOCK-REFERENCES`: **cross-block semantic references** (`CROSS-BLOCK-REFERENCES`, 2026-07-26) —
   formalizes the gap acknowledged in `LOGIC-FLOWCHART-GENRE-SCOPE` point 4: no first-class
   mechanism for one typed block to reference an element in another typed
@@ -1459,6 +1685,13 @@ alone. Recorded as an open question in §9.
   MUST live in the content zone — `pin` and the rest of the layout zone
   cannot carry it, because reading agents ignore that zone by default
   (§3, `GENRE-NAMESPACE`). All v0.2.
+  **STILL OPEN.** `MARKER-TARGET-KINDS` widened `in=` on
+  `threshold`/`band` to resolve a REGION id, which is the first time any
+  key crosses from the scene into a typed block — but it is a widening of
+  one key's value domain, not the block-qualified locator this entry
+  needs, and it declares no relation between regions. `note=` does not
+  reach this either: an aside is not a subordination claim, and §12.7
+  forbids reading one out of it.
 - `PUBLICATION-MANIFEST-PROFILE`: **publication manifest and provenance profile** (`PUBLICATION-MANIFEST-PROFILE`,
   2026-07-26) — a standardized non-core JSON manifest profile per
   published figure: source page/bbox provenance, original-image hash,
@@ -1484,6 +1717,11 @@ alone. Recorded as an open question in §9.
   design deferred to the v0.2 holistic targeting/annotation session.
   Downstream evidence: 4 downstream evidence figures affected, 2 outright
   unrepresentable (`TIMING-MEASUREMENT-ANNOTATIONS`). Interim: keep original raster + prose. All v0.2.
+  **STILL OPEN.** The signal-event locator was designed
+  and deliberately not built (`ANNOTATION-LOCATOR-SPLIT` disposition), and `note=` is not
+  accepted on `signal` at all — an aside beside a lane would be floating
+  text against two events it cannot name, which is the `MEANING-RECOVERY-SOURCE` failure this
+  entry already rules out. Nothing here is unblocked.
 - `BYTE-UNIT-PACKET-BLOCKS`: **byte-unit packet-block figures** (2026-07-27) — downstream
   first authoring pass found one figure where `bitfield` was misused for
   a byte-sized header block diagram, producing a misleading bit ruler.
@@ -1591,6 +1829,75 @@ alone. Recorded as an open question in §9.
   v0.2 annotation construct, it is `note`. (Its spelling arrives as a
   borrow, not a coinage: UML/PlantUML `note`, Mermaid `note`, GFM
   `> [!NOTE]` — see vocabulary-sources.tsv.) All v0.2.
+
+  **Source added 2026-08-13, and its limit stated with it.** ISO 5807:1985
+  — `flowchart`'s own source standard — **§9.4.3 defines an annotation
+  symbol**, reached from §9.3.2.3 (*Dashed line*), which cross-references
+  it as the symbol surrounding *"an annotated area"*. Read first-hand from
+  the published preview. That makes the drawn annotation a construct this
+  domain's standard already has, not only a UML notation and a tool
+  vernacular, and it strengthens RULE 4.1's case for building it. **It is
+  not a source for the SPELLING**: the clause number is confirmed from the
+  readable region, the symbol's NAME sits past page 8 and has not been
+  read, so nothing here says ISO calls it `note`. The borrow stays
+  **partial** on UML's notation plus the four-way tool attestation. Where a
+  word is the domain's common term rather than the standard's orthography,
+  this spec says so in those words.
+
+  **DISPOSITION (`DRAWN-ANNOTATION-FORM`/`MARKER-TARGET-KINDS`). The ANNOTATION half is answered;
+  the LOCATOR half is not, and was deliberately not built.** What landed,
+  and what each part of this entry is owed:
+
+  - **The annotation construct is an OPTION KEY, `note=`, and not a
+    standalone `note` KEYWORD** (§2.9, §10). The keyword shape was
+    measured against the same corpus that justified the construct, and it
+    is **NOT EARNED**. Of 70 annotation instances across 23 figures of a
+    643-file corpus, **75.7% are about exactly ONE element**, **14.3%
+    about the figure with no element**, and **10.0% span two or more**; a
+    second 252-file flowchart sub-corpus puts spanning at **6.7%**. A
+    keyword buys exactly one thing an attribute cannot buy — a body with
+    more than one target — and it buys it for the smallest of the three
+    classes while costing a top-level word, a target key and a locator
+    grammar. Attachment by syntactic position covers 75.7% with no
+    spelling at all, and a `note=` on `title` covers the 14.3% figure-level
+    class, which is what removes the last argument for a keyword: the
+    figure has a declaration line, so position reaches it too.
+  - **What would REOPEN the keyword**, stated so the question is decidable
+    rather than re-litigated: (a) a corpus in which spanning demand
+    **exceeds** single-element demand — the ratio, not the absolute count,
+    because the attribute already serves the majority; or (b) a measured
+    need to make many-to-one attribution **machine-readable** rather than
+    a footnote marker, i.e. a reading agent that must answer *which
+    elements is this aside about?* from the model. Either would be a
+    filing under `NEW-CONSTRUCT-EVIDENCE-GATE` with its own count.
+  - **The interim for the spanning residual is the corpus's OWN
+    workaround**, adopted rather than invented: a **footnote marker in the
+    label text** — `*`, `**`, `#`, `##` — on each element the aside covers,
+    with the aside itself carried in one `note=`. It is legal today, it
+    draws, and a human reads it the way they read a footnote anywhere
+    else, which is why the corpus reached for it unprompted. **Its one
+    loss is stated rather than glossed:** the correspondence between the
+    marker and the note is **not machine-readable** — the model records
+    two strings and no relation between them, and §12.7 forbids a reader
+    inferring one from the text. That loss is exactly what (b) above
+    measures, and it is the honest price of not spending a keyword on
+    10.0%.
+  - **`NON-GRAPH-ANNOTATION-NODE` is SOLVED** by the same release — see its entry below.
+  - **The LOCATOR half is untouched, and `CONTIGUOUS-RANGE-GROUPING`, `CELL-EDGE-ANCHORS`, `TAP-VERSUS-JUNCTION-SPELLING`, `CROSS-BLOCK-REFERENCES`
+    and `TIMING-MEASUREMENT-ANNOTATIONS` all stay OPEN.** The coordinate grammar this entry calls
+    for (`in=q(3)`, addressing a row inside a region) was designed and
+    **deliberately NOT built**: it has no shipping consumer,
+    and SYNTAX-STYLE RULE 4.7 argues against spending a grammar before one
+    exists. It stays on the record, unbuilt. What DID land is narrower and
+    must not be mistaken for it: **`in=` on `threshold`/`band` now
+    resolves a REGION id** (a `bitfield`, `table` or `timing` block) in
+    addition to a node or a group — `MARKER-TARGET-KINDS`, a widening of the value domain,
+    **not a third sense of `in=`** and not a new spelling. That unblocks
+    the two WRED `table`-genre figures named above, which is the concrete
+    evidence this entry rests on; it addresses nothing about naming a row,
+    a cell, a point on an edge or a signal event. The `on=` reservation
+    for a future annotation TARGET key stands unspent (SYNTAX-STYLE §8.1),
+    because `note=` needs no target key at all.
   **A LABEL is a sub-element, so LABEL COLOUR is filed here (
   `COLOUR-KEY-STATUS`/`LABEL-COLOUR-SOURCE`).** v0.1 has no label-colour key and will not gain one: the
   reason is structural, not demand. Measured on the reference engine, a
@@ -1702,7 +2009,7 @@ alone. Recorded as an open question in §9.
   SysML parts), and how ERD tools handle the same entity appearing in
   multiple diagrams. All v0.2; pending frequency measurement.
   **Where else this one gap is filed (`OPEN-QUESTION-CITATION-STATUS`).** It is ONE primitive with
-  three faces, and until this release none of the three named the others:
+  three faces, and until 0.2 none of the three named the others:
   (1) this entry, the MODEL-side statement; (2)
   the project’s working record — ISO 5807's **Connector**, in the *"Not
   in this repository's record of the standard"* table, status **unknown**
@@ -1736,8 +2043,25 @@ alone. Recorded as an open question in §9.
   evaluation; interim: express each encoding alternative as a separate
   `bitfield` block. Priority: high (CORRECTNESS; zero-warning parse
   failure). All v0.2.
-- `NON-GRAPH-ANNOTATION-NODE`: **annotation node that does not join the graph** (`PRODUCTION-CORPUS-MEASUREMENT`,
-  2026-07-30) — a floating explanatory block that comments on the
+- ~~`NON-GRAPH-ANNOTATION-NODE`: **annotation node that does not join the graph**~~ —
+  **SOLVED (`DRAWN-ANNOTATION-FORM`)** by `note=` (§2.9) together with the
+  figure-level form, a `note=` written on the `title` line. The entry is
+  kept in full below because two of its paragraphs are the evidence the
+  solution was built from, and because the shape of the answer is the
+  thing worth recording: the construct is **not** a participant that a
+  convention asks readers to ignore — it is **not an element at all**. An
+  aside about one element rides on that element's own line, so `nodes`
+  keeps holding participants and only participants (§12.7); an aside about
+  the whole figure rides on `title`, which is the one line every figure
+  has and no figure's subject matter contains. Both of this entry's named
+  defects therefore stop being reachable rather than being mitigated:
+  `strip-check.js` has no orphan to warn about, and a reading agent has no
+  extra `node` to miscount. The **capability loss** the `SHAPE-ENUM-VOCABULARY` corroboration
+  below records is repaid in the same release — the author who borrowed
+  `shape=cloud` to get "a shape that reads as a comment bubble" now has a
+  shape that IS one, the UML folded-corner note box, and does not spend a
+  geometric enum value to get it. *As filed (`PRODUCTION-CORPUS-MEASUREMENT`,
+  2026-07-30):* a floating explanatory block that comments on the
   figure as a whole without being a participant. Authors today use an
   orphan dashed node, which `strip-check.js` flags as a warning and
   which a reading agent counts as a participant, corrupting topology
@@ -1762,6 +2086,16 @@ alone. Recorded as an open question in §9.
   only an ergonomic gap. Design still deferred to the v0.2 holistic
   annotation session with `ROW-INDEX-GUTTER`/`CONTIGUOUS-RANGE-GROUPING`/`CELL-EDGE-ANCHORS`/`TAP-VERSUS-JUNCTION-SPELLING` — this note records the
   measurement, not a proposal.
+  **The capability loss is CLOSED (`DRAWN-ANNOTATION-FORM`).** From
+  `figdown 0.3` the aside that borrowed the cloud is written
+  `note="…"` on the element it is about, or on `title` when it is about
+  the figure, and it draws as the UML note symbol. `SHAPE-ENUM-VOCABULARY`'s retirement of
+  `shape=cloud` no longer costs a capability: the one non-icon use it
+  removed has a construct of its own, which is the outcome `SHAPE-ENUM-VOCABULARY` said it was
+  owed and could not supply at the time. The `shape=` enum stays purely
+  geometric (`SHAPE-ENUM-VOCABULARY`/`EXTERNAL-EDGE-ENDPOINTS`) and gains nothing back — the aside was never a
+  geometry question, which is precisely why a shape was the wrong carrier
+  for it.
 - `REPEATED-SUBGRAPH`: **repeated subgraph / instantiation** (`PRODUCTION-CORPUS-MEASUREMENT`, 2026-07-30) —
   no construct exists to declare that a sub-structure of K nodes and M
   edges appears N times; authors must spell out all N copies in full.
@@ -1918,7 +2252,7 @@ alone. Recorded as an open question in §9.
   the edge it would ask about** (2026-08-07, `EDGE-GEOMETRY-CONSTRUCTS`). **This is a
   requirement on file, not a note that something was deleted.** FigDown
   has no construct for **orthogonal (elbow) edge routing**, and none for
-  **controlling it per edge**. Both were expressible until this release —
+  **controlling it per edge**. Both were expressible until 0.1 —
   `routing orthogonal|straight` figure-wide and `routing=` on a `path` — <!-- fence-check: skip -->
   and `EDGE-GEOMETRY-CONSTRUCTS` withdrew the pair with their host directive. The need did not
   go with them.
@@ -1935,7 +2269,7 @@ alone. Recorded as an open question in §9.
   about 6× in cardinality and disagreeing on whether the set is open or
   closed — so a design that adds a third mode is designing without prior
   art, and a design that stops at two is not. Full derivation:
-  decisions/registry.md
+  decisions/registry.md.
   **The blocker is edge identity, and it is why this is an open question
   rather than a pending re-add.** A per-edge override has to *address* an
   edge, and FigDown has **no edge-identity construct**. The mechanism it
@@ -2021,7 +2355,7 @@ alone. Recorded as an open question in §9.
   in the IEEE 1685-2022 schemas (see
   [genres/bitfield.md](genres/bitfield.md)), and 4.7 does not outrank an
   attested spelling. What the choice costs: `ROW-INDEX-GUTTER`'s gutter, which this
-  document named `index=` from its filing until this release, must be spelled
+  document named `index=` from its filing until 0.1, must be spelled
   something else, and no genre may give `index` a second meaning while it is
   live (RULE 4.3). **The cost looks smaller than it did**, and the reason is
   in `ROW-INDEX-GUTTER` above: `ANNOTATION-FAMILY-SEQUENCING`'s gutter evidence is 100% ADDRESSES, and `address` is
@@ -2129,7 +2463,7 @@ alone. Recorded as an open question in §9.
   paragraph*, on the grounds that *"formatters like Prettier pad cells
   arbitrarily"* and that *"invisible characters carrying semantics is a
   classic failure mode (Makefile tabs) and a hallucination source for LLMs"*.
-  Both arguments apply verbatim to the rule `TABLE-ROW-SYNTAX` adopted. Before this release
+  Both arguments apply verbatim to the rule `TABLE-ROW-SYNTAX` adopted. Before 0.1
   this was acknowledged in **no** spec, design or conformance document and in
   none of `INDENTED-BLOCK-SUGAR`..S40.
   **This is filed, not fixed, and the reason is stated rather than implied.**
@@ -2273,12 +2607,12 @@ alone. Recorded as an open question in §9.
 ## 10. Keyword registry, conformance modes, extensions
 
 **Keyword registry (v0.1).** 22 top-level keywords, 6 typed-block child
-keywords, plus the table-row line-start token `|`. (22 until this release,
+keywords, plus the table-row line-start token `|`. (22 until 0.1,
 when the three `flowchart` role keywords landed — the first genre-owned set
 under `GENRE-VOCABULARY-OBLIGATION`, taking the count to 25; 0.1 removed one again by merging
 `size` into `pin`, `ELEMENT-GEOMETRY-DIRECTIVE`; and 0.1 removed two by WITHDRAWING `path`
 and `routing`, `EDGE-GEOMETRY-CONSTRUCTS` — 24 − 2 = 22, back to the 0.1 figure by a
-different route.) **Every figure in that history read one lower until this release**, because `chart` (c′) had no registry entry at all — a
+different route.) **Every figure in that history read one lower until 0.1**, because `chart` (c′) had no registry entry at all — a
 keyword the engine has accepted at the top level of every scene genre and
 of `table`, and which the `GENRE-KEYWORD-ALLOWLIST` paragraph below already
 named. A closed language's registry is obliged to list what the language
@@ -2339,7 +2673,7 @@ per-genre minimum sets.
 **Every member of this namespace is genre-independent** (§1, `LAYOUT-ZONE-NAMESPACE`): no genre may define, redefine or extend a keyword inside the
 layout zone, and `GENRE-VOCABULARY-OBLIGATION` does not reach into it. **The
 namespace has exactly one member.** `path` and `routing` were the other
-two — core until this release, EXPERIMENTAL from `CONSTRUCT-STATUS-TIERS`'s demotion, and
+two — core until 0.1, EXPERIMENTAL from `CONSTRUCT-STATUS-TIERS`'s demotion, and
 **WITHDRAWN from the language by `EDGE-GEOMETRY-CONSTRUCTS`** (retired-keyword
 table below; the requirement they served is §9 **`EDGE-IDENTITY-AND-GEOMETRY`**). The clause
 that governs the namespace is unchanged; only its membership is.
@@ -2347,7 +2681,7 @@ that governs the namespace is unchanged; only its membership is.
 distinction is kept here because it governs the next experimental member
 the zone acquires: EXPERIMENTAL is a statement about **stability**,
 genre-independence one about **belonging**, and a construct can be both.
-Until this release this section said the opposite of the second: *"a future
+Until 0.1 this section said the opposite of the second: *"a future
 genre MAY redefine `path` or `routing` under `GENRE-VOCABULARY-OBLIGATION`, and an agent may no
 longer assume their meaning is genre-independent."* That sentence was
 **WITHDRAWN** (`LAYOUT-ZONE-NAMESPACE`). It read a demotion in status as a release of
@@ -2362,13 +2696,33 @@ claim either under `GENRE-VOCABULARY-OBLIGATION` through the `NEW-CONSTRUCT-EVID
 `pin` absorbed `size` (`ELEMENT-GEOMETRY-DIRECTIVE`): one directive, one model
 object, and `size` is a retired spelling with a named diagnostic.
 
-*(b) The scene namespace (11) — shared today by `block`, `topology` and
-`flowchart`:*
+*(b) The scene BUCKET (10) — a count of distinct spellings, and NOT a
+namespace (`SUBJECT-VOCABULARY-SCOPE`).* Every one of these is declared separately
+by each scene genre that accepts it, so a spelling on four allowlists is
+four declarations, not one shared word (§1, `GENRE-VOCABULARY-OBLIGATION`). The registry enumerates
+spellings because a closed language has to say what exists; the column
+that says WHO declares each is the genre documents, and nothing may read
+this table as evidence that a word is shared.
 
-| Status | Keywords | Count |
-|---|---|---:|
-| NORMATIVE | `node` `group` `external` `edge` `class` `flow` `rank` | 7 |
-| EXPERIMENTAL | `threshold` `band` `bundle` `plane` | 4 |
+| Status | Keywords | Count | Declared by |
+|---|---|---:|---|
+| NORMATIVE | `node` | 1 | `block`, `topology`, `flowchart` (`statechart` spells it `state`) |
+| NORMATIVE | `edge` | 1 | `block`, `topology` (`flowchart` spells it `flowline`, `statechart` `transition`) |
+| NORMATIVE | `group` | 1 | `block`, `topology` |
+| NORMATIVE | `external` | 1 | `block`, `topology`, `flowchart` |
+| NORMATIVE | `class` `flow` `rank` | 3 | all four — and NOT subject vocabulary: styling declaration and layout intent, so no genre's domain holds a competing meaning (§1) |
+| EXPERIMENTAL | `threshold` `band` | 2 | `block` |
+| EXPERIMENTAL | `bundle` | 1 | `topology` |
+
+`plane` was the eleventh member and is **WITHDRAWN from the language**
+(`PAINT-ORDER-CONSTRUCT`, §2.4); its registry row survives below as a withdrawn
+diagnostic, and it is not counted, exactly like `path` and `routing`.
+The 16 keyword/genre cells `SCENE-KEYWORD-MEMBERSHIP` withdrew are visible in this table as
+absences — `group` under `flowchart` and `statechart`, `external` under
+`statechart`, `threshold`/`band` outside `block`, `bundle` outside
+`topology` — and each has a named per-genre diagnostic that gives the
+ground rather than a spellcheck. `statechart` declares **no** subject
+vocabulary at all, and the empty set is its declaration.
 
 *(b″) `flowchart`'s OWN namespace (3) — the first exercise of `GENRE-VOCABULARY-OBLIGATION`
 (`FLOWCHART-ROLE-KEYWORDS`):*
@@ -2386,7 +2740,28 @@ a `role` field, they share the node id namespace, and they take exactly
 derived geometry, the exclusion list and the `terminator` verification
 debt.
 
-*(b′) `bundle` and `plane` were NORMATIVE until this release and were demoted by
+*(b‴) The per-genre NODE and CONNECTOR spellings (3) — `GENRE-CONNECTOR-SPELLING`/`GENRE-NODE-SPELLING`,
+0.2:*
+
+| Status | Keyword | Genre | Replaces |
+|---|---|---|---|
+| EXPERIMENTAL | `flowline` | `flowchart` only, and `figdown 0.2` only (`KEYWORD-RENAME-SCOPE`) | `edge` |
+| EXPERIMENTAL | `transition` | `statechart` only | `edge` |
+| EXPERIMENTAL | `state` | `statechart` only | `node` |
+
+Each has `edge`'s or `node`'s grammar, option keys and model exactly, and
+REPLACES it in that genre rather than joining it. **This is (b) read
+correctly**: the four scene genres never shared one connector, they
+declared four connectors that happened to agree until `GENRE-CONNECTOR-SPELLING` — which is why
+the split was expressible at all, and why `SUBJECT-VOCABULARY-SCOPE` later had to say so in §1.
+The version gate on `flowline` is the cost of having authored the rename
+against a shared surface: under `figdown 0.1 flowchart` the connector is
+still `edge`, because the 0.1 language cannot lose a spelling
+(MIGRATIONS 0.2). This row was missing from the
+partition sum below until this release, so every keyword total in this
+project was three low for five releases.
+
+*(b′) `bundle` and `plane` were NORMATIVE until 0.1 and were demoted by
 `CONSTRUCT-STATUS-TIERS`,* on the same evidence the genre statuses rest on. Measured over the
 50-document in-repo corpus, `bundle` appears in **4** documents and
 `plane` in **3**, and **every one of the seven is a `topology`
@@ -2394,22 +2769,30 @@ document**. Both appear **zero** times in `block`, `bitfield` and `table`
 documents — so under the per-genre minimum-set reading neither is in any
 normative genre's vocabulary, and `topology` is itself EXPERIMENTAL.
 `bundle` is `topology`'s own domain vocabulary (`DOMAIN-VOCABULARY-PREFERENCE` §4) and is demoted
-*with* its genre, not against it; `plane` is a generic marker with no
-owning genre, exactly the position that demoted `threshold` and `band`. Both
-remain legal, keep the meaning §2.4 and §2.5 give them, and every
-document that uses them keeps rendering — the demotion changes their
-status, not their semantics.
+*with* its genre, not against it; `plane` was a generic marker with no
+owning genre, exactly the position that demoted `threshold` and `band`.
 
-**The option key moves with its declaration point.** `plane=` is demoted
-with the `plane` keyword. The two cannot be separated: `plane=` can only
-name a plane some `plane` line declared, so in a document that may not
-declare one it could only ever name the implicit `base` — an option with
-exactly one legal value, which is not an option. `z-index=` follows too, being
+**That same measurement is what settled both of them.**
+`bundle`'s zero uses under `block` are the evidence `SCENE-KEYWORD-MEMBERSHIP` withdrew that
+cell on, and its four uses under `topology` are the evidence `topology`
+kept it on — one measurement, read per genre, answering both ways at
+once, which is what per-genre declaration is for. `plane`'s three uses
+were all `topology` too, and `PAINT-ORDER-CONSTRUCT` withdrew the keyword from the language
+rather than reassign it, because a marker with no owning genre and no
+referent in any domain has nothing to be reassigned TO: the two most
+realistic figures that used it are byte-identical without it (§2.4).
+
+**The option key moves with its declaration point, and it moved twice.**
+`plane=` was demoted with the `plane` keyword and withdrawn
+with it, on the same rule both times: `plane=` could only
+name a plane some `plane` line declared, so with no `plane` line legal
+anywhere it has nothing left to name. `z-index=` follows too, being
 accepted by `plane` alone (the same rule that carried `extend=` out with
 `band`). What does **not** move is the implicit `base` plane or the
-model's `planes` array: a document that declares no plane still has
+model's `planes` array: every document still has
 `planes[0] = {id:"base", z:0}` and every element still reports
-`plane: "base"` (§12.5), so a normative-surface reader needs no new case.
+`plane: "base"` (§12.5), so a normative-surface reader needs no new case,
+and paint order is document order.
 
 *(c) The three nested-genre namespaces (3 openers + 6 children + `|`).*
 Each opener is a top-level line in ANY genre — that is composition (§4,
@@ -2436,31 +2819,36 @@ the construct — one option key, one legal value, and a data binding
 (rows→X, columns→Y) that no other keyword in the language uses. An agent
 writing a portable v0.1 figure leaves it alone.
 
-3 + 1 + 11 + 3 + 3 + 1 = **22 top-level**; 2 + 2 + 2 = **6 children** (the
-`|` token is a line-start token, not a keyword, and is counted separately
-— which is why `table` shows three entries in the row above and
-contributes two here).
+3 + 1 + 10 + 3 + 3 + 3 + 1 = **24 top-level**; 2 + 2 + 2 = **6 children**
+(the `|` token is a line-start token, not a keyword, and is counted
+separately — which is why `table` shows three entries in the row above and
+contributes two here). The seventh term is (b‴), the per-genre node and
+connector spellings `flowline` `transition` `state`.
 `CONSTRUCT-STATUS-TIERS` changed no total — entries moved column only; 0.1 is the first
 release since that ADDS keywords, three of them, all EXPERIMENTAL, taking the
 total to 25, and 0.1 is the first that REMOVES one: `ELEMENT-GEOMETRY-DIRECTIVE` merged
 `size` into `pin`, so 25 − 1 = 24. **0.1 removes two more, and it
 is the first removal that is a WITHDRAWAL rather than a merge or a
 rename**: `EDGE-GEOMETRY-CONSTRUCTS` took `path` and `routing` out of the language, so
-24 − 2 = **22**. `LAYOUT-ZONE-NAMESPACE`'s repartition, like `CONSTRUCT-STATUS-TIERS`'s, moved
-entries between rows without changing any total. A retired or withdrawn
-keyword is not counted here — its spelling stays registered so it fires a
-named diagnostic (the tables below), but it is no longer a keyword of the
-language. Of the 22
+24 − 2 = 22. **0.2 adds three** — `GENRE-CONNECTOR-SPELLING`/`GENRE-NODE-SPELLING` gave `flowchart`
+`flowline` and `statechart` `state` and `transition`, so 22 + 3 = 25 —
+and **0.3 removes one, the second WITHDRAWAL**: `PAINT-ORDER-CONSTRUCT` took `plane`
+out of the language, so 25 − 1 = **24**. `LAYOUT-ZONE-NAMESPACE`'s repartition, like `CONSTRUCT-STATUS-TIERS`'s,
+moved entries between rows without changing any total. A retired or
+withdrawn keyword is not counted here — its spelling stays registered so
+it fires a named diagnostic (the tables below), but it is no longer a
+keyword of the language. Of the 24
 top-level keywords **13 are NORMATIVE** — the core of three (a), `pin` (a′), the
-seven normative scene keywords (b), and the `bitfield` and `table` openers
+seven normative scene spellings (b), and the `bitfield` and `table` openers
 (c) —
-and **9 are EXPERIMENTAL**: `threshold` `band` `bundle` `plane`
-`timing` `process` `decision` `terminator` `chart`. (Both counts of the
-withdrawn pair were EXPERIMENTAL, so NORMATIVE is unchanged and EXPERIMENTAL falls 11 → 9.
-The NORMATIVE 13 has never moved; it is the EXPERIMENTAL side that carried the
-missing `chart`.)
+and **11 are EXPERIMENTAL**: `threshold` `band` `bundle`
+`timing` `process` `decision` `terminator` `chart` `flowline` `transition`
+`state`. (Every withdrawal so far took EXPERIMENTAL spellings only, so NORMATIVE has
+never moved; it is the EXPERIMENTAL side that carries every change, and it
+carried the `chart` that was missing until 0.1 and the `GENRE-CONNECTOR-SPELLING`/`GENRE-NODE-SPELLING`
+trio that was missing until this release.)
 Reserved for the dynamic profile: `page set pulse` — the three the §6 <!-- fence-check: skip -->
-sketch uses. `step` was reserved until this release and is now **released**
+sketch uses. `step` was reserved until 0.1 and is now **released**
 (`CONSTRUCT-STATUS-TIERS`): it appeared in no sketch and no genre claimed it, so it is an
 ordinary unknown keyword again and an author may have the word.
 
@@ -2498,7 +2886,7 @@ invented abbreviations. The keyword and option-key namespaces are
 disjoint, so a name may be reused across them without ambiguity: the
 `table` child keyword `width` (a line, one value per table column) and the
 `width=` option on `pin` (one node's px extent) are the SAME spelling
-And that is correct rather than tolerated — they denote
+and that is correct rather than tolerated — they denote
 the same concept, a horizontal extent, and a language that borrowed
 `width` from SVG/CSS for one of them and invented an abbreviation for the
 other would be the defect (`UNSAFE-DEFAULT-ELIMINATION`, single-source vocabulary). The parser can
@@ -2517,7 +2905,7 @@ line-start diagnostics with no live half anywhere.
 Reuse across namespaces is permitted, but it must not cost the reader.
 
 **One DECLARED EXCEPTION to the paragraph above (maintainer
-ruling).** the word `fill` is once more in two
+ruling).** The word `fill` is once more in two
 namespaces: it is a RETIRED KEYWORD, whose line-start diagnostic
 `fill has been renamed: use band` this section still requires, and it is
 the primary OPTION KEY, `fill=`. That is exactly the collision `UNSAFE-DEFAULT-ELIMINATION` exists
@@ -2542,10 +2930,13 @@ set, and leaving it unremarked would make the rule read as violated rather
 than excepted. The `timing` child keyword `gap <cycle>` (a time break) and the
 scene option `gap=<px>` on `group` (member spacing) are **both live**, and
 they denote **different concepts** — the only such pair in v0.1. (The other
-cross-namespace pairs — `class`/`class=`, `width`/`width=`, `plane`/`plane=`
+cross-namespace pairs — `class`/`class=`, `width`/`width=`
 — denote the SAME concept on both sides and are covered
 by the paragraph above, not by this exception. `routing`/`routing=` was a
-fourth such pair until this release, when `EDGE-GEOMETRY-CONSTRUCTS` withdrew both halves at once.)
+third such pair until 0.1, when `EDGE-GEOMETRY-CONSTRUCTS` withdrew both halves at once,
+and `plane`/`plane=` a fourth until this release, when `PAINT-ORDER-CONSTRUCT` did the same.
+Both withdrawals took the pair whole, which is the coupling (b′) states:
+neither half can outlive the other.)
 The reasoning is `GENRE-KEYWORD-ALLOWLIST`, and it is a **stronger** disjointness than the
 `fill`/`route` cases ever had. There the two spellings could appear in one
 document and only the parser's token position told them apart. Here they are
@@ -2564,7 +2955,9 @@ it opened admits only geometry — so it became `layout`, the cross-tool
 word for that half of a diagram language. `layout` and `layer` were a
 near-miss pair — five shared characters, one a bare keyword and the
 other id-taking — and 0.1 removed it: the `layer` half is gone
-(`PLANE-KEYWORD-SPELLING`), and `layout`/`plane` share nothing.
+(`PLANE-KEYWORD-SPELLING`), and `layout`/`plane` shared nothing; (`PAINT-ORDER-CONSTRUCT`)
+there is no `plane` either, so the zone's opener has no near-miss left in
+the language at all.
 **`GENRE-VOCABULARY-OBLIGATION` does not waive that rule.** A genre MAY reuse another genre's
 spelling with a different meaning (§1), but `UNSAFE-DEFAULT-ELIMINATION`'s test still applies: the
 reuse must not cost the reader. Across genres the disambiguator is the
@@ -2643,13 +3036,14 @@ spellings that 0.1 then withdrew,
 `TIMING-LANE-ALPHABET` — write `=` and name the cell in `data=`).
 
 Experimental (outside the v0.1 conformance surface), the complete list in
-its current spellings — keywords `threshold` `band` `bundle` `plane`
-`timing` `chart`, option keys `plane` `z-index`
+its current spellings — keywords `threshold` `band` `bundle`
+`timing` `chart` `flowline` `transition` `state`, option keys
 `offset` `extend` `data`
-`type`, genres `topology` `flowchart` `timing`. (`stroke=` was on this list
-until this release and is now NORMATIVE, `STROKE-KEY-STATUS`; `color=` was on it too and is
+`type`, genres `topology` `flowchart` `statechart` `timing`.
+(`plane` and its keys `plane=` and `z-index=` were on this list until this release, when `PAINT-ORDER-CONSTRUCT` withdrew all three from the language.) (`stroke=` was on this list
+until 0.1 and is now NORMATIVE, `STROKE-KEY-STATUS`; `color=` was on it too and is
 now retired language-wide, `COLOUR-KEY-STATUS`; the keywords `path`/`routing` and the
-option keys `points`/`tailport`/`headport`/`routing` were on it until this release and are WITHDRAWN, `EDGE-GEOMETRY-CONSTRUCTS`.)
+option keys `points`/`tailport`/`headport`/`routing` were on it until 0.1 and are WITHDRAWN, `EDGE-GEOMETRY-CONSTRUCTS`.)
 Each registered set (keywords, option keys, shape/style enums, edge
 operators, numbering values, timing lane characters, merge markers) is
 closed; additions follow the change policy (`NEW-CONSTRUCT-EVIDENCE-GATE` gate) and land as
@@ -2689,12 +3083,13 @@ their predecessors `layer` `kind` `labels` `via` `src` `dst`, plus `unit`
 acceptor**, which is the convention `w` `h` `via` `src` `dst` `level` have
 always been counted under — so 0.1's four WITHDRAWALS
 (`points` `tailport` `headport` `routing`, `EDGE-GEOMETRY-CONSTRUCTS`) move from EXPERIMENTAL to
-NORMATIVE (diagnostic) and the total does not change. This section previously said 33: that figure predated
+NORMATIVE (diagnostic) and the total does not change, and 0.3's two
+(`plane` `z-index`, `PAINT-ORDER-CONSTRUCT`) do the same. This section previously said 33: that figure predated
 0.1 and had also omitted `offset`, `z-index` and `unit` from the
 namespace table below, so it was never the registry's real size. **It then
 said 42 in an earlier release, and that figure went stale**, which registered `description` (`DESCRIPTION-KEY-SPELLING`, `note` kept as a
 diagnostic) and `present` (`PRESENCE-CONDITION-EXPRESSION`) without recounting: 42 + 2 = 44. **It said
-44 until this release**, which registered `index` (`BITFIELD-REPETITION-CONSTRUCT`, the `bitfield`
+44 until 0.1**, which registered `index` (`BITFIELD-REPETITION-CONSTRUCT`, the `bitfield`
 repetition key): 44 + 1 = 45. The
 figure above is re-derived row by row from the key table below, which has
 46 rows for 45 distinct keys — the two NORMATIVE rows spelled `fill` are ONE key
@@ -2720,13 +3115,45 @@ only host directive, and they appear in the last row now.
 |---|---|---:|---|
 | **layout** (`LAYOUT-ZONE-NAMESPACE` — owned by no genre; 0.1) | `at` `width` `height` (all three on `pin`) | 3 | NORMATIVE |
 | **scene** (`block`/`topology`/`flowchart`) | `shape` `in` `gap` + the retired diagnostics `label` `taillabel` `headlabel` `from` `to` | 8 | NORMATIVE |
-| **scene, experimental** (on the demoted `band`/`plane`/`threshold`, `CONSTRUCT-STATUS-TIERS`) | `plane` `extend` `offset` `z-index` | 4 | EXPERIMENTAL |
-| **`bitfield`** | `word` `numbering` `description` `present` `index` | 5 | NORMATIVE (0.1: `note` → `description`, `DESCRIPTION-KEY-SPELLING`; the positional flag `optional` became the key `present`, `PRESENCE-CONDITION-EXPRESSION`. 0.1: `index`, the repetition range, `BITFIELD-REPETITION-CONSTRUCT`) |
+| **scene, experimental** (on the demoted `band`/`threshold`, `CONSTRUCT-STATUS-TIERS`; both are `block`'s alone since `SCENE-KEYWORD-MEMBERSHIP`) | `extend` `offset` | 2 | EXPERIMENTAL (`plane` and `z-index` were the other two until 0.3, `PAINT-ORDER-CONSTRUCT` — see the retired row) |
+| **`bitfield`** | `word` `numbering` `description` `present` `index` | 5 | NORMATIVE (0.1: `note` → `description`, `DESCRIPTION-KEY-SPELLING` — a rename **out of this namespace**, and the vacated spelling is live again language-wide since 0.3 (`DRAWN-ANNOTATION-FORM`) without returning here: `field` still refuses `note=`, §10 audience table. The positional flag `optional` became the key `present`, `PRESENCE-CONDITION-EXPRESSION`. 0.1: `index`, the repetition range, `BITFIELD-REPETITION-CONSTRUCT`) |
 | **`timing`** | `data` | 1 | EXPERIMENTAL (inherited from the `timing` genre) |
 | **`table`** | *(none of its own)* | 0 | NORMATIVE |
-| **cross-namespace** (§5 presentation + `class`) | `fill` `stroke` `style` `class` | 4 | NORMATIVE (0.1: `style` lost its `field`/`cell`/`signal` acceptors — `STYLE-KEY-SCOPE` — and is now cross-namespace across the scene directives only) |
+| **cross-namespace** (§5 presentation + `class` + `note`) | `fill` `stroke` `style` `class` `note` | 5 | NORMATIVE (0.1: `style` lost its `field`/`cell`/`signal` acceptors — `STYLE-KEY-SCOPE` — and is now cross-namespace across the scene directives only. 0.3: `note` REVIVED as the drawn annotation, `DRAWN-ANNOTATION-FORM` — its acceptors span the scene namespace, `flowchart`'s and `statechart`'s own connector spellings and the `UNIVERSAL-CORE-KEYWORDS` core `title`, so no single namespace holds it) |
 | **experimental** (outside the conformance surface) | `type` (on `chart`) | 1 | EXPERIMENTAL |
-| **retired language-wide** (no acceptor at all) | `w` `h` `dir` · `text` `z` · `kind` `layer` `labels` `unit` `via` `src` `dst` · `level` (DELETED not renamed) · `color` (`COLOUR-KEY-STATUS` — retired with NO replacement) · `note` (`DESCRIPTION-KEY-SPELLING` — renamed `description`) · `points` `tailport` `headport` `routing` (`EDGE-GEOMETRY-CONSTRUCTS` — **WITHDRAWN** with the `path` directive, NO replacement) | 19 | NORMATIVE (diagnostic) |
+| **retired language-wide** (no acceptor at all) | `w` `h` `dir` · `text` `z` · `kind` `layer` `labels` `unit` `via` `src` `dst` · `level` (DELETED not renamed) · `color` (`COLOUR-KEY-STATUS` — retired with NO replacement) · `points` `tailport` `headport` `routing` (`EDGE-GEOMETRY-CONSTRUCTS` — **WITHDRAWN** with the `path` directive, NO replacement) · `plane` `z-index` (`PAINT-ORDER-CONSTRUCT` — **WITHDRAWN** with the `plane` directive, NO replacement) | 20 | NORMATIVE (diagnostic) |
+
+**`note` moved BETWEEN two rows of this table (`DRAWN-ANNOTATION-FORM`), and
+that is the only kind of move this registry has not seen before.** Every
+earlier movement was one-way — a live key retired into the last row, never
+out of it. `note` goes the other way: it left the `bitfield` namespace when `DESCRIPTION-KEY-SPELLING` renamed it `description=`, sat in the language-wide
+retired row for eleven dev states, and is live again as the **DRAWN
+annotation**, in the cross-namespace row, under SYNTAX-STYLE **RULE 4.9**.
+The move is legal precisely because of *why* `DESCRIPTION-KEY-SPELLING` retired it: `DESCRIPTION-KEY-SPELLING` retired
+the spelling **in order to reserve the name** for the annotation construct
+§9 `ANNOTATION-LOCATOR-SPLIT` was tracking, and this release **cashes that reservation rather
+than reversing a decision**. The retirement predates the first stable
+release and no published document ever carried the old meaning, so the
+three RULE 4.9 obligations are all satisfiable — and the third of them,
+*reverse the retirement diagnostic in the same release*, is why the message
+`note= has been renamed: use description=` no longer exists anywhere in the
+live engine (MIGRATIONS `0.2 → 0.3`; the message survives in
+`archive/0.1/figdown.html`, which §13.5 forbids changing and where it is
+still true). The key is **GATED on the declared version** — `note=` under
+`figdown 0.1` or `figdown 0.2` is a line error naming `0.3` — and the gate's
+reason is specific to this key rather than generic: the spelling has a prior
+meaning on the record, so accepting it silently under an older header would
+repaint an author's tooltip as ink, §13.0.1's named hazard.
+
+**No total in this section moves.** The registry still holds **45 keys in
+46 rows**, and it is still **39 NORMATIVE and 6 EXPERIMENTAL**: the row was already
+counted, and already counted NORMATIVE, because a registration counts here
+whether or not it has a live acceptor. What changed is which namespace owns
+it (retired language-wide 19 → **18**, cross-namespace 4 → **5**) and
+whether an author may write it (they may, at `figdown 0.3`). The count of
+keys an author may write on some directive therefore goes **21 → 22**; it is
+the first time that figure has risen without the registry's own size rising
+with it.
 
 The status column follows the same two-value rule stated for keywords
 above. All three surviving §5 paint/dash keys — `fill=`, `stroke=` and
@@ -2736,14 +3163,14 @@ re-measured (56+ in-repo, 567 downstream edge-colouring sites); the
 fourth key of the old set, `color=`, is retired outright by `COLOUR-KEY-STATUS` and the
 language has no label-colour key at all (§5; the derived default is
 `LABEL-COLOUR-SOURCE`). None of the three may ever be meaning's only carrier (`GUI-WRITEBACK-STRUCTURE`/`PRESENTATION-AS-MEANING-CARRIER`).
-`gap=` (a `group` layout option) stays normative. `plane=` is demoted
-with the `plane` keyword — a keyword and its only declaration point move
-together (b′) — and `extend=`, `offset=` and `z-index=` are demoted only
-because they are accepted solely by the demoted `band`, `threshold` and
-`plane` respectively. The
-option-key totals therefore move with the keywords: **39 NORMATIVE and 6
-EXPERIMENTAL**, 45 in all. The six EXPERIMENTAL keys are `plane` `extend` `offset`
-`z-index` `data` `type`; `EDGE-GEOMETRY-CONSTRUCTS`'s four withdrawals crossed the line the
+`gap=` (a `group` layout option) stays normative. `extend=` and `offset=`
+are demoted only because they are accepted solely by the demoted `band`
+and `threshold` — a keyword and its only acceptors move together (b′),
+which is also the rule that carried `plane=` and `z-index=` out of the
+language with `plane` (`PAINT-ORDER-CONSTRUCT`). The
+option-key totals therefore move with the keywords: **41 NORMATIVE and 4
+EXPERIMENTAL**, 45 in all. The four EXPERIMENTAL keys are `extend` `offset`
+`data` `type`; `EDGE-GEOMETRY-CONSTRUCTS`'s four withdrawals and `PAINT-ORDER-CONSTRUCT`'s two crossed the line the
 other way, because a withdrawn spelling is the opposite of unconverged —
 it is gone, and a fixed diagnostic message is all that is left to
 implement. (Five earlier counts in this paragraph did not add
@@ -2754,9 +3181,9 @@ The "22 NORMATIVE and 11 EXPERIMENTAL, 33 in all" that replaced it left `offset`
 `z-index` and `unit` out of the namespace table altogether and counted the
 live `color=` as a retired diagnostic; 0.1 recounted key by key
 against the engine's registry, which is where the 42 comes from. The
-"29 NORMATIVE and 13 EXPERIMENTAL" that stood until this release was itself one off its
+"29 NORMATIVE and 13 EXPERIMENTAL" that stood until 0.1 was itself one off its
 own table, which summed to 30/12. The "32 NORMATIVE and 10 EXPERIMENTAL, 42 in all"
-that stood until this release went stale, which registered
+that stood until 0.1 went stale, which registered
 `description` and `present` without recounting. The count above is
 re-derived row by row
 from the key table, where the two NORMATIVE rows spelled `fill` are ONE key
@@ -2767,15 +3194,28 @@ recorded here rather than in the table: `at` is core on `pin` and carries
 a diagnostic-only registration on the scene directive `threshold` (renamed
 `offset=`, when the directive was still spelled `guide`);
 `width`/`height` are
-live on `pin` (on the retired `size` until this release, `ELEMENT-GEOMETRY-DIRECTIVE`) and carry a
+live on `pin` (on the retired `size` until 0.1, `ELEMENT-GEOMETRY-DIRECTIVE`) and carry a
 diagnostic-only registration on the
 scene `node`. Neither is a redefinition —
 each is one key with one meaning, registered on directives in two
 namespaces. Each is counted **once**, in the namespace of the registration
 that names it in the table above: `at` and `width`/`height` under layout.
-The `UNIVERSAL-CORE-KEYWORDS` core of three owns no option key at all — `figdown`, `title` and
-`layout` take none — which is why the row that used to be spelled *core*
-is now spelled *layout*. No key moved and no count changed.
+The `UNIVERSAL-CORE-KEYWORDS` core of three owned no option key at all until this release —
+`figdown`, `title` and `layout` took none — which is why the row that used
+to be spelled *core* is now spelled *layout*. No key moved and no count
+changed then. **`title` gained its FIRST option key:
+`note=`, the figure-level drawn annotation (`DRAWN-ANNOTATION-FORM`).** That does not restore
+a *core* row and does not move `note` out of the cross-namespace row: the
+key is classified by the namespace of its registrations taken together, and
+`title` is one acceptor of ten spread across the scene namespace and two
+genre namespaces. **Nor does it strain `UNIVERSAL-CORE-KEYWORDS`.** `UNIVERSAL-CORE-KEYWORDS` is a **fixity** guarantee
+about what a core keyword MEANS — *wherever `title` appears, it names the
+document, and no genre may redefine that* — not a bar on a core keyword
+taking an option. `figdown` and `layout` still take none, and the reason is
+their own: `figdown` must be readable before the genre is known, and
+`layout` is a zone opener rather than a directive. `title`'s meaning under
+`figdown 0.3` is byte-for-byte what it was under `figdown 0.1`; what is new
+is a second channel written on the same line.
 `kind` used to be the third such key — retired on `node`, live on `plot`
 — and 0.1 ended the straddle by retiring it language-wide (the
 live half is now `type=` on `chart`).
@@ -2792,6 +3232,21 @@ so no genre may redefine them, ever. All four are NORMATIVE
 (`STROKE-KEY-STATUS` promoted `stroke=`; `COLOUR-KEY-STATUS` retired `color=`, which
 was the fifth).
 
+**`note=` joined this row and is the one member that is
+cross-namespace WITHOUT being shared by all six genres (`DRAWN-ANNOTATION-FORM`).** Its
+acceptors are the scene directives, `flowchart`'s and `statechart`'s own
+role and connector spellings, and the `UNIVERSAL-CORE-KEYWORDS` core `title`; the three typed-block
+genres accept it on no directive of theirs, and `field` refuses it by name.
+It is filed here anyway because the classification asks which namespace
+*owns* a key, and no single one does: a key accepted in the scene
+namespace, in two genre namespaces and on a core keyword cannot be filed
+under any of them without misstating where it lives. The `GENRE-VOCABULARY-OBLIGATION` licence reads
+the same for it as for the other four — a future genre MAY give `note=` its
+own defaults, at the cost of documenting it in its own vocabulary table and
+subject to `UNSAFE-DEFAULT-ELIMINATION` — with one thing already fixed: what a `note` MEANS (an
+aside, never structure, §12.7) is not a genre's to redefine, because a
+reading agent resolves it before the genre is consulted.
+
 The fourth column is the `CONSTRUCT-STATUS-TIERS` status. It is the **key's** status, and it
 answers one question: *may an author write this key and stay inside the
 v0.1 conformance surface?* A key is NORMATIVE when at least one directive that
@@ -2799,14 +3254,20 @@ v0.1 conformance surface?* A key is NORMATIVE when at least one directive that
 A key is EXPERIMENTAL when the key itself is demoted, or when every directive
 that live-accepts it is demoted.
 
-`plane=` is the one key that falls under the FIRST of those two clauses
-while normative directives still accept it. `node`, `group`, `external`,
-`edge` and `class` all live-accept it and all five are NORMATIVE, so the
-second clause would have kept the key normative. It is demoted in its own
-right, by (b′): the key's only legal values come from `plane` lines, and
-in a document that may not write one the key could name nothing but the
-implicit `base`. A key with exactly one legal value is not an option, so
-the keyword and its declaration point move together.
+`plane=` was the one key that fell under the FIRST of those two clauses
+while normative directives still accepted it — `node`, `group`,
+`external`, `edge` and `class` all live-accepted it and all five are
+NORMATIVE, so the second clause would have kept the key normative. It was
+demoted in its own right, by (b′): its only legal values came from
+`plane` lines, and in a document that may not write one the key could
+name nothing but the implicit `base`. A key with exactly one legal value
+is not an option, so the keyword and its declaration point move together
+— and they moved together again, out of the language (`PAINT-ORDER-CONSTRUCT`,
+§2.4). **The clause is kept with no live instance**, because it is the
+rule the next such key will be judged by and the example is what makes it
+readable; the state it describes — a demoted key on five normative
+acceptors — is exactly the state a reader will find in `migrations.md`
+for eight releases of this project's history.
 
 **Retired registrations are the third case, and they are NORMATIVE
 (diagnostic).** A retired key has no live acceptor at all: the host
@@ -2835,7 +3296,7 @@ and only its error text remains.
 | `class` | id of a declared `class` | `node` (incl. `process`/`decision`/`terminator`) `group` `edge` `field` `cell` | NORMATIVE |
 | `fill` | `#rgb`/`#rrggbb`/CSS name/`transparent` | `node` (incl. `process`/`decision`/`terminator`) `group` `band` `class` `bitfield` `table` `timing` `field` `cell` `signal` | NORMATIVE |
 | `fill` on `edge` `threshold` `bundle` | RETIRED 0.1 — no interior, so it named the same channel as `stroke=` (§5, `INTERIOR-LESS-ELEMENT-PAINT`) | those three (all reject, naming `stroke=`) | NORMATIVE (diagnostic) |
-| `color` | RETIRED language-wide at 0.1 (`COLOUR-KEY-STATUS`) — and it is the one retirement that is NOT a rename in either direction. Before 0.1 it set the FILL; from 0.1 it set the LABEL; v0.1 has no label-colour key at all. The message names BOTH eras and refuses to choose, which no live key could do | *(no acceptor; every directive rejects)* | NORMATIVE (diagnostic) |
+| `color` | RETIRED language-wide at 0.1 (`COLOUR-KEY-STATUS`) — and it is the one retirement that is NOT a rename in either direction. In one era it set the FILL; in another it set the LABEL; v0.1 has no label-colour key at all. The message names BOTH eras and refuses to choose, which no live key could do | *(no acceptor; every directive rejects)* | NORMATIVE (diagnostic) |
 | `data` | comma-separated names for the lane's `=` data cells (WaveDrom's own key) | `signal` | EXPERIMENTAL |
 | `extend` | `up`\|`down`\|`left`\|`right` | `band` | EXPERIMENTAL |
 | `dir` | RETIRED language-wide at 0.1 — see below | *(no acceptor; every directive rejects)* | NORMATIVE (diagnostic) |
@@ -2844,12 +3305,12 @@ and only its error text remains.
 | `in` | id of the containing/target element | `node` (incl. `process`/`decision`/`terminator`) `threshold` `band` | NORMATIVE (on `node`) |
 | `index` | the field's repetition RANGE, `<first>..<last>`, separator EXACTLY two dots and whitespace around it not significant (§12.2). `<first>` is ALWAYS a literal integer; `<last>` is a literal integer or opaque prose; a literal end above 9007199254740991 is a line error (§12.2, §12.5). Tri-state (§12.3): key absent = no repetition claim; `index=""` = repeats, indices not stated; a fully-literal range = determinate. **Determinacy is decided by parsing both ends as integers, NEVER by quoting** — RULE 2.3 makes quotes inert here, so `index="0..7"` is determinate too. Classic `field` form only (`BITFIELD-REPETITION-CONSTRUCT`) | `field` | NORMATIVE |
 | `labels` | RETIRED language-wide at 0.1 — renamed `data=` (WaveDrom's own key is `data`, "an array of signal labels", one per value cell) | *(no acceptor; every directive rejects)* | NORMATIVE (diagnostic) |
-| `layer` | RETIRED language-wide at 0.1 — renamed `plane=` (`PLANE-KEYWORD-SPELLING`; see the retired-keyword table above) | *(no acceptor; every directive rejects)* | NORMATIVE (diagnostic) |
+| `layer` | RETIRED language-wide at 0.1 — renamed `plane=` (`PLANE-KEYWORD-SPELLING`) — and `plane=` was itself **WITHDRAWN** at 0.3 (`PAINT-ORDER-CONSTRUCT`), so the message states the whole chain `layer=` → `plane=` → withdrawn and names NO live replacement. Naming `plane=` alone would send an author to a spelling that is itself a line error; the precedent for the repair is `route` → `path` at 0.1 | *(no acceptor; every directive rejects)* | NORMATIVE (diagnostic) |
 | `description` | authored documentation prose, quoted (`QUOTING-RULES`). Draws NO ink beyond an SVG `<title>` tooltip — a fact a human must SEE belongs in the label or a `class` meaning | `field` | NORMATIVE |
-| `note` | RETIRED language-wide at 0.1 — renamed `description=` (`DESCRIPTION-KEY-SPELLING`: IEEE 1685's spelling; the name is reserved for the v0.2 DRAWN annotation keyword, §9 `ANNOTATION-LOCATOR-SPLIT`) | *(no acceptor; every directive rejects)* | NORMATIVE (diagnostic) |
+| `note` | the DRAWN annotation: authored prose the human reader must SEE, quoted (`QUOTING-RULES`) and rendered as a UML-style folded-corner box beside its carrier. **Requires `figdown 0.3`** — under `0.1`/`0.2` the spelling is still the retired one that meant `description=`, and writing it there is a line error naming the version. Retired at 0.1 (`DESCRIPTION-KEY-SPELLING`) *in order to reserve the name*, revived at 0.3 (`DRAWN-ANNOTATION-FORM`) under SYNTAX-STYLE RULE 4.9, which is why this is a reservation cashed and not a decision reversed. The author does not place the box (`DOMAIN-CONVENTION-DIRECTIVES`, §2.9); on `field` it is refused at every version, naming the audience division below | `node` (incl. `process`/`decision`/`terminator`) `state` `group` `edge` `flowline` `transition` `title` | NORMATIVE |
 | `present` | the field's presence CONDITION as authored prose, quoted and MANDATORY. Tri-state (§12.3): key absent = no presence claim; `present=""` = conditional, condition not stated; `present="C = 1"` = conditional, condition stated. Quotable, never parsable (§12.7) | `field` | NORMATIVE |
 | `numbering` | `lsb0`\|`msb0` (REQUIRED, §4.1) | `bitfield` | NORMATIVE |
-| `plane` | id of a declared `plane` | `node` `group` `external` `edge` `bundle` `threshold` `band` `class` | EXPERIMENTAL |
+| `plane` | **WITHDRAWN from the language at 0.3 (`PAINT-ORDER-CONSTRUCT`)** with the `plane` keyword that declared its only legal values (b′). Was the id of a declared plane, on `node` `group` `external` `edge` `bundle` `threshold` `band` `class`. NO replacement: the correct action is to delete the key, and doing so does not change the rendered output — paint order is document order (§2.4). `external` took this key and no other, so it now takes none | *(no acceptor; every directive rejects)* | NORMATIVE (diagnostic) |
 | `points` | WITHDRAWN language-wide at 0.1 (`EDGE-GEOMETRY-CONSTRUCTS`) — removed with the `path` directive, **not renamed**, so there is no spelling to migrate to. Author waypoints are outside the stable prior-art intersection (§9, `EDGE-IDENTITY-AND-GEOMETRY`) | *(no acceptor; every directive rejects)* | NORMATIVE (diagnostic) |
 | `routing` | WITHDRAWN language-wide at 0.1 (`EDGE-GEOMETRY-CONSTRUCTS`) — the mode set (`orthogonal`\|`straight`) and its two scopes ARE inside the intersection, and the key goes anyway on evidence and implementation, with **no replacement** (§9, `EDGE-IDENTITY-AND-GEOMETRY`) | *(no acceptor; every directive rejects)* | NORMATIVE (diagnostic) |
 | `shape` | §2.1 shape enum (6 values; `cloud` RETIRED at 0.1 — see below) | `node` (incl. `process`/`decision`/`terminator`, where it overrides the DERIVED geometry and never the role — `FLOWCHART-ROLE-KEYWORDS`) | NORMATIVE |
@@ -2869,13 +3330,43 @@ and only its error text remains.
 | `height` | same as `width` | `pin` · `node` (diagnostic only) | NORMATIVE |
 | `w` | RETIRED language-wide at 0.1 — see below | *(no acceptor; every directive rejects)* | NORMATIVE (diagnostic) |
 | `h` | RETIRED language-wide at 0.1 — see below | *(no acceptor; every directive rejects)* | NORMATIVE (diagnostic) |
-| `z-index` | integer paint order (CSS's spelling in full, RULE 4.2) | `plane` | EXPERIMENTAL |
-| `z` | RETIRED 0.1 — renamed `z-index=` | *(no acceptor; every directive rejects)* | NORMATIVE (diagnostic) |
+| `z-index` | **WITHDRAWN from the language at 0.3 (`PAINT-ORDER-CONSTRUCT`)** with its only host directive `plane`. Was an integer paint order, CSS's spelling in full (RULE 4.2). NO replacement | *(no acceptor; every directive rejects)* | NORMATIVE (diagnostic) |
+| `z` | RETIRED 0.1 — renamed `z-index=` (`Z-ORDER-KEY-NAMING`) — and `z-index=` was itself **WITHDRAWN** at 0.3 (`PAINT-ORDER-CONSTRUCT`), so the message states the whole chain `z=` → `z-index=` → withdrawn and names NO live replacement, the same repair the `layer` row carries | *(no acceptor; every directive rejects)* | NORMATIVE (diagnostic) |
 | `kind` | RETIRED language-wide at 0.1 — on a `node` use `shape=`, on a `chart` use `type=`; one spelling was retired on `node` and live on `plot` at once, inside one namespace | *(no acceptor; every directive rejects)* | NORMATIVE (diagnostic) |
 | `label` | RETIRED, see below | `edge` | NORMATIVE (diagnostic) |
 | `taillabel` | RETIRED, see below | `edge` | NORMATIVE (diagnostic) |
 | `headlabel` | RETIRED, see below | `edge` | NORMATIVE (diagnostic) |
 | `level` | RETIRED language-wide at 0.1 — **DELETED, not renamed** (`CHART-LEVEL-KEY`): it drew a reference plane through a 3-D bar chart, with zero uses corpus-wide, zero 3-D bar charts and zero requests; it was the only construct whose caption the ENGINE wrote rather than the author, and its `parseFloat` grammar uniquely accepted `1e3` where every other number in the language is `\d+(\.\d+)?` | *(no acceptor; every directive rejects)* | NORMATIVE (diagnostic) |
+
+**`description=` and `note=` divide by AUDIENCE, and the division is
+written here rather than left to be inferred (`DRAWN-ANNOTATION-FORM`).** Two
+keys carrying authored prose invite exactly one mistake — reading them as
+a long form and a short form of one channel — and a later reader who makes
+it will try to merge them. They are not two spellings of one thing:
+
+| key | audience | draws | acceptor |
+|---|---|---|---|
+| `description=` | **the machine** | no — an SVG `<title>` tooltip and nothing else | `field` — unchanged |
+| `note=` | **the human** | **yes** | the ten directives listed above |
+
+Writing **both on one element is legal and meaningful** — a long
+machine-facing description beside a short drawn aside is the case the
+division exists to serve — and **neither is a fallback for the other**.
+An engine may not substitute one when the other is absent, an author may
+not reach for `description=` to get ink, and a reader may not treat a
+`note=` as a tooltip that happens to be visible.
+
+**The machine-readable-only channel is an ASSET, not an untidiness.** This
+standard's thesis is *one source, two readers*, and a channel addressed to
+exactly one of them is what that thesis predicts, not a defect in it: it
+lets an author carry a register's full IP-XACT description, a conformance
+caveat or a provenance line without spending ink a human reader did not ask
+for. Merging the two would force every machine-facing fact onto the page,
+and `description=`'s own instruction — *a fact a human must SEE belongs in
+the label or a `class` meaning* — would lose the counterpart that makes it
+an instruction rather than a prohibition. That
+counterpart has a name, and the instruction reads: put it in the label, in
+a `class` meaning, or in a `note=`.
 
 `in=` is **NORMATIVE**, not split: it is registered on the normative `node`
 and on the demoted `threshold`/`band`, and the parenthetical in the status
@@ -2909,12 +3400,12 @@ diagnostic instead of the generic `unknown option`:
 `bundle` (→ `stroke=`, 0.1, `INTERIOR-LESS-ELEMENT-PAINT`: no interior, so the two keys named
 one channel) —
 2 + 3 + 2 + 1 + 3 = 11 (key, directive) pairs; the count is per
-registration. It was twenty-four until this release, when `color=` moved to
+registration. It was twenty-four until 0.1, when `color=` moved to
 the language-wide list below and took its thirteen per-directive
 registrations with it — a key that left the LANGUAGE fires wherever it
 appears and needs no per-directive registration at all. It was twenty-five
-until this release, when `kind=` made the same move. (This count read
-**seven**, and those two read twenty and twenty-one, until this release: the
+until 0.1, when `kind=` made the same move. (This count read
+**seven**, and those two read twenty and twenty-one, until 0.1: the
 `at=` and the three `fill=` registrations were named elsewhere in this
 section — in the straddle note above and in the key table — but had never
 been entered here.)
@@ -2927,24 +3418,28 @@ pinned by `910-errors-retired-shape-cloud` in the NORMATIVE corpus. It
 does not change the eleven above. `type=bars3d` (renamed `bar3d`) is a second retired value and is counted the same way.
 
 Retired **KEYS** sit alongside them for the same reason, and are also
-counted separately — **nineteen** of them: `w=`, `h=` and `dir=`, `text=` and `z=`,
+counted separately — **eighteen** of them: `w=`, `h=` and `dir=`, `text=` and `z=`,
 `kind=` `layer=` `labels=` `unit=` `via=` `src=` `dst=`,
 `level=` (0.1 — DELETED rather than renamed, so its message names
 no replacement), `color=` (`COLOUR-KEY-STATUS` — retired with no
-replacement, and the one message that must name TWO eras), `note=`
-(`DESCRIPTION-KEY-SPELLING` — renamed `description=`) and the four WITHDRAWN (`points=` `tailport=` `headport=` `routing=`, `EDGE-GEOMETRY-CONSTRUCTS`). They
+replacement, and the one message that must name TWO eras) and the four
+WITHDRAWN (`points=` `tailport=` `headport=` `routing=`,
+`EDGE-GEOMETRY-CONSTRUCTS`). They
 are not (key, directive) pairs because they left the LANGUAGE, not a
 directive — no directive accepts them, so the message fires wherever the
 key appears, the `colw` → `width` precedent. `911-errors-retired-option-keys`
 pins the 0.1 three in the NORMATIVE corpus. (This list read
-**fourteen** until this release, having stopped: `note=` and
+**fourteen** until 0.1, having stopped at 0.1: `note=` and
 the four withdrawals were added to the language-wide row of the namespace
-table above — which has said **19** — but never here.
-Nineteen is the engine's own table, key for key.) Moving to this list
+table above — which said **19** — but never here. It read
+**nineteen** until this release, when `note=` LEFT this list
+in the one direction no key had taken before: `DRAWN-ANNOTATION-FORM` revived it as a live
+key, so it no longer fires anywhere and no longer has a message to count.
+Eighteen is the engine's own table, key for key.) Moving to this list
 DOES change the per-registration count, and twice: `kind=` on `node` left
 it, and `color=`'s thirteen per-directive registrations left
 it — which is the whole of the 24 → 11 drop. (`w=`/`h=` on
-`node` were two of the count before this release and `width=`/`height=` on
+`node` were two of the count before 0.1 and `width=`/`height=` on
 `node` are the same two now, so that move was neutral.)
 
 Eight of the eleven messages are pinned by a case in the
@@ -2961,10 +3456,10 @@ rule still makes them NORMATIVE (diagnostic) — a retired spelling is gone,
 which is the opposite of unconverged — but the pin is not currently in
 the normative corpus, and this sentence says so rather than claiming a
 coverage that does not exist.
-`width=`/`height=` are live on `pin` (on `size` until this release);
+`width=`/`height=` are live on `pin` (on `size` until 0.1);
 `type=` is live only on the experimental `chart`, outside
-the v0.1 conformance surface (`level=` was its sibling there until this release deleted it, `CHART-LEVEL-KEY`). `fill=` was registered for the same
-reason until this release and left the registry with the `fill` → `band`
+the v0.1 conformance surface (`level=` was its sibling there until 0.1 deleted it, `CHART-LEVEL-KEY`). `fill=` was registered for the same
+reason until 0.1 and left the registry with the `fill` → `band`
 keyword rename; it came BACK, as the live spelling
 `color=` was renamed to. That is the declared `UNSAFE-DEFAULT-ELIMINATION` exception recorded
 above: `fill` is a retired keyword and a live option key at the same
@@ -3019,10 +3514,10 @@ addition and to the hundredth alike.
 document       = *insignificant header *line
 insignificant  = comment-line / blank-line
 header         = "figdown" SP version SP genre eol
-version        = "0.1" / "0.2"            ; wire major.minor token only
+version        = "0.1" / "0.2" / "0.3"    ; wire major.minor token only
 genre          = "block" / "topology" / "flowchart"
                / "bitfield" / "table" / "timing"
-               / "statechart"             ; version "0.2" only (STATECHART-GENRE-SCOPE)
+               / "statechart"             ; version "0.2" and up (STATECHART-GENRE-SCOPE)
 line           = directive-line / table-row / insignificant
 directive-line = keyword *(SP argument) [SP comment] eol
 argument       = qstring / option / bare-token
@@ -3154,9 +3649,10 @@ fields are **omitted** when the condition does not hold — see §12.3.
 |---|---|---|---|
 | `header` | object | always | §12.2 *Header* |
 | `title` | string | when a `title` line is written | the figure's title (§1); the text is semantic whether or not a renderer draws it (§7). `title ""` is written, so the key is present and empty (§12.3) |
+| `note` | string | when the `title` line carries `note=` | the FIGURE-LEVEL drawn annotation (§2.9, 0.3, `DRAWN-ANNOTATION-FORM`) — an aside about the figure as a whole, with no element to attach to. It is a document key rather than a member of a `notes` array because there is at most one: `title` is single-valued per section (`REPEATED-DIRECTIVE-HANDLING`, §8.1), so its option is too. Reading rule in §12.7; it is prose, never structure |
 | `flow` | `"right"`\|`"down"`\|`"left"`\|`"up"` | always | the reading axis (§3), materialized from the genre default when no `flow` line is written |
 | `classes` | array of *Class* | always (MAY be empty) | §2.7 |
-| `planes` | array of *Plane* | always, never empty | the ARRAY is NORMATIVE: `planes[0]` is always the implicit `base` plane. A DECLARED plane is EXPERIMENTAL — §2.4, [experimental.md](experimental.md) §E1. Spelled `layers` until 0.1 (`PLANE-KEYWORD-SPELLING`) |
+| `planes` | array of *Plane* | always, exactly one entry | wholly NORMATIVE since 0.3: it holds the implicit `base` and nothing else, because `PAINT-ORDER-CONSTRUCT` withdrew the only directive that could declare a second (§2.4). Spelled `layers` until 0.1 (`PLANE-KEYWORD-SPELLING`) |
 | `nodes` | array of *Node* | always (MAY be empty) | §2.1 |
 | `groups` | array of *Group* | always (MAY be empty) | §2.2 |
 | `externals` | array of *External* | when the document declares at least one `external` | §2.8. Spelled `boundaries` until 0.1 (`EXTERNAL-ENDPOINT-NAMING`) |
@@ -3170,7 +3666,7 @@ fields are **omitted** when the condition does not hold — see §12.3.
 
 **Correction: `thresholds`, `bands` and `bundles` are NOT
 empty everywhere on the normative surface.** The three rows above said
-"empty on the normative surface" until this release, and it
+"empty on the normative surface" until 0.1, and it
 was **false**. Measured against `conformance/cases/`: `115-lex-option-
 before-label` and `304-presentation-on-every-element` carry a non-empty
 `thresholds`, `bands` AND `bundles`; `214-label-absent-vs-id` and
@@ -3192,8 +3688,8 @@ exceptions rather than unconditionally.
 
 | key | type | present | meaning |
 |---|---|---|---|
-| `version` | string | always | the wire-grammar version **as the document declared it** — `"0.1"` or `"0.2"` (§1). It stopped being a constant at `STATECHART-GENRE-SCOPE`: while exactly one version existed, "emit the literal `\"0.1\"`" and "copy the source token" were the same instruction, and they are not any more. **An engine MUST emit the token the header declared**, never the newest version it implements and never the one it would have preferred — the declared version is the contract the author wrote against, and §13.7 forbids a reader inferring it from anything else. It is NOT the dev increment (0.1), which appears in a rendered artifact's `data-engine-version` and never in the model (§12.6). Stated normatively at 0.1; it was a hard-coded constant in `conformance/normalize.js` until `STATECHART-GENRE-SCOPE` |
-| `genre` | string | always | one of the genre tokens legal at `version` (§1) — the six of `figdown 0.1`, or those plus `statechart` at `figdown 0.2`. REQUIRED in the source since 0.1, so it can be absent only from a document that failed to parse. Since `GENRE-NAMESPACE` it also names the NAMESPACE the document's top-level keywords belong to — a consumer resolves every non-core keyword against it (§1 `GENRE-NAMESPACE`, §12.7) |
+| `version` | string | always | the wire-grammar version **as the document declared it** — `"0.1"`, `"0.2"` or `"0.3"` (§1; `"0.3"` since 0.3, §13.7). It stopped being a constant at `STATECHART-GENRE-SCOPE`: while exactly one version existed, "emit the literal `\"0.1\"`" and "copy the source token" were the same instruction, and they are not any more. **An engine MUST emit the token the header declared**, never the newest version it implements and never the one it would have preferred — the declared version is the contract the author wrote against, and §13.7 forbids a reader inferring it from anything else. It is NOT the dev increment (0.1), which appears in a rendered artifact's `data-engine-version` and never in the model (§12.6). Stated normatively at 0.1; it was a hard-coded constant in `conformance/normalize.js` until `STATECHART-GENRE-SCOPE` |
+| `genre` | string | always | one of the genre tokens legal at `version` (§1) — the six of `figdown 0.1`, or those plus `statechart` at `figdown 0.2` and `figdown 0.3` (0.3 added an option key, no genre). REQUIRED in the source since 0.1, so it can be absent only from a document that failed to parse. Since `GENRE-NAMESPACE` it also names the NAMESPACE the document's top-level keywords belong to — a consumer resolves every non-core keyword against it (§1 `GENRE-NAMESPACE`, §12.7) |
 
 **Class** — `class` (§2.7).
 
@@ -3202,27 +3698,26 @@ exceptions rather than unconditionally.
 | `id` | string | always | the class id; its own namespace |
 | `meaning` | string | always | the human- and machine-readable meaning. The FIELD is mandatory on the directive, so the key is never absent — but its VALUE may be the empty string, which is a written value meaning *no meaning is claimed* (§2.7, `EMPTY-LABEL-STATE`/`CLASS-EMPTY-MEANING`). `""` MUST be recorded as `""`; normalizing it to an omitted key would destroy the distinction `EMPTY-LABEL-STATE` exists to preserve |
 | `fill` `stroke` `style` | string | when written | presentation defaults the class offers its members (§5) |
-| `plane` | string | when written | a declared plane id |
 | `line` | number | always | 1-based source line |
 
-**Plane** — the implicit `base`, plus (EXPERIMENTAL) any plane a `plane` line
-declares. The `plane` KEYWORD is EXPERIMENTAL (`CONSTRUCT-STATUS-TIERS`) and is
-defined in [experimental.md](experimental.md) §E1; the `planes` ARRAY is
-not — it is always present and never empty, and in a document that declares
-no plane it holds exactly the implicit `base`,
-`planes[0] = {id:"base", z:0}`. A reader restricted to the normative surface
-meets that one object and nothing else.
+**Plane** — the implicit `base`, and nothing else. The
+element is **wholly NORMATIVE**: `PAINT-ORDER-CONSTRUCT` withdrew the `plane` keyword, so no
+document can declare one, and `planes` is always present and always holds
+exactly `planes[0] = {id:"base", z:0}`. Every reader meets that one
+object and no other, whether or not they stay on the normative surface.
 
 | key | type | present | meaning |
 |---|---|---|---|
-| `id` | string | always | the plane id; `"base"` for the implicit plane |
-| `label` | string | when written | descriptive only; nothing reads it. Only a `plane` line can write one, so this key is EXPERIMENTAL |
-| `z` | number (integer) | always | paint order among planes; `0` for the implicit `base`. The default for a DECLARED plane is EXPERIMENTAL — [experimental.md](experimental.md) §E1 |
+| `id` | string | always | `"base"` — the only plane id the language can produce |
+| `z` | number (integer) | always | `0`. Paint order among elements is DOCUMENT ORDER: a later line paints on top |
 
-A *Plane* carries **no** `line`: the engine records none. Declaration
-order is preserved by array position, which is also what the default `z`
-counts. The element and its model field were named `Layer`/`layer` until this release (`PLANE-KEYWORD-SPELLING`); a model key rename is normative (`NORMATIVE-SEMANTIC-MODEL`), so a second
-implementation emits `plane`.
+A *Plane* carries **no** `line`: the engine records none, and the one
+plane is never declared. The `label` key left the element with the
+keyword — only a `plane` line could write one — and so did the positional
+`z` default (`PLANE-Z-INDEX-DEFAULT`), which counted declared planes. The element and its
+model field were named `Layer`/`layer` until 0.1 (`PLANE-KEYWORD-SPELLING`); a model
+key rename is normative (`NORMATIVE-SEMANTIC-MODEL`), so a second implementation emits
+`plane`.
 
 **Node** — `node`, and (under `flowchart` only) `process` / `decision` /
 `terminator` (§2.1; [genres/experimental/flowchart.md](genres/experimental/flowchart.md) §Roles).
@@ -3237,6 +3732,7 @@ implementation emits `plane`.
 | `plane` | string | always | materialized default `"base"` |
 | `fill` `stroke` `style` | string | when written | §5 |
 | `class` | **array of string** | when written | **references** to declared classes, never their resolved values (§12.6). Always an array, even for one class: `class=hot` emits `["hot"]`, because `class=` is multi-valued (`class=a,b`) and a consumer must not have to branch on arity (§12.5) |
+| `note` | string | when written | the DRAWN annotation attached to this node (§2.9, 0.3, `DRAWN-ANNOTATION-FORM`). Prose, never structure — §12.7. The same key and the same rule apply to the `flowchart` roles `process`/`decision`/`terminator` and to the `statechart` `state`, which are Nodes in the model |
 | `line` | number | always | 1-based source line |
 
 **Group** — `group` (§2.2).
@@ -3246,22 +3742,21 @@ implementation emits `plane`.
 | `id` | string | always | unique in the shared id namespace |
 | `label` | string | when written | §12.3 |
 | `gap` | number | when written | member spacing in px (presentation) |
-| `plane` | string | when written | **not** materialized — unlike `node`/`edge` (§12.4) |
 | `fill` `stroke` `style` | string | when written | §5 |
 | `class` | **array of string** | when written | class references, always an array (§12.5) — `class=hot` emits `["hot"]` |
+| `note` | string | when written | the DRAWN annotation attached to this group (§2.9, `DRAWN-ANNOTATION-FORM`) — prose, never structure (§12.7) |
 | `line` | number | always | 1-based source line |
 
 Group membership is recorded **on the member**, as `node.group`. A
 *Group* holds no child list.
 
 **External** — `external` (§2.8). The element and the top-level array
-were named `Boundary`/`boundaries` until this release (`EXTERNAL-ENDPOINT-NAMING`).
+were named `Boundary`/`boundaries` until 0.1 (`EXTERNAL-ENDPOINT-NAMING`).
 
 | key | type | present | meaning |
 |---|---|---|---|
 | `id` | string | always | unique in the shared id namespace |
-| `label` | string | when written | no id fallback: an unlabelled external endpoint draws no text, and so does `""` (§12.3). An external carries NO presentation key at all since 0.1: `color=` was the only one it took and it is retired (`COLOUR-KEY-STATUS`) |
-| `plane` | string | when written | **not** materialized |
+| `label` | string | when written | no id fallback: an unlabelled external endpoint draws no text, and so does `""` (§12.3). An external carries NO presentation key at all since 0.1: `color=` was the only one it took and it is retired (`COLOUR-KEY-STATUS`), and NO option key at all since 0.3: `plane=` was the last one and `PAINT-ORDER-CONSTRUCT` withdrew it |
 | `line` | number | always | 1-based source line |
 
 **Edge** — `edge` (§2.3).
@@ -3272,9 +3767,10 @@ were named `Boundary`/`boundaries` until this release (`EXTERNAL-ENDPOINT-NAMING
 | `op` | `"--"`\|`"->"`\|`"<-"`\|`"<->"` | always | the operator **as written**; the direction of the relationship is derived from it (§12.4) |
 | `b` | string | always | the SECOND endpoint **as written** |
 | `tail` `mid` `head` | string | when written | the three label positions (§2.3) |
-| `plane` | string | always | materialized default `"base"` |
+| `plane` | string | always | materialized `"base"`, and now that is its only value (§2.4) |
 | `stroke` `style` | string | when written | §5. There is **no** `fill`: an edge has no interior, so `fill=` is a line error naming `stroke=` (§5, `INTERIOR-LESS-ELEMENT-PAINT`) |
 | `class` | **array of string** | when written | class references, always an array (§12.5) — `class=hot` emits `["hot"]` |
+| `note` | string | when written | the DRAWN annotation attached to this connector (§2.9, `DRAWN-ANNOTATION-FORM`) — prose, never structure (§12.7). It is **not** a fourth label position: a label is ON the edge and a note is BESIDE it, and the note is the only channel that reaches an edge at all, since an edge has no id. The same key applies to the `flowchart` `flowline` and the `statechart` `transition`, which are Edges in the model |
 | `line` | number | always | 1-based source line |
 
 **Rank** — `rank` (§3).
@@ -3322,13 +3818,13 @@ directive.
 
 **Region** — the nested genre regions of §4, discriminated by `genre`.
 Regions appear in `regions` in document order. (`regions`/`genre` were
-spelled `blocks`/`type` until this release; the array held the same objects.
+spelled `blocks`/`type` until 0.1; the array held the same objects.
 The pair now says what a region IS: `GENRE-NAMESPACE` `GENRE-COMPOSITION` defines a nested `bitfield`,
 `table` or `timing` as a region governed by THAT genre's namespace, and the
 discriminator names exactly that genre. `chart` (§4.4) is the one value
 that is not a header genre; it is EXPERIMENTAL and outside the
 conformance surface, so a normative-surface reader never meets it. The
-value was `"plot"` until this release, `CHART-BLOCK-NAMING`.)
+value was `"plot"` until 0.1, `CHART-BLOCK-NAMING`.)
 
 *bitfield* (§4.1, [genres/bitfield.md](genres/bitfield.md)):
 
@@ -3348,7 +3844,7 @@ A `fields` member is either a **field** — `name` (string), `width`
 (**string**, when written), `index` (**object**, when written),
 `fill` `stroke` `class` `description` (when
 written), `line` — or a **break marker**, which carries exactly
-`break: true` and `line` (spelled `wrap` until this release, `ROW-BREAK-NAMING`). A field
+`break: true` and `line` (spelled `wrap` until 0.1, `ROW-BREAK-NAMING`). A field
 carries **no `style`** (`STYLE-KEY-SCOPE`): the dash is conditional
 presence's only carrier and nothing else may set or clear it.
 
@@ -3374,7 +3870,7 @@ materialized: the element COUNT is not a model member, for exactly the reason
 `first` and `last`, which the model does carry.
 
 **Three properties of the written range are normative, and each was left
-unstated until this release:**
+unstated until 0.1:**
 
 1. **Whitespace around `..` is not significant.** `index="0 .. 7"` is
    `index=0..7`; the ends are trimmed. It is reachable only in the QUOTED
@@ -3382,7 +3878,7 @@ unstated until this release:**
    The source is Ada (ISO/IEC 8652), which writes `1 .. 10`. Pinned by
    conformance case `420-bitfield-index-tristate`.
 2. **The separator is EXACTLY two dots.** A dot run longer than two is a
-   line error, not a separator followed by prose. Until this release the rule
+   line error, not a separator followed by prose. Until 0.1 the rule
    was stated only as "one `..`, and both ends present", and `index=0...7`
    satisfied its letter — splitting into two parts and recording
    `{"first": 0, "last": ".7"}`, a model the source does not say.
@@ -3429,7 +3925,7 @@ document emits no model at all — so the two rules currently select the
 same documents. It is stated anyway because it is the rule an
 implementation must **code**: emit the key when the array is non-empty,
 never `[]` and never `null`. The rows read "when at least one … line is
-written" until this release, which described the same behaviour by the
+written" until 0.1, which described the same behaviour by the
 wrong test; the emptiness test is what `conformance/normalize.js`
 implements and what the goldens pin. Contrast the document-level
 `thresholds` / `bands` / `bundles` / `ranks` / `pins` / `regions`, which
@@ -3461,14 +3957,14 @@ when the address is a header tier), `row`, `col`, `fill`, `stroke` and
 A *Signal* carries `name`, `lane` (the raw lane string — one character
 per cycle, over the closed alphabet `[01pnx=.]`), `data` (array, when
 `data=` is written; spelled `labels` in both the source and the model
-until this release, `SIGNAL-DATA-KEY-SPELLING`), and `fill`/`stroke` when written. A *Signal*
+until 0.1, `SIGNAL-DATA-KEY-SPELLING`), and `fill`/`stroke` when written. A *Signal*
 carries **no `style`** (`STYLE-KEY-SCOPE`), and **no** `line`: the
 engine records none, and lane order is carried by array position.
 
 *chart* (§4.4) is EXPERIMENTAL and outside the v0.1 conformance surface.
 Its shape is `genre: "chart"`, `table` (the referenced table id), `type`,
 and `line` (`level` was deleted, `CHART-LEVEL-KEY`). The genre value was `"plot"` and the
-type field `kind` until this release (`CHART-BLOCK-NAMING`).
+type field `kind` until 0.1 (`CHART-BLOCK-NAMING`).
 
 ### 12.3 Absent is omitted, and absence is meaning
 
@@ -3492,17 +3988,15 @@ omitted-when-absent fields are:
 - `title` at document level, and the whole `externals` array
   when no `external` is declared. Every other top-level collection is present even
   when empty — the document shape is fixed. (`routing` and `paths` were
-  the other two entries here until this release, when `EDGE-GEOMETRY-CONSTRUCTS` removed both keys
+  the other two entries here until 0.1, when `EDGE-GEOMETRY-CONSTRUCTS` removed both keys
   from the model outright.)
 - The optional **label** of `node`, `group`, `bundle`, `external`,
-  `plane`, `bitfield`, `table` and `timing`. (`class`'s `meaning` and a
+  `bitfield`, `table` and `timing`. (`class`'s `meaning` and a
   the `threshold` and `band` labels are MANDATORY on their directives and so are always
   present.)
 - `fill`, `stroke`, `style` wherever §5 accepts them (0.1: `style`
   is no longer accepted on `field`, `cell` or `signal` — `STYLE-KEY-SCOPE`), and
   `class` on `node`, `group`, `edge`, `field` and the `cell` mark.
-- `plane` on `group`, `external`, `bundle`, `threshold`, `band` and `class`.
-  (`node` and `edge` are the exception — see §12.4.)
 - `node.group` (absent when no `in=`), `group.gap`, edge `tail`/`mid`/
   `head`, `pin.x`/`pin.y` (together — `at=` is a point) and
   `pin.width`/`pin.height` individually.
@@ -3532,7 +4026,7 @@ things it is entitled to know.
 
 **Absence in the SOURCE — and the one place v0.1 has it.** Everything above
 is about absence in the MODEL. There is exactly one construct in v0.1 where
-absence in the *source text* carries meaning, and until this release this
+absence in the *source text* carries meaning, and until 0.1 this
 enumeration did not name it:
 
 > **A table pipe row's cell is a COLSPAN when its raw segment is EMPTY —
@@ -3555,10 +4049,14 @@ language change in a frozen genre.
 **The empty string is a written value.** The rule above distinguishes
 *absent* from *written*; an explicitly empty label is *written*, and it
 is a third state (`EMPTY-LABEL-STATE`). `node a ""`, `group g ""`, `bundle b ""`,
-`external x ""`, `plane L ""`, `title ""` and the typed blocks
+`external x ""`, `title ""` and the typed blocks
 `bitfield` / `table` / `timing` all record `label: ""` — never the omitted
 key. A consumer that tests truthiness rather than key presence merges
-two distinguishable documents and is non-conforming.
+two distinguishable documents and is non-conforming. (`plane L ""` was on <!-- fence-check: skip -->
+this site list until this release, when `PAINT-ORDER-CONSTRUCT` withdrew the keyword; the
+eleventh site, `field ""`, is the `bitfield` genre's own name slot and is
+stated in [genres/bitfield.md](genres/bitfield.md), because what it draws
+— an unnamed CELL — is not what any of the others draw.)
 
 The reason is `READ-SIDE-DETERMINISM`'s own premise: writing `""` is a distinction the
 author made, and the model must not destroy it. It is also the only way
@@ -3587,8 +4085,7 @@ The list is exhaustive for v0.1.
    | `flow` | the genre default — `"down"` for `flowchart`, `"right"` for the other five — unless a `flow` line overrides it | §1, `GENRE-NAMESPACE` `PER-GENRE-DEFAULTS` |
    | `node.shape` | `"box"` | §2.1 |
    | `node.plane`, `edge.plane` | `"base"` | §2.4 |
-   | `planes[0]` | the implicit base plane `{id: "base", z: 0}`, always first, never declared | §2.4, `PLANE-Z-INDEX-DEFAULT` |
-   | `plane.z` | see rule 2 | §2.4, `PLANE-Z-INDEX-DEFAULT`/`READ-SIDE-DETERMINISM` |
+   | `planes[0]` | the implicit base plane `{id: "base", z: 0}`, always first, never declared, and since 0.3 the only entry (§2.4, `PAINT-ORDER-CONSTRUCT`) | §2.4, `PLANE-Z-INDEX-DEFAULT` |
    | `band.extend` | `"up"` | §2.6 |
    | `band.fill` | the renderer's band colour | caveat below |
    | `bitfield.word` | `32` | §4.1 |
@@ -3599,25 +4096,33 @@ The list is exhaustive for v0.1.
    asserts a falsehood (`UNSAFE-DEFAULT-ELIMINATION` §3).
 
    `band.fill` is the one entry that breaks `READ-SIDE-DETERMINISM`'s rule and is recorded
-   as such (it was misspelled `band.color` in this table until this release;
+   as such (it was misspelled `band.color` in this table until 0.1;
    the model key has always been `fill`): the engine resolves it before the model exists, so a band
    that wrote no `fill=` is indistinguishable from one that wrote the
    default value. Frozen in the goldens and noted in
    [conformance/README.md](../conformance/README.md); a v0.2 candidate,
    not a licence.
 
-   `plane=` is materialized only on `node` and `edge`. On `group`,
-   `external`, `bundle`, `threshold`, `band` and `class` it is omitted when
-   absent. The asymmetry is the reference engine's; it is stated here so
-   a second implementation reproduces it exactly rather than guessing.
-   Uniformity is a v0.2 candidate.
+   `node.plane` and `edge.plane` are the last two materializations of a
+   key the source can no longer write: `plane=` is withdrawn (`PAINT-ORDER-CONSTRUCT`,
+   §2.4), so the value is always `"base"` and the parser supplies it. The
+   asymmetry this rule used to record — materialized on `node` and `edge`,
+   omitted when absent on `group`, `external`, `bundle`, `threshold`,
+   `band` and `class` — is **discharged** by the withdrawal, because there
+   is no longer an absent case to differ about. The two keys are kept in
+   the model rather than dropped, since removing them would be a model
+   change under `NORMATIVE-SEMANTIC-MODEL` and they carry a true fact: every element is painted
+   in the one plane there is.
 
-2. **Default `z`.** The implicit `base` plane is `z = 0`. A `plane` line
-   without `z-index=` takes its 1-based position among the DECLARED planes in
-   document order (`base` excluded). An explicit `z-index=` overrides for its
-   own line only and does not shift its neighbours, so
-   `plane a` / `plane b z-index=10` / `plane c` yields model `z` = 1, 10, 3. Values
-   need be neither unique nor contiguous; ties keep document order.
+2. **Default `z` — DISCHARGED (`PAINT-ORDER-CONSTRUCT`).** The implicit `base`
+   plane is `z = 0` and it is the only plane, so there is nothing left to
+   order. Until this release a `plane` line without `z-index=` took its
+   1-based position among the DECLARED planes in document order, an
+   explicit `z-index=` overrode that for its own line without shifting its
+   neighbours, and `z` values needed be neither unique nor contiguous with
+   ties keeping document order. The rule number is kept rather than closed
+   up so that every citation of rules 3–7 still resolves; what replaces it
+   is the one-line invariant in rule 6, **document order is paint order**.
    (§2.4, `PLANE-Z-INDEX-DEFAULT`/`READ-SIDE-DETERMINISM`.)
 
 3. **Edge direction is derived, and the written form is preserved.** The
@@ -3636,10 +4141,11 @@ The list is exhaustive for v0.1.
 4. **No inheritance, no resolution, one scope.** The model is flat.
    `class=` is recorded as a reference and its presentation values are
    NEVER copied onto the member; `in=` is recorded on the member as
-   `node.group` and never as a child list on the group; `plane=` is
-   recorded on the element and never distributed from the `plane` line.
-   No directive's attributes flow to any other line. The language has
-   exactly one scope, rule 5.
+   `node.group` and never as a child list on the group. No directive's
+   attributes flow to any other line. The language has exactly one scope,
+   rule 5. (`plane=` was the third example here, recorded on the element
+   and never distributed from the `plane` line, until `PAINT-ORDER-CONSTRUCT` withdrew both
+   halves.)
 
 5. **Typed-block child scope is sticky.** A child directive attaches to
    the nearest preceding block of a kind that accepts it: `field` and
@@ -3653,15 +4159,19 @@ The list is exhaustive for v0.1.
 
 6. **Document order, and the `line` field.** Every array is in document
    order. `pins` is keyed by id in the engine and is
-   emitted **sorted by source line**, which is the same thing. Within a
-   plane, document order is paint order — a later line paints on top
-   (§2.4).
+   emitted **sorted by source line**, which is the same thing.
+   **Document order is paint order** — a later line paints on top — and
+   that holds without qualification, because there is
+   one plane and no `z` to consult (§2.4, `PAINT-ORDER-CONSTRUCT`).
 
    Every element carries `line`, its **1-based source line number**, and
    that is what makes global document order recoverable across the
    per-kind arrays. Three element kinds carry no `line` because the
-   engine records none — `plane`, timing `signal`, and a table *Cell* —
-   and for those, array position is the only order information. That
+   engine records none — the implicit `plane`, timing `signal`, and a
+   table *Cell* — and for those, array position is the only order
+   information. The `plane` case is now trivial rather than a genuine
+   asymmetry: there is exactly one, it is never declared, and no source
+   line could carry its number. That
    asymmetry is a v0.2 candidate; it is recorded here because a second
    implementation must reproduce it to byte-compare.
 
@@ -3710,7 +4220,16 @@ implementation is compared against, byte for byte.
   migration entry (`template` → `genre`, 0.1, is the precedent).
 - **Key order**: the emission order of §12.2, top level and per element.
   JSON objects are unordered in principle, but the goldens are compared
-  as bytes, so key order is part of the binding.
+  as bytes, so key order is part of the binding. **`note` emits LAST among
+  an element's content keys, immediately before `line`** — on *Node*,
+  *Group* and *Edge* alike — and at the top level directly after `title`
+  (`DRAWN-ANNOTATION-FORM`). Those are the positions §12.2 lists it in, and both
+  follow one rule: a note is an **aside**, so it sits after everything the
+  element declares about itself and before the source address that is not
+  content at all; at the top level it sits beside the only other
+  figure-wide authored text there is. Appending rather than interleaving
+  also means no `figdown 0.1` or `figdown 0.2` golden moves a byte, since
+  none of them can carry the key.
 - **Array order**: document order, per §12.4 rule 6.
 - **Strings (the numeric-value rule = U)**: the model holds the author's
   text after source escapes are resolved (§12.4 rule 7) — real newlines,
@@ -3774,7 +4293,7 @@ decides which:
 
 Pinned by `013-header-duplicate`, `019-multi-section-stack` and
 `020-multi-section-id-reuse`. The first two were the wrapper's ONLY
-statement in the project until this release — it lived in a comment in
+statement in the project until 0.1 — it lived in a comment in
 `conformance/run.js`, in no normative document and not even in
 `conformance/normalize.js`, so an implementer could emit the wrong
 top-level shape with no way to have known.
@@ -3794,7 +4313,7 @@ for each. They still run and still pass; they simply carry no obligation.
 **Worked example.** This document — deliberately written on the FROZEN
 surface only, so that the model below needs nothing from
 [experimental.md](experimental.md) to be read (0.1; it declared a
-EXPERIMENTAL `plane` until then):
+EXPERIMENTAL `plane` until then, and no document can — `PAINT-ORDER-CONSTRUCT`):
 
 ```figdown
 # provenance: hand-authored
@@ -3896,9 +4415,8 @@ has exactly this model:
 Read it against the rules. The comment above the header is insignificant
 (§1) but still counts a source line, so `class` is `line: 4`. `flow` is
 materialized to `"right"` although no `flow` line exists. `planes` is
-present and holds exactly the implicit `base` at `z: 0` — the document
-declares none, which is what a document on the frozen surface looks like,
-and every element still reports `plane: "base"`. `node lookup` has **no**
+present and holds exactly the implicit `base` at `z: 0` — that is what EVERY document looks like, not merely one on the
+frozen surface, and every element still reports `plane: "base"`. `node lookup` has **no**
 `label` key — the renderer will draw
 "lookup", the model will not claim the author wrote it. The first edge
 keeps `op: "<-"` with `a: "lookup"`, `b: "parse"`: the relationship runs
@@ -3963,7 +4481,7 @@ is outside it:
 
 The test to apply is `GUI-WRITEBACK-STRUCTURE`'s: delete every `pin` line
 and the `layout` opener, then delete every `fill=`,
-`stroke=`, `style=`, `gap=` and `z-index=`. What is left MUST parse,
+`stroke=`, `style=` and `gap=`. What is left MUST parse,
 MUST still render under auto layout, and MUST express the identical
 structure and relationships. What that stripped document says is the
 model's subject matter; `tools/strip-check.js` runs the first half of the
@@ -4031,7 +4549,7 @@ An agent reading a model MAY conclude:
     from drawing geometry (`MEANING-RECOVERY-SOURCE`).
 - **Authored documentation prose (`description=`, 0.1, `DESCRIPTION-KEY-SPELLING`).** A
   `field`'s `description` is authored documentation prose — **quotable and
-  displayable, never parsable**. Until this release the key was spelled
+  displayable, never parsable**. Until 0.1 the key was spelled
   `note` and §12.7 did not list it at all, so a conforming reader was
   forbidden to conclude anything from it: authored content, in the content
   zone, silently discarded. What is licensed is exactly this — quote it,
@@ -4039,11 +4557,31 @@ An agent reading a model MAY conclude:
   structure, no relation and no condition; an agent MUST NOT parse it,
   and MUST NOT read a presence condition out of it (that is what
   `present=` is for, and even there the value is unparsable).
+- **The drawn annotation (`note=`, 0.3, `DRAWN-ANNOTATION-FORM`).** A `note` is
+  authored documentation prose — **quotable and displayable, never
+  parsable**, the `description=` rule above applied to a channel that
+  paints ink. It is an **aside**: its content is commentary about the
+  figure, not a fact about the figure's structure, and the model records
+  the string and nothing else. What is licensed is exactly this: a reader
+  **MAY** attribute a `note` to the element that carries it — `node.note`
+  is about that node, `edge.note` about that connector, `group.note` about
+  that group, and **`doc.note`** (from a `note=` on the `title` line)
+  about the figure as a whole — and a reader **MUST NOT** infer a
+  participant, an edge, a containment, a category or any other structure
+  from it. A note naming a node that is not declared does not declare it;
+  a note describing a relation does not create an edge; a note asserting
+  a kind is not a `class` meaning, which is the one machine-readable
+  category channel (§2.7, `CATEGORICAL-MEANING-MAPPING`). The division that makes this rule coherent
+  is stated in §10: `description=` addresses the machine and draws
+  nothing, `note=` addresses the human and always draws, and **neither is
+  a fallback for the other** — so an agent that finds a `note` where it
+  expected a `description` has found a different channel, not a
+  substitute, and may not read the second obligation out of the first.
 
 - **Absence.** No `label` key means the author wrote no label, and
   `label: ""` means the author wrote an empty one deliberately — two
   different facts, both recoverable (§12.3).
-- **Thresholds and bands (EXPERIMENTAL, §2.6).** Until this release this
+- **Thresholds and bands (EXPERIMENTAL, §2.6).** Until 0.1 this
   list did not mention them at all, and the rule below — "MAY rely on
   §12.7 and MUST NOT infer more" — therefore FORBADE a conforming reader
   to conclude anything from `threshold "fHIGH = PAUSE turn-on threshold"`:
@@ -4064,7 +4602,7 @@ An agent reading a model MAY conclude:
     — and if a distinction exists only in the fraction, the document has
     lost it, and the agent SHOULD say so;
   - a `band` asserts that the region named by its **label** spans that
-    fraction of the target. Before this release a band had no label and
+    fraction of the target. Before 0.1 a band had no label and
     therefore asserted nothing at all (§5, `BAND-LABEL-STATUS`);
   - both constructs are EXPERIMENTAL and outside the compatibility
     promise (§10, `CONSTRUCT-STATUS-TIERS`), so a reader that needs a portable conclusion MUST
@@ -4185,7 +4723,7 @@ An agent MUST NOT infer:
   clause cashed out — `EDGE-GEOMETRY-CONSTRUCTS` **withdrew** both from the language (§10).
   Stability and belonging are different questions, and an agent that needs
   a portable figure must consult §10's status column rather than assume a
-  construct's presence is a promise. Until this release
+  construct's presence is a promise. Until 0.1
   this clause said an agent "must not assume their meaning is
   genre-independent"; that reading is **withdrawn** (`LAYOUT-ZONE-NAMESPACE`).
 - **Status is part of what a reader must carry (`CONSTRUCT-STATUS-TIERS`, §10).** Every
@@ -4578,13 +5116,20 @@ still runnable for anyone who chooses not to move.
   satisfy this; the accepted `figdown X.Y` set is what an author's
   document is checked against.
 
-- **The reference engine's accepted set, stated (`STATECHART-GENRE-SCOPE`).**
+- **The reference engine's accepted set, stated (`STATECHART-GENRE-SCOPE`, 0.2;
+  extended 0.3, `DRAWN-ANNOTATION-FORM`).**
   `editor/figdown.html` and everything generated from it — `dist/`,
   `skill/figdown/figdown.html`, `tools/build-svg.js` — accept **`figdown
-  0.1` and `figdown 0.2`**, and nothing else. Any other version token is
-  `unsupported version "<token>" (expected 0.1 or 0.2)`. The set lives in
-  one constant, `LANG_VERSIONS`, so this sentence and the code cannot
-  drift. The **archived** `v0.1.0` engine (`archive/0.1/figdown.html`)
+  0.1`, `figdown 0.2` and `figdown 0.3`**, and nothing else. Any other
+  version token is
+  `unsupported version "<token>" (expected 0.1 or 0.2 or 0.3)` — the list
+  is the constant joined, so the message grows with the set. The set lives in
+  one constant, `LANG_VERSIONS` — `['0.1','0.2','0.3']` — so this sentence
+  and the code cannot
+  drift. (It said "0.1 and 0.2" from 0.2 to 0.3. The constant
+  is what kept that from becoming a silent lie: the sentence is checked
+  against it whenever the set moves, which is the whole reason the set was
+  put in one place.) The **archived** `v0.1.0` engine (`archive/0.1/figdown.html`)
   accepts `figdown 0.1` alone, which is §13.0.1's `Y` < `y` branch working
   as specified: it rejects a `0.2` document by name rather than guessing.
 
@@ -4622,6 +5167,74 @@ never been exercised. What it did:
   `0.2.0`, which does not exist until the release act. `archive/0.2/` and
   the `0.2` rows of `archive/MANIFEST.tsv` (which cover `read/0.2/` too)
   are written then, by `node tools/archive-check.js --write 0.2`.
+
+#### 13.7.2 The second `Y`, and why one of its two changes is gated
+
+`v0.3.0` is the project's second `Y`. It is smaller than the first and it
+exercises a distinction the first could not: **a `Y` may contain changes
+that need a version gate and changes that do not, and the difference is
+not "new" versus "old".**
+
+- **What it added: one option key and one resolver widening.** The key is
+  `note=`, the drawn annotation, accepted on ten directives including
+  `title` (§2.9, §10, `DRAWN-ANNOTATION-FORM`). The widening is `in=` on `threshold`/`band`
+  resolving a **region** id — a `bitfield`, `table` or `timing` block — in
+  addition to a node or a group (`MARKER-TARGET-KINDS`). No genre, no keyword, no new
+  value shape.
+- **It removed nothing**, which is `Y`'s definition (§13.0). Every
+  `figdown 0.1` and `figdown 0.2` document produces the same model under
+  `v0.3.0` that it produced under `v0.2.0`, and the `figdown 0.1` and
+  `figdown 0.2` goldens pass unmodified. One retirement is *reversed*
+  rather than performed: `note=` was retired and is live
+  again under SYNTAX-STYLE RULE 4.9 (§10). A revival removes nothing —
+  it removes a diagnostic.
+- **Why the LANGUAGE number had to move at all**, and not only the
+  release: §13.0 defines `Z` as bug fixes with no new features and **the
+  language not moving**, and a new option key is a new feature of the
+  document format. §13.0 also binds `figdown X.Y` to the first two parts
+  of the release version, so shipping `note=` under a `v0.2.z` would make
+  `figdown 0.2` name **two different languages** — the one `v0.2.0`
+  published and the one with `note=`. The engine constant is
+  0.3: `N` counts source states and never resets (§13.0.4), so 81
+  is followed by 82.
+- **`note=` is GATED on the declared version; `in=`'s widening is NOT.
+  This is the section's real content.** The discriminator is not novelty:
+  - **`in=` widening — ungated.** It adds **no spelling**: no keyword, no
+    option key, no enum value, no character, and §10's registry is
+    byte-unchanged. The only documents it affects are ones that **did not
+    parse at all** — `threshold "Max" in=q offset=50%` over a `table q`
+    answered `unknown target "q" for threshold`, the same error a
+    nonexistent id gets, because the resolver's accepted set was
+    hard-coded to nodes and groups. **A widening that makes a
+    previously-erroring document parse is not a compatibility break and
+    is therefore not gated**: no valid document changes meaning, none
+    becomes invalid, and §13.0.1's hazard cannot arise, because `in=q`
+    naming the document's own region has exactly one possible meaning and
+    the alternative was an error message rather than a different figure.
+    There is nothing to drift from.
+  - **`note=` — gated, and for a reason specific to this key.** It has a
+    **prior meaning on the record**: it was the retired spelling of
+    `description=`, and its retirement diagnostic actively told authors to
+    write `description=` for a never-drawn tooltip. An engine accepting
+    `note=` under a `figdown 0.2` header would repaint that author's
+    tooltip as ink on the page — §13.0.1's named hazard, *a figure that
+    looks right and means something else*. A key that had never been
+    spelled before would carry no such risk and would need no gate. The
+    diagnostic follows the `KEYWORD-RENAME-SCOPE` device: it names the version and offers
+    the one-step fix.
+- **It DID owe a new `read/<X.Y>/`, at the same point `read/0.2/` was
+  owed.** §13.7.1's rule is not about genres, it is about the reading
+  contract being indexed by language version: `read/0.1/` and `read/0.2/`
+  are frozen, `figdown 0.3` gives a reader a key it must know how to
+  handle, and the note reading rule (§12.7) has to go somewhere.
+  `read/0.3/` is that somewhere, written from `read/0.2/` plus that rule,
+  and it is the live contract from `v0.3.0` on.
+- **It owes an `archive/0.3/figdown.html` at publish, not before**, on
+  §13.5's rule unchanged: the archive holds the engine as users ran it,
+  and the engine stamped `0.3.0` does not exist until the release act.
+  `archive/0.1/figdown.html` is untouched by this release and MUST stay
+  so, including the retirement message it carries — that engine implements
+  `figdown 0.1`, where the message was true.
 
 ### 13.8 What tier 2 costs, stated honestly
 

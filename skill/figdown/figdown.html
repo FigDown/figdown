@@ -121,7 +121,7 @@ const SHAPES = ['box','rounded','circle','ellipse','diamond','cylinder'];
 // input to that promise, and under core §13 a 0.x renderer may differ from
 // the next — which makes the recorded version the only thing that can
 // explain a diff between two renderings of one source.
-const FIGDOWN_VERSION = '0.2.0';
+const FIGDOWN_VERSION = '0.3.0';
 // `STATECHART-GENRE-SCOPE`: the language number moved for the first time. The dev
 // counter does NOT reset (core §13.0.4 — `N` counts source states of the
 // engine and only ever increases), so 0.1 is followed by
@@ -131,13 +131,39 @@ const FIGDOWN_VERSION = '0.2.0';
 // MUST state this, and stating the release version alone does not satisfy
 // it). Declared here, in ONE place, so the header check and the documented
 // interface cannot drift:
-const LANG_VERSIONS = ['0.1', '0.2'];
+// `DRAWN-ANNOTATION-FORM`: `figdown 0.3` joins the set. `note=` is a NEW OPTION KEY,
+// and core §13.0 makes a new key a `Y` change and not a `Z` one — "`Z`: Bug
+// fixes only. No new features. The language does not move." Shipping `note=`
+// under `v0.2.z` would make `figdown 0.2` name two different languages: the one
+// `v0.2.0` published and the one with `note=`. So the language number moves.
+const LANG_VERSIONS = ['0.1', '0.2', '0.3'];
 // Genres per declared language version. `Y` never removes (core §13.0), so
 // each row is a superset of the one above it, and `figdown 0.1 <anything>`
 // resolves against exactly the list it resolved against before `STATECHART-GENRE-SCOPE`.
 const GENRES_BY_VERSION = {
   '0.1': ['block','topology','flowchart','bitfield','table','timing'],
-  '0.2': ['block','topology','flowchart','bitfield','table','timing','statechart']
+  '0.2': ['block','topology','flowchart','bitfield','table','timing','statechart'],
+  '0.3': ['block','topology','flowchart','bitfield','table','timing','statechart']
+};
+// The version an OPTION KEY first becomes legal in — the `CONNECTOR_MIN_VERSION`
+// device, applied to the option namespace. `DRAWN-ANNOTATION-FORM`: `note=` is gated on the
+// declared version, and the gate's reason is specific to THIS key rather than
+// generic to new keys. `note=` has a PRIOR MEANING on the record: it was the
+// retired spelling of `description=` (`DESCRIPTION-KEY-SPELLING`) and its retirement
+// diagnostic actively told authors to write `description=` for a tooltip.
+// Accepting it silently under a `figdown 0.2` header would repaint a document
+// whose author meant a never-drawn tooltip as one that puts ink on the page —
+// core §13.0.1's named hazard, "a figure that looks right and means something
+// else". A key that had never been spelled before would carry no such risk.
+const OPT_MIN_VERSION={note:'0.3'};
+// True when the document's declared version is older than the key's own.
+// A document with no parsable header has already been diagnosed on line 1, so
+// an absent version never gates a second time.
+const belowOptVersion=(key,ver)=>{
+  const need=OPT_MIN_VERSION[key];
+  if(!need||!ver) return false;
+  const i=LANG_VERSIONS.indexOf(ver), j=LANG_VERSIONS.indexOf(need);
+  return i>=0 && j>=0 && i<j;
 };
 // Retired shape VALUES keep a named diagnostic (PROCESS §5(d)), the same way
 // retired option keys do: `cloud` was the one value that named a domain
@@ -322,7 +348,7 @@ function splitList(t,off){
 //  - a key=value token with an unregistered key is an "unknown option"
 //    line error (`UNKNOWN-OPTION-DEGRADATION`) — except inside timing `signal` lanes, where bare
 //    tokens may contain '=' and stay positional (laneMode).
-// `fill` was registered here until this release solely to power a retired
+// `fill` was registered here until 0.1 solely to power a retired
 // migration diagnostic on the old `line` directive; it left the registry with
 // the `fill` → `band` KEYWORD rename, and 0.1 gave the word back to the
 // option-key namespace as the primary presentation key (`color=` → `fill=`).
@@ -337,11 +363,11 @@ function splitList(t,off){
 // time the language gains no replacement — v0.1 has no author-facing label
 // colour at all (the default is derived, `LABEL-COLOUR-SOURCE`; the owner-level key that could
 // be added today is the wrong shape, core §9 `ANNOTATION-LOCATOR-SPLIT`). It stays registered so
-// the message can name BOTH eras: a `color=` written before this release meant
-// the FILL, one written meant the LABEL, and only a human
+// the message can name BOTH eras: a `color=` written in one era meant
+// the FILL, one written in another meant the LABEL, and only a human
 // knows which document this is. `text` and `z` stay registered
 // as RETIRED keys so each rename gets a named diagnostic. `offset` replaces
-// `threshold at=` (the directive was spelled `guide` until this release);
+// `threshold at=` (the directive was spelled `guide` until 0.1);
 // `at` stays live on `pin`.
 // 0.1: `level` stays registered as a RETIRED key — the construct was
 // DELETED (`CHART-LEVEL-KEY`), and a registered-but-retired key is the only way the
@@ -372,7 +398,7 @@ const OPT_KEYS=new Set(['kind','type','shape','fill','color','stroke','text','in
 //  - `external` is NEVER drawn (`EXTERNAL-EDGE-ENDPOINTS`) — no fill, no border, no dash; only its
 //    label exists, so it takes `text=` (plus `plane=`, organizational exactly
 //    as on a node);
-//  - `band` carried NO label channel at all until this release (`BAND-LABEL-STATUS`); it now
+//  - `band` carried NO label channel at all until 0.1 (`BAND-LABEL-STATUS`); it now
 //    takes a mandatory quoted label, so `color=` applies to it like any
 //    other labelled element;
 //  - typed blocks (`bitfield`/`table`/`timing`) stack in document order OUTSIDE
@@ -391,29 +417,48 @@ const OPT_KEYS=new Set(['kind','type','shape','fill','color','stroke','text','in
 // the key existed only because there was no label to colour.
 const DIRECTIVE_OPTS={
   figdown:[],
-  node:['shape','fill','stroke','style','class','in','plane','width','height'],
+  // `DRAWN-ANNOTATION-FORM`: `title` gains its FIRST option key. It took one
+  // positional string and nothing else until now, and the key
+  // it gains carries the figure-level annotation — 14% of the measured demand,
+  // 10 instances that name no single element ("Total: 2 blocks × 8 ways × 1k
+  // sets = 16,384 entries", a four-signal legend, a TODO about the figure).
+  // The figure HAS a declaration line, so attachment-by-position reaches it and
+  // no standalone keyword is needed. `UNIVERSAL-CORE-KEYWORDS` fixes what `title` MEANS across genres;
+  // it is not a bar on the directive taking options, so the key exists in every
+  // genre at once, which is correct — every genre has figures.
+  title:['note'],
+  node:['shape','fill','stroke','style','class','in','width','height','note'],
   // `FLOWCHART-ROLE-KEYWORDS`: the three flowchart role keywords take EXACTLY the
   // option keys `node` takes — they ARE nodes, with a role recorded. Listing
   // `width`/`height` mirrors `node` so the same "use a pin line" diagnostic
   // fires rather than a bare `unknown option`.
-  process:['shape','fill','stroke','style','class','in','plane','width','height'],
-  decision:['shape','fill','stroke','style','class','in','plane','width','height'],
-  terminator:['shape','fill','stroke','style','class','in','plane','width','height'],
+  process:['shape','fill','stroke','style','class','in','width','height','note'],
+  decision:['shape','fill','stroke','style','class','in','width','height','note'],
+  terminator:['shape','fill','stroke','style','class','in','width','height','note'],
   // `GENRE-NODE-SPELLING`: `state` IS `node` under `statechart` — a rename, not a
   // new directive, so it takes `node`'s keys exactly and nothing more.
-  state:['shape','fill','stroke','style','class','in','plane','width','height'],
-  group:['fill','stroke','style','gap','class','plane'],
-  external:['plane'],
-  edge:['style','class','fill','stroke','plane','label','taillabel','headlabel'],
+  state:['shape','fill','stroke','style','class','in','width','height','note'],
+  group:['fill','stroke','style','gap','class','note'],
+  // `PAINT-ORDER-CONSTRUCT`: `external` now takes NO option key at all. `plane=`
+  // was its only one — it is never drawn (`EXTERNAL-EDGE-ENDPOINTS`), so it has no fill, no border
+  // and no dash to set — and the withdrawal of `plane=` empties the row. An
+  // empty array is the declaration: every key falls through to the generic
+  // `external does not take <k>=`.
+  external:[],
+  edge:['style','class','fill','stroke','label','taillabel','headlabel','note'],
   // `GENRE-CONNECTOR-SPELLING`/`GENRE-NODE-SPELLING`: same rename argument — the connector's option set is one set
   // under three spellings, listed three times only because the tables are
   // keyed by the surface word an author actually wrote.
-  flowline:['style','class','fill','stroke','plane','label','taillabel','headlabel'],
-  transition:['style','class','fill','stroke','plane','label','taillabel','headlabel'],
-  plane:['z','z-index'], flow:[], rank:[],
-  bundle:['fill','stroke','style','plane'],
-  threshold:['in','at','offset','fill','stroke','style','plane'],
-  band:['in','extend','fill','stroke','style','plane','from','to'],
+  flowline:['style','class','fill','stroke','label','taillabel','headlabel','note'],
+  transition:['style','class','fill','stroke','label','taillabel','headlabel','note'],
+  // `PAINT-ORDER-CONSTRUCT`: the `plane` row is GONE, not emptied — the keyword is
+  // withdrawn from the language, so it has no acceptor row at all, the shape
+  // `path`/`routing` left behind. `z-index=` goes with it: it
+  // was legal on `plane` and on nothing else.
+  flow:[], rank:[],
+  bundle:['fill','stroke','style'],
+  threshold:['in','at','offset','fill','stroke','style'],
+  band:['in','extend','fill','stroke','style','from','to'],
   // `ELEMENT-GEOMETRY-DIRECTIVE`: `size` merged into `pin`. ONE directive carries an
   // element's whole DECLARED geometry — `at=` places it, `width=`/`height=`
   // extend it — and one model object records it. All three keys are optional
@@ -424,7 +469,7 @@ const DIRECTIVE_OPTS={
   // derives its geometry from its content).
   pin:['at','width','height'],
   layout:[],
-  'class':['fill','stroke','style','plane'],
+  'class':['fill','stroke','style'],
   // 0.1: `class=` is NOT accepted on the typed-block OPENERS. The
   // normative registry (core §10) lists its acceptors as node/group/edge/
   // field/cell — the block openers were an engine-only extra with 0 uses in
@@ -448,7 +493,7 @@ const DIRECTIVE_OPTS={
   // the field is ONE ELEMENT of a repeated run and gives the run's index
   // range; the engine derives the elision row and the index labels from it,
   // exactly as it derives the dash and the caption from `present=`.
-  field:['fill','stroke','class','description','present','index'], 'break':[],
+  field:['fill','stroke','class','description','present','index','note'], 'break':[],
   cell:['fill','stroke','class'], width:[],
   signal:['data','fill','stroke'], gap:[]
 };
@@ -498,8 +543,8 @@ const RETIRED_OPT_KEYS={
   text:'text= has been retired: v0.1 has NO label-colour key — the label colour is DERIVED from the fill it sits on (core §5), and the owner-level key that could replace it would colour an edge\'s [tail]/[mid]/[head] labels identically, which is the wrong shape (core §9 `ANNOTATION-LOCATOR-SPLIT`). Delete the key; if the distinction was knowledge, write it in the label or a class= meaning (§5, `PRESENTATION-AS-MEANING-CARRIER`) (MIGRATIONS 0.1)',
   // `COLOUR-KEY-STATUS`. This is the ONLY key in the language whose diagnostic
   // must name two eras and refuse to choose between them: the same six
-  // characters meant the FILL before this release and the LABEL after
-  // 0.1, and no engine can tell the two source files apart. Retiring
+  // characters meant the FILL in one era and the LABEL
+  // in another, and no engine can tell the two source files apart. Retiring
   // the key is what makes the difference DIAGNOSABLE at all — while it was
   // live, a pre-0.1 document parsed and drew a legal, wrong figure in
   // silence.
@@ -516,8 +561,17 @@ const RETIRED_OPT_KEYS={
   // `color=` family, which reads the same evidence to decide its refusals.
   color:'color= has been retired: the same six characters set the box FILL in one era of this language and the LABEL colour in another, and this line does not say which — which is why the key is gone rather than renamed. READ IT OFF THE REST OF THE DOCUMENT. A file that also writes fill= cannot be from the FILL era (the two keys never coexisted), so its color= was a LABEL colour: delete it and let the derived default apply (core §5). A file still writing the spellings that were retired before the LABEL era (w= h= unit= via= dir= kind= layer= boundary wrap optional) cannot be from that era, so its color= was a FILL: write fill= instead. A file with NEITHER carries no evidence at all, and the two readings then differ only in what was DRAWN — as a FILL the value painted the box interior, as a LABEL colour it painted only the text. If the colour carried meaning, put that meaning in the label or a class= (§5, `PRESENTATION-AS-MEANING-CARRIER`). tools/migrate-figdown.js reads this evidence for you and REFUSES the wrong --color-means=fill|text (MIGRATIONS 0.1)',
   kind:'kind= has been renamed: on a node use shape= (geometric; the label text carries the device semantics — MIGRATIONS 0.1), on a chart use type= (Vega, Chart.js and ECharts all spell the chart-type key "type" — MIGRATIONS 0.1). One spelling was retired on node and live on plot at the same time, inside one namespace; 0.1 closed that.',
-  layer:'layer= has been renamed: use plane= (mxGraph makes a layer a containment parent that establishes coordinates; Inkscape layers can carry a transform; OGC WMS layers carry an SRS; CSS @layer is cascade priority. None of those is what this key does, and SVG has no layer at all) (MIGRATIONS 0.1)',
+  // `PAINT-ORDER-CONSTRUCT`: `layer=` was renamed `plane=`, and
+  // `plane=` has since been WITHDRAWN, so this message can no longer end at
+  // the rename — the `route`→`path` precedent, where a message
+  // pointing at a spelling that no longer exists had to state the whole chain.
+  layer:'layer= has been WITHDRAWN: it was renamed plane=, and plane= was withdrawn with the `plane` keyword (`PAINT-ORDER-CONSTRUCT`). There is no replacement spelling. Delete the key: everything paints in one plane, in document order. If the element is on a distinct logical layer of the SUBJECT — an overlay, a control plane — say so with a class= whose label states it, which is where that meaning belongs (core §5, `PRESENTATION-AS-MEANING-CARRIER`) (MIGRATIONS 0.3)',
   labels:'labels= has been renamed: use data= (WaveDrom\'s own key for exactly this is `data`, "an array of signal labels" — one per value cell of the lane) (MIGRATIONS 0.1)',
+  // `PAINT-ORDER-CONSTRUCT`. `plane=` referenced a declared `plane`; with the
+  // keyword withdrawn from every genre the key would keep exactly ONE legal
+  // value — the implicit `base` — so it is withdrawn with it rather than left
+  // as a key that can only ever restate the default.
+  plane:'plane= has been WITHDRAWN with the `plane` keyword (`PAINT-ORDER-CONSTRUCT`): the construct is removed from the language, not renamed, so there is no spelling to migrate to. `plane=` named a declared plane, and with no way to declare one the key had a single legal value — `base`, the implicit plane every element is already on. Delete the key. What it did was PAINT ORDER, and paint order is document order: a later line paints on top. The measurement: stripping `plane` and `plane=` from examples/evpn-fabric.fd left the drawn SVG byte-identical but for one `data-edge` index, because the overlay meaning was carried by `class=overlay` throughout — which is where a logical layer of the SUBJECT belongs (core §5, `PRESENTATION-AS-MEANING-CARRIER`) (MIGRATIONS 0.3)',
   // 0.1 (`EDGE-GEOMETRY-CONSTRUCTS`). These six keys end in a WITHDRAWAL, not a rename, so
   // their messages have a shape no earlier retirement in this table has: they
   // name no replacement spelling, because there is none. `via=`/`src=`/`dst=`
@@ -532,14 +586,80 @@ const RETIRED_OPT_KEYS={
   headport:'headport= has been WITHDRAWN with the `path` directive (`EDGE-GEOMETRY-CONSTRUCTS`): the construct is removed from the language, not renamed, so there is no spelling to migrate to. Attachment to a named site addressed by semantic role IS inside the stable prior-art intersection; FigDown\'s realisation was not (a fraction on the EDGE is mxGraph-only, and written-order attachment has zero prior art in any surveyed system). Restoring it needs an edge-identity construct first. Delete the line; the edge draws under auto layout. The decision and its evidence: MIGRATIONS 0.1, core §9 `EDGE-IDENTITY-AND-GEOMETRY`, decisions/registry.md',
   routing:'routing= has been WITHDRAWN with the `path` directive (`EDGE-GEOMETRY-CONSTRUCTS`): the construct is removed from the language, not renamed, so there is no spelling to migrate to. The per-edge routing SCOPE was inside the stable prior-art intersection and is deliberately lost with its host line — an override needs an edge to address, and FigDown has no edge-identity construct. Delete the line. The decision and its evidence: MIGRATIONS 0.1, core §9 `EDGE-IDENTITY-AND-GEOMETRY`, decisions/registry.md',
   unit:'unit= has been renamed: use word= (RFC 2360 §3.1: "a sequence of long words in network byte order, with each word horizontal on the page"; RFC 791 §3.1 measures the header in "32 bit words". Mermaid names the identical setting bitsPerRow — semantically right, camelCase barred. `unit=32` also inverts count-vs-unit, reading as "the unit is 32", and C\'s "unit" is the addressable storage unit, not the row width) (MIGRATIONS 0.1)',
-  z:'z= has been renamed: use z-index= (CSS spells the stacking concept z-index, and RULE 4.2 takes the standard spelling in full; a single-letter key is structurally risky next to the closed timing lane alphabet, `LANE-ALPHABET-KEY-RESERVATION`) (MIGRATIONS 0.1)',
-  // `DESCRIPTION-KEY-SPELLING`. The spelling leaves the LANGUAGE, so the message fires
-  // wherever it appears (the `w=`/`h=`/`unit=` placement test, RULE 6.2).
-  note:'note= has been renamed: use description= (IEEE 1685-2022 spells this channel `description`; SystemRDL\'s `desc` is barred by RULE 4.2 as an abbreviation. The rename is defensive: `ANNOTATION-LOCATOR-SPLIT` files `note` as the highest-demand v0.2 annotation construct — ~66 figure-identities, 20 independent reinventions — and that one will be a DRAWN callout, so a never-drawing `note=` beside an always-drawing `note` would be one spelling with two opposite behaviours) (MIGRATIONS 0.1)',
+  // `PAINT-ORDER-CONSTRUCT`: `z-index=` itself. Its ONLY acceptor was `plane`, so
+  // with the keyword withdrawn the key has no directive left to sit on. Left
+  // in OPT_KEYS with no acceptor row it would have produced `<directive> does
+  // not take z-index=` — true, but it tells an author holding a 0.2 document
+  // that they picked the wrong host, when in fact there is no host. RULE 6.2
+  // placement: the spelling left the LANGUAGE, so it is reported wherever it
+  // appears.
+  'z-index':'z-index= has been WITHDRAWN with the `plane` keyword (`PAINT-ORDER-CONSTRUCT`): it was legal on `plane` and on nothing else, so it left with its only acceptor. There is no replacement spelling and no other directive to move it to. Delete the key: paint order is document order, and a later line paints on top (MIGRATIONS 0.3)',
+  z:'z= has been WITHDRAWN: it was renamed z-index=, and z-index= was withdrawn with the `plane` keyword (`PAINT-ORDER-CONSTRUCT`) — it was legal on `plane` and on nothing else. There is no replacement spelling. Delete the key: paint order is document order, a later line paints on top (MIGRATIONS 0.3)',
+  // `note` was HERE (`DESCRIPTION-KEY-SPELLING`) until this release (`DRAWN-ANNOTATION-FORM`), and its
+  // row is gone because the key is LIVE again — SYNTAX-STYLE RULE 4.9
+  // obligation 3 forbids leaving the retirement message standing past the
+  // revival, on the ground that a message telling an author to write
+  // `description=` where `note=` is now the correct key is worse than no
+  // message: it is the language actively misinforming its user. What replaces
+  // it is not silence but two NARROWER messages — NOTE_VERSION for a document
+  // that declares a language version older than the key, and NOTE_ON_FIELD for
+  // the one directive that keeps refusing it. See OPT_MIN_VERSION above.
   level:'level= has been DELETED, not renamed: it drew a reference plane through a 3-D bar chart, has zero uses in either downstream corpus and zero 3-D bar charts to draw it on, was the only construct whose caption the ENGINE wrote rather than the author, and its parseFloat grammar uniquely accepted 1e3 where every other number in the language is \\d+(\\.\\d+)? — delete the key (MIGRATIONS 0.1)'
 };
+// `DRAWN-ANNOTATION-FORM`. The two messages that REPLACE the `note=` retirement
+// diagnostic. SYNTAX-STYLE RULE 4.9 obligation 3 requires the retirement
+// message to be reversed in the same release that revives the spelling, and
+// "reversed" does not mean "deleted": each of the two situations the old
+// message used to cover keeps a named diagnostic of its own.
+//
+// (a) The document declares a language version older than the key. The gate is
+//     `KEYWORD-RENAME-SCOPE`'s device — name the version, offer the one-step fix — and its
+//     reason is stated in the message because `note=`'s prior meaning is what
+//     makes the gate necessary rather than merely tidy.
+const NOTE_VERSION=(have)=>
+  'note= requires figdown 0.3 (this document declares '+have+'): under figdown '+
+  have+' the spelling is still the RETIRED one that meant description=, and an '+
+  'engine that accepted it here would repaint a tooltip as ink — a figure that '+
+  'looks right and means something else (core §13.0.1). note= is the DRAWN '+
+  'annotation: an explanation the human reader must SEE. Raise the header to '+
+  'figdown 0.3, or write description= if you meant prose only a machine reads '+
+  '(MIGRATIONS 0.3)';
+// (b) The directive is `field`, which refuses the key at EVERY version. The
+//     bitfield genre already has `description=` for machine-facing prose, and
+//     no measured figure needs a DRAWN per-field aside — granting a directive
+//     both keys with no evidence spends the distinction before anyone needs it.
+//     The message states the distinction rather than naming a replacement,
+//     because `description=` is not a replacement: it reaches a different
+//     reader.
+const NOTE_ON_FIELD=
+  'note= draws and is not accepted on field; use description= for prose a '+
+  'machine reads. The two keys divide by AUDIENCE, not by length: description= '+
+  'reaches the reading agent as an SVG <title> and puts no ink on the page, '+
+  'while note= is an explanation the human must see. A field\'s presence '+
+  'condition is present=, not either of them (MIGRATIONS 0.3)';
 // `PLANE-KEYWORD-SPELLING`: the keyword `plane`/`plane=` was spelled `layer`/`layer=`.
-const RETIRED_LAYER='layer has been renamed: use plane (in mxGraph — the geometry model FigDown adopted — a layer is a CONTAINMENT PARENT that establishes coordinates, so layer=overlay reads as "reparent and re-origin this element", which FigDown does not do; Inkscape layers are <g> and may carry a transform, OGC WMS layers each carry an SRS, and CSS @layer is cascade priority with no visual meaning. SVG has no layer concept at all. `plane` is claimed by no standard for a conflicting meaning and removes the layout/layer near-miss) (MIGRATIONS 0.1)';
+// `PAINT-ORDER-CONSTRUCT`: `plane` is WITHDRAWN, so `layer`'s message states the
+// whole chain and ends where `route`'s does — the precedent,
+// when `path` was withdrawn out from under the spelling `route` pointed at.
+// `PAINT-ORDER-CONSTRUCT`: `plane` is WITHDRAWN from the language. The construct
+// left because every genre that could write it lost it at once, and for two
+// different reasons that happen to converge:
+//  - `block` and `flowchart` had ZERO authored uses. Every authored use in
+//    the tree was a `topology` document.
+//  - `topology` had two, and they are the worst domain collision measured in
+//    the language: in networking a PLANE is the control / data / management
+//    partition of a device — one of the first distinctions the field teaches
+//    — and `topology` is precisely the genre network engineers author in.
+//    `examples/evpn-fabric.fd` showed the trap already closed: it wrote
+//    `plane overlay "VXLAN tunnels" z-index=2`, where `overlay` is itself a
+//    networking term, so the line read as a network-architectural assertion
+//    and was in fact a paint order.
+// What replaced it was already there. Stripping both writings from that file
+// left the drawn SVG byte-identical apart from one `data-edge` index, because
+// `class=overlay` carried the meaning the whole time.
+const WITHDRAWN_PLANE_WHERE=' The decision and its evidence: MIGRATIONS 0.3, decisions/registry.md.';
+const RETIRED_PLANE='plane has been WITHDRAWN from the language (`PAINT-ORDER-CONSTRUCT`) — removed, not renamed, so there is no replacement spelling. It declared a DRAWING LAYER (a z-order), and in the genre that actually used it "plane" means the control / data / management partition of a network device, so the one word said the wrong thing to exactly the readers who write the figure. Delete the line and delete every plane= that referenced it: paint order is document order, a later line paints on top. If the elements form a logical layer of the SUBJECT, that is a class= whose label states it (core §5, `PRESENTATION-AS-MEANING-CARRIER`) — which is what the two authored uses were already doing alongside it.'+WITHDRAWN_PLANE_WHERE;
+const RETIRED_LAYER='layer has been WITHDRAWN: it was renamed plane, and plane was withdrawn from the language (`PAINT-ORDER-CONSTRUCT`). There is no replacement spelling. Delete the line: everything paints in one plane and paint order is document order (a later line paints on top). A logical layer of the SUBJECT — an overlay, a control plane — is a class= whose label says so (core §5, `PRESENTATION-AS-MEANING-CARRIER`).'+WITHDRAWN_PLANE_WHERE;
 // `THRESHOLD-KEYWORD-SPELLING`: the scene keyword `guide` became `threshold`.
 const RETIRED_GUIDE='guide has been renamed: use threshold (in Illustrator, Inkscape, Figma and draw.io a "guide" is an author-only construction line that is NEVER rendered, while FigDown\'s is drawn output — an INVERTED name, which `UNSAFE-DEFAULT-ELIMINATION` rates worse than an unfamiliar one, and no counter-example was found where "guide" names rendered output. `guide` was also a FigDown coinage, and `SIZE-AND-DIRECTION-KEY-NAMING` makes coining a last resort; `threshold` comes whole from Grafana, whose "Show thresholds" render option offers "As lines", "As filled regions" and "As filled regions and lines" — FigDown\'s marker + region pair, split the same way — with IETF RED/AQM as the secondary source (RFC 2309: "Two RED parameters, minth (minimum threshold) and maxth (maximum threshold)"; RFC 7567: "an AQM algorithm configured with a threshold"). 78% of the measured corpus marks are thresholds; target/mean/reference marks: 0) (MIGRATIONS 0.1)';
 // `EXTERNAL-ENDPOINT-NAMING`: the scene keyword `boundary` became `external`.
@@ -561,7 +681,7 @@ const RETIRED_FIELD_CONDITIONAL='the field flag "conditional" has been retired: 
 // prose the model may not read. `present` is the attested spelling: X.680
 // PRESENT, IP-XACT isPresent, SystemRDL ispresent, RFC 2784 "present only
 // if", draft-mcquistin "present only when".
-const RETIRED_FIELD_OPTIONAL='the field flag "optional" has been retired and replaced by an option key that carries the CONDITION: write present="<the condition>" (e.g. field "Checksum" 16 present="C = 1"), or present="" when the condition is not stated. The bare flag could say only THAT the field was conditional, so the condition had to live in note= — invisible to the human reading the figure, and prose the model may not parse (`BITFIELD-CONDITIONAL-OFFSETS`). present= DRAWS: the field stays dashed and a stated condition becomes a caption under the block (MIGRATIONS 0.1)';
+const RETIRED_FIELD_OPTIONAL='the field flag "optional" has been retired and replaced by an option key that carries the CONDITION: write present="<the condition>" (e.g. field "Checksum" 16 present="C = 1"), or present="" when the condition is not stated. The bare flag could say only THAT the field was conditional, so the condition had to live in the field\'s documentation prose — the key spelled note= at the time and description= — where it was invisible to the human reading the figure, and prose the model may not parse (`BITFIELD-CONDITIONAL-OFFSETS`). (Today\'s note= is a different key: it is the DRAWN annotation revived, it is refused on field, and it is not where a presence condition belongs either.) present= DRAWS: the field stays dashed and a stated condition becomes a caption under the block (MIGRATIONS 0.1)';
 // `TIMING-GENRE-NAMING`: the EXPERIMENTAL genre `wave` became `timing`, both as
 // the header genre token and as the block opener. The old name was WaveDrom's
 // MEMBER KEY, not its figure name: in WaveJSON `signal` is the root object and
@@ -593,7 +713,7 @@ const RETIRED_WAVE='wave has been renamed: use timing (in WaveJSON `signal` is t
 // not "use X"), says what an author should do instead (delete the line and let
 // auto layout draw it, with the content-zone means named), and points at where
 // the decision is RECORDED so the reasoning is one lookup away.
-const WITHDRAWN_WHERE=' The decision and its evidence: MIGRATIONS 0.1, core §9 `EDGE-IDENTITY-AND-GEOMETRY`, decisions/registry.md';
+const WITHDRAWN_WHERE=' The decision and its evidence: MIGRATIONS 0.1, core §9 `EDGE-IDENTITY-AND-GEOMETRY`, decisions/registry.md.';
 const RETIRED_PATH='path has been WITHDRAWN from the language (`EDGE-GEOMETRY-CONSTRUCTS`) — removed, not renamed, so there is no replacement spelling. A prior-art study of Visio, draw.io/mxGraph, Graphviz and ELK found author waypoints OUTSIDE the stable intersection: only 2 of the 4 model them, and those 2 disagree on what happens when an endpoint moves. The dock realisation was outside it too — written-order attachment has zero prior art in any surveyed system. Delete the line: the edge draws under auto layout, and `rank`, `flow`, declaration order and `pin` are the content-zone means of shaping it.'+WITHDRAWN_WHERE;
 const RETIRED_ROUTING='routing has been WITHDRAWN from the language (`EDGE-GEOMETRY-CONSTRUCTS`) — removed, not renamed, so there is no replacement spelling. Two routing modes and two scopes ARE inside the stable prior-art intersection, so the need is recognised and its shape is known; what is missing is the evidence and the implementation (6 of the 8 in-repo `routing=orthogonal` writings were provable no-ops, and downstream adoption was zero), and the per-edge scope cannot be restored without an edge-identity construct FigDown does not have. Delete the line; the edges draw straight.'+WITHDRAWN_WHERE;
 // `TIMING-LANE-ALPHABET`: the timing lane digits `2`-`9` left the closed alphabet.
@@ -620,7 +740,7 @@ const CELL_HL_ON_CELL='highlight is a ROW mark and takes the single-valued row f
 const CELL_HL_ROW_CONFLICT=(r,c)=>'cell ('+r+','+c+') resolves to a fill on row '+r+', which is highlighted — the cell fill overrides the row tint, so the model says "row '+r+' is highlighted" while the drawing shows only part of the row tinted (`PRESENTATION-AS-MEANING-CARRIER`: presentation may render meaning, never delete it). Drop the row highlight, or move the cell fill to a row that carries none (MIGRATIONS 0.1)';
 const NO_ITEM_STYLE=new Set(['field','cell','signal']);
 const STYLE_NO_ITEM=k=>k+' does not take style= — '+(k==='field'
-  ? 'on a field the dash IS conditional presence (`present=`, spelled `optional` until this release), and style=solid erased it while the model still recorded the field as conditionally present (`PRESENTATION-AS-MEANING-CARRIER`: presentation may render meaning, never be its only carrier)'
+  ? 'on a field the dash IS conditional presence (`present=`, spelled `optional` until 0.1), and style=solid erased it while the model still recorded the field as conditionally present (`PRESENTATION-AS-MEANING-CARRIER`: presentation may render meaning, never be its only carrier)'
   : 'a dash on one '+k+' carried no meaning the block does not already carry, and 0 documents outside this repository wrote it')
   // `DESCRIPTION-KEY-SPELLING` corrected the second half of this message. It used to
   // offer `note=` as a place to put knowledge, which was wrong twice over:
@@ -888,9 +1008,53 @@ const LAYOUT_KW=['pin'];                       // `LAYOUT-ZONE-NAMESPACE`, NORMA
 const GENRE_FREE_KW=CORE_KW.concat(LAYOUT_KW);
 // `GENRE-CONNECTOR-SPELLING`/`GENRE-NODE-SPELLING`: the NODE and CONNECTOR spellings are per genre, so
 // they are NOT in the shared list — every scene genre concats its own two.
-const SCENE_KW_TOP=['group','external','class','flow','rank'];
-const SCENE_EXP_KW=['threshold','band','bundle','plane'];
-const SCENE_HOST_KW=GENRE_FREE_KW.concat(SCENE_KW_TOP, SCENE_EXP_KW, ['bitfield','table','timing','chart']);
+//
+// `SUBJECT-VOCABULARY-SCOPE`: SUBJECT VOCABULARY IS PER GENRE, AND THERE IS NO SHARED
+// LIST OF IT. `SCENE_KW_TOP` and `SCENE_EXP_KW` are gone. They held the words
+// that say what a figure is OF — `group`, `external`, `threshold`, `band`,
+// `bundle`, `plane` — in one array concatenated into four genres, which is
+// the same defect core §3's "scene keywords" sentence recorded: an
+// INTERSECTION written down as if it were a namespace. Under `GENRE-VOCABULARY-OBLIGATION` a genre owns
+// its words, so each scene genre now names its own subject vocabulary in its
+// own array below. Two arrays agreeing is TWO DECLARATIONS that agree today,
+// never one declaration inherited, and either may be withdrawn, renamed or
+// constrained without touching the other.
+//
+// What stays shared, and why that is not a contradiction:
+//  - `class` is STYLING declaration and `flow`/`rank` are LAYOUT INTENT.
+//    None of the three describes a referent, so no genre's domain holds a
+//    competing meaning for them and no genre can independently earn or lose
+//    one. They are nearer `LAYOUT-ZONE-NAMESPACE`'s genre-independent layout namespace than `GENRE-VOCABULARY-OBLIGATION`.
+//  - `bitfield`/`table`/`timing`/`chart` are `GENRE-COMPOSITION` REGION OPENERS: composition,
+//    not subject vocabulary. The region's own namespace is the nested
+//    genre's.
+const SCENE_STYLE_KW=['class','flow','rank'];
+const SCENE_REGION_KW=['bitfield','table','timing','chart'];
+const SCENE_HOST_KW=GENRE_FREE_KW.concat(SCENE_STYLE_KW, SCENE_REGION_KW);
+// --- Each scene genre's OWN subject vocabulary. One array per genre. ---
+// `block` (NORMATIVE): `group` and `external` are normative; `threshold` and
+// `band` are EXPERIMENTAL and are the `GENRE-EARNING-THRESHOLD` INTERIM scalar-marker pair, held here
+// deliberately unfrozen so the future scalar-marker genre can name them once
+// WITH a scale. They are not renamed now — a rename would hand that genre a
+// retired word.
+const BLOCK_SUBJECT_KW=['group','external','threshold','band'];
+// `topology` (EXPERIMENTAL): `bundle` is the one construct whose domain
+// reading and drawn reading are the same reading — a LAG (IEEE 802.1AX), an
+// ECMP set, an EVPN Ethernet Segment. `group`/`external` keep their block
+// spellings because every networking synonym is more taken (`zone` DNS and
+// firewall, `cluster` RFC 4456, `domain` RFC 7926, `area` OSPF, `site` EVPN)
+// and their collisions are SOFT — the picture contradicts the wrong reading.
+const TOPOLOGY_SUBJECT_KW=['group','external','bundle'];
+// `flowchart` (EXPERIMENTAL): `external` only — the off-page terminus, ISO
+// 5807 §9.4.2 *Terminator* being ISO's word for the concept and already this
+// genre's live keyword, so the spelling stays. `group` had one occurrence in
+// the whole tree and it was this genre's own reference figure.
+const FLOWCHART_SUBJECT_KW=['external'];
+// `statechart` (EXPERIMENTAL): NONE, and the empty array is the declaration.
+// Three authored statechart figures, all transcribed from RFCs, reach for
+// none of the six; `external` is additionally UML 2.5.1 §14's own
+// `TransitionKind` literal and is reserved for it (`RESERVED-SPELLINGS`).
+const STATECHART_SUBJECT_KW=[];
 // `FLOWCHART-ROLE-KEYWORDS`: the flowchart ROLE vocabulary — the FIRST exercise of
 // `GENRE-NAMESPACE` `GENRE-VOCABULARY-OBLIGATION` ("a genre owns its words"). These three are legal ONLY under
 // `figdown 0.1 flowchart`; `GENRE-NAMESPACE`'s allowlist is what makes `decision x` a line
@@ -963,7 +1127,7 @@ const WRONG_VERSION_WORD=(surf,want,genre,need,have)=>
 // "not allowed in genre X" tells an author nothing about what to write.
 const WORD_WHY={
   edge:'a block or topology figure is a graph, and `edge` is the graph word (DOT)',
-  flowline:'the connecting line in a flowchart is a FLOWLINE — the term ISO 5807 uses for it',
+  flowline:'the connecting line in a flowchart is a FLOWLINE — the term the flowchart domain commonly uses for the symbol ISO 5807 §9.3.1 names "Line"',
   transition:'the connecting line in a statechart is a TRANSITION — the term UML 2.5.1 §14 uses for it',
   node:'this genre has more kinds of thing than it has words for, so `node` is the general one',
   state:'a statechart has exactly ONE kind of node and it is a STATE (UML 2.5.1 §14)'
@@ -974,10 +1138,82 @@ const WORD_WHY={
 const WRONG_WORD=(surf,want,genre)=>
   '"'+surf+'" is not the word genre '+genre+' uses for this — write "'+want+'": '+WORD_WHY[want]+
   '. Each scene genre takes the term its own domain uses (block/topology `node` `edge`, flowchart `node` `flowline`, statechart `state` `transition`) — run tools/migrate-figdown.js to rewrite it (MIGRATIONS 0.2)';
+// `SCENE-KEYWORD-MEMBERSHIP`: a word WITHDRAWN FROM ONE GENRE is not an unknown word,
+// and `"threshold" is not allowed in genre topology` would send an author
+// looking for a typo. Each cell below was legal until this release and states
+// WHY that genre no longer declares it — the ruling's own ground, per cell,
+// because the grounds differ and a single sentence could not carry them.
+// Every one of these withdrawals was FREE: `topology`, `flowchart` and
+// `statechart` are EXPERIMENTAL genres outside the compatibility promise, and
+// in `block` the two withdrawn words were EXPERIMENTAL keywords (`EDGE-GEOMETRY-CONSTRUCTS` precedent:
+// experimental withdrawal, no gate, no rewrite owed).
+const WITHDREW_AT=' (withdrawn, `SCENE-KEYWORD-MEMBERSHIP`; MIGRATIONS 0.3)';
+const GENRE_WITHDRAWN={
+  block:{
+    bundle:'`bundle` is now declared by `topology` only. It had ZERO authored uses under `block` — every authored link bundle in the corpus is a topology document — and the construct is defined by a REFERENT that only that genre has: a LAG (IEEE 802.1AX), an ECMP set, an EVPN Ethernet Segment. Under `block` it was a ring around parallel edges with nothing to name.'
+  },
+  topology:{
+    threshold:'`threshold` is now declared by `block` only. It had ZERO occurrences under `topology` in the whole corpus, and in this genre\'s domain a threshold is a QUEUE DEPTH WITH A NUMERIC VALUE (RFC 2309 minth/maxth, RFC 7567) — while FigDown\'s takes no value= and its offset= is a fraction of the target\'s rendered extent, not a quantity. Author the figure as `block`, where the `GENRE-EARNING-THRESHOLD` scalar-marker evidence lives.',
+    band:'`band` is now declared by `block` only. Its two occurrences under `topology` were both conformance fixtures, never a figure anyone needed, and in this genre a BAND is a frequency band — radio, wireless, microwave, optical transport — which is exactly the kind of figure a topology document draws. Author the figure as `block`.'
+  },
+  flowchart:{
+    group:'`flowchart` no longer declares `group`. Its one occurrence in the corpus was this genre\'s own reference figure, which exists to demonstrate every form of every keyword — so citing it as evidence of need is circular. There were no authored uses.',
+    threshold:'`flowchart` no longer declares `threshold`. Zero occurrences, and the construct does not apply: a threshold is a labelled reference value drawn at a percentage of the target\'s RENDERED EXTENT, and a process box\'s extent is an artifact of its label length, so the line asserts nothing a reader can read.',
+    band:'`flowchart` no longer declares `band`. Zero occurrences, and a band is a RANGE over that same meaningless extent.',
+    bundle:'`flowchart` no longer declares `bundle`. Zero occurrences, and parallel flowlines between the same two stages are different CONDITIONS; drawing a ring round them hides what the figure is for.'
+  },
+  statechart:{
+    group:'`statechart` declares NO subject vocabulary at all. UML\'s grouping construct is the COMPOSITE STATE and its REGIONS, and under the single-source-vocabulary rule a statechart that needed grouping should take UML 2.5.1 §14\'s word for it — declared in this genre\'s own document — rather than inherit another genre\'s.',
+    external:'`statechart` declares NO subject vocabulary at all, and `external` is additionally RESERVED here: UML 2.5.1 §14 defines TransitionKind as `external | internal | local`, so in this genre\'s own source standard "external" already names A TRANSITION THAT EXITS AND RE-ENTERS ITS SOURCE STATE. FigDown\'s `external` means an endpoint outside the figure that is never drawn — same word, same genre, same standard, unrelated meanings.',
+    threshold:'`statechart` declares NO subject vocabulary at all. A state has no extent that means anything — its box is sized by its label — so a reference value drawn 60% down it asserts nothing.',
+    band:'`statechart` declares NO subject vocabulary at all, and a band is a range over that same meaningless extent.',
+    bundle:'`statechart` declares NO subject vocabulary at all, and here `bundle` is an ANTI-FEATURE: two transitions between the same pair of states are two different TRIGGERS, and the trigger is the whole content of the arc. Bundling them draws away exactly what the figure is for.'
+  }
+};
+const WITHDRAWN_FROM_GENRE=(kw,genre)=>
+  '"'+kw+'" is not allowed in genre '+genre+' — it was WITHDRAWN from this genre, not misspelled: '+
+  GENRE_WITHDRAWN[genre][kw]+
+  ' Subject vocabulary is per genre (core §3, `GENRE-VOCABULARY-OBLIGATION`): a spelling accepted by several genres is several '+
+  'independent declarations, and this genre\'s was withdrawn without touching any other\'s.'+WITHDREW_AT;
+// `MEMBERSHIP-KEY-ACCEPTANCE`: THE OPTION-KEY HALF OF `SCENE-KEYWORD-MEMBERSHIP`. A per-genre withdrawal can
+// strand an option KEY as easily as it strands a keyword: `in=` states
+// membership and its ONLY value domain is the id of a containing `group`, so
+// once `SCENE-KEYWORD-MEMBERSHIP` stopped `flowchart` and `statechart` from declaring a `group` the
+// key stayed accepted with nothing it could name. The measured symptom was
+// `process a "A" in=g` answering `unknown group "g"` with NO spelling that
+// succeeds — a dangling reference every author reaches by writing the key at
+// all. The other acceptors of `in=` in the language are `threshold` and
+// `band`, whose domain `MARKER-TARGET-KINDS` widened to REGION ids; neither is a keyword of
+// either genre since `SCENE-KEYWORD-MEMBERSHIP`, and the widening never reached `node`, so a
+// `flowchart` document that declares `table q` still answers `unknown group
+// "q"` for `node a "A" in=q`. Nothing in either genre was left un-stranded,
+// which is why the withdrawal is by KEY here and not directive by directive.
+//
+// The grounds differ per genre and are stated per cell, as `SCENE-KEYWORD-MEMBERSHIP`'s are:
+// `flowchart`'s is that every value is a dead end, `statechart`'s is that the
+// spelling is RESERVED for a different domain. Both genres are EXPERIMENTAL,
+// so both withdrawals are free — the `EDGE-GEOMETRY-CONSTRUCTS` precedent, no gate and no rewrite
+// owed — which is also what makes re-adding `in=` to `statechart` later with
+// a `state`-id domain cost nothing.
+const WITHDREW_OPT_AT=' (withdrawn, `MEMBERSHIP-KEY-ACCEPTANCE`; MIGRATIONS 0.3)';
+const GENRE_WITHDRAWN_OPT={
+  flowchart:{
+    in:'`flowchart` no longer accepts `in=`. Its only value domain was the id of a containing `group`, and this genre has not declared `group` (`SCENE-KEYWORD-MEMBERSHIP`) — so EVERY value was a dead end: `in=x` answered `unknown group "x"` and no spelling succeeded. An unknown-option error that names the reason beats a dangling reference no author can satisfy. What expresses membership TODAY is `class=`: declare `class ingress "Ingress phase"` and write `class=ingress` on each stage — it earns a legend entry and applies to every member at once. Containment in a flowchart is an OPEN question and the construct the need is waiting on is a swimlane, not a box (spec/genres/experimental/flowchart.md, What is excluded).'
+  },
+  statechart:{
+    in:'`statechart` no longer accepts `in=`, and the spelling is RESERVED rather than merely dropped. This genre declares NO subject vocabulary (`SUBJECT-VOCABULARY-SCOPE`), so the `group` id that was `in=`\'s only value domain cannot exist here and every value was a dead end. The reason for withdrawing rather than leaving it is the RESERVATION: `in=`\'s future domain in this genre is a STATE id — UML 2.5.1 §14.2.3.4 composite states would arrive as nesting on `state`, through this exact key — so a live key with a group-id domain taught the WRONG model using the very spelling reserved for the right one. Delete the key: a category shared by several states is a `class=` meaning. `in=` is expected back with a state-id domain when composite-state nesting is earned (`MEMBERSHIP-KEY-ACCEPTANCE`).'
+  }
+};
+const WITHDRAWN_OPT_FROM_GENRE=(key,genre)=>
+  key+'= is not allowed in genre '+genre+' — it was WITHDRAWN from this genre, not misspelled: '+
+  GENRE_WITHDRAWN_OPT[genre][key]+
+  ' An option key is per genre for the same reason a keyword is (core §3, `GENRE-VOCABULARY-OBLIGATION`): the key is accepted '+
+  'by the directive AND by the genre, and this genre\'s acceptance was withdrawn without touching any other\'s.'+
+  WITHDREW_OPT_AT;
 const GENRE_KW={
-  block:new Set(SCENE_HOST_KW.concat(['node','edge'])),
-  topology:new Set(SCENE_HOST_KW.concat(['node','edge'])),
-  flowchart:new Set(SCENE_HOST_KW.concat(['node','flowline'], FLOWCHART_ROLE_KW)),
+  block:new Set(SCENE_HOST_KW.concat(BLOCK_SUBJECT_KW, ['node','edge'])),
+  topology:new Set(SCENE_HOST_KW.concat(TOPOLOGY_SUBJECT_KW, ['node','edge'])),
+  flowchart:new Set(SCENE_HOST_KW.concat(FLOWCHART_SUBJECT_KW, ['node','flowline'], FLOWCHART_ROLE_KW)),
   // `STATECHART-GENRE-SCOPE`: `statechart` added no keyword of its own — it was the
   // scene host set and nothing else. `GENRE-NODE-SPELLING` gives it its two: the
   // scene host set with `state` and `transition` in the slots `node` and
@@ -985,7 +1221,10 @@ const GENRE_KW={
   // `terminator`: those are flowchart's words (`GENRE-NAMESPACE` `GENRE-VOCABULARY-OBLIGATION`), and a `decision` in a
   // statechart is a category error, not a shorthand. The allowlist is what
   // makes that a line error with no extra code.
-  statechart:new Set(SCENE_HOST_KW.concat(['state','transition'])),
+  // `SUBJECT-VOCABULARY-SCOPE`: its subject vocabulary is the empty array above, so
+  // `state` + `transition` + core + layout + styling + region openers is now
+  // the WHOLE of what a statechart document may write at top level.
+  statechart:new Set(SCENE_HOST_KW.concat(STATECHART_SUBJECT_KW, ['state','transition'])),
   bitfield:new Set(GENRE_FREE_KW.concat(['class','bitfield'])),
   // chart is experimental and attaches to a table id in the same document
   table:new Set(GENRE_FREE_KW.concat(['class','table','chart'])),
@@ -1048,7 +1287,10 @@ function parseOne(text){
   // `EMPTY-LABEL-STATE`: `title` and a plane label start ABSENT (null), never as an empty
   // string — an author who writes `title ""` has made a distinction the model
   // must keep, and the implicit `base` plane wrote no label at all.
-  const doc={title:null,nodes:[],groups:[],edges:[],planes:[{id:'base',label:null,z:0}],
+  // `DRAWN-ANNOTATION-FORM`: `note` sits beside `title` and starts ABSENT (null), on
+  // `EMPTY-LABEL-STATE`'s rule for `title` itself — an author who writes `note=""` has made
+  // a distinction the model must keep.
+  const doc={title:null,note:null,nodes:[],groups:[],edges:[],planes:[{id:'base',label:null,z:0}],
              flow:'right',ranks:[],pins:{},blocks:[],trunks:[],thresholds:[],bands:[],
              classes:[],boundaries:[]};
   const nodeIds=new Set(), groupIds=new Set(), planeIds=new Set(['base']), classIds=new Set(),
@@ -1201,6 +1443,16 @@ function parseOne(text){
       const e=idErr(o2.plane, optHasQ(oT2,'plane'), null);
       if(e){ err(n,e); return; }
     }
+    // `DRAWN-ANNOTATION-FORM`: the connector's copy of the `note=` version gate and
+    // of the `QUOTING-RULES` quoted-prose rule. A connector is the acceptor the ruling
+    // called decisive — an edge has no id, so an attribute is the ONLY form
+    // that can reach it — and this scanner has to carry every language-wide
+    // check itself or the one construct that most needs the key is the one
+    // construct where the key is unchecked.
+    if(o2.note!==undefined){
+      if(belowOptVersion('note',doc.version)){ err(n,NOTE_VERSION(doc.version)); return; }
+      if(!optQ(oT2,'note')){ err(n,'note= must be quoted: note="'+o2.note+'" — '+Q_WHY); return; }
+    }
     // `RULE-POSITION-ENUMERATION`: and the enum half of RULE 2.4, for the one enum key `edge` takes.
     // Checked before the value, exactly as `badOpts` does it.
     if(o2.style!==undefined && optHasQ(oT2,'style')){ err(n,ENUM_BARE('style='+o2.style)); return; }
@@ -1215,7 +1467,7 @@ function parseOne(text){
     // and `fill=` name the same channel (`stroke=` wins when both are
     // written); `text=` colours the [tail]/[mid]/[head] labels.
     doc.edges.push({a,b,op,tail,mid,head,style:o2.style,cls:ecls,
-                    stroke:o2.stroke,
+                    stroke:o2.stroke,note:o2.note,
                     plane:o2.plane||'base',line:n});
   }
 
@@ -1341,6 +1593,19 @@ function parseOne(text){
       // same-line repeated option key (last-wins was silent data loss)
       if(dup){ err(n,'duplicate option "'+dup+'=" on one line'); bad=true; }
       for(const u of unk){ err(n,'unknown option "'+u+'="'); bad=true; }
+      // `MEMBERSHIP-KEY-ACCEPTANCE`: the PER-GENRE option-key withdrawal, checked here —
+      // after `unknown option`, so a key the LANGUAGE does not have keeps its
+      // own answer, and before every value check, so a withdrawn key is never
+      // told what its value would have meant. `gwHit` suppresses the id-value
+      // rule below for the same key: ONE token, ONE error, the convention
+      // `enumQ` already follows. The line is abandoned by the caller
+      // (`if(badOpts(kw)) continue;`), so no cascade reaches the resolver and
+      // the author never sees the `unknown group "…"` this ruling removes.
+      const gwOpt=(doc.genre&&GENRE_WITHDRAWN_OPT[doc.genre])||null;
+      const gwHit=new Set();
+      if(gwOpt) for(const o in opts)
+        if(gwOpt[o]!==undefined && allowed.includes(o)){
+          err(n,WITHDRAWN_OPT_FROM_GENRE(o,doc.genre)); gwHit.add(o); bad=true; }
       // Retired spelling: `color=` → `fill=`. Fires only where
       // the key was accepted; on a directive that never took it the existing
       // `<directive> does not take color=` is still the right answer.
@@ -1350,6 +1615,19 @@ function parseOne(text){
       // spelling left the language rather than moving between directives.
       for(const rk in RETIRED_OPT_KEYS)
         if(opts[rk]!==undefined){ err(n,RETIRED_OPT_KEYS[rk]); bad=true; }
+      // `DRAWN-ANNOTATION-FORM`: the two `note=` refusals, in the order that gives
+      // ONE error per line. `field` is checked first and unconditionally,
+      // because it refuses the key at every version — telling a `figdown 0.2`
+      // bitfield author to raise their header would send them to a version
+      // that still refuses them. Every directive that does NOT list `note` in
+      // its row falls through to the generic `<directive> does not take note=`
+      // below, which is the right answer for `external`, `threshold`, `band`,
+      // `bundle`, `plane`, `class` and `cell`: the key is in OPT_KEYS, so none
+      // of them can report `unknown option` for a spelling the language has.
+      if(opts.note!==undefined && allowed.includes('note')){
+        if(k==='field'){ err(n,NOTE_ON_FIELD); bad=true; }
+        else if(belowOptVersion('note',doc.version)){ err(n,NOTE_VERSION(doc.version)); bad=true; }
+      }
       // `RULE-POSITION-ENUMERATION`: RULE 2.4's enum half on the OPTION keys. One loop
       // for every enum-valued key, the same device the id-valued keys below
       // use — so a key that gains an enum grammar later is covered by
@@ -1398,7 +1676,11 @@ function parseOne(text){
       // until then) and `present=` (`PRESENCE-CONDITION-EXPRESSION`). `present=""` is legal and is the
       // "conditional, condition not stated" form — an EMPTY quoted value,
       // not an unquoted one, so the same rule admits it.
-      for(const sk of ['description','present'])
+      // `DRAWN-ANNOTATION-FORM`: THREE since `note=` revived. It is prose in the
+      // same sense, and it revives with the value shape it retired with —
+      // which is RULE 4.9 obligation 2 satisfied in the parser rather than
+      // only on paper.
+      for(const sk of ['description','present','note'])
         if(opts[sk]!==undefined && allowed.includes(sk) && !optQ(optT,sk)){
           err(n,sk+'= must be quoted: '+sk+'="'+opts[sk]+'" — '+Q_WHY); bad=true; }
       // `QUOTED-IDS`: `in=` and `plane=` are ID-VALUED options, so the
@@ -1406,7 +1688,7 @@ function parseOne(text){
       // keeps its directive-specific message (`threshold needs in=…`); a written
       // one that is quoted or not a legal id gets the ID RULE.
       for(const k of ['in','plane'])
-        if(opts[k]!==undefined && allowed.includes(k)){
+        if(opts[k]!==undefined && allowed.includes(k) && !gwHit.has(k)){
           const e=idErr(opts[k], optHasQ(optT,k), null);
           if(e){ err(n,e); bad=true; }
         }
@@ -1515,7 +1797,7 @@ function parseOne(text){
     //    noun in a topology figure (`SHAPE-ENUM-VOCABULARY`: no domain nouns in the presentation
     //    vocabulary) while the directive means geometric waypoints;
     //  - `render` was a verb naming a zone that admits only geometry
-    //    (`pin` — and, until this release, `path` and `routing`), and it
+    //    (`pin` — and, until 0.1, `path` and `routing`), and it
     //    collided with the renderer
     //    and the render options of §7. `layout` is the cross-tool word for
     //    this half of a diagram language, and the zone it opens carried the
@@ -1533,6 +1815,12 @@ function parseOne(text){
     if(kw==='wrap'){ err(n,RETIRED_WRAP); continue; }
     if(kw==='boundary'){ err(n,RETIRED_BOUNDARY); continue; }
     if(kw==='layer'){ err(n,RETIRED_LAYER); continue; }
+    // `PAINT-ORDER-CONSTRUCT`: `plane` joins this block. RULE 6.2 placement — the
+    // spelling left the LANGUAGE, not one genre, so it fires wherever it
+    // appears at line start, in every genre, AHEAD of the `GENRE-KEYWORD-ALLOWLIST` allowlist. A
+    // `plane` line under `bitfield` gets the withdrawal, not "not allowed in
+    // genre bitfield", which would be true and useless.
+    if(kw==='plane'){ err(n,RETIRED_PLANE); continue; }
     if(kw==='guide'){ err(n,RETIRED_GUIDE); continue; }
     if(kw==='wave'){ err(n,RETIRED_WAVE); continue; }
     if(kw==='size'){ err(n,RETIRED_SIZE); continue; }
@@ -1547,7 +1835,7 @@ function parseOne(text){
         // per-field options. Classic form: field <name> <width> [options].
         // Classic form: field <name> <width-in-bits|*> [fill=] [description=]
         //                                             [present=]
-        // Conditional presence was a POSITIONAL FLAG until this release:
+        // Conditional presence was a POSITIONAL FLAG until 0.1:
         // `optional` (…0.1), `conditional` (0.1…0.1),
         // `optional` again (`PRESENCE-FLAG-SPELLING`). `PRESENCE-CONDITION-EXPRESSION` replaces the flag with
         // `present=`, an option key whose value is the presence CONDITION as
@@ -1634,7 +1922,7 @@ function parseOne(text){
           // the overflow.
           if(m[2]!=='*' && +m[2]>cur.word){
             // The suggestion spells the CLASSIC form, and the classic name is
-            // QUOTED (`QUOTING-RULES`). Until this release this string said
+            // QUOTED (`QUOTING-RULES`). Until 0.1 this string said
             // `write "field P 64"` — a second line error, so a user who
             // followed the diagnostic was told off twice.
             bad='"'+nm+':'+m[2]+'" is wider than word='+cur.word+' — a compact item must fit one row; write it in the classic form to span rows: field "'+nm+'" '+m[2]; break; }
@@ -1660,7 +1948,7 @@ function parseOne(text){
         // `break` ends the row after the fields declared since the block
         // opened (or since the previous break). With none there is nothing to
         // break — genre doc: "break with no preceding field in the current row".
-        // Spelled `wrap` until this release (`ROW-BREAK-NAMING`): in CSS/typography `wrap` is
+        // Spelled `wrap` until 0.1 (`ROW-BREAK-NAMING`): in CSS/typography `wrap` is
         // AUTOMATIC reflow — a mode — while this is an EXPLICIT break, an
         // event; CSS Fragmentation calls exactly this "a forced break …
         // explicitly indicated by the … author" and HTML spells it `br`.
@@ -1759,7 +2047,7 @@ function parseOne(text){
         //  / `TYPED-BLOCK-SILENT-FALLBACK`: data= is ABSENCE vs presence. An empty value, empty
         // members (a,b), or a count that does not match the lane's `=`
         // cells are all line errors — never silent drop or shift.
-        // Spelled `labels=` until this release (`SIGNAL-DATA-KEY-SPELLING`): WaveDrom's own key is
+        // Spelled `labels=` until 0.1 (`SIGNAL-DATA-KEY-SPELLING`): WaveDrom's own key is
         // `data`, "an array of signal labels" naming every value cell, and
         // after the `2`-`9` retirement (`TIMING-LANE-ALPHABET`) the two scopes coincide exactly.
         let labels;
@@ -1811,6 +2099,11 @@ function parseOne(text){
       // dispatched by their own scanner above.)
       if(NODE_SPELLINGS.has(kw) && GENRE_NODE_KW[doc.genre])
         err(n, WRONG_WORD(kw, GENRE_NODE_KW[doc.genre], doc.genre));
+      // `SCENE-KEYWORD-MEMBERSHIP`: same argument one step further. A word this genre
+      // WITHDREW is not an unknown word either, and the author holding it
+      // needs the ground, not a spellcheck.
+      else if(GENRE_WITHDRAWN[doc.genre] && GENRE_WITHDRAWN[doc.genre][kw])
+        err(n, WITHDRAWN_FROM_GENRE(kw, doc.genre));
       else
         err(n,'"'+kw+'" is not allowed in genre '+doc.genre);
       continue;
@@ -1837,10 +2130,23 @@ function parseOne(text){
         // different values for the same visible text. One form, one
         // meaning: the token is a normal quoted string and the generic
         // tokenizer above has already resolved its escapes.
-        const t0=tk.toks[1];
-        if(!t0||!t0.q){ err(n,'title needs a quoted string: title "<text>" (MIGRATIONS 0.1)'); break; }
-        if(tk.toks.length>2){ err(n,'unexpected argument "'+tk.toks[2].v+'"'); break; }
-        doc.title=t0.v; sawTitle=true; break;
+        // `DRAWN-ANNOTATION-FORM`: read the POSITIONALS, not the raw token stream.
+        // `title` took no options until this release, so `tk.toks[1]` and
+        // `tk.toks.length>2` were the same thing as `pos[1]` and
+        // `pos.length>2`. They stop being the same thing the moment the line
+        // may carry `note=`, and testing the raw stream would report the
+        // annotation as a surplus positional. This is `OPTION-POSITION-PARSING`'s lesson (`bundle`
+        // and `threshold` read `posq` for exactly this reason) applied to the
+        // one directive that had never needed it.
+        const t0v=pos[1], t0q=posq[1];
+        if(t0v===undefined||!t0q){ err(n,'title needs a quoted string: title "<text>" (MIGRATIONS 0.1)'); break; }
+        if(pos.length>2){ err(n,'unexpected argument "'+pos[2]+'"'); break; }
+        doc.title=t0v; sawTitle=true;
+        // The figure-level note lives on the document, not on an element —
+        // there is no element for it to live on, which is the whole reason
+        // `title` is an acceptor.
+        if(opts.note!==undefined) doc.note=opts.note;
+        break;
       }
       case 'class': {
         // semantic class (`CATEGORICAL-MEANING-MAPPING`): meaning + presentation defaults declared
@@ -1863,30 +2169,11 @@ function parseOne(text){
         if(pos.length>3){ err(n,'unexpected argument "'+pos[3]+'"'); break; }
         classIds.add(id);
         // `plane=` on a class is the members' default plane (an element's own
-        // plane= wins, rigidity `LAYOUT-STABILITY`) — the class carries all five §5 attributes.
+        // `PAINT-ORDER-CONSTRUCT`: `plane=` is withdrawn, so a class carries the
+        // FOUR §5 attributes it can still set. The paint-order attribute is
+        // gone from the language, not merely off this directive.
         doc.classes.push({id,label:pos[2],fill:opts.fill,stroke:opts.stroke,
-                          style:opts.style,plane:opts.plane,line:n});
-        break;
-      }
-      case 'plane': {
-        const id=pos[1];
-        { const e=idErr(id,posq[1],'plane needs an id'); if(e){ err(n,e); break; } }
-        if(planeIds.has(id)){ err(n,'duplicate plane id "'+id+'"'); break; }
-        if(pos[2]!==undefined&&!posq[2]){ err(n,'plane label must be quoted: plane '+id+' "'+pos[2]+'" — '+Q_WHY); break; }
-        if(pos.length>3){ err(n,'unexpected argument "'+pos[3]+'"'); break; }
-        // 0.1: `z=` -> `z-index=` (CSS's own spelling for the
-        // stacking concept, taken in full per RULE 4.2). The retired `z=`
-        // is caught language-wide in RETIRED_OPT_KEYS before this runs.
-        let z=doc.planes.length;
-        const zi=opts['z-index'];
-        if(zi!==undefined){
-          if(!/^-?\d+$/.test(zi)){ err(n,'z-index must be a number'); break; }
-          z=parseInt(zi,10);
-        }
-        planeIds.add(id);
-        // `EMPTY-LABEL-STATE`: absent is absent, `""` is a written value — same
-        // non-collapsing form as node/group/bundle and the typed blocks.
-        doc.planes.push({id,label:pos[2]!==undefined?pos[2]:null,z});
+                          style:opts.style,line:n});
         break;
       }
       // `FLOWCHART-ROLE-KEYWORDS`: `process` / `decision` / `terminator` DESUGAR to
@@ -1929,6 +2216,7 @@ function parseOne(text){
         // Display falls back to the id in render(), so the figure is unchanged.
         doc.nodes.push({id,label:pos[2]!==undefined?pos[2]:null,shape,role,fill:opts.fill,stroke:opts.stroke,
                         style:opts.style,cls:parseClassList(opts['class'],optList(optT,'class')).ids,
+                        note:opts.note,
                         group:opts['in']||null,plane:opts.plane||'base',line:n});
         break;
       }
@@ -1948,6 +2236,7 @@ function parseOne(text){
         }
         doc.groups.push({id,label:pos[2]!==undefined?pos[2]:null,fill:opts.fill,stroke:opts.stroke,
                          style:opts.style,gap:ggap,cls:parseClassList(opts['class'],optList(optT,'class')).ids,
+                         note:opts.note,
                          plane:opts.plane||null,line:n});
         break;
       }
@@ -1959,7 +2248,7 @@ function parseOne(text){
         // Shares the node/group/block id namespace. Of the §5 attributes it
         // can carry only the two that need no drawn shape: `text=` (the label
         // colour) and `plane=` (organizational, exactly as on a node).
-        // Spelled `boundary` until this release (`EXTERNAL-ENDPOINT-NAMING`): three standards claim that
+        // Spelled `boundary` until 0.1 (`EXTERNAL-ENDPOINT-NAMING`): three standards claim that
         // word for the OPPOSITE meaning (UML ECB «boundary» is an internal
         // interface object, C4 System_Boundary is a dashed grouping container,
         // BPMN's is an event), and this spec's own prose had already stopped
@@ -2114,7 +2403,7 @@ function parseOne(text){
       case 'chart': {
         // chart family: chart <table-id> [type=bar3d]
         // rows -> X, columns -> Y, numeric cells -> Z (the table IS the data)
-        // Spelled `plot` with `kind=bars3d` until this release (`CHART-BLOCK-NAMING`).
+        // Spelled `plot` with `kind=bars3d` until 0.1 (`CHART-BLOCK-NAMING`).
         // 0.1 (`CHART-LEVEL-KEY`): `level=` is DELETED. Zero uses corpus-wide, zero
         // 3-D bar charts, zero requests; one in-repo example and two fixtures.
         // It was the only construct whose caption the ENGINE wrote rather than
@@ -2155,7 +2444,7 @@ function parseOne(text){
         if(!opts['in']){ err(n,'band needs in=<node-or-group-id>'); break; }
         // 0.1: the `%` is MANDATORY, matching `threshold offset=` (`BARE-FRACTION-VALUES`).
         // `band 15`, `band 15-35` and `band 15%-35` all parsed before (the
-        // separator was a hyphen until this release); one concept in one
+        // separator was a hyphen until 0.1); one concept in one
         // document must not have two value grammars (RULE 4.4).
         // `RANGE-SPELLING`: the separator is `..`, and the HYPHEN form it
         // replaces gets its own named diagnostic. `15-35%` reads as
@@ -2253,7 +2542,7 @@ function parseOne(text){
         // the cell border colour, `text=` the block caption colour.
         // `TYPED-BLOCK-SILENT-FALLBACK`: word= empty or non-integer was a silent fallback/truncation
         // (word= → 32, word=8.5 → 8). Positive integer only; absence → 32.
-        // Spelled `unit=` until this release (`BITS-PER-ROW-KEY-NAMING`).
+        // Spelled `unit=` until 0.1 (`BITS-PER-ROW-KEY-NAMING`).
         let word=32;
         if(opts.word!==undefined){
           if(opts.word===''||!/^\d+$/.test(opts.word)||+opts.word<1){
@@ -2330,11 +2619,39 @@ function parseOne(text){
   }
   for(const r of doc.ranks) for(const id of r.ids)
     if(!nodeIds.has(id)) errs.push('Line '+r.line+': unknown node "'+id+'" in rank');
+  // `MARKER-TARGET-KINDS`: `in=` on `threshold`/`band` also resolves a REGION id —
+  // a `bitfield`, `table` or `timing` block. This is a WIDENING of the value
+  // domain, not a third sense of `in=` and not a new spelling: the relation is
+  // sense 2 verbatim, *the element this one is drawn across*, and what changes
+  // is only which declared ids the resolver will bind.
+  //
+  // It is UNGATED, and that is argued rather than assumed. A region-targeted
+  // threshold did not merely mean something else before this release — it did
+  // not PARSE. `threshold "Max" in=q offset=50%` over a `table q` answered
+  // `unknown target "q" for threshold`, the same error a nonexistent id gets,
+  // because this set was hard-coded to nodes and groups while `table <id>`
+  // makes the id mandatory and `chart <table-id>` already consumes it from
+  // another directive. So no `figdown 0.1` or `figdown 0.2` document changes
+  // meaning and none becomes invalid; the only documents affected are ones
+  // that produced no figure at all. Core §13.0.1's hazard — "a figure that
+  // looks right and means something else" — needs two readings to choose
+  // between, and here the alternative reading was an error message. That is
+  // exactly why `note=` IS gated a few hundred lines up and this is not: the
+  // key had a prior meaning, this had none. Nothing is added to the option
+  // registry, so a reader of `figdown 0.2` consulting core §10 finds the same
+  // 45 rows either way.
+  //
+  // The two WRED figures this unblocks are the whole of the measured demand
+  // (core §9 `ANNOTATION-LOCATOR-SPLIT`). The locator COORDINATE grammar — `in=q(3)`, addressing a
+  // row inside the region — is designed and deliberately NOT built: it has no
+  // shipping consumer, and RULE 4.7 argues against spending a grammar before
+  // one exists.
+  const regionTarget=id=>blockIds.has(id);
   for(const gl of doc.thresholds)
-    if(!groupIds.has(gl.target)&&!nodeIds.has(gl.target))
+    if(!groupIds.has(gl.target)&&!nodeIds.has(gl.target)&&!regionTarget(gl.target))
       errs.push('Line '+gl.line+': unknown target "'+gl.target+'" for threshold');
   for(const f of doc.bands)
-    if(!groupIds.has(f.target)&&!nodeIds.has(f.target))
+    if(!groupIds.has(f.target)&&!nodeIds.has(f.target)&&!regionTarget(f.target))
       errs.push('Line '+f.line+': unknown target "'+f.target+'" for band');
   for(const t of doc.trunks) for(const [a,b] of t.pairs){
     if((!nodeIds.has(a)&&!boundaryIds.has(a))||(!nodeIds.has(b)&&!boundaryIds.has(b))){ errs.push('Line '+t.line+': unknown endpoint in "'+a+'--'+b+'"'); continue; }
@@ -2393,7 +2710,7 @@ function parseOne(text){
     // b class=p` was accepted, drew a #555 line, and rendered a legend swatch
     // that showed nothing, so the class's meaning was invisible in its own
     // derived legend. With `color=` retired (`COLOUR-KEY-STATUS`) the remaining shape of the
-    // hole is a class carrying only `style=` and/or `plane=`, or nothing at
+    // hole is a class carrying only `style=`, or nothing at
     // all: the edge silently takes the default colour and the author who
     // declared a class to CLASSIFY the edge gets no colour and no warning.
     // Both halves are the same rule — a class an edge joins must declare at
@@ -2563,7 +2880,7 @@ function stackSectionSvgs(results){
 // became the node's LABEL. It is now a line error wherever it is part of the
 // GRAMMAR — that is, everywhere except the FOUR verbatim regions (this
 // function handles three of them; the pipe row is the caller's, see below).
-// The count read "three" until this release, listing four:
+// The count read "three" until 0.1, listing four:
 //   - inside a quoted string  ("…;…"),
 //   - inside a comment        (already stripped before this runs),
 //   - inside an edge label    (edge a -[packet arrives; TMR != 0]-> b),
@@ -2709,6 +3026,92 @@ function cwMax(s){ return Math.max(...String(s).split('\n').map(cw)); }
 // §5 style= → SVG dash pattern. `def` is the construct's conventional
 // default (the bundle ring and the threshold line are dashed by convention);
 // an explicit style= always wins.
+// ── the note box (`DRAWN-ANNOTATION-FORM`) ───────────────────────────────────────
+// The drawn annotation's whole appearance lives in these three functions,
+// because `DOMAIN-CONVENTION-DIRECTIVES` gives the engine the drawing convention outright: `note=` takes
+// no `at=`, no `side=`, no colour and no size, so there is exactly one look and
+// it is decided here rather than by an author.
+//
+// The look is the UML note symbol — a rectangle with a folded top-right corner
+// — which is the notation of the metaclass the SPELLING is borrowed from
+// (UML 2.5.1's `Comment`; RULE 4.1 takes the standard's word, and taking its
+// glyph with it is what lets a reader recognise the box as an aside without a
+// legend entry). It is deliberately unlike a `node`: no rounded corners, a
+// paler wash, smaller type, and a corner no node shape has.
+const NOTE_FS=10, NOTE_PAD=6, NOTE_FOLD=9, NOTE_MAXCH=30;
+const NOTE_FILL='#fdfaf0', NOTE_STROKE='#c9c4b2', NOTE_INK='#5c584c';
+// The leader is deliberately DARKER than the box outline. Drawn in the box's
+// own stroke it was legible in the SVG and invisible on the page at 1x — a
+// leader nobody can see is a leader that is not there, and the note then reads
+// as annotating whatever it happens to sit above. Checked by eye, not by a
+// contrast number: the box is a surface and may recede, the leader is a
+// statement of attachment and may not.
+const NOTE_LEADER='#9c968a';
+// Deterministic greedy word wrap. Author newlines are honoured and never
+// merged; a run longer than the wrap width is broken only between words, so a
+// long identifier keeps its shape and simply widens the box.
+function noteWrap(text){
+  const out=[];
+  for(const para of String(text).split('\n')){
+    const words=para.split(/ +/).filter(w=>w.length);
+    if(!words.length){ out.push(''); continue; }
+    let cur=words[0];
+    for(let i=1;i<words.length;i++){
+      if((cur+' '+words[i]).length<=NOTE_MAXCH) cur+=' '+words[i];
+      else { out.push(cur); cur=words[i]; }
+    }
+    out.push(cur);
+  }
+  return out;
+}
+function noteBox(text){
+  const lines=noteWrap(text);
+  const lh=NOTE_FS*1.35;
+  const w=Math.max(28, Math.max.apply(null,lines.map(tw))+NOTE_PAD*2+NOTE_FOLD);
+  const h=lines.length*lh+NOTE_PAD*2-lh*0.15;
+  return {w:Math.round(w*100)/100, h:Math.round(h*100)/100, lines, lh};
+}
+// The folded-corner outline, plus the small triangle that reads as the back of
+// the fold. One path each, so the shape is one primitive and the output is
+// byte-stable.
+function noteSvg(x,y,box,carrier){
+  const F=NOTE_FOLD, w=box.w, h=box.h;
+  const d='M'+x+' '+y+' H'+(x+w-F)+' L'+(x+w)+' '+(y+F)+' V'+(y+h)+' H'+x+' Z';
+  const fold='M'+(x+w-F)+' '+y+' V'+(y+F)+' H'+(x+w)+' Z';
+  const out=['<g class="fd-note"'+(carrier&&carrier.kind?' data-note-on="'+carrier.kind+'"':'')+'>',
+    '<path d="'+d+'" fill="'+NOTE_FILL+'" stroke="'+NOTE_STROKE+'" stroke-width="1"/>',
+    '<path d="'+fold+'" fill="'+NOTE_STROKE+'" fill-opacity="0.35" stroke="'+NOTE_STROKE+'" stroke-width="1"/>'];
+  const first=y+NOTE_PAD+NOTE_FS*0.85;
+  box.lines.forEach((ln,i)=>{
+    out.push('<text x="'+(x+NOTE_PAD)+'" y="'+Math.round((first+i*box.lh)*100)/100+
+             '" font-size="'+NOTE_FS+'" text-anchor="start" fill="'+NOTE_INK+'">'+esc(ln)+'</text>');
+  });
+  out.push('</g>');
+  return out.join('');
+}
+// The leader is drawn ONLY when adjacency failed, and it is drawn AFTER the
+// box is placed, so it is correct by construction: it runs from the box edge
+// facing the carrier to the carrier's nearest point, and cannot be stale.
+function noteLeader(best,box,rect){
+  const bx=best.x, by=best.y, bw=box.w, bh=box.h;
+  const cx=rect.x+rect.w/2, cy=rect.y+rect.h/2;
+  let x1,y1;
+  if(best.side==='right')      { x1=bx;        y1=by+bh/2; }
+  else if(best.side==='left')  { x1=bx+bw;     y1=by+bh/2; }
+  else if(best.side==='below') { x1=bx+bw/2;   y1=by; }
+  else                         { x1=bx+bw/2;   y1=by+bh; }
+  // land on the carrier's border, not its centre, so the line stops at the
+  // thing it points at
+  const x2=Math.max(rect.x, Math.min(rect.x+rect.w, x1));
+  const y2=Math.max(rect.y, Math.min(rect.y+rect.h, y1));
+  return '<line x1="'+x1+'" y1="'+y1+'" x2="'+(rect.w||rect.h?x2:cx)+'" y2="'+(rect.w||rect.h?y2:cy)+
+         '" stroke="'+NOTE_LEADER+'" stroke-width="1" stroke-dasharray="4 3"/>';
+}
+// A band's optional edge stroke. `renderScene` has had this as a local since
+// 0.1; `MARKER-TARGET-KINDS` needs the same rule for a REGION-scope band, which is drawn
+// outside the scene, so the one expression moves to module scope rather than
+// being written twice with a chance to drift.
+const bandEdgeOf=f=>(f.stroke||f.style)?' stroke="'+(f.stroke||'#8a8880')+'"'+dashOf(f.style,''):'';
 function dashOf(style,def){
   const p = style==='dashed'?'6 4' : style==='dotted'?'2 4' : style==='solid'?'' : def;
   return p?' stroke-dasharray="'+p+'"':'';
@@ -2904,21 +3307,17 @@ function render(doc,ropts){
       if(C[id] && C[id][k]!==undefined) x[k]=C[id][k];
     }
   };
-  // a class carries all five §5 attributes; the element's own value wins (`LAYOUT-STABILITY`).
-  // `plane` is materialized to 'base' at parse time, so "unset" is 'base' here.
-  const rsl=(x)=>{
-    if(!(x.plane===undefined||x.plane===null||x.plane==='base')) return;
-    for(const id of classIdsOf(x)){
-      if(C[id] && C[id].plane!==undefined) x.plane=C[id].plane;
-    }
-  };
-  const rsAll=(x)=>{ rs(x,'fill'); rs(x,'stroke'); rs(x,'style'); rsl(x); };
+  // `PAINT-ORDER-CONSTRUCT`: a class carries the FOUR §5 attributes that survive.
+  // The fifth was `plane`, and its cascade helper (`rsl`) is gone with the
+  // key — a class can no longer set a paint order because the language has
+  // no paint order to set. Everything is on the implicit `base` plane.
+  const rsAll=(x)=>{ rs(x,'fill'); rs(x,'stroke'); rs(x,'style'); };
   for(const n of doc.nodes){ rsAll(n); if(n.style===undefined) n.style='solid'; }
   for(const g of doc.groups){ rsAll(g); }
   // 0.1 (§8.4): an edge has no interior, so it takes every class
   // channel EXCEPT `fill` — which the parser has already guaranteed is
   // accompanied by a `stroke` on any class an edge joins.
-  for(const e of doc.edges){ rs(e,'stroke'); rs(e,'style'); rsl(e); if(e.style===undefined) e.style='solid'; }
+  for(const e of doc.edges){ rs(e,'stroke'); rs(e,'style'); if(e.style===undefined) e.style='solid'; }
   for(const b of doc.blocks){
     rsAll(b);
     if(b.fields) for(const f of b.fields) rsAll(f);
@@ -2932,13 +3331,54 @@ function render(doc,ropts){
     const s=renderScene(doc,y); parts.push(s.svg); y=s.y; maxW=Math.max(maxW,s.w);
     sceneMeta=s.meta;
   }
+  // `MARKER-TARGET-KINDS`: a region-scope `threshold`/`band` is drawn HERE and not
+  // in `renderScene`, because a region is not in the scene. Typed blocks stack
+  // in document order OUTSIDE the scene (core §2, the `plane=` carve-out says
+  // so in as many words), so at the moment `renderScene` emits its own
+  // thresholds the region has no geometry yet and sits at a `y` the scene never
+  // sees. The mark therefore travels with its target: each block reports its
+  // box, and the marks that name it are painted over that box in the same
+  // coordinate shape (`x0`/`x1`/`yA`/`yB`) the scene uses for a group.
+  const regionBox={};
   for(const b of doc.blocks){
     let s;
     if(b.type==='bitfield') s=renderBitfield(b,y);
     else if(b.type==='table') s=renderTable(b,y);
     else if(b.type==='chart') s=renderChart(b,y,doc);
     else s=renderTiming(b,y);
-    parts.push(s.svg); y=s.y+24; maxW=Math.max(maxW,s.w);
+    parts.push(s.svg);
+    if(s.box) regionBox[b.id]=s.box;
+    y=s.y+24; maxW=Math.max(maxW,s.w);
+  }
+  {
+    const rsvg=[];
+    for(const f of (doc.bands||[])){
+      const B=regionBox[f.target]; if(!B) continue;
+      const w=B.x1-B.x0, h=B.yB-B.yA;
+      let bx,by,bw,bh;
+      if(f.dir==='up')        { bx=B.x0; by=B.yB-h*f.to/100; bw=w; bh=h*(f.to-f.from)/100; }
+      else if(f.dir==='down') { bx=B.x0; by=B.yA+h*f.from/100; bw=w; bh=h*(f.to-f.from)/100; }
+      else if(f.dir==='right'){ bx=B.x0+w*f.from/100; by=B.yA; bw=w*(f.to-f.from)/100; bh=h; }
+      else                    { bx=B.x1-w*f.to/100; by=B.yA; bw=w*(f.to-f.from)/100; bh=h; }
+      rsvg.push('<rect x="'+bx+'" y="'+by+'" width="'+bw+'" height="'+bh+'" fill="'+f.fill+'" opacity="0.35"'+bandEdgeOf(f)+'/>');
+      rsvg.push(textEl(bx+bw/2, by+bh/2+4, 11, 'middle', labelInk(f.fill,'#334155'), f.label,
+                       ' paint-order="stroke" stroke="#fff" stroke-width="3"'));
+    }
+    for(const gl of (doc.thresholds||[])){
+      const B=regionBox[gl.target]; if(!B) continue;
+      const ly=B.yB-(B.yB-B.yA)*gl.pct/100;
+      const col=gl.stroke||'#ef4444';
+      rsvg.push('<line x1="'+B.x0+'" y1="'+ly+'" x2="'+B.x1+'" y2="'+ly+'" stroke="'+col+
+                '" stroke-width="'+(gl.pct>=100?4:2)+'"'+dashOf(gl.style,'7 4')+'/>');
+      rsvg.push(textEl(B.x1+8, ly+4, 11, 'start', col, gl.label,' paint-order="stroke" stroke="#fff" stroke-width="3"'));
+      maxW=Math.max(maxW, B.x1+8+tw(gl.label));
+    }
+    // A band is a translucent wash UNDER the grid ink; a threshold is a mark
+    // OVER it. The region has already been pushed, so both go after it and the
+    // band leans on opacity rather than paint order for the "under" reading —
+    // the same compromise `renderChart` makes, and the reason the opacity here
+    // is lower than the scene's 0.9.
+    if(rsvg.length) parts.push(rsvg.join(''));
   }
   // 0.1 (`CLASS-EMPTY-MEANING`): a class whose meaning is the EMPTY string claims no
   // meaning, so it has nothing to explain and draws NO legend entry — it is
@@ -2975,6 +3415,30 @@ function render(doc,ropts){
     }
     parts.push(es.join(''));
     y=ly+rowH;
+  }
+  // `DRAWN-ANNOTATION-FORM`: the FIGURE-level note — `title "…" note="…"`. It carries
+  // the 14% of measured annotations that name no single element ("Total: 8k
+  // tunnel indexes", a four-signal legend, a TODO about the whole figure), and
+  // it is the acceptor that removes the last argument for a standalone `note`
+  // keyword: the figure HAS a declaration line, so attachment-by-position
+  // reaches it too.
+  //
+  // It has no geometry to sit beside, so it takes no candidates and NEVER takes
+  // a leader — a leader must point at something, and "the figure" is not a
+  // thing on the canvas. It is placed with the caption, at the bottom, after
+  // the scene, the regions and the derived legend. That is a placement rule and
+  // not an author's choice (`DOMAIN-CONVENTION-DIRECTIVES`), and it is deterministic by construction:
+  // there is exactly one figure-level note and exactly one place for it.
+  //
+  // The title itself is NOT drawn by default (`DEFAULT-VALUE-SELECTION` — an embedded figure sits
+  // under a host caption), and the note does not follow it: the note is the
+  // thing that draws. An author who wants the sentence in the picture writes
+  // it here whether or not the renderer is showing the title.
+  if(doc.note!==null&&doc.note!==undefined){
+    const nb=noteBox(doc.note);
+    const ny=y+8;
+    parts.push(noteSvg(0,ny,nb,{kind:'title'}));
+    y=ny+nb.h+2; maxW=Math.max(maxW,nb.w);
   }
   const PADL=18, PADT=6;
   const W=Math.ceil(maxW)+PADL+8, H=Math.ceil(y)+PADT+4;
@@ -3460,7 +3924,7 @@ function renderScene(doc,y0){
     const halo=' paint-order="stroke" stroke="#fff" stroke-width="3"';
     const seg=(p,q,t,lbl,fs)=>reqLabel({p,q,t0:t,text:lbl,fs,col:ecol,halo,e,A,B,kind:'end'});
     if(isBack.has(e)&&!pinned(e.a)&&!pinned(e.b)){
-      // ── ROUTING-CHANGE ARCHITECTURE NOTE ──────────
+      // ── ROUTING-CHANGE ARCHITECTURE NOTE (`SELF-EDGE-DRAWING`/`EDGE-BEND-RETENTION`) ──────────
       // Edge labels are DEFERRED: every label is registered against its
       // FINAL segment geometry (reqLabel/lblReq above) and placed by ONE
       // greedy pass after all edges are drawn; arrowheads are computed from
@@ -3472,7 +3936,7 @@ function renderScene(doc,y0){
       // arrowheads, orphaned labels): that was external splicing, not an
       // engine gap. Patch routing here; do not "fix" the label machinery.
       if(A===B){
-        // Self-transition: a small side loop on the node, the
+        // Self-transition (`SELF-EDGE-DRAWING`): a small side loop on the node, the
         // convention of every drawing tool — never a lap of the figure
         // through the back-edge channel. Side order r,l,b,t; first side
         // whose loop box overlaps no other node wins (deterministic).
@@ -3625,7 +4089,7 @@ function renderScene(doc,y0){
       // their neighbours turns a 40-point staircase into the 2–4 bends a
       // dummy-vertex chain should have, without moving the drawn line.
       simplifyPts(pts);
-      // Waypoint prune: after collinear simplification a
+      // Waypoint prune (`EDGE-BEND-RETENTION`): after collinear simplification a
       // chain can still carry a staircase of near-collinear jogs — the drift
       // clamp allows only a few px of sideways movement per rank, so a run
       // that wants to move 35px sideways alternates short diagonals and
@@ -3737,7 +4201,13 @@ function renderScene(doc,y0){
   // the arrowheads, and the other edges — plus a pull back toward the
   // preferred point on the segment.  The lowest score wins.  No randomness,
   // no iteration to a fixed point: one deterministic pass.
-  if(lblReq.length){
+  // `DRAWN-ANNOTATION-FORM`: this block used to be guarded by `if(lblReq.length)`,
+  // with `obst`, `ovl`, `segHit` and `placed` local to it. The note pass below
+  // is a SECOND claimant on exactly that machinery and must see exactly the
+  // same `placed` list — a note that did not know where the edge labels went
+  // could not yield to them, which is the first of the four placement rules.
+  // So the scaffolding is hoisted and only the LOOP keeps the guard.
+  {
     const obst=nodes.filter(n=>!n.boundary).map(n=>({x:n.x,y:n.y,w:n.w,h:n.h,n}));
     const ovl=(a,b)=>{
       const ix=Math.min(a.x+a.w,b.x+b.w)-Math.max(a.x,b.x);
@@ -3775,7 +4245,7 @@ function renderScene(doc,y0){
       return {x,y:by+up,anchor,t,side,box:{x:bx,y:by,w,h}};
     };
     const placed=[];
-    for(const r of lblReq){
+    if(lblReq.length) for(const r of lblReq){
       const dx=r.q[0]-r.p[0], dy=r.q[1]-r.p[1];
       const across=Math.abs(dx)>=Math.abs(dy);
       let sides, ts, tPref;
@@ -3814,6 +4284,146 @@ function renderScene(doc,y0){
       placed.push(best.box);
       W=Math.max(W, best.box.x+best.box.w+4);
       Hh=Math.max(Hh, best.box.y+best.box.h+4-y0-20);
+    }
+    // ── note placement (`DRAWN-ANNOTATION-FORM`) — the SAME pass, entered LAST ────────────────
+    // Four rules, and they are in the spec rather than only here because two
+    // engines have to agree on them:
+    //
+    //  1. Notes register LAST, after every edge label and arrowhead. The
+    //     reason is semantic, not convenient: a label is ON the thing it names
+    //     and an arrowhead IS part of the connector, whereas a note is BESIDE
+    //     what it is about. A NOTE YIELDS; NOTHING YIELDS TO A NOTE. That is
+    //     why this loop runs after the one above, reads the same `placed`, and
+    //     is read by nothing after it.
+    //  2. Candidates are generated around the CARRIER's final geometry — a
+    //     node box, a group rect, or the edge's segment list, all of which are
+    //     rects or segments by the time this pass runs — and scored by the same
+    //     overlap function against `placed`, `obst`, `arrowBox` and `edgeSegs`.
+    //  3. A LEADER LINE is drawn ONLY when the box could not be placed adjacent
+    //     to its carrier. This is where attachment-by-syntax pays off twice:
+    //     the carrier is known from the line, so the PREFERRED position is
+    //     always adjacency and the leader is a fallback the engine reaches for
+    //     rather than a permanent part of the construct. It is drawn AFTER
+    //     placement, so it is correct by construction — the property `SELF-EDGE-DRAWING`/`EDGE-BEND-RETENTION`
+    //     already records for arrowheads.
+    //  4. Determinism is not optional. `RENDERING-DETERMINISM` promises byte-reproducible output,
+    //     and one greedy pass in registration order with no iteration is what
+    //     delivers it. Registration order here is DOCUMENT order — carriers are
+    //     sorted by source line, across kinds — so moving a `group` line above
+    //     a `node` line moves the notes with it and nothing else changes.
+    //
+    // `DOMAIN-CONVENTION-DIRECTIVES` binds throughout: `note=` accepts no `at=`, no `side=`, no
+    // `left of`/`right of`. The author names the meaning; the engine owns the
+    // drawing convention. The convention is the UML note symbol — a rectangle
+    // with a folded top-right corner — which is what makes a note readable AS
+    // a note without a legend entry, and is the notation belonging to the
+    // metaclass the spelling is borrowed from (RULE 4.1).
+    const noteCarriers=[];
+    for(const n of nodes) if(n.note!==undefined&&n.note!==null&&!n.boundary)
+      noteCarriers.push({line:n.line,text:n.note,kind:'node',rect:{x:n.x,y:n.y,w:n.w,h:n.h},n});
+    for(const g of doc.groups) if(g.note!==undefined&&g.note!==null){
+      const B=gBox[g.id]; if(!B) continue;
+      noteCarriers.push({line:g.line,text:g.note,kind:'group',
+                         rect:{x:B.x0,y:B.yA,w:B.x1-B.x0,h:B.yB-B.yA}});
+    }
+    for(const e of doc.edges) if(e.note!==undefined&&e.note!==null){
+      // An edge is a polyline, not a rect. Its carrier POINT is the midpoint of
+      // the middle registered segment — deterministic, and it is the same
+      // "middle of the run" an author means when they annotate a wire. A note
+      // whose edge never made it to the canvas (an endpoint that did not
+      // resolve) simply has no carrier and is not drawn; the missing endpoint
+      // is already its own line error.
+      const segs=edgeSegs.filter(g=>g.e===e); if(!segs.length) continue;
+      const m=segs[Math.floor((segs.length-1)/2)];
+      const cx=(m.p[0]+m.q[0])/2, cy=(m.p[1]+m.q[1])/2;
+      noteCarriers.push({line:e.line,text:e.note,kind:'edge',rect:{x:cx,y:cy,w:0,h:0},e});
+    }
+    noteCarriers.sort((a,b)=>a.line-b.line);
+    for(const c of noteCarriers){
+      const box=noteBox(c.text);
+      // Adjacency first, then the same four sides pushed out far enough that a
+      // leader is legible. `si` orders the sides; `far` is what decides the
+      // leader, and it costs enough that adjacency wins every time adjacency is
+      // merely imperfect rather than blocked.
+      // Sides in preference order, and for the two that straddle the carrier
+      // an ALIGNMENT as well. Centring a wide note over a narrow carrier at the
+      // left edge of the canvas puts the box off it; aligning the box's left
+      // edge with the carrier's is the same "beside this thing" reading and
+      // stays on the page. Found by eye — see the off-canvas note below.
+      const SIDES=[['right','c'],['left','c'],
+                   ['below','c'],['below','l'],['below','r'],
+                   ['above','c'],['above','l'],['above','r']];
+      // Three distance tiers, not two. `near` is adjacency and takes no leader;
+      // the two `far` tiers do. The third exists because a crowded figure can
+      // have NO free space within one leader length of the carrier — a note
+      // then had to sit on top of an edge label, which is the exact inversion
+      // of rule 1 (a note yields; nothing yields to a note). Given somewhere
+      // further to go, it goes there and the canvas grows to fit.
+      let best=null,bestS=Infinity, fallback=null,fallbackS=Infinity;
+      for(const tier of [0,1,2]){
+        const far=tier>0, gap=[10,46,96][tier];
+        for(let si=0;si<SIDES.length;si++){
+          const side=SIDES[si][0], al=SIDES[si][1];
+          let bx,by;
+          if(side==='right'){ bx=c.rect.x+c.rect.w+gap; by=c.rect.y+c.rect.h/2-box.h/2; }
+          else if(side==='left'){ bx=c.rect.x-gap-box.w; by=c.rect.y+c.rect.h/2-box.h/2; }
+          else {
+            bx=al==='l'?c.rect.x
+              :al==='r'?c.rect.x+c.rect.w-box.w
+              :c.rect.x+c.rect.w/2-box.w/2;
+            by=side==='below'?c.rect.y+c.rect.h+gap:c.rect.y-gap-box.h;
+          }
+          const cb={x:bx,y:by,w:box.w,h:box.h};
+          let s=0;
+          // A NOTE YIELDS; NOTHING YIELDS TO A NOTE. `placed` holds the edge
+          // labels and the notes already sited, and its weight is the HIGHEST
+          // of the three — higher than a node's — because a label is a small
+          // box and an AREA-weighted penalty would otherwise let a note sit on
+          // one for less than it costs to clip a node's corner. Found by eye: a
+          // transition note landed across two edge labels while a node overlap
+          // three times the area scored higher.
+          for(const b of placed)   s+=10*ovl(cb,b);
+          for(const o of obst)     s+=6*ovl(cb,o);
+          for(const a of arrowBox) s+=8*ovl(cb,a);
+          for(const g of edgeSegs) if(segHit(g.p,g.q,cb)) s+=26;
+          for(const g of doc.groups){ const B=gBox[g.id];
+            if(B) s+=1.2*ovl(cb,{x:B.x0,y:B.yA,w:B.x1-B.x0,h:B.yB-B.yA}); }
+          s+=si*12;
+          s+=tier*900;                          // the leader is a LAST resort
+          // Falling off the top or the left margin is not a BAD placement, it
+          // is NO placement. The canvas grows right and down but has no
+          // mechanism here to grow up or left, so such a box is clipped away
+          // and the annotation VANISHES — the author wrote a sentence and the
+          // reader never sees it, which is the worst outcome available. So it
+          // is a HARD FILTER and not a score term: every other penalty is an
+          // AREA and grows without bound, so no constant can outrank one
+          // reliably. Found by eye on a statechart, where the note on the
+          // leftmost state was emitted at x=-267.8 and simply did not appear —
+          // and then found AGAIN when a large constant was tried first and the
+          // box landed on top of two states instead.
+          // `<0`, not `<2`. The edge-label pass keeps a 2px margin because a
+          // label is loose text; a note is a BOX whose left edge at x=0 IS the
+          // canvas origin and is perfectly placed. With the label pass's
+          // threshold copied over, the one candidate that rescues a wide note
+          // on a leftmost element — below, left-aligned, at exactly x=0 — was
+          // filtered as off-canvas, and the note went to the only survivor: on
+          // top of the next two states.
+          if(cb.x<0||cb.y<y0){
+            if(s<fallbackS-1e-9){ fallbackS=s; fallback={x:bx,y:by,far,side}; }
+            continue;
+          }
+          if(s<bestS-1e-9){ bestS=s; best={x:bx,y:by,far,side}; }
+        }
+      }
+      // Only if EVERY candidate was off-canvas: take the least-bad one and
+      // clamp it on. It may overlap something; visible and overlapping is
+      // recoverable by an author, invisible is not.
+      if(!best){ best=fallback; best.x=Math.max(0,best.x); best.y=Math.max(y0,best.y); }
+      lblsvg.push(noteSvg(best.x,best.y,box,c));
+      if(best.far) lblsvg.push(noteLeader(best,box,c.rect));
+      placed.push({x:best.x,y:best.y,w:box.w,h:box.h});
+      W=Math.max(W, best.x+box.w+4);
+      Hh=Math.max(Hh, best.y+box.h+4-y0-20);
     }
   }
   // nodes on top (each wrapped in a draggable, identifiable group)
@@ -4127,7 +4737,7 @@ function renderBitfield(b,y0){
   //
   // and 0.1 already ruled that a spanning field follows the RFC's
   // drawing rather than a FigDown one; this is the same ruling applied to the
-  // other construct in the same figure. Until this release the engine drew ONE
+  // other construct in the same figure. Until 0.1 the engine drew ONE
   // occurrence and hung `[first] … [last]` on the strip — a FigDown invention
   // where a convention already existed.
   //
@@ -4174,7 +4784,7 @@ function renderBitfield(b,y0){
   const shiftFor=(row)=>elisBands(row)*EL_H;
   // `FIELD-WIDER-THAN-WORD`: ONE FIELD IS ONE BOX.
   //
-  // A field wider than `word=` occupies several rows. Until this release each
+  // A field wider than `word=` occupies several rows. Until 0.1 each
   // row was a separate fully-bordered <rect> carrying the full label, so a
   // 128-bit address at word=32 drew as FOUR captioned boxes and a reader saw
   // four fields where the model has one. In examples/srh.fd it was worse: the
@@ -4370,7 +4980,7 @@ function renderBitfield(b,y0){
     }
     boxes.forEach(function(bx,bi){
       // `DESCRIPTION-KEY-SPELLING`: the `<title>` is a CHILD of the shape it names, not
-      // a sibling. Until this release it was pushed into the block's stream
+      // a sibling. Until 0.1 it was pushed into the block's stream
       // after the rect and the label, so it landed under the figure's single
       // <g> — and SVG says a <title> names its PARENT, so every description in
       // a figure named the same <g> and a conforming UA showed one arbitrary
@@ -4529,7 +5139,8 @@ function renderBitfield(b,y0){
     }
     yb+=2;
   }
-  return {svg:svg.join(''), y:yb, w:wb};
+  return {svg:svg.join(''), y:yb, w:wb,
+          box:{x0:0, x1:wb, yA:y0+18, yB:yb}};
 }
 
 // ---- table (with ^ rowspan / < colspan merging and per-cell marks) ----
@@ -4625,7 +5236,20 @@ function renderTable(t,y0){
       i=>[xAt[i], xAt[i+1]], i=>[cellAt(r-1,i), cellAt(r,i)]));
   svg.push(edgeSvg(EDG, DEF));
   const yEnd=yTop+yAt[grid.length];
-  return {svg:svg.join(''), y:yEnd+6, w:totalW+2};
+  // `MARKER-TARGET-KINDS`: the GRID's box, so a region-scope `threshold`/`band`
+  // can be drawn across it. It is the grid and not the returned slot: the slot
+  // includes the caption row and the trailing gap, and `offset=50%` on a table
+  // must mean half way down the ROWS, not half way down the whitespace.
+  // `MARKER-TARGET-KINDS`: the box a region-scope `threshold`/`band` is measured
+  // against spans the DATA ROWS, not the whole grid. Measured over the grid,
+  // `offset=85%` on a three-row table lands on the COLUMN HEADINGS and strikes
+  // through them — found by eye on the WRED figure this widening exists for.
+  // The header tiers are chrome: they name the columns, they are not values,
+  // and a threshold is a statement about values. `h1..hN` and `1..` are already
+  // separate address spaces in this genre (genres/table.md), so the split is
+  // the genre's own and not invented here.
+  return {svg:svg.join(''), y:yEnd+6, w:totalW+2,
+          box:{x0:0, x1:totalW, yA:yTop+yAt[H], yB:yEnd}};
 }
 
 // ---- chart bar3d: deterministic isometric projection of a table ----
@@ -4729,7 +5353,8 @@ function renderTiming(w,y0){
     svg.push('<path d="M'+x+','+(y+4)+' q4,'+(hTotal/4)+' 0,'+(hTotal/2)+' q-4,'+(hTotal/4)+' 0,'+(hTotal/2)+'" fill="none" stroke="#999" stroke-width="2"/>');
   }
   const H=y+8+w.signals.length*(laneH+laneGap);
-  return {svg:svg.join(''), y:H, w:nameW+cycles*cycleW+2};
+  return {svg:svg.join(''), y:H, w:nameW+cycles*cycleW+2,
+          box:{x0:nameW, x1:nameW+cycles*cycleW, yA:y0+18, yB:H}};
 }
 
 // ============================================================
@@ -4844,7 +5469,7 @@ pin mon at=(340,0)`,
 
 'EVPN fabric (topology + supplementary tables)':
 `figdown 0.1 topology
-title "VXLAN/EVPN Leaf-Spine Fabric — topology with plane notes"
+title "VXLAN/EVPN Leaf-Spine Fabric — underlay and overlay"
 
 # ── Topology ────────────────────────────────────────────────────────
 node sp1 "Spine-1" shape=rounded fill=#e0e7ff
@@ -4871,8 +5496,7 @@ edge lf2 -- h2
 edge lf3 -- h3
 
 # overlay: VXLAN tunnel between the two VTEPs sharing VNI 10010
-plane overlay "VXLAN tunnels" z-index=2
-edge lf1 <-[VXLAN VNI 10010]-> lf2 style=dashed stroke=#dc2626 plane=overlay
+edge lf1 <-[VXLAN VNI 10010]-> lf2 style=dashed stroke=#dc2626
 
 # ── Supplementary knowledge ─────────────────────────────────────────
 table vni "VNI mapping"
@@ -5126,12 +5750,16 @@ let lastSVG='', lastMeta=null, lastPad={x:0,y:0}, lastDoc=null;
 // pin/layout are layout-zone only — they must never
 // be treated as "last scene line" (P0: drag then +Node was writing
 // into the layout zone → "node is a semantic directive" white screen).
-const CONTENT_KW=/^(figdown|title|node|group|external|edge|plane|flow|rank|threshold|band|bundle|class)\b/;
+// `PAINT-ORDER-CONSTRUCT`: `plane` leaves this list with the keyword. The list is
+// SPELLINGS, not per-genre legality (the parser owns legality), so the
+// per-genre withdrawals of `SCENE-KEYWORD-MEMBERSHIP` change nothing here — `threshold`, `band` and
+// `bundle` are still content lines in the genres that still declare them.
+const CONTENT_KW=/^(figdown|title|node|state|group|external|edge|flowline|transition|flow|rank|threshold|band|bundle|class)\b/;
 // `GENRE-CONNECTOR-SPELLING`/`GENRE-NODE-SPELLING`: `state` is a node-declaring keyword under
 // `statechart`, so an id it declares must count as USED here or the GUI
 // hands out a colliding id. The list is spellings, not per-genre legality —
 // the parser owns legality.
-const ID_DECL_KW=/^(node|state|group|external|bundle|class|plane|bitfield|table|timing)\s+(\S+)/;
+const ID_DECL_KW=/^(node|state|group|external|bundle|class|bitfield|table|timing)\s+(\S+)/;
 function lastContentLineIdx(lines){
   let last=-1;
   const layoutIdx=lines.findIndex(l=>l.trim()==='layout');

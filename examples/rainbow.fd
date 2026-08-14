@@ -3,8 +3,10 @@
 figdown 0.1 block
 title "Rainbow rings — line order is the layer"
 
-# Seven concentric ellipses. Earlier lines paint first (bottom), later
-# lines paint on top — the ring effect needs no plane directives at all.
+# Seven concentric ellipses. Earlier lines paint first (bottom), later lines
+# paint on top: DOCUMENT ORDER IS PAINT ORDER, and (`PAINT-ORDER-CONSTRUCT`) it
+# is the only paint order the language has — the ring effect is the whole
+# demonstration that no directive was needed to get one.
 
 # decorative
 # A rendering demo: the concentric geometry IS the subject (paint order),

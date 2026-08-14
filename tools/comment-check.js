@@ -31,7 +31,7 @@
  *   defect   a comment that USES a retired spelling as if it were current
  *            (`# text= colours the label`)
  *   allowed  a comment that NAMES a retired spelling as history
- *            (``# Spelled `guide` until this release``)
+ *            (``# Spelled `guide` until 0.1``)
  *
  * The rule (see tools/README.md for the rationale): a retired spelling is
  * admitted when its CONTIGUOUS COMMENT BLOCK also carries a retirement
@@ -143,10 +143,13 @@ const ENGLISH_AMBIGUOUS = {
   // "an optional label", "optional attributes" in §12.3).
   conditional: 'ordinary English, and how BITFIELD-CONDITIONAL-OFFSETS describes per-case offsets',
   optional: 'ordinary English, RFC 2119\'s OPTIONAL, and "an optional attribute" throughout §12.3',
-  // 0.1 (DESCRIPTION-KEY-SPELLING): the option key `note=` was renamed `description=`.
-  // The bare word is ordinary English AND the name of the v0.2 annotation
-  // keyword this project talks about constantly (ANNOTATION-LOCATOR-SPLIT).
-  note: 'ordinary English, and the name of the v0.2 annotation construct (ANNOTATION-LOCATOR-SPLIT)',
+  // `note` was HERE (DESCRIPTION-KEY-SPELLING) until this release (DRAWN-ANNOTATION-FORM), when the
+  // option key was REVIVED under SYNTAX-STYLE RULE 4.9 and stopped being
+  // retired vocabulary at all. The entry is dropped rather than kept "just in
+  // case": this file's own start-up assertion below refuses an opt-out for a
+  // spelling the engine no longer retires, because a stale exemption silently
+  // stops covering something. Nothing is lost — the scanner only ever looks
+  // for RETIRED spellings, so a live `note` is not a hit to exempt.
   // 0.1 (TIMING-GENRE-NAMING): the genre `wave` became `timing`. The bare word is
   // ordinary English and is the root of "waveform" and "WaveDrom", which the
   // timing genre's own documentation cites on nearly every line.

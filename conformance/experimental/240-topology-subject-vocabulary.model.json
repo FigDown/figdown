@@ -1,0 +1,78 @@
+{
+  "header": {
+    "version": "0.1",
+    "genre": "topology"
+  },
+  "flow": "right",
+  "classes": [],
+  "planes": [
+    {
+      "id": "base",
+      "z": 0
+    }
+  ],
+  "nodes": [
+    {
+      "id": "leaf1",
+      "label": "Leaf-1",
+      "shape": "box",
+      "group": "pod",
+      "plane": "base",
+      "line": 20
+    },
+    {
+      "id": "leaf2",
+      "label": "Leaf-2",
+      "shape": "box",
+      "group": "pod",
+      "plane": "base",
+      "line": 21
+    }
+  ],
+  "groups": [
+    {
+      "id": "pod",
+      "label": "Pod 1",
+      "line": 19
+    }
+  ],
+  "externals": [
+    {
+      "id": "wan",
+      "label": "to WAN",
+      "line": 22
+    }
+  ],
+  "edges": [
+    {
+      "a": "leaf1",
+      "op": "--",
+      "b": "wan",
+      "plane": "base",
+      "line": 23
+    },
+    {
+      "a": "leaf2",
+      "op": "--",
+      "b": "wan",
+      "plane": "base",
+      "line": 24
+    }
+  ],
+  "ranks": [],
+  "pins": [],
+  "thresholds": [],
+  "bands": [],
+  "bundles": [
+    {
+      "id": "es1",
+      "label": "ES-1",
+      "members": [
+        "leaf1--wan",
+        "leaf2--wan"
+      ],
+      "line": 25
+    }
+  ],
+  "regions": []
+}

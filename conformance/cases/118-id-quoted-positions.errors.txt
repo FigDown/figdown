@@ -12,6 +12,5 @@ Line 20: ids are bare and match [A-Za-z_][A-Za-z0-9_-]* — text with spaces or 
 Line 21: ids are bare and match [A-Za-z_][A-Za-z0-9_-]* — text with spaces or punctuation belongs in the label: node <id> "your text"
 Line 22: ids are bare and match [A-Za-z_][A-Za-z0-9_-]* — text with spaces or punctuation belongs in the label: node <id> "your text"
 Line 23: ids are bare and match [A-Za-z_][A-Za-z0-9_-]* — text with spaces or punctuation belongs in the label: node <id> "your text"
-Line 24: ids are bare and match [A-Za-z_][A-Za-z0-9_-]* — text with spaces or punctuation belongs in the label: node <id> "your text"
-Line 25: ids are bare and match [A-Za-z_][A-Za-z0-9_-]* — text with spaces or punctuation belongs in the label: node <id> "your text"
-Line 26: ids are bare and match [A-Za-z_][A-Za-z0-9_-]* — text with spaces or punctuation belongs in the label: node <id> "your text"
+Line 39: ids are bare and match [A-Za-z_][A-Za-z0-9_-]* — text with spaces or punctuation belongs in the label: node <id> "your text"
+Line 9: ids are bare and match [A-Za-z_][A-Za-z0-9_-]* — text with spaces or punctuation belongs in the label: node <id> "your text"

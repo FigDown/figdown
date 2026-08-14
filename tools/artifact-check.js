@@ -301,7 +301,7 @@ function main() {
     ' (no-metadata ' + skipped.noMeta.length + ', no-source ' + skipped.noSource.length + ')');
 
   if (noVer.length)
-    console.log('  no-engine-version: built before this release, which is where the attribute ' +
+    console.log('  no-engine-version: built before 0.1, which is where the attribute ' +
       'was added; no version is inferred for them (MIGRATIONS 0.1).');
   for (const s of skipped.noMeta)
     console.log('  skip (no figdown-source metadata): ' + s.rel);

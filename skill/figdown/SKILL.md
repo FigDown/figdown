@@ -106,12 +106,12 @@ so you know which file you need before you need it.
 
 | Genre on line 1 | Load | Add only for EXPERIMENTAL constructs |
 |---|---|---|
-| `block` — architecture, dataflow, hierarchy | `reference/scene.md`, `reference/layout.md` | `reference/experimental/constructs.md` |
+| `block` — architecture, dataflow, hierarchy | `reference/scene.md`, `reference/layout.md` | `reference/experimental/block.md`, `reference/experimental/chart.md` |
 | `bitfield` — packet headers, register layouts | `reference/bitfield.md` | — |
-| `table` — config, state, memory maps | `reference/table.md` | `reference/experimental/constructs.md` |
-| `topology` | `reference/scene.md`, `reference/layout.md` | `reference/experimental/topology.md`, `reference/experimental/constructs.md` |
-| `flowchart` | `reference/scene.md`, `reference/layout.md` | `reference/experimental/flowchart.md`, `reference/experimental/constructs.md` |
-| `statechart` | `reference/scene.md`, `reference/layout.md` | `reference/experimental/statechart.md`, `reference/experimental/constructs.md` |
+| `table` — config, state, memory maps | `reference/table.md` | `reference/experimental/chart.md` |
+| `topology` | `reference/experimental/topology.md`, `reference/layout.md` | `reference/experimental/chart.md` |
+| `flowchart` | `reference/experimental/flowchart.md`, `reference/layout.md` | `reference/experimental/chart.md` |
+| `statechart` | `reference/experimental/statechart.md`, `reference/layout.md` | `reference/experimental/chart.md` |
 | `timing` | — | `reference/experimental/timing.md` |
 
 Two more files answer a **task** rather than a genre:

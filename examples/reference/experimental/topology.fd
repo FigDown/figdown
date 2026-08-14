@@ -28,8 +28,30 @@ edge l1 -> wan
 edge l1 -- l2
 
 bundle mh "multi-home" l1--l2
+# The MULTI-MEMBER form: the member list is ONE comma-delimited token, and each
+# member must resolve to a unique edge, as written (`s1--l1` is not `l1--s1`).
+# It was demonstrated in block-experimental.fd until this release, when `SCENE-KEYWORD-MEMBERSHIP`
+# withdrew `bundle` from `block`; `topology` is now its only genre, so the form
+# is demonstrated here. `topology` is also where the word can be defined by its
+# REFERENT — an IEEE 802.1AX LAG, an ECMP set, an EVPN Ethernet Segment — which
+# is what L1's two spine uplinks are.
+bundle ecmp "ECMP uplink set" s1--l1,s2--l1
+# The WRITTEN-EMPTY label (`EMPTY-LABEL-STATE`): absent is omitted, `""` is a written value —
+# a third state, and the ring draws with no caption rather than falling back to
+# the id. This form was demonstrated on a `block` bundle until this release; it
+# moved here with the keyword, because `topology` is the only genre that
+# declares it now.
+bundle unlabelled "" s2--l2
 
-plane tunnels "VXLAN overlay" z-index=1
+# WITHDRAWN — `plane tunnels "VXLAN overlay" z-index=1` stood here. `plane`, its
+# `z-index=` and the `plane=` that referenced one left the LANGUAGE
+# (`PAINT-ORDER-CONSTRUCT`), with no replacement spelling. Of the four scene genres this one had the
+# worst collision: in networking a plane is the control/data/management partition
+# of a device, and `topology` is the genre network engineers author in — so the
+# line above read as an architectural claim and in fact set a paint order.
+# A layering relation, if it ever earns a keyword, has a reserved word waiting:
+# `network` (RFC 8345 §4.1/§6.1). Today the one figure that wanted it is served
+# by `class` (`RESERVED-SPELLINGS`).
 
 group peer "Peers" gap=4
 node p1 "P1" in=peer style=dashed stroke=#64748b

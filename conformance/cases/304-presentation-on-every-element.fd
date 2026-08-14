@@ -2,19 +2,28 @@ figdown 0.1 block
 # §5: the presentation attributes are optional on ANY element that can
 # carry them — one document exercising every construct that takes them.
 # 0.1 (`STYLE-KEY-SCOPE`): `style=` left `field`, `cell` and `signal`, so those
-# three lines carry `fill=`/`stroke=` only. See 306 for the carve-out.
+# three lines carry `fill=`/`stroke=` only. See 305 for the carve-out.
+#
+# 0.3 (`PAINT-ORDER-CONSTRUCT`): `plane=` was WITHDRAWN with the `plane` keyword, so the
+# §5 set is four attributes, not five, and every ` plane=over` that stood on
+# the `class`, `external`, `group`, `node`, `edge`, `bundle`, `threshold` and
+# `band` lines below is gone. The `plane over "Overlay" z-index=3`
+# declaration those keys referenced stood on the line after `title` and went
+# with them. One consequence is visible in the source: `external` had
+# `plane=` as its ONLY option key, so it now carries no §5 attribute at all
+# and appears here purely as the target of `edge a -> wire`.
+# `bundle bd "LAG"` is in section 2, because `bundle` is declared by
+# `topology` only since `SCENE-KEYWORD-MEMBERSHIP` — its presentation row is still exercised.
 title "Presentation attributes, everywhere"
-plane over "Overlay" z-index=3
-class hot "Hot path" fill=#fee2e2 stroke=#dc2626 style=dashed plane=over
-external wire "to the wire" plane=over
-group g "Group" fill=#f6f5ef stroke=#94a3b8 style=dotted plane=over
-node a "A" in=g fill=#dbeafe stroke=#1d4ed8 style=dashed plane=over
+class hot "Hot path" fill=#fee2e2 stroke=#dc2626 style=dashed
+external wire "to the wire"
+group g "Group" fill=#f6f5ef stroke=#94a3b8 style=dotted
+node a "A" in=g fill=#dbeafe stroke=#1d4ed8 style=dashed
 node b "B" in=g class=hot
-edge a [tx] -[mid]-> [hx] b stroke=#059669 style=dotted plane=over
+edge a [tx] -[mid]-> [hx] b stroke=#059669 style=dotted
 edge a -> wire
-bundle bd "LAG" a--b stroke=#7c3aed style=dotted plane=over
-threshold "cap" in=g offset=70% stroke=#b45309 style=dotted plane=over
-band "zone" 10..40% in=g fill=#e0f2fe stroke=#0369a1 style=dashed plane=over
+threshold "cap" in=g offset=70% stroke=#b45309 style=dotted
+band "zone" 10..40% in=g fill=#e0f2fe stroke=#0369a1 style=dashed
 bitfield bf "Bits" word=16 fill=#f8fafc stroke=#334155 numbering=lsb0
 field "One" 4 fill=#fde68a stroke=#b45309
 field "Two" 12
@@ -25,3 +34,9 @@ table t "Table" fill=#f8fafc stroke=#475569
 cell (1,1) fill=#fee2e2 stroke=#dc2626
 timing w "Wave" fill=#ecfeff stroke=#0e7490
 signal clk p... fill=#fef9c3 stroke=#a16207
+
+figdown 0.1 topology
+node a "A"
+node b "B"
+edge a -- b
+bundle bd "LAG" a--b stroke=#7c3aed style=dotted

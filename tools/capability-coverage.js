@@ -81,7 +81,7 @@
  *
  * THE GRANULARITY OF AXIS F IS PER SITE, NOT PER RULING
  * -----------------------------------------------------------------
- * Until this release each declared entry was ONE probe for a whole ruling, so a
+ * Until 0.1 each declared entry was ONE probe for a whole ruling, so a
  * ruling that reaches several constructs was satisfied by any one of them.
  * Measured: `examples/gre.fd` carried the corpus's only `field ""`, and
  * rewriting it to a named field left this gate green — `node ""` in
@@ -214,7 +214,12 @@ const STRUCTURAL = [
   //    eleventh site — `field` — is the bitfield genre's own name slot, whose
   //    empty form the core sentence does not mention. It draws an unnamed
   //    CELL, which is not what any of the others draw.
-  ...['node', 'group', 'bundle', 'external', 'plane', 'bitfield', 'table', 'timing']
+  //    PAINT-ORDER-CONSTRUCT removes `plane` from this list: the directive is
+  //    WITHDRAWN from the language, so its empty-label form is not a
+  //    capability with no demonstrator, it is a capability that no longer
+  //    exists. The site list shrank from eleven to ten and core §12.3's
+  //    sentence shrank with it.
+  ...['node', 'group', 'bundle', 'external', 'bitfield', 'table', 'timing']
     .map(kw => ({
       id: 'written-empty label (EMPTY-LABEL-STATE) — `' + kw + ' <id> ""`',
       anchor: ['spec/core.md', 'The empty string is a written value'],

@@ -1,220 +1,259 @@
 {
-  "header": {
-    "version": "0.1",
-    "genre": "block"
-  },
-  "title": "Presentation attributes, everywhere",
-  "flow": "right",
-  "classes": [
+  "sections": [
     {
-      "id": "hot",
-      "meaning": "Hot path",
-      "fill": "#fee2e2",
-      "stroke": "#dc2626",
-      "style": "dashed",
-      "plane": "over",
-      "line": 8
-    }
-  ],
-  "planes": [
-    {
-      "id": "base",
-      "z": 0
-    },
-    {
-      "id": "over",
-      "label": "Overlay",
-      "z": 3
-    }
-  ],
-  "nodes": [
-    {
-      "id": "a",
-      "label": "A",
-      "shape": "box",
-      "group": "g",
-      "plane": "over",
-      "fill": "#dbeafe",
-      "stroke": "#1d4ed8",
-      "style": "dashed",
-      "line": 11
-    },
-    {
-      "id": "b",
-      "label": "B",
-      "shape": "box",
-      "group": "g",
-      "plane": "base",
-      "class": [
-        "hot"
-      ],
-      "line": 12
-    }
-  ],
-  "groups": [
-    {
-      "id": "g",
-      "label": "Group",
-      "plane": "over",
-      "fill": "#f6f5ef",
-      "stroke": "#94a3b8",
-      "style": "dotted",
-      "line": 10
-    }
-  ],
-  "externals": [
-    {
-      "id": "wire",
-      "label": "to the wire",
-      "plane": "over",
-      "line": 9
-    }
-  ],
-  "edges": [
-    {
-      "a": "a",
-      "op": "->",
-      "b": "b",
-      "tail": "tx",
-      "mid": "mid",
-      "head": "hx",
-      "plane": "over",
-      "stroke": "#059669",
-      "style": "dotted",
-      "line": 13
-    },
-    {
-      "a": "a",
-      "op": "->",
-      "b": "wire",
-      "plane": "base",
-      "line": 14
-    }
-  ],
-  "ranks": [],
-  "pins": [],
-  "thresholds": [
-    {
-      "label": "cap",
-      "in": "g",
-      "offset": 70,
-      "stroke": "#b45309",
-      "style": "dotted",
-      "plane": "over",
-      "line": 16
-    }
-  ],
-  "bands": [
-    {
-      "label": "zone",
-      "in": "g",
-      "from": 10,
-      "to": 40,
-      "extend": "up",
-      "fill": "#e0f2fe",
-      "stroke": "#0369a1",
-      "style": "dashed",
-      "plane": "over",
-      "line": 17
-    }
-  ],
-  "bundles": [
-    {
-      "id": "bd",
-      "label": "LAG",
-      "members": [
-        "a--b"
-      ],
-      "stroke": "#7c3aed",
-      "style": "dotted",
-      "plane": "over",
-      "line": 15
-    }
-  ],
-  "regions": [
-    {
-      "genre": "bitfield",
-      "id": "bf",
-      "label": "Bits",
-      "word": 16,
-      "numbering": "lsb0",
-      "fill": "#f8fafc",
-      "stroke": "#334155",
-      "fields": [
+      "header": {
+        "version": "0.1",
+        "genre": "block"
+      },
+      "title": "Presentation attributes, everywhere",
+      "flow": "right",
+      "classes": [
         {
-          "name": "One",
-          "width": 4,
-          "fill": "#fde68a",
-          "stroke": "#b45309",
-          "line": 19
+          "id": "hot",
+          "meaning": "Hot path",
+          "fill": "#fee2e2",
+          "stroke": "#dc2626",
+          "style": "dashed",
+          "line": 18
+        }
+      ],
+      "planes": [
+        {
+          "id": "base",
+          "z": 0
+        }
+      ],
+      "nodes": [
+        {
+          "id": "a",
+          "label": "A",
+          "shape": "box",
+          "group": "g",
+          "plane": "base",
+          "fill": "#dbeafe",
+          "stroke": "#1d4ed8",
+          "style": "dashed",
+          "line": 21
         },
         {
-          "name": "Two",
-          "width": 12,
+          "id": "b",
+          "label": "B",
+          "shape": "box",
+          "group": "g",
+          "plane": "base",
+          "class": [
+            "hot"
+          ],
+          "line": 22
+        }
+      ],
+      "groups": [
+        {
+          "id": "g",
+          "label": "Group",
+          "fill": "#f6f5ef",
+          "stroke": "#94a3b8",
+          "style": "dotted",
           "line": 20
         }
       ],
-      "line": 18
-    },
-    {
-      "genre": "table",
-      "id": "t",
-      "label": "Table",
-      "fill": "#f8fafc",
-      "stroke": "#475569",
-      "heads": [
-        [
-          {
-            "v": "h"
-          },
-          {
-            "v": "i"
-          }
-        ]
-      ],
-      "aligns": [
-        "none",
-        "none"
-      ],
-      "rows": [
+      "externals": [
         {
-          "cells": [
-            {
-              "v": "1"
-            },
-            {
-              "v": "2"
-            }
-          ],
+          "id": "wire",
+          "label": "to the wire",
+          "line": 19
+        }
+      ],
+      "edges": [
+        {
+          "a": "a",
+          "op": "->",
+          "b": "b",
+          "tail": "tx",
+          "mid": "mid",
+          "head": "hx",
+          "plane": "base",
+          "stroke": "#059669",
+          "style": "dotted",
+          "line": 23
+        },
+        {
+          "a": "a",
+          "op": "->",
+          "b": "wire",
+          "plane": "base",
           "line": 24
         }
       ],
-      "marks": [
+      "ranks": [],
+      "pins": [],
+      "thresholds": [
         {
-          "row": 1,
-          "col": 1,
-          "fill": "#fee2e2",
-          "stroke": "#dc2626",
+          "label": "cap",
+          "in": "g",
+          "offset": 70,
+          "stroke": "#b45309",
+          "style": "dotted",
           "line": 25
         }
       ],
-      "line": 21
-    },
-    {
-      "genre": "timing",
-      "id": "w",
-      "label": "Wave",
-      "fill": "#ecfeff",
-      "stroke": "#0e7490",
-      "signals": [
+      "bands": [
         {
-          "name": "clk",
-          "lane": "p...",
-          "fill": "#fef9c3",
-          "stroke": "#a16207"
+          "label": "zone",
+          "in": "g",
+          "from": 10,
+          "to": 40,
+          "extend": "up",
+          "fill": "#e0f2fe",
+          "stroke": "#0369a1",
+          "style": "dashed",
+          "line": 26
         }
       ],
-      "line": 26
+      "bundles": [],
+      "regions": [
+        {
+          "genre": "bitfield",
+          "id": "bf",
+          "label": "Bits",
+          "word": 16,
+          "numbering": "lsb0",
+          "fill": "#f8fafc",
+          "stroke": "#334155",
+          "fields": [
+            {
+              "name": "One",
+              "width": 4,
+              "fill": "#fde68a",
+              "stroke": "#b45309",
+              "line": 28
+            },
+            {
+              "name": "Two",
+              "width": 12,
+              "line": 29
+            }
+          ],
+          "line": 27
+        },
+        {
+          "genre": "table",
+          "id": "t",
+          "label": "Table",
+          "fill": "#f8fafc",
+          "stroke": "#475569",
+          "heads": [
+            [
+              {
+                "v": "h"
+              },
+              {
+                "v": "i"
+              }
+            ]
+          ],
+          "aligns": [
+            "none",
+            "none"
+          ],
+          "rows": [
+            {
+              "cells": [
+                {
+                  "v": "1"
+                },
+                {
+                  "v": "2"
+                }
+              ],
+              "line": 33
+            }
+          ],
+          "marks": [
+            {
+              "row": 1,
+              "col": 1,
+              "fill": "#fee2e2",
+              "stroke": "#dc2626",
+              "line": 34
+            }
+          ],
+          "line": 30
+        },
+        {
+          "genre": "timing",
+          "id": "w",
+          "label": "Wave",
+          "fill": "#ecfeff",
+          "stroke": "#0e7490",
+          "signals": [
+            {
+              "name": "clk",
+              "lane": "p...",
+              "fill": "#fef9c3",
+              "stroke": "#a16207"
+            }
+          ],
+          "line": 35
+        }
+      ]
+    },
+    {
+      "header": {
+        "version": "0.1",
+        "genre": "topology"
+      },
+      "flow": "right",
+      "classes": [],
+      "planes": [
+        {
+          "id": "base",
+          "z": 0
+        }
+      ],
+      "nodes": [
+        {
+          "id": "a",
+          "label": "A",
+          "shape": "box",
+          "plane": "base",
+          "line": 2
+        },
+        {
+          "id": "b",
+          "label": "B",
+          "shape": "box",
+          "plane": "base",
+          "line": 3
+        }
+      ],
+      "groups": [],
+      "edges": [
+        {
+          "a": "a",
+          "op": "--",
+          "b": "b",
+          "plane": "base",
+          "line": 4
+        }
+      ],
+      "ranks": [],
+      "pins": [],
+      "thresholds": [],
+      "bands": [],
+      "bundles": [
+        {
+          "id": "bd",
+          "label": "LAG",
+          "members": [
+            "a--b"
+          ],
+          "stroke": "#7c3aed",
+          "style": "dotted",
+          "line": 5
+        }
+      ],
+      "regions": []
     }
   ]
 }

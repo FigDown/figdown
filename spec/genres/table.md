@@ -57,7 +57,7 @@ conformance surface.
 |---|---|---|---|---|---|
 | `table` | `table <id> ["label"]` | top level, under any genre | NORMATIVE | `fill` `stroke` | label absent |
 | `\|` (row token) | `\| cell \| cell \|` | inside a `table` region ONLY | NORMATIVE | — | header tier above `\|---\|`, data row below |
-| `cell` | `cell (<r>,<c>)` · `cell <r> highlight` | inside a `table` region ONLY | NORMATIVE | `fill` `stroke` `class` — **`style=` LEFT this list at 0.1** (`STYLE-KEY-SCOPE`) | needs a mark or `highlight` |
+| `cell` | `cell (<r>,<c>)` · `cell <r> highlight` | inside a `table` region ONLY | NORMATIVE | `fill` `stroke` `class` — **`style=` LEFT this list at 0.1** (`STYLE-KEY-SCOPE`); **and NO `note=`** — this genre takes no drawn annotation on a cell at any version (`DRAWN-ANNOTATION-FORM`; see below) | needs a mark or `highlight` |
 | `width` | `width <w1>,<w2>[,<w3>…]` | inside a `table` region ONLY | NORMATIVE | — | all columns `auto`; ONE whitespace-free comma-delimited token. The space form was RETIRED at 0.1 (`POSITIONAL-LIST-SPELLING`); a `px` SUFFIX was rejected at 0.1, so this shares one unit grammar with the `width=` option (auto \| `<n>` \| `<n>%`) |
 | `chart` | `chart <table-id>` | top level, under any genre that hosts a `table` | **EXPERIMENTAL** | `type` | reads the table AS the data (rows→X, columns→Y, numeric cells→Z); `type=bar3d` is the only value. Added at 0.1: the keyword had prose mentions but no vocabulary row. Spelled `plot` with `kind=bars3d` until 0.1; `level=` was DELETED at 0.1, so `chart <table-id> [type=bar3d]` is the whole grammar. |
 
@@ -105,7 +105,7 @@ segment is trimmed, then read for a leading and a trailing colon; the model's
 Any number of hyphens works; `-` alone is a legal segment. `"none"` is a
 FOURTH value, not a synonym for `"left"`: it records that the author declared
 no alignment, and rendering then applies GFM's defaults (data rows left,
-header rows centre). Until this release this document said `|---|` *was* left
+header rows centre). Until 0.1 this document said `|---|` *was* left
 and never mentioned `:--` at all, while conformance case
 `502-table-separator-forms` pinned all four — so a second implementation had
 to reproduce a mapping no normative text stated.
@@ -124,7 +124,7 @@ it, but the rule is the emptiness, not the digraph:
 
 The encoding is **injective** — the two are distinguishable and both are
 pinned as goldens — and it is the only place in v0.1 where absence in the
-*source text* carries meaning (core §12.3). Until this release this document
+*source text* carries meaning (core §12.3). Until 0.1 this document
 said only "`||` colspan-left", which reads as a token you type; the word
 "empty" did not appear in it at all, and the actual rule lived in
 `vocabulary-sources.tsv` and in a passing clause of a MIGRATIONS rewrite
@@ -221,7 +221,7 @@ both survive. A merged cell has no interior lines at all: both sides of every
 boundary it spans have the same owner, so nothing is emitted there.
 
 Retired language-wide (`COLOUR-KEY-STATUS`): `color=`. It set the FILL
-before this release and the LABEL, and no engine can tell the
+in one era and the LABEL in another, and no engine can tell the
 two source files apart — so its diagnostic names BOTH eras and hands the
 choice to a human. v0.1 has no label-colour key at all; the label colour is
 derived from the background it sits on (core §5, `LABEL-COLOUR-SOURCE`).
@@ -244,6 +244,115 @@ otherwise-uniform `\d+(\.\d+)?` numeric grammar. `chart <table-id>
 [type=bar3d]` is now the whole grammar, and the migration tool deletes a
 `level=` token from a `chart` line mechanically.
 
+### `cell` REFUSES `note=`, and the genre owns its own surface (`DRAWN-ANNOTATION-FORM`)
+
+`note=` became a live option key — the **DRAWN** annotation, the
+one that puts an explanation on the page — accepted on the scene genres'
+elements and on `title`. **`table` grants it to nothing.** `cell` refuses
+`note=` at every version:
+
+<!-- fence-check: skip -->
+```figdown
+figdown 0.3 table
+table t "Queue profile"
+| Queue | Depth |
+|---|---|
+| q0 | 40 |
+| q1 | 80 |
+cell (2,2) note="tuned by hand in 2024"
+```
+
+That last line is a line error under `figdown 0.3` exactly as it was under
+`figdown 0.1`.
+
+**Why, in this genre's own terms.** Two reasons, and the second is the one
+that would still hold if the first changed:
+
+1. **Zero measured instances.** Across the corpus that decided the acceptor
+   list, no `table`-genre figure carries a drawn per-cell aside. A key granted
+   without evidence is a key that has to be kept.
+2. **A table already owns its own surface.** Where a scene genre has empty
+   canvas around a node for a note to occupy, a grid has *cells* — and the
+   place a caveat about a value goes is a cell: another column, a footnote
+   row, or the sentence in the host Markdown beside the figure. An annotation
+   box floating over a grid has to point at a cell to mean anything, and the
+   moment it does it is competing with the row it is sitting on.
+
+**What would reopen it:** **a count from `table`-genre figures** — measured
+figures whose per-cell caveat must be visible on the page and cannot be a
+column, a row, or host prose. Bring the count and the figures; `cell` is the
+directive that would take the key.
+
+**`note=` and `description=` divide by AUDIENCE, and `table` accepts neither.**
+`description=` reaches the **machine** — no ink beyond an SVG `<title>`
+tooltip — and belongs to `bitfield`'s `field`
+([bitfield.md](bitfield.md)); `note=` reaches the **human** and always draws.
+Neither is a fallback for the other, and neither is a `table` key. A hybrid
+figure that genuinely needs a drawn note puts the table in a scene section
+(§4, `GENRE-COMPOSITION`, below) and writes the `note=` on the scene element or on `title`,
+where this release does accept it.
+
+**Where a typed slot exists, `note=` would not be the right answer anyway.**
+`table`'s slots are small and exact: a **category** shared by several cells is
+a `class` meaning, which earns a legend entry; a **row worth pointing at** is
+`cell <r> highlight`; **column widths** are `width` and **alignment** is the
+delimiter row's colons; and a cell's own text is the cell. What a table cannot
+express in those, it expresses as another column.
+
+### This region's ADDRESS SPACE, and what `in=` consumes today (`MARKER-TARGET-KINDS`, `GENRE-DOCUMENT-CONTRACT`)
+
+**A `table` region's address space is `(row)` and `(row,col)`** — the same
+address the `cell` directive already takes, stated here as the region's own,
+normatively (`GENRE-DOCUMENT-CONTRACT`):
+
+- **rows** are `h1`, `h2`, … `hN` for the header tiers, counted top-down from
+  the first one, and then `1`, `2`, … for the DATA rows, counted from the
+  first row below the delimiter row;
+- **columns** are `1`, `2`, … left to right.
+
+**Only the region HEAD is consumed today.** `threshold` and `band`
+resolve (`MARKER-TARGET-KINDS`) `in=<region-id>` against a nested
+`bitfield`/`table`/`timing` region as well as a `node` or a `group`:
+`threshold "max_th" in=wred offset=75%` names the whole `table wred` block.
+The widening is **ungated** — it adds no spelling, and the only documents it
+affects are ones that previously answered `unknown target "wred" for threshold`
+and drew nothing at all.
+
+**A region-scope `threshold` or `band` measures its `offset=` over the DATA
+ROWS, not the whole grid.** The header tiers name the columns; they are not
+values, and a threshold is a statement about values. `offset=0%` is therefore
+the top edge of data row 1 and `offset=100%` the bottom edge of the last data
+row, whatever number of header tiers sits above them — so adding a second
+header tier to a table does not move its thresholds.
+
+**The coordinate grammar is designed and deliberately NOT built.** `in=wred(3)`
+or `in=wred(3,2)` — a mark addressed to one row or one cell inside the region —
+has no shipping consumer, and RULE 4.7 argues against spending a grammar
+before one exists. The address space is written down here so a later consumer
+inherits a decided answer instead of inventing a second one; the engine
+accepts the region head and nothing else.
+
+**`GENRE-KEYWORD-ALLOWLIST` is unchanged by this, and nothing here should be read as widening it.**
+`threshold` and `band` are still **not** on the pure-`table` top-level
+allowlist: under `figdown 0.1 table` they remain the line error
+`"threshold" is not allowed in genre table`, exactly as stated above and in the
+allowlist paragraph below. `MARKER-TARGET-KINDS` changed what `in=` may NAME, not where the two
+keywords may be WRITTEN. The path that works is **composition** (§4, `GENRE-COMPOSITION`) — a
+scene header hosting a nested `table` region, with the marks at the scene's
+top level — and it is the path the WRED figures use:
+
+Written out, that is a `figdown 0.1 block` header; `table wred "WRED profile"`
+opening the region; its GFM pipe rows (`| Queue | min_th | max_th |`, the
+delimiter row, then `| q0 | 40 | 80 |` and `| q1 | 30 | 70 |`); and then, back at
+the scene's top level, `threshold "max_th" in=wred offset=75%` and
+`band "drop zone" 40..80% in=wred`.
+<!-- fence-check: skip -->
+
+**`threshold` and `band` are EXPERIMENTAL** (`CONSTRUCT-STATUS-TIERS`), which is why this is prose
+rather than a ` ```figdown ` block: a frozen normative document may cite an
+experimental construct but may not *define* one in a fence, and this file is
+frozen. The runnable version lives in [../experimental.md](../experimental.md).
+
 ### The core, and what else a `table` document may contain
 
 Core keywords (NS = C, never redefined by any genre — §1 `UNIVERSAL-CORE-KEYWORDS`): `figdown`
@@ -253,8 +362,8 @@ the zone `layout` opens is a namespace of its own, owned by no genre, and
 holds `pin` (NORMATIVE) alone. Every member of it is
 **genre-independent** — no genre may define, redefine or extend a keyword
 inside the zone, and `GENRE-VOCABULARY-OBLIGATION` does not reach in. The zone also held `path` and
-`routing` (EXPERIMENTAL) until this release, when **`EDGE-GEOMETRY-CONSTRUCTS` withdrew both from the
-language**: they were core until this release, EXPERIMENTAL from `CONSTRUCT-STATUS-TIERS`, and
+`routing` (EXPERIMENTAL) until 0.1, when **`EDGE-GEOMETRY-CONSTRUCTS` withdrew both from the
+language**: they were core until 0.1, EXPERIMENTAL from `CONSTRUCT-STATUS-TIERS`, and
 removed outright on prior-art and demand evidence
 ([../migrations.md](../migrations.md) 0.1, core §9 **`EDGE-IDENTITY-AND-GEOMETRY`**).
 There is no replacement spelling, and `LAYOUT-ZONE-NAMESPACE` itself is unchanged — only its
@@ -310,7 +419,7 @@ spelled by no other genre, and it introduces no option key of its own. The
 overlaps are deliberate and are the same thing under every genre: the core
 of three (NS = C), the layout namespace (`LAYOUT-ZONE-NAMESPACE`), and the cross-namespace keys
 `fill` `stroke` `class` (§10), all
-NORMATIVE (`STROKE-KEY-STATUS`/`COLOUR-KEY-STATUS`). `style=` was a fourth until this release, when `STYLE-KEY-SCOPE` removed it from `cell`; it remains a
+NORMATIVE (`STROKE-KEY-STATUS`/`COLOUR-KEY-STATUS`). `style=` was a fourth until 0.1, when `STYLE-KEY-SCOPE` removed it from `cell`; it remains a
 cross-namespace key on the scene directives. One shared spelling is worth naming: the `table` child keyword
 `width` (a line, one value per column) and the `width=` option on `pin`
 (one element's px extent — a layout-namespace directive,
@@ -401,7 +510,7 @@ top-left cell.
 | Unknown option on `table`, `width`, or `cell` | line error |
 
 **The two `duplicate …` rows were golden-pinned but MISSING from this
-table until this release**, in a document that opens by calling exactly that
+table until 0.1**, in a document that opens by calling exactly that
 disagreement a defect to report. They are instances of the general rule
 (core §8.1): a single-valued construct is a line error on its second
 occurrence. `width` is single-valued per table and the delimiter row is

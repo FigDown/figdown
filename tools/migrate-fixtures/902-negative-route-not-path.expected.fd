@@ -1,6 +1,6 @@
 figdown 0.1 block
 # The second negative. route -> path, via= -> points= and src=/dst= ->
-# tailport=/headport= were live rewrites until this release withdrew their
+# tailport=/headport= were live rewrites until 0.1 withdrew their
 # TARGETS (`EDGE-GEOMETRY-CONSTRUCTS`). A rewrite whose output is a hard error is not a migration,
 # so these lines must be REPORTED and returned untouched.
 node a "A"

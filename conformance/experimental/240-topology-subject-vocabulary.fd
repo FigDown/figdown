@@ -1,0 +1,25 @@
+# `SUBJECT-VOCABULARY-SCOPE`/`SCENE-KEYWORD-MEMBERSHIP`: subject vocabulary is PER GENRE, and `topology`
+# declares exactly three subject words of its own — `group`, `external`,
+# `bundle`. This fixture is the KEEP half of the grid for this genre: all
+# three must still parse. The WITHDRAW half is 241.
+#
+# `group` and `external` keep their `block` spellings, and the ruling records
+# why rather than leaving it to look like inheritance: every networking
+# synonym is more taken — `zone` (DNS, firewall), `cluster` (RFC 4456),
+# `domain` (RFC 7926), `area` (OSPF), `site` (EVPN) — and both collisions are
+# SOFT, because the picture contradicts the wrong reading. A multicast group
+# is never drawn as a box round its members, and an `external` is never drawn
+# at all (`EXTERNAL-EDGE-ENDPOINTS`). Two genres agreeing on a spelling is two independent
+# declarations that happen to agree, never one inherited (core §3, `GENRE-VOCABULARY-OBLIGATION`).
+#
+# `bundle` is the cell defined BY ITS REFERENT: a LAG (IEEE 802.1AX), an ECMP
+# set, an EVPN Ethernet Segment. That is why it survives here and was
+# withdrawn from `block`, which has no referent to name.
+figdown 0.1 topology
+group pod "Pod 1"
+node leaf1 "Leaf-1" in=pod
+node leaf2 "Leaf-2" in=pod
+external wan "to WAN"
+edge leaf1 -- wan
+edge leaf2 -- wan
+bundle es1 "ES-1" leaf1--wan,leaf2--wan

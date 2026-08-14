@@ -1,0 +1,4 @@
+figdown 0.1 block
+# `z=`→`z-index=` is suppressed too: `z-index=` was legal on
+# `plane` and on nothing else, so `PAINT-ORDER-CONSTRUCT` took it with the keyword.
+node a "A" z=2

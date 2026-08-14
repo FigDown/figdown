@@ -5,7 +5,7 @@
 // substantially pinned — asserts the two properties the auto-placement fix must
 // hold (see the external-pinned-layout conformance case):
 //
-// The DIRECTIVE is spelled `external` (it was `boundary` until this release,
+// The DIRECTIVE is spelled `external` (it was `boundary` until 0.1,
 // PRESENCE-FLAG-SPELLING); the engine's own model still calls the collection `doc.boundaries` and
 // flags each anchor `n.boundary`, so those spellings below are engine internals
 // read as-is, not the language.

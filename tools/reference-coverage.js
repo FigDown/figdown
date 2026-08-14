@@ -25,7 +25,7 @@
  * Usage:
  *   node tools/reference-coverage.js [--strict] [--normative-only] [genre...]
  *
- *   --normative-only  skip EXPERIMENTAL / EXPERIMENTAL rows, and run the leak check
+ *   --normative-only  skip EXPERIMENTAL rows, and run the leak check
  *   --strict          exit 1 on any gap
  *   --enums           accepted and ignored (enum coverage is always on now)
  */
@@ -36,7 +36,15 @@ const path = require('path');
 const ROOT = path.resolve(__dirname, '..');
 const GENRES_DIR = path.join(ROOT, 'spec', 'genres');
 const REF_DIR = path.join(ROOT, 'examples', 'reference');
-const GENRES = ['block', 'bitfield', 'table', 'topology', 'flowchart', 'timing'];
+// GENRE-NODE-SPELLING added `statechart` and this list did not follow, so for
+// two releases nothing checked that the statechart reference teaches what the
+// engine accepts under that genre. SUBJECT-VOCABULARY-SCOPE makes the omission
+// costly rather than merely untidy: `statechart` declares NO subject
+// vocabulary, and an EMPTY declaration is exactly the kind of claim that
+// needs a gate — there is no missing keyword for a reader to trip over, so
+// nothing but this tool can notice if the genre document and the engine stop
+// agreeing about the emptiness.
+const GENRES = ['block', 'bitfield', 'table', 'topology', 'flowchart', 'statechart', 'timing'];
 
 // Composition openers listed on scene genres — covered only if present in set;
 // not required for a pure scene reference figure.
@@ -130,8 +138,15 @@ function engineVocabFacts(engine) {
   // diagnostics — the same three sources tools/comment-check.js reads.
   const retiredOpt = new Set(Object.keys(engine.RETIRED_OPT_KEYS));
   const retiredKw = new Set();
-  for (const re of [/(?:^|[^\w-])([a-z][\w-]*) has been (?:renamed|retired|DELETED)/g,
-                    /"([a-z][\w-]*)" has been (?:renamed|retired|DELETED)/g]) {
+  // PAINT-ORDER-CONSTRUCT adds WITHDRAWN to the verb set. The filter had matched
+  // the three verbs the engine used up to then; EDGE-GEOMETRY-CONSTRUCTS's withdrawals reached it
+  // only because their diagnostics ALSO said "renamed" somewhere in the chain,
+  // and `plane`'s does not — it says WITHDRAWN and names no replacement,
+  // which is the whole point of the shape. Left unlisted, the keyword stayed
+  // TRACKED after the language dropped it, so the tool went on demanding a
+  // reference figure demonstrate a spelling that is now a line error.
+  for (const re of [/(?:^|[^\w-])([a-z][\w-]*) has been (?:renamed|retired|DELETED|WITHDRAWN)/g,
+                    /"([a-z][\w-]*)" has been (?:renamed|retired|DELETED|WITHDRAWN)/g]) {
     re.lastIndex = 0;
     while ((m = re.exec(engine.src))) retiredKw.add(m[1]);
   }
@@ -187,7 +202,7 @@ function engineEnums(engine) {
 const MULTIVALUE = [
   { kind: 'opt', name: 'class', detect: /\bclass=[A-Za-z_][\w-]*,/,
     probe: 'figdown 0.1 block\nclass a "A"\nclass b "B"\nnode n class=a,b' },
-  // `points=` stood here (spelled `via=` until this release, WAYPOINT-KEY-SPELLING) as the second
+  // `points=` stood here (spelled `via=` until 0.1, WAYPOINT-KEY-SPELLING) as the second
   // multi-value OPTION form. EDGE-GEOMETRY-CONSTRUCTS withdrew it with the `path`
   // directive, so `class=` and `data=` are the two that remain.
   { kind: 'opt', name: 'data', detect: /\bdata=[^\s#]*,/,
@@ -196,8 +211,13 @@ const MULTIVALUE = [
     probe: 'figdown 0.1 block\nnode a\nnode b\nrank a,b' },
   { kind: 'kw', name: 'width', detect: /^\s*width\s+\S+,\S/m,
     probe: 'figdown 0.1 table\ntable t\n| a | b |\n|---|---|\n| 1 | 2 |\nwidth auto,90' },
+  // SCENE-KEYWORD-MEMBERSHIP: the probe declares `topology`, not `block`. `bundle` is
+  // declared by `topology` alone now — a link bundle is a LAG / ECMP set /
+  // EVPN Ethernet Segment, a referent only that genre has — so a `block`
+  // probe would be testing a spelling that genre no longer accepts. The
+  // multi-value FORM is unchanged; only the genre that may write it moved.
   { kind: 'kw', name: 'bundle', detect: /^\s*bundle\s+.*\w--\w[\w-]*,\s*\w[\w-]*--/m,
-    probe: 'figdown 0.1 block\nnode a\nnode b\nnode c\nnode d\nedge a -- b\nedge c -- d\n' +
+    probe: 'figdown 0.1 topology\nnode a\nnode b\nnode c\nnode d\nedge a -- b\nedge c -- d\n' +
            'bundle t "L" a--b,c--d' },
 ];
 
@@ -431,7 +451,7 @@ function genreDocFor(genre) {
  * since VERBATIM-REGION-SCOPE — never inside a `[edge label]` either.
  *
  * The bracket depth counter and the in-string escape skip were missing here
- * until this release, so this function's "match engine findComment" claim was
+ * until 0.1, so this function's "match engine findComment" claim was
  * false for two of the engine's four verbatim regions: `edge a -[hop #1]-> b`
  * was cut at the `#`, and `"a \" b # c"` toggled the quote state on the
  * ESCAPED quote and then cut there too. Both are lines the engine accepts, so

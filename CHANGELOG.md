@@ -65,6 +65,232 @@ Statuses referred to above are defined in [`spec/README.md`](spec/README.md).
 
 Nothing yet.
 
+## v0.3.0 — 2026-08-13
+
+**Language version: `0.3`.** The second minor release. It **adds** one option
+key and one resolver widening, and takes nothing away from the frozen surface:
+every frozen construct behaves exactly as it did at v0.2.0, and every
+`figdown 0.1` and `figdown 0.2` conformance golden passes unmodified. It does
+**withdraw experimental vocabulary**, which the compatibility promise has never
+covered — if you write `plane`, or a scene keyword in a genre other than the
+one that still declares it, read the **Experimental** sections below before
+upgrading. Everything else needs no rewriting.
+
+**Language — `note=`, the drawn annotation.** A figure often needs a short
+aside that the reader must *see*: a caveat, a unit, a "counted here". Until now
+the language had no way to say it, and authors reached for a detached node, a
+`shape=cloud`, or a `class` invented to mean "this box is a remark". Those are
+workarounds with a cost: a detached node **is a participant** in the model, so
+the figure asserts something that is not true of the subject.
+
+    figdown 0.3 block
+    title "Ingress" note="counters are per port"
+    node q "Queue" note="drops counted here"
+    node a "A"
+    edge a -> q note="backpressure"
+
+`note=` is an **attribute**, written on the annotated element's own line. There
+is no id to resolve, no target key and no ambiguity about which of three
+identically labelled elements is meant. It is accepted on ten directives:
+`node` and its flowchart role siblings `process`, `decision` and `terminator`;
+`state`; `group`; the three connector spellings `edge`, `flowline` and
+`transition`; and `title` — the first option key `title` has ever taken, and
+the way to write a remark about the figure as a whole, which draws at the
+bottom of the canvas with no leader line. A connector is the case that decides
+the shape: an edge has no id, so an attribute is the only form that could reach
+it at all.
+
+**`note=` and `description=` are both live, and neither is a fallback for the
+other.** They divide by **audience**:
+
+| key | audience | draws | accepted on |
+|---|---|---|---|
+| `description=` | the machine — an SVG `<title>` tooltip | no | `field`, unchanged |
+| `note=` | the human reader | **yes** | the ten directives above |
+
+Writing both on one element is legal and means what it says: a long
+machine-facing description beside a short drawn aside. The machine-only channel
+is deliberate. It is what lets a bitfield carry a register's full vendor
+description, a provenance note or a conformance caveat without spending ink a
+human reader did not ask for, and merging the two keys would force every
+machine-facing fact into the picture.
+
+**`note=` requires `figdown 0.3`, and the reason is specific to this key** —
+"a new key needs a gate" is not a reason, because it would gate every key the
+language ever adds. `note=` **has a prior meaning on the record**: it was the
+retired spelling of `description=`, and its retirement message actively told
+authors to write `description=` for a tooltip that is never drawn. An engine
+accepting `note=` under a `figdown 0.2` header would take that author at the
+word the language taught them and **repaint their tooltip as ink on the page**
+— a figure that looks right and means something else. So under `figdown 0.1`
+and `figdown 0.2` the key is an error that names the version and the one-step
+fix. A key that had never been spelled before would carry no such risk and
+would need no gate; the second change in this release is exactly that case.
+
+**Where `note=` is *not* accepted, and what would change that.** `field` keeps
+`description=` and gains nothing, because there are zero measured cases of a
+per-field aside that must be drawn — granting one directive both keys with no
+evidence spends the distinction before anyone needs it. `cell` is syntactically
+possible with zero measured cases and the `table` genre owns its own surface.
+`external`, `threshold`, `band`, `bundle` and `class` have zero measured cases
+on any of them. Each of those reopens on a count of real figures, not on the
+observation that it would be convenient.
+
+**There is no standalone `note` keyword, and the measurement is why.** Across
+two corpora — 70 annotation instances in 23 figures of one, 75 in 25 of the
+other — the two populations disagree about almost everything and agree on the
+only number that decides anything: annotations spanning **two or more**
+elements are between **6.7% and 10%** of the demand. Three quarters are about
+exactly one element, which an attribute covers exactly, and a seventh are about
+the whole figure, which `title note=` covers. For the residual tenth, authors
+had already invented a footnote marker (`*`, `**`) in the annotated labels keyed
+to a note carrying the same marker; its only loss is that the correspondence is
+not machine-readable. That reopens if a corpus shows spanning demand exceeding
+single-element demand, or a measured need to make many-to-one attribution
+machine-readable.
+
+**Language — `in=` on `threshold` and `band` now reaches a region, and this
+change is *not* gated.** A marker laid across a `bitfield`, `table` or `timing`
+block used to be unwritable: the target resolver's accepted set was hard-coded
+to nodes and groups, so
+
+    threshold "Max" in=q offset=50%
+
+over a `table q` answered `unknown target "q" for threshold` — the same message
+a nonexistent id gets — while the id was mandatory and another directive
+already consumed it. The document was well-formed and named a real element of
+itself, and the engine said the element did not exist. Region ids now resolve.
+
+No spelling is added: no keyword, no option key, no enum value, no character,
+and the option-key registry is byte-unchanged. The only documents affected are
+ones that **did not parse at all**, so nothing valid changes meaning and
+nothing valid becomes invalid. A version gate exists to stop a meaning drifting
+under a declared header; `in=q` naming the document's own region has exactly one
+possible meaning and the alternative it replaces was an error message rather
+than a different figure, so there is nothing to drift from and gating would only
+withhold a fix from documents that are broken today. This is not a third sense
+of `in=` — it is the same relation with a larger set of ids behind it.
+
+That two changes ship together, one gated and one not, is the point: **a
+feature release may hold changes that need a version gate and changes that do
+not, and the discriminator is not how new they are.**
+
+**Experimental — each scene genre now declares its own vocabulary, and there is
+no shared scene namespace.** Six keywords used to be accepted by all four scene
+genres, and the specification described them as a shared category. That was an
+**intersection recorded as a rule**: each genre happened to define the same six.
+The description was already false in its own terms, because since v0.2.0 the
+scene genres do not share the connector — `flowchart` spells it `flowline` and
+`statechart` spells it `transition`.
+
+The category is dissolved. Only the core keywords (`figdown`, `title`, `layout`)
+are cross-genre, and that is a guarantee about **meaning being fixed**, never a
+statement that a word is available everywhere. Each genre documents its own
+complete vocabulary in its own document, even where the wording is identical —
+which is also the only place a difference can be stated. `topology` can now
+define `bundle` by what it refers to (a LAG, an ECMP set, an EVPN Ethernet
+Segment) where `block` has no referent to name; `flowchart` can cite ISO 5807
+§9.4.2 for `external` and warn that FigDown's spelling is not ISO's, which
+`block`'s declaration has no reason to carry.
+
+**16 of the 24 genre-and-keyword pairs are withdrawn.** Each was weighed on two
+independent grounds — no evidence of need in that genre, and the word already
+being taken there by a more established meaning — and most fail both. What
+remains:
+
+| genre | subject vocabulary it declares |
+|---|---|
+| `block` | `group`, `external`, `threshold`, `band` |
+| `topology` | `group`, `external`, `bundle` |
+| `flowchart` | `external` |
+| `statechart` | none — and the empty declaration is the declaration |
+
+Nothing is renamed. `threshold` and `band` keep their spellings in `block`
+because a future scalar-marker genre should be free to name them once, with a
+scale, and renaming now would hand it a retired word. `topology` keeps `group`
+and `external` because every networking synonym is *more* taken — `zone`,
+`cluster`, `domain`, `area`, `site` — and both collisions are contradicted by
+the picture: a multicast group is never drawn as a box round its members, and
+an `external` is never drawn at all.
+
+**The error you get is not a spellcheck.** A withdrawn word is known, not
+unknown, so the message says it was withdrawn from *this* genre, gives the
+ground for that cell, and names the genre that still declares it.
+
+**Experimental — `plane`, `plane=` and `z-index=` are removed from the
+language**, from every genre rather than from four, and removed rather than
+renamed: there is no replacement spelling. `plane` declared a **drawing layer**
+— a paint order. In `topology`, the genre network engineers actually author in,
+a plane is the **control / data / management partition** of a device, so the one
+figure in the corpus that used the keyword declared a `plane` it named *overlay*
+— and *overlay* is itself a networking word, so the line read as a
+network-architectural assertion while being a z-order. It had two
+authored uses in the whole corpus, and stripping it out of the figure that
+declared it produces the same drawn markup down to one edge index: the overlay's
+entire appearance came from the `class=` the figure had already declared.
+
+**What to write instead.** If a set of elements is a logical layer of the
+subject, that is a `class` whose label says so — which is what both authored
+uses were already doing alongside the keyword. If elements merely need to paint
+on top, write them later: paint order is document order, and the implicit base
+layer every element is on is unchanged. `z-index=` goes because it was legal on
+`plane` and on nothing else; `plane=` goes because with no way to declare a
+plane it would have had exactly one legal value, the default. `external` is left
+taking no option key at all.
+
+**Three older messages were repaired at the same time.** `layer`, `layer=` and
+`z=` were each retired years of increments ago by renaming them to `plane`,
+`plane=` and `z-index=` — spellings that no longer exist. A message naming a
+destination that is not there is worse than no message, because it sends the
+author one hop further from a working document. All three now state the whole
+chain and end in the withdrawal.
+
+**Experimental — `in=` is no longer accepted in `flowchart` or `statechart`.**
+It states membership, and its only value domain was the id of a containing
+`group`, which neither genre declares any more. Every value it could take was a
+dead end: `in=g` answered `unknown group "g"` and no spelling of `g` succeeded.
+An error that names the reason beats a dangling reference no author can satisfy.
+Write `class=` instead — it earns a legend entry and applies to every member at
+once. `in=` is untouched under `block` and `topology`.
+
+For `statechart` this is not merely tidying, and the reason is worth stating
+because it is not the obvious one. If state nesting ever arrives it will arrive
+as **a state inside a state**, through this exact key, because `in=` is already
+the language's membership spelling. A key left live with a *group*-id domain
+would not merely fail — it would **teach the wrong model using the exact
+spelling reserved for the right one**, which is worse than an error and worse
+than silence. It is expected back with a state-id domain if composite states are
+ever measured as needed; both genres are experimental, so that will cost
+documents nothing then, exactly as this costs them nothing now.
+
+**Fixed — a message claimed ISO's spelling for a word ISO does not use.** The
+error that fires when a `figdown 0.2 flowchart` document writes `edge` said the
+connecting line is a *flowline*, "the term ISO 5807 uses for it". That clause is
+false. ISO 5807:1985 §9.3.1 names the symbol **`Line`** — and §9.3.1 is on p. 7,
+inside the part of the standard this project has always been able to read, so
+this was not a bet on an unread clause that went the wrong way. It was a claim
+that could have been checked at any time and was not.
+
+**The keyword does not move.** `flowline` was chosen because it is what the
+flowchart domain commonly writes — draw.io, Visio and the teaching texts all say
+it — and that decision stands, as does the `figdown 0.2` gate and every other
+diagnostic. One sentence changes: the message now says `flowline` is the term
+the flowchart domain commonly uses for the symbol ISO 5807 §9.3.1 names "Line".
+The failure was escalating *the domain says X* into *the standard spells it X* —
+two different claims settled by two different kinds of evidence, and a message
+that borrows the standard's authority for a claim the standard does not make is
+worse than one that claims less, because a reader cannot tell which of the two
+it means. Prefer a weaker verifiable claim to a stronger false one. The
+repository's own vocabulary-source record had it right all along; only the
+user-facing message overstated, and the two now agree.
+
+No `.fd` file changes for this, no keyword moves, and the archived v0.1.0 page
+is untouched: it carries an older engine that never had this message.
+
+**Also.** `read/0.3/` is the reading contract for the new language version and
+is the live one from this release on; `read/0.1/` and `read/0.2/` stay exactly
+as their releases published them.
+
 ## v0.2.0 — 2026-08-12
 
 **Language version: `0.2`.** The first minor release, and the first time the

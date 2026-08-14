@@ -3,5 +3,11 @@
 # unchanged — an unknown MINOR version is a line error, not a lenient parse
 # (`UNKNOWN-MINOR-VERSION`) — so the fixture keeps its name and its citation, and moves to the
 # next minor the engine does not implement.
-figdown 0.3 block
+# `DRAWN-ANNOTATION-FORM`: the same thing happened again. `note=` made the language
+# number move 0.2 → 0.3 (core §13.0: a new option key is a new feature of the
+# document format, so it cannot ship under a `Z` bump), `0.3` joined
+# LANG_VERSIONS, and this fixture moved on to `0.4` by the same rule. Expect
+# this line to move once per `Y` bump for as long as the fixture exists; that
+# is the fixture working, not rotting.
+figdown 0.4 block
 node a "A"

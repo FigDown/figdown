@@ -1,0 +1,42 @@
+# `PAINT-ORDER-CONSTRUCT`: the EXPERIMENTAL half of `918-withdrawn-plane-keyword`.
+#
+# `plane` is reached from the retired-keyword sweep, which runs AHEAD of the
+# `GENRE-KEYWORD-ALLOWLIST` genre allowlist, so it answers the SAME message in every genre and
+# abandons the line before its options are read. "Every genre" is a claim
+# about all eight, and it is only checked if all eight are written down. The
+# normative five are `918`'s three sections (`block`, `bitfield`, `table`)
+# plus the `timing`/`signal` DIRECTIVES exercised there as a region inside a
+# block section. This file is the rest of the claim, which cannot live in
+# `cases/` because each section declares an EXPERIMENTAL genre:
+#
+#   flowchart   here                      statechart  here
+#   timing      here — the genre HEADER, which is a different position from
+#               the block opener `918` writes, the distinction `916` pins for
+#               the `wave` -> `timing` rename in both positions
+#   topology    241-topology-withdrawn-cells, alongside that genre's two
+#               per-cell withdrawals — it is the genre where every authored
+#               `plane` in the tree was actually written
+#
+# The `timing` section is the one worth having: it is a REGION genre and
+# never declared a scene keyword, so nothing in it could be a per-genre
+# withdrawal (`SCENE-KEYWORD-MEMBERSHIP`) and the message can only be arriving from the
+# language-wide sweep. That is the difference between `SCENE-KEYWORD-MEMBERSHIP` and `PAINT-ORDER-CONSTRUCT` made
+# observable rather than asserted.
+#
+# `flowchart` and `statechart` declare 0.2 because the genres do; `timing`
+# is legal from 0.1 (spelled `wave` until 0.1, `TIMING-GENRE-NAMING`).
+figdown 0.2 flowchart
+node a "A"
+plane over "Overlay"
+flowline a -> a plane=over
+
+figdown 0.2 statechart
+state idle "IDLE"
+plane over "Overlay"
+transition idle -[tick]-> idle plane=over
+
+figdown 0.1 timing
+plane over "Overlay"
+timing bus "Bus"
+signal clk 0101
+signal data ==.= z-index=1

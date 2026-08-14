@@ -1,0 +1,29 @@
+figdown 0.3 block
+# `DRAWN-ANNOTATION-FORM`: `note=` joins the `QUOTING-RULES` QUOTED-VALUE set. A prose value is
+# written `note="…"`; a bare token is a line error.
+#
+# The rule is `QUOTING-RULES`'s, not a new one: whitespace also separates positionals, so
+# a bare token cannot express a phrase — `note=needs review` would parse as a
+# `note=` of "needs" followed by a stray positional "review", and the author
+# would lose half their sentence with no diagnostic. `description=` and
+# `present=` are already in this set; `note=` is the third prose key and is
+# held to the same rule at every position that accepts it.
+#
+# BOTH SCANNERS ARE EXERCISED. `edge` does not go through `badOpts` — it has
+# its own option scanner (`RULE-POSITION-ENUMERATION`/`DRAWN-ANNOTATION-FORM`) — so a language-wide check has to be
+# written into it separately, and a fixture that only tested `node` would
+# pass against an engine that forgot the `edge` copy. Line 21 is that test.
+#
+# ONE ERROR PER LINE, and the version gate runs FIRST: under `figdown 0.2`
+# these same lines report the gate (case 805) and never reach the quoting
+# check, because an unavailable key's value shape is not the author's
+# problem yet.
+#
+# LINE 24 IS DELIBERATELY SILENT. `note=""` is QUOTED and therefore legal —
+# the rule is about the value's SHAPE, not its length, and an empty note is
+# the author's business. It is here as the near-miss the trigger must not
+# catch; its absence from the golden below is the assertion.
+node a "A" note=bare
+node b "B" note=""
+edge a -> b note=bare
+title "Quoting" note=bare

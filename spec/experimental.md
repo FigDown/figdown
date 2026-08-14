@@ -1,6 +1,6 @@
 # FigDown v0.1 — the EXPERIMENTAL constructs
 
-> Status: **EXPERIMENTAL / EXPERIMENTAL throughout**. Every construct defined in
+> Status: **EXPERIMENTAL throughout**. Every construct defined in
 > this file is **outside the v0.1 conformance surface** and **outside the
 > compatibility promise** (`CONSTRUCT-STATUS-TIERS`, 0.1; core
 > [§10](core.md#10-keyword-registry-conformance-modes-extensions)). An
@@ -11,18 +11,85 @@
 >
 > **One exception, measured and stated: an implementation
 > that skips this file entirely CANNOT pass the normative conformance
-> suite.** 17 of the 165 fixtures in `conformance/cases/` write an
+> suite.** 23 of the 192 fixtures in `conformance/cases/` write an
 > experimental keyword at line start. See §E0.1 for the list and for what
 > a skipping implementation should do instead.
+>
+> **This file no longer DECLARES anything (`SUBJECT-VOCABULARY-SCOPE`).** Each
+> surviving construct is declared by the one genre that has it, and this
+> file records status, model and history. See §E0.
 
 ## E0. What this file is, and why it is a separate file
 
-Four constructs live here — the keywords **`plane`**, **`bundle`**,
-**`threshold`** and **`band`**, with the option keys that only they accept
-(`plane=`, `z-index=`, `extend=`, `offset=`). Until this release they were
-defined inline in [core.md](core.md) and in
-[genres/block.md](genres/block.md), interleaved with the frozen material and
-distinguished only by a status marker in the prose.
+**Three constructs are recorded here — `bundle`, `threshold` and `band`,
+with the option keys that only they accept (`extend=`, `offset=`) — and
+this file DECLARES none of them.** Each is declared by
+the one genre that has it, in that genre's own normative document:
+
+| Construct | Declared by | Withdrawn from |
+|---|---|---|
+| `threshold` (+ `offset=`) | [genres/block.md](genres/block.md) | `topology`, `flowchart`, `statechart` (`SCENE-KEYWORD-MEMBERSHIP`) |
+| `band` (+ `extend=`) | [genres/block.md](genres/block.md) | `topology`, `flowchart`, `statechart` (`SCENE-KEYWORD-MEMBERSHIP`) |
+| `bundle` | [genres/experimental/topology.md](genres/experimental/topology.md) | `block`, `flowchart`, `statechart` (`SCENE-KEYWORD-MEMBERSHIP`) |
+| `plane` (+ `plane=`, `z-index=`) | — | **WITHDRAWN FROM THE LANGUAGE** (`PAINT-ORDER-CONSTRUCT`) |
+
+What stays here is what is not a genre's to say: the STATUS ruling that
+separates frozen from experimental at the file level (this section), the
+conformance consequence of it (§E0.1), the semantic model the constructs
+project into (§E5), the register of where the frozen files still name
+them (§E6), and the migration and stability contract (§E7).
+
+**Why the declarations left (`SUBJECT-VOCABULARY-SCOPE`).** Until this release the
+file defined `plane`, `bundle`, `threshold` and `band` for **all** the
+scene genres at once. That made it a second shared surface beside core
+§1's "scene keywords" sentence, and it carried the same defect: an
+INTERSECTION written down as if it were a namespace. `GENRE-VOCABULARY-OBLIGATION` obliges a genre
+to document its **complete** vocabulary — every keyword, option key, enum
+value and default — in its own document; while four scene genres could
+legally write `bundle` and none of them defined it, four genre documents
+were incomplete **by `GENRE-VOCABULARY-OBLIGATION`'s own exchange condition**, and this file was the
+reason. Core §1 now states the rule from the other end — a spelling
+accepted by more than one genre is more than one declaration, never one
+inherited — and this file stops being the counter-example to it. The
+withdrawals do most of the work: after `SCENE-KEYWORD-MEMBERSHIP` each surviving construct has
+exactly **one** declaring genre, so there is nothing left here for a
+second genre to inherit even if the file offered it.
+
+**The count of experimental core constructs: six → four → three.** The
+file held **six** until 0.1, when `EDGE-GEOMETRY-CONSTRUCTS` withdrew `path` and
+`routing` with their option keys `points=`, `tailport=`, `headport=` and
+`routing=`; **four** until this release; and **three** now, because
+**`plane` is WITHDRAWN from the language** by `PAINT-ORDER-CONSTRUCT` — the keyword, the
+`plane=` option key that could only reference a declared plane, and
+`z-index=`, which was legal on `plane` and nowhere else. The engine
+rejects all three spellings with a diagnostic that names **no
+replacement**, because there is none; that is the `path`/`routing` shape
+from `EDGE-GEOMETRY-CONSTRUCTS`, and §E7 records what it costs. Evidence:
+[migrations.md](migrations.md) 0.1 and 0.3,
+[core.md](core.md) §9 **`EDGE-IDENTITY-AND-GEOMETRY`**, `decisions/registry.md`
+and `decisions/registry.md`/§4.6.
+**§E1 and §E4 are not reused.** §E4 defined `path` and `routing`; §E1
+defined `plane`. Both numbers are left vacant rather than closed up, so
+that every citation of §E2–§E3 and §E5–§E7 written before this release
+still resolves to the section it was written about.
+
+**What withdrawing `plane` cost, measured.** Stripping
+`plane overlay "VXLAN tunnels" z-index=2` <!-- fence-check: skip --> and the ` plane=overlay` it
+supported from `examples/evpn-fabric.fd` and rebuilding produces an SVG
+of **12449 bytes** — the same size as before. Of 198 markup tokens
+exactly **one** differs, and it is `data-edge="36"` → `data-edge="35"`;
+normalising that counter makes the two files byte-identical. The
+overlay's whole visual identity — `stroke=#dc2626`, dashed — came from
+`class=overlay`, which the figure had already declared. A construct whose
+removal moves one index in the rendered output is not carrying the
+meaning its declaration claimed. **What does NOT go with it** is the
+implicit plane: `planes[0] = {id:"base", z:0}` is NORMATIVE and stays in core
+§12.2, every `node` and `edge` still reports `plane: "base"`, and paint
+order is **document order** — a later line paints on top. `RESERVED-SPELLINGS` records
+the reservation should the need return: RFC 8345 §4.1/§6.1's `network`
+is the word for a **layering relation**, and it reopens if a second and a
+third figure need to assert that one set of nodes is supported by
+another, and `class` is measured to be losing that claim.
 
 **The 0.1 isolation ruling separates frozen from experimental at the
 FILE level**, so that a user or an agent who does not want experimental
@@ -38,14 +105,24 @@ and `examples/reference/experimental/`. `tools/isolation-check.js --strict`
 is the gate that tests the criterion mechanically, and it is run with every
 other gate.
 
-**Complete isolation does not mean the frozen files never mention these four.**
-The registry in core §10 must still list them — a closed language has to say
-what exists — and the frozen genre documents still carry a vocabulary row per
-construct so that a reader meeting one in the wild can find out what it is.
-What the frozen set may not do is **define** any of them, or **depend** on any
-of them: no normative sentence in a frozen file requires this file to be read
-in order to be complete. Every frozen mention is marked EXPERIMENTAL and points
-here.
+**Complete isolation does not mean the frozen files never mention these
+constructs.** The registry in core §10 must still list them — a closed
+language has to say what exists — and it must list the WITHDRAWN
+spellings too, because a withdrawal owes a named diagnostic exactly as a
+rename does. What the frozen set may not do is **depend** on any of them:
+no normative sentence in a frozen file requires this file, or an
+experimental genre document, to be read in order to be complete. Every
+frozen mention is marked EXPERIMENTAL and points at the declaring document.
+
+**One frozen file DOES define, and that is the point of `SUBJECT-VOCABULARY-SCOPE`.**
+`threshold` and `band` are declared by [genres/block.md](genres/block.md),
+which is a **frozen** document, and their declarations sit there marked
+EXPERIMENTAL — status and belonging are orthogonal (core §1, `LAYOUT-ZONE-NAMESPACE`), so a frozen
+document may declare an experimental construct as long as nothing frozen
+depends on it. That is not a breach of the isolation ruling; it is the
+ruling read correctly. What the isolation ruling separates is the
+**compatibility promise**, and `tools/isolation-check.js --strict` tests
+the strip criterion after the move exactly as it did before it.
 
 **What EXPERIMENTAL is not.** It is not deprecation and not a warning about
 correctness; it is a statement that the construct has **not converged**. The
@@ -55,22 +132,18 @@ gets. It is documentary by design (`CONSTRUCT-STATUS-TIERS`). An agent generatin
 SHOULD restrict itself to the NORMATIVE surface, which is core plus the frozen
 genre documents and nothing here.
 
-**None of these four is deprecated and none is removed.** The reference engine
-accepts all four unchanged, every document that uses them keeps parsing and
-rendering, and **no `.fd` needs rewriting** — including for the 0.1 file
-move, which changed documentation paths and not one byte of the language.
-
-**The file held six until this release.** `path` and `routing`, with their option
-keys `points=`, `tailport=`, `headport=` and `routing=`, were **WITHDRAWN from
-the language** by `EDGE-GEOMETRY-CONSTRUCTS`; the engine now rejects all six spellings with a
-diagnostic that names **no replacement**, because there is none. That is the
-first exercise of the withdrawal power this file's status paragraph reserves,
-and §E7 records what it cost. The evidence is
-[migrations.md](migrations.md) 0.1, [core.md](core.md) §9 **`EDGE-IDENTITY-AND-GEOMETRY`**,
-and `decisions/registry.md`
-**§E4 is not reused.** It defined those two, and its number is left vacant
-rather than closed up, so that every citation of §E1–§E3 and §E5–§E7 written
-before this release still resolves to the section it was written about.
+**None of the three is deprecated, and the 0.3 move removed no
+spelling from any of them.** The reference engine accepts `threshold`,
+`band` and `bundle` unchanged **in their declaring genre**, with the same
+grammar, the same option keys and the same model; what changed is that
+each is now legal under one genre instead of four (`SCENE-KEYWORD-MEMBERSHIP`). A `.fd` that
+wrote one of them under the genre that declares it needs no rewriting.
+A `.fd` that wrote one under a genre that has withdrawn it gets a named
+per-genre diagnostic that gives the ground rather than a spellcheck —
+`"threshold" is not allowed in genre topology — it was WITHDRAWN from
+this genre, not misspelled: …` — and every affected genre was
+EXPERIMENTAL, or the construct was, so nothing under the compatibility
+promise moved (§E7).
 
 ### E0.1 The skip promise, and where it does not hold
 
@@ -80,34 +153,71 @@ the DOCUMENTS. It was read — including by this file — as also promising
 that an implementation could skip experimental material and still conform.
 **That second reading is false, and this section is the correction.**
 
-**17 of the 165 normative fixtures write an experimental keyword at line
+**23 of the 192 normative fixtures write an experimental keyword at line
 start**, so an implementation that rejects those keywords as unknown fails
-all 17: on the error fixtures it emits a different message (`unknown
+all 23: on the error fixtures it emits a different message (`unknown
 keyword` where the golden says `bundle needs an id`), and on the model
 fixtures it emits an empty array where the golden carries members.
 
 | fixture | kind | experimental keywords it writes |
 |---|---|---|
 | `112-lex-extra-args-every-directive` | errors | `band`, `signal`, `threshold`, `timing` |
-| `115-lex-option-before-label` | model | `band`, `bundle`, `plane`, `threshold` |
-| `118-id-quoted-positions` | errors | `bundle`, `plane`, `timing` |
-| `119-id-double-dash` | errors | `bundle`, `plane` |
-| `121-positional-quotes-scene` | errors | `plane` |
+| `115-lex-option-before-label` | model | `band`, `bundle`, `threshold` |
+| `118-id-quoted-positions` | errors | `bundle`, `timing` |
+| `119-id-double-dash` | errors | `bundle` |
 | `123-comma-list-one-token` | errors | `bundle` |
-| `214-label-absent-vs-id` | model | `bundle`, `plane`, `signal`, `timing` |
-| `215-label-empty-string` | model | `bundle`, `plane`, `signal`, `timing` |
-| `304-presentation-on-every-element` | model | `band`, `bundle`, `plane`, `signal`, `threshold`, `timing` |
-| `305-presentation-carve-outs` | errors | `signal`, `timing` |
+| `125-typed-block-label-quotes` | errors | `timing` |
+| `214-label-absent-vs-id` | model | `bundle`, `signal`, `timing` |
+| `215-label-empty-string` | model | `bundle`, `signal`, `timing` |
+| `245-block-subject-vocabulary` | model | `band`, `threshold` |
+| `246-block-withdrawn-cells` | errors | `bundle`, `plane` |
+| `304-presentation-on-every-element` | model | `band`, `bundle`, `signal`, `threshold`, `timing` |
+| `305-presentation-carve-outs` | errors | `timing` |
 | `306-presentation-value-errors` | errors | `band`, `bundle`, `threshold` |
 | `414-block-id-cross-kind-collision` | errors | `signal`, `timing` |
 | `478-typed-block-style-retired` | errors | `signal`, `timing` |
+| `804-note-refused-generic` | errors | `band`, `bundle`, `threshold` |
+| `810-threshold-in-region-target` | model | `band`, `threshold` |
+| `811-threshold-in-region-ungated` | model | `band`, `threshold` |
 | `901-errors-child-outside-block` | errors | `signal` |
 | `905-errors-retired-text-option` | errors | `band`, `bundle`, `threshold` |
-| `906-errors-needs-id` | errors | `bundle`, `plane`, `timing` |
+| `906-errors-needs-id` | errors | `bundle`, `timing` |
 | `911-errors-retired-option-keys` | errors | `band` |
+| `918-withdrawn-plane-keyword` | errors | `plane`, `signal`, `timing` |
+
+**This table is the enumeration, and `conformance/README.md` points here
+for it rather than repeating it.** It is derived by scanning
+`conformance/cases/*.fd` for an experimental keyword at line start with
+comments stripped; the command is in that README.
+
+**Re-measured; it read 17 of 165.** Seven
+of the eight differences are fixtures added since — `125`, `804`, `810`,
+`811`, and this release's own three, `245` (`block`'s surviving subject
+vocabulary), `246` (`block`'s withdrawn cells) and `918` (the withdrawn
+`plane` keyword). The eighth is `PAINT-ORDER-CONSTRUCT` itself: `plane` stood in eight cells
+of this table — `115`, `118`, `119`, `121`, `214`, `215`, `304`, `906` —
+and the withdrawal removes it from every one of them. Only
+`121-positional-quotes-scene` **leaves the list**, because `plane` was
+its sole experimental keyword; the other seven keep `bundle`, `band`,
+`threshold`, `timing` or `signal` and stay.
+
+**Two rows still write `plane`, and that is not a contradiction.** `246`
+and `918` are ERROR fixtures whose SUBJECT is the withdrawal: they write
+the spelling in order to pin the diagnostic that rejects it, which is the
+same treatment `path` and `routing` get. A withdrawn spelling can never
+appear in a MODEL fixture — there is no model for it — and an error
+fixture that stopped writing it would stop testing anything.
+
+**A 24th fixture, `912`, writes `chart`, and this table has never counted
+it.** That is an older scoping choice, not a new omission: the table's
+vocabulary is the four constructs this file was written about, and
+`chart` is a `table`-attached experimental construct that arrived by a
+different route (§10 (b)). It is recorded here so that a
+reader who greps the fixtures and finds 24 knows which basis this table
+counts on, rather than concluding the count is wrong.
 
 **Why they are like that, and why it is not simply a mistake.** Every one
-of the 17 is a **cross-cutting lexical** case: its subject is a rule that
+of the 23 is a **cross-cutting lexical** case: its subject is a rule that
 quantifies over the whole keyword registry — "an option may precede a
 label on any directive", "every directive rejects the retired `text=`",
 "a positional id may be quoted anywhere it is legal", "every element that
@@ -119,11 +229,12 @@ files exist to provide, so it was not done.
 
 **What this means for an implementation, stated as a rule.**
 
-- To claim **v0.1 parser conformance** — the 165 normative fixtures —
-  an implementation MUST parse `plane`, `bundle`, `threshold` and `band`,
-  and the `timing` genre with its `signal` child, at least well enough to
-  produce their model shapes (§E5) and their error messages. **Skipping
-  this file is not compatible with that claim.**
+- To claim **parser conformance** — the 192 normative fixtures — an
+  implementation MUST parse `bundle`, `threshold` and `band`, and the
+  `timing` genre with its `signal` child, at least well enough to produce
+  their model shapes (§E5) and their error messages. **Skipping this file
+  and the genre documents that declare the three is not compatible with
+  that claim.**
 - To claim **support for the portable authoring surface** — every
   document a v0.1 author is taught to write — an implementation may skip
   the whole experimental set. No frozen document teaches these keywords
@@ -131,37 +242,41 @@ files exist to provide, so it was not done.
   `tools/isolation-check.js` and `tools/skill-coverage.js` gate.
   **This is a claim about what is TAUGHT, not about what exists on disk.**
   Eight in-repo figures outside `examples/reference/experimental/` use one
-  of the four — `partition-map` and `evpn-fabric` and `srl-evpn-irb` and
+  of the three — `partition-map` and `evpn-fabric` and `srl-evpn-irb` and
   `patterns/topology-b`, plus the four `layout-compare` variants of the
-  last two — so an implementation that skips this file cannot render this
-  repository's own `examples/` directory in full. That is the honest
-  measure of "portable surface": it is the surface an author is taught,
-  and the project's own showcase reaches past it.
-- These are **two different claims**, and until this release this file
+  last two — so an implementation that skips the experimental surface
+  cannot render this repository's own `examples/` directory in full. That
+  is the honest measure of "portable surface": it is the surface an author
+  is taught, and the project's own showcase reaches past it.
+- These are **two different claims**, and until 0.1 this file
   offered only one sentence for both. The second is the one the isolation
   ruling actually established.
 
 The corresponding false clause in core §12.2 — that `thresholds`, `bands`
 and `bundles` are "empty on the normative surface" — is corrected in the
-same release; four of the 17 populate them.
+same release; seven of the 23 populate them.
 
-| Construct | Namespace | Where its registry row is | Where its model shape is |
+| Construct | Declared by | Where its registry row is | Where its model shape is |
 |---|---|---|---|
-| `plane` (+ `plane=`, `z-index=`) | scene (§E1) | core §10 (b), (b′) | core §12.2 *Plane* (the implicit `base` half is normative) + §E5 |
-| `bundle` | scene / `topology` vocabulary (§E2) | core §10 (b) | §E5 |
-| `threshold` (+ `offset=`) | scene (§E3) | core §10 (b) | §E5 |
-| `band` (+ `extend=`) | scene (§E3) | core §10 (b) | §E5 |
+| `bundle` | [genres/experimental/topology.md](genres/experimental/topology.md) (§E2) | core §10 (b) | §E5 |
+| `threshold` (+ `offset=`) | [genres/block.md](genres/block.md) (§E3) | core §10 (b) | §E5 |
+| `band` (+ `extend=`) | [genres/block.md](genres/block.md) (§E3) | core §10 (b) | §E5 |
+| `plane` (+ `plane=`, `z-index=`) | *nothing — WITHDRAWN, `PAINT-ORDER-CONSTRUCT`* | core §10, as a retired diagnostic | *none; §E1 is vacant* |
 
-One fact about belonging survives the move unchanged, and it is stated in
-core because it is a statement about the LANGUAGE rather than about these
-constructs:
+One fact about belonging is stated in core rather than here, because it
+is a statement about the LANGUAGE rather than about these constructs:
 
-- **The four scene constructs share a namespace whose other seven members are
-  frozen.** `node`, `group`, `external`, `edge`, `class`, `flow` and `rank`
-  are NORMATIVE and are the frozen `block` genre's vocabulary. Extracting
-  `threshold`/`band`/`bundle`/`plane` into this file changes nothing about
-  the seven, and [genres/block.md](genres/block.md) remains the complete,
-  self-contained normative home of the scene genre without this file.
+- **There is no shared scene namespace for these constructs to sit in**
+  (core §1, `GENRE-VOCABULARY-OBLIGATION`; 0.3, `SUBJECT-VOCABULARY-SCOPE`). Each genre declares its own subject
+  vocabulary, so `threshold` and `band` are `block`'s two experimental
+  declarations beside its NORMATIVE `node`, `group`, `external` and `edge`,
+  and `bundle` is `topology`'s one beside its own four. Status and
+  belonging stay orthogonal: `block` is a frozen document and two of the
+  words it declares are EXPERIMENTAL, which is a statement about their
+  stability and not about which document owns them.
+  [genres/block.md](genres/block.md) remains the complete,
+  self-contained normative home of that genre, and the strip test still
+  passes because nothing frozen DEPENDS on the two.
 
 **The layout-zone namespace of `LAYOUT-ZONE-NAMESPACE` no longer has an experimental member.** With
 `path` and `routing` withdrawn the zone's own membership is `pin`
@@ -173,203 +288,186 @@ ignoring the layout zone entirely, has no crack in it. The clause's own
 written about `path`/`routing`, and it is the record of what the project
 foresaw before the withdrawal, not a claim about the current membership.
 
-## E1. `plane` — paint-order planes (`PRESENTATION-CONTROL-TIERS`)
+## E2. `bundle` — declared by `topology` (`SUBJECT-VOCABULARY-SCOPE`/`SCENE-KEYWORD-MEMBERSHIP`)
 
-*Relocated here from core §2.4 and
-[genres/block.md](genres/block.md) §2.4, unchanged.*
+**`bundle` is declared by
+[genres/experimental/topology.md](genres/experimental/topology.md), which
+is normative for that genre. This section no longer defines it.** The
+grammar, the option keys, the member-matching rule and the derived ring
+are stated there and only there; what follows is the record of how the
+declaration got there and why this file stopped holding it.
 
-The `plane` keyword, its option key `z-index=` and the option key `plane=`
-that references a declared plane are all EXPERIMENTAL. Both the keyword and the
-option key were spelled `layer`/`layer=` until this release (`PLANE-KEYWORD-SPELLING`); the old
-spellings are line errors naming their migration.
+*It was relocated here from core §2.5 and
+[genres/block.md](genres/block.md) §2.5, and it moved on to `topology`'s
+own document.* The demotion that brought it here was
+already an argument about ONE genre: measured over the 50-document
+in-repo corpus, `bundle` appeared in four documents and **every one of
+them was a `topology` document**, so it belonged to no normative genre's
+minimum set. Holding it in a file shared by four scene genres kept the
+other three able to write a word none of them had earned, which is the
+defect `SUBJECT-VOCABULARY-SCOPE` names.
 
-```figdown
-plane overlay "LSP paths" z-index=2
-edge r1 -> r2 plane=overlay stroke=#dc2626
-```
+**`block` withdrew it (`SCENE-KEYWORD-MEMBERSHIP`), and the ground is stronger
+than the count.** `bundle` had **zero** authored uses under `block`, and
+the construct is defined **by its referent**: a LAG (IEEE 802.1AX), an
+ECMP set, an EVPN Ethernet Segment — a referent `topology` has and
+`block` does not. Under `block` the definition had to be geometric, a
+ring drawn round parallel edges with nothing to name; under `topology` it
+is the umbrella noun for a thing the reader already knows. That is the
+divergence the shared text hid, and it **reads better per genre**:
+`topology`'s declaration is shorter and stronger than the one it
+replaces. `flowchart` and `statechart` withdrew it too, and there it is
+an anti-feature — two flowlines between the same two stages are different
+CONDITIONS, and two transitions between the same two states are different
+TRIGGERS, so a ring round them hides exactly what the figure is for.
 
-Planes are author-facing organizational units; `z` order among planes is
-explicit, document order within a plane is paint order — **a later line
-paints on top (closer to the viewer)**, so line order itself is the
-implicit z within a plane. `z-index=` accepts integers only; a non-integer
-value (e.g. `z-index=1.5`) is a line error.
+**The spelling stays `bundle`, recorded as a deliberate RULE 4.1
+exception.** IEEE 802.1AX's own noun is *aggregation*, and it is FALSE
+for two of the three things the construct covers: an ECMP set is not an
+aggregation and neither is an EVPN Ethernet Segment. The standard is
+cited as the REFERENT and `bundle` is kept as the umbrella spelling; the
+row and its `exception_reason` are in
+[vocabulary-sources.tsv](vocabulary-sources.tsv).
 
-**Default `z`** (`PLANE-Z-INDEX-DEFAULT`). Every element belongs to a plane and every plane
-has a `z`, so the defaults are normative for anyone who implements the
-construct at all, not implementation choices:
+## E3. `threshold` and `band` — declared by `block` (`SUBJECT-VOCABULARY-SCOPE`/`SCENE-KEYWORD-MEMBERSHIP`)
 
-- The implicit `base` plane — the plane of every element that writes no
-  `plane=` — is **`z = 0`**. It is always present; a document never
-  declares it.
-- A `plane` line **without** `z-index=` takes its **1-based position among the
-  declared planes**: the first `plane` line is `z = 1`, the second
-  `z = 2`, and so on. The position counts *declared* planes in document
-  order, `base` excluded.
-- An explicit `z-index=` **overrides** that default for its own line and does
-  **not** shift the positions of the planes around it. So
-  `plane a` / `plane b z-index=10` / `plane c` yields model `z` = 1, 10, 3.
-- `z` values need be neither unique nor contiguous; ties keep document
-  order (the same "later line paints on top" rule as within a plane).
+**`threshold` and `band` are declared by
+[genres/block.md](genres/block.md), which is normative for that genre.
+This section no longer defines them.** The grammar, the mandatory quoted
+label, the `offset=` and `extend=` keys, the `..` range separator and the
+scope rule are stated there and only there; what follows is the record of
+how the declarations got there, plus the one clause that is about the
+RESOLVER rather than about either construct (§E3.1).
 
-**What does NOT move with the keyword.** The implicit `base` plane and the
-model's `planes` array are **normative** and stay in core (§12.2 *Plane*,
-§12.4): every document has `planes[0] = {id:"base", z:0}` and every `node`
-and `edge` reports `plane: "base"`, so a reader restricted to the normative
-surface needs no new case and never has to open this file. Only the
-DECLARED plane — the directive, its `z-index=`, and the `plane=` reference —
-is experimental.
-
-**Why `plane=` is demoted even though five normative directives accept it.**
-A keyword and its only declaration point move together: `plane=` can only
-name a plane some `plane` line declared, so in a document that may not
-declare one it could only ever name the implicit `base` — an option with
-exactly one legal value, which is not an option. `z-index=` follows for the
-same reason, being accepted by `plane` alone.
-
-## E2. `bundle` — one logical bundle of links (`topology` vocabulary)
-
-*Relocated here from core §2.5 and
-[genres/block.md](genres/block.md) §2.5, unchanged. The genre document that
-owns it is [genres/experimental/topology.md](genres/experimental/topology.md),
-itself experimental.*
-
-`bundle` is demoted because it is `topology` vocabulary and `topology` is
-itself an experimental genre: measured over the 50-document in-repo corpus,
-`bundle` appears in four documents and every one of them is a `topology`
-document, so it belongs to no normative genre's minimum set.
-
-```figdown
-bundle es1 "ES-1 / LAG-1" bd24a--srv,bd24b--srv stroke=#0ea5e9
-```
-
-The member list is ONE comma-delimited token, so it
-terminates at whitespace instead of resting on the `A--B` shape test alone.
-The whitespace-separated form (`bd24a--srv, bd24b--srv`) was **RETIRED** (`COMMA-LIST-WHITESPACE`/`POSITIONAL-LIST-SPELLING`) and is now the line error `bundle members take ONE
-comma-delimited token: write bundle b1 "LAG" a--c,b--c — the space form is
-retired (MIGRATIONS 0.1)`. One policy governs every comma list in the
-language — a list is ONE whitespace-free token — because it is the only
-policy under which a positional list terminates, leaving the rest of the
-line reservable for future `key=` options; `bundle` is held to it exactly as
-`rank` and `width` are. The earlier ruling that the space forms were "NOT
-deprecated" (`POSITIONAL-LIST-SPELLING`) rested on measured migration cost, and cost is not a
-language argument before the freeze.
-
-Declares that the listed links form **one logical bundle** — the neutral
-umbrella term (LAG, Ethernet Segment, port-channel, multi-chassis
-trunk…; the label says which). The label is optional; when omitted the
-bundle's id is used as the rendered label. The renderer **derives** the
-conventional dashed ellipse around the member links — no coordinates
-involved, and the ring follows the nodes wherever they move. Members
-must reference existing edges (line error otherwise), and a member
-reference `A--B` must resolve to a **unique** edge — parallel edges
-between the same endpoints are out of scope for v0.1 and referencing
-them is an error. This is the semantics-first rule (`DOMAIN-CONVENTION-DIRECTIVES`): name the
-*meaning* and the engine owns the drawing convention.
-
-A `bundle` member is matched **without** regard to the order its endpoints
-were written or the operator that joined them: `a--b`, `b--a` and `a -> b` all
-resolve to the same edge, so a bundle names the *link* and not the text that
-declared it. (Until this release this property was stated as a contrast with
-`path`, which matched its edge as written; `path` was withdrawn from the
-language by `EDGE-GEOMETRY-CONSTRUCTS`, and the property stands on its own.)
-
-## E3. `threshold` and `band` — scalar markers and zone bands (generic)
-
-*Relocated here from core §2.6 and
-[genres/block.md](genres/block.md) §2.6, unchanged.*
-
+*They were relocated here from core §2.6 and
+[genres/block.md](genres/block.md) §2.6, and they went back to `block`'s
+own document — this time as `block`'s own declarations
+rather than as a shared section that document merely pointed at.*
 `threshold` was spelled `guide` in an earlier release (`THRESHOLD-KEYWORD-SPELLING`) and
-`line` before that; `band` was spelled `fill` until this release and gained a
-MANDATORY quoted label (`BAND-LABEL-STATUS`). Every old spelling is a line
-error naming its migration.
+`line` before that; `band` was spelled `fill` until 0.1 and gained
+a MANDATORY quoted label (`BAND-LABEL-STATUS`). Every old spelling is a
+line error naming its migration, and the diagnostics are unchanged by the
+move.
+
+**`topology`, `flowchart` and `statechart` withdrew both
+(`SCENE-KEYWORD-MEMBERSHIP`).** The evidence was **zero authored uses** in all three, and in
+each the construct fails for a reason of that genre's own: a `threshold`
+is a labelled reference value drawn at a percentage of the target's
+RENDERED EXTENT, and a process box, a state box and a router glyph are
+all sized by their label, so the line asserts nothing a reader can read;
+a `band` is a range over the same meaningless extent. In `topology` there
+was a second ground — **`band` collides with the frequency band**, which
+is core vocabulary of that genre's own audience.
+
+**`band` does not collide that way in `block`, and that asymmetry is
+itself the argument for `SUBJECT-VOCABULARY-SCOPE`.** `block` has **no single domain** — that
+is what general-purpose means — so no domain meaning arrives with the
+reader to compete with FigDown's. The same word being safe in one genre
+and misleading in another cannot be recorded by one shared sentence
+belonging to no genre.
+
+**`block` keeps the spellings `threshold` and `band`, deliberately
+unfrozen.** They are the `GENRE-EARNING-THRESHOLD` *interim general constructs* for the
+candidate genre in core §9 — "a quantity extent carrying named reference
+values and named regions". `GENRE-EARNING-THRESHOLD` forbids over-stretching a general
+construct to satisfy a genre-shaped need ("approximating a genre with
+general block-and-edge draws a similar picture while discarding the
+meaning: 'looks right' is not 'expressed'"), and it supplies the interim
+in the same breath: general constructs "let the user at least draw the
+figure they want to express, so authors are never left without a way
+forward." Freezing either would bind a scene construct to the
+compatibility promise and foreclose the genre design; the 0.1
+renames correct DEFECTS in them (an inverted name, a construct that could
+carry no meaning) without promoting them. **Renaming either one now was
+considered and REJECTED**: they are held unfrozen precisely so a future
+scalar-marker genre can name the pair once, WITH a scale, and a rename
+today would hand that genre a retired word.
+
+**Withdrawing them from three genres is the first half of that same move,
+not wasted work.** It removes three of the four genres the constructs
+would eventually have to be extracted from, at zero cost and against zero
+authored evidence, so the eventual extraction is a **one-genre**
+operation on `block`. It also stops the corpus growing in the wrong
+direction — every month `threshold` stayed legal under `statechart` was a
+month someone could author one, and each such figure would be migration
+debt for a genre with no meaning for the construct. And it sharpens `GENRE-EARNING-THRESHOLD`'s
+own evidence: `GENRE-EARNING-THRESHOLD` rests on ~22 scalar-marker figure identities, and
+leaving the constructs legal in three genres that contribute zero of them
+diluted the claim that the need is a distinct genre's.
+
+**`threshold` carries an irony worth recording where `block` declares
+it.** In the QoS domain a threshold is a queue depth **with a numeric
+value** — RFC 2309's `minth`/`maxth`, RFC 7567 — and those are the very
+RFCs `THRESHOLD-KEYWORD-SPELLING` cited as the secondary source for the spelling. FigDown's
+`threshold` takes **no `value=`** (`THRESHOLD-VALUE-SCOPE`), and its `offset=` is a fraction
+of the target's rendered extent, not a quantity of anything: the target
+declares no scale (core §12.7). The name is borrowed from a domain that
+means a number by it, into a construct that refuses to carry one.
+
+### E3.1 A `threshold` or `band` on a REGION (`MARKER-TARGET-KINDS`)
+
+*This clause stays in this file because it is about the
+**resolver** — which declared ids `in=` will bind — and not about either
+construct's vocabulary. `in=` is a NORMATIVE core option key (core §10), so
+its value domain is not `block`'s to declare; what `block` declares is
+that `threshold` and `band` take `in=` at all.*
+
+**`in=` also resolves a REGION id** — a `bitfield`, `table` or `timing` block —
+in addition to a node or a group. This is a **widening of the value domain**,
+not a third sense of `in=`: the relation is sense 2 verbatim, *the element this
+one is drawn across*, and only the set of declared ids the resolver will bind
+has grown. It is **ungated**, so it holds under `figdown 0.1` too. Before it,
+`threshold "Max" in=q offset=50%` over a `table q` answered
+`unknown target "q" for threshold` — the same error a nonexistent id gets —
+which is why the two WRED figures in the measured corpus became GFM tables
+instead.
+
+`threshold` and `band` are **`block`'s** keywords, so they are not on the pure
+`table` / `bitfield` / `timing` top-level allowlist (`GENRE-KEYWORD-ALLOWLIST`) and this widening does
+not put them there — nor are they on `topology`'s, `flowchart`'s or
+`statechart`'s any more (`SCENE-KEYWORD-MEMBERSHIP`), so the header in every example below is
+`block` and no other genre can be substituted for it. The path that works is
+**composition** (`GENRE-COMPOSITION`): a `block` header hosting a nested region, with the mark
+at the scene's top level. These are the runnable versions of the examples
+cited from [genres/table.md](genres/table.md) and
+[genres/bitfield.md](genres/bitfield.md).
+
+Over a `table` region — the WRED case, and the driver the widening exists for:
 
 ```figdown
-threshold "Max cap"                in=buf offset=80%
-threshold "Reserved {port, queue}" in=buf offset=15%
-band "Reserved" 15% in=buf fill=#a3c93a
+figdown 0.1 block
+table wred "WRED profile"
+| Queue | min_th | max_th |
+|---|---|---|
+| q0 | 40 | 80 |
+| q1 | 30 | 70 |
+threshold "max_th" in=wred offset=75%
+band "drop zone" 40..80% in=wred
 ```
 
-- `threshold` is a **pure marker**: a horizontal line across the target's
-  box at a percentage of its height (bottom = 0%). No id — nothing
-  references a threshold. Covers thresholds, waterlines, caps, future chart
-  markers (`NEW-CONSTRUCT-EVIDENCE-GATE`: this one directive replaced a would-be genre). The quoted
-  label is MANDATORY.
-- **`threshold` takes no `value=` and no `ref=` (`THRESHOLD-VALUE-SCOPE`).** The rename did not
-  change its shape. **Zero** figures in the measured corpus carry a literal
-  numeric value on a mark: every reference is a named, software-configurable
-  register, and that name already lives in the mandatory label. `offset=` is
-  a fraction of the target's rendered extent, **not a value of any
-  quantity** — the target declares no scale (core §12.7) — though the relative
-  ORDER of two thresholds on one target IS knowledge.
-- **Why `guide` went (`THRESHOLD-KEYWORD-SPELLING`).** `guide` was an **inverted** name: in
-  Illustrator, Inkscape, Figma and draw.io a *guide* is an author-only
-  construction line that is NEVER rendered, while FigDown's is drawn
-  output — and `UNSAFE-DEFAULT-ELIMINATION` rates an inverted name worse than an unfamiliar one. It
-  was also a FigDown coinage, which `SIZE-AND-DIRECTION-KEY-NAMING` makes a last resort. `threshold`
-  comes whole from **Grafana**, whose threshold render option is literally
-  *"Show thresholds: as lines / as filled regions / as both"* — FigDown's
-  marker + region pair, split the same way — with **IETF RED/AQM**
-  `min_th`/`max_th` (RFC 2309, RFC 7567) as the secondary source and
-  exactly what the corpus's WRED figures transcribe. The model array
-  `guides[]` is renamed `thresholds[]` with the keyword (`NORMATIVE-SEMANTIC-MODEL`).
-- `band` is a **range band** carrying a MANDATORY quoted label written
-  FIRST, then the range positionally: `band "Reserved" 15%` = 0–15%
-  (the common case needs one number); `band "Headroom" 15..35%` = an
-  explicit range in one token. **The separator is `..`
-  (`RANGE-SPELLING`)**: FigDown has ONE range grammar, single-sourced from Ada
-  (ISO/IEC 8652) and Pascal (ISO 7185), both inclusive, and the hyphen form
-  `15-35%` it replaces is a line error with a named diagnostic — between two
-  numbers a hyphen reads as subtraction. Stackable. `extend=up|down|left|right` picks
-  the measuring axis and its 0% edge (default `up`: 0% at the bottom —
-  the waterline convention; `right` gives progress-bar style bands).
-  The key was spelled `dir=` until this release; it was renamed because
-  HTML's `dir` attribute means TEXT WRITING DIRECTION, and one spelling
-  with two meanings is what `UNSAFE-DEFAULT-ELIMINATION` forbids. Threshold and band are decoupled
-  concepts.
-- **The `band` label is MANDATORY, and that is a defect fix (`BAND-LABEL-STATUS`).** Until then `band` had no label slot at all, and earlier
-  editions of this section recorded that as if it were a design feature —
-  "a zone band carries no label" — which was FALSE as a justification. A
-  band's complete model was `{target, from, to, extend, fill, line}`; strip
-  `fill=`, which core §5 and `PRESENTATION-AS-MEANING-CARRIER` entitle any reader to discard as
-  presentation, and a band asserted **nothing whatsoever** — its meaning rode
-  on colour alone, which core §5 declares must never happen. Every interval
-  region in the measured corpus is a *named* one (Headroom/Share/Guarantee,
-  Latency/Block/Transmit, G/Y/R), and the buffer-region figure that
-  motivated this was forced to carry those names in three `class`
-  declarations all literally spelled "region". The label is written FIRST
-  because that is the position every other labelled directive in the
-  language uses (`node`, `group`, `external`, `bundle`, `threshold`), so
-  one reader rule covers the whole vocabulary and the sibling pair reads the
-  same way. The text channel came with the label — and 0.1 then
-  removed that channel from the whole language (`COLOUR-KEY-STATUS`), so a band's label
-  takes the derived colour like every other label. A `band`
-  line with no quoted label is a line error naming the migration; the
-  migration tool reports it and refuses to invent a name.
-- **Scope follows the meaning (`AUTHORING-INTENT-OVER-RENDERING`)**: both directives take a **group**
-  or a **single node** as their target, and the pair is symmetric.
-  Attach to the *group* when the semantics are global ("one threshold
-  config referenced by all columns"); attach to a
-  *node* when the semantics are genuinely per-element
-  (`band "Share" 15..35% in=g2`, `threshold "watermark" in=g2` — e.g. one
-  column's occupancy watermark). The writer chooses the scope that
-  states their intent; the renderer treats both identically.
+Over a `bitfield` region:
 
-**Both stay EXPERIMENTAL, deliberately.** They are the `GENRE-EARNING-THRESHOLD` *interim
-general constructs* for the candidate genre in core §9 — "a quantity extent
-carrying named reference values and named regions". `GENRE-EARNING-THRESHOLD` forbids
-over-stretching a general construct to satisfy a genre-shaped need
-("approximating a genre with general block-and-edge draws a similar
-picture while discarding the meaning: 'looks right' is not 'expressed'"),
-and it supplies the interim in the same breath: general constructs "let
-the user at least draw the figure they want to express, so authors are
-never left without a way forward." Freezing these two would bind two
-scene constructs to the compatibility promise and foreclose the genre
-design; the 0.1 renames correct DEFECTS in them (an inverted name,
-a construct that could carry no meaning) without promoting them. A defect in
-an experimental construct is still a defect, which is why the rename and the
-mandatory label landed anyway.
+```figdown
+figdown 0.1 block
+bitfield hdr "Header" numbering=msb0
+field "Type" 8
+field "Payload" 24
+threshold "byte boundary" in=hdr offset=25%
+```
 
-## E5. The semantic model of the four
+**On a `table` the offset is measured over the DATA ROWS**, not over the whole
+grid. The header tiers name the columns; they are not values, and a threshold is
+a statement about values. Measured over the grid, `offset=85%` on a three-row
+table lands on the column headings and strikes through them.
+
+**The locator COORDINATE grammar is designed and deliberately NOT built.**
+`in=q(3)`, addressing a row inside the region, has no shipping consumer, and
+RULE 4.7 argues against spending a grammar before one exists; `in=hdr(2)` is a
+line error today. Each region genre states its own address space normatively
+(`GENRE-DOCUMENT-CONTRACT`) against the day one arrives. *Reopens on* a construct that needs to
+address a row, a cell or a cycle INSIDE a region.
+
+## E5. The semantic model of the three
 
 *Relocated here from core §12.2, unchanged. Core §12 remains
 the normative contract for the model as a whole, and its Document table still
@@ -377,7 +475,14 @@ lists the top-level keys below — a closed model has to say what exists.
 Everything here is the shape of a key a normative-surface reader never meets
 in a document that stays inside the surface.*
 
-**Experimental does NOT mean unmodelled.** All four project into the canonical
+*This section stayed here while the VOCABULARY moved to the
+declaring genres (§E0). `GENRE-VOCABULARY-OBLIGATION`'s exchange obliges a genre to document its
+keywords, option keys, enum values and defaults; the canonical model is
+not on that list — it is core §12's contract, one shape per construct
+whatever genre writes it — so splitting it per genre would duplicate
+identical tables and invite them to drift.*
+
+**Experimental does NOT mean unmodelled.** All three project into the canonical
 model exactly like anything else, and `conformance/normalize.js` implements
 that projection. What they lack is a conformance obligation.
 
@@ -385,13 +490,13 @@ The top-level keys, as core §12.2 lists them:
 
 | key | present | note |
 |---|---|---|
-| `planes` | always, never empty | the ARRAY is NORMATIVE — `planes[0]` is the implicit `base`; only a DECLARED plane is EXPERIMENTAL |
+| `planes` | always, exactly one entry | wholly NORMATIVE since 0.3: `planes[0]` is the implicit `base` and `PAINT-ORDER-CONSTRUCT` withdrew the only directive that could add a second |
 | `thresholds` | always (MAY be empty) | the array is empty in every document on the normative surface |
 | `bands` | always (MAY be empty) | same |
 | `bundles` | always (MAY be empty) | same |
 
 **Threshold** — `threshold` (§E3). The directive and the model array were
-spelled `guide` / `guides` until this release (`THRESHOLD-KEYWORD-SPELLING`); `NORMATIVE-SEMANTIC-MODEL` makes the model
+spelled `guide` / `guides` until 0.1 (`THRESHOLD-KEYWORD-SPELLING`); `NORMATIVE-SEMANTIC-MODEL` makes the model
 normative, so the array rename is part of the migration, the precedent
 being `sizes[].w` → `.width` (an array 0.1 then merged into `pins`
 entirely, `ELEMENT-GEOMETRY-DIRECTIVE`) and `text` → `color` (a key 0.1 then
@@ -403,7 +508,6 @@ removed from the model entirely, `COLOUR-KEY-STATUS`).
 | `in` | string | always | the target: a node id OR a group id |
 | `offset` | number | always | a fraction of the target's rendered extent, `0`–`100`, **without** the `%` sign; MAY be fractional. It is **not a value of any quantity** — the target declares no scale (core §12.7). The model key follows the source key, renamed from `at` at 0.1. The relative ORDER of two thresholds on one target, by this key, IS knowledge (core §12.7) |
 | `fill` `stroke` `style` | string | when written | core §5 |
-| `plane` | string | when written | **not** materialized |
 | `line` | number | always | 1-based source line |
 
 **Band** — `band` (§E3).
@@ -416,7 +520,6 @@ removed from the model entirely, `COLOUR-KEY-STATUS`).
 | `extend` | `"up"`\|`"down"`\|`"left"`\|`"right"` | always | materialized default `"up"`. Spelled `dir` in both the source and the model until 0.1 |
 | `fill` | string | always | materialized (see the caveat in core §12.4) |
 | `stroke` `style` | string | when written | core §5 |
-| `plane` | string | when written | **not** materialized |
 | `line` | number | always | 1-based source line |
 
 **Bundle** — `bundle` (§E2); the
@@ -429,41 +532,47 @@ declares none.
 | `label` | string | when written | core §12.3 |
 | `members` | array of string | always | one `"a--b"` string per member, endpoints in the order the member was written |
 | `fill` `stroke` `style` | string | when written | core §5 |
-| `plane` | string | when written | **not** materialized |
 | `line` | number | always | 1-based source line |
 
-**Plane** — the DECLARED plane, `plane` (§E1). The *Plane* element itself and
-the `planes` array stay in core §12.2, because the implicit `base` is
-normative; what is experimental is every plane a document declares, and the
-`label` key, which only a `plane` line can write.
+**No `plane` row anywhere above (`PAINT-ORDER-CONSTRUCT`).** All three
+carried an optional, unmaterialized `plane` key while a document could
+declare a plane to point it at. The `plane=` option key is withdrawn with
+the keyword, so the key can no longer be written on any of them and the
+rows are deleted rather than marked absent — a model key that no source
+line can produce is not a key. **What is unaffected** is the implicit
+plane: `planes` still holds exactly `{id:"base", z:0}`, `node.plane` and
+`edge.plane` are still materialized to `"base"` (core §12.2, §12.4), and
+paint order is document order. The *Plane* element is now wholly NORMATIVE
+and wholly core's; this file no longer has a half of it to describe, and
+§E1 is vacant.
 
-A *Plane* carries **no** `line`: the engine records none. Declaration
-order is preserved by array position, which is also what the default `z`
-counts. The element and its model field were named `Layer`/`layer` until this release (`PLANE-KEYWORD-SPELLING`); a model key rename is normative (`NORMATIVE-SEMANTIC-MODEL`), so a second
-implementation emits `plane`.
+## E6. Where the frozen files still name these three
 
-**The `plane` REFERENCE on other elements.** `node.plane` and `edge.plane`
-are materialized to `"base"` and are therefore normative; on `group`,
-`external`, `bundle`, `threshold`, `band` and `class` the key is omitted
-when absent (core §12.4 rule 1). A value other than `"base"` can only come
-from a `plane=` written against a declared plane, so it can only appear in a
-document that is already outside the surface.
+A closed language has to say what exists, so the frozen set names all three —
+and, `block`'s own declarations aside, never defines them. Each of these is a
+registry row or a marked cross-reference:
 
-## E6. Where the frozen files still name these four
-
-A closed language has to say what exists, so the frozen set names all four —
-and never defines them. Each of these is a registry row or a marked
-cross-reference, and each points here:
-
-| Frozen file | What it says about the four |
+| Frozen file | What it says about the three |
 |---|---|
-| [core.md](core.md) §2.4–§2.6 | one marked pointer each, to §E1–§E3 |
-| [core.md](core.md) §5 | which directives accept `fill=`/`stroke=`/`style=`/`plane=` — acceptor rows, marked |
+| [core.md](core.md) §1 | that subject vocabulary is per genre (`GENRE-VOCABULARY-OBLIGATION`) and that these constructs are declared per genre, not shared — 0.3, `SUBJECT-VOCABULARY-SCOPE` |
+| [core.md](core.md) §2.5–§2.6 | one marked pointer each, to §E2–§E3 |
+| [core.md](core.md) §5 | which directives accept `fill=`/`stroke=`/`style=` — acceptor rows, marked |
 | [core.md](core.md) §9 | the `GENRE-EARNING-THRESHOLD` candidate genre that `threshold`/`band` stand in for as interim general constructs (§E3) |
-| [core.md](core.md) §10 | the **registry**: one row per keyword and per option key, with its EXPERIMENTAL status. This is the enumeration the isolation ruling explicitly preserves |
-| [core.md](core.md) §12 | the Document key list and the normative `planes`/`base` half of the plane model |
-| [genres/block.md](genres/block.md) | one vocabulary row per construct, marked EXPERIMENTAL, pointing here — so a reader who meets one in a scene document can identify it without leaving the genre document |
+| [core.md](core.md) §10 | the **registry**: one row per keyword and per option key, with its EXPERIMENTAL status, plus the WITHDRAWN rows that are owed a named diagnostic. This is the enumeration the isolation ruling explicitly preserves |
+| [core.md](core.md) §12 | the Document key list and the wholly normative `planes`/`base` model |
+| [genres/block.md](genres/block.md) | **the declaration** of `threshold` and `band`, marked EXPERIMENTAL — a frozen document may declare an experimental construct as long as nothing frozen depends on it (§E0) — plus a vocabulary row for `bundle` pointing at `topology` |
 | [genres/README.md](genres/README.md) | the count of demoted constructs and what a demotion means |
+
+**Two rows left this table, and are recorded here so the
+deletion is not silent.** Core §2.4 was the marked pointer to §E1, and
+core §5's acceptor row named `plane=` among the presentation keys; both
+went with `PAINT-ORDER-CONSTRUCT`. Every clause around them survives — §2.4's neighbours,
+§5's table and §12's plane model are all frozen text — and what changed
+is that none of them names a construct this file defines. The `plane`
+spelling itself stays REGISTERED in core §10 as a withdrawn diagnostic,
+on the same convention `path` and `routing` sit under: a registration
+counts whether or not it has a live acceptor, and the engine still owes
+each withdrawn spelling a named message.
 
 Three rows left this table with the constructs they were about,
 and are recorded here so the deletion is not silent: core §1 (`UNIVERSAL-CORE-KEYWORDS`, `LAYOUT-ZONE-NAMESPACE`) named
@@ -483,9 +592,12 @@ point of the file. Concretely:
 - A change here needs **no** `migrations.md` entry (`CONSTRUCT-STATUS-TIERS`, core §13.3). Entries
   have nonetheless been written for every change these constructs have had —
   `guide` → `threshold`, `band`'s mandatory label, `layer` → `plane`,
-  `via`/`src`/`dst` → `points`/`tailport`/`headport`, and the 0.1
-  withdrawal itself — because accumulating migrations is the rehearsal for
-  v1.0's machinery (core §13.4), not because they were owed.
+  `via`/`src`/`dst` → `points`/`tailport`/`headport`, the 0.1
+  withdrawal itself, and the 0.3 per-genre withdrawals and the
+  removal of `plane` — because accumulating migrations is the rehearsal for
+  v1.0's machinery (core §13.4), not because they were owed. An
+  unpublished working draft is not where a reader looks for what happened
+  to a keyword.
 - Promotion is possible and has precedent in the other direction: `stroke=`
   was demoted by `CONSTRUCT-STATUS-TIERS` and promoted back to NORMATIVE by `STROKE-KEY-STATUS` once its use was
   re-measured. A promotion moves the construct's definition OUT of this file
@@ -499,6 +611,31 @@ point of the file. Concretely:
   set, and `tools/isolation-check.js --strict` still passes because deleting the
   experimental file set must leave a complete standard, which is what it tests
   on every run.
+- **0.3 exercises the power twice more, at two different scopes,
+  and the distinction is the whole content of the release.** `PAINT-ORDER-CONSTRUCT` is a
+  LANGUAGE withdrawal in `EDGE-GEOMETRY-CONSTRUCTS`'s exact shape: `plane`, `plane=` and
+  `z-index=` are gone everywhere, the diagnostic names no replacement,
+  and `plane` joins the retired-keyword sweep AHEAD of the per-genre
+  allowlist so it fires under `bitfield`, `table` and `timing` too. `SCENE-KEYWORD-MEMBERSHIP`
+  is a **per-genre** withdrawal, which is new: 16 keyword/genre cells
+  where the spelling survives in another genre, so the diagnostic must
+  say *withdrawn from this genre, not misspelled* and give that genre's
+  own ground rather than offer a spellcheck. Both were free. Three of the
+  four scene genres are EXPERIMENTAL genres whose own documents promise
+  they "may change or be withdrawn in a later `0.x` without a migration
+  entry"; in `block`, the one NORMATIVE scene genre, the two withdrawn
+  cells were `bundle` and `plane`, both EXPERIMENTAL, and neither of `block`'s
+  NORMATIVE cells — `group` and `external` — is touched. No compatibility
+  break, no MAJOR version spent.
+- **`SCENE-KEYWORD-MEMBERSHIP` and `PAINT-ORDER-CONSTRUCT` also had to repair two diagnostics they did not
+  change.** `RETIRED_LAYER`, `layer=` and `z=` each named a replacement
+  spelling that `PAINT-ORDER-CONSTRUCT` has now removed, so each was rewritten to state the
+  WHOLE chain — `layer` → `plane` → withdrawn — rather than send an
+  author to a word that is itself a line error. The precedent is
+  `route` → `path`, where the same repair was owed. A
+  withdrawal's blast radius is every diagnostic that pointed at it, and
+  that is a cost worth naming, because it is the one part of a
+  withdrawal that is not a deletion.
 - **A withdrawal, unlike every retirement before it, has no replacement
   spelling — so it has no mechanical migration.** Every earlier retired
   spelling in this project is a RENAME: `layer` → `plane`, `guide` →

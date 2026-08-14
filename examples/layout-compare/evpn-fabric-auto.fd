@@ -1,7 +1,7 @@
 # FigDown — figures as text. Spec: https://github.com/FigDown/figdown
 
 figdown 0.1 topology
-title "VXLAN/EVPN Leaf-Spine Fabric — topology with plane notes"
+title "VXLAN/EVPN Leaf-Spine Fabric — underlay and overlay told apart by class"
 
 # ── Semantic classes ─────────────────────────────────────────────────
 class underlay "Physical underlay link — eBGP/L3 transport between leaf and spine" stroke=#555
@@ -29,8 +29,7 @@ edge lf2 -- h2 class=underlay
 edge lf3 -- h3 class=underlay
 
 # overlay: VXLAN tunnel between the two VTEPs sharing VNI 10010
-plane overlay "VXLAN tunnels" z-index=2
-edge lf1 <-[VXLAN VNI 10010]-> lf2 class=overlay plane=overlay
+edge lf1 <-[VXLAN VNI 10010]-> lf2 class=overlay
 
 # ── Supplementary knowledge ─────────────────────────────────────────
 

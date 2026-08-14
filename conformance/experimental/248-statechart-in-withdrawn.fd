@@ -1,0 +1,27 @@
+# `MEMBERSHIP-KEY-ACCEPTANCE`: `in=` is WITHDRAWN from `statechart`, and the argument
+# here is NOT the flowchart one. It is a RESERVATION.
+#
+# `statechart` declares no subject vocabulary at all (`SUBJECT-VOCABULARY-SCOPE`), so the `group` id
+# that was `in=`'s only value domain cannot exist here and every value was a
+# dead end — that much is the same. What decided it is the future: `in=`'s
+# value domain in THIS genre is a `state` id, not a group id. UML 2.5.1
+# §14.2.3.4 composite states are states nested inside a state, and they would
+# arrive as nesting on `state`, through this exact key. A key left live with a
+# group-id domain therefore taught the WRONG model using the very spelling
+# reserved for the right one — worse than an error and worse than silence.
+#
+# The fixture writes `in=idle`, whose value IS a declared state id, because
+# that is precisely the form the reservation is about: it is refused today,
+# and the diagnostic says what would bring it back.
+#
+# `open` is declared and connected on its own lines, and the refused `in=`
+# sits on a THIRD state nothing references — deliberately, so the golden holds
+# ONE error. A line that errors abandons its declaration, so writing `in=` on a
+# state a transition names would add an `unknown endpoint` cascade whose
+# subject is error RECOVERY (conformance/README.md, exception 2), not this
+# withdrawal.
+figdown 0.2 statechart
+state idle "IDLE"
+state open "OPEN"
+transition idle -> open
+state up "UP" in=open

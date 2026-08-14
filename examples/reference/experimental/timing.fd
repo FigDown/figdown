@@ -1,6 +1,6 @@
 # FigDown — figures as text. Spec: https://github.com/FigDown/figdown
 
-# Reference set for genre `timing` (EXPERIMENTAL; spelled `wave` until this release, `TIMING-GENRE-NAMING`).
+# Reference set for genre `timing` (EXPERIMENTAL; spelled `wave` until 0.1, `TIMING-GENRE-NAMING`).
 figdown 0.1 timing
 title "Reference: timing diagram"
 

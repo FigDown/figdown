@@ -1,5 +1,5 @@
 figdown 0.1 timing
-# Before this release the tokenizer discarded quotedness BEFORE the value was
+# Before 0.1 the tokenizer discarded quotedness BEFORE the value was
 # split, so data="a,b" was TWO elements. Per-element quoting is what PRESERVES
 # that meaning; it is not cosmetic.
 timing w "W"

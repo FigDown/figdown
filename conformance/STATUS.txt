@@ -17,7 +17,7 @@
 #
 # WHAT CHANGED, AND WHAT IT COST
 # --------------------------------------------
-# Until this release this file was a per-case TAG and the 52 fixtures named
+# Until 0.1 this file was a per-case TAG and the 52 fixtures named
 # below sat inside `cases/` alongside the normative ones. The reasoning
 # recorded here for that choice was explicit — a tag keeps every citation
 # by filename valid, while a directory move breaks them — and the
@@ -58,16 +58,22 @@
 # WHAT WAS DEMOTED, AND BY WHAT
 # -----------------------------
 # `CONSTRUCT-STATUS-TIERS` made the genres `topology`, `flowchart` and `timing`
-# (spelled `wave` until this release, `TIMING-GENRE-NAMING`)
+# (spelled `wave` until 0.1, `TIMING-GENRE-NAMING`)
 # EXPERIMENTAL and demoted nine constructs (`threshold` — spelled `guide`
-# until this release — `band`, `bundle`,
+# until 0.1 — `band`, `bundle`,
 # `plane`, `path`, `routing`, `text=`, `stroke=`, `plane=`) to
-# EXPERIMENTAL. Four of those nine have since moved: `stroke=` was
+# EXPERIMENTAL. SIX of those nine have since moved: `stroke=` was
 # promoted back to NORMATIVE (`STROKE-KEY-STATUS`), `text=`/`color=`
-# left the language altogether (`TEXT-COLOUR-KEY-NAMING`, `COLOUR-KEY-STATUS`), and `path`/`routing` were
+# left the language altogether (`TEXT-COLOUR-KEY-NAMING`, `COLOUR-KEY-STATUS`), `path`/`routing` were
 # WITHDRAWN outright (`EDGE-GEOMETRY-CONSTRUCTS`) — the first exercise of the
-# withdrawal path `CONSTRUCT-STATUS-TIERS` always allowed. The demoted set is now
-# five and none of them is a paint key. A second implementation may skip
+# withdrawal path `CONSTRUCT-STATUS-TIERS` always allowed — and `plane`/`plane=` were WITHDRAWN
+# (`PAINT-ORDER-CONSTRUCT`), the second exercise of it, taking `z-index=` with
+# them (the key was legal on `plane` and nowhere else). The demoted set is
+# now three — `threshold`, `band`, `bundle` — and none of them is a paint
+# key. `bundle` is additionally the first construct to be demoted, kept, and
+# then withdrawn FROM ONE GENRE ONLY (`block`, `SCENE-KEYWORD-MEMBERSHIP`) while staying live in
+# another (`topology`), which is what per-genre vocabulary makes possible.
+# A second implementation may skip
 # all of that and still claim v0.1 conformance, so a fixture whose
 # SUBJECT is one of them must not be counted in the headline number.
 #
@@ -94,12 +100,17 @@
 #     something normative stays NORMATIVE — it stays in `cases/`. Twelve
 #     are in this position
 #     (112, 115, 209, 214, 215, 233, 259, 301, 304, 305, 306, 307 —
-#     115 runs `bundle`, `threshold`, `band` and `plane` through
+#     115 runs `bundle`, `threshold` and `band` through
 #     the generic option-before-label rule (`OPTION-POSITION-PARSING`), which is core lexing;
 #     the others are presentation and lexical sweeps touching
-#     `extend=`, `plane=`, `z=`, or running `threshold`/`band`/
-#     `bundle`/`plane`/`timing` through a generic check; 259 is nonetheless
-#     experimental below, by its `topology` header). Six more embed a
+#     `extend=`, or running `threshold`/`band`/`bundle`/`timing` through a
+#     generic check; 259 is nonetheless
+#     experimental below, by its `topology` header). Until this release the
+#     same sentence named `plane` and `plane=`/`z=` alongside them, and
+#     `115` ran `bundle` under a `block` header: `SCENE-KEYWORD-MEMBERSHIP`/`PAINT-ORDER-CONSTRUCT` withdrew `plane`
+#     from the language and `bundle` from `block`, so those writings left
+#     `cases/` in that release — `115` grew a `topology` section to keep the
+#     `bundle` half of its coverage rather than lose it. Six more embed a
 #     `timing` block, itself EXPERIMENTAL, inside a normative-genre document
 #     (112, 214, 215, 304, 305, 414). Moving any of them would drag
 #     normative coverage of `fill=`, `style=`, the label absent/empty
@@ -116,6 +127,41 @@
 #     nothing experimental is left in the fixture. `914-retired-guide-keyword` is EXPERIMENTAL by the
 #     opposite reading: it is a dedicated test of the demoted construct's
 #     own retirement, and it WRITES `guide` at line start.
+#   * OPEN QUESTION — THE CRITERION AND ITS OWN RECORDED
+#     EXCEPTIONS NOW DISAGREE, AND THIS IS THE RECORD OF THAT, NOT A RULING.
+#     `SCENE-KEYWORD-MEMBERSHIP` withdrew `bundle` from `block`, and the fixtures that USED it as a
+#     lexical host kept their coverage by APPENDING a `topology` section
+#     rather than deleting the line. ELEVEN normative fixtures now declare
+#     one: 115, 118, 119, 123, 214, 215, 304, 306, 804, 905, 906. (Three more
+#     declare `flowchart` or `statechart` and predate this release: 801, 802,
+#     807.)
+#     * AGAINST leaving them in `cases/`: criterion 1 above says a case is
+#       EXPERIMENTAL if its header genre is experimental, on the ground that
+#       "an implementation restricted to the normative genre surface cannot
+#       parse the fixture AT ALL, so it cannot be asked to". Read literally
+#       that reaches a fixture with ONE experimental section as surely as one
+#       with only experimental sections, and it would move eleven files and
+#       move the published normative count with them.
+#     * FOR leaving them: criterion 1's ground is about a WHOLE fixture being
+#       unparseable, and this file's own gloss on `224` already decides the
+#       multi-section case the other way — "its four headers are block/
+#       topology/bitfield/flowchart, so the genre criterion does not reach
+#       it" — which is why `224` carries `construct=role` alone. `801` and
+#       `802` are the same shape and are NORMATIVE. And
+#       criterion 3 governs directly: a fixture that merely USES an
+#       experimental construct while testing something normative stays
+#       normative, and a section is how a multi-genre lexical sweep USES one
+#       now that vocabulary is per genre.
+#     * What is NOT in dispute: `spec/experimental.md` §E0.1 already records
+#       that the skip promise is conditional and enumerates the fixtures that
+#       make it so. Whichever way this resolves, that enumeration is the
+#       honest statement to an implementer, and it is where the cost is
+#       already visible.
+#     RESOLVING IT is a maintainer ruling plus eleven file moves plus eleven
+#     records here, and it changes a published count — so it does not happen
+#     as a side effect of a vocabulary release. It is written down so the
+#     next reader finds the QUESTION rather than a rule that quietly stopped
+#     being true.
 #   * `915-retired-chart-level` is EXPERIMENTAL: `chart` is outside the
 #     v0.1 conformance surface entirely (§4.4), so its option key's
 #     deletion diagnostic is too.
@@ -124,12 +170,16 @@
 #     — both core, both normative.
 #   * The `bundle`/`plane` demotion (same batch as the rest
 #     of `CONSTRUCT-STATUS-TIERS`) moved THREE cases and only three: `331`, `332` and `333`
-#     are dedicated `plane` tests written under a `block` header, so
-#     nothing but the construct criterion reaches them. The other seven
+#     were dedicated `plane` tests written under a `block` header, so
+#     nothing but the construct criterion reached them. The other seven
 #     dedicated `bundle`/`plane` cases (`271`, `330`, `390`–`394`) were
 #     already experimental by their `topology` header and gained a
 #     `construct=` reason without changing status, exactly as
-#     `330-plane-paint-order` carries both. `271`'s subject is read here as the
+#     `330-plane-paint-order` carried both. (HISTORICAL: `330`–`333` were
+#     DELETED with the construct — see the `plane` block
+#     below. The reading is recorded because it is the criterion, and the
+#     criterion outlives the fixtures that illustrated it.)
+#     `271`'s subject is read here as the
 #     `bundle` member rule (an external id resolving as a member); read
 #     as an `external` test instead it would lose the `construct=` half
 #     and keep its bucket either way — a one-line edit.
@@ -139,7 +189,7 @@
 #   <fixture-basename>  <reason>[,<reason>...]  <note — rest of line>
 #
 # Blank lines and lines starting with `#` are ignored. Fields are
-# whitespace-separated; the note is rest-of-line. (Until this release this
+# whitespace-separated; the note is rest-of-line. (Until 0.1 this
 # read "lexed the way FigDown itself lexes `title`"; `title` now takes a
 # quoted string, so the comparison no longer holds and the note format is
 # stated on its own terms.) Reasons:
@@ -173,7 +223,10 @@ default normative
 222-flowchart-role-unstated       genre=flowchart,construct=role  a bare `node` under flowchart is role-UNSTATED, never a defaulted process (`UNSAFE-DEFAULT-ELIMINATION` §3)
 223-flowchart-role-errors         genre=flowchart,construct=role  every `node` rule governs a role line unchanged (id, label quoting, shape enum, options)
 224-flowchart-roles-genre-scoped  construct=role    the role keywords are rejected under block/topology/bitfield by `GENRE-NAMESPACE`'s allowlist (no per-keyword code)
-225-flowchart-flowline            genre=flowchart,construct=connector  `flowline` is the flowchart connector; every `edge` rule governs it unchanged (`GENRE-CONNECTOR-SPELLING`)
+225-flowchart-flowline            genre=flowchart,construct=connector  `flowline` is the flowchart connector; every `edge` rule governs it unchanged (`GENRE-CONNECTOR-SPELLING`). The `plane=base` its last line also carried LEFT (`PAINT-ORDER-CONSTRUCT`) — incidental to the connector claim
+242-flowchart-subject-vocabulary  genre=flowchart   0.3 (`SUBJECT-VOCABULARY-SCOPE`/`SCENE-KEYWORD-MEMBERSHIP`): the KEEP half of the grid for this genre — `external` is the one subject word it declares, and its referent is ISO 5807 §9.4.2, not `block`'s
+243-flowchart-withdrawn-cells     genre=flowchart,construct=threshold,construct=band,construct=bundle  0.3 (`SCENE-KEYWORD-MEMBERSHIP`): the WITHDRAW half — `group`, `threshold`, `band` and `bundle`, each with the ground of its own cell; `node` is written alongside to pin that `GENRE-CONNECTOR-SPELLING`'s asymmetry keeps it
+247-flowchart-in-withdrawn        genre=flowchart   0.3 (`MEMBERSHIP-KEY-ACCEPTANCE`): `in=` is WITHDRAWN from this genre — `SCENE-KEYWORD-MEMBERSHIP` removed `group`, its only value domain, so every value was a dead end no spelling satisfied. All four acceptors are written, plus a `table` region to pin that `MARKER-TARGET-KINDS`'s region widening never reached `node`
 226-flowchart-edge-rejected       genre=flowchart,construct=connector  `edge` and `state` under flowchart are NAMED line errors, not `unrecognized line` (`GENRE-CONNECTOR-SPELLING`; header is 0.2 since `KEYWORD-RENAME-SCOPE` gated the rename to the version)
 235-flowchart-edge-legal-at-0-1   genre=flowchart,construct=connector  `edge` under `figdown 0.1 flowchart` STAYS legal — the rename is gated by the declared version (`KEYWORD-RENAME-SCOPE`)
 236-flowchart-flowline-requires-0-2  genre=flowchart,construct=connector  `flowline` under `figdown 0.1` is a line error NAMING the version, not a silent alias (`KEYWORD-RENAME-SCOPE`)
@@ -186,21 +239,24 @@ default normative
 232-statechart-vocabulary-scoped  genre=statechart  the allowlist is the scene host set: flowchart's role keywords are rejected under it (`STATECHART-GENRE-SCOPE`)
 233-statechart-state-transition   genre=statechart,construct=connector  `state` and `transition` are the statechart vocabulary; `state` is `node` renamed (`GENRE-NODE-SPELLING`)
 234-statechart-old-spellings-rejected  genre=statechart,construct=connector  `node` and `edge` under statechart are NAMED line errors (`GENRE-NODE-SPELLING`)
+244-statechart-withdrawn-cells    genre=statechart,construct=threshold,construct=band,construct=bundle  0.3 (`SUBJECT-VOCABULARY-SCOPE`/`SCENE-KEYWORD-MEMBERSHIP`): all five withdrawn cells. There is no KEEP fixture for this genre because it declares NO subject vocabulary at all — the empty declaration is what 230 and 233 already pin
+248-statechart-in-withdrawn       genre=statechart  0.3 (`MEMBERSHIP-KEY-ACCEPTANCE`): `in=` is WITHDRAWN here on a RESERVATION, not merely because it is stranded — its future domain is a `state` id (UML 2.5.1 §14.2.3.4 composite states), so the fixture writes `in=<state id>`, the exact form the reservation is about
 # topology
+240-topology-subject-vocabulary   genre=topology,construct=bundle  0.3 (`SUBJECT-VOCABULARY-SCOPE`/`SCENE-KEYWORD-MEMBERSHIP`): the KEEP half of the grid for this genre — `group`, `external` and `bundle` all still parse
+249-in-legal-block-topology       genre=topology    0.3 (`MEMBERSHIP-KEY-ACCEPTANCE`): the KEEP half of the `in=` withdrawal — two sections, `block` and `topology`, both still resolving `in=` against a declared `group` id. A per-genre withdrawal is one declaration lapsing, never the key leaving the language
+241-topology-withdrawn-cells      genre=topology,construct=threshold,construct=band  0.3 (`SCENE-KEYWORD-MEMBERSHIP`): the WITHDRAW half — `threshold` and `band` with their per-cell diagnostics, plus the language-wide `plane` refusal pinned once in the genre that authored every `plane` in the tree
 251-edge-labels-three-positions   genre=topology    three edge-label positions, authored as topology
-258-edge-options                  genre=topology    edge option keys, authored as topology
-909-errors-band-chart-bundle      genre=topology,construct=chart error strings for band/chart/bundle under topology
+258-edge-options                  genre=topology    edge option keys, authored as topology (the `plane` line and `plane=` it also carried LEFT, `PAINT-ORDER-CONSTRUCT` — incidental, and the subject is the option set)
+909-errors-band-chart-bundle      genre=topology,construct=chart error strings for band/chart/bundle — TWO sections (`SCENE-KEYWORD-MEMBERSHIP`), `block` for band/chart and `topology` for bundle, because the three no longer share a genre
 259-edge-order-preserved          genre=topology    written edge order, authored as topology
-264-edge-plane-quoted-id          genre=topology,construct=plane  both: a topology header AND a live `plane` declaration; pins the one id position that tolerated a quoted id (`RULE-POSITION-ENUMERATION`)
-265-enum-bare-experimental        construct=band,construct=chart  the two EXPERIMENTAL enum positions RULE 2.4 now reaches: `extend=` on a band, `type=` on a chart (`RULE-POSITION-ENUMERATION`)
+265-enum-bare-experimental        construct=band,construct=chart  the two EXPERIMENTAL enum positions RULE 2.4 now reaches: `extend=` on a band, `type=` on a chart (`RULE-POSITION-ENUMERATION`). Its first section declared `topology` until this release (`SCENE-KEYWORD-MEMBERSHIP`) and is REWRITTEN to `block`, the genre that still declares `band` — it is one of the two topology `band` occurrences the withdrawal cites, and both were fixtures
 271-external-bundle-member        genre=topology,construct=bundle both: a topology header AND the bundle member-rule test
-330-plane-paint-order             genre=topology,construct=plane  both: a topology header AND the plane paint-order test
 390-bundle-basic                  genre=topology,construct=bundle both: a topology header AND the bundle test
 391-bundle-member-errors          genre=topology,construct=bundle both: bundle member errors
 392-bundle-parallel-ambiguous     genre=topology,construct=bundle both: ambiguous parallel bundle member
 393-bundle-duplicate-id-rejected  genre=topology,construct=bundle both: duplicate bundle id
 394-bundle-member-reverse         genre=topology,construct=bundle both: reversed bundle member
-# timing  (the genre was spelled `wave` until this release, `TIMING-GENRE-NAMING`)
+# timing  (the genre was spelled `wave` until 0.1, `TIMING-GENRE-NAMING`)
 600-timing-alphabet               genre=timing      the timing signal alphabet
 601-timing-child-errors           genre=timing      timing child errors
 602-timing-no-signals             genre=timing      a timing block with no signals
@@ -214,7 +270,7 @@ default normative
 # ---    genre-owned keyword. Some are listed under A above too, where
 # ---    the genre reason comes first; the runner prints how many ---------
 # role (220-223 are listed under A above; 224 is here only)
-# threshold / band   (`threshold` was spelled `guide` until this release, `THRESHOLD-KEYWORD-SPELLING`)
+# threshold / band   (`threshold` was spelled `guide` until 0.1, `THRESHOLD-KEYWORD-SPELLING`)
 370-threshold-basic               construct=threshold threshold, basic forms
 371-threshold-errors              construct=threshold threshold errors
 372-band-forms                    construct=band    band, the three forms
@@ -236,15 +292,50 @@ default normative
 # the two files of the fixture that moved out), carrying 81 non-comment
 # lines of fixture input — none of which any second implementation was ever
 # obliged to run.
-# plane  (330 is listed under A above — it is in both sets)
-331-plane-errors                  construct=plane                 duplicate plane id, and plane= naming no declared plane
-332-plane-default-z               construct=plane                 the 1-based default z and an explicit z= override
-124-plane-z-index                 construct=plane                 0.1: z= renamed z-index= (CSS's own spelling, RULE 4.2)
-333-plane-z-nonnumeric            construct=plane                 a non-integer z= is a line error
-334-layer-retired                 construct=plane                 layer/layer= → plane/plane= (`PLANE-KEYWORD-SPELLING`) and z= → z-index= (`LANE-ALPHABET-KEY-RESERVATION`) retirement diagnostics; WRITES the retired spellings, do not migrate it
+# plane — ONE RECORD BELOW, and it is the retirement diagnostic
+# `PAINT-ORDER-CONSTRUCT` WITHDREW `plane`, `plane=` and `z-index=` from the
+# LANGUAGE, so — exactly as with `path`/`routing` above — there is no demoted
+# construct left for a fixture to be a dedicated test OF. The second exercise
+# of the withdrawal path, and it follows the first one line for line.
+# HISTORICAL: FIVE fixtures whose SUBJECT was `plane` had
+# nothing left to test and were DELETED — 124 (`z=` -> `z-index=`, pinning
+# `z-index=` as the LIVE spelling), 330 (paint order), 331 (duplicate plane
+# id, and `plane=` naming no declared plane), 332 (the 1-based default `z`
+# and an explicit override) and 333 (a non-integer `z` is a line error).
+# 264 went with them: its subject was `RULE-POSITION-ENUMERATION`'s one id position that tolerated a
+# quoted id, and that position WAS `edge … plane=`. `edge` has no id-valued
+# option key left — `DIRECTIVE_OPTS.edge` is `style class fill stroke label
+# taillabel headlabel note` — so the behaviour is unreachable rather than
+# rehostable, which is the test the 0.1 precedent applies: `118` and
+# `122` were KEPT and adjusted because their rules outlived the spellings
+# that illustrated them, and these six do not.
+# Twelve files left this directory, carrying 29 non-comment lines of fixture
+# input — none of which any second implementation was ever obliged to run.
+# The deleted NUMBERS are not reused, the 0.1 rule for the `38x` band.
+#
+# What survives is `334`, and only because its subject is a RETIREMENT
+# DIAGNOSTIC rather than the construct: §10 classifies a retired registration
+# NORMATIVE, and RULE 6.2 still binds a withdrawn spelling. It now carries the
+# WHOLE chain in one file — `plane`, `layer`, `layer=`, `plane=`, `z=` and
+# (new at this release) `z-index=`, which had no line of its own while 124
+# pinned it as live. Two of its hosts moved onto a plain `node`, the
+# `913-withdrawn-edge-geometry-keys` device: the `plane`
+# sweep runs ahead of the option scan and abandons the line, so a key written
+# on a `plane` line can no longer be reached at all.
+# ITS BUCKET IS AN OPEN QUESTION, recorded rather than settled. By the
+# 0.1 reading — `913` MOVED to `cases/` once its retired keys had no
+# experimental host left — `334` belongs in `cases/` too: its header is
+# `figdown 0.1 block` and nothing in it is experimental any more. It is left
+# here because 0.3 lands the language-wide `plane` refusals in
+# `cases/` directly, so the move would duplicate them rather than add
+# coverage; what `334` uniquely holds is the TWO-HOP chains (`layer` ->
+# `plane` -> withdrawn, `z=` -> `z-index=` -> withdrawn). Resolving it is a
+# file move plus this line.
+334-layer-retired                 construct=plane                 the whole plane/layer withdrawal chain: layer/layer= (`PLANE-KEYWORD-SPELLING`), z=/z-index= (`LANE-ALPHABET-KEY-RESERVATION`) and plane/plane= (`PAINT-ORDER-CONSTRUCT`). WRITES the retired spellings, do not migrate it
+919-withdrawn-plane-experimental-genres  genre=flowchart,genre=statechart,genre=timing,construct=plane  the EXPERIMENTAL half of 918: `plane` is refused by the retired-keyword sweep AHEAD of the genre allowlist, so "every genre" is a claim about all eight and is only checked if all eight are written. 918 holds the normative genres, 241 holds topology, this holds the other three — including `timing`, a REGION genre that never declared a scene keyword, which is what makes the message provably the `PAINT-ORDER-CONSTRUCT` sweep rather than an `SCENE-KEYWORD-MEMBERSHIP` per-cell withdrawal
 # chart (outside the conformance surface, §4.4; 909 is listed under A above)
 915-retired-chart-level           construct=chart   chart level= deletion diagnostic (`CHART-LEVEL-KEY`)
-700-chart-basic                   construct=chart   the chart block itself — held in this directory since before this release, under the SECOND mechanism the isolation ruling removed; it now runs on a default invocation like every other fixture
+700-chart-basic                   construct=chart   the chart block itself — held in this directory since before 0.1, under the SECOND mechanism the isolation ruling removed; it now runs on a default invocation like every other fixture
 701-chart-errors                  construct=chart   chart error strings — same history as 700
 # bundle (271 and 390-394 are listed under A above — all of them are in both sets)
 
@@ -254,7 +345,7 @@ default normative
 # and the directory contents. The A ∩ B MEMBERS are marked in place: every
 # record carrying both a `genre=` and a `construct=` reason is in it.
 #
-# (Until this release a tally lived here. It was wrong in four ways at once —
+# (Until 0.1 a tally lived here. It was wrong in four ways at once —
 # it enumerated `381`, `398` and `399` as members of A ∩ B twenty lines
 # after recording their deletion — which is why the tally is gone rather
 # than corrected: a number no mechanism checks will drift again.)

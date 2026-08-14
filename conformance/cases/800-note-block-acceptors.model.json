@@ -1,0 +1,76 @@
+{
+  "header": {
+    "version": "0.3",
+    "genre": "block"
+  },
+  "title": "Note acceptors, block genre",
+  "note": "a figure-level remark: no carrier geometry, so it draws at the bottom",
+  "flow": "right",
+  "classes": [],
+  "planes": [
+    {
+      "id": "base",
+      "z": 0
+    }
+  ],
+  "nodes": [
+    {
+      "id": "spine",
+      "label": "Spine",
+      "shape": "box",
+      "group": "edge_dc",
+      "plane": "base",
+      "note": "on a node",
+      "line": 38
+    },
+    {
+      "id": "leaf",
+      "label": "Leaf",
+      "shape": "box",
+      "group": "edge_dc",
+      "plane": "base",
+      "line": 39
+    },
+    {
+      "id": "wan",
+      "label": "WAN",
+      "shape": "box",
+      "plane": "base",
+      "note": "a node outside every group still takes one",
+      "line": 40
+    }
+  ],
+  "groups": [
+    {
+      "id": "edge_dc",
+      "label": "Edge data centre",
+      "note": "on a group — the note frames the whole rect",
+      "line": 37
+    }
+  ],
+  "edges": [
+    {
+      "a": "spine",
+      "op": "->",
+      "b": "leaf",
+      "plane": "base",
+      "note": "on an edge — the carrier with no id",
+      "line": 41
+    },
+    {
+      "a": "leaf",
+      "op": "->",
+      "b": "wan",
+      "mid": "uplink",
+      "plane": "base",
+      "note": "a labelled edge takes both: [uplink] draws ON the line, note= draws beside it",
+      "line": 42
+    }
+  ],
+  "ranks": [],
+  "pins": [],
+  "thresholds": [],
+  "bands": [],
+  "bundles": [],
+  "regions": []
+}

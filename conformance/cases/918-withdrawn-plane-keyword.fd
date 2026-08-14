@@ -1,0 +1,76 @@
+figdown 0.1 block
+# `PAINT-ORDER-CONSTRUCT`: `plane` is WITHDRAWN from the LANGUAGE, and both option
+# keys that existed only for it go with it — `plane=`, which named a declared
+# plane, and `z-index=`, which was legal on `plane` and nowhere else. Removed,
+# not renamed: there is no replacement spelling, because what the construct
+# did is already the default. Paint order is document order, a later line
+# paints on top; and where the elements form a logical layer of the SUBJECT —
+# an overlay, a control plane — that is a `class=` whose label states it
+# (core §5, `PRESENTATION-AS-MEANING-CARRIER`).
+#
+# THE MEASUREMENT. Stripping `plane overlay "VXLAN tunnels" z-index=2` and
+# every ` plane=overlay` from `examples/evpn-fabric.fd` and rebuilding leaves
+# both SVGs at 12449 bytes; of 198 markup tokens exactly ONE differs, and it
+# is `data-edge="36"` → `data-edge="35"`. The overlay's whole visual identity
+# — dashed, `#dc2626` — came from `class=overlay`, which the figure already
+# declared alongside it. `EDGE-GEOMETRY-CONSTRUCTS` (`path`/`routing`) is the precedent
+# for the shape of this withdrawal.
+#
+# WHY THIS FIXTURE IS NOT 246's JOB. The per-genre withdrawals of `SCENE-KEYWORD-MEMBERSHIP` are
+# reached from the `GENRE-KEYWORD-ALLOWLIST` genre allowlist and name their genre. `plane` is
+# reached from the retired-keyword sweep that runs AHEAD of that allowlist,
+# so it answers the SAME message in every genre — including the region
+# genres, which never had a scene keyword to withdraw. That is what the three
+# sections below check: `block`, `bitfield` and `table`, one section each.
+# (`topology`, `flowchart`, `statechart` and the `timing` genre header are
+# EXPERIMENTAL genres and their sections are in experimental/; the `timing`
+# and `signal` directives are exercised here as a REGION inside the block
+# section, which is where a normative document may write them.)
+#
+# WHAT THE MODEL KEEPS. The implicit `planes[0] = {id:"base", z:0}` is
+# UNAFFECTED and still projected — see any model golden. What is gone is the
+# author's ability to declare a second one or to point an element at it.
+#
+# ALL THREE SPELLINGS ANSWER FOR THEMSELVES. `z-index=` does NOT fall through
+# to the ordinary allowlist message `<directive> does not take z-index=`; it
+# has its own `PAINT-ORDER-CONSTRUCT` diagnostic, reached from the retired-key sweep like
+# `plane` and `plane=`. That is RULE 6.2's placement test applied the way the
+# language already applies it: a spelling that has LEFT the language is
+# reported wherever it appears and never per-directive — the `colw` → `width`
+# precedent, `w=`/`h=` and `z=` itself.
+# The generic message would be actively misleading here, because it says the
+# author picked the wrong HOST, and an author holding a 0.2 document would go
+# looking for the right one. There is none: `plane` was `z-index=`'s only
+# acceptor and the key left with it. The retired SHORT spelling `z=` states
+# the whole two-hop chain (`z=` → `z-index=` → withdrawn); 334-layer-retired
+# pins that one.
+#
+# The four bare `z-index=` writings below — on `node`, `signal`, `field` and
+# `cell`, four directives that never accepted the key — are what would go red
+# if the entry were ever dropped from the retired-key table and the spelling
+# fell back to the per-directive allowlist.
+plane over "Overlay" z-index=2
+node a "A" plane=over
+node b "B" z-index=3
+class c "Meaning" plane=over
+edge a -> b plane=over
+timing w "W" plane=base
+signal clk 0101 z-index=1
+
+figdown 0.1 bitfield
+# A region genre: it never declared a scene keyword, so nothing here could be
+# a per-genre withdrawal. The keyword sweep reaches it all the same.
+plane over
+bitfield hdr "Header" numbering=msb0
+field "One" 8
+field "Two" 8 plane=base
+field "Three" 16 z-index=1
+
+figdown 0.1 table
+plane over
+table t "Cells"
+| h | i |
+|---|---|
+| 1 | 2 |
+cell (1,1) plane=base
+cell (2,1) z-index=1

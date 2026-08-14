@@ -1,0 +1,33 @@
+# `SCENE-KEYWORD-MEMBERSHIP`: the cells WITHDRAWN from `topology`, each with its own
+# named diagnostic. A word withdrawn from one genre is not an unknown word,
+# and `"threshold" is not allowed in genre topology` on its own would send an
+# author looking for a typo — so every message states the ground of ITS cell,
+# because the grounds differ:
+#
+#   threshold  a threshold in this genre's domain is a QUEUE DEPTH WITH A
+#              NUMERIC VALUE (RFC 2309 minth/maxth, RFC 7567), while
+#              FigDown's takes no value= at all. Zero occurrences.
+#   band       a BAND here is a frequency band — radio, wireless, microwave,
+#              optical transport — which is exactly the figure a topology
+#              document draws. Its two occurrences were both fixtures.
+#
+# The KEEP half of the grid for this genre is 240.
+#
+# The last line is a DIFFERENT diagnostic and is here deliberately. `plane`
+# is not a per-genre withdrawal: `PAINT-ORDER-CONSTRUCT` removes it from the LANGUAGE, so it
+# joins the retired-keyword sweep AHEAD of the genre allowlist and reports
+# the same message in every genre, including `bitfield`/`table`/`timing`.
+# `topology`'s share of that claim sits here rather than with the rest,
+# because this is where every authored `plane` in the tree was written —
+# `examples/evpn-fabric.fd` had `plane overlay "VXLAN tunnels" z-index=2`,
+# where `overlay` is itself a networking term, so the line read as a
+# network-architectural assertion and was in fact a paint order. The other
+# seven genres are `918-withdrawn-plane-keyword` (NORMATIVE: `block`,
+# `bitfield`, `table`) and `919-withdrawn-plane-experimental-genres`
+# (`flowchart`, `statechart`, the `timing` genre header).
+figdown 0.1 topology
+node a "A"
+group g "G"
+threshold "Budget" 60% in=g
+band "Window" 10..20% in=g
+plane overlay "VXLAN tunnels" z-index=2

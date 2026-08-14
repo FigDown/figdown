@@ -1,0 +1,82 @@
+{
+  "sections": [
+    {
+      "header": {
+        "version": "0.2",
+        "genre": "block"
+      },
+      "title": "in= under block is untouched",
+      "flow": "right",
+      "classes": [],
+      "planes": [
+        {
+          "id": "base",
+          "z": 0
+        }
+      ],
+      "nodes": [
+        {
+          "id": "a",
+          "label": "A",
+          "shape": "box",
+          "group": "g",
+          "plane": "base",
+          "line": 12
+        }
+      ],
+      "groups": [
+        {
+          "id": "g",
+          "label": "Chassis",
+          "line": 11
+        }
+      ],
+      "edges": [],
+      "ranks": [],
+      "pins": [],
+      "thresholds": [],
+      "bands": [],
+      "bundles": [],
+      "regions": []
+    },
+    {
+      "header": {
+        "version": "0.2",
+        "genre": "topology"
+      },
+      "title": "in= under topology is untouched",
+      "flow": "right",
+      "classes": [],
+      "planes": [
+        {
+          "id": "base",
+          "z": 0
+        }
+      ],
+      "nodes": [
+        {
+          "id": "r1",
+          "label": "R1",
+          "shape": "box",
+          "group": "site",
+          "plane": "base",
+          "line": 4
+        }
+      ],
+      "groups": [
+        {
+          "id": "site",
+          "label": "Site 1",
+          "line": 3
+        }
+      ],
+      "edges": [],
+      "ranks": [],
+      "pins": [],
+      "thresholds": [],
+      "bands": [],
+      "bundles": [],
+      "regions": []
+    }
+  ]
+}

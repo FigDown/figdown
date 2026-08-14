@@ -1,0 +1,18 @@
+# `SUBJECT-VOCABULARY-SCOPE`/`SCENE-KEYWORD-MEMBERSHIP`: `flowchart` declares exactly ONE subject word of
+# its own — `external` — and it must still parse. The WITHDRAW half of the
+# grid for this genre is 243.
+#
+# The referent is ISO 5807 §9.4.2 *Terminator*, "the exit to, or entry from,
+# the outside world", and this is the divergence the shared text hid: it is
+# NOT `block`'s referent, which is a generic out-of-figure endpoint with no
+# source standard at all. The spelling is FigDown's, not ISO's, and it stays
+# for a reason that only exists inside this genre — the rename ISO points to
+# COLLIDES with `terminator`, which is already this genre's live role
+# keyword (`FLOWCHART-ROLE-KEYWORDS`). So ISO has no word left for the never-drawn variant, which
+# is stated rather than papered over.
+figdown 0.2 flowchart
+terminator start "Request received"
+process apply "Apply change"
+external audit "Audit store"
+flowline start -> apply
+flowline apply -> audit

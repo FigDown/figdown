@@ -27,7 +27,7 @@ strict subset of WaveDrom's, `DESIGN-DECISION-METHOD` — do not reinvent, and d
 
 ## Renamed: `wave` → `timing` (`TIMING-GENRE-NAMING`)
 
-The genre was spelled `wave` until this release, in both positions — the header
+The genre was spelled `wave` until 0.1, in both positions — the header
 genre token (`figdown 0.1 wave`) and the block opener (`wave por "…"`). Both  <!-- fence-check: skip -->
 old spellings are now line errors carrying a named diagnostic. The child
 keywords `signal` and `gap`, the lane alphabet, `data=` and the model's
@@ -216,7 +216,7 @@ are experimental because the constructs that accept them are (`signal`,
 `gap`), and `data=` is one of the two reasons the genre has not converged.
 
 Retired language-wide (`COLOUR-KEY-STATUS`): `color=`. It set the FILL
-before this release and the LABEL, and no engine can tell the
+in one era and the LABEL in another, and no engine can tell the
 two source files apart — so its diagnostic names BOTH eras and hands the
 choice to a human. v0.1 has no label-colour key at all; the label colour is
 derived from the background it sits on (core §5, `LABEL-COLOUR-SOURCE`).
@@ -229,6 +229,100 @@ one array differently (`UNSAFE-DEFAULT-ELIMINATION` single-source). `labels=` is
 carrying a named diagnostic; it is kept registered only so a stale document
 gets that migration instead of `unknown option`.
 
+### `timing` takes NO `note=`, and the refusal is this genre's own (`DRAWN-ANNOTATION-FORM`)
+
+`note=` became a live option key — the **DRAWN** annotation, the
+one that puts an explanation on the page — accepted on the scene genres'
+elements and on `title`. **`timing` grants it to nothing.** Neither `signal`
+nor `gap` nor the `timing` opener accepts it, at any version:
+
+<!-- fence-check: skip -->
+```figdown
+figdown 0.3 timing
+timing bus "Bus"
+signal clk 01010101 note="free-running"
+signal req 00110011
+```
+
+That third line is a line error under `figdown 0.3` exactly as it was under
+`figdown 0.1`.
+
+**Why, in this genre's terms.** There are **zero measured instances** of a
+drawn per-signal aside in the corpus, and this genre is the least converged in
+the language — every construct it owns is EXPERIMENTAL, and `data=` is one of
+the two reasons it has not converged. Granting a brand-new key to a vocabulary
+that may still change its shape spends the key on a surface that is not
+settled. A `timing` figure that needs a drawn note today puts the waveform in
+a scene section (§4, `GENRE-COMPOSITION`) and writes the `note=` on the scene element or on
+`title`, where this release does accept it.
+
+**What would reopen it:** a **measured count of `timing` figures** whose
+per-signal or per-cycle caveat must be visible on the page — and, before that,
+the genre converging. Bring the count and the figures.
+
+**`note=` and `description=` divide by AUDIENCE, and `timing` accepts
+neither.** `description=` reaches the **machine** — no ink beyond an SVG
+`<title>` tooltip — and belongs to `bitfield`'s `field`
+([../bitfield.md](../bitfield.md)); `note=` reaches the **human** and always
+draws. Neither is a fallback for the other.
+
+**Where a typed slot exists, `note=` would not be the right answer anyway.**
+This genre's slots are unusually literal:
+
+- **what a signal does over time IS its lane string** — the closed alphabet
+  `0` `1` `p` `n` `x` `=` `.`, one character per cycle. A note saying "goes
+  high on the third clock" says less than `001` does, and a reading agent can
+  act on the string;
+- **the name of a value cell is `data=`**, in order of appearance, not a note
+  beside the brick;
+- **a break in the record is `gap`**, which is presentation only and never
+  renumbers cycles;
+- **a category** shared by several signals is a `class` meaning, which earns a
+  legend entry.
+
+### This region's ADDRESS SPACE, and what `in=` consumes today (`MARKER-TARGET-KINDS`, `GENRE-DOCUMENT-CONTRACT`)
+
+**A `timing` region's address space is `(signal,cycle)`**, stated here as this
+genre's own, normatively (`GENRE-DOCUMENT-CONTRACT`):
+
+- **signal** is the nth declared `signal`, counted in DECLARATION ORDER (`DECLARATION-ORDER-SEMANTICS`),
+  1-based — declaration order is drawing order top-down, so it is also the
+  order a reader sees;
+- **cycle** is the 1-based position along the lane string, counted in
+  characters. A `gap` never renumbers cycles, so inserting one does not move
+  any address.
+
+**Only the region HEAD is consumed today.** `threshold` and `band`
+resolve (`MARKER-TARGET-KINDS`) `in=<region-id>` against a nested
+`bitfield`/`table`/`timing` region as well as a `node` or a `group`:
+`threshold "setup" in=bus offset=50%` names the whole `timing bus` block. The
+widening is **ungated** — it adds no spelling, and the only documents it
+affects are ones that previously answered `unknown target "bus" for threshold`
+and drew nothing at all.
+
+**The coordinate grammar is designed and deliberately NOT built.**
+`in=bus(2,7)` — a mark addressed to one signal at one cycle, which is exactly
+the shape a timing figure would eventually want — has **no shipping consumer**,
+and RULE 4.7 argues against spending a grammar before one exists. The address
+space is written down here so a later consumer inherits a decided answer
+instead of inventing a second one; the engine accepts the region head and
+nothing else.
+
+**`GENRE-KEYWORD-ALLOWLIST` is unchanged by this.** `threshold` and `band` are still **not** on the
+pure-`timing` top-level allowlist: under `figdown 0.1 timing` they remain the
+line error `"threshold" is not allowed in genre timing`. `MARKER-TARGET-KINDS` changed what
+`in=` may NAME, not where the two keywords may be WRITTEN. The path that works
+is composition (§4, `GENRE-COMPOSITION`) — a scene header hosting a nested `timing` region,
+with the mark at the scene's top level:
+
+```figdown
+figdown 0.1 block
+timing bus "Bus"
+signal clk 01010101
+signal req 00110011
+threshold "setup" in=bus offset=50%
+```
+
 ### The core, and what else a `timing` document may contain
 
 Core keywords (NS = C, never redefined by any genre — §1 `UNIVERSAL-CORE-KEYWORDS`): `figdown`
@@ -238,7 +332,7 @@ zone `layout` opens is a namespace of its own, owned by no genre, holding
 `pin` (NORMATIVE) alone, and **every member of it is
 genre-independent** — no genre may define, redefine or extend a keyword
 inside the zone, and `GENRE-VOCABULARY-OBLIGATION` does not reach in. The zone also held `path` and
-`routing` (EXPERIMENTAL) until this release: they were core until this release,
+`routing` (EXPERIMENTAL) until 0.1: they were core until 0.1,
 demoted to EXPERIMENTAL by `CONSTRUCT-STATUS-TIERS`, and **WITHDRAWN from the language by `EDGE-GEOMETRY-CONSTRUCTS`**
 on prior-art and demand evidence ([../../migrations.md](../../migrations.md)
 0.1, core §9 **`EDGE-IDENTITY-AND-GEOMETRY`**). There is no replacement spelling; `LAYOUT-ZONE-NAMESPACE` itself
@@ -294,7 +388,7 @@ of `gap` above. The overlaps are deliberate and are the same thing under
 every genre: the core of three (NS = C), the layout namespace (NS = L, `LAYOUT-ZONE-NAMESPACE`)
 and the cross-namespace keys
 `fill` `stroke` `class` (§10), all NORMATIVE
-(`STROKE-KEY-STATUS`/`COLOUR-KEY-STATUS`). `style=` was a fourth until this release, when `STYLE-KEY-SCOPE` removed it
+(`STROKE-KEY-STATUS`/`COLOUR-KEY-STATUS`). `style=` was a fourth until 0.1, when `STYLE-KEY-SCOPE` removed it
 from `signal`; it remains a cross-namespace key on the scene directives. Under `GENRE-NAMESPACE` `GENRE-VOCABULARY-OBLIGATION` a future genre MAY spell a keyword
 the same as `timing`'s with a different meaning; none does today — and `GENRE-VOCABULARY-OBLIGATION`
 stops at the layout zone, whose members no genre may respell (`LAYOUT-ZONE-NAMESPACE`).

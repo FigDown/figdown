@@ -1,4 +1,4 @@
-figdown 0.1 block
+figdown 0.1 topology
 node a "A"
 node b "B"
 node c "C"

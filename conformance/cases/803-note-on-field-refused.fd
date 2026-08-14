@@ -1,0 +1,34 @@
+figdown 0.3 bitfield
+# `DRAWN-ANNOTATION-FORM`: `field` REFUSES `note=`, and does so at EVERY version.
+# One document, two sections, the two versions that matter — the message is
+# the same string in both, which is the whole point of the fixture.
+#
+# WHY A DEDICATED MESSAGE RATHER THAN THE GENERIC ONE. `field` is listed in
+# DIRECTIVE_OPTS as taking `note` for exactly one reason: so that the refusal
+# is REASONED instead of falling through to `field does not take note=` (the
+# answer the seven directives in case 804 get). The distinction it has to
+# state is not "wrong directive", it is AUDIENCE — `description=` is not a
+# replacement for `note=` here, it reaches a different reader — and a generic
+# message cannot say that.
+#
+# WHY THE REFUSAL IS VERSION-INDEPENDENT. Section 2 declares `figdown 0.1`
+# and gets the SAME message, not the version gate of case 805. If `field`
+# fell through to `belowOptVersion` under an old header, the engine would
+# tell a `figdown 0.1` bitfield author to raise their header to 0.3 — sending
+# them to a version that still refuses them. The engine checks `field` FIRST
+# and unconditionally so that never happens: ONE ERROR PER LINE, and it is
+# the true one.
+#
+# The evidence behind the refusal: the bitfield genre already has
+# `description=` for machine-facing prose, and no measured figure needs a
+# DRAWN per-field aside. Granting one directive both keys with nothing asking
+# for it spends the distinction before anyone needs it.
+bitfield hdr "Header, declared 0.3" word=32 numbering=msb0
+field "A" 16 note="refused under 0.3 — raising the header does not help"
+field "B" 16 description="the key a field does take"
+
+figdown 0.1 bitfield
+# Section 2: the identical line under the OLDEST header. Same message.
+bitfield old "Header, declared 0.1" word=32 numbering=msb0
+field "C" 16 note="refused under 0.1 — the same message, not a version gate"
+field "D" 16 present="C = 1"

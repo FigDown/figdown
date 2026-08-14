@@ -1,2 +1,0 @@
-Line 10: ids are bare and match [A-Za-z_][A-Za-z0-9_-]* — text with spaces or punctuation belongs in the label: node <id> "your text"
-Line 11: ids are bare and match [A-Za-z_][A-Za-z0-9_-]* — text with spaces or punctuation belongs in the label: node <id> "your text"

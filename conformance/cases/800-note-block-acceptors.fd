@@ -1,0 +1,42 @@
+figdown 0.3 block
+# `DRAWN-ANNOTATION-FORM`: `note=` — the DRAWN annotation — on every acceptor the
+# `block` genre owns. FOUR CARRIERS, four different geometries to hang a note
+# off, one per carrier:
+#
+#   node    a box; the note attaches to the box.
+#   group   a rect; the note attaches to the rect, not to a member.
+#   edge    a segment list, and the acceptor the ruling called DECISIVE: an
+#           edge has no id, so an attribute is the ONLY form that can reach
+#           it. A callout construct addressing elements by id could annotate
+#           the other three and never this one.
+#   title   NO GEOMETRY AT ALL. `note=` is `title`'s first and only option
+#           key; the note draws at the bottom of the canvas as a figure-level
+#           remark and never takes a leader line.
+#
+# `note=` is NOT `description=` and neither is a fallback for the other: they
+# divide by AUDIENCE (core, and case 808). `description=` reaches the reading
+# agent as an SVG <title> and puts no ink on the page; `note=` is an
+# explanation the human must SEE. That is why the header is `figdown 0.3` —
+# under 0.1/0.2 the spelling still means the retired tooltip key, and the
+# engine says so rather than repainting it (cases 805/806).
+#
+# Placement is NOT in the golden: core §12.7 keeps geometry out of the model,
+# and where the box lands is the renderer reading the structure (held by the
+# runner's determinism self-check).
+#
+# GOLDEN GAP, STATED RATHER THAN IMPLIED: `conformance/normalize.js` does NOT
+# project `note` into the canonical model (it projects `description` on a
+# `field`,). So the `.model.json` beside this file pins that
+# these lines PARSE and that the rest of the model is unchanged by them — it
+# does not yet pin the strings. Until normalize.js carries `note`, a second
+# implementation could accept the key and discard the value and still match
+# this golden. Adding the projection is an edit to normalize.js, not to a
+# fixture, and the goldens here regenerate to hold the strings the moment it
+# lands.
+title "Note acceptors, block genre" note="a figure-level remark: no carrier geometry, so it draws at the bottom"
+group edge_dc "Edge data centre" note="on a group — the note frames the whole rect"
+node spine "Spine" in=edge_dc note="on a node"
+node leaf "Leaf" in=edge_dc
+node wan "WAN" note="a node outside every group still takes one"
+edge spine -> leaf note="on an edge — the carrier with no id"
+edge leaf -[uplink]-> wan note="a labelled edge takes both: [uplink] draws ON the line, note= draws beside it"

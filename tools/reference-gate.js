@@ -16,7 +16,16 @@ const path = require('path');
 const ROOT = process.argv[2] || '.';
 
 // The accepted state, as recorded in examples/reference/index.md.
-const ACCEPTED = { all: 3, normativeOnly: 2 };
+//
+// Moved at v0.3.0, and the two numbers moved for two different reasons, both
+// set out in that file's delta note. Both rose because `statechart` joined the
+// tool's genre list: it had never been extended past the release that added
+// the genre, so for two releases nothing checked a statechart reference figure
+// at all, and the gap it now reports is that there is no such figure.
+// `normativeOnly` also absorbs `note=`, a NORMATIVE option key registered this
+// release that no reference figure writes yet — the one accepted gap inside
+// the v0.1 conformance surface.
+const ACCEPTED = { all: 4, normativeOnly: 4 };
 
 function gaps(args) {
   let out = '';

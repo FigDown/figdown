@@ -10,7 +10,7 @@
       "id": "fail",
       "meaning": "Failure path",
       "stroke": "#dc2626",
-      "line": 7
+      "line": 12
     }
   ],
   "planes": [
@@ -26,7 +26,7 @@
       "role": "terminator",
       "shape": "rounded",
       "plane": "base",
-      "line": 8
+      "line": 13
     },
     {
       "id": "valid",
@@ -34,7 +34,7 @@
       "role": "decision",
       "shape": "diamond",
       "plane": "base",
-      "line": 9
+      "line": 14
     },
     {
       "id": "apply",
@@ -42,14 +42,14 @@
       "role": "process",
       "shape": "box",
       "plane": "base",
-      "line": 10
+      "line": 15
     },
     {
       "id": "store",
       "label": "Audit store",
       "shape": "cylinder",
       "plane": "base",
-      "line": 11
+      "line": 16
     },
     {
       "id": "done",
@@ -57,7 +57,7 @@
       "role": "terminator",
       "shape": "rounded",
       "plane": "base",
-      "line": 12
+      "line": 17
     }
   ],
   "groups": [],
@@ -67,7 +67,7 @@
       "op": "->",
       "b": "valid",
       "plane": "base",
-      "line": 13
+      "line": 18
     },
     {
       "a": "valid",
@@ -75,7 +75,7 @@
       "b": "apply",
       "mid": "yes",
       "plane": "base",
-      "line": 14
+      "line": 19
     },
     {
       "a": "valid",
@@ -86,14 +86,14 @@
       "class": [
         "fail"
       ],
-      "line": 15
+      "line": 20
     },
     {
       "a": "apply",
       "op": "->",
       "b": "done",
       "plane": "base",
-      "line": 16
+      "line": 21
     },
     {
       "a": "store",
@@ -103,14 +103,14 @@
       "head": "kept",
       "plane": "base",
       "style": "dotted",
-      "line": 17
+      "line": 22
     },
     {
       "a": "apply",
       "op": "<->",
       "b": "store",
       "plane": "base",
-      "line": 18
+      "line": 23
     }
   ],
   "ranks": [],

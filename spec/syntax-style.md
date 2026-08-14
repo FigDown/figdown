@@ -77,7 +77,7 @@ Everything else — `-` `>` `<` `:` `%` `*` `#` `|` `^` `=` `\` `..` `^^`
 `||` — belongs to a specific construct's value grammar, not to the
 punctuation scheme.
 
-**Four residual marks were missing from that list until this release, and
+**Four residual marks were missing from that list until 0.1, and
 §1's own sentence is why it matters.** `..` was adopted as the language's
 one range separator (`RANGE-SPELLING`) and named nowhere here; `\` has
 been the escape introducer inside quoted strings and the two pipe-cell
@@ -152,7 +152,7 @@ entirely (`EDGE-GEOMETRY-CONSTRUCTS`), so the table now has **two** live rows, a
 the two withdrawn ones are kept struck through because the correction they
 record is what the rule was derived from.
 
-| Construct | Before 0.1 | From 0.1 |
+| Construct | In one era | in another |
 |---|---|---|
 | `pin … at=` | `at=50,145` | `at=(50,145)` |
 | ~~`path src=`~~ | ~~`src=0.5,1` (fraction form)~~ | ~~`src=(0.5,1)`~~ — the key was renamed `tailport=` at 0.1 and **WITHDRAWN with `path` at 0.1 (`EDGE-GEOMETRY-CONSTRUCTS`)** |
@@ -179,7 +179,7 @@ because the argument was never about those two keys.)
 be given any other meaning.** It was taken back from `via=`
 for exactly this reason (migrations.md:1328-1338; core.md:329-331).
 
-**The reservation was not enforced until this release.** Before that,
+**The reservation was not enforced until 0.1.** Before that,
 verified: `node a ;` **parsed**, and `;` became the node's *label*;
 `node a;` reported `node needs an id`; `;` alone reported `";" is not
 allowed in genre block` (the genre allowlist, not a reservation
@@ -268,7 +268,7 @@ extension.** They are the language's only string-typed OPTION values, and an
 option value is delimited by whitespace exactly as a positional is:
 `description=a b` silently kept `a` and turned `b` into a surplus positional
 reported on a different part of the line. Same defect, same cure. (The first
-was spelled `note=` until this release, `DESCRIPTION-KEY-SPELLING`; the second replaced a bare
+was spelled `note=` until 0.1, `DESCRIPTION-KEY-SPELLING`; the second replaced a bare
 positional flag at the same release, `PRESENCE-CONDITION-EXPRESSION`.) **`present=""` is admitted by the
 same rule, not excepted from it**: it is an EMPTY QUOTED value, which is a
 written value under §12.3's tri-state, and the rule tests quotedness, never
@@ -293,7 +293,7 @@ required. `field "Long Name":16` is the shipped instance of this reasoning
 
 and `labels="a,b,c"` is ONE element whose text is `a,b,c`.
 
-**Before this release the parser did not do this.** Verified then, on a lane
+**Before 0.1 the parser did not do this.** Verified then, on a lane
 with two `=` cells: `labels="a,b"` reported *"labels= has 2 labels,
 expected 1"* — the quotes were stripped by the tokenizer's inline-quote
 path **before** the value was split on commas, so a quoted element could
@@ -420,7 +420,7 @@ one meaning feed hallucination). The id half's own argument, generalised.
 thing (`PRIOR-ART-BORROWING`: two spellings of one meaning feed hallucination) and invites an
 author to believe that quoting makes an arbitrary string into an id.
 
-**Before this release the parser did not enforce this.** Verified then:
+**Before 0.1 the parser did not enforce this.** Verified then:
 `node "a" "Label"`, `class "c" "m"`, `group "g"` and `pin "a" at=1,2` all
 parsed — quotedness was discarded before `ID_RE` was applied. Ten of the
 twelve id positions accepted a quoted id silently; the remaining two
@@ -470,7 +470,7 @@ a--b,c--d`; `field a:1,b:2`.
 **RULE 3.2 — a comma-delimited list has ONE whitespace policy, and it is
 the same policy in every construct in the language.**
 
-Before this release there were **five**, all verified:
+Before 0.1 there were **five**, all verified:
 
 | Construct | `a, b` (space after comma) | `a ,b` |
 |---|---|---|
@@ -601,6 +601,31 @@ present but retired, so they are not counted here): keywords `layout`,
 core, not borrowed for it, which is why the keyword tally and
 the option-key tally were always counted apart).
 
+**RULE 4.1 is measured PER GENRE, and until this release four genres had no
+vocabulary to measure.** The rule says *a genre's vocabulary* — so a
+shared section holding `group`, `external`, `threshold`, `band`, `bundle`
+and `plane` for four scene genres at once made the question unanswerable
+for each of them: a word belonging to no genre has no single domain
+standard to be checked against. `SUBJECT-VOCABULARY-SCOPE` (core §1, `GENRE-VOCABULARY-OBLIGATION`) dissolves that
+section. Each scene genre now declares its own, **and two declarations
+agreeing is two declarations, not one inherited**, so this rule bites four
+separate times on `external` and twice on `group`. The immediate finding
+is that per-genre measurement produces two exceptions the shared text
+could not have stated:
+
+| Exception | Genre | The standard, and what it spells | Why the spelling is not taken whole |
+|---|---|---|---|
+| `bundle` | `topology` | **IEEE 802.1AX** — Link Aggregation, whose noun is *aggregation* | The construct's referent is a LAG **and** an ECMP set **and** an EVPN Ethernet Segment. `aggregation` is FALSE for two of the three, so the standard's own noun cannot cover what the construct covers. `bundle` is kept as the umbrella spelling; the referent is cited, the noun is not. |
+| `external` | `flowchart` | **ISO 5807 §9.4.2** *Terminator* — the genre's own source standard, from which `process`, `decision` and `terminator` are taken whole (and whose §9.3.1 *Line* is the symbol the domain-common `flowline` names; `VOCABULARY-SOURCE-ATTRIBUTION`) | ISO's word is **already spent inside this genre**: `terminator` is a live `flowchart` keyword for the start/stop stage symbol (`FLOWCHART-ROLE-KEYWORDS`). Taking it a second time would give one spelling two meanings, which RULE 4.7 and `UNSAFE-DEFAULT-ELIMINATION` both forbid. ISO has no other word for the never-drawn variant, so the coinage stays. |
+
+Both are **declared, not tolerated**: the argument shape §4.1 requires of a
+mix is the one both rows follow — name the primary source, show it cannot
+express the need, draw the line, and record what was rejected. Both are in
+`vocabulary-sources.tsv` under `exception_reason`. Note what makes the
+second one possible to state at all: it is a collision **between two words
+of the same genre**, and it is only visible once `flowchart` has a
+vocabulary of its own to collide inside.
+
 **Two of the sources this project actually borrows from are missing from
 the genre docs.** `->`/`--`'s DOT lineage and the `||`/`^^` mixing
 justification exist only in `design/`, which is not normative. If
@@ -672,7 +697,7 @@ they denote the same concept, they MUST share the value grammar too.**
 
 The `table` child keyword `width` and the `width=` option on `pin` share a
 spelling on purpose (`SIZE-AND-DIRECTION-KEY-NAMING`; core.md:1173-1178) — both are a horizontal
-extent. (The option was carried by `size` until this release, when `ELEMENT-GEOMETRY-DIRECTIVE`
+extent. (The option was carried by `size` until 0.1, when `ELEMENT-GEOMETRY-DIRECTIVE`
 merged that keyword into `pin`; the key, its grammar and this rule are
 unchanged by the move, only the directive that carries it.) But verified,
 they do not share a grammar:
@@ -750,7 +775,7 @@ opener, so keyword-echo is evidence of nothing.
 `page`, `set`, `pulse` are reserved for the dynamic profile and produce a
 named diagnostic (figdown.html:939). Keywords and option keys beginning
 `x-` are reserved for a future extension mechanism and MUST NOT be used by
-standard vocabulary (core.md:1464-1466). `step` was reserved until this release and **released**: a word reserved against nothing costs authors
+standard vocabulary (core.md:1464-1466). `step` was reserved until 0.1 and **released**: a word reserved against nothing costs authors
 a name for nothing (core.md:1137-1140). Reviewers should apply that test to
 every reservation they propose.
 
@@ -846,7 +871,7 @@ genre document. Nothing was coined.
 **The two rejected separators, with their reasons, so neither is proposed
 again:**
 
-- **the hyphen** — `band "Headroom" 15-35%` was the spelling until this release, and between two numbers it **reads as subtraction**: `10-20%`
+- **the hyphen** — `band "Headroom" 15-35%` was the spelling until 0.1, and between two numbers it **reads as subtraction**: `10-20%`
   is a legal arithmetic expression whose value is not the interval it means.
   It was the second range spelling in the language, and retiring it is what
   lets §8 carry **no declared exception for two coexisting range grammars**.
@@ -859,6 +884,78 @@ again:**
   available collision in a genre about bits. And it is a range separator in
   **no programming language and no standard** — only a CJK typographic
   convention, which is a fact about typesetting, not grammar attestation.
+
+### 4.9 Reviving a spelling retired before the first stable release
+
+**RULE 4.9 (`DRAWN-ANNOTATION-FORM`) — a spelling retired BEFORE the language's
+first stable release MAY be revived in its OWN namespace, provided no
+published document ever carried the retired meaning. The permission expires
+at `figdown 1.0`.**
+
+**Why RULE 4.3's exception does not reach it.** 4.3's retired-spelling
+exception is **directional**, and core.md:2548 says so in as many words:
+*"a retired spelling MAY be reused in **the other namespace**, a live one
+may not."* `fill` is the worked precedent (§8.2) — a retired KEYWORD
+returning as a live OPTION KEY, where the two can never meet because a
+keyword is only ever a line's first token and an option key only ever the
+left of a `key=`. That structural separation is the whole of the licence. A
+**same-namespace** revival has none of it: `note=` retired as an option key
+and returns as an option key, so the same `key=` position carries the old
+meaning in one document and the new meaning in another. Proceeding on 4.3
+alone would be the silent tolerance §8 exists to prevent; this rule is what
+the case actually needs.
+
+**What makes it safe, stated rather than assumed.** The hazard RULE 4.3
+guards against is a **reader** — human or agent — who knows one meaning and
+meets the other. **Where no document carrying the old meaning was ever
+published, that reader cannot exist.** `note=` retired
+(`DESCRIPTION-KEY-SPELLING`), which is before `v0.1.0` shipped: the old meaning was never
+released, no archived engine (core §13.5) ever rendered it, and there is no
+corpus in which it can be met. The test is about publication, not about the
+project's own intermediate states.
+
+**And in this instance the revival is not a reversal at all.** `DESCRIPTION-KEY-SPELLING` retired
+`note=` **in order to** reserve the name for the drawn construct, and said
+so twice on the record — in the retirement's own diagnostic and in
+core.md:2865, *"the name is reserved for the … DRAWN annotation"*. **Cashing
+a stated reservation is the opposite of contradicting a decision.** A
+proposal that meets this rule's three obligations but reverses a decision
+the retirement made on the merits is a different act and is not licensed
+here.
+
+**The permission is bounded to the 0.x rehearsal, and the expiry is IN this
+rule.** Core §13.4 calls 0.x a rehearsal — the project follows the `v1.0.0`
+rules without being bound by them — and a revival is one of the things a
+rehearsal is for. **From `figdown 1.0` the compatibility promise binds
+(§13.6), and a same-namespace revival becomes a meaning change to a
+published spelling — which §13.9's renaming corollary already forbids**
+(retiring a spelling IS removing support; after `v1.0.0` a rename takes
+`figdown 2.0`). The expiry is written here rather than in a footnote because
+a future reader must meet both halves at once: a rule whose licence is read
+without its end date is a general licence, which this is not.
+
+**Three obligations attach to every use.**
+
+1. The proposal MUST name the **retirement release** and show it predates
+   the first stable release of the language.
+2. The revived spelling MUST return **either** with the meaning the
+   retirement explicitly reserved it for, **or** with the same value shape it
+   retired with. `note=` satisfies both — the reservation is on the record,
+   and the value is quoted prose in each era.
+3. **The retirement diagnostic MUST be reversed in the same release, never
+   left standing.** A message telling an author to write `description=`
+   where `note=` is now the correct key is worse than no message: it is the
+   language actively misinforming its user. RULE 6.2 requires a retired
+   spelling to carry a named diagnostic; this is its converse, and it binds
+   every copy of the message that a shipping engine reads. (The one
+   exception is an ARCHIVED engine — core §13.5 keeps it as users ran it,
+   and there the old message is still true of the version it implements.)
+
+*Instance.* `note=` (`DRAWN-ANNOTATION-FORM`, MIGRATIONS 0.2 → 0.3). It is the
+only one, and this rule does not invite a second: a spelling is still spent
+when it is spent (RULE 4.7), and the revival costs a version gate — under
+`figdown 0.1` and `figdown 0.2` the key is a line error naming `0.3`,
+because an author who wrote the retired spelling meant the tooltip.
 
 ## 5. Two forms of one construct
 
@@ -1001,7 +1098,7 @@ parser. The maintainer-ruling item codes cited in the table (`OMITTED-LABEL-RECO
 | **The grammar is closed.** Every non-blank non-comment line must begin with a registered token. Under a DECLARED genre the message names the genre (`"zzz" is not allowed in genre block`); `unrecognized line` is what an implementation must produce when no valid genre is in force. core §0.1 states both from 0.1. | the genre allowlist, and `unrecognized line` in the switch default |
 | **Comma within a value, whitespace between positionals.** No construct uses whitespace as an intra-value delimiter, and no construct uses a comma as a positional separator. Since 0.1 (`COMMA-LIST-WHITESPACE`) this is exact rather than nearly-true: a comma list is ONE whitespace-free token everywhere. | The comma appears only inside `at=`, `class=`, `labels=`, `rank`, `width`, `bundle`, `field` compact and `cell` — always within one value. Verified across all eight. (It was ten until 0.1: `via=` and the `src=`/`dst=` pair, counted as one carrier each, went with the `path` directive under `EDGE-GEOMETRY-CONSTRUCTS`. 10 − 2 = 8.) |
 
-**Numeric value grammars are uniform — now an invariant.** The one exception was `chart level=` (spelled `plot level=` until this release), which used bare `parseFloat` and therefore accepted `1e3`
+**Numeric value grammars are uniform — now an invariant.** The one exception was `chart level=` (spelled `plot level=` until 0.1), which used bare `parseFloat` and therefore accepted `1e3`
 where every other numeric key rejects scientific notation by exact regex. It was **deleted** (`CHART-LEVEL-KEY`), not fixed: zero uses
 corpus-wide, zero 3-D bar charts and zero requests, so the construct did
 not earn a grammar repair. Every numeric value in the language is now
@@ -1036,6 +1133,27 @@ against the closed option-key registry, core.md §10) and appears on no
 avoid-list. See also the locator note in core.md §9: `on=` names the
 target, and the grammar for naming a *sub-element* as that target is a
 separate, shared problem.
+
+**ANNOTATION (`DRAWN-ANNOTATION-FORM`) — the ruling above is LEFT UNSPENT, and
+it is annotated rather than deleted.** The annotation landed, and it landed
+as an **attribute attached by syntactic position**: `note=` is written on the
+annotated element's own line, so there is no target to name and therefore no
+target key to choose. **`on=` was not needed, is not proposed, and remains
+unregistered.** The ruling is not contradicted and it is not discharged —
+nothing was built for it to bind. It stands as written for any future
+construct that does need a target key, and the paragraph above keeps its
+force: a third sense of `in=` is still refused, and a `note … in=<id>` would
+still be one.
+
+**The `MARKER-TARGET-KINDS` widening of `in=` is NOT that third sense.**
+`in=` on `threshold`/`band` resolves a **region** id (`bitfield`, `table`,
+`timing`) in addition to a node or a group. The **relation is sense 2
+verbatim** — *the element this one is drawn across* — and only the **value
+domain** widened, from "a node or group id" to "a node, group or region id".
+RULE 4.3's third sub-rule is about one key carrying **two grammars** (`at=`
+on `pin` and on `threshold` was the instance); here there is **one grammar**,
+and the id set it accepts got larger. **`in=` still has exactly two senses**,
+and this exception is neither deepened nor discharged by the widening.
 
 ### 8.2 `fill` is a retired keyword and a live option key
 
@@ -1080,6 +1198,20 @@ both, leaving **three** live pairs. `gap`'s own status is untouched: it remains 
 two sides mean different things, and it remains a declared exception. Nothing
 here was discharged by the withdrawal — this section's exception is `gap`, and
 `gap` is still live.
+
+**Recount (`PAINT-ORDER-CONSTRUCT`).** `plane`/`plane=` is no longer one of them
+either: `PAINT-ORDER-CONSTRUCT` withdrew **both** registrations at once — the keyword and the
+option key that could only reference it — exactly as `EDGE-GEOMETRY-CONSTRUCTS` did for `routing`,
+so the same-concept counterexamples go **three → two** (`class`/`class=`,
+`width`/`width=`). `vocabulary-sources.tsv`'s header records the same list
+from the other side, and it was corrected in the same release: SIX spellings
+appear as both an option and a keyword (`class` `gap` `layer` `plane`
+`routing` `width`), of which `layer` is retired in both namespaces and
+`routing` and `plane` are withdrawn in both, leaving **two** live
+same-concept pairs beside `gap`. The header had read FIVE and omitted
+`plane` while the pair was live, which is the one time the fact was easy to
+see. `gap` is untouched again, and for the third time nothing here is
+discharged: this section's exception is `gap`.
 
 ### 8.4 NOT an exception — `fill=`/`stroke=` on interior-less constructs — **FIXED (`INTERIOR-LESS-ELEMENT-PAINT`)**
 
@@ -1240,6 +1372,31 @@ the entries that make it one. **The counts in both files count LIVE
 registrations only**; a withdrawn row is present and uncounted, exactly like
 every retired row beside it.
 
+**Recount (`SUBJECT-VOCABULARY-SCOPE`, `PAINT-ORDER-CONSTRUCT`), and the partition above was already
+wrong twice over.** First, the running total `3 + 1 + 11 + 3 + 3 = 21`
+omits the `chart` term, which is the same registry omission core §10
+records having fixed and `vocabulary-sources.tsv` — this document never caught it, so its 0.1 figure
+should read **22**. Second, `GENRE-CONNECTOR-SPELLING`/`GENRE-NODE-SPELLING` registered `flowline`,
+`transition` and `state` — the per-genre connector and node spellings —
+and nobody recounted anywhere, so every file read a figure from before
+that release. The trace is therefore **22 → 25** (the trio) **→ 24**
+(`PAINT-ORDER-CONSTRUCT` withdraws `plane`), and the live partition is **3 universal core +
+1 layout namespace (`pin`) + 10 scene + 3 per-genre node/connector
+spellings + 3 flowchart roles + 3 nested-genre openers + 1 `chart` = 24**.
+`vocabulary-sources.tsv`'s keyword-section header carries the same
+derivation and is the machine-readable half of it. On the option-key side
+`PAINT-ORDER-CONSTRUCT` withdraws **two** keys (`plane=`, `z-index=`), both of which only the
+`plane` keyword gave a reason to exist, and the registry total does not
+move for the reason it did not move at `EDGE-GEOMETRY-CONSTRUCTS` — a registration counts
+whether or not it has a live acceptor. What DOES move is the live count,
+22 → 20.
+**What `SUBJECT-VOCABULARY-SCOPE` changes is not a count but what the `scene` bucket MEANS.** It
+is 10 distinct SPELLINGS, not a namespace: each is declared separately by
+each genre that accepts it, so a spelling on four allowlists is four
+declarations. The bucket totals spellings because a registry has to
+enumerate what exists; it has never been evidence that a word is shared,
+and after `SUBJECT-VOCABULARY-SCOPE` nothing in this project may read it that way.
+
 ### 0.1 — the last pre-freeze language batch (`PRESENCE-CONDITION-EXPRESSION`–`BITFIELD-GENRE-NAMING`)
 
 | # | Correction | Rule | Migration cost |
@@ -1397,7 +1554,7 @@ engine.
    carrying semantics is a classic failure mode"). This is not a deviation
    between this document and the parser — they agree — but it is a rule of
    §1's kind (a mark doing structural work) that no normative document
-   stated until this release. Now stated in core §12.3 and `genres/table.md`,
+   stated until 0.1. Now stated in core §12.3 and `genres/table.md`,
    and filed as core §9 **`COLSPAN-EMPTY-CELL-SPELLING`**: changing the spelling is a language
    change in a frozen genre, so this release owes the record, not a fix.
 3. **`tools/layout-lint.js` mis-measures every non-rectangular node.**
@@ -1454,7 +1611,7 @@ or a value-band primitive at all, and recording either as coined would
 have been false. Both enums are extended rather than forced, because
 forcing them would put a false value in a machine-read table.
 
-**`ISO` was in the brief's enum from the start and had no rows until this release.** It gained three — the `flowchart` role keywords `process`,
+**`ISO` was in the brief's enum from the start and had no rows until 0.1.** It gained three — the `flowchart` role keywords `process`,
 `decision` and `terminator`, taken whole from ISO 5807 (`FLOWCHART-ROLE-KEYWORDS`/`FLOWCHART-ROLE-SOURCE`). The
 absence had been recorded as measured rather than accidental: `shape=` is
 purely geometric under `SHAPE-ENUM-VOCABULARY`/`EXTERNAL-EDGE-ENDPOINTS`, so ISO 5807's symbol names had nothing to

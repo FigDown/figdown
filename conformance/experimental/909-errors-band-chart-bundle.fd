@@ -1,10 +1,25 @@
 # Static err() coverage: band label + range, chart id, bundle members, and
 # the DELETED `chart level=` (`CHART-LEVEL-KEY`)
+#
+# 0.3 (`SCENE-KEYWORD-MEMBERSHIP`): this fixture was ONE `figdown 0.1 topology` section
+# until this release, and the ruling splits it in two, because the three
+# constructs it covers no longer share a genre: `band` was WITHDRAWN from
+# `topology` (there a BAND is a frequency band) and `bundle` was WITHDRAWN
+# from `block` (there it is a ring round parallel edges with nothing to
+# name). It is split into two SECTIONS of one file rather than two fixtures:
+# the subject is a set of static argument errors, not a genre, and one of the
+# halves would otherwise be a fixture of a single line. Multi-section (`MULTI-FIGURE-DOCUMENTS`) is
+# the device this suite already uses when one fixture has to span genres —
+# `224-flowchart-roles-genre-scoped` writes four headers, `265` two.
+# `chart` goes with `band` in the `block` section: it is a `GENRE-COMPOSITION` REGION OPENER,
+# declared by every scene genre, so either section could host it.
+figdown 0.1 block
+node a "A"
+band "z" in=a
+chart
+chart t level=-1
 figdown 0.1 topology
 node a "A"
 node b "B"
 edge a -- b
-band "z" in=a
 bundle empty
-chart
-chart t level=-1

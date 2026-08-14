@@ -1,20 +1,24 @@
 figdown 0.1 block
 # spec §12.3: absent is OMITTED, and an explicitly EMPTY label is a
-# WRITTEN value — a third state, recorded uniformly on all nine
-# label-bearing directives and on `title` (`EMPTY-LABEL-STATE`, 0.1;
+# WRITTEN value — a third state, recorded uniformly on every
+# label-bearing directive and on `title` (`EMPTY-LABEL-STATE`, 0.1;
 # DISCREPANCIES `EMPTY-LABEL-DIRECTIVE-COVERAGE` resolved). The companion fixture
 # 214-label-absent-vs-id freezes the absent half: read the two goldens
 # together and the rule is the contrast between them. The id
 # substitution is a RENDERING rule that applies only to absence, so
 # every label written below draws nothing at all.
+#
+# The fixture wrote NINE empty labels until this release and now writes
+# eight: `plane over ""` stood after `title ""` and the directive left the
+# language (`PAINT-ORDER-CONSTRUCT`), taking its row with it. `bundle bl "" a--b` stood after
+# the `edge` line and did NOT leave — `bundle` is declared by `topology`
+# only since `SCENE-KEYWORD-MEMBERSHIP`, so it moved to section 2 rather than being dropped.
 title ""
-plane over ""
 node a ""
 group g ""
 external x ""
 node b "" in=g
 edge a -> b
-bundle bl "" a--b
 bitfield hdr "" numbering=lsb0
 field "ver" 4
 table t ""
@@ -23,3 +27,9 @@ table t ""
 | 1 |
 timing w ""
 signal clk 0101
+
+figdown 0.1 topology
+node a ""
+node b ""
+edge a -> b
+bundle bl "" a--b

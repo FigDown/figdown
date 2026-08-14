@@ -58,7 +58,7 @@ when a release is published.
 regenerating these files is a byte-level no-op, that both builds report the
 engine's own version, that both load and produce identical SVG, and that every
 published `.fd` parses through `dist/figdown.js` with the same error set as the
-reference engine. Until this release nothing in the repository read `dist/` at
+reference engine. Until 0.1 nothing in the repository read `dist/` at
 all, and a published tarball shipped a build of an older engine that rejected
 `index=` — a frozen key — and refused `examples/srh.fd`. Run the gate before
 publishing.

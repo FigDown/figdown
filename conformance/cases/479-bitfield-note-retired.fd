@@ -1,10 +1,28 @@
 figdown 0.1 bitfield
-# `DESCRIPTION-KEY-SPELLING`: the option key `note=` became `description=` (IEEE
-# 1685-2022's spelling; SystemRDL's `desc` is barred by RULE 4.2 as an
-# abbreviation). The spelling left the LANGUAGE, so the diagnostic fires
-# wherever it appears — the `w=`/`h=`/`unit=` placement test (RULE 6.2).
-# The reason is the collision ahead: `ANNOTATION-LOCATOR-SPLIT` files `note` as the highest-demand
-# v0.2 annotation construct, and that one will be a DRAWN callout.
+# `DRAWN-ANNOTATION-FORM`: `note=` IS LIVE AGAIN, LANGUAGE-WIDE. What this fixture
+# pins has CHANGED SIDES — it is no longer a RETIREMENT, it is a REFUSAL.
+#
+# `DESCRIPTION-KEY-SPELLING` retired the spelling in order to RESERVE the name for the
+# drawn callout `ANNOTATION-LOCATOR-SPLIT` had measured, and SYNTAX-STYLE RULE 4.9 lets that
+# reservation be cashed: a spelling retired before the first stable release,
+# where no published document carried the old meaning, may return in its own
+# namespace. So `note=` is now the DRAWN annotation and is accepted on
+# `node`, `process`, `decision`, `terminator`, `state`, `group`, `edge`,
+# `flowline`, `transition` and `title` under `figdown 0.3` (cases 800-802),
+# and the retirement diagnostic this file used to pin is GONE from the engine.
+#
+# `field` still refuses the key, and NOT because the spelling was renamed. It
+# refuses on EVIDENCE: the bitfield genre already carries `description=` for
+# prose a machine reads, and no measured figure needs a DRAWN per-field aside,
+# so granting one directive both keys would spend the AUDIENCE distinction
+# before anything needs it. The refusal is version-independent — this document
+# still declares `figdown 0.1` precisely because raising the header to 0.3
+# would NOT make line 20 legal (case 803 pins both halves of that).
+#
+# The file keeps its name. Renaming it would break every citation of it by
+# path in files this change does not otherwise touch, and STATUS.txt already
+# records what a rename costs the suite; case 014 kept its name through the
+# same kind of shift for the same reason.
 bitfield hdr "Header" word=32 numbering=msb0
-field "A" 16 note="the retired spelling"
-field "B" 16 description="the live spelling"
+field "A" 16 note="the key field refuses"
+field "B" 16 description="the key field takes"

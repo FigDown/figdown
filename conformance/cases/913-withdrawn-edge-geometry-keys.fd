@@ -5,7 +5,7 @@ figdown 0.1 block
 # left the LANGUAGE, so it errors wherever it appears) instead of the generic
 # `unknown option`. None of them names a replacement, because there is none.
 #
-# Four of the seven were live until this release (`points=` `tailport=`
+# Four of the seven were live until 0.1 (`points=` `tailport=`
 # `headport=` `routing=`); the other three were renamed INTO those four at
 # 0.1 (`via=` `src=` `dst=`, `WAYPOINT-KEY-SPELLING`/`ENDPOINT-DOCKING-KEYS`) and their messages now state the
 # whole two-hop chain in one lookup, the `line` -> `guide` -> `threshold`

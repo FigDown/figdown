@@ -1,4 +1,7 @@
-figdown 0.1 block
+figdown 0.1 topology
+# `SCENE-KEYWORD-MEMBERSHIP` made this rule genre-aware: `bundle` is declared by
+# `topology` alone now, so the rewrite fires here and is REPORTED, not
+# performed, under any other genre — see 624-withdrawn-from-genre.
 node a "A"
 node b "B"
 edge a -> b

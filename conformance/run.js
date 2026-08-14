@@ -9,7 +9,7 @@
 // conformance/cases/        the v0.1 conformance surface — NORMATIVE.
 // conformance/experimental/ everything outside it — EXPERIMENTAL.
 //
-// Until this release there were TWO: this directory split, plus a per-case
+// Until 0.1 there were TWO: this directory split, plus a per-case
 // tag in conformance/STATUS.txt that put 52 experimental fixtures inside
 // cases/. The 0.1 isolation ruling requires frozen and
 // experimental material to be separated at the FILE level, so that a

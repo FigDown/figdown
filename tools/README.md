@@ -122,7 +122,7 @@ the run aborts with a named error instead.
   pinned scenes that declare externals; "pinned" means a `pin` line carrying
   `at=`, since `ELEMENT-GEOMETRY-DIRECTIVE` lets a `pin` declare an extent and no position at all.
   `--strict` exits 1 on any failure. Same engine lookup as `build-svg.js`.
-  (The directive was spelled `boundary` until this release, which is where the
+  (The directive was spelled `boundary` until 0.1, which is where the
   file name and the engine's `doc.boundaries` model key come from.)
 - `shape-check.js` — render-side check that a node's label sits inside
   the outline the node is actually **drawn** with, and that every edge
@@ -454,7 +454,7 @@ the run aborts with a named error instead.
 
 ## migrate-check.js
 
-The engine has 205 conformance fixtures. Until this release the migration
+The engine has 205 conformance fixtures. Until 0.1 the migration
 tool had **one manual end-to-end run** — and it had already failed in
 exactly the way a suite catches: it carried the rewrite
 `optional` → `conditional` for a **full release** after `PRESENCE-FLAG-SPELLING` reversed that
@@ -898,7 +898,7 @@ failures are reported and the figure is skipped.
 
 ## strip-check.js
 
-*Named `r25-check.js`, and gated as `gate:r25`, until this release.* The tool
+*Named `r25-check.js`, and gated as `gate:r25`, until 0.1.* The tool
 does the strip test and every prose reference already called it that; the
 filename was the last place carrying the internal item code. The requirement
 ID **`GUI-WRITEBACK-STRUCTURE` is unchanged** — it is what the spec cites, and only the file and
@@ -957,7 +957,7 @@ carries no knowledge that must survive the strip test — its geometry *is* the
 subject (e.g. `examples/rainbow.fd`, a paint-order rendering demo), so there
 are no relationships for the check to protect. Use it only when that is
 genuinely true; a figure whose arrangement encodes real structure must express
-that structure in syntax instead. It was spelled `# r25: decorative` until this release; the prefix was an internal item code, and this was the only place
+that structure in syntax instead. It was spelled `# r25: decorative` until 0.1; the prefix was an internal item code, and this was the only place
 the project asked an author to type one into their own document. The old
 spelling is **not** accepted — `tools/migrate-figdown.js` rewrites it
 (MIGRATIONS 0.1).
@@ -1006,7 +1006,8 @@ norm `<= 1.0`, an endpoint at `1.00 +/- 0.02`.
 Reported but **not** asserted: co-located edges on the same node pair,
 which the renderer deliberately fans out sideways (± 7 px per lane) —
 their endpoints are offset from the outline by design. They appear in
-the `fanned` column. Self-loops draw a small side loop on their own node and are skipped.
+the `fanned` column. Self-loops draw a small side loop on their own node
+(`SELF-EDGE-DRAWING`) and are skipped.
 
 `--verbose` prints the per-node and per-endpoint norms (the numbers to
 quote in a review); `--strict` exits 1 on any failure. Deterministic;

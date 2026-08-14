@@ -1,0 +1,4 @@
+figdown 0.1 block
+# The option-key half: `layer=`→`plane=` (`PLANE-KEYWORD-SPELLING`), suppressed at
+# 0.3 for the same reason as the keyword half.
+node a "A" layer=over

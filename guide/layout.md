@@ -28,7 +28,7 @@ removed, not renamed, so there is no spelling to migrate to. See
 [spec/migrations.md](../spec/migrations.md) 0.1, core §9 **`EDGE-IDENTITY-AND-GEOMETRY`** for
 the requirement that survived them, and
 the project’s working record for the evidence, which is not published.)
-(The zone opener was spelled `render` before this release; that spelling is now a
+(The zone opener was spelled `render` before 0.1; that spelling is now a
 line error, because the zone takes geometry, not presentation.)
 
 Key invariant (`GUI-WRITEBACK-STRUCTURE`, `MEANING-RECOVERY-SOURCE`): stripping every `pin` line
@@ -443,9 +443,9 @@ paragraph is for.)
 
 **Long back-edges and bypasses read as detours — say what they are.** An edge
 that skips several ranks is routed through the gaps and keeps a bend only
-where something is actually in the way (it used to pick up
+where something is actually in the way (`EDGE-BEND-RETENTION` — it used to pick up
 a bend per rank crossed and read as a staircase); but however clean the line,
-a reader who cannot tell *why* a line is out there reads it as noise. Until this release the taught answer was a hand-written waypoint; `path` is withdrawn
+a reader who cannot tell *why* a line is out there reads it as noise. Until 0.1 the taught answer was a hand-written waypoint; `path` is withdrawn
 and there is no replacement, so the answer moves into the content zone, where
 it arguably belonged: name the bypass so the detour is legible as a bypass.
 
@@ -515,7 +515,7 @@ better (backlog item #4) makes a layered drawing tidier; it never turns it into
 a ring.
 
 There is a second cause, and it is in the language rather than the engine.
-Every flowchart connector today is a plain `flowline` (spelled `edge` before this release, `GENRE-CONNECTOR-SPELLING` — the rename gave the genre its own word, not a role). The
+Every flowchart connector today is a plain `flowline` (spelled `edge` before 0.2, `GENRE-CONNECTOR-SPELLING` — the rename gave the genre its own word, not a role). The
 renderer cannot tell the mainline from an exception branch from a retry loop — and those distinctions
 are *exactly* what human flowchart routing conventions are made of.
 0.1 (`FLOWCHART-ROLE-KEYWORDS`) gave the genre role vocabulary for its NODES — `process`,

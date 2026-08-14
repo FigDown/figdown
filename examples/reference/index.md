@@ -58,9 +58,9 @@ all four checks under both runs.
 
 | Command | Exit | Reported |
 |---|---|---|
-| `node tools/reference-coverage.js --strict` | **1** | `FAIL  3 genre(s) with gaps` — `block`, `topology`, `flowchart` |
-| `node tools/reference-coverage.js --normative-only --strict` | **1** | `FAIL  2 genre(s) with gaps` — `topology`, `flowchart` |
-| `node tools/reference-coverage.js --normative-only` | 0 | the same two genres, printed as gaps; without `--strict` the exit code does not carry them |
+| `node tools/reference-coverage.js --strict` | **1** | `FAIL  4 genre(s) with gaps` — `block`, `topology`, `flowchart`, `statechart` |
+| `node tools/reference-coverage.js --normative-only --strict` | **1** | `FAIL  4 genre(s) with gaps` — the same four (it was 2 until 0.3: `note=` (`DRAWN-ANNOTATION-FORM`) is a NORMATIVE option key no reference figure writes yet, and 3 until 0.3 added `statechart` to the genre list) |
+| `node tools/reference-coverage.js --normative-only` | 0 | the same four genres, printed as gaps; without `--strict` the exit code does not carry them |
 
 The third row is the one to hold on to. The non-strict form prints exactly the
 gaps the row above it fails on, and still exits 0 — so a clean prompt from it
@@ -87,26 +87,30 @@ plainly than it forbids the absence of the gate.
 
 ### What is green, and it is the half the freeze rests on
 
-Under `--normative-only`, all three NORMATIVE genres — `block`, `bitfield`,
-`table` — report `ok` on all four checks (keywords, options, enum values,
-multi-value forms) and `experimental leak: none`. Under the full run,
-`bitfield`, `table` and `timing` are `ok` on all four, and `block`'s normative
-rows are `ok` too: its two gaps there are both EXPERIMENTAL constructs. **No gap
-recorded below is inside the v0.1 conformance surface.** Every one of them
-lives in `experimental/block-experimental.fd`, `experimental/topology.fd` or
-`experimental/flowchart.fd`. (That sentence was **retracted**,
-which said "exactly ONE gap below is inside the v0.1 conformance surface" for
-as long as that was the true thing to say. It is restored
-because both commands were re-run and the gap list below is what they print —
-not because closing one gap makes it safe to assume the surface is clear. A
-record that says the comfortable thing after it stopped being true is the
-drift this section exists to prevent, and the drift runs in both directions.)
+Under `--normative-only`, `bitfield` and `table` report `ok` on all four checks
+(keywords, options, enum values, multi-value forms) and `experimental leak:
+none`. Under the full run, `bitfield`, `table` and `timing` are `ok` on all
+four. **`block` is not, and that is the sentence this section keeps having to
+rewrite: exactly ONE gap below is inside the v0.1 conformance surface, and it
+is `note=` on `block`.** Every other gap lives in
+`experimental/block-experimental.fd`, `experimental/topology.fd` or
+`experimental/flowchart.fd`, or is the `statechart` reference figure that does
+not exist yet.
+
+That sentence has now been true, then false, then true again. It said "exactly
+ONE", was restored to "no gap" when
+`bitfield.fd` closed the `index=` gap, and goes back to "exactly ONE", when `note=` (`DRAWN-ANNOTATION-FORM`) registered a NORMATIVE option key that no
+reference figure writes. It is rewritten each time because both commands are
+re-run and the gap list below is what they print — a record that keeps saying
+the comfortable thing after it stopped being true is the drift this section
+exists to prevent, and the drift runs in both directions.
 
 ### The recorded gap list, quoted so it can be diffed
 
 Both blocks are the tool's own output with the `ok` and `tracked:` rows
 dropped and the long lines wrapped; every `MISSING` and `FAIL` line is
-reproduced word for word.
+reproduced word for word. **They were re-recorded** — see the
+delta note below the second block for what moved and what is still moving.
 
 `node tools/reference-coverage.js --strict` — EXPERIMENTAL constructs throughout,
 marked `(exp)` by the tool itself:
@@ -114,45 +118,94 @@ marked `(exp)` by the tool itself:
 ```
 [block]
   MISSING keywords (1): chart (exp)
-  MISSING options (1): type (exp)
+  MISSING options (2): note, type (exp)
 [topology]
-  MISSING keywords (3): threshold (exp), band (exp), chart (exp)
-  MISSING options (5): fill, plane (exp), offset (exp), type (exp), extend (exp)
-  MISSING enum values (11): shape=box, shape=circle, shape=ellipse, shape=diamond,
-      shape=cylinder, style=solid, style=dotted, extend=up, extend=down,
-      extend=left, extend=right
-  MISSING multi-value forms (2): class=a,b, bundle a,b
+  MISSING keywords (1): chart (exp)
+  MISSING options (3): note, fill, type (exp)
+  MISSING enum values (7): shape=box, shape=circle, shape=ellipse, shape=diamond,
+      shape=cylinder, style=solid, style=dotted
+  MISSING multi-value forms (1): class=a,b
 [flowchart]
-  MISSING keywords (4): bundle (exp), threshold (exp), band (exp), chart (exp)
-  MISSING options (3): offset (exp), type (exp), extend (exp)
-  MISSING enum values (10): shape=box, shape=rounded, shape=diamond, shape=cylinder,
-      style=solid, style=dotted, extend=up, extend=down, extend=left, extend=right
-  MISSING multi-value forms (1): bundle a,b
-FAIL  3 genre(s) with gaps
+  MISSING keywords (2): chart (exp), flowchart
+  MISSING options (2): note (exp), type (exp)
+  MISSING enum values (6): shape=box, shape=rounded, shape=diamond, shape=cylinder,
+      style=solid, style=dotted
+[statechart] NO reference files
+FAIL  4 genre(s) with gaps
 ```
 
 `node tools/reference-coverage.js --normative-only --strict` — the same corpus
 with the EXPERIMENTAL rows dropped from the vocabulary:
 
 ```
+[block]
+  MISSING options (1): note
 [topology]
-  MISSING options (1): fill
+  MISSING options (2): note, fill
   MISSING enum values (7): shape=box, shape=circle, shape=ellipse, shape=diamond,
       shape=cylinder, style=solid, style=dotted
   MISSING multi-value forms (1): class=a,b
-  EXPERIMENTAL LEAK in topology.fd (2): bundle, plane  — move it to
+  EXPERIMENTAL LEAK in topology.fd (1): bundle  — move it to
       topology-experimental.fd  [advisory: the genre itself is EXPERIMENTAL]
 [flowchart]
+  MISSING keywords (1): flowchart
+  MISSING options (1): note
   MISSING enum values (6): shape=box, shape=rounded, shape=diamond, shape=cylinder,
       style=solid, style=dotted
-  EXPERIMENTAL LEAK in flowchart.fd (5): process, decision, terminator, plane,
-      plane=  — move it to flowchart-experimental.fd
+  EXPERIMENTAL LEAK in flowchart.fd (5): process, decision, terminator, flowline,
+      class=  — move it to flowchart-experimental.fd
       [advisory: the genre itself is EXPERIMENTAL]
+[statechart] NO reference files
 [timing]                                              (no MISSING line at all)
   EXPERIMENTAL LEAK in timing.fd (3): signal, gap, data=  — move it to
       timing-experimental.fd  [advisory: the genre itself is EXPERIMENTAL]
-FAIL  2 genre(s) with gaps
+FAIL  4 genre(s) with gaps
 ```
+
+**The delta, and which half of it is still moving.** The blocks above replace
+the 0.1 record. Four things moved, and they moved for three different
+reasons:
+
+1. **`note` (`DRAWN-ANNOTATION-FORM`)** is a new option key on `node`/`group`/`edge`/
+   `title` that no reference figure writes yet, so it appears as a MISSING
+   option in every scene genre, under both runs. It is the one gap here that is
+   inside the v0.1 conformance surface — which retracts, again, the sentence
+   two sections up. Closing it is authoring, not a decision.
+2. **`flowchart` and `flowline`** appear because the tool requires a genre's own
+   opener as a keyword and now reads `flowline` out of the engine; neither was
+   in the 0.1 record and neither was moved by this release.
+3. **`plane` has left both blocks, and the tool gap that was holding it there
+   is closed.** The retirement filter dropped `plane=` the option key but not
+   `plane` the keyword, because it matched the engine's
+   *renamed/retired/DELETED* wording and `PAINT-ORDER-CONSTRUCT`'s diagnostic says **WITHDRAWN** —
+   so a keyword the language no longer has stayed TRACKED, and the tool went on
+   demanding a reference figure demonstrate a spelling that is now a line
+   error. `WITHDRAWN` joins the verb set in `tools/reference-coverage.js`, and
+   `plane` leaves the tracked vocabulary with it.
+4. **`group`, `threshold`, `band` and `bundle` have left the `topology` and
+   `flowchart` MISSING lines**, which is the re-record the 0.3 draft of
+   this section said was owed. They were tracked only because the two
+   experimental genre documents still carried their vocabulary rows; those
+   documents now declare what `SCENE-KEYWORD-MEMBERSHIP` left them, so the rows are gone and the
+   lines went with them. `bundle a,b` left `[block]` at the same time and for
+   the same reason.
+5. **`statechart` is a fourth genre with a gap, and it is the count that
+   moved, not the corpus.** The tool's genre list had never been extended past
+   `GENRE-NODE-SPELLING`, so for two releases nothing checked the statechart reference against
+   what the engine accepts. It is listed now and reports `NO reference files`,
+   which is true and is the gap: the genre has no reference figure at all.
+   `SUBJECT-VOCABULARY-SCOPE` makes that costly rather than untidy — `statechart` declares **no**
+   subject vocabulary, and an empty declaration is exactly the claim that needs
+   a gate, because there is no missing keyword for a reader to trip over.
+   Closing it is authoring a `statechart` reference figure, and it is the
+   largest single item this record carries.
+
+One gap did close by authoring: `bundle a,b`, the multi-value member-list form,
+was demonstrated only in `experimental/block-experimental.fd`, and `SCENE-KEYWORD-MEMBERSHIP`
+withdrew `bundle` from `block`. The demonstration moved to
+`experimental/topology.fd` — `bundle`'s only remaining genre — as
+`bundle ecmp "ECMP uplink set" s1--l1,s2--l1`. Without the move the form would
+have had no demonstrating figure anywhere in the tree.
 
 **To audit:** run both commands and compare their `MISSING` lines against the
 two blocks above, which are quoted from the 0.1 run. A line here that
@@ -164,13 +217,17 @@ worse than no record, because it is read as current.
 ### The three classes of gap, why each is accepted, and what would close it
 
 **Class 1 — EXPERIMENTAL constructs that no reference figure exercises.**
-`chart`, `threshold`, `band`, `plane`, `bundle` and the `bundle a,b` form,
-`offset=`, `type=`, `extend=` and its four values `extend=up|down|left|right`.
-These are registered in the engine's vocabulary and demonstrated nowhere in
-this directory. They are outside the v0.1 conformance surface, so the gap is
-in *demonstration*, not in the standard: the constructs themselves are
-exercised by the fixtures in `conformance/experimental/`, which
-`node conformance/run.js --experimental` runs as a gate.
+`chart`, `type=`, and — in `topology` and `flowchart` only, and only until
+those two genre documents drop the rows (see the delta note above) —
+`threshold`, `band`, `bundle`, `offset=`, `extend=` and its four values
+`extend=up|down|left|right`. These are registered in the tracked vocabulary and
+demonstrated nowhere in this directory. They are outside the v0.1 conformance
+surface, so the gap is in *demonstration*, not in the standard: the constructs
+themselves are exercised by the fixtures in `conformance/experimental/`, which
+`node conformance/run.js --experimental` runs as a gate. **`plane` is no longer
+one of them and is not a gap of any class**: it left the language (`PAINT-ORDER-CONSTRUCT`), and the only reason it still prints is the retirement-filter
+wording gap recorded above. `bundle a,b` left this list at the same release by
+being demonstrated, in `experimental/topology.fd`.
 
 **Class 2 — NORMATIVE enum values and options the two experimental-genre
 figures leave unexercised.** `shape=box|circle|ellipse|diamond|cylinder`,
@@ -236,6 +293,11 @@ experimental figure as if it were part of the frozen set.
 Normative reading path for a genre remains **core + genre doc**
 ([spec/core.md](../../spec/core.md) + [spec/genres/](../../spec/genres/README.md)).
 The experimental genres' documents are in
-[spec/genres/experimental/](../../spec/genres/experimental/), and the **four**
-experimental core constructs — `plane`, `bundle`, `threshold`, `band` — in
-[spec/experimental.md](../../spec/experimental.md). (It read *six* until this release; `EDGE-GEOMETRY-CONSTRUCTS` withdrew `path` and `routing`.)
+[spec/genres/experimental/](../../spec/genres/experimental/), and the **three**
+experimental constructs — `bundle`, `threshold`, `band` — in
+[spec/experimental.md](../../spec/experimental.md). (It read *six* until 0.1, when `EDGE-GEOMETRY-CONSTRUCTS` withdrew `path` and `routing`, and *four*
+until this release, when `PAINT-ORDER-CONSTRUCT` withdrew `plane` from the language.) They are no
+longer "core" constructs in any sense: `SUBJECT-VOCABULARY-SCOPE` made subject vocabulary **per
+genre**, so `bundle` is declared by `topology` and `threshold`/`band` by
+`block`, and each of those declarations stands on its own even where the
+wording agrees.

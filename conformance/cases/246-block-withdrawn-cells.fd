@@ -1,0 +1,36 @@
+figdown 0.1 block
+# `SCENE-KEYWORD-MEMBERSHIP`/`PAINT-ORDER-CONSTRUCT`: the cells WITHDRAWN from `block`. There are two,
+# and they are withdrawn by DIFFERENT rulings with different diagnostics —
+# which is the whole point of writing them in one file. The KEEP half of the
+# grid for this genre is 245.
+#
+#   bundle  `SCENE-KEYWORD-MEMBERSHIP`, a PER-GENRE withdrawal. `bundle` is still live under
+#           `topology` and this line would parse there. It had ZERO authored
+#           uses under `block`, and the construct is defined by a REFERENT
+#           only that genre has — a LAG (IEEE 802.1AX), an ECMP set, an EVPN
+#           Ethernet Segment. Under `block` it was a ring drawn round
+#           parallel edges with nothing to name. The message must say so:
+#           a word withdrawn from one genre is not a misspelling, and
+#           `"bundle" is not allowed in genre block` on its own would send an
+#           author hunting for a typo that is not there.
+#
+#   plane   `PAINT-ORDER-CONSTRUCT`, a LANGUAGE-WIDE withdrawal — not per genre, so it reports a
+#           different message reached from a different place: `plane` joins
+#           the retired-keyword sweep AHEAD of the `GENRE-KEYWORD-ALLOWLIST` genre allowlist, and
+#           answers identically in every genre, including `bitfield`,
+#           `table` and `timing`. It is written here so the block column of
+#           the grid is complete in one file; the full sweep, and the two
+#           option keys that went with it (`plane=`, `z-index=`), are pinned
+#           by 918-withdrawn-plane-keyword.
+#
+# Both withdrawals were FREE: in `block` — the one normative scene genre —
+# `bundle` and `plane` were the EXPERIMENTAL keywords of the keyword-status table,
+# and `EDGE-GEOMETRY-CONSTRUCTS` (`path`/`routing`) is the precedent for withdrawing an
+# experimental construct with no version gate and no rewrite owed. `group`
+# and `external` are the only normative cells in this column and neither
+# moved.
+node a "A"
+node b "B"
+edge a -- b
+bundle lag "LAG" a--b
+plane over "Overlay"

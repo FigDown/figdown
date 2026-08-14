@@ -39,6 +39,10 @@ state requesting "REQUESTING\nawait ACK/NAK" class=mode
 state bound "BOUND\nlease active" class=mode
 # Address in use (yiaddr / assigned).
 # T1 and T2 timers run; data plane may use the lease.
+# "Data plane" there is the NETWORKING term — the forwarding path — and not
+# FigDown's `plane`, which was WITHDRAWN from the language
+# (`PAINT-ORDER-CONSTRUCT`). That a comment in a DHCP figure reaches for the word in its domain
+# sense, unprompted, is the collision that withdrew the keyword.
 
 state renewing "RENEWING\nT1 unicast" class=mode
 # T1 fired. Client unicasts DHCPREQUEST to the server

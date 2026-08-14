@@ -8,7 +8,7 @@ figdown 0.1 bitfield
 
 # Six of this header's fields are VARIABLE-length on the wire and v0.1 has no
 # RANGE width (`BITFIELD-RANGE-WIDTH`): three connection-id/token regions and three varints.
-# Until this release they carried invented widths (24, 24, 24, 8, 16, 16) with
+# Until 0.1 they carried invented widths (24, 24, 24, 8, 16, 16) with
 # nothing in the model to say so, and `note="padded to 24 bits for display"`
 # — a renderer's excuse in a channel that does not draw. The `*` budget is one
 # per block and it is spent on Payload, so the honest move available in v0.1
@@ -33,7 +33,7 @@ field H:1,F:1,PT:2,Rs:2,PN:2
 # read as padding. That is a FALSE STATEMENT ABOUT THE WIRE, and it is a
 # different thing from the `varlen` fiction below: `varlen` declares its
 # placeholder in the model, whereas blank space declares nothing and is simply
-# believed. Until this release this file had the break, so every offset in the
+# believed. Until 0.1 this file had the break, so every offset in the
 # figure was 24 bits too high — a reader computed DCID Length at byte 8 when
 # it is at byte 5. Do not re-add it.
 

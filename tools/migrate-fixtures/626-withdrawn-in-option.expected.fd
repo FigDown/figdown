@@ -1,0 +1,14 @@
+figdown 0.2 flowchart
+# `MEMBERSHIP-KEY-ACCEPTANCE`: `in=` is no longer this genre's option key. It named a
+# `group` id and nothing else, and `flowchart` stopped declaring `group` one
+# release earlier, so every value was a dead end. REPORT-ONLY: there is nothing
+# to rewrite it to, and what replaces it — a `class` naming the phase — is a
+# decision about the figure.
+process a "Parse" in=ingress
+decision b "Match?" in=ingress
+
+figdown 0.2 statechart
+# The statechart half, whose message additionally carries the RESERVATION:
+# the spelling comes back with a `state`-id domain if UML composite states are
+# earned, which is why it was withdrawn rather than left pointing at a group.
+state s "IDLE" in=super

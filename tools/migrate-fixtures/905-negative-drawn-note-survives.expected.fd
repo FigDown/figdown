@@ -1,0 +1,31 @@
+figdown 0.3 block
+# NEGATIVE (`DRAWN-ANNOTATION-FORM`): a DRAWN `note=` must survive a migration run
+# COMPLETELY UNTOUCHED.
+#
+# The `note=`→`description=` rewrite was LINE-AGNOSTIC until this release.
+# `note=` is live again language-wide as the drawn annotation, so left as it
+# was the rule would have fired on every `node`, `group`, `edge` and `title`
+# line in every downstream corpus and silently turned a box the author drew
+# on purpose into a tooltip nobody can see — ink deleted, no diagnostic, by
+# the one tool a user is asked to run unattended over their whole tree.
+#
+# Section 1 is the counter-example: four acceptors, four `note=` values, and
+# the golden is this file BYTE FOR BYTE.
+#
+# Section 2 is the rule still doing its job, in the one scope where `note=`
+# really is the retired tooltip key: a `field` line. Keeping both halves in
+# ONE fixture is the point — a fixture that only showed survival would also
+# pass against a tool that had deleted the rule outright, and fixture 206
+# alone would pass against the line-agnostic version this replaces.
+title "Drawn notes survive" note="a figure-level note, and title takes no other option key"
+group fabric "Fabric" note="on a group"
+node spine "Spine" in=fabric note="on a node — THIS is the line that used to be silently rewritten"
+node leaf "Leaf" in=fabric
+edge spine -> leaf note="on an edge"
+
+figdown 0.1 bitfield
+# Section 2: the surviving scope. `field` is the only directive that ever
+# accepted `note=`, so this one IS the retired tooltip key and IS rewritten.
+bitfield h "H" word=16 numbering=lsb0
+field "A" 8 description="the low half"
+field "B" 8

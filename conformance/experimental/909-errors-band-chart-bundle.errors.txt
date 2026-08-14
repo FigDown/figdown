@@ -1,4 +1,4 @@
-Line 10: level= has been DELETED, not renamed: it drew a reference plane through a 3-D bar chart, has zero uses in either downstream corpus and zero 3-D bar charts to draw it on, was the only construct whose caption the ENGINE wrote rather than the author, and its parseFloat grammar uniquely accepted 1e3 where every other number in the language is \d+(\.\d+)? — delete the key (MIGRATIONS 0.1)
-Line 7: band needs a range with the % sign: band "<label>" <pct>% or band "<label>" <a>..<b>%
-Line 8: bundle needs at least one member link A--B
-Line 9: chart needs a table id
+Line 18: band needs a range with the % sign: band "<label>" <pct>% or band "<label>" <a>..<b>%
+Line 19: chart needs a table id
+Line 20: level= has been DELETED, not renamed: it drew a reference plane through a 3-D bar chart, has zero uses in either downstream corpus and zero 3-D bar charts to draw it on, was the only construct whose caption the ENGINE wrote rather than the author, and its parseFloat grammar uniquely accepted 1e3 where every other number in the language is \d+(\.\d+)? — delete the key (MIGRATIONS 0.1)
+Line 25: bundle needs at least one member link A--B

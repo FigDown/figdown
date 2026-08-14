@@ -2,13 +2,13 @@ figdown 0.1 block
 # core §13.4: a document from ANY earlier version must reach the current one
 # in a SINGLE run. This is written in the oldest spellings the tool still
 # carries — six releases of them — and must land fully migrated after one pass.
-plane over "Overlay"
-node a "A" plane=over
+# The `layer`/`layer=` pair stood here until this release; `PAINT-ORDER-CONSTRUCT` WITHDREW their
+# target, so a chain containing them no longer completes and the halt is
+# pinned by its own fixture, 951-chain-halted-by-withdrawal.
 node b "B" shape=diamond
 node c "C"
 external e "Upstream"
-edge a -> b
-edge a -> e
+edge b -> c
+edge b -> e
 layout
-pin a at=(20,20)
-pin b width=100 height=40
+pin b at=(20,20) width=100 height=40

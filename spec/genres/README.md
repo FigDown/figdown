@@ -19,7 +19,7 @@
 > every such row is marked EXPERIMENTAL and points at where the definition lives.
 > The same split runs through [../experimental.md](../experimental.md) (the
 > **four** experimental core constructs — `plane`, `bundle`, `threshold`,
-> `band`; this read *six* until this release, a figure `EDGE-GEOMETRY-CONSTRUCTS` made stale at
+> `band`; this read *six* until 0.1, a figure `EDGE-GEOMETRY-CONSTRUCTS` made stale at
 > 0.1 when it WITHDREW `path` and `routing` outright),
 > `conformance/experimental/` and
 > `examples/reference/experimental/`; `tools/isolation-check.js` is the gate.
@@ -54,7 +54,7 @@ always lived in, and it absorbed `size` in the same release (`ELEMENT-GEOMETRY-D
 
 **Status and genre-independence are orthogonal axes**, and the pair the rule
 was written on is now gone. `path` and `routing`
-were core members until this release, `CONSTRUCT-STATUS-TIERS` demoted them to EXPERIMENTAL
+were core members until 0.1, `CONSTRUCT-STATUS-TIERS` demoted them to EXPERIMENTAL
 (core doc §10), `LAYOUT-ZONE-NAMESPACE` made them genre-independent while they stayed
 experimental — the two axes at once — and **`EDGE-GEOMETRY-CONSTRUCTS` withdrew both from the
 language**, leaving `pin` as the zone's only member. The
@@ -98,7 +98,7 @@ doc's prose.
 | `timing` | 7.2% | nested genre | **EXPERIMENTAL** | `timing`, `signal`, `gap` | [complete vocabulary](experimental/timing.md#complete-vocabulary-normative) | [experimental/timing.md](experimental/timing.md) |
 | `statechart` | 3 of 91 production docs | scene namespace | **EXPERIMENTAL** | `state`, `transition` (`GENRE-NODE-SPELLING`, OMG UML 2.5.1 §14) — they **replace** the scene `node` and `edge` here; needs `figdown 0.2` | [complete vocabulary](experimental/statechart.md#complete-vocabulary-normative) | [experimental/statechart.md](experimental/statechart.md) |
 
-**Genre status (`CONSTRUCT-STATUS-TIERS`, core doc §10).** each genre carries a
+**Genre status (`CONSTRUCT-STATUS-TIERS`, core doc §10).** Each genre carries a
 status. The six of `figdown 0.1` split three and three; `statechart` (`STATECHART-GENRE-SCOPE`)
 made the experimental side four:
 
@@ -135,7 +135,7 @@ never defined — in the frozen genre documents.
 (`extend=` and `z-index=` follow, because the
 only directives that accept them — `band`, `plane` — are demoted.)
 A demotion moves **status** and nothing else.
-**The count, and how it was reached: 9 → 7 → 5.** It was nine until this release, when `stroke=` was promoted back to NORMATIVE
+**The count, and how it was reached: 9 → 7 → 5.** It was nine until 0.1, when `stroke=` was promoted back to NORMATIVE
 (`STROKE-KEY-STATUS`, on a re-measured count) and `color=` was retired language-wide
 (`COLOUR-KEY-STATUS`), taking it to seven. It is **five**, when `EDGE-GEOMETRY-CONSTRUCTS`
 **withdrew** `path` and `routing` from the language — with the four option
@@ -178,10 +178,10 @@ implicit `base` — an option with exactly one legal value. The implicit
 NORMATIVE scene keywords are therefore the seven `node`, `group`,
 `external`, `edge`, `class`, `flow`, `rank` — 13 normative top-level
 keywords in all (3 core + `pin` + 7 scene + the `bitfield`/`table`
-openers), of **22** top-level keywords total. That total read 24, when `ELEMENT-GEOMETRY-DIRECTIVE` retired `size`, until this release, when `EDGE-GEOMETRY-CONSTRUCTS`'s
+openers), of **22** top-level keywords total. That total read 24, when `ELEMENT-GEOMETRY-DIRECTIVE` retired `size`, until 0.1, when `EDGE-GEOMETRY-CONSTRUCTS`'s
 withdrawal of `path` and `routing` took it to 22; the **13** does not move,
 because both withdrawn keywords were EXPERIMENTAL. (Both figures read one lower
-here and in core §10 until this release, when the missing `chart` entry was
+here and in core §10 until 0.1, when the missing `chart` entry was
 added to the registry — it is EXPERIMENTAL, so again the **13** is unmoved.) Every
 genre document's vocabulary table now
 carries a per-construct **Status** column: it records each construct's own
@@ -241,7 +241,7 @@ of legal top-level keywords for that section (enforced `GENRE-NAMESPACE`). `UNIV
 `pin` (`LAYOUT-ZONE-NAMESPACE`) are always allowed. Pure `bitfield` / `table` / `timing` reject
 scene keywords (`node`, `edge`, …) except `class` (and experimental `chart`
 under `table`). Scene genres share the scene vocabulary, may open nested
-typed regions. Until this release the scene lists were also the only ones
+typed regions. Until 0.1 the scene lists were also the only ones
 carrying the layout namespace's experimental members `path`/`routing` — a
 **status** fact, not a namespace one, since `LAYOUT-ZONE-NAMESPACE` fixes what a zone member means
 wherever it is legal and says nothing about which genres admit it, the same

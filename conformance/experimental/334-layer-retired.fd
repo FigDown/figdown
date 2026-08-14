@@ -1,10 +1,29 @@
 figdown 0.1 block
 # `PLANE-KEYWORD-SPELLING`: `layer`/`layer=` became `plane`/`plane=`.
 # `LANE-ALPHABET-KEY-RESERVATION`: the stacking key `z=` became `z-index=`.
+# `PAINT-ORDER-CONSTRUCT`: `plane`, `plane=` and `z-index=` are WITHDRAWN from the
+# language, so every chain above now TERMINATES in a withdrawal instead of a
+# spelling — the `route` -> `path` -> withdrawn shape. This
+# fixture is the whole chain in one place: six lines, six messages, one per
+# spelling the family ever had.
 # The retired spellings below are the SUBJECT of this fixture — do not rename
 # them to the current ones, that deletes the coverage rather than updating it.
-plane over "Overlay" z-index=2
+#
+# 0.3 also moved two hosts. `z=` used to ride on a `plane` line, and
+# the `plane` sweep now runs AHEAD of the option scan and abandons the line,
+# so the `z=` message was unreachable there; it is hosted on a plain `node`
+# instead, exactly as `913-withdrawn-edge-geometry-keys` rehosted the edge
+# geometry keys when `path` was withdrawn out from under them. `z-index=`
+# gained a line of its own for the first time: it was pinned as a LIVE key by
+# `124-plane-z-index` until that fixture was deleted with its construct, and
+# a withdrawn spelling still has to be diagnosed by name (RULE 6.2). It has
+# its own `RETIRED_OPT_KEYS` row, so all six lines below are NAMED messages
+# and none falls through to the generic `<directive> does not take <k>=`.
+# The two `z` spellings differ only in how much chain they state: `z=` was
+# renamed `z-index=` and needs both hops, `z-index=` needs one.
+plane over "Overlay"
 layer under "Underlay"
 node a "A" layer=over
 node b "B" plane=over
-plane deep "Deep" z=3
+node c "C" z=3
+node d "D" z-index=2

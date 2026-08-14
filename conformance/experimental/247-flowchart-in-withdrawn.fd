@@ -1,0 +1,36 @@
+# `MEMBERSHIP-KEY-ACCEPTANCE`: `in=` is WITHDRAWN from `flowchart`. `SCENE-KEYWORD-MEMBERSHIP` stopped this
+# genre declaring `group`, and a `group` id was `in=`'s ONLY value domain, so
+# every value of the key was a dead end — `in=g` answered
+# `unknown group "g"` and NO spelling of `g` succeeded, because no flowchart
+# document can declare one. An unknown-option error that names the reason
+# beats a dangling reference no author can satisfy, and the message points at
+# `class=`, which is what expresses membership here today.
+#
+# All four acceptors of `in=` in this genre are written, because a key
+# stranded on one directive need not be stranded on another: `node` and the
+# three role lines resolve `in=` against declared GROUP ids and nothing else.
+# The other two acceptors in the LANGUAGE — `threshold` and `band`, whose
+# domain `MARKER-TARGET-KINDS` widened to REGION ids — are not this genre's keywords since
+# `SCENE-KEYWORD-MEMBERSHIP`, which is why the withdrawal is by KEY and not directive by directive.
+#
+# The last line is the check that made "stranded" measurable rather than
+# assumed: a flowchart document CAN declare a region (`table` is a `GENRE-COMPOSITION` region
+# opener, legal in every scene genre), and `MARKER-TARGET-KINDS`'s widening still never reached
+# `node` — `node e "E" in=q` over a `table q` answered `unknown group "q"`,
+# not a region binding. If a later ruling widens `node`'s `in=` to regions,
+# this line is the fixture that must change.
+#
+# The header is `figdown 0.2` deliberately: the withdrawal is NOT gated by the
+# language version, because `flowchart` is EXPERIMENTAL and outside the
+# compatibility promise (`EDGE-GEOMETRY-CONSTRUCTS` precedent — no gate, no rewrite owed).
+figdown 0.2 flowchart
+node a "A" in=g
+process b "B" in=g
+decision c "C" in=g
+terminator d "D" in=g
+table q
+| Head |
+| ---- |
+| 1    |
+
+node e "E" in=q

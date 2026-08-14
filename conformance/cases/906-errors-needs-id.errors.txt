@@ -1,5 +1,4 @@
-Line 10: bundle needs an id
-Line 11: plane needs an id
+Line 18: bundle needs an id
 Line 3: class needs an id
 Line 4: group needs an id
 Line 5: node needs an id

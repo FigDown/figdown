@@ -1,3 +1,0 @@
-Line 2: duplicate plane id "base"
-Line 4: duplicate plane id "o"
-Line 5: unknown plane "ghost"

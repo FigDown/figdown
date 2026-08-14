@@ -1,0 +1,24 @@
+figdown 0.3 block
+# `DRAWN-ANNOTATION-FORM`: the VERSION GATE, ACCEPTING half. The five directive
+# lines below are BYTE-IDENTICAL to case 805's FIRST SECTION; the header is
+# the only thing that differs, `0.2` → `0.3`, and this document parses CLEAN.
+# (805 carries a second section under `figdown 0.1`, to pin the version the
+# message interpolates; there is no accepting counterpart to that one,
+# because 0.1 is exactly where the key is not available.)
+#
+# A gate is only a gate if BOTH directions are pinned. Case 805 alone would
+# be satisfied by an engine that rejected `note=` everywhere, and this case
+# alone would be satisfied by one that accepted it everywhere; the pair is
+# what says the key's legality is a function of the declared version and of
+# nothing else. Keep them edited together — if a line moves in one, move it
+# in the other, or the pair stops being a pair and neither half notices.
+#
+# The model golden holds the same four carriers as case 800 (title, group,
+# node, edge). See case 800 for the GOLDEN GAP: normalize.js does not project
+# `note`, so what is pinned is that the document parses and that the rest of
+# the model is unchanged — not the note strings themselves.
+title "The note= version gate" note="title is an acceptor: legal at 0.3, refused below it"
+group ring "Ring" note="on a group"
+node a "A" note="on a node"
+node b "B"
+edge a -> b note="on an edge, which has its own scanner and its own copy of the gate"

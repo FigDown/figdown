@@ -17,7 +17,7 @@
 //
 // .github/CONTRIBUTING.md §3.1(c) already answers that with a rule — "the migration
 // tool is verified end to end, not read" — and this file is that rule
-// MECHANISED. The engine has 205 conformance fixtures; until this release the
+// MECHANISED. The engine has 205 conformance fixtures; until 0.1 the
 // tool had one manual end-to-end run.
 //
 // HOUSE STYLE: conformance/. Numbered fixture files, byte-compared goldens,
@@ -104,6 +104,36 @@ const RETIRED_DIRECTIONS = [
          'rewrites that used to feed it are suppressed, because a rewrite ' +
          'whose OUTPUT is a hard error is not a migration. If this fires, a ' +
          'withdrawn target has come back as a rewrite destination.',
+  },
+  {
+    name: 'layer→plane / layer=→plane= / z=→z-index=',
+    trigger: /(^|\s)(layer|z=)/m,
+    forbidden: /(^|\s)(plane\s|plane=|z-index=)/m,
+    why: 'PAINT-ORDER-CONSTRUCT WITHDREW `plane`, `plane=` and `z-index=` from ' +
+         'the language. Three rewrites had been feeding them ' +
+         'and 0.1 and all three are suppressed, the same shape ' +
+         '`route`→`path` took. If this fires, a withdrawn ' +
+         'target has come back as a rewrite destination.',
+  },
+];
+
+// ---------------------------------------------------------------------------
+// SCENE-KEYWORD-MEMBERSHIP: a PER-GENRE negative assertion, the first of its kind.
+// `trunk`→`bundle` is still correct under `topology` and wrong everywhere
+// else, so the assertion cannot be a bare spelling test the way the three
+// above are — it has to read the section header. If a future edit drops the
+// genre guard, this fires.
+// ---------------------------------------------------------------------------
+const GENRE_SCOPED_DIRECTIONS = [
+  {
+    name: 'trunk→bundle outside `topology`',
+    genre: 'block',
+    trigger: /^\s*trunk(\s|$)/m,
+    forbidden: /^\s*bundle(\s|$)/m,
+    why: 'SCENE-KEYWORD-MEMBERSHIP withdrew `bundle` from `block`; it is declared by ' +
+         '`topology` alone. The rename still fires under `topology` and must ' +
+         'not fire under any other genre, because its output would be a line ' +
+         'error. If this fires, the genre guard on the rename is gone.',
   },
 ];
 
@@ -256,6 +286,24 @@ function main() {
       }
     }
 
+    // --- negative, GENRE-SCOPED (SCENE-KEYWORD-MEMBERSHIP) ---------------------------
+    // Same test, gated on the fixture's FIRST header genre — a rewrite that is
+    // correct in one genre and forbidden in another cannot be asserted by
+    // spelling alone.
+    {
+      const gm = /^\s*figdown\s+\S+\s+(\S+)/m.exec(stripComments(input));
+      const fixtureGenre = gm ? gm[1] : null;
+      for (const d of GENRE_SCOPED_DIRECTIONS) {
+        if (fixtureGenre !== d.genre) continue;
+        if (d.trigger.test(stripComments(input))) triggered.add(d.name);
+        if (d.forbidden.test(stripComments(landed)) && !d.forbidden.test(stripComments(input))) {
+          problems.push('GENRE-SCOPED RETIRED REWRITE `' + d.name + '` has reappeared under `' +
+            fixtureGenre + '` — the tool produced a spelling that genre does not ' +
+            'declare.\n    ' + d.why);
+        }
+      }
+    }
+
     if (problems.length) {
       fail++;
       failures.push({ name: c.name, problems });
@@ -291,7 +339,7 @@ function main() {
 
   // --- coverage: every negative assertion must have a live trigger ----------
   console.log('');
-  for (const d of RETIRED_DIRECTIONS) {
+  for (const d of RETIRED_DIRECTIONS.concat(GENRE_SCOPED_DIRECTIONS)) {
     if (triggered.has(d.name)) {
       console.log('negative  ' + d.name + '  triggered and clean');
     } else {

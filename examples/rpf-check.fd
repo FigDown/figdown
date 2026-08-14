@@ -3,7 +3,7 @@
 # Reverse-path-forwarding check — a small figure that reads RIGHT TO LEFT.
 #
 # What this figure probes: four constructs that had no demonstrator anywhere in
-# the corpus before this release. They are gathered into one small document on
+# the corpus before 0.1. They are gathered into one small document on
 # purpose — a capability needs A demonstrator, not a document of its own.
 #
 #   1. `flow left`   — the reverse direction. Twelve figures in this corpus use

@@ -1,0 +1,8 @@
+figdown 0.1 block
+# `SCENE-KEYWORD-MEMBERSHIP`: `bundle` is declared by `topology` alone, so under
+# `block` the `trunk`→`bundle` rewrite is suppressed and the line reported.
+# The fix is a decision about the FIGURE — change the header or move the line
+# — which no tool may make unattended.
+node a "A"
+node b "B"
+trunk t "Link" a--b

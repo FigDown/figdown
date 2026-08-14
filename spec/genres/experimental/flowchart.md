@@ -10,7 +10,7 @@
 > needs rewriting — but the genre may change or be withdrawn in a later
 > `0.x` without a migration entry, and a `flowchart` document is not a
 > portable v0.1 document. It is demoted because it had **not converged**:
-> until this release it shared `block`'s namespace with nothing but a default
+> until 0.1 it shared `block`'s namespace with nothing but a default
 > (`flow down`) to tell the two apart. **0.1 (`FLOWCHART-ROLE-KEYWORDS`) landed the first
 > tranche of its own vocabulary** — `process`, `decision`, `terminator`,
 > §Roles below — which is the first exercise of `GENRE-NAMESPACE` `GENRE-VOCABULARY-OBLIGATION` by any genre. The
@@ -20,6 +20,20 @@
 > NORMATIVE v0.1 genres are `block`, `bitfield` and `table`. See core doc
 > §10 for what the status means. This document remains normative *for* the
 > genre: it is the authority on what `flowchart` means.
+>
+> **The rest of this genre's vocabulary became its own too
+> (`SUBJECT-VOCABULARY-SCOPE`).** There is no shared "scene vocabulary" to inherit any more. Beside
+> the four words above, `flowchart` declares exactly one subject keyword —
+> **`external`**, the off-page terminus (§The `external` endpoint) — and
+> withdrew five: `group`, `threshold`, `band` and `bundle` from this genre
+> (`SCENE-KEYWORD-MEMBERSHIP`), and `plane` from the language (`PAINT-ORDER-CONSTRUCT`).
+>
+> **The option key `in=` followed `group` out of this genre
+> (`MEMBERSHIP-KEY-ACCEPTANCE`).** It named a `group` id and nothing else, so the `SCENE-KEYWORD-MEMBERSHIP` withdrawal left
+> it accepted with no value that could resolve; the key is now a named line
+> error here and `class=` is what expresses membership. The same ruling records
+> **pipeline phases as a SIBLING candidate to swimlanes** — two constructs on
+> orthogonal axes, not one — in §*What is excluded*.
 
 **Census**: #3 by unique images, 8.3% weighted. Prior art surveyed:
 **ISO 5807** flowchart symbols (the SOURCE of the role vocabulary, §Roles);
@@ -98,15 +112,19 @@ under `SIZE-AND-DIRECTION-KEY-NAMING`/`GENRE-DOCUMENT-CONTRACT` §6(b). See *Sou
     terminator <id> ["label"]
 
 Option keys are **identical to `node`**: `shape` `fill` `stroke` `style`
-`class` `in` `plane`. A role line shares the node / group / external /
-typed-block **id namespace** and is addressable by `flowline`, `pin` and
-`rank` exactly like a `node`. Every rule that governs `node` — id spelling,
+`class` `note`. `in` was a seventh until this release (`MEMBERSHIP-KEY-ACCEPTANCE`) withdrew it from
+this genre — it named a `group`, which this genre stopped declaring (`SCENE-KEYWORD-MEMBERSHIP`), so every value was a dead end; see *`in=` is withdrawn from
+`flowchart` at 0.3*. `plane` was an eighth until `PAINT-ORDER-CONSTRUCT` withdrew it from
+the language. A role line shares the node / external / typed-block **id
+namespace** and is addressable by `flowline`, `pin` and `rank` exactly like a
+`node`. Every rule that governs `node` — id spelling,
 label quoting, duplicate ids, the `shape=` enum, `width=`/`height=` rejection
 (`<node|process|decision|terminator> does not take width=/height= — use a
 pin line`) — governs a role line unchanged, because the parser desugars all
 four spellings into one case.
 
-The keywords are legal **only under `figdown 0.1 flowchart`**. Under any
+The keywords are legal **only under `figdown 0.1 flowchart`** and later.
+Under any
 other genre they are `"<keyword>" is not allowed in genre <g>` — the header
 genre's allowlist (core §1, `GENRE-NAMESPACE`) enforces it with no per-keyword code.
 
@@ -266,23 +284,28 @@ not parse. `statechart` needs no gate of its own: the **genre** requires
 `figdown 0.2`, so its vocabulary cannot be reached from a 0.1 document.
 
 **Under `figdown 0.2 flowchart` the line between two steps is spelled
-`flowline`, and `edge` is a line error.** ISO 5807's own term for the connecting symbol is a
-*flowline*; a flowchart is a procedure, not a graph, and `edge` was the graph
+`flowline`, and `edge` is a line error.** *Flowline* is what the flowchart
+domain commonly calls the connecting symbol ISO 5807 §9.3.1 names **Line**;
+a flowchart is a procedure, not a graph, and `edge` was the graph
 word borrowed from DOT before this genre had a vocabulary of its own. Nothing
 else changes: `flowline` takes the same operators, the same `[tail]`/`[mid]`/
 `[head]` label positions, the same option keys and the same model as `edge`.
 The five 0.2.0 corpus figures re-rendered **byte-identically** under the new
 spelling — it is a rename, and only a rename.
 
-**The verification status is the same as `terminator`'s and is recorded, not
-claimed away.** ISO 5807 was readable only to p. 8 of 25, so the clause
-defining the linking symbol was not read. The criterion the maintainer applied
-is **the term the domain actually uses**, corroborated across independent
-sources, *not* RULE 4.1's requirement of the standard's exact orthography — so
-the ISO-spelling debt does not decide this word. If the purchased clause spells
-it otherwise, `Z-ORDER-KEY-NAMING` renames it with a MIGRATIONS entry and a named diagnostic.
+**The verification status is recorded, not claimed away — and for this word it
+is now READ, not pending (`VOCABULARY-SOURCE-ATTRIBUTION`).** §9.3.1 (*Basic line symbol*)
+sits **inside** the readable pp. 1–8 and names the symbol **Line**: *"This
+symbol represents the flow of data or control."* ISO 5807 nowhere spells it
+*flowline*. The criterion the maintainer applied is **the term the domain
+actually uses** — draw.io, Visio and the teaching texts all say *flowline* —
+corroborated across independent sources, *not* RULE 4.1's requirement of the
+standard's exact orthography; that ruling stands, and the keyword does not
+move. What changed at `VOCABULARY-SOURCE-ATTRIBUTION` is only the CLAIM: nothing here may say ISO spells
+the symbol `flowline`. `terminator`'s own pending status is untouched — §9.4.2
+is past p. 8 and remains unread, along with the rest of pp. 9–25.
 
-**The cost, accepted deliberately.** Before this release, reclassifying a
+**The cost, accepted deliberately.** Before 0.2, reclassifying a
 flowchart as a statechart changed **line 1 only** — that is how the five corpus
 figures migrated at `STATECHART-GENRE-SCOPE`. With per-genre connectors it now rewrites **every
 connector line**. The maintainer judged that the one-line convenience was
@@ -368,7 +391,8 @@ standard itself.
 | a loop head / loop bound construct | 21% of figures contain cycles (45 of 227 deduped) with **172 back-edges — not one of which marks the loop**; 32% of those are entirely unlabelled and the rest reuse the ordinary yes/no marker. **The plain back-edge IS the mechanism**, and a `loop`/`while` keyword would state nothing the back-edge does not. |
 | a `default` / `otherwise` branch | **0 edges spell `otherwise`, `else` or `default`**; 3 spell `other:`. BPMN itself puts conditional and default sequence flows **below** its 24-element Descriptive conformance class. And the downstream guideline forbids the mixed fan-out such a branch exists to disambiguate. |
 | edge roles (`mainline` / `exception` / `loop-back`) | Recorded in `LOGIC-FLOWCHART-GENRE-SCOPE` and guide/layout.md §9; entangled with the logic genre. `class main/retry/fail` is the taught interim. |
-| swimlanes / partitions | Not a role — **a container with an axis**. Recorded as the **next flowchart candidate**: it is Mermaid's most-requested flowchart feature (issue #2028, 401 reactions) and exists in UML (`ActivityPartition`), BPMN (`Lane`), PlantUML and Visio. |
+| swimlanes / partitions | Not a role — **a container with an axis**. Recorded as the **next flowchart candidate**: it is Mermaid's most-requested flowchart feature (issue #2028, 401 reactions) and exists in UML (`ActivityPartition`), BPMN (`Lane`), PlantUML and Visio. A swimlane partitions **across** the flow, by responsibility. |
+| pipeline **phases** — **a SIBLING candidate, added 0.3 (`MEMBERSHIP-KEY-ACCEPTANCE`), not extra weight for the row above** | **A phase is not a swimlane**, and the distinction is not FigDown's invention: **Visio ships the two as separate constructs on orthogonal axes** — swimlanes (bands), one per functional unit, answering *who is responsible*; and **phases** (separators), which cut **across all the lanes** to mark a stage boundary in the process — and a cross-functional flowchart routinely has both at once. **UML's `ActivityPartition` is the actor-ish one**: it partitions actions by the classifier, part or actor that performs them, which is the swimlane row's construct, not a stage divider. A phase is therefore **an ORDERED STAGE-PARTITION ALONG THE FLOW AXIS** — the stages of one flow cut into consecutive named intervals, order-bearing, covering the flow rather than dividing responsibility across it. Neither is a degenerate case of the other and the two must be weighed apart. **The demand is real and was never measured**: the downstream flowchart survey counted 3266 nodes and 2684 edges across 227 deduped figures and **never counted containers at all**, so the thin evidence is thin on both sides — 0 authored uses of `group` here is a real zero, but the absence of demand evidence is an absence of MEASUREMENT. *Reopens on:* a count of downstream production parser specifications whose phases fail to read once rendered from `class`. The taught interim is a `class` per phase; its residual loss is a RENDERER question (adjacency and phase order are not guaranteed), filed in `decisions/registry.md` beside items 26/27, **not** a vocabulary one. |
 | `annotation` as a flowchart role | Cross-genre, not flowchart-specific; it belongs to the annotation family and is filed under **`ANNOTATION-LOCATOR-SPLIT`**. Corpus: 65 annotation nodes in 31 figures, 17 of them declaring a `note`/`ann`/`annotation` class, plus two figures using `style=dashed` on an edge to mean "not control flow". |
 
 **Two corroborations for stopping at three.** (1) BPMN ships a
@@ -399,12 +423,25 @@ without any of them beyond `figdown`); **L** = the **layout namespace** (`LAYOUT
 it is genre-independent, so no genre may define, redefine or extend a keyword
 inside it; `pin` is its only member (`path` and `routing` were its two
 experimental members until `EDGE-GEOMETRY-CONSTRUCTS` withdrew them);
-**S** = the scene namespace shared with
-`block` and `topology`; **F** = **`flowchart`'s OWN vocabulary** — legal
-under this genre and no other (`FLOWCHART-ROLE-KEYWORDS`; the first exercise of
-`GENRE-NAMESPACE` `GENRE-VOCABULARY-OBLIGATION` by any genre — joined, `GENRE-CONNECTOR-SPELLING`, by `flowline`, which
-**replaces** the scene-namespace `edge` here rather than adding to it); **N** = a nested-genre opener — composition, not
-`flowchart` vocabulary (§4, `GENRE-COMPOSITION`).
+**H** = the **scene host set** — `class`, `flow`, `rank`. Every scene genre
+accepts all three and **none of them is subject vocabulary**: `class` is a
+styling declaration and `flow`/`rank` are layout intent, so none names a
+referent, no genre's domain holds a competing meaning for one, and no genre
+can independently earn or lose one (`SUBJECT-VOCABULARY-SCOPE`); **F** =
+**`flowchart`'s OWN vocabulary** (`GENRE-VOCABULARY-OBLIGATION`) — declared in this document, which is
+normative for it. Four of its members are legal under this genre and no other
+(`process`, `decision`, `terminator` — 0.1, `FLOWCHART-ROLE-KEYWORDS`, the first exercise
+of `GENRE-NAMESPACE` `GENRE-VOCABULARY-OBLIGATION` by any genre; and `flowline` — 0.2, `GENRE-CONNECTOR-SPELLING`, which **replaces**
+`edge` here rather than adding to it). The other two, `node` and `external`,
+are spelled by other genres as well, and those are **their own separate
+declarations agreeing with this one** (`SUBJECT-VOCABULARY-SCOPE`), not this one shared; **N** = a
+nested-genre opener — composition, not `flowchart` vocabulary (§4, `GENRE-COMPOSITION`).
+
+**The NS column changed.** Every row now marked **F** or **H**
+that is not one of the four role/connector words was marked **S**, "the scene
+namespace shared with `block` and `topology`". There was no such namespace,
+only a set of words four genres happened to accept — and five of the words
+this table listed under it are not this genre's words at all any more.
 
 **Status** = the `CONSTRUCT-STATUS-TIERS` status (§10): **NORMATIVE** = NORMATIVE, inside the v0.1
 conformance surface and the compatibility promise; **EXPERIMENTAL** =
@@ -418,32 +455,23 @@ carrying the same construct into `block`.
 | Keyword | Form | NS | Status | Option keys | `flowchart` default |
 |---|---|---|---|---|---|
 | `figdown` | `figdown 0.1 flowchart` | C | NORMATIVE | — | required, first significant line |
-| `title` | `title "<text>"` | C | NORMATIVE | — | absent |
-| `node` | `node <id> ["label"]` | S | NORMATIVE | `shape` `fill` `stroke` `style` `class` `in` `plane` | `shape=box`, `plane=base`, label absent; under `flowchart` the model `role` is **ABSENT** — a bare node is role-UNSTATED, never a defaulted `process` |
-| `process` | `process <id> ["label"]` | **F** | **EXPERIMENTAL** | `shape` `fill` `stroke` `style` `class` `in` `plane` | `role="process"`, `shape=box` DERIVED (§Roles) |
-| `decision` | `decision <id> ["label"]` | **F** | **EXPERIMENTAL** | `shape` `fill` `stroke` `style` `class` `in` `plane` | `role="decision"`, `shape=diamond` DERIVED; exits are mutually exclusive |
-| `terminator` | `terminator <id> ["label"]` | **F** | **EXPERIMENTAL** | `shape` `fill` `stroke` `style` `class` `in` `plane` | `role="terminator"`, `shape=rounded` DERIVED; spelling PENDING VERIFICATION (§Roles) |
-| `group` | `group <id> ["label"]` | S | NORMATIVE | `fill` `stroke` `style` `class` `plane` `gap` | one nesting level; `plane` absent |
-| `external` | `external <id> ["label"]` | S | NORMATIVE | `plane` | never drawn (`EXTERNAL-EDGE-ENDPOINTS`); since 0.1 it takes NO paint key at all — `color=` was its only one and it is retired (`COLOUR-KEY-STATUS`) |
-| `flowline` | `flowline <a> [tail] <op> [head] <b>` | **F** | **EXPERIMENTAL** | `stroke` `style` `class` `plane` | **`edge` under this genre is a line error (`GENRE-CONNECTOR-SPELLING`)**; op is written form; `[mid]` splits the operator; all three labels take the line's colour (`LABEL-COLOUR-SOURCE`) |
-| `bundle` | `bundle <id> ["label"] <a>--<b>,<c>--<d>` | S | **EXPERIMENTAL** | `stroke` `style` `plane` | ring drawn dashed; member list is ONE whitespace-free comma-delimited token (the space form was RETIRED at 0.1); no `fill=` — a ring has no interior (§8.4) |
-| `class` | `class <id> "<meaning>"` | S | NORMATIVE | `fill` `stroke` `style` `plane` | the meaning FIELD is REQUIRED, its VALUE may be `""` (= no meaning claimed, no legend entry — `CLASS-EMPTY-MEANING`); a class an `edge` joins MUST declare `stroke=` or `style=` (`INTERIOR-LESS-ELEMENT-PAINT`/`CLASS-PAINT-REQUIREMENT`) |
-| `plane` | `plane <id> ["label"]` | S | **EXPERIMENTAL** | `z-index` | model `z` = 1-based declaration index; implicit `base` is `z` = 0 |
-| `threshold` | `threshold "<label>" in=<id> offset=<0..100>%` | S | **EXPERIMENTAL** | `stroke` `style` `plane` `offset` `in` | dashed; the quoted label is REQUIRED; no `value=` and no `ref=` (`THRESHOLD-VALUE-SCOPE`). Spelled `guide` in an earlier release (`THRESHOLD-KEYWORD-SPELLING`) |
-| `band` | `band "<label>" <pct>%\|<a>..<b>% in=<id>` | S | **EXPERIMENTAL** | `fill` `stroke` `style` `plane` `in` `extend` | `extend=up`, `fill=#e5e7eb`; the quoted label is REQUIRED and written FIRST (`BAND-LABEL-STATUS`) |
-| `flow` | `flow right\|down\|left\|up` | S | NORMATIVE | — | **`down`** |
-| `rank` | `rank <id>,<id>[,<id>…]` | S | NORMATIVE | — | two or more ids in ONE whitespace-free comma-delimited token; the space form was RETIRED at 0.1; the rest of the line is reserved for future options |
+| `title` | `title "<text>"` | C | NORMATIVE | `note` (requires `figdown 0.3`) | absent; `note=` is `title`'s FIRST option key (`DRAWN-ANNOTATION-FORM`) |
+| `node` | `node <id> ["label"]` | **F** | NORMATIVE | `shape` `fill` `stroke` `style` `class` `note` (requires `figdown 0.3`) | `shape=box`, label absent; under `flowchart` the model `role` is **ABSENT** — a bare node is role-UNSTATED, never a defaulted `process` |
+| `process` | `process <id> ["label"]` | **F** | **EXPERIMENTAL** | `shape` `fill` `stroke` `style` `class` `note` (requires `figdown 0.3`) | `role="process"`, `shape=box` DERIVED (§Roles) |
+| `decision` | `decision <id> ["label"]` | **F** | **EXPERIMENTAL** | `shape` `fill` `stroke` `style` `class` `note` (requires `figdown 0.3`) | `role="decision"`, `shape=diamond` DERIVED; exits are mutually exclusive |
+| `terminator` | `terminator <id> ["label"]` | **F** | **EXPERIMENTAL** | `shape` `fill` `stroke` `style` `class` `note` (requires `figdown 0.3`) | `role="terminator"`, `shape=rounded` DERIVED; spelling PENDING VERIFICATION (§Roles) |
+| `external` | `external <id> ["label"]` | **F** | NORMATIVE | **none** | the OFF-PAGE terminus — see the declaration below. Never drawn (`EXTERNAL-EDGE-ENDPOINTS`); since 0.1 it took no paint key (`color=` was its only one, retired by `COLOUR-KEY-STATUS`) and since 0.3 (`PAINT-ORDER-CONSTRUCT`) **no option key at all**; no `note=` either — nothing of it is drawn, so a note would have nothing to stand beside |
+| `flowline` | `flowline <a> [tail] <op> [head] <b>` | **F** | **EXPERIMENTAL** | `stroke` `style` `class` `note` (requires `figdown 0.3`) | **`edge` under this genre is a line error (`GENRE-CONNECTOR-SPELLING`)**; op is written form; `[mid]` splits the operator; all three labels take the line's colour (`LABEL-COLOUR-SOURCE`) |
+| `class` | `class <id> "<meaning>"` | H | NORMATIVE | `fill` `stroke` `style` | the meaning FIELD is REQUIRED, its VALUE may be `""` (= no meaning claimed, no legend entry — `CLASS-EMPTY-MEANING`); a class a `flowline` joins MUST declare `stroke=` or `style=` (`INTERIOR-LESS-ELEMENT-PAINT`/`CLASS-PAINT-REQUIREMENT`) |
+| `flow` | `flow right\|down\|left\|up` | H | NORMATIVE | — | **`down`** |
+| `rank` | `rank <id>,<id>[,<id>…]` | H | NORMATIVE | — | two or more ids in ONE whitespace-free comma-delimited token; the space form was RETIRED at 0.1; the rest of the line is reserved for future options |
 | `layout` | `layout` | C | NORMATIVE | — | opens the layout zone (§3) |
-| `pin` | `pin <id> [at=(<x>,<y>)] [width=<px>] [height=<px>]` | L | NORMATIVE | `at` `width` `height` | canvas px; group members are group-local. All three keys are OPTIONAL and at least one is REQUIRED; `at=` applies to nodes (including role lines), groups and `external` endpoints, `width=`/`height=` to **nodes only** (`ELEMENT-GEOMETRY-DIRECTIVE`, 0.1 — `size` is retired and its keys moved here) |
+| `pin` | `pin <id> [at=(<x>,<y>)] [width=<px>] [height=<px>]` | L | NORMATIVE | `at` `width` `height` | canvas px. All three keys are OPTIONAL and at least one is REQUIRED; `at=` applies to nodes (including role lines) and `external` endpoints — the group case in `LAYOUT-ZONE-NAMESPACE`'s language-wide rule is unreachable here, since this genre declares no `group` (`SCENE-KEYWORD-MEMBERSHIP`) — and `width=`/`height=` to **nodes only** (`ELEMENT-GEOMETRY-DIRECTIVE`, 0.1 — `size` is retired and its keys moved here) |
 | `bitfield` `table` `timing` | see §4 | N | NORMATIVE (`bitfield` `table`) · **EXPERIMENTAL** (`timing`) | — | composition (§4, `GENRE-COMPOSITION`); their child keywords are NOT valid at `flowchart` top level |
 | `chart` | `chart <table-id>` | N | **EXPERIMENTAL** | `type` | 0.1 correction: `chart` was legal at a scene document's top level but had no vocabulary row anywhere. It is defined by its reference to a `table` id, and `table` is a legal host keyword in every scene genre, so a scene document can carry both the data and the chart. `type=bar3d` is the only value. Spelled `plot` with `kind=bars3d` until 0.1; `level=` was DELETED at 0.1 (`CHART-LEVEL-KEY`), so `chart <table-id> [type=bar3d]` is the whole grammar. |
 
-`threshold`, `band`, `bundle` and `plane` are demoted, not
-removed: the engine accepts all four exactly as before and every document
-that uses them keeps rendering.
-
 **Two rows left this table, and the deletion is recorded rather
-than silent.** `path` and `routing` were core keywords until this release, then
+than silent.** `path` and `routing` were core keywords until 0.1, then
 EXPERIMENTAL members of the layout namespace (`LAYOUT-ZONE-NAMESPACE`), and `EDGE-GEOMETRY-CONSTRUCTS` **WITHDREW** them
 from the language along with the four option keys only `path` accepted
 (`points=` `routing=` `tailport=` `headport=`). There is **no replacement
@@ -454,55 +482,137 @@ and `pin`). The evidence: [../../migrations.md](../../migrations.md)
 0.1, core §9 **`EDGE-IDENTITY-AND-GEOMETRY`**, and `decisions/registry.md`
 `LAYOUT-ZONE-NAMESPACE` is unchanged; only its membership is, and it now holds `pin` alone.
 
-`bundle` and `plane` were NORMATIVE until this release and were demoted by `CONSTRUCT-STATUS-TIERS`.
-Over the 50-document in-repo corpus `bundle` appears in 4 documents and
-`plane` in 3, all seven of them `topology` — **zero** uses in any
-`flowchart` document, and `flowchart` claims neither as its own vocabulary
-(it has none yet; see below). The demotion therefore costs this genre
-nothing it was using. Both stay legal and render exactly as before, and the
-implicit `base` plane is untouched: a document that declares no `plane`
-still has `planes[0] = {id:"base", z:0}`.
+### The `external` endpoint — this genre's one subject keyword (NS = F)
+
+    external <id> ["label"]        # no option key at all
+
+**An OFF-PAGE terminus.** It declares that a flowline leaves the charted
+procedure, or arrives from outside it, without naming a stage the chart is
+making claims about. It is never drawn as a shape (`EXTERNAL-EDGE-ENDPOINTS`): the flowline ends
+open at an anchor auto-layout places at the natural margin, and the label,
+when written, renders as small muted text just beyond the open end. Two
+authored figures use it exactly this way — `examples/packet-ingress.fd` and
+`examples/showcase/l2-forwarding-logic.fd`.
+
+**ISO 5807 §9.4.2 already names this concept, and this genre's spelling is
+NOT ISO's — stated here rather than left silent.** Everywhere else this
+document exercises single-source vocabulary: `process`, `decision` and
+`terminator` come whole from ISO 5807 (§Roles, *Source*), and `flowline` is the
+flowchart domain's common term for the symbol §9.3.1 names *Line* (`VOCABULARY-SOURCE-ATTRIBUTION`). This
+one does not. ISO 5807 §9.4.2's **Terminator** is *"an exit to, or an entry
+from, the outside of the procedure"* — an entry or exit at the boundary,
+which is the same concept — and §9.4 additionally names the **off-page
+connector** for the case where the chart continues on another page.
+
+**The rename RULE 4.1 would point at is BLOCKED, and the blocker is inside
+this genre.** ISO's word is *terminator*, and `terminator` is **already this
+genre's live keyword**, taken from the same standard for the drawn start/end
+symbol. One spelling cannot mean both, and neither meaning is available to
+give up: the role keyword is what the 22%-misreading measurement earned, and
+the boundary endpoint is what 70–80% of block/flowchart figures contain at
+least one of (`EXTERNAL-EDGE-ENDPOINTS`). So the spelling stays `external`, and **ISO has no word
+at all for the variant this construct actually is** — a boundary endpoint
+that is *never drawn*. ISO 5807 is a standard for drawing flowcharts by hand;
+an author with a pen must put a symbol on the paper, so "the endpoint exists
+and is not drawn" is not a thing that standard can say.
+
+**This divergence reads better per genre than it ever could
+shared.** `block` declares `external` too, and its declaration has **no
+source standard behind it at all** and says so; `topology`'s has a
+**collision** to warn about — the external route (OSPF Type 5/7, eBGP).
+Three genres, one grammar, three different provenances and three different
+things a reader needs to be told. The shared paragraph told none of them.
+
+### Withdrawn from `flowchart`
+
+Five words this table used to list are not this genre's words any more. All
+five withdrawals were free: `flowchart` is an EXPERIMENTAL genre, outside the
+compatibility promise, and `EDGE-GEOMETRY-CONSTRUCTS`'s withdrawal of `path`/`routing` is the precedent for doing it without a version gate.
+
+| Withdrawn | R | Ground |
+|---|---|---|
+| `group` | `SCENE-KEYWORD-MEMBERSHIP` | **One occurrence in the whole tree, and it was this genre's own reference figure** — a file whose stated purpose is to demonstrate every form of every keyword, so citing it as evidence of need is circular (`decisions/registry.md`). Zero authored uses. Swimlanes, which is what a flowchart container would actually be for, are recorded as the next candidate below and are *"not a role — a container with an axis"*, so a plain `group` was never going to be that construct |
+| `threshold` | `SCENE-KEYWORD-MEMBERSHIP` | Zero occurrences, and the concept does not apply: a threshold is a labelled reference value drawn at a percentage of the target's **rendered extent**, and a process box's extent is an artefact of its label length. A line drawn 60% down a `Classify` box asserts nothing a reader can read |
+| `band` | `SCENE-KEYWORD-MEMBERSHIP` | Zero occurrences, and a band is a **range** over that same meaningless extent |
+| `bundle` | `SCENE-KEYWORD-MEMBERSHIP` | Zero occurrences, and it is an anti-feature here: two flowlines between the same pair of stages are two different **conditions**, and the condition is the whole content of the arc. Drawing a ring round them hides exactly what the figure is for |
+| `plane` | `PAINT-ORDER-CONSTRUCT` | **Withdrawn from the LANGUAGE**, with `plane=` and `z-index=`. One occurrence under `flowchart`, in this genre's own reference figure. There is no replacement spelling: paint order is document order, a later line paints on top, and a set of stages forming a logical layer of the SUBJECT is a `class` whose meaning says so (§5, `PRESENTATION-AS-MEANING-CARRIER`) |
+
+### `in=` is withdrawn from `flowchart`
+
+**The withdrawal above stranded an OPTION KEY, and 0.3 (`MEMBERSHIP-KEY-ACCEPTANCE`) finishes
+the job.** `in=` states membership and its only value domain is *the id of a
+containing `group`* — so once this genre stopped declaring `group`, no such id
+could exist in a `flowchart` document and **every value of the key was a dead
+end**. In this release, `process a "A" in=g` answered
+`unknown group "g"` and **no spelling of `g` succeeded**. An unknown-option
+error that names the reason beats a dangling reference no author can satisfy,
+so the key is withdrawn from this genre rather than left accepted.
+
+**What was checked before withdrawing the key wholesale**, because a key
+stranded on one directive need not be stranded on another. `in=` has exactly
+six acceptors in the language: `node`, `process`, `decision`, `terminator`,
+`state`, and the pair `threshold` / `band`. The first four are this genre's,
+and all four resolve `in=` against declared GROUP ids and nothing else.
+`threshold` and `band` are the only acceptors with a wider domain — 0.3
+(`MARKER-TARGET-KINDS`) widened theirs to REGION ids — and neither is a `flowchart` keyword
+since `SCENE-KEYWORD-MEMBERSHIP`. **The widening never reached `node`**, which is checkable rather
+than assumed: a `flowchart` document may declare a region (`bitfield`, `table`,
+`timing` and `chart` are `GENRE-COMPOSITION` region openers, legal in every scene genre), and
+`node a "A" in=q` over a `table q` still answered `unknown group "q"`. Nothing
+in this genre was left un-stranded, which is why the withdrawal is by KEY and
+not directive by directive.
+
+**The diagnostic points at `class=`**, because an author who wrote `in=` was
+trying to express membership and is owed what expresses it today: declare a
+`class` whose label names the phase and write `class=` on each stage — it earns
+a legend entry and applies to every member at once. Containment in a flowchart
+remains an OPEN question; **swimlanes and phases are the two constructs it is
+waiting on, and they are two constructs, not one** (§*What is excluded*).
 
 ### Option-key values
 
 | Key | Values | Status | `flowchart` default |
 |---|---|---|---|
 | `shape` | `box` `rounded` `circle` `ellipse` `diamond` `cylinder` | NORMATIVE | `box` |
-| `style` | `solid` `dashed` `dotted` | NORMATIVE | per directive (`solid` on `node`/`group`/`edge`; dashed on `bundle`/`threshold`) |
+| `style` | `solid` `dashed` `dotted` | NORMATIVE | per directive — `solid` on `node`, a role line and `flowline` |
+
 | `fill` | `#rgb` · `#rrggbb` · one of the 147 CSS colour names · `transparent` | NORMATIVE | absent |
-| `stroke` | same value set as `fill` — the OUTLINE of anything with an interior, and the WHOLE of a line (`edge`, `bundle`, `threshold`), which is SVG's own asymmetry | NORMATIVE | absent |
+| `stroke` | same value set as `fill` — the OUTLINE of anything with an interior, and the WHOLE of a line (`flowline`), which is SVG's own asymmetry | NORMATIVE | absent |
 | `class` | id of a declared `class` | NORMATIVE | absent |
-| `in` | id of the containing `group` (`node`) or the target `node`/`group` (`threshold`/`band`) | NORMATIVE | absent |
-| `plane` | id of a declared `plane` | **EXPERIMENTAL** | `base` on `node`; absent elsewhere |
-| `z-index` | integer | **EXPERIMENTAL** | 1-based declaration index (model field `z`) |
-| `gap` | non-negative number (px) — exact member spacing inside a `group` | NORMATIVE | absent → the renderer's automatic spacing |
-| `extend` | `up` `down` `left` `right` | **EXPERIMENTAL** | `up` (spelled `dir=` until 0.1) |
-| `at` | `(<x>,<y>)` canvas px — a PAREN POINT, `pin` only | NORMATIVE | optional on `pin` — nodes, groups and `external` endpoints |
-| `offset` | `<0..100>%` (the `%` is mandatory) — `threshold` only; spelled `at=` until 0.1 | **EXPERIMENTAL** | required on `threshold` |
-| `width` `height` | px number | NORMATIVE | optional on `pin`, **nodes only** — a group, an `external` endpoint or a typed block sizes to its content; at least one of `at`/`width`/`height` is required on the line. Spelled `w=`/`h=` until 0.1; carried by `size` until 0.1 (`ELEMENT-GEOMETRY-DIRECTIVE`) |
+| `note` | quoted prose — the DRAWN annotation, on `process`, `decision`, `terminator`, a bare `node`, `flowline` and `title` (`DRAWN-ANNOTATION-FORM`) | NORMATIVE since `figdown 0.3` | absent |
+| `at` | `(<x>,<y>)` canvas px — a PAREN POINT, `pin` only | NORMATIVE | optional on `pin` — nodes (including role lines) and `external` endpoints |
+| `width` `height` | px number | NORMATIVE | optional on `pin`, **nodes only** — an `external` endpoint or a typed block sizes to its content; at least one of `at`/`width`/`height` is required on the line. Spelled `w=`/`h=` until 0.1; carried by `size` until 0.1 (`ELEMENT-GEOMETRY-DIRECTIVE`) |
 
 `fill=`, `stroke=` and `style=` are all normative:
 `stroke=` was promoted by `STROKE-KEY-STATUS` once its use count was re-measured (5 in-repo
 at `CONSTRUCT-STATUS-TIERS`; 56+ in-repo and 567 downstream edge-colouring sites now). There is
 no text channel — `color=` is retired language-wide (`COLOUR-KEY-STATUS`) and the label
 colour is derived from the background it sits on (core §5, `LABEL-COLOUR-SOURCE`).
-`plane=` is demoted with the `plane`
-keyword — a keyword and its only declaration point move together — and
-`extend=` and `z-index=` are demoted only because the sole
-directives that accept them (`band`, `plane`) are. **`points=`, `tailport=`,
-`headport=` and `routing=` had rows here until this release**: `path` alone
+**Four rows left this table.** `plane=` and `z-index=` were
+withdrawn from the LANGUAGE with the `plane` keyword (`PAINT-ORDER-CONSTRUCT`) — a keyword and
+its only declaration point move together — and neither names a replacement.
+`extend=`, `offset=` and `gap=` left this GENRE with the directives that
+accepted them (`band`, `threshold` and `group`, `SCENE-KEYWORD-MEMBERSHIP`); all three are still
+live under `block`, which declares those keywords. **`points=`, `tailport=`,
+`headport=` and `routing=` had rows here until 0.1**: `path` alone
 accepted all four, and `EDGE-GEOMETRY-CONSTRUCTS` withdrew them from the language with it.
+
+**A sixth row left: `in=` (`MEMBERSHIP-KEY-ACCEPTANCE`).** It is withdrawn from this
+GENRE, not from the language — it is untouched under `block` and `topology`,
+on every directive that accepts it there. The ground and what was checked
+first are above, under *`in=` is withdrawn from `flowchart` at 0.3*.
 
 Edge operators: `->` `<-` `--` `<->`. The written form is the model (`READ-SIDE-DETERMINISM`);
 `A <- B` and `B -> A` are a *rendering* equivalence only.
 
 Retired spellings, kept only so a stale document gets a named migration
 instead of `unknown option`: `kind=` on `node` (→ `shape=`),
-`width=`/`height=` on `node` and on a role line (→ a `pin` line), `label=`/`taillabel=`/`headlabel=` on `edge`
-(→ inline `[…]` labels) and `from=`/`to=` on `band` (→ the positional
-range). `kind=` is retired **language-wide** (`CHART-BLOCK-NAMING`), not merely on
+`width=`/`height=` on `node` and on a role line (→ a `pin` line), and
+`label=`/`taillabel=`/`headlabel=` on the connector (→ inline `[…]` labels).
+(`from=`/`to=` on `band` was a fifth; `band` is not this genre's word, so that row moved to [../block.md](../block.md) with the
+keyword.) `kind=` is retired **language-wide** (`CHART-BLOCK-NAMING`), not merely on
 `node`, and so is `color=` (`COLOUR-KEY-STATUS`) — it named the FILL
-before this release and the LABEL, and no engine can tell the
+in one era and the LABEL in another, and no engine can tell the
 two apart, so its message names both eras and hands the choice to a human.
 
 **Renamed.** Each old spelling is now a line error carrying a
@@ -519,42 +629,127 @@ does not.
 | Old | New | R | Why |
 |---|---|---|---|
 | `boundary` | `external` | `EXTERNAL-ENDPOINT-NAMING` | UML's «boundary» is an INTERNAL interface object, C4's `System_Boundary` is the dashed grouping container FigDown already spells `group`, and BPMN's Boundary Event is a third meaning — all three invert or displace the intended sense, which the spec's own prose already stated as "declares an external I/O endpoint" |
-| `layer` · `layer=` | `plane` · `plane=` | `PLANE-KEYWORD-SPELLING` | in mxGraph — the geometry model FigDown adopted — a layer is a CONTAINMENT PARENT that establishes coordinates; Inkscape layers may carry a transform, OGC WMS layers carry an SRS, CSS `@layer` is cascade priority, and SVG has no layer at all. No standard claims `plane` for a conflicting meaning |
+| `layer` · `layer=` | *(nothing — the destination is gone)* | `PLANE-KEYWORD-SPELLING`, then `PAINT-ORDER-CONSTRUCT` | `PLANE-KEYWORD-SPELLING` renamed both to `plane` · `plane=` at 0.1, holding that no standard claimed `plane` for a conflicting meaning — a claim made in a paragraph belonging to no genre, and false in `topology`, where a plane is the control / data / management partition. `PAINT-ORDER-CONSTRUCT` withdrew `plane` · `plane=` from the language, so the diagnostic now states the whole chain (`layer=` → `plane=` → withdrawn) rather than ending at a spelling that no longer exists — the `route` → `path` precedent from 0.1 |
 | `plot` | `chart` | `CHART-BLOCK-NAMING` | `plot` reads as an imperative — the reason `render` was retired at 0.1 — while every other block opener is a noun, and ECharts, Chart.js and Mermaid all name the object a chart |
 | `kind=` | `type=` | `CHART-BLOCK-NAMING` | Vega, Chart.js and ECharts spell the chart-type key `type`; `kind=` was retired on `node` and live on `plot` at the same time, inside one namespace. Its one legal value was renamed `bars3d` → `bar3d` |
 
-**Changed — the annotation family.** `guide` is RENAMED
-`threshold` (`THRESHOLD-KEYWORD-SPELLING`: `guide` is an INVERTED name — in Illustrator, Inkscape,
-Figma and draw.io a guide is an author-only construction line that is never
-rendered, while FigDown's is drawn output — and it was a coinage;
-`threshold` comes whole from Grafana, with IETF RED/AQM `min_th`/`max_th`
-as the secondary source), and the model array `guides[]` is renamed
-`thresholds[]` with it. `threshold` keeps its shape: no `value=` and no
-`ref=` (`THRESHOLD-VALUE-SCOPE`). `band` gains a MANDATORY quoted label written FIRST
-(`band "Headroom" 15..35% in=pool`) (`BAND-LABEL-STATUS`) — without a
-label, a band whose `fill=` a reader discards as presentation asserted
-nothing at all. `chart level=` is DELETED, not renamed (`CHART-LEVEL-KEY`). Both markers
-stay EXPERIMENTAL. The normative treatment is
-[block.md](../block.md) §2.6.
+**Changed — the annotation family, and this genre no longer
+carries it.** `guide` was renamed `threshold` and `band` gained its mandatory
+quoted label in that release, while both were still legal here. Neither is
+`flowchart`'s word (`SCENE-KEYWORD-MEMBERSHIP`), so the rename and the label rule
+are recorded where the keywords now live — [../block.md](../block.md) §2.6
+and its declaration section. `chart level=` is DELETED, not renamed (`CHART-LEVEL-KEY`),
+and that one still applies here: `chart` is a region opener every scene genre
+may write.
+
+### The drawn annotation: `note=` (`DRAWN-ANNOTATION-FORM`)
+
+**`note=` is the annotation that draws.** Under `flowchart` it is accepted on
+the three role keywords `process`, `decision` and `terminator`, on a bare
+role-unstated `node`, on `flowline`, and on `title`. Its value is
+**quoted prose; the quotes are mandatory** (`QUOTING-RULES`):
+
+```figdown
+figdown 0.3 flowchart
+title "Fig 2-4 — admission" note="ISO 5807 symbols only"
+terminator start "Start" note="entered once per packet"
+process classify "Classify" note="reads the DSCP, never rewrites it"
+decision fits "Fits in queue?"
+external drop "to the drop counter"
+flowline start -> classify
+flowline classify -> fits note="one packet at a time"
+```
+
+**Attachment is by SYNTACTIC POSITION** — the note is written on the stage's
+or the flowline's own line. There is no id to write, no target key and no
+locator, so a chart with two stages both labelled `Retry` has no ambiguity
+about which one carries the aside. A `flowline` has no id at all: an attribute
+on its line is the only form that could ever reach a connector here.
+
+**It requires `figdown 0.3`.** `flowchart`'s own connector already needs
+`figdown 0.2` (`GENRE-CONNECTOR-SPELLING`/`KEYWORD-RENAME-SCOPE`), and `note=` needs `0.3`: under an earlier header
+the spelling is still the RETIRED one that meant a never-drawn `description=`
+(`DESCRIPTION-KEY-SPELLING`), so the engine names the version and the fix rather than
+repainting a tooltip as ink. Raising the section header is the whole
+migration.
+
+**`note=` and `description=` divide by AUDIENCE, not by length.**
+`description=` reaches the **machine** — no ink beyond an SVG `<title>`
+tooltip — and no `flowchart` directive accepts it; it belongs to `bitfield`'s
+`field` ([../bitfield.md](../bitfield.md)). `note=` reaches the **human**, and
+it ALWAYS draws. Both on one stage is legal and meaningful, and **neither is a
+fallback for the other**.
+
+**The author does not place the box (`DOMAIN-CONVENTION-DIRECTIVES`).** `note=` takes no `at=`, no
+`side=`, and there is no `left of` / `right of` to write. The engine chooses
+adjacency around the stage's or the flowline's final geometry, after every
+branch label and arrowhead has been placed, and **reaches for a leader line
+only when adjacency fails**. A `title … note=` has no geometry to sit beside:
+it draws as a figure-level note at the bottom of the canvas and never takes a
+leader. This genre's `flow` default is `down` and its charts grow by
+insertion; an annotation pinned to a hand-chosen side would be wrong the first
+time a stage was added above it.
+
+**Where a typed slot exists, `note=` is never the right answer.** `flowchart`
+has more typed slots than any other scene genre, and each of them says
+something a note can only describe:
+
+- **what kind of stage this is** is the role keyword itself — `process`,
+  `decision`, `terminator`. A `node "Check"` with `note="this is a decision"`
+  asserts nothing a reader may act on; `decision check "Check"` does. And when
+  the source genuinely does not state the kind, the answer is the bare `node`
+  — role UNSTATED is a value here, not a gap to paper over with prose;
+- **a branch condition** is the flowline's `[mid]` label
+  (`flowline fits -[yes]-> enqueue`), which is where a reader looks for it;
+- **a category** shared by several stages is a `class` meaning, which earns a
+  legend entry and applies to all of them at once;
+- an endpoint **outside the charted procedure** is an `external`, which is why
+  `external` takes no `note=`.
+
+This list is one item shorter than it was. It used to say
+"which phase or swimlane a stage belongs to is `in=` or the enclosing
+`group`", and neither half of that is available: `group` is not this genre's
+word (`SCENE-KEYWORD-MEMBERSHIP`), and `in=` is not this genre's option key (`MEMBERSHIP-KEY-ACCEPTANCE`), the second withdrawal following from the first. **A note is
+still not the answer** — the honest position is that `flowchart` has no
+containment construct today, that **swimlanes and phases** are the two
+constructs the need is waiting on (§What is excluded, where they are recorded
+as siblings on orthogonal axes), and that a `class` meaning is the taught
+interim, because it earns a legend entry and applies to every member of the
+phase at once. What the interim does NOT give is a guarantee that the members
+are drawn adjacent or in phase order; that is a renderer question, filed in
+`decisions/registry.md` beside items 26/27.
+
+A `note=` is for what none of those hold: the caveat, the measured number, the
+sentence about the procedure that the procedure's own shapes cannot carry.
 
 ### How this differs from the other genres
 
-Today the only difference is a default. `flowchart` shares the scene namespace
-with `block` and `topology` and every entry above is identical under all
-three, except:
+**The opening sentence of this section used to be "today the only difference
+is a default". It has been false and it is now false four
+times over**, which is the argument `SUBJECT-VOCABULARY-SCOPE` makes structurally: a difference
+that has nowhere to be declared is a difference nobody maintains.
 
 | | `block` | `topology` | `flowchart` | `statechart` |
 |---|---|---|---|---|
 | `flow` default | `right` | `right` | **`down`** | `right` |
 | the thing | `node` | `node` | `node` | **`state`** |
 | the line | `edge` | `edge` | **`flowline`** | **`transition`** |
-| Own keywords (`GENRE-NAMESPACE` `GENRE-VOCABULARY-OBLIGATION`) | none | none | **`process` `decision` `terminator` `flowline`** | **`state` `transition`** |
+| own subject vocabulary (`SUBJECT-VOCABULARY-SCOPE`) | `group` `external` `threshold` `band` | `group` `external` `bundle` | **`external` only** | none |
+| own keywords no other genre has (`GENRE-VOCABULARY-OBLIGATION`) | none | none | **`process` `decision` `terminator` `flowline`** | **`state` `transition`** |
 | Genre status (`CONSTRUCT-STATUS-TIERS`) | NORMATIVE | EXPERIMENTAL | **EXPERIMENTAL** | **EXPERIMENTAL** (needs `figdown 0.2`) |
+
+Every scene genre also accepts the host set `class` / `flow` / `rank` (NS = H
+above) and may open a `bitfield`/`table`/`timing`/`chart` region (§4, `GENRE-COMPOSITION`).
 
 The role row is new and was the first real difference: under
 `block` or `topology` those three spellings are line errors. The two
 vocabulary rows are new (`GENRE-CONNECTOR-SPELLING`/`GENRE-NODE-SPELLING`) and cut in both directions —
-`edge` is now a line error *here*, and `flowline` is one under `block`.
+`edge` is now a line error *here*, and `flowline` is one under `block`. The
+subject row is new: this genre is the **thinnest** of the four
+by subject vocabulary, holding one word, and that is the honest count rather
+than the five it used to appear to share. Where it and `block` both read
+`external`, the two are separate declarations with different provenances —
+ISO 5807 §9.4.2 here, no source standard there (see the declaration above).
 
 **Why `node` stays here but not in `statechart`**, since the two rulings look
 inconsistent until the reason is stated: under `flowchart` a stage can have a
@@ -571,11 +766,10 @@ scene genre v0.1 freezes on, and `flowchart` is still held back because one
 tranche of vocabulary is not a converged set (§Roles, *What is excluded*).
 
 `bitfield`, `table` and `timing` own their own child keywords, which are not
-valid at a `flowchart` document's top level (§4, `GENRE-COMPOSITION`). Under `GENRE-NAMESPACE` `GENRE-VOCABULARY-OBLIGATION` a future
-genre MAY spell a keyword the same as `flowchart`'s with a different meaning; no
-v0.1 genre does, and neither the core rows (NS = C, `UNIVERSAL-CORE-KEYWORDS`) nor the
-layout-namespace rows (NS = L, `LAYOUT-ZONE-NAMESPACE`) can ever be redefined — `GENRE-VOCABULARY-OBLIGATION` does not reach
-inside the layout zone.
+valid at a `flowchart` document's top level (§4, `GENRE-COMPOSITION`). Under `GENRE-NAMESPACE` `GENRE-VOCABULARY-OBLIGATION` a genre MAY
+spell a keyword the same as `flowchart`'s with a different meaning, and
+neither the core rows (NS = C, `UNIVERSAL-CORE-KEYWORDS`) nor the layout-namespace rows (NS = L, `LAYOUT-ZONE-NAMESPACE`)
+can ever be redefined — `GENRE-VOCABULARY-OBLIGATION` does not reach inside the layout zone.
 
 The genre token is REQUIRED (§1) and now carries more than a default: it
 selects the namespace in which `decision` is a keyword rather than an error.
@@ -585,7 +779,8 @@ Two conventions matter for reading procedures:
 - **Branch conditions ride the flowline, not the node.** A flowline's `[mid]`
   label is where the condition goes: `flowline q -[yes]-> commit`. A branch whose
   condition is unwritten is a branch a reading agent cannot follow. This is
-  scene-namespace behaviour, not `flowchart` behaviour.
+  the connector's behaviour under every scene genre, not a `flowchart`
+  peculiarity — the three genres declare it separately and agree.
 - **`shape=diamond` is geometry, not a role.** Drawing a decision as a
   diamond is conventional and permitted, but on a bare `node` it asserts
   nothing: under `SHAPE-ENUM-VOCABULARY`/`EXTERNAL-EDGE-ENDPOINTS` the shape enum is purely geometric. The fact that a step is a decision is stated by the word
@@ -622,11 +817,16 @@ transition is taken.
 none either — they desugar into `node`'s case, so every one of `node`'s
 diagnostics fires on them verbatim, naming the keyword the author wrote.
 Its validation profile is the core profile: unknown keyword, unknown or
-inapplicable option, unknown `shape`, duplicate id, dangling edge endpoint,
-`in=` cycle, and the single-valued-directive rules of §8 — all line errors.
+inapplicable option, unknown `shape`, duplicate id, dangling flowline
+endpoint, and the single-valued-directive rules of §8 — all line errors.
+(`in=` cycle is a category core §8 reserves and **no `flowchart` document can
+reach**: this genre declares no `group` at all, so there is
+nothing for `in=` to name and nothing to make a cycle out of — and the key itself is not this genre's, so every `in=` here is the
+named withdrawal error rather than the dangling reference it was for one
+release.)
 
-The genre-scoped errors, both from the header genre's allowlist (core §1, `GENRE-NAMESPACE`)
-and neither needing per-keyword code:
+The genre-scoped errors. The first two come from the header genre's allowlist
+(core §1, `GENRE-NAMESPACE`) and need no per-keyword code; the third is named per cell:
 
 1. `process` / `decision` / `terminator` written under a genre other than
    `flowchart` is `"<keyword>" is not allowed in genre <g>`.
@@ -637,16 +837,34 @@ and neither needing per-keyword code:
 
    ```
    "edge" is not the word genre flowchart uses for this — write "flowline":
-   the connecting line in a flowchart is a FLOWLINE — the term ISO 5807 uses
-   for it. Each scene genre takes the term its own domain uses (block/topology
-   `node` `edge`, flowchart `node` `flowline`, statechart `state`
-   `transition`) — run tools/migrate-figdown.js to rewrite it
-   (MIGRATIONS 0.2)
+   the connecting line in a flowchart is a FLOWLINE — the term the flowchart
+   domain commonly uses for the symbol ISO 5807 §9.3.1 names "Line". Each
+   scene genre takes the term its own domain uses (block/topology `node`
+   `edge`, flowchart `node` `flowline`, statechart `state` `transition`) —
+   run tools/migrate-figdown.js to rewrite it (MIGRATIONS 0.2)
    ```
 
    The author has written a **real construct under the wrong spelling**, which
    is a different situation from an unknown word, so the message names the word
    this genre uses, says why, and names the tool that rewrites the document.
+
+3. **0.3 (`SCENE-KEYWORD-MEMBERSHIP`):** `group`, `threshold`, `band` or `bundle` written
+   under `flowchart` is a **NAMED** line error carrying that cell's own
+   ground. The author has written a construct that was legal here until this
+   release, so `unrecognized line` would send them hunting a typo, and the
+   bare allowlist message would tell them nothing about why:
+
+   ```
+   "group" is not allowed in genre flowchart — it was WITHDRAWN from this
+   genre, not misspelled: `flowchart` no longer declares `group`. … Subject
+   vocabulary is per genre (core §3, G2): a spelling accepted by several
+   genres is several independent declarations, and this genre's was withdrawn
+   without touching any other's. (withdrawn, R160; MIGRATIONS
+   0.3)
+   ```
+
+   `plane` is not in that family: it fires the LANGUAGE-level withdrawal
+   ahead of the allowlist, in every genre at once (`PAINT-ORDER-CONSTRUCT`).
 
 ## What this genre does NOT own (yet)
 
@@ -666,6 +884,23 @@ block following `bitfield`/`table`. What remains open:
   settles it for a decision's exits and for nothing else.
 - **Everything in *What is excluded* above**, each with its measured
   evidence. Swimlanes are recorded there as the next candidate.
+- **Containment, which this genre now has NO construct for.** `group` was
+  withdrawn against one circular occurrence and zero authored
+  uses (`SCENE-KEYWORD-MEMBERSHIP`), and with it went the only value `in=` could name here — so
+  `in=` itself was withdrawn (`MEMBERSHIP-KEY-ACCEPTANCE`), the key being stranded
+  rather than merely unused. That is a gap stated rather than papered over,
+  and it is **two** candidates, not one: a **swimlane** — *"not a role — a
+  container with an axis"*, partitioning ACROSS the flow by responsibility —
+  and a **phase**, an ordered stage-partition ALONG the flow axis (§What is
+  excluded records them as siblings, with Visio shipping both and UML's
+  `ActivityPartition` being the swimlane one). Taking a plain box because a
+  plain box was already on the allowlist is exactly the borrowing `SUBJECT-VOCABULARY-SCOPE` ends.
+  `class main/retry/fail` is the taught interim, as it is for connector roles.
+  **The demand for phases is real and was never measured** — the downstream
+  survey counted 3266 nodes and 2684 edges across 227 deduped figures and
+  never counted containers at all — and the condition that reopens it is a
+  count of downstream production parser specifications whose phases fail to
+  read once rendered from `class` (`MEMBERSHIP-KEY-ACCEPTANCE` §4).
 
 Mermaid is recorded in prior-art.md §5 as
 positive prior art for "each genre owns its vocabulary" and **negative**
@@ -689,6 +924,6 @@ flowline acl -[no match]-> fwd
 flowline acl -[deny rule]-> drop
 ```
 
-The same figure written before this release — `node acl "ACL match?"
+The same figure written before 0.1 — `node acl "ACL match?"
 shape=diamond` — still parses and still renders. It simply says less: the
 model records a geometry where this one records a role.

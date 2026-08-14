@@ -56,13 +56,19 @@ process    fetch  "Fetch inputs" class=costly,retry
 # different one — and the exit VALUES ride the edges exactly as yes/no does.
 decision kind "Job kind?"
 
-# `group` is containment; membership is declared with in= on the member, never
-# inferred from geometry. One nesting level only. `gap=0` is exact member
-# spacing — flush, the one-frame-with-dividers look.
-group work "Per-kind work" fill=transparent style=dashed gap=0
-process build  "Compile artifacts" in=work class=costly
-process test   "Run test suite"    in=work class=costly
-process deploy "Roll out release"  in=work
+# WITHDRAWN from this genre — the three processes below were wrapped in
+# `group work "Per-kind work" fill=transparent style=dashed gap=0`, with
+# `in=work` on each member. `group` was WITHDRAWN from `flowchart`
+# (`SCENE-KEYWORD-MEMBERSHIP`) on ground (a), no evidence of need: across the whole tree the only
+# `group` ever written in a flowchart document was this one, in this reference
+# figure — a keyword demonstrated nowhere but in its own demonstration. It is
+# KEPT in `block` (89 uses across 5 authored figures) and in `topology`, which
+# is what a per-genre vocabulary is for (`SUBJECT-VOCABULARY-SCOPE`): one genre's evidence is not
+# another's. What the box was saying here, `rank build,test,deploy` below still
+# says, and says as CONTENT rather than as a frame.
+process build  "Compile artifacts" class=costly
+process test   "Run test suite"    class=costly
+process deploy "Roll out release"
 # A role line MAY still write `shape=` — it overrides the DRAWING only, for an
 # author who needs a particular picture. The role stays the model (§12.7:
 # presentation is not meaning on its own), so this is a `process` that happens
@@ -94,14 +100,16 @@ process other  "Record unknown kind" shape=ellipse class=tint
 # and the gap gets reported — the project’s working record keeps it.
 node backoff "Wait (exponential backoff)" shape=circle class=retry
 
-# `plane` (EXPERIMENTAL) is paint order, not containment: `z-index=` sets it
-# explicitly and the implicit `base` plane sits at the bottom. It is scene
-# vocabulary, legal here and identical under `block`/`topology`; a flowchart
-# rarely needs it, and it is exercised once so this file covers the surface.
-plane over "Overlay" z-index=1
-
+# WITHDRAWN — `plane over "Overlay" z-index=1` stood here, and the terminator
+# below carried `plane=over`. The line's own comment used to call `plane` "scene
+# vocabulary, legal here and identical under block/topology" — that sentence is
+# the model `SUBJECT-VOCABULARY-SCOPE` dissolved, and the keyword did not survive the audit it invited:
+# `plane`, `z-index=` and `plane=` were WITHDRAWN from the LANGUAGE
+# (`PAINT-ORDER-CONSTRUCT`), in every genre, with no replacement spelling. In this genre the ground
+# was (a), no evidence of need — the only `plane` in any flowchart document in
+# the tree was the one written above to cover the surface.
 decision   ok   "All steps green?"
-terminator done "Released" plane=over
+terminator done "Released"
 
 flow down                # right|down|left|up — `down` is flowchart's default
 # `rank` states that these elements are PEERS — same position along the flow

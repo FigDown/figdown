@@ -1,1 +1,1 @@
-Line 6: unsupported version "0.3" (expected 0.1 or 0.2)
+Line 12: unsupported version "0.4" (expected 0.1 or 0.2 or 0.3)

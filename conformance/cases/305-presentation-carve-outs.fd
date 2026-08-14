@@ -1,19 +1,36 @@
 figdown 0.1 block
 # The §5 attributes an element cannot carry, because it draws no such
 # thing: a boundary is never drawn (only its label exists), and typed blocks
-# stack outside the scene (nothing to layer against) with per-item dashes
-# reserved for `conditional` fields. `band` left this list
-# (`BAND-LABEL-STATUS`): it gained a mandatory label, and the text channel came with it.
+# stack outside the scene with per-item dashes reserved for `conditional`
+# fields. `band` left this list (`BAND-LABEL-STATUS`): it gained a mandatory
+# label, and the text channel came with it.
+#
+# 0.3 (`PAINT-ORDER-CONSTRUCT`) took a whole ATTRIBUTE out of the carve-out, so the list
+# is one shorter than it was. Until then every typed-block line below also
+# wrote ` plane=base` — `bitfield`, `field`, `timing`, `signal`, `cell` and
+# `table` each answered `<directive> does not take plane=`, and that refusal
+# was the second half of the carve-out's reason (nothing to layer against,
+# because the typed blocks stack outside the scene). `plane=` has now been
+# withdrawn from the LANGUAGE: it is refused on every directive in every
+# genre, so a `plane=` written here would no longer be evidence of anything
+# directive-specific — it would be the language-wide withdrawal firing, and
+# that is case 918's subject, not this one.
+#
+# What remains is the carve-out proper: `style=` on the three region openers,
+# and the three §5 attributes `external` refuses. The three typed-block
+# CHILDREN — `field`, `signal`, `cell` — were in the fixture only to be told
+# `does not take plane=`; two of them are gone with the key, and `cell`
+# stays, written clean, because `fill=` on a cell is accepted and the
+# contrast is the point. Their own `style=` refusal is `STYLE-KEY-SCOPE`'s separate
+# reasoned diagnostic and is pinned by 478-typed-block-style-retired.
 external w "ext" fill=#ffffff stroke=#000000 style=dashed
 group g "G"
 node a "A" in=g
-bitfield bf "B" style=dashed plane=base
-field "one" 4 plane=base
-timing wv "W" style=dotted plane=base
-signal clk p... plane=base
+bitfield bf "B" style=dashed
+timing wv "W" style=dotted
 table t "T"
 | h |
 |---|
 | 1 |
-cell (1,1) fill=#fee2e2 plane=base
-table t2 "T2" style=solid plane=base
+cell (1,1) fill=#fee2e2
+table t2 "T2" style=solid

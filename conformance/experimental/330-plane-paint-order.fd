@@ -1,7 +1,0 @@
-figdown 0.1 topology
-plane overlay "Overlay" z-index=2
-plane under "Underlay" z-index=1
-node a "A"
-node b "B"
-edge a -> b plane=under
-edge a -> b plane=overlay

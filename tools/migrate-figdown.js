@@ -25,7 +25,7 @@
  *   dir=            → extend=         (option key on `band`)
  *   band a-b%       → band a..b%      (`RANGE-SPELLING` — ONE range grammar)
  *   kind=<map>      → shape=<geom>    (known kind map; unknown → report)
- *                     (`fill <range> in=` → `band …` was here until this release;
+ *                     (`fill <range> in=` → `band …` was here until 0.1;
  *                     see the report-only list — its output has not parsed
  *                     since `BAND-LABEL-STATUS` made the `band` label mandatory)
  *   via=x,y;x,y       → via=(x,y),(x,y),…  (0.1; ";" reserved)
@@ -41,7 +41,9 @@
  *                     is what PRESERVES the old meaning, not a cosmetic change)
  *   text=           DELETED             (0.1 renamed it color=, which
  *                     0.1 retired outright — v0.1 has NO label-colour key)
- *   z=              → z-index=
+ *   z=              REPORT-ONLY          (renamed z-index=;
+ *                     z-index= was legal on `plane` and nowhere else and went
+ *                     with it, `PAINT-ORDER-CONSTRUCT`)
  *   threshold at=   → threshold offset=
  *   fill= on edge/threshold/bundle → stroke=, or DELETED when stroke= is already
  *                     present (0.1; both preserve the drawing exactly)
@@ -49,7 +51,10 @@
  *   unit=           → word=             (`BITS-PER-ROW-KEY-NAMING`)
  *   boundary        → external          (`EXTERNAL-ENDPOINT-NAMING`; line-initial keyword)
  *   wrap            → break             (`ROW-BREAK-NAMING`; bitfield child keyword)
- *   layer / layer=  → plane / plane=    (`PLANE-KEYWORD-SPELLING`; keyword AND option key)
+ *   layer / layer=  REPORT-ONLY          (renamed plane / plane=,
+ *                     `PLANE-KEYWORD-SPELLING`; `plane` was WITHDRAWN, `PAINT-ORDER-CONSTRUCT`, so the
+ *                     rewrite's target no longer exists — the `route`→`path`
+ *                     shape)
  *   labels=         → data=             (`SIGNAL-DATA-KEY-SPELLING`)
  *   plot            → chart             (`CHART-BLOCK-NAMING`; line-initial keyword)
  *   guide           → threshold         (`THRESHOLD-KEYWORD-SPELLING`; line-initial keyword)
@@ -115,7 +120,7 @@
  *   WHAT THE MESSAGES SAY, AND WHAT THEY MAY NOT. The refusals
  *   above name a fact about the file in front of the user — "this file also
  *   writes `fill=`" — and that is the only shape this family is allowed to
- *   have. Until this release `color-ambiguous` had the opposite shape: it
+ *   have. Until 0.1 `color-ambiguous` had the opposite shape: it
  *   asked the reader to say which PRE-RELEASE their document came from, a
  *   property no document records (downstream every file says `figdown 0.1`)
  *   and no reader can check. All four era branches are now spelled by the
@@ -429,6 +434,47 @@ const WITHDRAWN_KW_RE = /^(path|route|routing)(\s|$)/;
 const DECORATIVE_OLD_RE = /^(\s*)#\s*r25:\s*decorative\b/;
 const WITHDRAWN_OPT_RE = /(^|\s)(points|tailport|headport|routing|via|src|dst)=/;
 
+// `PAINT-ORDER-CONSTRUCT`: the withdrawn PLANE family. Same shape as the edge-
+// geometry family above and for the same reason — `layer`/`layer=` were
+// renamed `plane`/`plane=` and `z=` was renamed `z-index=` at
+// 0.1, and `PAINT-ORDER-CONSTRUCT` withdrew all three targets, so every one of those
+// rewrites would now emit a hard error. A rewrite whose output does not parse
+// is not a migration, so the six spellings are DETECTED AND REPORTED and the
+// line is returned unchanged for a human to delete.
+const WITHDRAWN_PLANE_KW_RE  = /^(plane|layer)(\s|$)/;
+const WITHDRAWN_PLANE_OPT_RE = /(^|\s)(plane|layer|z|z-index)=/;
+// `SCENE-KEYWORD-MEMBERSHIP`: `bundle` is declared by `topology` alone. `trunk` was
+// renamed `bundle` at an earlier release and that rewrite is still correct
+// under `topology`; under any other genre its output is a line error, so the
+// line is reported instead. This is the FIRST rule in this tool whose
+// suppression is per GENRE rather than per release, which is the ruling
+// showing up in the migration surface: a word can be live in one genre and
+// gone from another, so a rewrite has to know which document it is in.
+const GENRE_WITHDRAWN_KW_RE  = /^(bundle|trunk|threshold|band|guide|group|external)(\s|$)/;
+const GENRE_KEEPS = {
+  block:      new Set(['group', 'external', 'threshold', 'band', 'guide']),
+  topology:   new Set(['group', 'external', 'bundle', 'trunk']),
+  flowchart:  new Set(['external']),
+  statechart: new Set([]),
+};
+// `MEMBERSHIP-KEY-ACCEPTANCE`: the OPTION-KEY half of the same rule. `in=` named a
+// `group` id and nothing else, so withdrawing `group` from `flowchart` and
+// `statechart` left the key accepted there with no value that could resolve;
+// `MEMBERSHIP-KEY-ACCEPTANCE` withdrew the key from both genres. REPORTED, never rewritten, for the
+// same reason the keyword half is: there is nothing to rewrite it TO. The key
+// is untouched in `block` and `topology`, so the map is keyed by genre.
+const GENRE_WITHDRAWN_OPT_RE = /(^|\s)in=/;
+const GENRE_DROPS_OPT = {
+  flowchart:  new Set(['in']),
+  statechart: new Set(['in']),
+};
+
+// A rename entry is [pattern, replacement, label] and may carry a FOURTH
+// element: the DIRECTIVE the rewrite is scoped to. Absent means language-wide,
+// which is what every 0.1/37 entry wants — those keys left the language
+// outright, so wherever the old spelling appears the new one is correct.
+// A scoped entry fires only on a line whose first word is that directive; the
+// test is `parenPointOpt`'s, reused rather than reinvented (see `lineDirectiveIs`).
 const OPT_RENAMES = [
   [/(^|\s)w=/g, '$1width=', 'w=→width='],
   [/(^|\s)h=/g, '$1height=', 'h=→height='],
@@ -438,16 +484,44 @@ const OPT_RENAMES = [
   // is a hard error, so a rewritten file can never match again.
   [/(^|\s)unit=/g, '$1word=', 'unit=→word='],
   // `via=`→`points=` and `src=`/`dst=`→`tailport=`/`headport=` (
-  // `WAYPOINT-KEY-SPELLING`/`ENDPOINT-DOCKING-KEYS`) stood here until this release. `EDGE-GEOMETRY-CONSTRUCTS` withdrew their TARGETS, so the
+  // `WAYPOINT-KEY-SPELLING`/`ENDPOINT-DOCKING-KEYS`) stood here until 0.1. `EDGE-GEOMETRY-CONSTRUCTS` withdrew their TARGETS, so the
   // rewrites would have produced hard errors; the six keys are now handled by
   // the report-only withdrawal detection (see WITHDRAWN_RE below).
   [/(^|\s)labels=/g, '$1data=', 'labels=→data='],
-  [/(^|\s)layer=/g, '$1plane=', 'layer=→plane='],
-  // 0.1 (`DESCRIPTION-KEY-SPELLING`). `note=` is a hard error, so a
-  // rewritten file can never match this rule again — idempotent, like every
-  // other pure spelling swap above.
-  [/(^|\s)note=/g, '$1description=', 'note=→description='],
+  // `layer=`→`plane=` (`PLANE-KEYWORD-SPELLING`) stood here until this release. `PAINT-ORDER-CONSTRUCT`
+  // withdrew its TARGET, so the rewrite would have produced a hard error; the
+  // key is now handled by the report-only withdrawal detection below, exactly
+  // as `via=`/`src=`/`dst=` have been.
+  // 0.1 (`DESCRIPTION-KEY-SPELLING`). `note=` → `description=`, SCOPED TO `field` LINES.
+  //
+  // `DRAWN-ANNOTATION-FORM` REVIVED the spelling: `note=` is live language-wide
+  // again, as the DRAWN annotation, on node/process/decision/terminator/
+  // state/group/edge/flowline/transition/title. This rule was line-agnostic
+  // until then, and left that way it would have fired on every one of those
+  // lines and SILENTLY CONVERTED A DRAWN NOTE INTO A TOOLTIP — deleting ink
+  // the author asked for, with no diagnostic, in the one tool whose whole
+  // job is to be trusted unattended. That is worse than any error it could
+  // have reported.
+  //
+  // `field` is the correct and complete scope because it is the ONLY place
+  // `note=` was ever legal: `DESCRIPTION-KEY-SPELLING` renamed the key on the directive that had
+  // it, and no other directive accepted the spelling in any release. So a
+  // `note=` on a `field` line is unambiguously the retired tooltip key and
+  // the rewrite is right; a `note=` anywhere else is either the new drawn
+  // annotation (leave it alone) or a key that directive never took (the
+  // engine's own error, not this tool's business to guess at).
+  //
+  // Still idempotent, and now for two reasons: `note=` on a `field` remains
+  // a hard error at every version (`DRAWN-ANNOTATION-FORM`'s `field` refusal), and the rewrite
+  // eliminates the token its own pattern matches.
+  [/(^|\s)note=/g, '$1description=', 'note=→description=', 'field'],
 ];
+
+// The DIRECTIVE-SCOPE test, extracted from `parenPointOpt` so the two agree
+// by construction: a line belongs to directive `kw` when the code portion's
+// first word is `kw`.
+const lineDirectiveIs = (line, kw) =>
+  new RegExp('^\\s*' + kw + '(\\s|$)').test(stripComment(line));
 
 // A `field` line in the COMPACT form whose item name contains unquoted spaces
 // Returns the suggested quoted line, or null when the line is
@@ -474,7 +548,7 @@ function quoteCompactFieldNames(code) {
   });
   // Joined with a BARE comma, not ", ": `COMMA-LIST-WHITESPACE` makes a comma list
   // ONE whitespace-free token, and the space form is exactly what the
-  // `field compact list → one token` rewrite below removes. Until this release
+  // `field compact list → one token` rewrite below removes. Until 0.1
   // this suggestion printed the retired spelling for the author to paste —
   // the tool teaching the form it migrates away from. Found by
   // tools/migrate-check.js fixture 604.
@@ -548,8 +622,7 @@ const joinList = toks => toks.map(t => t.text.replace(/,+$/, '')).filter(Boolean
 // `key=<num>,<num>` -> `key=(<num>,<num>)` on the named directive only.
 // `guide at=50%` is single-valued and is deliberately left alone.
 function parenPointOpt(line, kw, keys) {
-  const code = stripComment(line);
-  if (!new RegExp('^\\s*' + kw + '(\\s|$)').test(code)) return null;
+  if (!lineDirectiveIs(line, kw)) return null;
   let after = line;
   for (const k of keys) {
     after = mapCode(after, seg => seg.replace(
@@ -700,7 +773,7 @@ function bareEnumValues(line) {
   return hit ? out + comment : null;
 }
 
-// Spellings that were retired at or before this release. A file that writes any
+// Spellings that were retired at or before 0.1. A file that writes any
 // of them cannot be a pre-release file, so --color-means=text is a false
 // assertion about it (refusal (b)). Keyword forms are anchored to
 // line start; option keys are matched as ` key=`.
@@ -934,6 +1007,100 @@ function migrateText(text, colorMeans) {
       return line;
     }
 
+    // `PAINT-ORDER-CONSTRUCT`: the withdrawn PLANE family, reported the same way and
+    // for the same reason. `guide` is NOT here — it is a live RENAME to
+    // `threshold` and the tool still performs it.
+    if (WITHDRAWN_PLANE_KW_RE.test(trim) || WITHDRAWN_PLANE_OPT_RE.test(code)) {
+      const kw = WITHDRAWN_PLANE_KW_RE.test(trim) ? trim.split(/\s/)[0] : null;
+      reports.push({
+        line: n,
+        code: 'withdrawn-plane',
+        msg: (kw ? '`' + kw + '` is' : 'this line uses an option key') +
+          ' WITHDRAWN from the language (`PAINT-ORDER-CONSTRUCT`) — removed, not renamed, ' +
+          'so there is NO replacement spelling and NO mechanical rewrite. ' +
+          'DELETE the line and every plane= that referenced it. Paint order is ' +
+          'document order: a later line paints on top, so the drawing is ' +
+          'unchanged unless the planes were written out of document order — ' +
+          'check the result. If the elements formed a logical layer of the ' +
+          'SUBJECT (an overlay, a control plane), that meaning belongs in a ' +
+          'class= whose LABEL states it (core §5, `PRESENTATION-AS-MEANING-CARRIER`), which is where the ' +
+          'corpus was already carrying it. The freeze contract promises ' +
+          'mechanical migration for FROZEN constructs; `plane` was ' +
+          'EXPERIMENTAL, so none was owed. ' +
+          'See spec/migrations.md 0.3 and decisions/registry.md.  ' +
+          'line: ' + trim,
+      });
+      return line;
+    }
+
+    // `SCENE-KEYWORD-MEMBERSHIP`: a keyword this document's GENRE no longer declares.
+    // Reported, never rewritten — there is nothing to rewrite it TO, because
+    // the word is not gone from the language, only from this genre, and the
+    // fix is a decision about the figure (change the header, or move the line
+    // to a section that declares the word) which no tool may make unattended.
+    if (genre && GENRE_KEEPS[genre] && GENRE_WITHDRAWN_KW_RE.test(trim)) {
+      const kw = trim.split(/\s/)[0];
+      if (!GENRE_KEEPS[genre].has(kw)) {
+        const still = Object.keys(GENRE_KEEPS).filter(g => GENRE_KEEPS[g].has(kw));
+        reports.push({
+          line: n,
+          code: 'withdrawn-from-genre',
+          // The version parenthetical keeps its LEADING SPACE inside the same
+          // string literal as the clause it annotates. Split across a `+`, the
+          // space belongs to one literal and the parenthesis to the next, and
+          // the publish transform — which deletes a version parenthetical
+          // together with the whitespace in front of it — can only reach the
+          // half it can see. The `.report.txt` golden beside this file is one
+          // flat string and loses both, so the two halves of the pair came out
+          // of the same edit spelled differently: `genre \`x\` .` here against
+          // `genre \`x\`.` there. Same rule below, and for the `at <version>`
+          // clause, which a temporal-clause rule removes whole or not at all.
+          msg: '`' + kw + '` is no longer declared by genre `' + genre + '`' +
+            ' (`SCENE-KEYWORD-MEMBERSHIP`). Subject vocabulary is per genre: a spelling ' +
+            'accepted by several genres is several independent declarations, ' +
+            'and this genre withdrew its own. There is NO mechanical rewrite — ' +
+            (still.length
+              ? 'the word is still declared by ' + still.join(', ') + ', so the fix'
+              : 'the word is declared by no genre at all now, so the fix') +
+            ' is a decision about the figure: change the section header, or ' +
+            'move the line into a section whose genre declares the word. ' +
+            'The genre or the keyword was EXPERIMENTAL in every affected cell, ' +
+            'so no migration was owed. See spec/migrations.md 0.3.  ' +
+            'line: ' + trim,
+        });
+        return line;
+      }
+    }
+
+    // `MEMBERSHIP-KEY-ACCEPTANCE`: an OPTION KEY this document's GENRE no longer
+    // accepts. Same shape as the keyword rule above and same reason for being
+    // report-only: `in=` is not gone from the language, only from this genre,
+    // and what replaces it is a decision about the figure (a `class` naming
+    // the phase, or a section whose genre declares `group`).
+    if (genre && GENRE_DROPS_OPT[genre] && GENRE_WITHDRAWN_OPT_RE.test(trim)) {
+      const drop = GENRE_DROPS_OPT[genre];
+      if (drop.has('in')) {
+        reports.push({
+          line: n,
+          code: 'withdrawn-opt-from-genre',
+          msg: '`in=` is no longer accepted by genre `' + genre + '`' +
+            ' (`MEMBERSHIP-KEY-ACCEPTANCE`). Its only value domain was the id of a ' +
+            'containing `group`, and this genre stopped declaring ' +
+            '`group`, so every value was a dead end. ' +
+            'There is NO mechanical ' +
+            'rewrite: what expresses membership now is a `class` whose label ' +
+            'names the partition, put on each member with `class=`' +
+            (genre === 'statechart'
+              ? ' — and note the spelling is RESERVED here for a `state`-id ' +
+                'domain, should UML composite states be earned'
+              : '') +
+            '. See spec/migrations.md 0.3.  ' +
+            'line: ' + trim,
+        });
+        return line;
+      }
+    }
+
     // header
     const hm = /^figdown(\s+)(0\.\d+)(?:\s+(\S+))?/.exec(trim);
     if (hm) {
@@ -1061,15 +1228,24 @@ function migrateText(text, colorMeans) {
     // mechanical line-initial renames
     const renames = [
       [/^(\s*)render(\b)/, '$1layout$2', 'render→layout'],
-      // `route`→`path` stood here until this release: `EDGE-GEOMETRY-CONSTRUCTS`
+      // `route`→`path` stood here until 0.1: `EDGE-GEOMETRY-CONSTRUCTS`
       // withdrew `path`, so the rewrite's output is a line error. `route`
       // lines are reported by the withdrawal detection instead.
       [/^(\s*)line(\b)/, '$1threshold$2', 'line→threshold'],
       [/^(\s*)colw(\b)/, '$1width$2', 'colw→width'],
-      [/^(\s*)trunk(\b)/, '$1bundle$2', 'trunk→bundle'],
+      // `SCENE-KEYWORD-MEMBERSHIP` makes this rule GENRE-AWARE. `bundle` is now
+      // declared by `topology` alone, so under any other genre the rewrite's
+      // output is a line error and the rule must not fire; the withdrawal
+      // detection reports those lines instead. Under `topology` it is the
+      // same pure spelling swap it always was.
+      ...(genre === 'topology'
+        ? [[/^(\s*)trunk(\b)/, '$1bundle$2', 'trunk→bundle']]
+        : []),
       // 0.1 (the terminology batch)
       [/^(\s*)boundary(\b)/, '$1external$2', 'boundary→external'],
-      [/^(\s*)layer(\b)/, '$1plane$2', 'layer→plane'],
+      // `layer`→`plane` (`PLANE-KEYWORD-SPELLING`) stood here until this release — same
+      // reason as `layer=` above, and the same reason `route`→`path` left at
+      // 0.1: `PAINT-ORDER-CONSTRUCT` withdrew `plane`, so the output would not parse.
       [/^(\s*)wrap(\b)/, '$1break$2', 'wrap→break'],
       [/^(\s*)plot(\b)/, '$1chart$2', 'plot→chart'],
       // 0.1 (`THRESHOLD-KEYWORD-SPELLING`). `line` above already lands on `threshold`, so a
@@ -1159,8 +1335,12 @@ function migrateText(text, colorMeans) {
       }
     }
 
-    // 0.1 option-key renames (w=/h=/dir=), code portions only
-    for (const [re, rep, label] of OPT_RENAMES) {
+    // 0.1 option-key renames (w=/h=/dir=), code portions only.
+    // A fourth element scopes the rename to one DIRECTIVE (`DRAWN-ANNOTATION-FORM`: `note=` is
+    // live again everywhere except `field`, so its rewrite must not leave
+    // that line — see OPT_RENAMES).
+    for (const [re, rep, label, kw] of OPT_RENAMES) {
+      if (kw && !lineDirectiveIs(next, kw)) continue;
       const after = mapCode(next, seg => seg.replace(re, rep));
       if (after !== next) {
         changes.push({ line: n, rule: label, before: trim, after: stripComment(after).trim() });
@@ -1312,14 +1492,10 @@ function migrateText(text, colorMeans) {
       reports.push({ line: n, code: 'color-ambiguous', msg: head + tail + COLOUR_WHERE });
     }
 
-    // ---- 0.1: z= -> z-index=, guide at= -> offset= ----
-    {
-      const after = mapCode(next, seg => seg.replace(/(^|\s)z=/g, '$1z-index='));
-      if (after !== next) {
-        changes.push({ line: n, rule: 'z=→z-index=', before: trim, after: stripComment(after).trim() });
-        next = after;
-      }
-    }
+    // ---- 0.1: guide at= -> offset= ----
+    // `z=`→`z-index=` stood here until this release. `z-index=` was legal on
+    // `plane` and on nothing else, so `PAINT-ORDER-CONSTRUCT` took it with the keyword and the
+    // rewrite lost its target; `z=` is reported, not rewritten.
     if (/^\s*threshold(\s|$)/.test(stripComment(next))) {
       const after = mapCode(next, seg => seg.replace(/(^|\s)at=/g, '$1offset='));
       if (after !== next) {
@@ -1432,7 +1608,7 @@ function migrateText(text, colorMeans) {
     }
 
     // The `via=x,y;…` → `points=(x,y),…` rewrite (0.1 shape,
-    // 0.1 spelling) stood here until this release. `EDGE-GEOMETRY-CONSTRUCTS` withdrew
+    // 0.1 spelling) stood here until 0.1. `EDGE-GEOMETRY-CONSTRUCTS` withdrew
     // `points=`, so any line that would have reached this rule is now caught
     // by the withdrawal report at the top of the loop and returned untouched.
 
@@ -1440,7 +1616,7 @@ function migrateText(text, colorMeans) {
     {
       const rules = [
         ['pin', ['at'], 'pin at=(x,y)'],
-        // `['path', ['tailport','headport'], …]` stood here until this release
+        // `['path', ['tailport','headport'], …]` stood here until 0.1
         // (`EDGE-GEOMETRY-CONSTRUCTS`): the directive it operated on no longer exists.
       ];
       for (const [kw, keys, label] of rules) {

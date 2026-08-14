@@ -35,13 +35,13 @@ The **nested-region `GENRE-COMPOSITION` form** (spec core §4): a `block` scene 
 region and `chart` sit inside the SAME document, with no second `figdown`
 header. Compare with `evpn-fabric.fd` and `pvlan-flows.fd`, which use the
 multi-section **`MULTI-FIGURE-DOCUMENTS`** form for the same kind of panel — both forms are in the
-spec, and until this release only `MULTI-FIGURE-DOCUMENTS` had ever been shown. Also the corpus's only
+spec, and until 0.1 only `MULTI-FIGURE-DOCUMENTS` had ever been shown. Also the corpus's only
 `chart` on a scene document.
 
 ![Telemetry export path](telemetry-export.svg)
 
 ### RPF check — a figure that reads right to left  — [source](rpf-check.fd)
-Four constructs that had no demonstrator anywhere before this release, gathered
+Four constructs that had no demonstrator anywhere before 0.1, gathered
 into one small figure: `flow left` (the corpus was `right` and `down` only),
 the `\"` escape inside a quoted label, a `#` inside a bracketed edge label
 (verbatim since `VERBATIM-REGION-SCOPE`), and a
@@ -54,6 +54,17 @@ The same block constructs plus `threshold`/`band` markers cover buffer
 quotas, memory maps, and watermark charts.
 
 ![Partition map](partition-map.svg)
+
+### Annotated datapath — the drawn annotation  — [source](annotated-datapath.fd)
+`note=` (`figdown 0.3`) is prose the **human** must see, attached to an element
+by writing it on that element's own line — here on a `node`, a `group`, an
+`edge` and on `title` (the figure-level note). It is not `description=`, which
+reaches only the **machine** as an SVG `<title>` and puts no ink on the page;
+the two divide by audience, and neither is a fallback for the other. The author
+never places the box (`DOMAIN-CONVENTION-DIRECTIVES`): the engine sits it beside its carrier and reaches
+for a leader line only when adjacency fails.
+
+![Annotated datapath](annotated-datapath.svg)
 
 ## Topology (with semantic annotations)
 
@@ -186,8 +197,8 @@ singly-linked entry chains — a static data-structure explainer.
 ## Just for fun
 
 ### Rainbow rings — [source](rainbow.fd)
-No `plane` directives at all: line order is the layer. Seven concentric
-`ellipse` nodes; later lines paint on top.
+Document order is paint order — (`PAINT-ORDER-CONSTRUCT`) the only paint order
+the language has. Seven concentric `ellipse` nodes; later lines paint on top.
 
 ![Rainbow rings](rainbow.svg)
 
@@ -212,7 +223,7 @@ live here; read them beside that document.
 Two figures, each shown twice: once with an empty layout zone and once with
 layout intent added. The content zones are byte-identical within each pair —
 that is the point. The **tuned** side is the top-level example itself, not a
-copy: until this release this directory held `*-tuned.fd` files that were
+copy: until 0.1 this directory held `*-tuned.fd` files that were
 md5-identical to `examples/evpn-fabric.fd` and `examples/srl-evpn-irb.fd`,
 which is a duplicate rather than a demonstration. Measurements and the reading of each pair are in
 [guide/layout.md §7](../guide/layout.md#7-before--after-the-same-semantics-different-layout-zones).

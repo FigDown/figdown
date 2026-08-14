@@ -1,0 +1,62 @@
+{
+  "header": {
+    "version": "0.2",
+    "genre": "flowchart"
+  },
+  "flow": "down",
+  "classes": [],
+  "planes": [
+    {
+      "id": "base",
+      "z": 0
+    }
+  ],
+  "nodes": [
+    {
+      "id": "start",
+      "label": "Request received",
+      "role": "terminator",
+      "shape": "rounded",
+      "plane": "base",
+      "line": 14
+    },
+    {
+      "id": "apply",
+      "label": "Apply change",
+      "role": "process",
+      "shape": "box",
+      "plane": "base",
+      "line": 15
+    }
+  ],
+  "groups": [],
+  "externals": [
+    {
+      "id": "audit",
+      "label": "Audit store",
+      "line": 16
+    }
+  ],
+  "edges": [
+    {
+      "a": "start",
+      "op": "->",
+      "b": "apply",
+      "plane": "base",
+      "line": 17
+    },
+    {
+      "a": "apply",
+      "op": "->",
+      "b": "audit",
+      "plane": "base",
+      "line": 18
+    }
+  ],
+  "ranks": [],
+  "pins": [],
+  "thresholds": [],
+  "bands": [],
+  "bundles": [],
+  "regions": []
+}

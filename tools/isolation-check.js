@@ -305,7 +305,7 @@ function isExperimentalPath(relPath) {
 // core §10, and it is the declaration this tool enforces.
 
 // The four EXPERIMENTAL keywords (core §10). These drive definition-in-frozen.
-// There were six until this release (EDGE-GEOMETRY-CONSTRUCTS), when `path` and `routing` were
+// There were six until 0.1 (EDGE-GEOMETRY-CONSTRUCTS), when `path` and `routing` were
 // WITHDRAWN from the language: a withdrawn construct is not an experimental
 // one, it is not one at all, so it leaves this list rather than staying on it
 // with an exemption.
@@ -324,7 +324,7 @@ const EXPERIMENTAL_GENRES = ['topology', 'flowchart', 'timing'];
 
 // THE `SCHEDULED_FOR_REMOVAL` EXCLUSION IS GONE (EDGE-GEOMETRY-CONSTRUCTS).
 //
-// Between an earlier release this file carried a named set — `path`,
+// In an earlier release this file carried a named set — `path`,
 // `routing`, `points=`, `tailport=`, `headport=`, `routing=` — excluded from
 // `unmarked-citation` and from nothing else, on one stated ground: the next
 // release was going to delete the constructs, so every marker added to their

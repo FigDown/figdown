@@ -38,7 +38,7 @@
 //     - `label` on every directive whose label is optional — `node`,
 //       `group`, `bundle`, `external`, `plane`, `bitfield`, `table`,
 //       `timing` (OMITTED-LABEL-RECORDING/READ-SIDE-DETERMINISM; the genre was spelled `wave`
-//       until this release, TIMING-GENRE-NAMING). An omitted label is ABSENT in the
+//       until 0.1, TIMING-GENRE-NAMING). An omitted label is ABSENT in the
 //       model, never silently replaced by the id: `node a` and
 //       `node a "a"` are different documents and must project
 //       differently. The engine records `label: null` there and this
@@ -56,7 +56,7 @@
 //       STYLE-KEY-SCOPE removed the key from those three); `edge`,
 //       `threshold` and `bundle` have no interior and therefore no `fill`
 //       (core §5, the carve-out table). There is NO text channel: `color` was retired language-wide
-// (COLOUR-KEY-STATUS) and v0.1 has no label-colour key at all, so no
+//       (COLOUR-KEY-STATUS) and v0.1 has no label-colour key at all, so no
 //       element carries one (the label colour is a DERIVED renderer default,
 //       core §5 / LABEL-COLOUR-SOURCE, and a resolved presentation value is not model, §12.4
 //       rule 4).
@@ -79,15 +79,15 @@
 //       label is omitted when not written
 //   Empty top-level collections stay as [] (the document shape is fixed;
 //   `externals` is the one omit-when-absent exception left — `paths` was the
-//   other until this release).
+//   other until 0.1).
 //   Table aligns: a column with no explicit `:` alignment is "none".
 //
 // Top-level key order:
 //   header, title, flow, classes, planes, nodes, groups,
 //   externals?, edges, ranks, pins, thresholds, bands,
 //   bundles, regions
-//   (`routing?` sat after `flow` and `paths?` after `pins` until this release)
-//   (`thresholds` was spelled `guides` until this release, THRESHOLD-KEYWORD-SPELLING/NORMATIVE-SEMANTIC-MODEL)
+//   (`routing?` sat after `flow` and `paths?` after `pins` until 0.1)
+//   (`thresholds` was spelled `guides` until 0.1, THRESHOLD-KEYWORD-SPELLING/NORMATIVE-SEMANTIC-MODEL)
 //
 // Element key orders:
 //   class : id, meaning, fill, stroke, style, plane, line
@@ -101,7 +101,12 @@
 //            not a process, so there is no materialized default here.
 //            `shape` is DERIVED from the role when the line writes no
 //            `shape=`; a `shape=` on a role line changes only `shape`.)
-//   group : id, label, gap, plane, fill, stroke, style, class, line
+//   group : id, label, gap, plane, fill, stroke, style, class, note, line
+//     DRAWN-ANNOTATION-FORM: `note` — the DRAWN annotation — is projected on
+//     `node`, `group` and `edge`, and as a document key from `title …
+//     note=`. It is projected for the same reason `description` is: it is
+//     AUTHORED CONTENT, so a second implementation that accepted the key
+//     and discarded the value would otherwise match every golden.
 //   external: id, label, plane, line          (label only when written —
 //                                             an external has no id-default
 //                                             even for display)
@@ -125,7 +130,7 @@
 //                                             `line` is the SOURCE LINE
 //                                             NUMBER — the collision that
 //                                             renamed the directive `guide`
-// itself renamed
+//                                             itself renamed
 //                                             `threshold`)
 //   band  : label, in, from, to, extend, fill, stroke, style, plane,
 //           line                           (0.1: `dir` -> `extend`;
@@ -141,8 +146,8 @@
 //   bundle: id, label, members, stroke, style, plane, line
 //                                            (0.1: no `fill`, core §5)
 //                                            (members as "a--b" strings)
-//   regions (document order, spelled `blocks` until this release),
-//     discriminated by `genre` (spelled `type` until this release) — the
+//   regions (document order, spelled `blocks` until 0.1),
+//     discriminated by `genre` (spelled `type` until 0.1) — the
 //     nested genre that governs the region and its children (§4, GENRE-COMPOSITION).
 //     `chart` is the one value that is not a header genre; it stays
 //     EXPERIMENTAL (CONSTRUCT-STATUS-TIERS) and is outside the conformance surface:
@@ -289,6 +294,9 @@ function normalize(doc) {
   // EMPTY-LABEL-STATE/EMPTY-LABEL-STATE: absence, not truthiness — `title ""` is a written value and must
   // stay distinguishable from a document with no `title` line.
   if (doc.title !== null && doc.title !== undefined) model.title = doc.title;
+  // DRAWN-ANNOTATION-FORM: the FIGURE-LEVEL drawn annotation, from `title … note=`.
+  // Same absence rule as `title` itself — `note=""` is a written value.
+  if (doc.note !== null && doc.note !== undefined) model.note = doc.note;
   model.flow = doc.flow;
   model.classes = (doc.classes || []).map(c => o([
     ['id', c.id], ['meaning', c.label], ['fill', c.fill],
@@ -300,11 +308,12 @@ function normalize(doc) {
     ['id', n.id], ['label', n.label], ['role', n.role], ['shape', n.shape],
     ['group', n.group], ['plane', n.plane], ['fill', n.fill],
     ['stroke', n.stroke], ['style', n.style],
-    ['class', cls(n.cls)], ['line', n.line]]));
+    ['class', cls(n.cls)], ['note', n.note], ['line', n.line]]));
   model.groups = (doc.groups || []).map(g => o([
     ['id', g.id], ['label', g.label], ['gap', g.gap], ['plane', g.plane],
     ['fill', g.fill], ['stroke', g.stroke],
-    ['style', g.style], ['class', cls(g.cls)], ['line', g.line]]));
+    ['style', g.style], ['class', cls(g.cls)], ['note', g.note],
+    ['line', g.line]]));
   if ((doc.boundaries || []).length)
     model.externals = doc.boundaries.map(b => o([
       ['id', b.id], ['label', b.label], ['plane', b.plane],
@@ -314,7 +323,7 @@ function normalize(doc) {
     ['tail', e.tail], ['mid', e.mid], ['head', e.head],
     ['plane', e.plane], ['stroke', e.stroke],
     ['style', e.style],
-    ['class', cls(e.cls)], ['line', e.line]]));
+    ['class', cls(e.cls)], ['note', e.note], ['line', e.line]]));
   model.ranks = (doc.ranks || []).map(r => o([['ids', r.ids], ['line', r.line]]));
   // ELEMENT-GEOMETRY-DIRECTIVE: ONE object per pinned element. `x`/`y` are present
   // exactly when `at=` was written (both or neither — `at=` is a point, not

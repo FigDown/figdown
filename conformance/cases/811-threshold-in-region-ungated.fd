@@ -1,0 +1,36 @@
+figdown 0.1 block
+# `MARKER-TARGET-KINDS`: case 810's document, UNCHANGED, under the OLDEST header.
+# The widening that lets `in=` resolve a region id is deliberately UNGATED,
+# and this file is the assertion — the directive lines below are
+# BYTE-IDENTICAL to case 810's and the header is the only difference.
+#
+# The pair 810/811 is the exact counterpart of the pair 805/806, and it comes
+# out the OTHER WAY ROUND. 805/806 say `note=` is legal at 0.3 and refused
+# below it; 810/811 say the region resolver behaves identically at 0.1 and at
+# 0.3. Both changes shipped in the same release, so a reader who saw only one
+# pair would take away a rule the project does not have — that 0.3
+# gated everything it added, or that it gated nothing.
+#
+# The discriminator, argued at length in case 810: `note=` ADDS A SPELLING
+# with a prior meaning on the record, and accepting it under an old header
+# would repaint a tooltip as ink. This adds NO spelling — the core §10
+# registry is byte-unchanged — and the only documents it affects are ones
+# that previously did not parse at all. A widening with nothing to drift from
+# does not need a version to hide behind.
+#
+# Keep the two bodies edited together; if a line moves in 810, move it here.
+group pool "Resource pool"
+node q0 "Q0" in=pool
+table q "Queue depth"
+| Slot | Depth |
+|------|-------|
+| s0 | 12 |
+| s1 | 30 |
+threshold "Max" in=q offset=50%
+band "Reserved" 15..35% in=q
+bitfield hdr "Header" word=32 numbering=msb0
+field "Type" 8
+field "Rest" 24
+threshold "Split" in=hdr offset=25%
+threshold "Group target, unchanged" in=pool offset=80%
+threshold "Node target, unchanged" in=q0 offset=35%

@@ -1,8 +1,0 @@
-figdown 0.1 block
-# 0.1: `z=` -> `z-index=`. CSS spells the stacking concept `z-index`
-# and RULE 4.2 takes the standard spelling in full; a single-letter key is
-# also structurally risky next to the closed wave lane alphabet (`LANE-ALPHABET-KEY-RESERVATION`).
-plane over "Overlay" z-index=5
-plane under "Underlay" z-index=-1
-node a "A" plane=over
-node b "B" plane=under

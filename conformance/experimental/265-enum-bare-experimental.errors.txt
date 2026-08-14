@@ -1,2 +1,2 @@
-Line 12: this position takes a BARE value: write type=bar3d — quoting a value drawn from a closed set suggests the position accepts arbitrary text, when it accepts only the listed spellings (SYNTAX-STYLE RULE 2.4)
-Line 6: this position takes a BARE value: write extend=up — quoting a value drawn from a closed set suggests the position accepts arbitrary text, when it accepts only the listed spellings (SYNTAX-STYLE RULE 2.4)
+Line 15: this position takes a BARE value: write extend=up — quoting a value drawn from a closed set suggests the position accepts arbitrary text, when it accepts only the listed spellings (SYNTAX-STYLE RULE 2.4)
+Line 21: this position takes a BARE value: write type=bar3d — quoting a value drawn from a closed set suggests the position accepts arbitrary text, when it accepts only the listed spellings (SYNTAX-STYLE RULE 2.4)

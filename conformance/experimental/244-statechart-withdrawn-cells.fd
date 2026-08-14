@@ -1,0 +1,35 @@
+# `SUBJECT-VOCABULARY-SCOPE`/`SCENE-KEYWORD-MEMBERSHIP`: `statechart` declares NO subject vocabulary at all,
+# and the EMPTY declaration is the point — `state` + `transition` + core +
+# layout + styling + the region openers is now the whole of what a statechart
+# document may write at top level. There is therefore no KEEP fixture for
+# this genre: what it keeps is pinned by `230-statechart-header` and
+# `233-statechart-state-transition`, and this file is all five withdrawn
+# cells, each with the ground of its own cell:
+#
+#   group      UML's grouping construct is the COMPOSITE STATE and its
+#              REGIONS; under the single-source-vocabulary rule a statechart
+#              that needed grouping takes UML 2.5.1 §14's word for it, not
+#              another genre's.
+#   external   additionally RESERVED (`RESERVED-SPELLINGS`): UML 2.5.1 §14 defines
+#              TransitionKind as `external | internal | local`, so in this
+#              genre's own source standard the word already names A
+#              TRANSITION THAT EXITS AND RE-ENTERS ITS SOURCE STATE.
+#              FigDown's means an endpoint outside the figure that is never
+#              drawn — same word, same genre, same standard, unrelated
+#              meanings. It may only ever come back meaning what UML means.
+#   threshold  a state's box is sized by its label, so a reference value
+#              drawn 60% down it asserts nothing.
+#   band       a range over that same meaningless extent.
+#   bundle     an ANTI-FEATURE: two transitions between the same pair of
+#              states are two different TRIGGERS, and the trigger is the
+#              whole content of the arc.
+#
+# Three authored statechart figures, all transcribed from RFCs, reach for
+# none of the five.
+figdown 0.2 statechart
+state idle "IDLE"
+group g "G"
+external x "X"
+threshold "Budget" 60% in=idle
+band "Window" 10..20% in=idle
+bundle par idle--idle

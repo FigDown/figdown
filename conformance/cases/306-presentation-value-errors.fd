@@ -1,12 +1,29 @@
 figdown 0.1 block
-# The value rules apply uniformly wherever an attribute is accepted:
-# the colour set, the style enum, and plane= naming a declared plane.
+# The value rules apply uniformly wherever an attribute is accepted: the
+# colour set and the style enum.
+#
+# There was a THIRD rule here until this release — `plane=` naming a declared
+# plane, which answered `unknown plane "ghost"`. That diagnostic no longer
+# exists: `plane=` was withdrawn with the `plane` keyword (`PAINT-ORDER-CONSTRUCT`), so there is
+# no plane to name and no name to get wrong, and the key is now refused
+# before any value is looked at (case 918). Three writings went with it —
+# ` plane=ghost` on the `band` line below, `external w "ext" plane=ghost`,
+# and `class c1 "Meaning" plane=ghost`. The last two lines are gone
+# altogether rather than rewritten: `plane=` was `external`'s ONLY option
+# key, and neither line carried a colour or a style to check.
 group g "G"
 node a "A" in=g
 node b "B" in=g
 edge a -- b stroke=notacolor
-bundle bd "LAG" a--b style=bold
 threshold "cap" in=g offset=50% stroke=nope
-band "zone" 10% in=g stroke=#12 plane=ghost
-external w "ext" plane=ghost
-class c1 "Meaning" plane=ghost
+band "zone" 10% in=g stroke=#12
+
+figdown 0.1 topology
+# Section 2: the style enum on a `bundle`. `bundle bd "LAG"
+# a--b style=bold` stood after the `edge` line until `SCENE-KEYWORD-MEMBERSHIP` withdrew `bundle`
+# from `block`; the value rule is genre-independent, so the line moved to the
+# genre that still declares the directive rather than being deleted.
+node a "A"
+node b "B"
+edge a -- b
+bundle bd "LAG" a--b style=bold

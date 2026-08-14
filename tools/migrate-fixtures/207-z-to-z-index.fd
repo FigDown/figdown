@@ -1,3 +1,0 @@
-figdown 0.1 block
-plane over "Overlay" z=2
-node a "A" plane=over

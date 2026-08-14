@@ -5,7 +5,7 @@
 # What this figure probes: a typed region NESTED INSIDE a scene document,
 # with NO second `figdown` header. FigDown has two ways to put a table (or a
 # bitfield, or a timing diagram) next to a box-and-wire figure, and this is
-# the one that had never been demonstrated in the corpus until this release:
+# the one that had never been demonstrated in the corpus until 0.1:
 #
 #   `MULTI-FIGURE-DOCUMENTS`, multi-section — the file carries a second `figdown 0.1 table` header
 #     and the table is a SEPARATE DOCUMENT stacked below the first.
@@ -49,7 +49,7 @@ edge enc -> coll
 # bottom of the figure because it is at the bottom of the stack, and each
 # stage above it is further from the wire. Twelve figures in this corpus flow
 # `right` and twelve flow `down`; `up` and `left` had no demonstrator at all
-# before this release, so half of a four-value enum went into the freeze
+# before 0.1, so half of a four-value enum went into the freeze
 # untested by any figure. (`left` is in examples/rpf-check.fd.)
 flow up
 rank ring,enc
@@ -91,7 +91,7 @@ field "Records" *
 # it, so it needs no data of its own — and it is listed in the `block` and
 # `topology` vocabularies exactly so a scene document can carry one over a
 # table it composed. That row had no demonstrator anywhere in the corpus
-# before this release, which is the whole reason this line is here. Every column
+# before 0.1, which is the whole reason this line is here. Every column
 # after the first must be numeric — a chart plots the numbers, and the label
 # column names the series, so the `Owner` column this table would otherwise
 # carry belongs in a `description` or a second table, not here.

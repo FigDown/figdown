@@ -137,7 +137,7 @@ conformance surface.
 | Keyword | Form | Where | Status | Option keys | Default |
 |---|---|---|---|---|---|
 | `bitfield` | `bitfield <id> ["label"]` | top level, under any genre | NORMATIVE | `word` `numbering` `fill` `stroke` | `word=32`; `numbering=` **REQUIRED, no default**; label absent |
-| `field` | classic: `field "<name>" <width\|*>` — the name's quotes are MANDATORY since 0.1 (`QUOTING-RULES`) · compact: `field a:1,b:2,"Long Name":16` | inside a `bitfield` region ONLY | NORMATIVE | `fill` `stroke` `class` `description` `present` — on BOTH forms since 0.1; on the compact form they are LINE-wide · `index` — **classic form ONLY** (`BITFIELD-REPETITION-CONSTRUCT`). **`style=` LEFT this list at 0.1** (`STYLE-KEY-SCOPE`); **the positional flag `optional` LEFT it at 0.1** (`PRESENCE-CONDITION-EXPRESSION`, replaced by `present=`); **`note=` became `description=` at 0.1** (`DESCRIPTION-KEY-SPELLING`) | `present` absent; `description` absent; `index` absent |
+| `field` | classic: `field "<name>" <width\|*>` — the name's quotes are MANDATORY since 0.1 (`QUOTING-RULES`) · compact: `field a:1,b:2,"Long Name":16` | inside a `bitfield` region ONLY | NORMATIVE | `fill` `stroke` `class` `description` `present` — on BOTH forms since 0.1; on the compact form they are LINE-wide · `index` — **classic form ONLY** (`BITFIELD-REPETITION-CONSTRUCT`). **`style=` LEFT this list at 0.1** (`STYLE-KEY-SCOPE`); **the positional flag `optional` LEFT it at 0.1** (`PRESENCE-CONDITION-EXPRESSION`, replaced by `present=`); **`note=` became `description=` at 0.1** (`DESCRIPTION-KEY-SPELLING`), and although `note=` came BACK to the language as the DRAWN annotation at 0.3 (`DRAWN-ANNOTATION-FORM`), **`field` refuses it at every version** — see below | `present` absent; `description` absent; `index` absent |
 | `break` | `break` | inside a `bitfield` region ONLY | NORMATIVE | — | presentation only; adds no bits |
 
 All three of this genre's own keywords are normative: `bitfield` owns no
@@ -224,7 +224,7 @@ The same removal applied to `cell` and `signal` in the same release, as one
 minimum set: 11 in-repo uses across the three, **0 downstream**.
 
 Retired language-wide (`COLOUR-KEY-STATUS`): `color=`. It set the FILL
-before this release and the LABEL, and no engine can tell the
+in one era and the LABEL in another, and no engine can tell the
 two source files apart — so its diagnostic names BOTH eras and hands the
 choice to a human. v0.1 has no label-colour key at all; the label colour is
 derived from the background it sits on (core §5, `LABEL-COLOUR-SOURCE`).
@@ -246,7 +246,7 @@ are now retired — see the next section.
 
 ### `description=` is documentation prose, and it draws no ink (`DESCRIPTION-KEY-SPELLING`)
 
-Spelled `note=` until this release. The source is **IEEE 1685-2022's
+Spelled `note=` until 0.1. The source is **IEEE 1685-2022's
 `description`**; SystemRDL's `desc` is barred by RULE 4.2 (an option key takes
 the primary source's spelling in full).
 
@@ -266,7 +266,9 @@ independent reinventions in the measured corpus — **and that one will be a
 DRAWN callout**. A live never-drawing `note=` beside a future always-drawing
 `note` keyword is one spelling with two opposite behaviours, which is exactly
 why `line`, `fill` and `route` were renamed. The keyword cannot move (every
-source spells it `note`); the option key can.
+source spells it `note`); the option key can. **That prediction landed** (`DRAWN-ANNOTATION-FORM`) — the drawn annotation arrived as an option key `note=` on
+the scene genres' elements and on `title`, not as a keyword, and `field`
+refuses it. The next section states that refusal and its reason.
 
 Two related defects were fixed in the same release. The SVG `<title>` is now a
 **child of the `<rect>` it names** — it used to be pushed into the block's
@@ -275,6 +277,103 @@ stream after the rect and the label, so it landed under the figure's single
 in a figure named the same `<g>` and a conforming UA showed one arbitrary
 tooltip for the whole figure. And the `STYLE-KEY-SCOPE` `style=` diagnostic no longer
 offers this channel as a place to put knowledge.
+
+### `field` REFUSES `note=`, and the refusal is about AUDIENCE (`DRAWN-ANNOTATION-FORM`)
+
+`note=` came back into the language as a live option key — the
+**DRAWN** annotation, the one that puts an explanation on the page — accepted
+on the scene genres' elements and on `title`. **`bitfield` grants it to
+nothing.** `field` refuses `note=` **at every version**, and keeps
+`description=`:
+
+<!-- fence-check: skip -->
+```figdown
+figdown 0.3 bitfield
+bitfield hdr "Header" numbering=msb0
+field "Flags" 8 note="cleared on reset"
+```
+
+That third line is a line error under `figdown 0.3` exactly as it was under
+`figdown 0.1`, and the diagnostic is `field`'s **own**, not the generic
+"directive does not take this key": it states the division rather than naming
+a replacement, because `description=` is not a replacement — it reaches a
+different reader.
+
+**Why: the two keys divide by AUDIENCE, not by length.** `description=`
+reaches the **machine**. It draws no ink beyond an SVG `<title>` tooltip on
+the field's own rectangle (see the section above), which is what lets a `.fd`
+carry a register's full IP-XACT description without spending page space a
+human reader did not ask for. `note=` reaches the **human**, and it ALWAYS
+draws. Granting one directive both keys would put the whole distinction on one
+line, where the only thing separating them is which reader the author had in
+mind — and there are **zero measured instances** of a drawn per-field aside in
+the corpus. Spending the distinction before anyone needs it is what the
+refusal avoids. Neither key is a fallback for the other, here or anywhere.
+
+**What would reopen it,** recorded so the decision can be re-taken on evidence
+rather than re-argued: **a measured count of `bitfield` figures whose
+per-field caveat must be VISIBLE** — not documentation prose a tool reads, but
+a sentence beside one field that a human reading the page has to see. Bring
+the count and the figures; `field` is the directive that would take the key.
+
+**Where a typed slot exists, `note=` would not be the right answer anyway.**
+`bitfield` is the genre with the most typed slots in the language, and each of
+them is a claim rather than prose a reader must interpret:
+
+- **a field's machine-facing prose is `description=`** — quotable,
+  displayable, never parsable (core §12.7);
+- **a field's condition is `present=`**, which carries the condition itself
+  and draws the dash that says "may be absent"; a note saying "only when the
+  T bit is set" asserts nothing the renderer or a reading agent can act on;
+- **a condition SHARED by several fields is a `class`**, which earns a legend
+  entry and applies to all of them at once;
+- **a field's name is its quoted name**, and its width is its width; a
+  repetition is `index=`, and a row break for legibility is `break`.
+
+### This region's ADDRESS SPACE, and what `in=` consumes today (`MARKER-TARGET-KINDS`, `GENRE-DOCUMENT-CONTRACT`)
+
+**A `bitfield` region's address space is `(n)`: the nth declared `field`,
+counted in DECLARATION ORDER (`DECLARATION-ORDER-SEMANTICS`), 1-based.** One entry per classic `field`
+line and one per item of a compact `field` line — `field a:1,b:2,"Long":5`
+declares three, so `(2)` is `b`. An `index=` repetition is still **one**
+field, however many copies it draws, because it is one declaration. Bit
+numbers are deliberately not the address: `numbering=` chooses between `msb0`
+and `lsb0`, so a bit index means two different things in two documents, while
+declaration order means one thing in both.
+
+**Only the region HEAD is consumed today.** `threshold` and `band`
+resolve (`MARKER-TARGET-KINDS`) `in=<region-id>` against a nested
+`bitfield`/`table`/`timing` region as well as a `node` or a `group`:
+`threshold "boundary" in=hdr offset=50%` names the whole `bitfield hdr` block.
+That widening is **ungated** — it adds no spelling, and the only documents it
+affects are ones that previously produced the error
+`unknown target "hdr" for threshold` and no figure at all.
+
+**The coordinate grammar is designed and deliberately NOT built.** `in=hdr(2)`
+— a mark addressed to one field inside the region — has no shipping consumer,
+and RULE 4.7 argues against spending a grammar before one exists. The address
+space is written down here so that a later consumer inherits a decided answer
+instead of inventing a second one; the engine accepts the region head and
+nothing else, and `in=hdr(2)` is a line error today.
+
+**`GENRE-KEYWORD-ALLOWLIST` is unchanged by this.** `threshold` and `band` are still **not** on the
+pure-`bitfield` top-level allowlist: under `figdown 0.1 bitfield` they remain
+the line error `"threshold" is not allowed in genre bitfield`. The widening
+changes what `in=` may NAME, not where the two keywords may be WRITTEN. The
+path that works is composition (§4, `GENRE-COMPOSITION`) — a scene header hosting a nested
+`bitfield` region, with the `threshold` line at the scene's top level:
+
+Written out, that is a `figdown 0.1 block` header, then
+`bitfield hdr "Header" numbering=msb0` opening the region, its `field "Type" 8`
+and `field "Payload" 24` items, and then — back at the scene's top level, not
+inside the region — `threshold "byte boundary" in=hdr offset=25%`.
+<!-- fence-check: skip -->
+
+**`threshold` and `band` are EXPERIMENTAL** (`CONSTRUCT-STATUS-TIERS`), which is why the worked
+example above is written as prose rather than as a ` ```figdown ` block: a
+frozen normative document may cite an experimental construct but may not
+*define* one in a fence, and this file is frozen. The runnable version lives in
+[../experimental.md](../experimental.md).
 
 ## Conditional presence: `present=` (`PRESENCE-CONDITION-EXPRESSION`)
 
@@ -301,7 +400,7 @@ field "Sequence" 32 present=""
 **Why the flag had to grow a value.** A bare flag can say only *that* a field
 is conditional. Every RFC that draws one also states *why* — RFC 2784's own
 diagram writes `| Checksum (optional) |` and its prose says "present only if
-the C bit is set" — and until this release that sentence had nowhere to live but
+the C bit is set" — and until 0.1 that sentence had nowhere to live but
 `note=`, where it was invisible to the human reading the figure and, under
 `BITFIELD-CONDITIONAL-OFFSETS`, prose the model may not read.
 
@@ -347,7 +446,7 @@ no option key for it.
 *shared* with its neighbour, and the renderer draws each boundary exactly once.
 An edge is dashed **iff at least one of the two fields touching it carries
 `present=`** — so a conditional field is enclosed by a dashed outline even
-where the field on the other side is unconditional. Before this release each
+where the field on the other side is unconditional. Before 0.1 each
 field was stroked as its own box and the second painting won, which meant a
 plain neighbour could overwrite a conditional field's dash back to solid and
 silently delete the only carrier of conditional presence (`STYLE-KEY-SCOPE`).
@@ -404,7 +503,7 @@ tracks the coverage-span question this idiom sits inside) and **`ANNOTATION-LOCA
 ## Repetition: `index=` (`BITFIELD-REPETITION-CONSTRUCT`)
 
 **A `field` may be ONE ELEMENT of a repeated run, and `index=` is how it says
-so.** Until this release the language had no construct for this at all: a
+so.** Until 0.1 the language had no construct for this at all: a
 repeated element had to be spelled out as N literal `field` lines, nothing in
 the model said the list was a sample rather than the whole, and core §12.7
 carried a MUST NOT precisely because that gap degrades to a *confidently
@@ -630,8 +729,8 @@ the zone `layout` opens is a namespace of its own, owned by no genre, and
 holds `pin` (NORMATIVE) alone. Every member of it is
 **genre-independent** — no genre may define, redefine or extend a keyword
 inside the zone, and `GENRE-VOCABULARY-OBLIGATION` does not reach in. The zone also held `path` and
-`routing` (EXPERIMENTAL) until this release, when **`EDGE-GEOMETRY-CONSTRUCTS` withdrew both from the
-language**: they were core until this release, EXPERIMENTAL from `CONSTRUCT-STATUS-TIERS`, and
+`routing` (EXPERIMENTAL) until 0.1, when **`EDGE-GEOMETRY-CONSTRUCTS` withdrew both from the
+language**: they were core until 0.1, EXPERIMENTAL from `CONSTRUCT-STATUS-TIERS`, and
 removed outright on prior-art and demand evidence
 ([../migrations.md](../migrations.md) 0.1, core §9 **`EDGE-IDENTITY-AND-GEOMETRY`**).
 There is no replacement spelling, and `LAYOUT-ZONE-NAMESPACE` itself is unchanged — only its
@@ -844,7 +943,7 @@ fields **MSB-first**: the first-declared field is the leftmost, and under
 | `numbering=` missing from the `bitfield` declaration | line error |
 | `present=` written without quotes | line error |
 | The retired positional flag `optional` or `conditional` | line error naming `present=` |
-| The retired option key `note=` | line error naming `description=` |
+| `note=` on a `field`, at ANY version (0.1 as a rename; 0.3 as a REFUSAL) | line error. Since 0.3 it states the AUDIENCE division rather than naming a rename: `note=` draws and `field` does not take it; `description=` is for prose a machine reads, and a field's presence condition is `present=` |
 | `index=` with no `..`, or with more than one | line error |
 | `index=` with a dot RUN longer than two — `index=0...7` | line error, the same one |
 | `index=` whose FIRST index is not a literal integer | line error |

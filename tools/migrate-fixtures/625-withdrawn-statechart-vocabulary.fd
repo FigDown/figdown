@@ -1,0 +1,9 @@
+figdown 0.2 statechart
+# `statechart` declares NO subject vocabulary (`SCENE-KEYWORD-MEMBERSHIP`). `external` is the sharp
+# cell: UML 2.5.1 §14 already spells a TransitionKind `external`, so the word
+# is reserved here rather than merely absent (`RESERVED-SPELLINGS`).
+state a "A"
+state b "B"
+transition a -> b
+external e "Upstream"
+group g "Region"

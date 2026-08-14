@@ -8,9 +8,20 @@ figdown 0.1 block
 node a "A"
 node b "B"
 edge a--b
-bundle ok a--b
 node x--y "Double dash in a node id"
-plane l--1
 class c--1 "meaning"
+# `plane l--1` stood here until this release — the whole directive left the
+# language (`PAINT-ORDER-CONSTRUCT`), so that id position left with it.
+
+figdown 0.1 topology
+# Section 2: the `bundle` half, which is the half `LINK-OPERATOR-IN-IDS` was
+# written for — `bundle` is now declared by `topology` only (`SCENE-KEYWORD-MEMBERSHIP`), so the
+# lines moved here rather than being deleted. Losing them would leave the
+# rule pinned only on the ids that never had two readings, and the greedy
+# member regex is the whole reason the ban exists.
+node a "A"
+node b "B"
+edge a--b
+bundle ok a--b
 bundle t--1 "L" a--b
 bundle t2 "L" a--b--a

@@ -2,7 +2,7 @@
 // strip-check.js — the GUI-WRITEBACK-STRUCTURE "strip test" for FigDown figures
 //
 // Named for what it does, not for the item code that ordered it: the file was
-// `r25-check.js` until this release. Every prose reference in the repository
+// `r25-check.js` until 0.1. Every prose reference in the repository
 // already said "the strip test"; the filename was the last place carrying the
 // internal code. The requirement ID GUI-WRITEBACK-STRUCTURE is unchanged and is still what the
 // spec cites.
@@ -44,7 +44,7 @@
 // A document carrying the marker comment `# decorative` is reported as
 // `skip` and never fails, including under --strict. The marker is an author
 // assertion: this figure carries no knowledge that must survive the strip test.
-// It was spelled `# r25: decorative` until this release, which dropped the
+// It was spelled `# r25: decorative` until 0.1, which dropped the
 // internal-code prefix: it is the one place the standard asked an author to
 // type a project item code into their own document (MIGRATIONS 0.1).
 //

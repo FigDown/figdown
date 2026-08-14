@@ -38,7 +38,7 @@ now the whole toolbox:
 | Double-click empty canvas (or **+ Node**) | `node` + a `pin` for it; the shape dropdown picks `shape=` |
 | Double-click a node | rename it |
 | **Link** → click two nodes | `edge a -> b` |
-| **⬚ Group** → drag a box | `group` (members follow by `in=`) |
+| **⬚ Group** → drag a box | `group` (members follow by `in=`) — **not usable on a statechart document**: `group` is not this genre's keyword since 0.3 (`SCENE-KEYWORD-MEMBERSHIP`) and `in=` is not its option key since 0.3 (`MEMBERSHIP-KEY-ACCEPTANCE`), so the two lines the button writes are both line errors here. It works on a `block` or `topology` document |
 | fill colour | `fill=` on the selected element |
 | **Raise ↑** / **Lower ↓** | move the element's line down/up in the text — paint order |
 | **Delete** (or Del) | removes the node with its `pin`s and edges |

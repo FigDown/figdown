@@ -15,7 +15,7 @@
 figdown 0.1 table
 title "Egress drops by sampling window (experimental constructs)"
 
-# `stroke=` (cell border colour) was EXPERIMENTAL until this release and is now
+# `stroke=` (cell border colour) was EXPERIMENTAL until 0.1 and is now
 # NORMATIVE (`STROKE-KEY-STATUS`); `color=` (text colour) was RETIRED in the same release
 # (`COLOUR-KEY-STATUS`), so the only experimental construct left in this file is `chart`.
 class hot "Above the drop watermark" fill=#fee2e2 stroke=#b91c1c
@@ -38,5 +38,5 @@ cell (2,4) stroke=#b45309
 # to the page rather than recolouring the first.
 # `type=bar3d` is the whole option surface — `bar3d` is its only value, so
 # `chart drops` alone means the same thing. It was spelled `plot` with
-# `kind=bars3d` until this release, and `level=` was DELETED.
+# `kind=bars3d` until 0.1, and `level=` was DELETED.
 chart drops type=bar3d

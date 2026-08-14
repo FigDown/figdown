@@ -1,0 +1,36 @@
+figdown 0.1 block
+# `DRAWN-ANNOTATION-FORM`: the OTHER half of the compatibility promise. `note=`
+# moved the language number 0.2 → 0.3, and a version bump is only affordable
+# if documents written against the older numbers keep parsing exactly as they
+# did. This file is the assertion that they do.
+#
+# WHAT COULD HAVE GONE WRONG, which is why this is not an empty test. The
+# release touched four shared mechanisms: `LANG_VERSIONS` gained a member,
+# `GENRES_BY_VERSION` gained a row, `OPT_MIN_VERSION`/`belowOptVersion` are
+# consulted on every option key, and `RETIRED_OPT_KEYS` LOST its `note` row.
+# The last one is the sharpest: removing a retired-key row is exactly the
+# kind of edit that takes a neighbouring row with it. So the sections below
+# do not merely avoid `note=` — they exercise the machinery around it.
+#
+#   Section 1 (`figdown 0.1`): a 0.1 document using `description=`, the key
+#     `note=` was renamed TO. It still means what it always meant — an SVG
+#     <title>, no ink — and its acceptor is still `field`.
+#   Section 2 (`figdown 0.2`): a 0.2 document using the 0.2 vocabulary that
+#     `figdown 0.1` refuses (`flowline`, `KEYWORD-RENAME-SCOPE`). The 0.2 gate is unmoved by
+#     the arrival of a third version.
+#
+# Neither section mentions `note=` anywhere. That is the point: a document
+# that never heard of the key must not be able to tell that the key exists.
+group ring "Access ring"
+node a "A" in=ring
+node b "B" in=ring
+edge a -[10G]- b
+bitfield hdr "Header" word=16 numbering=msb0
+field "Type" 4 description="prose a machine reads — still the live spelling, still field-only"
+field "Len" 12
+
+figdown 0.2 flowchart
+# Section 2: the 0.2-only vocabulary, still gated exactly as `KEYWORD-RENAME-SCOPE` left it.
+process p "Classify"
+terminator t "Done"
+flowline p -> t

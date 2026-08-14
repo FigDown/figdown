@@ -50,13 +50,31 @@ box below; read it before you rely on the sentence above.
 >    is reasoning the normative documents do not supply. What would change
 >    it: a recovery model and a precedence rule in §8, in that order — a
 >    MIGRATIONS-entry change, because it moves existing goldens.
-> 3. **17 normative fixtures write an experimental keyword**, so
+> 3. **Normative fixtures write an experimental keyword**, so
 >    `spec/experimental.md`'s skip promise is conditional, not absolute.
->    Those 17 are enumerated in that file's §E0.1 with what a skipping
+>    They are enumerated in that file's §E0.1 with what a skipping
 >    implementation should do. What would change it: re-authoring the
 >    cross-cutting lexical fixtures over the frozen registry only — cheap
 >    per file, but it deletes the coverage those files exist to provide,
 >    which is why it was not done.
+>
+>    **The COUNT is not written here, for the reason the rest of this file
+>    gives, and it is also DISPUTED — recompute it before
+>    quoting it.** This file said *17 of 165*; §E0.1 now
+>    says *20 of 189* and enumerates twenty rows. Recomputed against the
+>    directory —
+>    `grep -lE '^(band|bundle|threshold|timing|signal)\b' conformance/cases/*.fd`
+>    — the answer is **23 of 192** (the denominator moved in this release
+>    too), and the three §E0.1 does not list are the three
+>    fixtures this very release added: `245-block-subject-vocabulary`
+>    (`threshold`, `band`), `246-block-withdrawn-cells` (`bundle`) and
+>    `918-withdrawn-plane-keyword` (`timing`, `signal`). A twenty-fourth,
+>    `912-retired-plot-keyword`, writes `chart` — experimental by core §4.4
+>    — which §E0.1's vocabulary has never counted; that is a scoping choice
+>    of the table's, older than this release, not a new omission. The
+>    discrepancy is recorded rather than quietly corrected here, because
+>    §E0.1 owns the enumeration and this file owns neither it nor the
+>    resolution.
 >
 > Items 1 and 2 are the reason this file no longer claims the whole suite
 > is reachable from the normative documents. Item 3 is bounded and listed.
@@ -145,6 +163,68 @@ every invocation. That output is what a claim quotes. Copies of it typed
 into prose drifted for several releases running and were deleted; the few numbers still written down in this file are marked as
 HISTORICAL records of what a past release *changed*.
 
+*Historical.* **The suite's SECOND withdrawal, and — unlike the
+first — a withdrawal in two different shapes at once.** `PAINT-ORDER-CONSTRUCT` removed `plane`,
+`plane=` and `z-index=` from the LANGUAGE; `SCENE-KEYWORD-MEMBERSHIP` removed sixteen per-genre
+CELLS, a word leaving one genre's vocabulary while staying live in another's.
+The two shapes cost the suite different things.
+
+The language-wide one follows 0.1 exactly. **SIX experimental fixtures
+whose SUBJECT was `plane` were DELETED** — `124-plane-z-index`,
+`330-plane-paint-order`, `331-plane-errors`, `332-plane-default-z`,
+`333-plane-z-nonnumeric` and `264-edge-plane-quoted-id` — twelve files
+carrying 29 non-comment lines of input. `264` is the one that needed a
+ruling rather than a rule: its subject is `RULE-POSITION-ENUMERATION`'s fix for the ONE id position
+in the language that tolerated a quoted id, and that position was
+`edge … plane=`. `edge` has no id-valued option key left, so the behaviour is
+unreachable rather than rehostable, which is the test `118-id-quoted-positions`
+and `122-points-parenthesised` passed and these did not. **The
+deleted numbers are not reused**, the same rule the `38x` band follows.
+`334-layer-retired` survives — its subject is a retirement DIAGNOSTIC, which
+§10 classifies NORMATIVE — and GREW into the whole chain: `plane`, `layer`,
+`layer=`, `plane=`, `z=` and `z-index=`, six lines and six messages. Two of
+its hosts moved onto a plain `node`, the `913-withdrawn-edge-geometry-keys`
+device: the `plane` sweep runs ahead of the option scan and abandons the
+line, so a key written on a `plane` line can no longer be reached at all.
+
+The per-genre one is new and **deletes nothing** — a cell withdrawal moves a
+fixture's HEADER, because the construct is still in the language and still has
+a genre that declares it. `265-enum-bare-experimental` and
+`909-errors-band-chart-bundle` were the entire `band`-under-`topology`
+evidence in the tree, and both are parse/diagnostic fixtures rather than
+figures anyone needed, so both were **rewritten to `block`** rather than
+deleted. `909` needed a SPLIT to do it: `band` left `topology` and `bundle`
+left `block`, so its three constructs no longer share one genre, and it is now
+two SECTIONS of one file — `block` for `band`/`chart`, `topology` for
+`bundle`. Two sections rather than two fixtures because the subject is a set
+of static argument errors, not a genre, and the `bundle` half would otherwise
+be a fixture of one line; multi-section is the device `224` (four headers) and
+`265` (two) already use for exactly this. Two more fixtures lost an
+INCIDENTAL `plane` writing and kept everything else — `225-flowchart-flowline`
+(`flowline … plane=base`) and `258-edge-options` (a `plane` declaration and a
+`plane=` on the edge) — the "kept and adjusted" criterion, unchanged.
+
+**SIX new EXPERIMENTAL fixtures.** Five are the `24x` band and pin the grid
+for the three experimental genres: `240-topology-subject-vocabulary` and
+`242-flowchart-subject-vocabulary` are the KEEP halves (all three of
+`topology`'s words, `flowchart`'s one), and `241-topology-withdrawn-cells`,
+`243-flowchart-withdrawn-cells` and `244-statechart-withdrawn-cells` are the
+WITHDRAW halves, each cell with its own named diagnostic. `statechart` has no
+KEEP fixture because it declares NO subject vocabulary at all — the empty
+declaration is what `230` and `233` already pin.
+
+The sixth is `919-withdrawn-plane-experimental-genres`, and it is not part of
+that band because the `plane` row of the grid is not a per-cell withdrawal at
+all: `plane` is refused by the retired-keyword sweep, which runs **ahead** of
+the genre allowlist and answers the same message in **every** genre. That is a
+claim about all eight, so all eight are written down — `918` (NORMATIVE) holds
+`block`, `bitfield` and `table`, `241` holds `topology` (the genre where every
+authored `plane` in the tree was actually written), and `919` holds
+`flowchart`, `statechart` and the `timing` genre HEADER. The `timing` section
+is the one that earns its place: a region genre never declared a scene keyword,
+so nothing in it could be an `SCENE-KEYWORD-MEMBERSHIP` per-cell withdrawal, which makes the message
+provably the `PAINT-ORDER-CONSTRUCT` sweep rather than an assertion that it is.
+
 *Historical.* **`208 → 218`** — eight NORMATIVE fixtures
 (normative `165 → 173`) and two EXPERIMENTAL (`43 → 45`). **Exactly one
 existing golden moved**: `254-edge-label-errors` lost the line that pinned
@@ -159,7 +239,9 @@ inert at number/point/range positions), `263-edge-option-quoting`,
 `422-bitfield-index-step-reserved` and `423-bitfield-index-step-prose`
 (what the `step` reservation deliberately does NOT catch), plus
 `264-edge-plane-quoted-id` and `265-enum-bare-experimental` in
-`experimental/`.
+`experimental/`. (`264` was DELETED with the `plane=` position
+its subject rode on; `265`'s first section was rewritten from `topology` to
+`block` in the same release. See the 0.3 record above.)
 
 *Historical.* **`205 → 208`, an addition of three NORMATIVE
 fixtures and nothing else** (normative `162 → 165`; experimental unchanged
@@ -307,7 +389,7 @@ is outside the surface, one record per fixture:
 ```
 default normative
 370-threshold-basic  construct=threshold  threshold, basic forms
-330-plane-paint-order  genre=topology,construct=plane   both
+390-bundle-basic  genre=topology,construct=bundle   both
 ```
 
 - **The reason is recorded, not just the fact** — `genre=<g>` or
@@ -321,7 +403,7 @@ default normative
   criterion and the reason for each fixture are readable in one place, and
   `ls experimental/*.fd` diffed against it is the audit.
 
-**What the unification cost, stated rather than hidden.** Until this release
+**What the unification cost, stated rather than hidden.** Until 0.1
 the 52 fixtures now in `experimental/` were *tagged* inside `cases/`, and
 this section argued for the tag over a directory move in these words:
 *"cases are cited by filename throughout `DISCREPANCIES.md`, the R-entries
@@ -353,9 +435,9 @@ each size.
 
 | Set | Size — read it from | Which |
 |---|---|---|
-| **A** — header genre is EXPERIMENTAL | `run.js`, the `… by genre` figure | `topology` (251, 258, 259, 271, 330, 390–394, 909), `timing` (600–606, 916 — the genre was spelled `wave` until 0.1, `TIMING-GENRE-NAMING`), `flowchart` (011, 210, 213, 220–223) |
-| **B** — dedicated test of a demoted keyword, or of an experimental genre-owned keyword | `run.js`, the `… by demoted construct` figure | `threshold`/`band` (370–376, 914) + `plane` (124, 330–334) + `bundle` (271, 390–394) + `chart` (700, 701, 909, 915) + `role` (220–224, the flowchart role vocabulary). **No** `path`/`routing`: there were 11 until `EDGE-GEOMETRY-CONSTRUCTS` withdrew both keywords at 0.1, and a withdrawn construct is not a demoted one |
-| A ∩ B | `run.js`, the `… both` figure | `271`, `330`, `390`–`394`, `909` and the four role cases `220`–`223` are each both — an experimental genre header AND a dedicated test of the construct. Equivalently: every `STATUS.txt` record carrying two reasons |
+| **A** — header genre is EXPERIMENTAL | `run.js`, the `… by genre` figure | `topology` (240, 241, 251, 258, 259, 271, 390–394, 909), `timing` (600–606, 916 — the genre was spelled `wave` until 0.1, `TIMING-GENRE-NAMING`), `flowchart` (011, 210, 213, 220–223, 225, 226, 235–238, 242, 243), `statechart` (230–234, 244) |
+| **B** — dedicated test of a demoted keyword, or of an experimental genre-owned keyword | `run.js`, the `… by demoted construct` figure | `threshold`/`band` (241, 243, 244, 265, 370–376, 914) + `bundle` (240, 243, 244, 271, 390–394) + `chart` (265, 700, 701, 909, 915) + `role` (220–224, the flowchart role vocabulary) + `connector` (225–227, 233–238). **No** `path`/`routing`: there were 11 until `EDGE-GEOMETRY-CONSTRUCTS` withdrew both keywords at 0.1, and a withdrawn construct is not a demoted one. **`plane` likewise since 0.3** (`PAINT-ORDER-CONSTRUCT`): five of its six fixtures were deleted and `334-layer-retired` is the one record left, kept for its retirement diagnostic, not for the construct |
+| A ∩ B | `run.js`, the `… both` figure | every `STATUS.txt` record carrying two reasons — the definition, and the only form that cannot drift. It is no longer worth enumerating by hand: 0.3 alone added five members and removed six, and the 0.1 cleanup exists because an enumeration here named three fixtures that had been deleted twenty lines above |
 | **A ∪ B** — EXPERIMENTAL | `run.js`, the EXPERIMENTAL total | the whole of `conformance/experimental/` |
 | **Normative total** | `run.js`, the NORMATIVE total | the whole of `conformance/cases/` |
 
@@ -370,6 +452,24 @@ A ∪ B = 41 — were both wrong, and the A ∩ B enumeration still named `381`,
 were removed rather than corrected, for the reason at the top
 of this section.
 
+**An OPEN QUESTION opened, recorded here and argued in full in
+`STATUS.txt`.** `SCENE-KEYWORD-MEMBERSHIP` withdrew `bundle` from `block`, and the normative
+fixtures that used it as a lexical host kept their coverage by APPENDING a
+`topology` section rather than deleting the line. **Eleven normative fixtures
+now declare an experimental genre in one of their sections** — 115, 118, 119,
+123, 214, 215, 304, 306, 804, 905, 906 (three more, 801, 802 and 807, predate
+this release). Set A's criterion, read literally, reaches them: an
+implementation restricted to the normative genre surface cannot parse those
+sections. This file's own gloss on `224` decides the multi-section case the
+other way, and criterion 3 — a fixture that merely USES an experimental
+construct stays normative — governs directly. **The two now disagree, and
+neither is being applied silently.** Moving eleven files would move the
+published normative count, so it is a maintainer ruling and not a side effect
+of a vocabulary release. What is not in dispute either way is
+`spec/experimental.md` §E0.1, which already enumerates every normative
+fixture that writes an experimental keyword and tells an implementer what it
+costs.
+
 `224-flowchart-roles-genre-scoped` is in **B only**: its four headers are
 `block` / `topology` / `bitfield` / `flowchart`, so the genre criterion does
 not reach it, but its SUBJECT is the experimental keyword.
@@ -377,14 +477,17 @@ not reach it, but its SUBJECT is the experimental keyword.
 and `cell` is a change to the normative `bitfield`/`table` surface, and only
 its `timing` third is experimental — a case's status follows what it TESTS.
 
-`bundle` and `plane` (spelled `layer` until this release) were demoted in the same `CONSTRUCT-STATUS-TIERS` batch as
+`bundle` and `plane` (spelled `layer` until 0.1) were demoted in the same `CONSTRUCT-STATUS-TIERS` batch as
 `threshold`/`band`/`path`/`routing`, which grew set B. Only **three** cases
 changed bucket: `331`, `332` and `333`, the dedicated `layer` tests
 written under a `block` header — nothing but the construct criterion
-reaches them. The other seven dedicated `bundle`/`layer` cases were
+reached them. The other seven dedicated `bundle`/`layer` cases were
 already experimental by their `topology` header and merely gained a
-`construct=` reason, which is why B grows by ten while the union grows by
-three.
+`construct=` reason, which is why B grew by ten while the union grew by
+three. (HISTORICAL: `331`, `332` and `333` were DELETED when
+`PAINT-ORDER-CONSTRUCT` withdrew `plane` from the language. The reading is kept because it is
+the CRITERION, and a criterion outlives the fixtures that illustrated it —
+the same reason the `path`/`routing` reading is still written down.)
 
 Set A is experimental whole even where the case's subject is a normative
 construct (`251` tests edge labels): an implementation restricted to the
@@ -393,11 +496,14 @@ asked to.
 
 The coverage note this used to carry has **shrunk to one item**. It
 previously read that `bundle` (390–394, `271`) has no normative-genre case
-at all, and that edge labels, edge options and layer paint order are
+at all, and that edge labels, edge options and plane paint order are
 pinned normatively only by their `block`-genre siblings.
-`bundle` and `layer` are themselves outside the normative surface, so
+`bundle` and `plane` are themselves outside the normative surface, so
 having no normative-genre case for either is correct and expected, not a
-gap. What remains genuinely outstanding is **edge labels (`251`) and edge
+gap — and the question cannot be asked of either: `plane`
+left the language (`PAINT-ORDER-CONSTRUCT`) and `bundle` left `block` (`SCENE-KEYWORD-MEMBERSHIP`), so `topology` is
+now the ONLY genre that can host a `bundle` fixture at all. What remains
+genuinely outstanding is **edge labels (`251`) and edge
 options (`258`)** — normative behaviour on the normative `edge` keyword,
 currently pinned only by fixtures written under the experimental
 `topology` genre. Fixing that means new `block`-genre fixtures, not
@@ -406,7 +512,7 @@ count.
 
 Three refinements the raw bands hide.
 
-1. The `38x` band held ten files until this release, of which **seven**
+1. The `38x` band held ten files until 0.1, of which **seven**
    tested `path`/`routing`; `EDGE-GEOMETRY-CONSTRUCTS` withdrew both keywords and those seven were
    deleted. The band now holds the three that never tested them:
    `387-layout-zone-basic`, `388-layout-zone-node-after` and
@@ -416,12 +522,16 @@ Three refinements the raw bands hide.
    experimental half of the layout zone is gone.
 2. **Twelve** cases *use* a demoted construct incidentally without being
    about it: 112, 115, 209, 214, 215, 233, 259, 301, 304, 305, 306, 307 —
-   `115-lex-option-before-label` runs `bundle`, `threshold`, `band` and
-   `plane` through the generic option-before-label rule (`OPTION-POSITION-PARSING`, core
+   `115-lex-option-before-label` runs `bundle`, `threshold` and `band`
+   through the generic option-before-label rule (`OPTION-POSITION-PARSING`, core
    lexing); the rest are presentation and lexical sweeps that touch
-   `extend=`, `plane=`, `z-index=`, or run
-   `threshold`/`band`/`bundle`/`plane` through a
-   generic check. Six more embed a `timing` block
+   `extend=`, or run `threshold`/`band`/`bundle` through a
+   generic check. Until this release the same sentence named `plane` and
+   `plane=`/`z-index=` alongside them, and `115` ran `bundle` under a
+   `block` header; `PAINT-ORDER-CONSTRUCT` withdrew `plane` from the language and `SCENE-KEYWORD-MEMBERSHIP`
+   withdrew `bundle` from `block`, so those writings left `cases/` in that
+   release, `115` growing a `topology` section rather than losing the
+   `bundle` half of its coverage. Six more embed a `timing` block
    (itself EXPERIMENTAL) inside a normative-genre document: 112, 214, 215, 304,
    305, 414. All stay NORMATIVE under the criterion; `259` is experimental
    anyway, by its `topology` header. Moving the rest would carry
@@ -456,20 +566,21 @@ clean, `.errors.txt` if it does not. Case numbering groups by area
 | `1xx` | lexical (titles, escapes, comments, option syntax, extra args) |
 | `20x`–`21x` | `node`, the shape enum, per-shape geometry, absent-vs-id label, absent-vs-empty label (`EMPTY-LABEL-DIRECTIVE-COVERAGE`) |
 | `23x` | `group` |
-| `25x`–`26x` | `edge` (operators, the three label positions, retired options, written order). `262` pins `#` inside `[ ]` and `263` the enum half of RULE 2.4 on an edge; `264` is `edge plane=` as an id position, EXPERIMENTAL because the fixture declares a live `plane` |
+| `24x` | per-genre subject vocabulary (`SUBJECT-VOCABULARY-SCOPE`/`SCENE-KEYWORD-MEMBERSHIP`) — one KEEP fixture and one WITHDRAW fixture per scene genre, so the 24-cell grid is readable as fixtures. `240`/`241` topology, `242`/`243` flowchart, `244` statechart (all EXPERIMENTAL, in `experimental/`), `245`/`246` block (NORMATIVE, in `cases/`). `statechart` has no KEEP fixture and cannot have one — it declares no subject vocabulary at all, and the empty declaration is what `230`/`233` pin. The `plane` row of the grid is NOT here: it is a language-wide withdrawal, not a per-cell one, and lives at `918`/`919` |
+| `25x`–`26x` | `edge` (operators, the three label positions, retired options, written order). `262` pins `#` inside `[ ]` and `263` the enum half of RULE 2.4 on an edge. `264` was `edge plane=` as an id position, EXPERIMENTAL because the fixture declared a live `plane`; it was DELETED at 0.3 (`PAINT-ORDER-CONSTRUCT`) with that position, and its number is not reused |
 | `27x` | `boundary`, plus explicit-arrowhead geometry |
 | `30x` | `class` and the §5 presentation attributes (carve-outs, value errors, class references never resolved) |
-| `33x` | `plane` (paint order, default `z`, errors) — all five **EXPERIMENTAL, in `experimental/`** (`CONSTRUCT-STATUS-TIERS`: `plane` is a demoted keyword; `330` also has a `topology` header) |
+| `33x` | `plane` until 0.3, when `PAINT-ORDER-CONSTRUCT` withdrew the keyword from the language and `330`–`333` were deleted with it (as `124` and `264` were, in their own bands). The band now holds **one** file, `334-layer-retired` — **EXPERIMENTAL, in `experimental/`** — and its subject is the retirement DIAGNOSTIC, not the construct: the whole `layer` → `plane` → withdrawn and `z=` → `z-index=` → withdrawn chain, six spellings and six messages. The vacated numbers are not reused |
 | `35x` | `flow` and `rank` |
 | `36x` | `pin` — position (`360`–`362`) and extent (`363`–`368`; a separate `size` directive until 0.1, `ELEMENT-GEOMETRY-DIRECTIVE`) |
 | `37x` | `threshold` and `band` (`threshold` was `line` before 0.1 and `guide` before 0.1 (`THRESHOLD-KEYWORD-SPELLING`); `band` was `fill` before 0.1) — all seven **EXPERIMENTAL, in `experimental/`** (`CONSTRUCT-STATUS-TIERS`) |
 | `38x` | the `layout` zone opener (`387`–`389`, normative, in `cases/`). The band was `routing` and `path` (`path` was `route` before 0.1) until 0.1, when `EDGE-GEOMETRY-CONSTRUCTS` withdrew both keywords and their seven fixtures were deleted |
-| `39x` | `bundle` (`topology` genre AND a demoted keyword since `CONSTRUCT-STATUS-TIERS`, so **EXPERIMENTAL** on both counts), plus two further `layout`-zone cases (`395`, `396`, normative, in `cases/`) that did not fit the `38x` run |
+| `39x` | `bundle` (`topology` genre AND a demoted keyword since `CONSTRUCT-STATUS-TIERS`, so **EXPERIMENTAL** on both counts; since 0.3, `SCENE-KEYWORD-MEMBERSHIP`, `topology` is the ONLY genre that declares it, so no other header could host these fixtures), plus two further `layout`-zone cases (`395`, `396`, normative, in `cases/`) that did not fit the `38x` run |
 | `12x` | the quoting scheme across the whole vocabulary — `118`/`119` ids, `120`/`121` positional strings, `122` points, `123` comma lists, and (`RULE-POSITION-ENUMERATION`) `125` the typed-block labels, `126`/`127` RULE 2.4's enum half, `128` its complement where quoting stays INERT |
 | `4xx` | `bitfield` (`418` is the `DECLARATION-ORDER-SEMANTICS` worked example: the bit numbers a reader DERIVES from `numbering=`, which the model deliberately does not carry — spec core §12.7; `419` is the `PRESENCE-CONDITION-EXPRESSION` `present=` tri-state worked example; `420`/`421` are `BITFIELD-REPETITION-CONSTRUCT`'s `index=` — the repetition tri-state in the model, and every one of its five errors) |
 | `5xx` | `table` (`520` is the `ROW-HIGHLIGHT-CELL-FILL-COLLISION` `highlight`/cell-`fill=` collision worked example) |
 | `6xx` | `timing` (spelled `wave` until 0.1, `TIMING-GENRE-NAMING`) — **EXPERIMENTAL, in `experimental/`** (experimental genre, `CONSTRUCT-STATUS-TIERS`) |
-| `9xx` | cross-cutting errors (unknown keyword, misplaced child, reserved dynamic keywords, duplicate single-valued directives, retired keywords, the retired `text=` option key, and the per-release retirement diagnostics — `912` `plot`, `913` the WITHDRAWN edge-geometry option keys (`EDGE-GEOMETRY-CONSTRUCTS` — seven spellings, no replacement), `914` `guide` → `threshold` (`THRESHOLD-KEYWORD-SPELLING`), `915` the DELETED `chart level=` (`CHART-LEVEL-KEY`), `916` `wave` → `timing` (`TIMING-GENRE-NAMING`); `914`, `915` and `916` are **EXPERIMENTAL, in `experimental/`**, `912` and `913` are not — `913` moved into `cases/` at 0.1) |
+| `9xx` | cross-cutting errors (unknown keyword, misplaced child, reserved dynamic keywords, duplicate single-valued directives, retired keywords, the retired `text=` option key, and the per-release retirement diagnostics — `912` `plot`, `913` the WITHDRAWN edge-geometry option keys (`EDGE-GEOMETRY-CONSTRUCTS` — seven spellings, no replacement), `914` `guide` → `threshold` (`THRESHOLD-KEYWORD-SPELLING`), `915` the DELETED `chart level=` (`CHART-LEVEL-KEY`), `916` `wave` → `timing` (`TIMING-GENRE-NAMING`), `917` `size` → `pin` (`ELEMENT-GEOMETRY-DIRECTIVE`), and `918`/`919` the WITHDRAWN `plane`/`plane=`/`z-index=` (`PAINT-ORDER-CONSTRUCT` — three spellings, no replacement); `914`, `915`, `916` and `919` are **EXPERIMENTAL, in `experimental/`**, the rest are not — `913` moved into `cases/` at 0.1. `918` and `919` are one claim in two files, split by bucket: the keyword sweep runs AHEAD of the genre allowlist and answers the same message in every genre, so checking "every genre" needs all eight written down, and three of them are experimental genres that a normative fixture cannot declare) |
 | `7xx` | `chart` (spelled `plot` until 0.1) — in `experimental/`, outside the conformance surface. Until 0.1 these two fixtures were the ONLY residents of that directory and no default run executed them |
 
 Each case isolates one behavior (error
@@ -496,15 +607,16 @@ implementation side. Highlights:
   contains a `null` (non-numeric `z`/`w`/`h` are line errors — DISCREPANCIES `NON-NUMERIC-Z-VALUE`/`NON-NUMERIC-EXTENT`, resolved); a `null` appearing in a
   regenerated golden would signal a new engine NaN defect.
 - Every element carries its 1-based source `line` where the engine
-  records one (layers, timing signals and table cells do not — spec §12.4
-  rule 6).
+  records one (the implicit base plane, timing signals and table cells do
+  not — spec §12.4 rule 6; the plane never had one because it was never
+  written, which is now the only kind of plane there is).
 - `header.version` is the constant `"0.1"` (the engine accepts exactly
   that version).
 - Known caveat: `band.fill` includes the engine's default
   (`#e5e7eb`) when the author wrote none — the engine does not preserve
   the distinction, so the projection cannot either.
 - The top-level array of scalar markers is `thresholds[]` (it was
-  `guides[]` until this release, `THRESHOLD-KEYWORD-SPELLING` — the model array was renamed with
+  `guides[]` until 0.1, `THRESHOLD-KEYWORD-SPELLING` — the model array was renamed with
   the keyword, since `NORMATIVE-SEMANTIC-MODEL` makes the model normative). A `band` element
   now carries its mandatory `label` FIRST (`BAND-LABEL-STATUS`). The `color` key it
   gained with that label left the whole model (`COLOUR-KEY-STATUS`): no
@@ -530,22 +642,34 @@ appear in the model):
 
 - `flow` = `"right"` when no `flow` line is written
 - `node.shape` = `"box"`
-- `node.layer` / `edge.layer` = `"base"`
-- the implicit base layer `{id:"base", z:0}` is always `layers[0]`
+- `node.plane` / `edge.plane` = `"base"` (spelled `layer` until 0.1)
+- the implicit base plane `{id:"base", z:0}` is always `planes[0]`
 - `band.extend` = `"up"`, `band.fill` = `"#e5e7eb"` (engine default);
   `band.label` is MANDATORY (`BAND-LABEL-STATUS`), so it is never
   defaulted and never absent
 - `bitfield.unit` = `32` (`numbering=` has **no** default — it is required on every `bitfield` line, `UNSAFE-DEFAULT-ELIMINATION`)
-- `layer.z` = declaration index (1, 2, …) when `z=` is omitted
 
-`layer=` is materialized only on `node` and `edge`; on `group`,
-`boundary`, `bundle`, `threshold`, `band` and `class` it is omitted when
-absent (spec §12.4 rule 1). `header.genre` is always present — the genre
+**What 0.3 changed here, and what it deliberately did not.** `PAINT-ORDER-CONSTRUCT`
+withdrew the `plane` keyword, `plane=` and `z-index=` from the LANGUAGE, so
+the entry that used to sit at the end of this list — `plane.z` = declaration
+index (1, 2, …) when `z-index=` is omitted — is **gone**: no document can
+declare a plane, so no plane can take a default `z`. `planes` is therefore
+always the one-element array above and `node.plane`/`edge.plane` always the
+constant `"base"`. **The model keys stay**, which is the deliberate half:
+the implicit base plane was never authored, it is what "everything paints in
+one plane" looks like in the §12 projection, and removing it would be a model
+change nothing in the ruling asked for. Paint order is document order. The
+sentence that used to follow — `plane=` is materialized only on `node` and
+`edge`, and omitted when absent on `group`, `external`, `bundle`,
+`threshold`, `band` and `class` — no longer describes anything an author can
+write, because the key does not exist; the model shape it described is
+unchanged. `header.genre` is always present — the genre
 token has been REQUIRED (`HEADER-GENRE-REQUIREMENT`), so it can only be absent
 from a document that failed to parse.
 
 **Omitted when absent** (never `null`): the optional `label` of
-`node`/`group`/`bundle`/`boundary`/`layer`/`bitfield`/`table`/`timing`
+`node`/`group`/`bundle`/`boundary`/`bitfield`/`table`/`timing` (`layer`, the
+plane's own label, left this list with the keyword — `PAINT-ORDER-CONSTRUCT`)
 (`OMITTED-LABEL-RECORDING` — an omitted label is **absent**, never replaced by the
 id: `node a` and `node a "a"` project differently, and renderers do the
 id substitution for display; an explicitly EMPTY label is a third state,
@@ -557,17 +681,17 @@ never truthiness, and the id substitution applies only to absence, so
 `fill`/`stroke`/`style`/`class` on nodes/groups/edges/classes,
 `group.gap`, edge `tail`/`mid`/`head`, `pin.x`/`pin.y` (together — `at=` is
 a point) and `pin.width`/`pin.height` (each may be absent; spelled
-`size.w`/`size.h` until this release and carried by a separate `size`
-directive until this release), `threshold` `stroke`, `node.role` (0.1 — written only by a
+`size.w`/`size.h` until 0.1 and carried by a separate `size`
+directive until 0.1), `threshold` `stroke`, `node.role` (0.1 — written only by a
 `flowchart` role keyword; a bare `node` has none, and that absence is
 meaning, `UNSAFE-DEFAULT-ELIMINATION` §3), field
 `present`/`fill`/`class`/`description` (`present` was the positional
-flag `optional`, and `note` was `description`'s name, until this release —
+flag `optional`, and `note` was `description`'s name, until 0.1 —
 `PRESENCE-CONDITION-EXPRESSION`/`DESCRIPTION-KEY-SPELLING`),
 table `width`/`marks`/`highlights`, timing signal `labels`, timing `gaps`.
 (`plot`/`chart` `level` left this list: `CHART-LEVEL-KEY` DELETED the
 option key outright rather than renaming it.)
-(Until this release there were two more, both additive: the
+(Until 0.1 there were two more, both additive: the
 top-level scalar `routing` appeared only when the document wrote an explicit
 `routing` line, and the top-level `paths` array was omitted entirely when
 there were no `path` lines. `EDGE-GEOMETRY-CONSTRUCTS` withdrew both constructs, so neither key can
@@ -578,7 +702,7 @@ when the document declares no `boundary` lines, and a boundary's
 
 Empty top-level collections stay as `[]` — the document shape is fixed
 (`boundaries` is the one omit-when-empty exception left; `paths` and the
-scalar `routing` were the others until this release). In `aligns`, a column
+scalar `routing` were the others until 0.1). In `aligns`, a column
 with no explicit `:` alignment is `"none"`.
 
 ## Running

@@ -3,7 +3,7 @@
 # style=solid` erased the dash that is conditional presence's only visual
 # carrier while the MODEL still recorded the field as conditionally present,
 # so one line produced two different figures — `PRESENTATION-AS-MEANING-CARRIER`'s exact prohibition.
-# (The flag was spelled `optional` until this release, `PRESENCE-CONDITION-EXPRESSION`.) The other two move with it as
+# (The flag was spelled `optional` until 0.1, `PRESENCE-CONDITION-EXPRESSION`.) The other two move with it as
 # one minimum set (11 in-repo uses, 0 downstream). `style=` stays live on
 # node/group/edge/class/bundle/threshold/band; only these three lost it.
 # Multi-section (`MULTI-FIGURE-DOCUMENTS`): one file, three genres, three diagnostics.

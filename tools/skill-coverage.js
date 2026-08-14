@@ -29,7 +29,7 @@
  *
  *   0. VENDOR      `skill/figdown/reference/` is byte-identical to the LIVE
  *                  `read/<X.Y>/`, which is the source of truth (
- *                  GENRE-REFERENCE-ADDRESS; the live directory became `read/0.2/` at STATECHART-GENRE-SCOPE). The bundle
+ *                  GENRE-REFERENCE-ADDRESS; the live directory became `read/0.2/` at STATECHART-GENRE-SCOPE and `read/0.3/` at DRAWN-ANNOTATION-FORM). The bundle
  *                  carries its own copy because it is installed standalone,
  *                  with no repository and no network; a generated copy that
  *                  nothing compares is the eighth four-copy-drift incident
@@ -83,7 +83,7 @@ const BUNDLE = path.join(ROOT, 'skill', 'figdown');
 const SKILL = path.join(BUNDLE, 'SKILL.md');
 // The source of truth for the per-genre reading files. `skill/figdown/reference/`
 // is a generated mirror of this directory — see check 0, VENDOR.
-const READ_SRC = path.join(ROOT, 'read', '0.2');
+const READ_SRC = path.join(ROOT, 'read', '0.3');
 // Reference files that answer a TASK rather than a genre, so no genre row can
 // name them. They are routed by SKILL.md's task list, which is prose an agent
 // reads and a regex cannot check.
