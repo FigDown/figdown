@@ -474,8 +474,10 @@ A topology figure's meaning is a **scene** with the same reading rule as
   so its label is the whole of what it puts on the page, and even that is
   drawn beside the open end of an edge rather than as a shape.
 - Geometry carries nothing. Adjacency in the rendered picture is not
-  connectivity — only an `edge` is. The `layout` zone is ignored by default
-  (§3, `CONTENT-LAYOUT-ZONE-SPLIT`/`GENRE-NAMESPACE`), and that skip is only safe because the zone is a namespace
+  connectivity — only an `edge` is. Every member of the layout NAMESPACE is
+  ignored by default, wherever in the document it appears
+  (§3, `CONTENT-LAYOUT-ZONE-SPLIT`/`GENRE-NAMESPACE` — membership decides, not position), and that is only
+  safe because the zone is a namespace
   of its own whose every member is genre-independent, so no genre semantics
   can ever appear inside it (`LAYOUT-ZONE-NAMESPACE`).
 

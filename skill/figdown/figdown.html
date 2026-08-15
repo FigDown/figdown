@@ -121,7 +121,7 @@ const SHAPES = ['box','rounded','circle','ellipse','diamond','cylinder'];
 // input to that promise, and under core §13 a 0.x renderer may differ from
 // the next — which makes the recorded version the only thing that can
 // explain a diff between two renderings of one source.
-const FIGDOWN_VERSION = '0.3.0';
+const FIGDOWN_VERSION = '0.3.1';
 // `STATECHART-GENRE-SCOPE`: the language number moved for the first time. The dev
 // counter does NOT reset (core §13.0.4 — `N` counts source states of the
 // engine and only ever increases), so 0.1 is followed by
@@ -3535,6 +3535,44 @@ function renderScene(doc,y0){
     return rk[u]=r;
   };
   nodes.forEach(n=>n.rank=rankOf(find(n.id)));
+  // SPINE CHAIN (item 27, ordering phase). A figure whose reading order is a
+  // chain must draw that chain in ONE lane; the incumbent barycenter sweep
+  // cannot, because a chain node and its branch sibling share one desired
+  // position and the sibling — declared first — takes the slot, so the chain
+  // steps aside once per rank and a logical column renders as a staircase
+  // (spine.fd: +165 px per rank, 2208 px wide for a 200 px column).
+  //
+  // The chain is found HERE, before any coordinate exists, and it is the
+  // longest rank-consecutive path of real nodes. Deterministic throughout:
+  // longest-path DP taken in decreasing rank, every tie broken by document
+  // order, so one document has exactly one chain.
+  const chainNext=new Map(), chainPrev=new Map();
+  const CHAIN_MIN=4;             // nodes; below this a figure has no spine to
+  {                              // hold and the incumbent sweep is left alone
+    const sc=new Map();
+    for(const e of doc.edges){
+      const A=byId[e.a],B=byId[e.b];
+      if(!A||!B||isBack.has(e)||e.a===e.b) continue;
+      if(e.op!=='->') continue;               // a chain is a READING order, and
+                                              // only a directed edge states one
+      if(B.rank!==A.rank+1) continue;         // a chain is rank-consecutive
+      if(pinned(e.a)||pinned(e.b)) continue;  // a pin is the author's word
+      if(!sc.has(A)) sc.set(A,[]); sc.get(A).push(B);
+    }
+    const len=new Map(), nxt=new Map();
+    for(const n of [...nodes].sort((p,q)=>q.rank-p.rank||p.di-q.di)){
+      let best=null,bl=0;
+      for(const s of sc.get(n)||[]){
+        const l=len.get(s)||1;
+        if(l>bl||(l===bl&&best&&s.di<best.di)){ bl=l; best=s; }
+      }
+      len.set(n,bl+1); if(best) nxt.set(n,best);
+    }
+    let head=null;
+    for(const n of nodes) if(!head||len.get(n)>len.get(head)) head=n;   // ties: doc order
+    if(head&&len.get(head)>=CHAIN_MIN)
+      for(let n=head,m=nxt.get(n);m;n=m,m=nxt.get(n)){ chainNext.set(n,m); chainPrev.set(m,n); }
+  }
   // positions: children spread around their parents' lane (barycenter
   // sweeps down/up/down). Edges that span multiple layers get invisible
   // waypoint slots so they no longer cut through intermediate nodes.
@@ -3544,6 +3582,33 @@ function renderScene(doc,y0){
   const lblPx=s=>cwMax(s)*6.5;
   const lay=[...nodes];                    // layout participants
   const chains=new Map();                  // edge -> [A, ...waypoints, B]
+  // Bus eligibility, TOPOLOGICAL half (item 26 stage 1). Three or more forward
+  // `->` edges arriving at one target with one label, one stroke and one dash,
+  // no endpoint labels and no pinned endpoint. It is computed here, before the
+  // geometry, because the render pass needs the group SET whole: the figure
+  // decides all-or-none, so it has to know how many groups it is deciding for.
+  //
+  // Placement is deliberately NOT touched. A member still reserves its
+  // waypoint column, which is the cost item 27 records; suppressing those
+  // columns was implemented and measured (spine.fd 2208 -> 1318 px and a
+  // visibly better drawing) and is NOT landed here, because the suppression
+  // has to be decided before coordinates exist while adoption can only be
+  // decided after, and a figure that suppresses and then declines draws
+  // straight through its own boxes (bfd-session: score 30 -> 35 with a new
+  // `thru`). That belongs with item 27's ordering change, priced.
+  const busGroups=[];
+  {
+    const g=new Map();
+    for(const e of doc.edges){
+      const A=byId[e.a], B=byId[e.b];
+      if(!A||!B||e.a===e.b||isBack.has(e)) continue;
+      if(e.op!=='->'||e.tail||e.head) continue;
+      if(pinned(e.a)||pinned(e.b)||B.rank<=A.rank) continue;
+      const k=e.b+' '+(e.mid||'')+' '+(e.stroke||'')+' '+(e.style||'');
+      if(!g.has(k)) g.set(k,[]); g.get(k).push(e);
+    }
+    for(const [,m] of g) if(m.length>=3) busGroups.push(m);
+  }
   for(const e of doc.edges){
     const A=byId[e.a], B=byId[e.b];
     if(!A||!B||isBack.has(e)) continue;
@@ -3610,7 +3675,92 @@ function renderScene(doc,y0){
   const center=n=>n.cross+cs(n)/2;
   ranksArr.forEach(lane=>{ if(!lane) return; let c=0;    // seed: doc order
     lane.forEach((n,k)=>{ n.cross=c; c+=cs(n)+(k<lane.length-1?gapOf(n,lane[k+1]):0); }); });
-  const place=(lane,des)=>{   // order by desired center, resolve overlaps,
+  // WHERE THE HOLD YIELDS, WHICH IS MOST OF THE RULE. Holding a chain node on
+  // its chain neighbour puts every OTHER neighbour of that node on one side of
+  // it, and where the figure diverges or converges that is the wrong drawing:
+  // item 27's Brandes-Köpf rejection measured this exact mechanism from the
+  // other end — aligning on ONE neighbour where the barycentre uses the AVERAGE
+  // made 11 of 19 figures worse, and "the average is what a human draws". So
+  // the hold is dropped wherever it would displace a spread the reader reads.
+  //
+  // `realDeg` is degree as the READER sees it at one rank boundary: real
+  // neighbours, plus the waypoints of long edges whose far end is OFF the
+  // chain. A long edge that leaves the chain and rejoins it later is not a
+  // spread — counting it would drop the hold on exactly the columns this pass
+  // exists to create (bfd-session's ADMINDOWN is entered by UP and by two
+  // waypoints of edges that left DOWN and INIT) — while a long edge arriving
+  // from elsewhere is one, and its target belongs at the average (that is
+  // packet-ingress's `Forward`, entered by `IPv4 checksum OK?` beside it and by
+  // two waypoints from the IPv6 and ARP branches).
+  const onChain=n=>chainNext.has(n)||chainPrev.has(n);
+  const realDeg=(m,side)=>{
+    let k=0;
+    for(const s of (side===1?succs:preds).get(m)||[]){
+      if(!s.virtual){ k++; continue; }
+      const o=side===1?s.homeB:s.homeA;
+      if(o&&!onChain(o)) k++;
+    }
+    return k;
+  };
+  const realFan=(n,dir)=>{
+    const m=(dir===1?chainPrev:chainNext).get(n); return m?realDeg(m,dir):0;
+  };
+  // PROSPECTIVE BUSES, AND WHY THE HOLD YIELDS TO THEM RATHER THAN SERVING
+  // THEM. Item 26 records the trap this pass had to answer: a bus member's
+  // waypoint column can be suppressed only BEFORE coordinates exist, while the
+  // bus is adopted only AFTER, so a figure that suppresses and then declines
+  // routes through its own boxes (bfd-session 30 -> 35 with a new `thru`).
+  // Nothing here suppresses anything. It takes the one direction of that
+  // decision which is safe under a decline: it WITHHOLDS the hold from the
+  // source of a bus group that is topologically eligible, and withholding is
+  // the incumbent behaviour — a figure that declines is drawn exactly as it is
+  // drawn today, with nothing to undo. Holding them is the unsafe direction:
+  // it stacks the sources of one convergence into a single column, and a bus
+  // leg dropping from the earliest then pierces the latest — patterns/
+  // flowchart-a loses the trunk it gained that way, measured.
+  //
+  // ...and only for a group that could ever BE a rail. A bus drops every source
+  // onto one cross-axis rail, so a group whose sources sit on top of each other
+  // along the FLOW axis — one source an ancestor of another — is unadoptable
+  // whatever ordering does, and withholding there would cost the column and buy
+  // nothing (bfd-session's three `admin disable` edges leave DOWN, INIT and UP,
+  // and DOWN reaches both of the others).
+  const busSrc=new Set();
+  {
+    const fwd=new Map();
+    for(const e of doc.edges){
+      if(!byId[e.a]||!byId[e.b]||isBack.has(e)||e.a===e.b) continue;
+      if(!fwd.has(e.a)) fwd.set(e.a,[]); fwd.get(e.a).push(e.b);
+    }
+    const reaches=(u,v)=>{                       // forward-DAG reachability
+      const seen=new Set([u]), st=[u];
+      while(st.length){ const x=st.pop();
+        for(const y of fwd.get(x)||[]){ if(y===v) return true;
+          if(!seen.has(y)){ seen.add(y); st.push(y); } } }
+      return false;
+    };
+    for(const m of busGroups){
+      const s=m.map(e=>e.a);
+      let stacked=false;
+      for(const a of s) for(const b of s) if(a!==b&&reaches(a,b)) stacked=true;
+      if(!stacked) for(const a of s) busSrc.add(a);
+    }
+  }
+  // A chain node is HELD — it follows its chain neighbour rather than the
+  // average of all of them — unless it is a bus source (above), unless the
+  // neighbour it would follow spreads three or more ways into this rank, or
+  // unless the node itself is where three or more come together (block-a's
+  // Collector, lifted off the middle lane by BK, is the recorded instance of
+  // the latter).
+  const held=(n,dir)=>onChain(n)
+                      &&!(n.id&&busSrc.has(n.id))
+                      &&realFan(n,dir)<3&&realDeg(n,-dir)<3;
+  // A whole LANE keeps its barycentre recentring if anything in it converges,
+  // even where the chain node itself does not: recentring on the chain node
+  // moves every other member of that lane, and a convergence is read from the
+  // spread of its inputs.
+  const laneConverges=(lane,dir)=>lane.some(n=>!n.virtual&&realDeg(n,-dir)>=3);
+  const place=(lane,des,dir)=>{   // order by desired center, resolve overlaps,
     const arr=lane.map(n=>({n,d:des.get(n)}));           // recenter the lane
     arr.sort((p,q)=>p.d-q.d||p.n.di-q.n.di);
     let cEnd=-Infinity;
@@ -3618,7 +3768,25 @@ function renderScene(doc,y0){
       x.n.cross=Math.max(x.d-cs(x.n)/2, cEnd);
       cEnd=x.n.cross+cs(x.n)+(i<arr.length-1?gapOf(x.n,arr[i+1].n):0);
     });
-    const err=arr.reduce((s,x)=>s+center(x.n)-x.d,0)/arr.length;
+    // Recentre. Normally on the lane's MEAN error, which shares the packing
+    // displacement out over every member — and that is exactly what walks a
+    // chain sideways, since the chain node is one member among many. When the
+    // lane carries the chain (at most one node per rank, by construction) the
+    // lane is recentred on THAT node instead: it lands on its desired position
+    // exactly, its siblings keep the order and spacing the sort gave them, and
+    // the chain is straight by construction rather than by iteration.
+    // Two more lanes keep the mean. A lane holding a PINNED node, because the
+    // pin's coordinate is the author's word and does not move with the lane, so
+    // sliding the lane against it can only put free nodes on a fixed one
+    // (reference/block's `Drop?` diamond landed on the pinned `Rule set` that
+    // way, `novlp 1`). And the chain's LAST lane in the sweep direction, where
+    // there is no next step to keep aligned, so the hold buys no straightness
+    // and only redistributes that lane's other members (annotated-datapath
+    // redrew for no gain until this clause was added).
+    const anc=(lane.some(n=>!n.virtual&&pinned(n.id))||laneConverges(lane,dir))
+              ?null:arr.find(x=>held(x.n,dir)&&(dir===1?chainNext:chainPrev).has(x.n));
+    const err=anc?center(anc.n)-anc.d
+                 :arr.reduce((s,x)=>s+center(x.n)-x.d,0)/arr.length;
     arr.forEach(x=>{ x.n.cross-=err; });
     lane.length=0; arr.forEach(x=>lane.push(x.n));
   };
@@ -3633,6 +3801,13 @@ function renderScene(doc,y0){
       for(const n of lane){
         const ref=(dir===1?preds:succs).get(n);
         let d=ref&&ref.length ? ref.reduce((s,m)=>s+center(m),0)/ref.length : center(n);
+        // A chain node follows its CHAIN neighbour alone, not the average of
+        // its neighbours: a branch that leaves the chain and rejoins it later
+        // otherwise drags the chain off its own lane, which is the drift this
+        // pass exists to remove. Its other neighbours still order themselves
+        // around it in the sweep below.
+        const cn=(dir===1?chainPrev:chainNext).get(n);
+        if(cn&&held(n,dir)) d=center(cn);
         // Waypoint excursion bound (item 17): a multi-rank forward edge's dummy
         // vertices may follow the barycenter freely WITHIN the cross-axis band
         // their own endpoints span — that is where the ordering that separates
@@ -3653,7 +3828,7 @@ function renderScene(doc,y0){
         }
         des.set(n,d);
       }
-      place(lane,des);
+      place(lane,des,dir);
     }
   };
   sweep(1); sweep(-1); sweep(1);
@@ -3675,23 +3850,43 @@ function renderScene(doc,y0){
       if(horiz) n.x=M-n.x-n.w; else n.y=y0+20+(M-(n.y-y0-20))-n.h; }
   }
   // Two-level coordinates (`PIN-COORDINATE-SCOPE`): a pinned GROUP anchors its local origin in
-  // canvas px; a pinned MEMBER is group-local (relative to that origin);
+  // canvas px; a pinned MEMBER of it is group-local (relative to that origin);
   // ungrouped pins are canvas px. Moving a group = editing one pin line.
+  //
+  // A member of an UNPINNED group has NO anchored origin to be relative to, so
+  // its pin is canvas px exactly like an ungrouped node's. This is `LAYOUT-STABILITY` rigidity:
+  // the pin is the author's word and MUST land where written, whether or not
+  // the node is a group member. The prior code derived an unpinned group's
+  // origin from its members' AUTO-LAYOUT extent and then added the member pin
+  // to it, so the pin was neither honoured (it read canvas 400 as origin+400)
+  // nor stable (the origin moved whenever an unrelated edit reshaped the auto
+  // layout — a pinned member drifted 160.9px under a synthetic added edge,
+  // violating `RENDERING-DETERMINISM` stability; task #47). The pin now wins and the group BOX grows
+  // to CONTAIN the member wherever it lands (box is measured from final member
+  // positions below), rather than the member being repositioned to fit the box.
   const gOrigin={};
+  // Pass 1: a pinned group anchors its origin in canvas px (`ELEMENT-GEOMETRY-DIRECTIVE`: only a pin
+  // carrying `at=` anchors one). An unpinned group gets no origin here, so its
+  // members fall to the canvas-px branch below.
   for(const g of doc.groups){
     const p=doc.pins[g.id];
-    // `ELEMENT-GEOMETRY-DIRECTIVE`: only a pin that carries `at=` anchors an origin.
-    if(p&&p.fx!==null){ gOrigin[g.id]={x:p.fx, y:y0+20+p.fy}; }
-    else{
-      const mem=nodes.filter(n=>n.group===g.id);
-      if(mem.length) gOrigin[g.id]={x:Math.min(...mem.map(n=>n.x)),
-                                    y:Math.min(...mem.map(n=>n.y))};
-    }
+    if(p&&p.fx!==null) gOrigin[g.id]={x:p.fx, y:y0+20+p.fy};
   }
+  // Pass 2: place pinned nodes. A member of a PINNED group is group-local; an
+  // ungrouped node OR a member of an UNPINNED group is canvas px.
   for(const n of nodes){ const p=doc.pins[n.id]; if(!p||p.fx===null) continue;
     const o=n.group?gOrigin[n.group]:null;
     if(o){ n.x=o.x+p.fx; n.y=o.y+p.fy; }
     else { n.x=p.fx; n.y=y0+20+p.fy; }
+  }
+  // Pass 3: an unpinned group has no anchor of its own; its display origin
+  // (drag anchor / data-gx,gy) is the top-left of its members' FINAL positions,
+  // so it reflects any pinned members and matches the group box drawn below.
+  for(const g of doc.groups){
+    if(gOrigin[g.id]) continue;
+    const mem=nodes.filter(n=>n.group===g.id);
+    if(mem.length) gOrigin[g.id]={x:Math.min(...mem.map(n=>n.x)),
+                                  y:Math.min(...mem.map(n=>n.y))};
   }
   // Boundary adjacency in pinned scenes (presentation-only): auto-layout ranks
   // a degree-1 boundary relative to the free lanes, so in a scene where the
@@ -3793,6 +3988,27 @@ function renderScene(doc,y0){
       const g=byT[t].filter(e=>chPlan.get(e).ringOK);
       const B=byId[t], m=g.length;
       g.forEach((e,k)=>{ chPlan.get(e).ex=B.x+B.w*(m-k)/(m+1); });
+    }
+    // RETURN LANES — the other axis. A back edge got a lane in ONE axis and
+    // not the other: each route was handed its own COLUMN out in the channel
+    // and then every route into one target came home along that target's
+    // CENTRE line, so N returns drew as one line. bfd-session put three of
+    // them (452 px, 263 px, 263 px of shared ink) on y=46, and the figure
+    // showed one horizontal stroke with three arrowheads stacked on it.
+    // The entry now fans across the target's border exactly as a ring hub
+    // entry fans across its top, and the ORDER is what keeps the returns from
+    // crossing one another: an outer return has to pass every inner column on
+    // its way in, so it must arrive BEYOND where those columns stop —
+    // innermost ring takes the lane furthest from the channel's turn-in side,
+    // outermost the nearest. The fraction is stored, not the coordinate,
+    // because the three entry forms need it on different edges of the box
+    // (right border, bottom border, detour into the bottom). One back edge
+    // into a target still lands on the centre line (m=1 -> 1/2), so every
+    // figure without a fan-in is byte-unchanged.
+    for(const t in byT){
+      const g=byT[t].filter(e=>!chPlan.get(e).ringOK&&e.a!==e.b);
+      const m=g.length;
+      g.forEach((e,k)=>{ chPlan.get(e).ef=(m-k)/(m+1); });
     }
     // ring return rows run above the top rank; shift the whole scene down
     // when they would spill into the title band. The shift is uniform
@@ -3904,6 +4120,167 @@ function renderScene(doc,y0){
     const v=chain[1+Math.floor((chain.length-3)/2)];
     occR=Math.max(occR, v.x+v.w/2+9+lblPx(e.mid));
   });
+  // ── merge bus (item 26 stage 1) ──────────────────────────────────────────
+  // Three or more edges that arrive at the SAME target carrying the SAME
+  // (or no) label are one statement — "all of these go there" — and a drawing
+  // tool draws it once: each source drops to a shared rail, the rail runs to
+  // one trunk, the trunk enters the target with ONE arrowhead and ONE label,
+  // and the joins are marked with junction dots. Drawing three lines to one
+  // box and repeating one label three times is what this removes.
+  //
+  // Each member still emits its OWN full path from its source outline to the
+  // target outline — shape-check asserts exactly that, and `data-edge` carries
+  // one source line — so the shared trunk is stroked once per member. That
+  // coincidence is the convention and not a defect, and the members say so:
+  // every bus path carries `data-bus="<target>"`, which is what lets a reader
+  // (and layout-lint) tell a deliberate trunk from two edges hidden under each
+  // other.
+  //
+  // ── THE FIGURE-LEVEL STYLE DECISION (item 26's unresolved tension) ────────
+  // A bus is axis-aligned by construction, so a figure that takes one has
+  // taken an orthogonal convention. Item 26 records the failure mode: keeping
+  // the incumbent PER EDGE leaves a figure with diagonal and orthogonal routes
+  // mixed, and the mixture itself reads unprofessional (`dhcp-client` was
+  // rejected on exactly that). So the decision is taken ONCE PER FIGURE and it
+  // is ALL-OR-NONE:
+  //
+  //   1. enumerate every eligible group (the topological test above: three or
+  //      more forward `->` edges, one target, one label, one stroke and dash,
+  //      no endpoint labels, no pinned endpoint, no source an ancestor of
+  //      another source);
+  //   2. build and test each one — every leg must clear every node it does not
+  //      touch and every group box it does not belong to, the sources must all
+  //      lie on one side of the target along the flow axis with room for a
+  //      rail, and the bus must not cross more of the figure than the routes
+  //      it replaces (item 26's "kept unless strictly beaten", moved from the
+  //      edge to the group);
+  //   3. IF ANY ELIGIBLE GROUP FAILS, THE FIGURE ADOPTS NO BUS AT ALL.
+  //
+  // Clause 3 is the whole of the style rule. A figure with one convergence
+  // merged into a trunk and another left as a fan is the mixed drawing; a
+  // figure where every convergence is a trunk, or none is, is one drawing
+  // either way. There is deliberately no per-edge escape.
+  const busRoute=new Map();
+  {
+    const RAIL_GAP=22, RAIL_CLEAR=12, RAIL_ROOM=30;
+    const fLo=n=>horiz?n.x:n.y, fHi=n=>horiz?n.x+n.w:n.y+n.h;
+    const cC =n=>horiz?n.y+n.h/2:n.x+n.w/2;
+    const P=(f,c)=>horiz?[f,c]:[c,f];          // (flow,cross) -> [x,y]
+    const gObs=[];
+    for(const k in gBox){ const b=gBox[k]; gObs.push({x:b.x0,y:b.yA,w:b.x1-b.x0,h:b.yB-b.yA}); }
+    const obsFor=(s,t)=>{
+      const o=nodes.filter(n=>n!==s&&n!==t&&!n.boundary).map(n=>({x:n.x,y:n.y,w:n.w,h:n.h}));
+      const inG=(b,q)=>q[0]>b.x&&q[0]<b.x+b.w&&q[1]>b.y&&q[1]<b.y+b.h;
+      const ps=[s.x+s.w/2,s.y+s.h/2], pt=[t.x+t.w/2,t.y+t.h/2];
+      for(const b of gObs) if(!inG(b,ps)&&!inG(b,pt)) o.push(b);
+      return o;
+    };
+    // The incumbent a bus is measured against, reconstructed exactly as the
+    // edge loop would draw it in THIS layout: a multi-rank edge follows its
+    // waypoint chain, everything else is the straight border-to-border line.
+    // Placement is untouched by the bus, so this is a like-for-like comparison
+    // inside one drawing — not a comparison across two layouts, which is the
+    // mistake item 27 was rejected for.
+    const incumbent=e=>{
+      const A=byId[e.a], B=byId[e.b], ch=chains.get(e);
+      const pp=[];
+      if(ch) for(const v of ch.slice(1,-1)) pp.push([v.x+v.w/2,v.y+v.h/2]);
+      const first=pp.length?pp[0]:[B.x+B.w/2,B.y+B.h/2];
+      const last =pp.length?pp[pp.length-1]:[A.x+A.w/2,A.y+A.h/2];
+      return [borderPoint(A,first[0],first[1]),...pp,borderPoint(B,last[0],last[1])];
+    };
+    // crossing count of a polyline against the rest of the figure's incumbent
+    // geometry — the term item 26's score weights highest, and the only one on
+    // which "never worse" is worth promising for a construct whose whole point
+    // is to share ink.
+    const busMem=new Set(); for(const m of busGroups) for(const e of m) busMem.add(e);
+    const others=[];
+    for(const e of edges){
+      if(!byId[e.a]||!byId[e.b]||e.a===e.b) continue;
+      if(busMem.has(e)) continue;
+      if(isBack.has(e)&&!pinned(e.a)&&!pinned(e.b)) continue;   // channel routes: not reconstructible here
+      others.push(incumbent(e));
+    }
+    const xseg=(a,b,c,d)=>{
+      const rx=b[0]-a[0], ry=b[1]-a[1], sx=d[0]-c[0], sy=d[1]-c[1];
+      const den=rx*sy-ry*sx; if(Math.abs(den)<1e-9) return false;
+      const t=((c[0]-a[0])*sy-(c[1]-a[1])*sx)/den, u=((c[0]-a[0])*ry-(c[1]-a[1])*rx)/den;
+      return t>1e-6&&t<1-1e-6&&u>1e-6&&u<1-1e-6;
+    };
+    // ...and a route that pierces a box counts the same as a crossing, because
+    // a short crossing-free line that goes straight through a node is not a
+    // better drawing than a long one that goes round it.
+    const pierceCount=(rts,mem)=>{
+      let n=0;
+      rts.forEach((r,i)=>{
+        const A=byId[mem[i].a], B=byId[mem[i].b];
+        const obs=obsFor(A,B);
+        for(let k=0;k+1<r.length;k++) if(segHitsObs(r[k],r[k+1],obs)){ n++; break; }
+      });
+      return n;
+    };
+    const crossCount=rts=>{
+      let n=0;
+      const pairs=rts.map(r=>r).concat(others);
+      for(let i=0;i<rts.length;i++) for(let j=0;j<pairs.length;j++){
+        if(pairs[j]===rts[i]) continue;
+        if(j<rts.length&&j<i) continue;              // count each member pair once
+        for(let a=0;a+1<rts[i].length;a++) for(let b=0;b+1<pairs[j].length;b++)
+          if(xseg(rts[i][a],rts[i][a+1],pairs[j][b],pairs[j][b+1])) n++;
+      }
+      return n;
+    };
+    const built=[];
+    let figureOK=busGroups.length>0;
+    for(const mem of busGroups){
+      if(!figureOK) break;
+      const T=byId[mem[0].b], src=mem.map(e=>byId[e.a]);
+      let dir=0;
+      if(src.every(s=>fLo(T)-fHi(s)>=RAIL_ROOM)) dir=1;
+      else if(src.every(s=>fLo(s)-fHi(T)>=RAIL_ROOM)) dir=-1;
+      else { figureOK=false; break; }              // no room for a rail
+      const railF=dir>0
+        ? Math.min(fLo(T)-RAIL_CLEAR, Math.max(fLo(T)-RAIL_GAP, Math.max(...src.map(fHi))+RAIL_CLEAR))
+        : Math.max(fHi(T)+RAIL_CLEAR, Math.min(fHi(T)+RAIL_GAP, Math.min(...src.map(fLo))-RAIL_CLEAR));
+      const tc=cC(T);
+      const cand=[]; let ok=true;
+      for(const e of mem){
+        const s=byId[e.a], cs=cC(s);
+        const j=P(railF,cs), h=P(railF,tc);
+        const pts=Math.abs(cs-tc)<0.5
+          ? [borderPoint(s,h[0],h[1]), h, borderPoint(T,h[0],h[1])]
+          : [borderPoint(s,j[0],j[1]), j, h, borderPoint(T,h[0],h[1])];
+        const obs=obsFor(s,T);
+        for(let i=0;i+1<pts.length;i++) if(segHitsObs(pts[i],pts[i+1],obs)) ok=false;
+        if(!ok) break;
+        cand.push({e,cs,pts});
+      }
+      if(!ok){ figureOK=false; break; }             // a leg pierces something
+      const bpts=cand.map(c=>c.pts), ipts=mem.map(incumbent);
+      const bc=crossCount(bpts)+pierceCount(bpts,mem);
+      const ic=crossCount(ipts)+pierceCount(ipts,mem);
+      if(bc>ic){
+        figureOK=false; break;                      // not beaten: keep the incumbents
+      }
+      // junction dots mark the interior joins only: the two ends of the rail
+      // are corners, not junctions, and a dot on a corner is wrong.
+      const xs=cand.map(c=>c.cs).concat([tc]);
+      const cLo=Math.min(...xs), cHi=Math.max(...xs);
+      const dots=[];
+      for(const c of cand) if(c.cs>cLo+0.5&&c.cs<cHi-0.5) dots.push(P(railF,c.cs));
+      if(tc>cLo+0.5&&tc<cHi-0.5&&!dots.some(d=>Math.abs(d[horiz?1:0]-tc)<0.5)) dots.push(P(railF,tc));
+      // one label and one arrowhead for the whole bus: the member whose rail
+      // run is longest carries the label, document order breaks the tie.
+      let lead=cand[0], best=-1;
+      for(const c of cand){ const d=Math.abs(c.cs-tc); if(d>best+0.5){ best=d; lead=c; } }
+      built.push({T,cand,dots,lead});
+    }
+    // Nothing to undo when the figure declines: the bus is a routing pass and
+    // the layout it declines is the layout it already had.
+    if(figureOK) for(const g of built)
+      g.cand.forEach((c,i)=>busRoute.set(c.e,{pts:c.pts,bus:g.T.id,lead:c===g.lead,
+        dots:i===g.cand.length-1?g.dots:null, arrow:i===g.cand.length-1}));
+  }
   for(const e of edges){
     const A=byId[e.a], B=byId[e.b]; if(!A||!B) continue;
     // an edge is pure stroke: `stroke=` and `fill=` name the same channel
@@ -3923,6 +4300,29 @@ function renderScene(doc,y0){
     const m1='', m2='';   // markers removed — arrowTri() paints triangles above nodes in lblsvg
     const halo=' paint-order="stroke" stroke="#fff" stroke-width="3"';
     const seg=(p,q,t,lbl,fs)=>reqLabel({p,q,t0:t,text:lbl,fs,col:ecol,halo,e,A,B,kind:'end'});
+    const bus=busRoute.get(e);
+    if(bus){
+      const pts=bus.pts;
+      // data-bus is written LAST so every reader that keys on the
+      // `d=… fill=none stroke=… stroke-width=1.6` prefix is unaffected.
+      esvg.push('<path data-edge="'+e.line+'" d="'+roundPath(pts)+'" fill="none" stroke="'+col+'" stroke-width="1.6"'+dash+' data-bus="'+esc(bus.bus)+'"/>');
+      noteSegs(e,pts);
+      for(const p of pts){ W=Math.max(W,p[0]+4); Hh=Math.max(Hh,p[1]+4-y0-20); }
+      if(bus.dots) for(const d of bus.dots)
+        lblsvg.push('<circle cx="'+d[0]+'" cy="'+d[1]+'" r="3" fill="'+col+'" stroke="none"/>');
+      // the trunk is drawn once by every member; the label and the arrowhead
+      // are drawn ONCE for the bus, which is the whole point of merging it.
+      if(bus.lead&&e.mid){          // longest rail run carries the one label
+        let bi=0,bl=-1;
+        for(let i=0;i+1<pts.length;i++){
+          const l=Math.hypot(pts[i+1][0]-pts[i][0],pts[i+1][1]-pts[i][1]);
+          if(l>bl){ bl=l; bi=i; }
+        }
+        reqLabel({p:pts[bi],q:pts[bi+1],text:e.mid,fs:11,col:lcol,halo,e,A,B,kind:'mid',first:bi===0});
+      }
+      if(bus.arrow&&wantsEnd) arrowTri(pts[pts.length-1],pts[pts.length-2],col);
+      continue;
+    }
     if(isBack.has(e)&&!pinned(e.a)&&!pinned(e.b)){
       // ── ROUTING-CHANGE ARCHITECTURE NOTE (`SELF-EDGE-DRAWING`/`EDGE-BEND-RETENTION`) ──────────
       // Edge labels are DEFERRED: every label is registered against its
@@ -3940,6 +4340,32 @@ function renderScene(doc,y0){
         // convention of every drawing tool — never a lap of the figure
         // through the back-edge channel. Side order r,l,b,t; first side
         // whose loop box overlaps no other node wins (deterministic).
+        //
+        // THE LOOP AND THE CHANNEL SHARE THIS SIDE, AND THAT IS A KNOWN,
+        // MEASURED, UNFIXED DEFECT. A loop hangs off one side of the box on
+        // the box's MID line; a channel back edge leaves and enters on the
+        // SAME side (right under vertical flow, bottom under horizontal) at
+        // rows near that same mid line — so a state that both loops and takes
+        // a channel route has a line drawn across a 20 px ornament. It is
+        // CROSSING, not shared ink: measured over the whole corpus, no
+        // self-loop shares more than 0 px of collinear ink with anything.
+        // bfd-session is the only figure where it bites (turnstile's two loops
+        // are clean), and there it is 12 crossings over four loops.
+        //
+        // THE OBVIOUS FIX WAS BUILT AND REJECTED, so it is not re-attempted
+        // blind: treat the channel side as occupied and take the next free
+        // side. bfd-session's crossings fall 15 -> 4 and every loop comes
+        // clean — but DOWN, INIT and UP have only 'l' free (their 'b' and 't'
+        // boxes sit on the spine, which loopHit does not test), and the left
+        // of a scene is only PADL=18 px wide. Their three trigger labels were
+        // placed at x = -102.6, -73.4 and -57.1 and CLIPPED OFF THE CANVAS —
+        // three labels lost to buy eleven crossings, which is the wrong trade
+        // in the direction label placement has been moving all week.
+        // WHAT WOULD REOPEN IT: a left-margin mechanism for the scene (the
+        // uniform-shift pattern bShift/chShift already use, applied before the
+        // label pass), so a loop and its label can hang off the left at all.
+        // Until then the loop stays on the channel side and the crossing is
+        // recorded rather than papered over.
         const scy=A.y+A.h/2, scx=A.x+A.w/2;
         const mkLoop=sd=>sd==='r'?[[A.x+A.w,scy-8],[A.x+A.w+20,scy-8],[A.x+A.w+20,scy+8],[A.x+A.w,scy+8]]
           :sd==='l'?[[A.x,scy-8],[A.x-20,scy-8],[A.x-20,scy+8],[A.x,scy+8]]
@@ -3956,7 +4382,15 @@ function renderScene(doc,y0){
         for(const p of sp){ W=Math.max(W,p[0]+4); Hh=Math.max(Hh,p[1]+16-y0-20); }
         esvg.push('<path data-edge="'+e.line+'" d="'+roundPath(sp)+'" fill="none" stroke="'+col+'" stroke-width="1.6"'+dash+'/>');
         noteSegs(e,sp);
-        if(e.mid) reqLabel({p:sp[1],q:sp[2],text:e.mid,fs:11,col:lcol,halo,e,A,B,kind:'mid',first:false});
+        // A self-loop's outer run is 16 px long, so sliding the label ALONG it
+        // buys ~15 px and no escape at all from a line crossing it — and a
+        // back edge leaves the same node on the same side at the same mid-y,
+        // which is how bfd-session drew three self-loop labels with a line
+        // through them. Parameters outside [0,1] are offered too: they park the
+        // box just above or just below the loop, still hard against it, which
+        // is a placement a reader still reads as belonging to the loop.
+        if(e.mid) reqLabel({p:sp[1],q:sp[2],text:e.mid,fs:11,col:lcol,halo,e,A,B,kind:'mid',first:false,
+                            ts:[0.5,0.2,0.8,-0.7,1.7,-1.4,2.4],tw:10});
         if(e.tail) seg(sp[0],sp[1],0.5,e.tail,10);
         if(e.head) seg(sp[3],sp[2],0.5,e.head,10);
         if(wantsStart) arrowTri(sp[0],sp[1],col);
@@ -3972,47 +4406,68 @@ function renderScene(doc,y0){
       const lane=r=>(ranksArr[r]||[]).filter(n=>!n.virtual);
       const P=chPlan.get(e), ring=P.ring;
       const pts=[];
+      // WHERE A BACK-EDGE LABEL GOES. It used to be registered on
+      // the CHANNEL run — the long leg out in the side channel, past every node
+      // in the figure. That is the furthest point on the route from either
+      // endpoint, and every back edge's channel run is in the same channel, so
+      // the labels landed in one column with nothing but proximity to say which
+      // line each named (bfd-session parked three of them around x=1100 while
+      // its four states occupied x 57-200). The label now rides the first
+      // stretch of the route AS IT LEAVES THE SOURCE, where the reader can see
+      // which box the line comes out of. The stub is capped so the candidate
+      // parameters land the box beside the source rather than halfway to the
+      // channel; a shorter first leg just uses all of itself. The cap has to
+      // scale with the LABEL, not be a constant: at the middle of a stub the
+      // box spans the midpoint plus and minus half its width, so a stub
+      // shorter than the label puts the box back on top of the source box
+      // whatever parameter is chosen (bfd-session's "Detect expired, Echo
+      // failed" is 169 px wide and a fixed 64 px stub buried it in INIT).
+      const srcStub=(pp,wpx)=>{
+        const a=pp[0], b=pp[1], L=Math.hypot(b[0]-a[0],b[1]-a[1])||1;
+        const k=Math.min(1,Math.max(64,wpx+24)/L);
+        return [a,[a[0]+(b[0]-a[0])*k, a[1]+(b[1]-a[1])*k]];
+      };
       if(horiz){             // channel runs below the lanes
         const chY=occB+28+P.slot;             // labels ride ON the channel
         const colR=r=>Math.max(...lane(r).map(n=>n.x+n.w));
         const blockedV=(y1,y2,xx,skip)=>nodes.some(n=>n!==skip&&!n.boundary&&n.x<xx&&n.x+n.w>xx&&n.y+n.h>y1&&n.y<y2);
-        const sx=A===B?A.x+A.w*0.3:A.x+A.w/2, tx=A===B?B.x+B.w*0.7:B.x+B.w/2;
+        const sx=A===B?A.x+A.w*0.3:A.x+A.w/2, tx=A===B?B.x+B.w*0.7:B.x+B.w*P.ef;
         if(A!==B&&blockedV(A.y+A.h,chY,sx,A)){
           const gx=colR(A.rank)+10+ring*7;
           pts.push([outSide(A,'r'),A.y+A.h/2],[gx,A.y+A.h/2],[gx,chY]);
         } else pts.push([sx,outSide(A,'b')],[sx,chY]);
         if(A!==B&&blockedV(B.y+B.h,chY,tx,B)){
           const gx=colR(B.rank)+10+ring*7;
-          pts.push([gx,chY],[gx,B.y+B.h/2],[outSide(B,'r'),B.y+B.h/2]);
+          pts.push([gx,chY],[gx,B.y+B.h*P.ef],[outSide(B,'r'),B.y+B.h*P.ef]);
         } else pts.push([tx,chY],[tx,outSide(B,'b')]);
         if(e.mid){
-          const c1=pts.findIndex(p=>p[1]===chY);
-          reqLabel({p:pts[c1],q:pts[c1+1],text:e.mid,fs:11,col:lcol,halo,e,A,B,kind:'mid',first:false});
+          const ss=srcStub(pts,lblPx(e.mid)), c1=pts.findIndex(p=>p[1]===chY);
+          reqLabel({p:ss[0],q:ss[1],alt:[pts[c1],pts[c1+1]],text:e.mid,fs:11,col:lcol,halo,e,A,B,kind:'mid',first:false});
         }
       } else if(P.ringOK){   // concentric ring: under, around, over, in
         const sx=A.x+A.w/2;
         const gy=occB+14+ring*12, chX=occR+28+P.slot, topY=chTop-14-ring*12;
         pts.push([sx,outSide(A,'b')],[sx,gy],[chX,gy],[chX,topY],[P.ex,topY],[P.ex,outSide(B,'t')]);
         if(e.mid){
-          const c1=pts.findIndex(p=>p[0]===chX);
-          reqLabel({p:pts[c1],q:pts[c1+1],text:e.mid,fs:11,col:lcol,halo,e,A,B,kind:'mid',first:false});
+          const ss=srcStub(pts,lblPx(e.mid)), c1=pts.findIndex(p=>p[0]===chX);
+          reqLabel({p:ss[0],q:ss[1],alt:[pts[c1],pts[c1+1]],text:e.mid,fs:11,col:lcol,halo,e,A,B,kind:'mid',first:false});
         }
       } else {               // channel runs right of the lanes
         const chX=occR+28+P.slot;
         const laneB=r=>Math.max(...lane(r).map(n=>n.y+n.h));
         const blockedH=(x1,x2,yy,skip)=>nodes.some(n=>n!==skip&&!n.boundary&&n.y<yy&&n.y+n.h>yy&&n.x+n.w>x1&&n.x<x2);
-        const sy=A===B?A.y+A.h*0.3:A.y+A.h/2, ty=A===B?B.y+B.h*0.7:B.y+B.h/2;
+        const sy=A===B?A.y+A.h*0.3:A.y+A.h/2, ty=A===B?B.y+B.h*0.7:B.y+B.h*P.ef;
         if(A!==B&&blockedH(A.x+A.w,chX,sy,A)){
           const gy=laneB(A.rank)+10+ring*7;
           pts.push([A.x+A.w/2,outSide(A,'b')],[A.x+A.w/2,gy],[chX,gy]);
         } else pts.push([outSide(A,'r'),sy],[chX,sy]);
         if(A!==B&&blockedH(B.x+B.w,chX,ty,B)){
           const gy=laneB(B.rank)+10+ring*7;
-          pts.push([chX,gy],[B.x+B.w/2,gy],[B.x+B.w/2,outSide(B,'b')]);
+          pts.push([chX,gy],[B.x+B.w*P.ef,gy],[B.x+B.w*P.ef,outSide(B,'b')]);
         } else pts.push([chX,ty],[outSide(B,'r'),ty]);
         if(e.mid){
-          const c1=pts.findIndex(p=>p[0]===chX);
-          reqLabel({p:pts[c1],q:pts[c1+1],text:e.mid,fs:11,col:lcol,halo,e,A,B,kind:'mid',first:false});
+          const ss=srcStub(pts,lblPx(e.mid)), c1=pts.findIndex(p=>p[0]===chX);
+          reqLabel({p:ss[0],q:ss[1],alt:[pts[c1],pts[c1+1]],text:e.mid,fs:11,col:lcol,halo,e,A,B,kind:'mid',first:false});
         }
       }
       // non-incident nodes are obstacles for the channel runs too: a run
@@ -4209,6 +4664,21 @@ function renderScene(doc,y0){
   // So the scaffolding is hoisted and only the LOOP keeps the guard.
   {
     const obst=nodes.filter(n=>!n.boundary).map(n=>({x:n.x,y:n.y,w:n.w,h:n.h,n}));
+    // An `external` is never DRAWN as a shape, so its 12x12 anchor is not ink
+    // and is rightly excluded above — but its LABEL is ink, and this pass could
+    // not see it. arp-resolution put a 234 px edge label straight through
+    // "rest of the LAN / (hosts C, D, ...)". The label box is added here with
+    // the same geometry the node pass below emits it at, so the obstacle and
+    // the drawing cannot disagree.
+    for(const n of nodes){
+      if(!n.boundary||!n.label) continue;
+      const cx=n.x+n.w/2, cy=n.y+n.h/2, [bdx,bdy]=bDir(n);
+      const bw=lblPx(n.label), bl=String(n.label).split('\n').length, bh=13*bl;
+      let ox,oy;
+      if(Math.abs(bdx)>=Math.abs(bdy)){ ox=bdx>=0?cx+10:cx-10-bw; oy=cy+3.5-13*bl/2-1.5; }
+      else { ox=cx-bw/2; oy=(bdy>=0?cy+17:cy-10)-13*bl/2-1.5; }
+      obst.push({x:ox,y:oy,w:bw,h:bh,n:null});
+    }
     const ovl=(a,b)=>{
       const ix=Math.min(a.x+a.w,b.x+b.w)-Math.max(a.x,b.x);
       const iy=Math.min(a.y+a.h,b.y+b.h)-Math.max(a.y,b.y);
@@ -4229,26 +4699,54 @@ function renderScene(doc,y0){
       return t1>t0;
     };
     const CLAMP=t=>Math.max(0.06,Math.min(0.94,t));
-    const cand=(r,t,side)=>{
+    // SLOPE CLEARANCE (`cl`): "3 px above the line" clears the line only where
+    // the box touches it. The offsets are axis-aligned while the segment is
+    // not, so on a diagonal the line keeps climbing across the box's WIDTH and
+    // re-enters it — which is why a label could sit squarely across its own
+    // edge and the drawing showed a strikethrough. Over half a box the line
+    // rises |dy/dx|*w/2, so that much extra offset is exactly what puts the
+    // whole box on one side of the line. It is offered as a SECOND candidate
+    // per side (cl=1) rather than imposed, priced per pixel of displacement
+    // below: a label 7 px further out to stop being struck is worth it, a
+    // 90 px shove for a long label on a 45 degree line is not, and the scorer
+    // decides which case it is holding.
+    const cand=(r,t,side,cl)=>{
       const lines=String(r.text).split('\n'), n=lines.length;
       const w=Math.max(...lines.map(cw))*6.5*r.fs/11;
       const lh=r.fs*1.3, h=(n-1)*lh+r.fs*1.1;
       const up=(n-1)*lh/2+r.fs*0.85;          // baseline y = box top + up
       const mx=r.p[0]+(r.q[0]-r.p[0])*t, my=r.p[1]+(r.q[1]-r.p[1])*t;
+      const sdx=Math.abs(r.q[0]-r.p[0]), sdy=Math.abs(r.q[1]-r.p[1]);
+      let ex=0;
+      if(cl){
+        if(side==='above'||side==='below') ex=sdx>1e-9?Math.min(1,sdy/sdx)*w/2:0;
+        else if(side==='right'||side==='left') ex=sdy>1e-9?Math.min(1,sdx/sdy)*h/2:0;
+      }
       let bx,by,x,anchor=n>1?'middle':'start';
       if(side==='on')          { bx=mx-w/2; by=my-4-up;  anchor='middle'; }
-      else if(side==='above')  { bx=mx-w/2; by=my-3-h;   anchor='middle'; }
-      else if(side==='below')  { bx=mx-w/2; by=my+3;     anchor='middle'; }
-      else if(side==='right')  { bx=mx+6;   by=my-h/2; }
-      else                     { bx=mx-6-w; by=my-h/2; }
+      else if(side==='above')  { bx=mx-w/2; by=my-3-h-ex; anchor='middle'; }
+      else if(side==='below')  { bx=mx-w/2; by=my+3+ex;  anchor='middle'; }
+      else if(side==='right')  { bx=mx+6+ex; by=my-h/2; }
+      else                     { bx=mx-6-w-ex; by=my-h/2; }
       x=anchor==='middle'?bx+w/2:bx;
-      return {x,y:by+up,anchor,t,side,box:{x:bx,y:by,w,h}};
+      return {x,y:by+up,anchor,t,side,ex,box:{x:bx,y:by,w,h}};
     };
     const placed=[];
-    if(lblReq.length) for(const r of lblReq){
+    // A request may name a SECOND carrying segment (`alt`). Back edges do: the
+    // stub leaving the source is the preferred carrier because it says which
+    // box the line comes out of, but on a figure where two edges leave the same
+    // node the stub can only put the label where an earlier one already sits
+    // (flowchart-b drew "no" twice, one under the other, and neither said which
+    // line it named). The alternate carrier — the channel run — is offered at a
+    // flat surcharge so it is taken only when the stub really has nowhere.
+    if(lblReq.length) for(const r0 of lblReq){
+    const carriers=[[r0.p,r0.q]].concat(r0.alt?[r0.alt]:[]);
+    let best=null,bestS=Infinity;
+    for(let ci=0;ci<carriers.length;ci++){
+      const r=ci?Object.assign({},r0,{p:carriers[ci][0],q:carriers[ci][1]}):r0;
       const dx=r.q[0]-r.p[0], dy=r.q[1]-r.p[1];
       const across=Math.abs(dx)>=Math.abs(dy);
-      let sides, ts, tPref;
+      let sides, ts, tPref, apWant=null;
       if(r.kind==='end'){
         // endpoint labels keep their historical spot as first choice
         sides=['on'].concat(across?['above','below']:['right','left']);
@@ -4256,6 +4754,30 @@ function renderScene(doc,y0){
         ts=[r.t0,r.t0-0.06,r.t0+0.06,r.t0-0.12,r.t0+0.12].map(CLAMP);
       } else {
         sides=across?['above','below']:['right','left'];
+        // ANTI-PARALLEL PAIRS: the label belongs on the OUTSIDE of its own
+        // stroke. `apOff` moved the two strokes of an A->B / B->A pair to
+        // opposite sides of the pair's centre line so they stop coinciding —
+        // "so opposite directions land on opposite sides" — and the label
+        // rides its own offset segment. But which SIDE of that segment the
+        // text lands on was decided here, independently, by score, and the two
+        // strokes are only 7 px apart, so the two candidate sets are nearly
+        // identical. Both labels took the same side and the pair drew as two
+        // lines of text stacked 1.6 px apart (tcp-state-machine: "passive OPEN
+        // / create TCB" directly over "CLOSE / delete TCB", 117 px of shared
+        // width, one of them lying across the partner's stroke).
+        // The offset vector IS the index that decided which side the stroke
+        // took, so `apWant` is read straight off it. It is not merely ORDERED
+        // first: measured on that pair, the outside candidate cost 52 and the
+        // stacked one 36, because a stack that does not actually OVERLAP costs
+        // the scorer NOTHING while the outside position crossed one edge (26).
+        // Ordering is worth 10 and could not move it. The wrong side is
+        // therefore PRICED, in the band the identical-text term already uses
+        // (34): an anti-parallel pair is exactly two lines a reader must tell
+        // apart, and a label on the inside of its own stroke — between the two,
+        // or beyond the partner — has stopped saying which one it names, which
+        // is the same defect that term exists to charge for.
+        const apv=apOff.get(r.e);
+        apWant=apv?(across?(apv[1]<0?'above':'below'):(apv[0]<0?'left':'right')):null;
         // flowchart convention: a short branch marker leaving a decision node
         // reads as that branch's name only if it sits next to the decision.
         // `FLOWCHART-ROLE-KEYWORDS`: the test is the ROLE, not the geometry. Until
@@ -4266,22 +4788,41 @@ function renderScene(doc,y0){
         const branch=r.first && r.A && r.A.role==='decision' &&
                      String(r.text).length<=3 && !String(r.text).includes('\n');
         tPref=branch?0.22:0.5;
-        ts=branch?[0.22,0.3,0.16,0.4,0.5,0.62]:[0.5,0.38,0.62,0.28,0.72];
+        ts=r.ts?r.ts:(branch?[0.22,0.3,0.16,0.4,0.5,0.62]:[0.5,0.38,0.62,0.28,0.72]);
       }
-      let best=null,bestS=Infinity;
-      for(let si=0;si<sides.length;si++) for(const t of ts){
-        const c=cand(r,t,sides[si]);
+      for(let si=0;si<sides.length;si++) for(const t of ts) for(const cl of [0,1]){
+        const c=cand(r,t,sides[si],cl);
         let s=0;
         for(const b of placed)   s+=3*ovl(c.box,b);
         for(const o of obst)     s+=(o.n===r.A||o.n===r.B?6:2.4)*ovl(c.box,o);
         for(const a of arrowBox) s+=4*ovl(c.box,a);
-        for(const g of edgeSegs) if(g.e!==r.e && segHit(g.p,g.q,c.box)) s+=26;
-        s+=70*Math.abs(t-tPref)+si*10;
+        // The label's OWN edge is charged like any other. It used to be exempt
+        // (`g.e!==r.e`), which made a label lying across the line it names FREE
+        // — and that is the single commonest way a label stops saying which
+        // line it belongs to, so the exemption was paying for the defect.
+        for(const g of edgeSegs) if(segHit(g.p,g.q,c.box)) s+=26;
+        s+=0.35*c.ex;             // price of the slope-clearance displacement
+        s+=ci*30;                 // price of leaving the preferred carrier
+        // Two identical texts sitting side by side is the defect in its purest
+        // form: neither of them says which line it belongs to, and no overlap
+        // test can see it because they do not overlap.
+        for(const b of placed) if(b.text===r.text &&
+            Math.hypot(b.x+b.w/2-c.box.x-c.box.w/2, b.y+b.h/2-c.box.y-c.box.h/2)<64) s+=34;
+        // the inside of an anti-parallel pair — see `apWant` above
+        if(apWant&&c.side!==apWant) s+=34;
+        // The pull back toward the preferred point is priced in PARAMETER
+        // units, so the same number means 70/L per pixel: cheap along a 900 px
+        // channel leg, ruinous along a 16 px self-loop run. A request that
+        // offers parameters outside [0,1] states its own weight so its escape
+        // positions cost what they are worth in pixels rather than being
+        // priced out by the length of the thing they slide along.
+        s+=(r.tw||70)*Math.abs(t-tPref)+si*10;
         if(c.box.x<2) s+=400;                 // would fall off the left margin
         if(s<bestS-1e-9){ bestS=s; best=c; }
       }
-      lblsvg[r.idx]=textEl(best.x,best.y,r.fs,best.anchor,r.col,r.text,r.halo);
-      placed.push(best.box);
+    }
+      lblsvg[r0.idx]=textEl(best.x,best.y,r0.fs,best.anchor,r0.col,r0.text,r0.halo);
+      placed.push(Object.assign({text:r0.text},best.box));
       W=Math.max(W, best.box.x+best.box.w+4);
       Hh=Math.max(Hh, best.box.y+best.box.h+4-y0-20);
     }
@@ -5248,7 +5789,17 @@ function renderTable(t,y0){
   // and a threshold is a statement about values. `h1..hN` and `1..` are already
   // separate address spaces in this genre (genres/table.md), so the split is
   // the genre's own and not invented here.
-  return {svg:svg.join(''), y:yEnd+6, w:totalW+2,
+  // THE SECTION IS AS WIDE AS ITS WIDEST INK, AND THE CAPTION IS INK.
+  // `w` was the GRID's width alone, so a caption longer than the table it names
+  // ran past the right edge of the section and was CLIPPED — patterns/table-b
+  // shipped as "Feature Matrix — rowspan/colspan merges with c", losing 86 px
+  // of a sentence that is the only place the figure says what it is about. The
+  // grid is not the figure; the caption is not decoration.
+  // Bold at 13 px is wider than `CH` (a regular-weight advance), so the caption
+  // is measured with the same 8% allowance the raster needed — verified by
+  // rendering, not assumed.
+  const capW=cwMax(t.label)*CH*1.08+2;
+  return {svg:svg.join(''), y:yEnd+6, w:Math.max(totalW+2,capW),
           box:{x0:0, x1:totalW, yA:yTop+yAt[H], yB:yEnd}};
 }
 
@@ -5266,7 +5817,26 @@ function renderChart(b,y0,doc){
   const R=rows.length, C=cLab.length;
   const zmax=Math.max(...rows.flat(), 1);
   const W2=20,H2=10,ZS=130/zmax,BAR=0.72;
-  const ox=R*W2+8, oy=y0+18+ZS*zmax+6;
+  // LEFT GUTTER for the row labels. They are anchored `end` at the floor's
+  // left corner and hang LEFTWARD from it, and nothing reserved room for them:
+  // the section's width is measured from the floor's RIGHT corner, and a
+  // section has no mechanism to grow leftwards, so any row label wider than
+  // its corner's own offset was clipped away at x<0 and the reader saw a
+  // sliver or nothing. Measured on the shipped corpus: telemetry-export lost
+  // 16.0 px of "Export ring" (24.6% of the box) and 41.9 px of "gRPC encoder"
+  // (59.1%), and table-experimental shaved "00:05".
+  // The LABEL is not moved. A row label belongs beside its row — that
+  // adjacency is what makes it a row label rather than a caption — so the
+  // ORIGIN moves right instead, by exactly what the widest label overhangs.
+  // That is the "grow the canvas" answer, and it is the right one here
+  // because the space is genuinely needed: no placement of a right-anchored
+  // label at the left edge of the floor can avoid needing a margin, and the
+  // gutter costs only the width it actually uses (0 when no label overhangs,
+  // so every chart whose labels already fitted is byte-unchanged).
+  const rLabPx=l=>cwMax(l)*6.5*10/11;          // textEl draws these at font-size 10
+  const ox0=R*W2+8;
+  const gut=Math.max(0,...rLab.map((l,r)=>rLabPx(l)+4-(ox0-(r+0.65)*W2)));
+  const ox=ox0+gut, oy=y0+18+ZS*zmax+6;
   const P=(r,c,z)=>[ox+(c-r)*W2, oy+(c+r)*H2-z*ZS];
   const svg=[];
   svg.push('<text x="0" y="'+(y0+14)+'" font-size="13" font-weight="600">'+esc(t.label)+' — bar3d</text>');

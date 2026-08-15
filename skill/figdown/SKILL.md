@@ -1,6 +1,6 @@
 ---
 name: figdown
-description: Create and maintain documentation figures as FigDown .fd text files with deterministic SVG artifacts embedded in Markdown. Use when asked to create, edit, fix, or read diagrams/figures in docs — block and architecture diagrams, topologies, flowcharts, bit-level layouts (packet headers, hardware registers), tables, timing waveforms — or when a .md contains an SVG with a "source: *.fd" footer.
+description: Draw a figure a human can read and an agent can read too — FigDown .fd text that states the meaning, with a deterministic SVG embedded in Markdown. Use when asked to create, edit, fix, or read diagrams/figures in docs — block and architecture diagrams, topologies, flowcharts, bit-level layouts (packet headers, hardware registers), tables, timing waveforms — or when a .md contains an SVG with a "source: *.fd" footer.
 ---
 
 # FigDown — figures as text, one source, two readers
@@ -119,7 +119,15 @@ Two more files answer a **task** rather than a genre:
 - **Reading a `.fd` someone else wrote, to summarise or answer from it** →
   `reference/reading.md`. It is the contract for what you may conclude and
   what you must not infer, and it is all you need: a reader can skip every
-  genre file above.
+  genre file above. **One correction applies to it.** `reference/reading.md` is
+  a byte-frozen copy of a released reading contract, and one sentence in it is
+  wrong: where it says *"Ignore the layout zone. Everything from the `layout`
+  keyword down is …"*, do not read it as a rule about **position**. Ignore the
+  layout **namespace** — its one member is `pin` — **wherever a member
+  appears**, because a `pin` may legally sit *before* the `layout` line, and
+  about half of them do. Membership decides, not position. The frozen file is
+  left as-is on purpose; apply this rule instead, the same one stated above
+  under "layout and pin".
 - **Transcribing an existing figure** — a drawing, a screenshot, another
   format → `reference/transcribe.md`.
 
@@ -210,8 +218,10 @@ itself.
 **`layout` and `pin`** are the layout zone. Everything from a `layout` line
 down is geometry that exists only to stabilise the `.svg`: it carries no
 meaning, no genre may put its own semantics inside it, and `pin` is the only
-directive legal there. Skip the zone when reading; see `reference/layout.md`
-when writing.
+directive legal there. When READING, ignore every member of the **layout
+namespace** — `pin`, and nothing else today (core §10 (a′)) — **wherever it
+appears**: membership decides, not position, and `pin` is legal before the
+`layout` line too. See `reference/layout.md` when writing.
 
 ## Portability: two statuses, and the parser tells you nothing
 

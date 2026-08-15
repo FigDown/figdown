@@ -210,8 +210,15 @@ function extractEdges(svgText, tx, ty) {
   // Use a conservative check: path must have fill="none" and not be inside <defs>.
   //
   // Strategy: find the <g transform="translate("> content block and scan it.
-  const pathRe = /<path(?: data-edge="[^"]*")? d="([^"]*)" fill="none" stroke="[^"]*" stroke-width="1\.6"[^/]*\/>/g;
+  const pathRe = /<path(?: data-edge="[^"]*")? d="([^"]*)" fill="none" stroke="[^"]*" stroke-width="1\.6"([^/]*)\/>/g;
   while ((m = pathRe.exec(svgText)) !== null) {
+    // A merge bus (engine, item 26 stage 1) draws ONE trunk that several edges
+    // share, and every member says so with data-bus="<target>". The shared ink
+    // is the convention — the junction dots are what tell the reader how many
+    // lines the trunk carries — so `coincident` below does not charge two
+    // members of the SAME bus for it. Coincidence between anything else,
+    // including two members of two DIFFERENT buses, is scored as before.
+    const busM = /\bdata-bus="([^"]*)"/.exec(m[2] || '');
     // skip the arrowhead path (M0,0 L10,5 L0,10 z — it lives in <defs>)
     const d = m[1];
     if (d.includes('z') || d.includes('Z')) continue;
@@ -222,7 +229,7 @@ function extractEdges(svgText, tx, ty) {
     // decompose polyline into individual segments
     const segs = [];
     for (let i = 0; i + 1 < tpts.length; i++) segs.push([tpts[i], tpts[i + 1]]);
-    edges.push({ segs });
+    edges.push({ segs, bus: busM ? busM[1] : null });
   }
 
   return edges;
@@ -230,7 +237,20 @@ function extractEdges(svgText, tx, ty) {
 
 // Extract edge-label text bounding boxes (approximate).
 // Labels are <text> elements NOT inside a data-node group.
-// We use: chars * 6.5 wide, 12 tall, anchored at the text x,y (y is baseline, so top = y-12).
+//
+// Two properties this reader MUST get right, because `lblcol` now also charges
+// an edge that runs through a label box (a strikethrough is the commonest way a
+// label stops saying which line it belongs to, and the old reader was blind to
+// it — bfd-session read `lblcol 0` with three labels visibly struck):
+//
+//   1. text-anchor. The engine anchors multi-line labels "middle" and single
+//      line ones "start"/"middle"/"end" depending on the side chosen. Treating
+//      every x as a left edge put half the boxes a full width off, which both
+//      invented collisions and hid real ones.
+//   2. <tspan> children. A multi-line label carries no text directly, so the
+//      old `>([^<]*)<` capture read it as empty and SKIPPED it. Every one of
+//      bfd-session's parked back-edge labels is multi-line: the metric could
+//      not see the worst-placed labels in the corpus at all.
 function extractLabels(svgText, tx, ty) {
   const labels = [];
   // We need text elements that are edge labels: they appear after the edge SVG
@@ -264,25 +284,132 @@ function extractLabels(svgText, tx, ty) {
   // must deduplicate by (x, y, text) before collision testing or every label
   // would register a collision against its own twin.
   const seen = new Set();
-  const textRe = /<text x="([^"]*)" y="([^"]*)"[^>]*font-size="(1[01])"[^>]*>([^<]*)</g;
+  // font-size exactly 10 or 11: the two sizes edge labels use. 10.5/11.5 are
+  // the timing genre's span and lane labels, which ride ON their waveform by
+  // convention and must not be read as edge labels.
+  const textRe = /<text x="([^"]*)" y="([^"]*)"([^>]*)font-size="(1[01])"([^>]*)>([\s\S]*?)<\/text>/g;
   let tm;
   while ((tm = textRe.exec(svgText)) !== null) {
     if (inNode(tm.index)) continue;
     const x    = parseFloat(tm[1]) + tx;
     const y    = parseFloat(tm[2]) + ty;
-    const text = tm[4];
+    const fs   = parseFloat(tm[4]);
+    const attrs = tm[3] + tm[5];
+    const body  = tm[6];
+    // Body is either bare text (single line) or a run of <tspan>s (one per line).
+    let lines;
+    if (body.indexOf('<tspan') >= 0) {
+      lines = [];
+      const sp = /<tspan[^>]*>([\s\S]*?)<\/tspan>/g;
+      let sm; while ((sm = sp.exec(body)) !== null) lines.push(sm[1]);
+    } else {
+      lines = [body];
+    }
+    const text = lines.join('\n');
     if (!text.trim()) continue;
     const key = x.toFixed(2) + ',' + y.toFixed(2) + ',' + text;
     if (seen.has(key)) continue;
     seen.add(key);
-    const charW = 6.5, h = 12;
-    const w = text.length * charW;
-    // x is the anchor; text-anchor might be "middle" or "start" — both occur.
-    // Conservatively use the position as the left edge (start), which is the
-    // common case for edge labels that could collide.
-    labels.push({ x, y: y - h, w, h, text });
+    // Same geometry the engine's own placement pass uses (cand() in
+    // editor/figdown.html): width = widest line, line height 1.3*fs, ink box
+    // 1.1*fs, baseline of the first line sits 0.85*fs below the box top.
+    const charW = 6.5 * fs / 11;
+    const n = lines.length;
+    const w = Math.max(...lines.map(l => l.length)) * charW;
+    const h = (n - 1) * fs * 1.3 + fs * 1.1;
+    const am = /text-anchor="([^"]*)"/.exec(attrs);
+    const anchor = am ? am[1] : 'start';
+    const left = anchor === 'middle' ? x - w / 2 : anchor === 'end' ? x - w : x;
+    labels.push({ x: left, y: y - fs * 0.85, w, h, text });
   }
   return labels;
+}
+
+// ── Off-canvas text (axis: is the ink ON THE PAGE at all?) ────────────────────
+// THE SEVENTEENTH INSTANCE OF THE SAME BLIND SPOT, and it is the same shape as
+// the sixteen before it: every metric above measures a PROPERTY OF WHAT IT
+// FOUND — crossings among the edges it parsed, overlaps among the labels it
+// read — and none of them asks whether what it found is INSIDE THE FRAME. A
+// label 95% outside the canvas crosses nothing, overlaps nothing and strikes
+// nothing, so it scored 0 and the figure read as clean. Measured on the shipped
+// corpus: telemetry-export drew "gRPC encoder" 41.9 px off the
+// left edge (59.1% of the box) and "Export ring" 16.0 px off (24.6%), and
+// table-experimental shaved "00:05" — three labels a reader saw as a sliver or
+// not at all, under a gate reporting `score 0` for one of those figures.
+//
+// This reader is deliberately NOT `extractLabels`. That one answers "which text
+// is an edge label" and filters to font-size 10/11 outside node groups, which
+// is right for collision scoring and wrong here: a clipped NODE label or a
+// clipped chart axis label is exactly as invisible. The question this axis asks
+// is about ink, not about role, so it reads every <text> in the section.
+function extractAllText(svgText, tx, ty) {
+  const out = [];
+  const textRe = /<text x="([^"]*)" y="([^"]*)"([^>]*?)>([\s\S]*?)<\/text>/g;
+  let tm;
+  while ((tm = textRe.exec(svgText)) !== null) {
+    const x = parseFloat(tm[1]) + tx, y = parseFloat(tm[2]) + ty;
+    if (!isFinite(x) || !isFinite(y)) continue;
+    const attrs = tm[3], body = tm[4];
+    const fsm = /font-size="([\d.]+)"/.exec(attrs);
+    const fs = fsm ? parseFloat(fsm[1]) : 13;
+    let lines;
+    if (body.indexOf('<tspan') >= 0) {
+      lines = [];
+      const sp = /<tspan[^>]*>([\s\S]*?)<\/tspan>/g;
+      let sm; while ((sm = sp.exec(body)) !== null) lines.push(sm[1]);
+    } else lines = [body];
+    const text = lines.join('\n');
+    if (!text.trim()) continue;
+    // TWO ADVANCES, because the engine has two and this reader must not invent
+    // a third. `cand()` sizes edge labels at 6.5 px per character at font-size
+    // 11; `CH = 7.2` at `FONT = 13` sizes every box and caption. They are not
+    // the same ratio, and using the label one for 13 px text overestimates by
+    // 6.7% — enough to put a correctly-placed node label 1.6 px "off canvas"
+    // (rpf-check's "Drop (RPF fail)", which the raster shows intact). A reader
+    // that reports a defect the engine did not commit is as useless as one that
+    // misses the defects it did.
+    const charW = fs <= 11.5 ? 6.5 * fs / 11 : 7.2 * fs / 13;
+    const w = Math.max(...lines.map(l => l.replace(/&[a-z]+;/g, 'x').length)) * charW;
+    const h = (lines.length - 1) * fs * 1.3 + fs * 1.1;
+    const am = /text-anchor="([^"]*)"/.exec(attrs);
+    const anchor = am ? am[1] : 'start';
+    const left = anchor === 'middle' ? x - w / 2 : anchor === 'end' ? x - w : x;
+    out.push({ x: left, y: y - fs * 0.85, w, h, text });
+  }
+  return out;
+}
+
+// The canvas is the section's own <svg width/height> — the box a viewer clips
+// to. Anything outside it is not "badly placed", it is NOT DRAWN.
+function canvasOf(svgText) {
+  const w = /<svg[^>]*\swidth="([\d.]+)"/.exec(svgText);
+  const h = /<svg[^>]*\sheight="([\d.]+)"/.exec(svgText);
+  return w && h ? { W: parseFloat(w[1]), H: parseFloat(h[1]) } : null;
+}
+
+// TOLERANCE, and why it is 1 px and not a percentage. The width model above is
+// an ESTIMATE (a fixed advance per character against a proportional font), so
+// sub-pixel overhang says nothing. One pixel is below what any reader can see
+// and above what the estimate can resolve. It is NOT a severity threshold:
+// a 1.1 px clip and a 41.9 px clip are both reported, because "how much of the
+// label is missing" is the report's job, not the filter's.
+const OFFCANVAS_TOL = 1;
+
+function offCanvasText(svgText) {
+  const c = canvasOf(svgText);
+  if (!c) return [];
+  const [tx, ty] = parseTranslate(svgText);
+  const hits = [];
+  for (const L of extractAllText(svgText, tx, ty)) {
+    const outPx = Math.max(-L.x, -L.y, (L.x + L.w) - c.W, (L.y + L.h) - c.H);
+    if (outPx <= OFFCANVAS_TOL) continue;
+    const ix = Math.max(0, Math.min(L.x + L.w, c.W) - Math.max(L.x, 0));
+    const iy = Math.max(0, Math.min(L.y + L.h, c.H) - Math.max(L.y, 0));
+    const area = L.w * L.h;
+    hits.push({ text: L.text, x: L.x, y: L.y, w: L.w, h: L.h, outPx,
+                frac: area > 0 ? 1 - (ix * iy) / area : 1 });
+  }
+  return hits;
 }
 
 // ── Geometry helpers ──────────────────────────────────────────────────────────
@@ -447,7 +574,21 @@ function computeMetrics(edges, nodes, groups, labels) {
     }
   }
 
-  // 4. lblcol — edge label bounding-box overlaps
+  // 4. lblcol — a label that has stopped saying which line it belongs to.
+  //    Two ways that happens, and only the first used to be counted:
+  //      (a) two label boxes overlap (unreadable, and the reader cannot tell
+  //          which of the two texts is one label);
+  //      (b) an edge runs THROUGH a label box — the strikethrough. This is the
+  //          commoner defect by a wide margin and the metric was blind to it.
+  //    A label is charged AT MOST ONCE for (b) no matter how many edges cross
+  //    it, because what the eye reports is "that label is struck", not a count
+  //    of strokes; the label-vs-label term stays a pair count as before.
+  //
+  //    Every mid/endpoint label the engine places is offset 3–6 px CLEAR of its
+  //    own carrying segment, so a label sitting on a line is a defect whichever
+  //    edge drew the line — including the one the label names. The merge-bus
+  //    exemption does not apply here: a trunk striking a label is still a
+  //    strikethrough. `coincident` is where the bus convention is exempt.
   let lblcol = 0;
   for (let i = 0; i < labels.length; i++) {
     for (let j = i + 1; j < labels.length; j++) {
@@ -458,12 +599,47 @@ function computeMetrics(edges, nodes, groups, labels) {
         lblcol++;
     }
   }
+  for (const L of labels) {
+    // The test is against the box's CENTRE BAND — the middle 40% of its height,
+    // inset 2 px in x — not the full box. That band is where the glyph ink
+    // lives, so a line that crosses it reads as a strikethrough, while a
+    // shallow diagonal that clips a corner of the (generous) text box does not
+    // and is not charged. Measured against the corpus by eye: the full box
+    // charged `ingress` "L3 hit" and `l2-forwarding-logic` "no", both of which
+    // sit visibly clear of their lines.
+    const r = { x: L.x + 2, y: L.y + L.h * 0.3, w: L.w - 4, h: L.h * 0.4 };
+    if (r.w <= 0 || r.h <= 0) continue;
+    let struck = false;
+    for (const e of edges) {
+      for (const [p, q] of e.segs) {
+        if (segPassesThroughRect(p[0], p[1], q[0], q[1], r.x, r.y, r.w, r.h)) { struck = true; break; }
+      }
+      if (struck) break;
+    }
+    if (struck) lblcol++;
+  }
 
-  // 5. coincident — distinct edges with collinear segments overlapping > 10px
+  // 5. coincident — HOW MANY EDGES are drawn on top of another edge: an edge
+  //    is charged once if any of its segments shares more than 10 px of line
+  //    with a segment of any OTHER edge. Once per edge, like the `lblcol`
+  //    strikethrough, because what the eye reports is "that line is buried",
+  //    not a count of buriers.
+  //
+  //    IT USED TO SCAN FORWARD ONLY. The inner loop ran `j = i + 1`, so the
+  //    LAST edge of a coincident set was never charged: it had already been
+  //    counted from the other side, but only as somebody else's partner, and
+  //    its own pass had nothing left to look at. Three edges sharing one row
+  //    therefore read `2` — not the three pairs, not the three edges, a number
+  //    that is neither. That is what bfd-session reported while three back
+  //    edges (452 px, 263 px and 263 px of shared ink) drew as one stroke on
+  //    y=46: the metric that exists to make this class visible was quietly one
+  //    short of every reading of it. `j` now scans every other edge.
   let coincident = 0;
   for (let i = 0; i < edges.length; i++) {
     let found = false;
-    for (let j = i + 1; j < edges.length && !found; j++) {
+    for (let j = 0; j < edges.length && !found; j++) {
+      if (j === i) continue;
+      if (edges[i].bus && edges[i].bus === edges[j].bus) continue;  // one merge bus, one trunk
       for (const [p1, p2] of edges[i].segs) {
         for (const [p3, p4] of edges[j].segs) {
           if (collinearOverlap(p1[0], p1[1], p2[0], p2[1], p3[0], p3[1], p4[0], p4[1]) > 10) {
@@ -490,10 +666,20 @@ function computeMetrics(edges, nodes, groups, labels) {
 
 function renderWithRetry(engine, src, fdPath) {
   function attempt() {
-    const { doc, errs } = engine.parse(src);
+    const parsed = engine.parse(src);
+    const { doc, errs } = parsed;
     if (errs.length) return { ok: false, errs };
     const result = engine.render(doc);
-    return { ok: true, svg: result.svg, doc };
+    // EVERY SECTION, not only the first. The scene metrics below are about ONE
+    // scene and rightly read the primary document, but "is this ink on the
+    // page" is a question about the whole published artifact — and the answer
+    // that was missing lived in a LATER section: telemetry-export's clipped
+    // labels are in its `chart` section, which this gate rendered zero times.
+    // A gate that reads section 1 of a 3-section figure and reports on the
+    // figure is the same lie as a gate that does not recurse.
+    const docs = (parsed.docs && parsed.docs.length) ? parsed.docs : [doc];
+    const svgs = docs.map(d => (d === doc ? result : engine.render(d)).svg);
+    return { ok: true, svg: result.svg, svgs, doc };
   }
   try {
     return attempt();
@@ -611,8 +797,15 @@ const SCENE_GENRES = new Set(['block', 'topology', 'flowchart', 'statechart']);
 
 // ── Formatting helpers ────────────────────────────────────────────────────────
 
+// `offcv` carries the HEAVIEST weight in this function, above `thru` and
+// `novlp`. Every other term measures text or lines that are hard to read; this
+// one measures text that is NOT THERE. The engine's own note-placement pass
+// already states the ranking — an annotation the author wrote and the reader
+// never sees is "the worst outcome available" — and the score should agree
+// with it rather than rank a clipped label below a crossing.
 function score(m) {
-  return m.crossings * 2 + m.thru * 3 + m.novlp * 3 + m.lblcol * 2 + m.coincident * 2;
+  return m.crossings * 2 + m.thru * 3 + m.novlp * 3 + m.lblcol * 2 + m.coincident * 2
+       + (m.offcv || 0) * 4;
 }
 
 function pad(s, n) {
@@ -693,6 +886,7 @@ function main() {
   console.log('');
 
   const rows = [];
+  const offCanvas = [];
 
   for (const fdPath of files) {
     const rel = path.relative(process.cwd(), fdPath);
@@ -716,7 +910,18 @@ function main() {
       continue;
     }
 
-    if (metrics.nodeCount === 0 && metrics.edgeCount === 0) {
+    // Off-canvas is measured across every section, and it is measured BEFORE
+    // the no-scene-genre skip below. A bitfield or chart figure has no edges to
+    // cross and is correctly not scored for crossings — but it has text, and
+    // text can fall off the page. Skipping the file entirely is how the two
+    // `chart` sections stayed invisible to this gate.
+    const off = [];
+    for (const s of (result.svgs || [result.svg]))
+      for (const h of offCanvasText(s)) off.push({ file: rel, ...h });
+    offCanvas.push(...off);
+    metrics.offcv = off.length;
+
+    if (metrics.nodeCount === 0 && metrics.edgeCount === 0 && !off.length) {
       // No scene geometry. For bitfield/table/timing/chart that is the CORRECT
       // outcome — those genres have no nodes or edges to measure — so it is
       // reported and not failed. For a scene genre it means the tool rendered
@@ -745,6 +950,7 @@ function main() {
     thru:        4,
     novlp:       5,
     lblcol:      6,
+    offcv:       5,
     coinc:       5,
     ink:         7,
     score:       5,
@@ -758,6 +964,7 @@ function main() {
     lpad('thru',   COL.thru),
     lpad('novlp',  COL.novlp),
     lpad('lblcol', COL.lblcol),
+    lpad('offcv',  COL.offcv),
     lpad('coinc',  COL.coinc),
     lpad('ink/e',  COL.ink),
     lpad('score',  COL.score),
@@ -779,6 +986,7 @@ function main() {
       lpad(r.thru,                    COL.thru),
       lpad(r.novlp,                   COL.novlp),
       lpad(r.lblcol,                  COL.lblcol),
+      lpad(r.offcv || 0,              COL.offcv),
       lpad(r.coincident,              COL.coinc),
       lpad(r.inkPerEdge.toFixed(0),   COL.ink),
       lpad(r.score,                   COL.score),
@@ -814,6 +1022,35 @@ function main() {
       for (const h of hits)
         console.log('      ' + h.file + (h.detail ? ' — ' + h.detail : ''));
     }
+  }
+
+  // ── OFF-CANVAS FINDINGS, named one by one ─────────────────────────────────
+  // A count in a column is enough for a defect of DEGREE — one more crossing is
+  // worse than none and an author can go and look. Ink that is not on the page
+  // is not a matter of degree: the author cannot see what is missing BY
+  // LOOKING AT THE FIGURE, which is the whole reason it went unnoticed. So each
+  // one is named, with how far out and how much of it is gone.
+  //
+  // AND IT FAILS --strict, unlike every score above it. The scores rank figures
+  // that could be better; this says a figure does not show what its source
+  // says. That is the same class as "the tool could not read it", which is
+  // already the strict bar here.
+  if (offCanvas.length) {
+    console.log('');
+    console.log('OFF-CANVAS TEXT — drawn outside the section\'s own <svg> box, so a reader');
+    console.log('sees a sliver or nothing:');
+    let last = null;
+    for (const h of offCanvas) {
+      if (h.file !== last) { console.log('  ' + h.file); last = h.file; }
+      console.log('      ' + lpad(h.outPx.toFixed(1) + 'px', 8) + ' out, '
+                + lpad((h.frac * 100).toFixed(0) + '%', 4) + ' of the box gone   '
+                + JSON.stringify(h.text.length > 60 ? h.text.slice(0, 57) + '...' : h.text));
+    }
+    console.log('  The canvas grows right and down only, so text placed at a negative');
+    console.log('  coordinate is CLIPPED, never merely misplaced. Reserve the room in the');
+    console.log('  renderer (the origin moves; the label does not) rather than nudging the');
+    console.log('  text somewhere it no longer names what it is beside.');
+    if (strict) anyFail = true;
   }
 
   const unread = skips.filter(s => STRICT_SKIPS.has(s.reason));

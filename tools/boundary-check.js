@@ -18,11 +18,26 @@
 //                   the canvas out).
 //
 // Unpinned scenes keep auto-layout and are reported but not asserted.
+//
+// usage: node tools/boundary-check.js [--strict] [--verbose] [<file.fd|dir> ...]
+// Default roots: examples/, conformance/cases/ — WALKED RECURSIVELY.
+//
+// Until 0.3 those two roots were read NON-recursively by a private `collectFd`
+// — the same copied line three sibling gates carried. It opened 212 files and
+// printed TWO rows, and every one of the other 210 left no trace: a scene was
+// dropped on a bare `continue` whether it had no boundary, no pins, or could
+// not be parsed at all. When no row survived, the whole output was the single
+// line `(no pinned boundary scenes found)`, which is what a correct run and a
+// completely broken run both printed.
+//
+// Enumeration, the skip taxonomy and the coverage line now come from
+// `tools/lib/corpus.js`.
 // Deterministic; engine lookup order matches build-svg.js.
 'use strict';
 
 const fs   = require('fs');
 const path = require('path');
+const corpus = require('./lib/corpus.js');
 
 // ── Engine lookup (same order as build-svg.js) ────────────────────────────────
 const ENGINE_CANDIDATES = [
@@ -78,7 +93,7 @@ function anchorGap(b, reals) {
 function checkOne(engine, fdPath) {
   const src = fs.readFileSync(fdPath, 'utf8');
   const { doc, errs } = engine.parse(src);
-  if (errs.length) return { fd: fdPath, skip: 'parse-error' };
+  if (errs.length) return { fd: fdPath, skip: 'parse-error', detail: errs[0] };
   if (!(doc.boundaries || []).length) return { fd: fdPath, skip: 'no-boundary' };
 
   let probed = null;
@@ -139,63 +154,85 @@ function checkOne(engine, fdPath) {
   return { fd: fdPath, contentW, sceneW, ratio, maxGap, fails };
 }
 
-// ── file collection (matches layout-lint.js) ──────────────────────────────────
-function collectFd(arg) {
-  const st = fs.statSync(arg);
-  if (st.isDirectory())
-    return fs.readdirSync(arg).filter(f => f.endsWith('.fd')).sort()
-      .map(f => path.join(arg, f));
-  return [arg];
-}
+// ── file collection ───────────────────────────────────────────────────────────
+// Enumeration lives in tools/lib/corpus.js.
 
-function pad(s, n) { s = String(s); return s + ' '.repeat(Math.max(0, n - s.length)); }
-function lpad(s, n) { s = String(s); return ' '.repeat(Math.max(0, n - s.length)) + s; }
+// Skip reasons this gate adds. None fails --strict: each is a correct ANSWER
+// about a figure this check has no claim to make about, not a failure to read
+// it. All are counted and named on every run, which is the difference that
+// matters — the old code expressed all three as the same bare `continue`.
+const EXTRA_REASONS = [
+  ['no-boundary', 'scene declares no `external` endpoint — nothing to place', false],
+  ['no-scene',    'document renders no scene (bitfield/table/timing)',        false],
+  ['unpinned',    'scene is auto-laid-out, so adjacency is not promised',     false],
+];
+
+const pad  = corpus.pad;
+const lpad = corpus.lpad;
 
 function main() {
   const args = process.argv.slice(2);
-  let maxFail = null;
+  let strict = false, verbose = false;
   const paths = [];
   for (const a of args) {
-    if (a.startsWith('--strict')) maxFail = 0;
+    if (a === '--strict')  strict  = true;
+    else if (a === '--verbose') verbose = true;
     else paths.push(a);
   }
-  if (!paths.length) {
-    const root = path.join(__dirname, '..');
-    for (const d of ['examples', 'conformance/cases'])
-      if (fs.existsSync(path.join(root, d))) paths.push(path.join(root, d));
-  }
+
+  // The gate's DECLARED scope, walked recursively.
+  const en = corpus.enumerate(['examples', 'conformance/cases'], paths);
+  corpus.assertNonEmpty(en, 'boundary-check');
+  const cov = new corpus.Coverage('boundary-check', en, EXTRA_REASONS);
+
   const enginePath = findEngine();
   if (!enginePath) { console.error('figdown.html not found'); process.exit(2); }
   const engine = loadEngine(enginePath);
 
-  const files = [];
-  for (const p of paths) for (const f of collectFd(p)) files.push(f);
+  const files = en.files;
+  cov.header();
 
   const rows = [];
   let anyFail = false;
   for (const f of files) {
     let r;
     try { r = checkOne(engine, f); }
-    catch (e) { r = { fd: f, skip: 'error: ' + e.message }; }
-    if (r.skip) continue;                 // report only boundary+pinned scenes
+    catch (e) { r = { fd: f, skip: 'render-error', detail: e.message }; }
+    if (r.skip) {
+      // A conformance fixture paired with `.errors.txt` is MEANT not to parse.
+      const reason = (r.skip === 'parse-error' && en.invalidByDesign.has(f))
+        ? 'invalid-by-design' : r.skip;
+      cov.skip(f, reason, r.detail);
+      continue;
+    }
+    cov.score();
     rows.push(r);
     if (r.fails.length) anyFail = true;
   }
 
-  console.log(pad('figure', 34) + lpad('content', 9) + lpad('canvas', 9) +
+  console.log(pad('figure', 46) + lpad('content', 9) + lpad('canvas', 9) +
     lpad('ratio', 8) + lpad('maxGap', 9) + '  result');
   for (const r of rows) {
-    const name = path.basename(r.fd);
     const res = r.fails.length ? 'FAIL' : 'ok';
-    console.log(pad(name, 34) + lpad(r.contentW.toFixed(0), 9) +
+    console.log(pad(corpus.rel(r.fd), 46) + lpad(r.contentW.toFixed(0), 9) +
       lpad(r.sceneW.toFixed(0), 9) + lpad(r.ratio.toFixed(2) + 'x', 8) +
       lpad(r.maxGap.toFixed(1), 9) + '  ' + res);
     for (const m of r.fails) console.log('    - ' + m);
   }
-  if (!rows.length) console.log('(no pinned boundary scenes found)');
 
-  if (maxFail !== null && anyFail) process.exit(1);
-  process.exit(0);
+  // ── COVERAGE. Printed on EVERY run, every reason, zero or not. ────────────
+  const covResult = cov.report({ verbose });
+
+  if (covResult.unread) {
+    console.log('');
+    console.log((strict ? 'FAIL' : 'WARN') + '  ' + covResult.unread
+              + ' figure(s) were considered and NOT scored for a reason that means'
+              + ' the tool could not read them.');
+    if (!strict) console.log('      (run with --strict to make this an exit-1 failure)');
+  }
+  if (covResult.broken) process.exit(2);
+
+  process.exit(strict && (anyFail || covResult.unread) ? 1 : 0);
 }
 
 main();

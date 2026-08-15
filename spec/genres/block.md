@@ -528,11 +528,13 @@ contain them, and the edges that relate them.
   `key=` options is exactly what forces this: a positional list that runs on
   past whitespace never terminates, so there is nowhere for an option to
   begin. `POSITIONAL-LIST-SPELLING` had ruled the space form "NOT deprecated" on migration cost,
-  and cost is not a language argument before the freeze. A reading agent IGNORES the layout zone by default —
+  and cost is not a language argument before the freeze. A reading agent IGNORES
+  every member of the layout namespace by default, wherever in the document it
+  appears (`GENRE-NAMESPACE`: membership decides, not position; core §10 (a′) enumerates) —
   the exception is the missing-construct workaround for a load-bearing
   arrangement (`MEANINGFUL-ARRANGEMENT`), which is a semantics gap, not a second contract.
-  `GENRE-NAMESPACE` made that skip the default, and it is only safe if no genre semantics
-  can ever appear inside the zone — which is exactly what `LAYOUT-ZONE-NAMESPACE`
+  `GENRE-NAMESPACE` made that the default, and it is only safe if no genre semantics
+  can ever appear in the namespace — which is exactly what `LAYOUT-ZONE-NAMESPACE`
   guarantees by making the layout zone a namespace of its own that no genre
   may define, redefine or extend a keyword inside.
 - Nothing in a block figure means anything by virtue of where it was drawn.

@@ -53,13 +53,26 @@
 //
 // --strict   exit 1 if any document has pinned-orphan scene nodes
 //
-// Default paths when none given: examples/  examples/patterns/  figures/
-// (resolved from the project root, independent of CWD).
+// Default roots when none given: examples/  figures/ — WALKED RECURSIVELY.
+//
+// Until 0.3 this read `examples/`, `examples/patterns/`, `figures/` from a
+// hard-coded, NON-recursive list — the same copied line `shape-check.js`,
+// `boundary-check.js` and `stability-check.js` carried, and the one
+// `layout-lint.js` had already been fixed for. It opened 38 files and printed
+// 21 rows; `examples/showcase/`, `examples/statechart/`, `examples/reference/`
+// and `examples/layout-compare/` were never opened by this gate at all. Its
+// coverage line was one number (`skipped: N`) printed only `if (skipped)`, with
+// non-scene genres, parse errors and unreadable files collapsed into it.
+//
+// Enumeration, the skip taxonomy and the coverage line now come from
+// `tools/lib/corpus.js`, which recurses, prints coverage unconditionally, and
+// treats an empty corpus as a tool error rather than a pass.
 
 'use strict';
 
 const fs   = require('fs');
 const path = require('path');
+const corpus = require('./lib/corpus.js');
 
 // ── Engine lookup (same order as build-svg.js / layout-lint.js) ──────────────
 
@@ -163,43 +176,32 @@ function isDecorative(src) {
 }
 
 // ── File collection ───────────────────────────────────────────────────────────
+// Enumeration lives in tools/lib/corpus.js. See this file's header for what the
+// private, non-recursive copy that used to sit here cost.
 
-function collectFd(arg) {
-  const resolved = path.resolve(arg);
-  if (!fs.existsSync(resolved)) {
-    process.stderr.write('warning: path not found: ' + arg + '\n');
-    return [];
-  }
-  const st = fs.statSync(resolved);
-  if (st.isDirectory()) {
-    return fs.readdirSync(resolved)
-      .filter(f => f.endsWith('.fd'))
-      .sort()
-      .map(f => path.join(resolved, f));
-  }
-  return [resolved];
-}
+// Skip reasons this gate adds to the shared taxonomy. Neither fails --strict:
+// both are a correct ANSWER ("there is nothing here to strip"), not a failure to
+// answer. Both are still counted and named on every run.
+const EXTRA_REASONS = [
+  ['non-scene-genre', 'bitfield/table/timing — no scene nodes to orphan', false],
+  ['empty-document',  'scene genre declaring no nodes and no groups',     false],
+];
 
 // ── Formatting helpers ────────────────────────────────────────────────────────
 
-function pad(s, n) {
-  s = String(s);
-  return s.length >= n ? s : s + ' '.repeat(n - s.length);
-}
-function lpad(s, n) {
-  s = String(s);
-  return s.length >= n ? s : ' '.repeat(n - s.length) + s;
-}
+const pad  = corpus.pad;
+const lpad = corpus.lpad;
 
 // ── Main ──────────────────────────────────────────────────────────────────────
 
 function main() {
   const argv = process.argv.slice(2);
 
-  let strict = false;
+  let strict = false, verbose = false;
   const inputs = [];
   for (const a of argv) {
-    if (a === '--strict') { strict = true; continue; }
+    if (a === '--strict')  { strict  = true; continue; }
+    if (a === '--verbose') { verbose = true; continue; }
     if (a.startsWith('--')) {
       process.stderr.write('unknown flag: ' + a + '\n');
       process.exit(2);
@@ -207,14 +209,14 @@ function main() {
     inputs.push(a);
   }
 
-  const projectRoot = path.join(__dirname, '..');
-  const searchPaths = inputs.length
-    ? inputs
-    : [
-        path.join(projectRoot, 'examples'),
-        path.join(projectRoot, 'examples', 'patterns'),
-        path.join(projectRoot, 'figures'),
-      ];
+  // The gate's DECLARED scope. `examples/patterns` no longer needs naming
+  // because the walk reaches it, and so do the four sibling directories the old
+  // hard-coded list silently omitted. conformance/ is not a root here: its
+  // fixtures test the ERROR MODEL, not whether a published figure's meaning
+  // survives losing its layout lines.
+  const en = corpus.enumerate(['examples', 'figures'], inputs);
+  corpus.assertNonEmpty(en, 'strip-check');
+  const cov = new corpus.Coverage('strip-check', en, EXTRA_REASONS);
 
   const enginePath = findEngine();
   if (!enginePath) {
@@ -230,22 +232,12 @@ function main() {
     process.exit(2);
   }
 
-  // Collect all .fd files.
-  const files = [];
-  for (const sp of searchPaths) {
-    for (const f of collectFd(sp)) {
-      if (!files.includes(f)) files.push(f);
-    }
-  }
-
-  if (!files.length) {
-    process.stderr.write('No .fd files found in the given paths.\n');
-    process.exit(0);
-  }
+  const files = en.files;
+  cov.header();
 
   // Column widths.
   const C = {
-    file:          34,
+    file:          52,   // recursive roots produce nested paths; 34 truncated them
     nodes:          5,
     orphans:        7,
     pinOrph:        9,
@@ -268,43 +260,41 @@ function main() {
   console.log(SEP);
 
   const rows    = [];     // { rel, nodeCount, orphans, pinnedOrphans, verdict }
-  let skipped   = 0;
   let anyFail   = false;
 
   for (const fdPath of files) {
-    const rel = path.relative(process.cwd(), fdPath);
+    const rel = corpus.rel(fdPath);
 
     let src;
     try { src = fs.readFileSync(fdPath, 'utf8'); }
-    catch (e) {
-      process.stderr.write('Cannot read ' + fdPath + ': ' + e.message + '\n');
-      skipped++;
-      continue;
-    }
+    catch (e) { cov.skip(fdPath, 'unreadable', e.message); continue; }
 
     // ── Step 1: parse as-is ──────────────────────────────────────────────────
     let base;
     try { base = engine.parse(src); }
-    catch (e) {
-      process.stderr.write('skip ' + rel + ': parse threw: ' + e.message + '\n');
-      skipped++;
-      continue;
-    }
+    catch (e) { cov.skip(fdPath, 'parse-error', 'parse threw: ' + e.message); continue; }
 
     if (base.errs && base.errs.length) {
-      process.stderr.write('skip ' + rel + ': ' + base.errs[0] + '\n');
-      skipped++;
+      cov.skip(fdPath, 'parse-error', base.errs[0]);
       continue;
     }
 
     const doc = base.doc;
 
-    // Skip non-scene documents.
-    if (!isSceneGenre(doc)) { skipped++; continue; }
-    if (doc.nodes.length === 0 && doc.groups.length === 0) { skipped++; continue; }
+    // Non-scene genres and empty documents are counted under their own reasons
+    // rather than folded into one `skipped` number, so "nothing to strip" and
+    // "the tool could not read it" are different lines of output.
+    if (!isSceneGenre(doc)) { cov.skip(fdPath, 'non-scene-genre'); continue; }
+    if (doc.nodes.length === 0 && doc.groups.length === 0) {
+      cov.skip(fdPath, 'empty-document');
+      continue;
+    }
 
     // Author opt-out: the figure asserts it carries no strip-test knowledge.
+    // It is SCORED, not skipped: the gate reached a verdict on it, and that
+    // verdict is "the author has taken responsibility for this one".
     if (isDecorative(src)) {
+      cov.score();
       rows.push({
         rel,
         nodeCount:  doc.nodes.length,
@@ -319,12 +309,12 @@ function main() {
     // ── Step 2: parse stripped copy ──────────────────────────────────────────
     const stripped = stripLayout(src);
     let strippedResult;
+    // A THROW here is the same event as an error list: stripping the layout
+    // namespace destroyed the document. It used to be a silent `skipped++`
+    // while the errs branch below was a hard fail — one condition, two
+    // opposite verdicts, decided by how the engine happened to report it.
     try { strippedResult = engine.parse(stripped); }
-    catch (e) {
-      process.stderr.write('skip ' + rel + ': stripped parse threw: ' + e.message + '\n');
-      skipped++;
-      continue;
-    }
+    catch (e) { strippedResult = { errs: ['stripped parse threw: ' + e.message] }; }
 
     if (strippedResult.errs && strippedResult.errs.length) {
       // Stripping broke the document — severe violation.
@@ -336,6 +326,7 @@ function main() {
         verdict: 'fail',
         stripError: strippedResult.errs[0],
       };
+      cov.score();
       rows.push(row);
       anyFail = true;
       continue;
@@ -351,6 +342,7 @@ function main() {
 
     if (verdict === 'fail') anyFail = true;
 
+    cov.score();
     rows.push({
       rel,
       nodeCount:       doc.nodes.length,
@@ -376,12 +368,15 @@ function main() {
   }
 
   console.log(SEP);
-  if (skipped) console.log('skipped (non-scene / parse error): ' + skipped);
+
+  // ── COVERAGE. Printed on EVERY run, every reason, zero or not. ────────────
+  // The old tail printed one collapsed number, and only `if (skipped)` — so a
+  // run that read nothing and a run that found nothing wrong produced the same
+  // output. They are different by construction now.
+  const covResult = cov.report({ verbose });
 
   const decorative = rows.filter(r => r.verdict === 'skip');
-  if (decorative.length) {
-    console.log('decorative (author opt-out, `# decorative`): ' + decorative.length);
-  }
+  console.log('decorative (author opt-out, `# decorative`): ' + decorative.length);
 
   // ── Per-flagged-doc detail ────────────────────────────────────────────────
   const flagged = rows.filter(r => r.verdict !== 'ok' && r.verdict !== 'skip');
@@ -411,7 +406,19 @@ function main() {
     console.log('All documents pass the GUI-WRITEBACK-STRUCTURE strip test.');
   }
 
-  if (strict && anyFail) {
+  // An IN-SCOPE figure the tool could not read fails --strict. A silent skip is
+  // indistinguishable from a pass, so it has to cost something; that is the
+  // whole reason this gate was blind for three releases.
+  if (covResult.unread) {
+    console.log('');
+    console.log((strict ? 'FAIL' : 'WARN') + '  ' + covResult.unread
+              + ' figure(s) were considered and NOT scored for a reason that means'
+              + ' the tool could not read them.');
+    if (!strict) console.log('      (run with --strict to make this an exit-1 failure)');
+  }
+  if (covResult.broken) process.exit(2);
+
+  if (strict && (anyFail || covResult.unread)) {
     process.exit(1);
   }
   process.exit(0);

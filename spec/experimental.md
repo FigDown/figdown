@@ -283,7 +283,8 @@ is a statement about the LANGUAGE rather than about these constructs:
 alone, NORMATIVE (core §10 (a′); the opener `layout` is a `UNIVERSAL-CORE-KEYWORDS` structural marker, not
 a directive inside the zone). `LAYOUT-ZONE-NAMESPACE` itself is unchanged and stays whole in
 core §1 — it fixes the zone's membership so that `GENRE-NAMESPACE`'s default, a reading agent
-ignoring the layout zone entirely, has no crack in it. The clause's own
+ignoring every member of the layout namespace wherever it appears (`GENRE-NAMESPACE`), has
+no crack in it. The clause's own
 "status and belonging are orthogonal" reasoning is preserved there: it was
 written about `path`/`routing`, and it is the record of what the project
 foresaw before the withdrawal, not a claim about the current membership.

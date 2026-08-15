@@ -1,6 +1,29 @@
 # FigDown tools
 
 See also `../conformance/` — the v0.1 parser-conformance suite (golden fixtures + runner: `node conformance/run.js`).
+
+**This directory is not the whole gate list.** One `gate:*` script lives
+outside it: `gate:mcp` runs `integrations/mcp-server/test.js`, because the MCP
+server is shipped software (`bin: figdown-mcp`) rather than a linter, and its
+test belongs beside it. The gate list has exactly one home — the `gate:*`
+scripts in `package.json` — and `npm run gates:list` prints it.
+**`lib/corpus.js` is the one enumeration every corpus gate calls.** `CORPUS-ENUMERATION-MECHANISM` records
+that an earlier ruling counted fourteen instances of a check measuring a property
+of what it FOUND while the defect sat in what it did not find, and concluded the
+class has a general question — *what is the denominator, and who chose it?* — and
+no general fix, because no mechanism can decide what SHOULD be in a denominator.
+That is right about the **choice** and wrong about the **mechanism**: four gates
+(`shape-check`, `boundary-check`, `strip-check`, `stability-check`) carried the
+same hard-coded directory list and the same non-recursive `readdirSync`, which
+is one copied line rather than four judgements. The walk, the skip taxonomy,
+the coverage line and the empty-corpus guard now live in `lib/corpus.js` and
+are shared; each gate still declares its own roots **by name**, because that
+part is a claim about the world. The module enforces three things a gate can no
+longer forget: the walk **recurses**; the coverage line is printed
+**unconditionally**, every reason, zero or not; and an **empty corpus exits 2**
+rather than reporting a clean run. `layout-lint.js` predates the module and
+still carries its own equivalent copy.
+
 The runner also enforces the **`LANE-ALPHABET-KEY-RESERVATION` option-key namespace guard** before it runs
 any case: registering a single-letter option key drawn from the timing lane
 alphabet (`p`, `n`, `x`) would silently reparse existing lanes as options, so
@@ -103,6 +126,24 @@ the run aborts with a named error instead.
   being put in the right place. No engine is loaded; this is a documentation
   gate. See below.
 - `layout-lint.js` — render-quality linter for scene figures (see below).
+- `namespace-check.js` — the layout **namespace** has one membership, and two
+  places state it: the `§10 (a′)` table in `spec/core.md` and
+  the engine's `LAYOUT_DIRECTIVES`. `GENRE-NAMESPACE` restated §3's ignorability
+  default over MEMBERSHIP rather than over the layout zone's textual extent —
+  `pin` is legal before the `layout` opener as well as after it, so a promise
+  phrased over the zone's extent was literally true and practically empty. A
+  membership-based promise is only actionable if a reader can ENUMERATE the
+  namespace, which makes `§10 (a′)` normative and makes an unchecked
+  enumeration exactly the defect the ruling exists to stop. Four assertions:
+  the three sources name the same keywords; each `(a′)` heading's parenthesised
+  count matches its own table; `layout` is not listed as a member (it is the
+  zone's opener, `§10 (a)` — `guide/layout.md` had claimed two members); and
+  both core specs still state the default over membership and no longer carry
+  the retired position wording. Every source is required: a missing heading, an
+  unparseable table or an engine whose `LAYOUT_DIRECTIVES` moved is exit 2
+  naming what moved, never a quietly smaller check. No engine is executed — the
+  set is read from the engine source, as `capability-coverage.js` reads
+  `CHILD_KW`. `gate:namespace` runs it with `--strict`.
 - `strip-check.js` — `GUI-WRITEBACK-STRUCTURE` "strip test": flags scene nodes whose only relationship
   to the rest of the figure is geometric (no incident edge, no group membership)
   so their meaning would be lost if layout lines were stripped (see below).
@@ -117,20 +158,25 @@ the run aborts with a named error instead.
 - `boundary-check.js` — render-side check that `external` endpoints in a
   pinned scene land adjacent to their connected node (not at a far
   auto-layout rank) and never blow the canvas out:
-  `node tools/boundary-check.js [--strict] <file.fd | dir> ...`
-  (default paths: `examples/`, `conformance/cases/`). Reports only
-  pinned scenes that declare externals; "pinned" means a `pin` line carrying
-  `at=`, since `ELEMENT-GEOMETRY-DIRECTIVE` lets a `pin` declare an extent and no position at all.
-  `--strict` exits 1 on any failure. Same engine lookup as `build-svg.js`.
+  `node tools/boundary-check.js [--strict] [--verbose] <file.fd | dir> ...`
+  (default roots: `examples/`, `conformance/cases/`, **walked recursively**).
+  Asserts only pinned scenes that declare externals; "pinned" means a `pin`
+  line carrying `at=`, since `ELEMENT-GEOMETRY-DIRECTIVE` lets a `pin` declare an extent and no
+  position at all — but every other figure is now **counted under a named
+  reason** rather than dropped. `--strict` exits 1 on any failure, or on an
+  in-scope figure the tool could not read. Same engine lookup as
+  `build-svg.js`.
   (The directive was spelled `boundary` until 0.1, which is where the
   file name and the engine's `doc.boundaries` model key come from.)
 - `shape-check.js` — render-side check that a node's label sits inside
   the outline the node is actually **drawn** with, and that every edge
   endpoint lands **on** that outline:
   `node tools/shape-check.js [--strict] [--verbose] <file.fd | dir> ...`
-  (default paths: `conformance/cases/`, `examples/`,
-  `examples/patterns/`, `figures/`). Reads the rendered SVG, not engine
-  internals; `--strict` exits 1 on any failure (see below).
+  (default roots: `conformance/cases/`, `examples/`, `figures/`, **walked
+  recursively** — `examples/patterns/` no longer needs naming because the walk
+  reaches it, and so do the four sibling directories the old list omitted).
+  Reads the rendered SVG, not engine internals; `--strict` exits 1 on any
+  failure, or on an in-scope figure the tool could not read (see below).
 - `editor-check.js` — the round-trip gate for everything the EDITOR writes:
   `node tools/editor-check.js [--strict]`. Two checks. (A) every entry of the
   editor's built-in `EXAMPLES` dropdown must parse with zero errors — a stale
@@ -777,11 +823,21 @@ than a claim. For each scene-bearing `.fd` (skipping pure `bitfield` /
 move after each one.
 
 ```
-node tools/stability-check.js [--max-spillover=N] [<file.fd | dir> ...]
+node tools/stability-check.js [--strict] [--verbose] [--max-spillover=N] [<file.fd | dir> ...]
 ```
 
-Default paths when none are given: `examples/`, `examples/patterns/`,
-`figures/` (resolved from the project root, so the tool works from any CWD).
+Default roots when none are given: `examples/`, `figures/`, **walked
+recursively** (resolved from the project root, so the tool works from any CWD).
+
+The node set of each document comes from the **engine's** `doc.nodes`, not
+from a keyword this tool knows. Matching `^node` and nothing else was correct
+only for `block` and `topology`: a flowchart declares
+`terminator`/`process`/`decision` and a statechart declares `state`, so ten
+scene figures — the whole of `examples/statechart/` among them — parsed to
+zero node declarations and were dropped without a number. An edit that adds a
+node likewise reuses the **document's own** declaration spelling, and an edit
+that adds an edge is built by cloning an existing edge line, so the connector
+keeps that genre's form (`flowline a -> b`, `transition a -[coin]-> b`).
 
 **The five edits (applied to first eligible node/target in document order):**
 
@@ -850,12 +906,21 @@ that was never FigDown source.
 | `cross` | true edge-edge segment crossings (shared endpoints and T-junctions excluded) |
 | `thru` | edges passing through node rectangles they are not incident to |
 | `novlp` | peer node-node rectangle overlaps (group containers excluded) |
-| `lblcol` | edge-label bounding-box collisions (estimated: chars × 6.5 px wide, 12 px tall) |
-| `coinc` | distinct edge pairs whose segments overlap collinearly for > 10 px |
+| `lblcol` | a label that has stopped saying which line it belongs to: one count per overlapping label PAIR, plus one count per label an edge STRIKES (however many edges cross it). Boxes are rebuilt with the engine's own `cand()` geometry — widest line × 6.5 px × `fs`/11, line height 1.3 `fs` — honouring `text-anchor` and joining `<tspan>` lines; the strike test is against the box's centre band (middle 40 % of height, inset 2 px), so a corner graze is not a strike |
+| `coinc` | distinct edge pairs whose segments overlap collinearly for > 10 px — **except between two members of the same merge bus**, which are not charged. A bus draws one trunk stroked once per member (every member still emits its own full path), so shared ink there is the convention rather than a defect, and the junction dots are what tell a reader how many lines the trunk carries. Members are recognised by the `data-bus="<target-id>"` attribute the engine writes on each bus path. Coincidence with anything else — including between members of **two different** buses — is charged exactly as before |
 | `ink/e` | total edge path length ÷ edge count |
 | `score` | weighted sum: cross×2 + thru×3 + novlp×3 + lblcol×2 + coinc×2 |
 
 The table is sorted worst-first by `score`.
+
+`lblcol` says how many, never which. A diagnostic companion in the project’s
+working record answers *which*: per figure it
+names each struck label with the edge segment that strikes it, and each
+overlapping pair. It loads this file's own `extractLabels` / `extractEdges` /
+`segPassesThroughRect` rather than re-implementing them, so the diagnostic and
+the gate cannot drift apart. Reach for it before changing anything about label
+placement (R166, 0.3 — the release where `lblcol` learned to read
+multi-line labels at all).
 
 **Coverage is printed on every run, whether or not any count is non-zero:**
 

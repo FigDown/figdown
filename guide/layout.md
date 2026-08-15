@@ -37,23 +37,31 @@ expresses the identical structure and relationships. No knowledge lives in the
 layout zone. If removing a `pin` changes what an AI reader can learn, the
 position was encoding meaning that should live in text instead.
 
-**The layout zone is DEFAULT-IGNORED (`GENRE-NAMESPACE`, strengthening `CONTENT-LAYOUT-ZONE-SPLIT`).** It exists
+**The layout NAMESPACE is DEFAULT-IGNORED (`GENRE-NAMESPACE`, strengthening `CONTENT-LAYOUT-ZONE-SPLIT`; restated
+over the namespace by `GENRE-NAMESPACE`).** It exists
 ONLY to stabilise the rendered `.svg`. Anything that is content, logic or
 concept MUST be expressible in the content zone, so a reading agent's default
-behaviour is to skip the zone entirely — not merely that it may. Write for
-that: every line you put after `layout` is a line an AI reader will not see.
-There is no keyword to opt in or out. (What makes the default safe across all
-six genres is that `layout` itself is a core keyword with the same meaning
-under every genre — `GENRE-NAMESPACE` `UNIVERSAL-CORE-KEYWORDS` — so the skip is driven by the `layout` marker, not
-by what the zone contains. The guarantee runs deeper: **the
-layout zone is a namespace of its own** (`LAYOUT-ZONE-NAMESPACE`, new clause `LAYOUT-ZONE-NAMESPACE`), and every
+behaviour is to ignore **every member of the layout namespace, wherever in the
+document it appears** — not merely that it may. **Membership decides, never
+position.** Write for that: every `pin` you write is a line an AI reader will
+not see, whether you put it after `layout` or before.
+There is no keyword to opt in or out. (The earlier form of this promise said
+"skip everything from the `layout` line down", and that was literally true and
+practically empty: `pin` is legal before `layout` too, and about half the pins
+in this repository's own corpus are written there, so an agent keeping that
+promise still met half the layout information. `GENRE-NAMESPACE` moved the promise onto the
+namespace, where the container model already was.
+**the layout zone is a namespace of its own** (`LAYOUT-ZONE-NAMESPACE`, clause
+`LAYOUT-ZONE-NAMESPACE`), and every
 member of it is genre-independent. No genre may
 define, redefine or extend a keyword inside the zone; `GENRE-VOCABULARY-OBLIGATION`, "a genre owns its
-words", does not reach in. That is what makes the skip safe *for ever*: a
-future genre cannot put meaning behind the `layout` marker, so a reader may
-skip the zone without even resolving the header's genre token. That namespace has exactly two members, `layout` and `pin`, and
-both are NORMATIVE: the withdrawal of `path` and `routing` left `LAYOUT-ZONE-NAMESPACE` whole and
-took its only experimental members with it.) If a
+words", does not reach in. That is what makes the default safe *for ever* and
+what makes it usable: ONE enumeration of the members is correct under every
+genre, so a reader may apply it without even resolving the header's genre
+token. That enumeration is **core §10 (a′)**, it is NORMATIVE, and it has exactly **one** member — `pin`, NORMATIVE. `layout` is not a
+member: it is the zone's OPENER and lives in the universal core of three
+(§10 (a)) alongside `figdown` and `title`. The withdrawal of `path` and
+`routing` left `LAYOUT-ZONE-NAMESPACE` whole and took its only experimental members with it.) If a
 figure needs
 "arrangement carries meaning", the language owes it a content-zone construct
 (`MEANINGFUL-ARRANGEMENT`); until that lands, say the arrangement in prose in the content zone

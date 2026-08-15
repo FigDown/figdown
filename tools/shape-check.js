@@ -25,12 +25,24 @@
 // fractions of the distance from the centre to the outline.
 //
 // usage: node tools/shape-check.js [--strict] [--verbose] [<file.fd | dir> ...]
-// Default paths: conformance/cases/, examples/, examples/patterns/, figures/.
+// Default roots: conformance/cases/, examples/, figures/ — WALKED RECURSIVELY.
+//
+// Until 0.3 that list was `conformance/cases`, `examples`, `examples/patterns`,
+// `figures` read NON-recursively — the same copied line three sibling gates
+// carried. It opened 230 files and printed 71 rows; the other 159 vanished
+// without a number, and the footer read identically whether the tool had
+// measured everything or nothing. `examples/showcase/`, `examples/statechart/`,
+// `examples/reference/` and `examples/layout-compare/` were never opened.
+//
+// Enumeration, the skip taxonomy and the coverage line now come from
+// `tools/lib/corpus.js`. A conformance fixture paired with a `.errors.txt` is
+// invalid ON PURPOSE and is counted as such rather than failing --strict.
 // Deterministic; engine lookup order matches build-svg.js.
 'use strict';
 
 const fs   = require('fs');
 const path = require('path');
+const corpus = require('./lib/corpus.js');
 
 // ── Engine lookup (same order as build-svg.js) ────────────────────────────────
 const ENGINE_CANDIDATES = [
@@ -144,8 +156,12 @@ function pointsOfEdge(tag, d) {
 function checkOne(engine, fdPath) {
   const src = fs.readFileSync(fdPath, 'utf8');
   const { doc, errs } = engine.parse(src);
-  if (errs.length) return { fd: fdPath, skip: 'parse-error' };
+  if (errs.length) return { fd: fdPath, skip: 'parse-error', detail: errs[0] };
   const out = engine.render(doc, {});
+  // `render` returns null for a document it cannot lay out. Reading `.svg` off
+  // that threw, and the throw was caught upstream as a generic `error:` row.
+  if (!out || typeof out.svg !== 'string')
+    return { fd: fdPath, skip: 'render-error', detail: 'render() returned no svg' };
   const svg = out.svg;
 
   const nodes = {};                          // id -> {outline, label}
@@ -209,16 +225,20 @@ function checkOne(engine, fdPath) {
   return { fd: fdPath, nodes: Object.keys(nodes).length, textFails, endFails, seen, rows };
 }
 
-// ── file collection (matches layout-lint.js / boundary-check.js) ──────────────
-function collectFd(arg) {
-  const st = fs.statSync(arg);
-  if (st.isDirectory())
-    return fs.readdirSync(arg).filter(f => f.endsWith('.fd')).sort()
-      .map(f => path.join(arg, f));
-  return [arg];
-}
-function pad(s, n) { s = String(s); return s + ' '.repeat(Math.max(0, n - s.length)); }
-function lpad(s, n) { s = String(s); return ' '.repeat(Math.max(0, n - s.length)) + s; }
+// ── file collection ───────────────────────────────────────────────────────────
+// Enumeration lives in tools/lib/corpus.js. See this file's header for what the
+// private, non-recursive copy that used to sit here cost.
+
+// Skip reasons this gate adds. Neither fails --strict: both are a correct
+// ANSWER ("this document draws no outline this check can measure"), not a
+// failure to answer. Both are counted and named on every run.
+const EXTRA_REASONS = [
+  ['no-drawn-shapes', 'no node outline in the rendered SVG (bitfield/table/timing)', false],
+  ['nothing-to-assert', 'shapes drawn but no label and no edge endpoint to check',   false],
+];
+
+const pad  = corpus.pad;
+const lpad = corpus.lpad;
 
 function main() {
   const args = process.argv.slice(2);
@@ -229,30 +249,47 @@ function main() {
     else if (a === '--verbose') verbose = true;
     else paths.push(a);
   }
-  if (!paths.length) {
-    const root = path.join(__dirname, '..');
-    for (const d of ['conformance/cases', 'examples', 'examples/patterns', 'figures'])
-      if (fs.existsSync(path.join(root, d))) paths.push(path.join(root, d));
-  }
+  // The gate's DECLARED scope, walked recursively.
+  const en = corpus.enumerate(['conformance/cases', 'examples', 'figures'], paths);
+  corpus.assertNonEmpty(en, 'shape-check');
+  const cov = new corpus.Coverage('shape-check', en, EXTRA_REASONS);
+
   const engine = loadEngine();
   if (!engine) { console.error('figdown.html not found'); process.exit(2); }
 
-  const files = [];
-  for (const p of paths) for (const f of collectFd(p)) files.push(f);
+  const files = en.files;
+  cov.header();
 
   const perShape = {};
   let anyFail = false, checkedText = 0, checkedEnd = 0;
   const bad = [];
-  console.log(pad('figure', 40) + lpad('nodes', 6) + lpad('labels', 7) +
+  console.log(pad('figure', 52) + lpad('nodes', 6) + lpad('labels', 7) +
               lpad('ends', 6) + '  result');
   for (const f of files) {
     let r;
     try { r = checkOne(engine, f); }
-    catch (e) { console.log(pad(path.basename(f), 40) + '  error: ' + e.message); anyFail = true; continue; }
-    if (r.skip) continue;
+    catch (e) {
+      // A throw is a reason the tool could not read the figure, so it belongs
+      // in the coverage table under a named reason rather than as a loose row.
+      cov.skip(f, 'render-error', e.message);
+      continue;
+    }
+    if (r.skip) {
+      // A conformance fixture paired with `.errors.txt` is MEANT not to parse.
+      const reason = (r.skip === 'parse-error' && en.invalidByDesign.has(f))
+        ? 'invalid-by-design' : r.skip;
+      cov.skip(f, reason, r.detail);
+      continue;
+    }
     const nt = r.rows.filter(x => x.kind === 'text').length;
     const ne = r.rows.filter(x => x.kind === 'end' || x.kind === 'fan').length;
-    if (!nt && !ne) continue;
+    if (!nt && !ne) {
+      // These two used to share one bare `continue`, so "renders no shapes at
+      // all" and "draws shapes with nothing to assert" were both invisible.
+      cov.skip(f, r.nodes ? 'nothing-to-assert' : 'no-drawn-shapes');
+      continue;
+    }
+    cov.score();
     checkedText += nt; checkedEnd += ne;
     for (const row of r.rows) {
       const s = perShape[row.shape] = perShape[row.shape] ||
@@ -269,7 +306,7 @@ function main() {
     }
     const fails = r.textFails.concat(r.endFails);
     if (fails.length) { anyFail = true; bad.push([f, fails]); }
-    console.log(pad(path.basename(f), 40) + lpad(r.nodes, 6) + lpad(nt, 7) +
+    console.log(pad(corpus.rel(f), 52) + lpad(r.nodes, 6) + lpad(nt, 7) +
                 lpad(ne, 6) + '  ' + (fails.length ? 'FAIL (' + fails.length + ')' : 'ok'));
     if (verbose)
       for (const row of r.rows)
@@ -291,7 +328,21 @@ function main() {
   console.log('total: ' + checkedText + ' labels, ' + checkedEnd + ' endpoints, ' +
     bad.reduce((n, b) => n + b[1].length, 0) + ' failures');
 
-  process.exit(strict && anyFail ? 1 : 0);
+  // ── COVERAGE. Printed on EVERY run, every reason, zero or not. ────────────
+  // The old footer printed the same three totals whether the tool had measured
+  // 230 files or none of them.
+  const covResult = cov.report({ verbose });
+
+  if (covResult.unread) {
+    console.log('');
+    console.log((strict ? 'FAIL' : 'WARN') + '  ' + covResult.unread
+              + ' figure(s) were considered and NOT scored for a reason that means'
+              + ' the tool could not read them.');
+    if (!strict) console.log('      (run with --strict to make this an exit-1 failure)');
+  }
+  if (covResult.broken) process.exit(2);
+
+  process.exit(strict && (anyFail || covResult.unread) ? 1 : 0);
 }
 
 main();

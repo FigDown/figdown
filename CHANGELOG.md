@@ -65,6 +65,77 @@ Statuses referred to above are defined in [`spec/README.md`](spec/README.md).
 
 Nothing yet.
 
+## v0.3.1 — 2026-08-14
+
+**Release `v0.3.1`, language version `0.3`.** A patch release: it is **rendering
+and tooling only**. There is no **Language** section, because the language does
+not move — `figdown` stays `0.3`, no `.fd` source changes, every `figdown 0.1`,
+`0.2` and `0.3` conformance golden passes unmodified, and the frozen reading
+contract [`read/0.3`](read/0.3/) is reused byte-for-byte. The same figures are
+drawn better, and four new gates check things prose alone could not.
+
+**Fixed — three or more edges into one target are drawn as one merge bus.** A
+target reached by three or more edges that carry the same label used to be drawn
+as that many separate lines, arrowheads and copies of the label; it is now a
+single shared rail into one trunk with one arrowhead and one label. The bus is
+adopted **once per figure and all-or-none** — a drawing never mixes a merged
+convergence with a fanned one — and there is deliberately no per-edge override.
+Alongside it, a **spine-priority straightening pass** holds a deep decision
+spine in one column instead of letting it staircase across the page: the
+eleven-branch reference fixture goes from **2208 px wide to 854**, with its
+waypoint columns still fully reserved.
+
+**Fixed — an edge label is placed to say which line it belongs to.** The rule
+that let a label lie free across its own line is removed, and the metric that
+judged placement is corrected — it had read multi-line labels as empty and every
+label as left-anchored, so it could not see half of what it was scoring. On the
+corrected reader, label strikes across the example corpus fall **256 → 180**
+(`tcp-state-machine` 12 → 1, `srl-evpn-irb` 6 → 0, `packet-ingress` 4 → 0).
+Back-edge **return lanes** land with it, and the two labels of a bidirectional
+pair now sit on opposite sides: `bfd-session` goes from **`coincident` 2 to 0**
+under a stricter metric.
+
+**Fixed — a pin on a group member lands where written.** A `pin at=(400,80)` on
+a member of an unpinned group used to be offset by the group's auto-layout
+extent, so it landed at `min_auto_x + 400` rather than at canvas `400` and
+drifted under edits it did not name — the one thing a `pin` exists to prevent.
+A member of an unpinned group is now placed in canvas pixels exactly like an
+ungrouped node; a member of a pinned group is unchanged.
+
+**Added — a Model Context Protocol server, and a namespace gate.** A new
+[MCP server](integrations/mcp-server/README.md) (`figdown-mcp`) carries FigDown
+to agents that have no checkout, skill or shell; it adds **no fifth engine
+copy**, reaching the engine only through `dist/figdown.js`, and `gate:mcp`
+exercises it as a real subprocess over stdio. `gate:namespace` joins the gate
+list, holding the layout namespace to one membership across the specification
+and the engine. Two further checks — that every decision citation resolves to a
+real ruling, and that every erratum entry matches the frozen files it corrects —
+run in development, where the internal ruling ledger they read lives; that ledger
+is working record and is not published, so those two checks are not among the
+gates in this tree. (A shared recursive corpus walk, `tools/lib/corpus.js`, now
+backs every corpus gate, replacing the hand-copied non-recursive directory lists
+that had drifted between them.)
+
+**Fixed — a frozen reading contract found wrong is corrected by *erratum*, not
+by editing frozen bytes.** [`spec/ERRATA.md`](spec/ERRATA.md) is a new register,
+and its first entry **E1** records that the layout namespace is ignorable by
+**membership, not textual position**: the frozen reading contract says "ignore
+everything from the `layout` keyword down", but a `pin` may appear *before* that
+opener — 54% of the `pin` lines in the corpus do — so position is the wrong
+test. The register ships with the release; the check that proves each entry
+against the bytes it corrects runs in development, where the ruling ledger it
+reads lives.
+
+**The honest limit, stated plainly.** Because `read/` is indexed by **language**
+version, E1 **cannot reach the frozen `read/0.3/` tree in any `0.3.z` release** —
+a patch release implements `figdown 0.3` and reuses `read/0.3/` unchanged, so
+those bytes stay wrong-by-bytes and correct-by-erratum. E1's corrected wording
+lands in a `read/` tree only when `figdown 0.4` writes `read/0.4/`. Until then it
+reaches reading-contract consumers **only** through `spec/ERRATA.md` and, for an
+agent, the inline correction carried in
+[`skill/figdown/SKILL.md`](skill/figdown/SKILL.md). That gap is real, and this is
+exactly the kind of limit worth naming rather than papering over.
+
 ## v0.3.0 — 2026-08-13
 
 **Language version: `0.3`.** The second minor release. It **adds** one option

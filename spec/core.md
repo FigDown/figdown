@@ -274,11 +274,13 @@ profile**.
   is the confusion this clause removed; the distinction stands on its own
   and applies to the next experimental member the zone acquires.
   **Why the zone needs this and not merely a fixed `layout`.** `GENRE-NAMESPACE`'s
-  default is that a reading agent ignores the layout zone ENTIRELY (§3).
-  That default holds only if no genre semantics can ever appear there —
-  and the skip is driven by the `layout` marker, never by inspecting what
-  the zone contains, so an agent has no way to notice if some genre put
-  meaning inside it. While `path`/`routing` were genre-redefinable, the
+  default is that a reading agent ignores EVERY MEMBER of this namespace,
+  wherever in the document it appears (§3, as restated by `GENRE-NAMESPACE` — the
+  default is stated over membership, never over the zone's textual
+  extent). That default holds only if no genre semantics can ever appear
+  in the namespace, and it is applied by RECOGNISING the members, so the
+  member set has to be one list that is correct under every genre.
+  While `path`/`routing` were genre-redefinable, the
   premise had a crack; `LAYOUT-ZONE-NAMESPACE` closes it by fixing the zone's **membership**,
   not just its opener.
   A genre that needs its own edge geometry does not get it by taking a
@@ -911,34 +913,67 @@ Normative rules:
   are legal — any semantic directive after `layout` is a line error.
   The layout zone MUST NOT carry semantics; the content zone SHOULD
   NOT hold information needed only for rendering.
-  **The layout zone is DEFAULT-IGNORED (`GENRE-NAMESPACE`, strengthening `CONTENT-LAYOUT-ZONE-SPLIT`).** The
-  zone exists ONLY to stabilise the rendered `.svg`. Any information that
+  **The layout NAMESPACE is DEFAULT-IGNORED (`GENRE-NAMESPACE`, strengthening `CONTENT-LAYOUT-ZONE-SPLIT`;
+  restated over the namespace by `GENRE-NAMESPACE`).** The zone exists
+  ONLY to stabilise the rendered `.svg`. Any information that
   is content, logic or concept MUST be expressible in the content zone.
-  A reading agent's DEFAULT behaviour is therefore to **ignore the layout
-  zone entirely** — not merely that it may. No opt-in or opt-out keyword
-  is introduced; the default is the contract.
+  A reading agent's DEFAULT behaviour is therefore to **ignore every
+  member of the layout namespace, wherever in the document it appears**
+  — not merely that it may. **MEMBERSHIP decides, never position.** The
+  namespace is ENUMERATED in §10 (a′) and has exactly
+  one member, `pin`; a `pin` written before the `layout` opener is
+  ignored on precisely the same terms as one written after it. No opt-in
+  or opt-out keyword is introduced; the default is the contract.
+  **Why the promise is stated over the namespace and not over the zone's
+  textual extent (`GENRE-NAMESPACE`).** `pin` MAY legally appear before `layout`
+  (below), and in practice about half of it does — so a promise phrased
+  as "ignore everything from the `layout` line down" is literally true
+  and practically empty: an agent that kept it would still meet half the
+  document's layout information, because the zone was meant to be the
+  container for presentation and only holds half of it. Two alternatives
+  were rejected. **Requiring `pin` inside the zone** is a tightening that
+  invalidates previously legal documents, and `pin` is NORMATIVE rather
+  than EXPERIMENTAL, so under §13's X/Y/Z policy only a major version may
+  do it — a migration plus a version gate, buying nothing but a sentence
+  being literally true, since the position constraint carries no meaning.
+  **Naming `pin` in the promise** instead of the namespace abandons the
+  container model and creates recurring debt: every future member would
+  owe an amendment to this sentence, and a missed amendment is another
+  promise that does not do what it says. The namespace form costs
+  nothing, because §1 `LAYOUT-ZONE-NAMESPACE` already makes the layout zone a namespace of its
+  own — `GENRE-NAMESPACE` aligns two statements the spec already makes rather than
+  adding a rule.
+  **The enumeration is therefore NORMATIVE, and it is checked.** A
+  namespace-based promise is only actionable if a reader can ENUMERATE
+  the namespace, so §10 (a′) is the enumeration a reading agent applies,
+  not a summary of one; `tools/namespace-check.js` asserts that it agrees
+  with the reference engine's accepted set and fails
+  when either moves.
   This also puts an obligation on genre design: if a genre needs
   "arrangement carries meaning", it owes a content-zone construct
   (`MEANINGFUL-ARRANGEMENT`) — `pin` is not a substitute, and neither is anything else in
-  the layout zone. `UNIVERSAL-CORE-KEYWORDS` and `LAYOUT-ZONE-NAMESPACE` (§1) are together what makes the default hold
-  across genres. `UNIVERSAL-CORE-KEYWORDS` fixes the OPENER: `layout` is core and means the same
-  thing under every genre, so an agent can skip the zone without knowing
-  which genre it is reading, and the skip is driven by that marker rather
-  than by the zone's contents. `LAYOUT-ZONE-NAMESPACE` fixes the MEMBERSHIP: every keyword
-  inside the zone is genre-independent, so there is nothing a genre could
-  have put there for the skipping agent to miss. The second half was added
-  (`LAYOUT-ZONE-NAMESPACE`) because the first is not sufficient on its own —
+  the layout namespace. `UNIVERSAL-CORE-KEYWORDS` and `LAYOUT-ZONE-NAMESPACE` (§1) are together what makes the
+  default hold across genres. `LAYOUT-ZONE-NAMESPACE` fixes the MEMBERSHIP, and that is what
+  the default now rests on: every member of the namespace is
+  genre-independent, so ONE enumeration is correct under every genre and
+  an agent can apply it without first knowing which genre it is reading,
+  and there is nothing a genre could have put there for the ignoring
+  agent to miss. `UNIVERSAL-CORE-KEYWORDS` fixes the OPENER: `layout` is core and means the same
+  thing under every genre, which is what gives authors a conventional
+  place to collect the members and gives the `GUI-WRITEBACK-STRUCTURE` strip set a boundary —
+  it is no longer what carries the skip. `LAYOUT-ZONE-NAMESPACE` was added
+  (`LAYOUT-ZONE-NAMESPACE`) because `UNIVERSAL-CORE-KEYWORDS` is not sufficient on its own —
   while `path`/`routing` were genre-redefinable, a future genre could have
   given one of them a meaning of its own inside the zone, and an agent
   that never looks at the contents has no way to notice. Both were
-  withdrawn from the language (`EDGE-GEOMETRY-CONSTRUCTS`), so the zone now holds
-  `pin` alone; `LAYOUT-ZONE-NAMESPACE` is what keeps the premise true for whatever it holds
-  next.
+  withdrawn from the language (`EDGE-GEOMETRY-CONSTRUCTS`), so the namespace now
+  holds `pin` alone; `LAYOUT-ZONE-NAMESPACE` is what keeps the premise true for whatever it
+  holds next.
   The one narrow exception is the gap the language has not yet closed:
   until a declared-arrangement construct exists (`MEANINGFUL-ARRANGEMENT`), a reading agent
-  SHOULD read the layout zone, and say that it did, when a document's
-  layout looks load-bearing — dense pins arranged as a stack, a grid, or a
-  map (`PRESENTATION-AS-MEANING-CARRIER`). That is a workaround for a missing construct, not a second
+  SHOULD read the namespace's lines, and say that it did, when a
+  document's layout looks load-bearing — dense pins arranged as a stack, a
+  grid, or a map (`PRESENTATION-AS-MEANING-CARRIER`). That is a workaround for a missing construct, not a second
   contract; a document that needs it has a semantics gap. Meaningful
   colour and shape are never in this position: they are declared as a
   `class` (§2.7) and already live in the content zone.
@@ -1682,8 +1717,9 @@ alone. Recorded as an open question in §9.
   for that design: the never-implemented `table … attach=` spelling is
   not a starting point (it was removed, and the engine rejects it as an
   unknown option), and a subordination relationship is SEMANTIC, so it
-  MUST live in the content zone — `pin` and the rest of the layout zone
-  cannot carry it, because reading agents ignore that zone by default
+  MUST live in the content zone — `pin` and the rest of the layout
+  namespace cannot carry it, because reading agents ignore every member
+  of that namespace by default, wherever it is written
   (§3, `GENRE-NAMESPACE`). All v0.2.
   **STILL OPEN.** `MARKER-TARGET-KINDS` widened `in=` on
   `threshold`/`band` to resolve a REGION id, which is the first time any
@@ -2503,6 +2539,20 @@ alone. Recorded as an open question in §9.
   and three separate ones would be the drift this project keeps paying for.
   **What would reopen it:** a measured figure in the production corpus that
   needs the outer frame and cannot honestly merge. v0.2.
+- OQ-S43: **glyph advance widths are checked only against the engine
+  itself** (2026-08-11). `gate:shape` verifies that emitted geometry is
+  consistent with the character widths the engine used, but it takes `cw`
+  **from** the engine under test, so it asserts self-consistency, not truth
+  about glyphs. A wrong advance width — the CJK glyphs that 0.1 drew outside
+  their box — is therefore invisible to every gate and stayed green through
+  every release until it was caught by eye (MIGRATIONS 0.1). The open
+  question is how a gate could pin an advance width against **ground truth**
+  (an independent font metric, or a rendered reference) rather than against
+  the engine's own table. Filed on that basis and deliberately not built: the
+  corpus has measured no second instance, and a metrics oracle is a large
+  dependency to add for one defect. **What would reopen it:** a second
+  glyph-width defect that ships, or a downstream figure whose correctness
+  turns on an advance width the engine gets wrong. v0.2.
 - **A presence condition cannot reference a field** — `present="C = 1"`
   names `C`, and the language cannot resolve that to the `field "C"` three
   lines up: a bitfield field name is a **label**, not an id, and `class=` /
@@ -2670,6 +2720,18 @@ per-genre minimum sets.
 |---|---|---|
 | `pin` | NORMATIVE | an element's declared geometry: `at=` places it, `width=`/`height=` extend it (§3) |
 
+**THIS TABLE IS THE NORMATIVE ENUMERATION OF THE LAYOUT NAMESPACE
+(`GENRE-NAMESPACE`).** §3's default — a reading agent ignores every member
+of the layout namespace, wherever in the document it appears — is
+actionable only if a reader can ENUMERATE the namespace, so this table is
+the list a reading agent applies, not a summary of one. It currently has
+exactly one row, `pin`, which is what a reader may rely on until a
+migration entry says otherwise; a keyword absent from this table is not a
+member, and `layout` itself is the zone's opener under (a) rather than a
+member. `tools/namespace-check.js` asserts that this table and the reference
+engine's accepted set (`LAYOUT_DIRECTIVES`) name the same keywords, and
+fails loudly when either moves.
+
 **Every member of this namespace is genre-independent** (§1, `LAYOUT-ZONE-NAMESPACE`): no genre may define, redefine or extend a keyword inside the
 layout zone, and `GENRE-VOCABULARY-OBLIGATION` does not reach into it. **The
 namespace has exactly one member.** `path` and `routing` were the other
@@ -2686,9 +2748,10 @@ genre MAY redefine `path` or `routing` under `GENRE-VOCABULARY-OBLIGATION`, and 
 longer assume their meaning is genre-independent."* That sentence was
 **WITHDRAWN** (`LAYOUT-ZONE-NAMESPACE`). It read a demotion in status as a release of
 ownership, and it put a crack in `GENRE-NAMESPACE`'s default that a reading agent
-ignores the layout zone entirely — a default that holds only if no genre
-semantics can ever appear there, and whose skip is driven by the `layout`
-marker rather than by any inspection of what the zone contains. `CONSTRUCT-STATUS-TIERS`'s
+ignores every member of this namespace — a default that holds only if no
+genre semantics can ever appear in it, and which (since `GENRE-NAMESPACE` restated it
+over membership rather than over the zone's textual extent) is applied by
+recognising the members, so one list must be correct under every genre. `CONSTRUCT-STATUS-TIERS`'s
 demotion of `path`/`routing` stood until `EDGE-GEOMETRY-CONSTRUCTS` removed them outright.
 **A withdrawal DOES release the spelling**, which a demotion never did:
 `path` and `routing` belong to no namespace now, so a future genre may
@@ -4686,8 +4749,11 @@ An agent MUST NOT infer:
   author's statement order, which is a focus and reading-order signal,
   not a ranking, a priority or a sequence. Where an arrangement really is
   knowledge the language has no construct yet (`MEANINGFUL-ARRANGEMENT`) — the layout
-  zone is not that construct. A reading agent's DEFAULT is to ignore the
-  layout zone entirely (§3, `GENRE-NAMESPACE`); `pins` is
+  namespace is not that construct. A reading agent's DEFAULT is to ignore
+  every member of the layout namespace — enumerated in §10 (a′) — wherever
+  in the document it appears (§3, `GENRE-NAMESPACE`); membership decides, not
+  position, so a `pin` written before the `layout` opener is ignored
+  exactly like one written after it. `pins` is
   in the model as the author's declared geometry constraints, and
   carries no meaning. The one exception is the missing-construct workaround
   of §3: when a document's layout looks load-bearing, read it and say
@@ -4714,9 +4780,11 @@ An agent MUST NOT infer:
   means the same thing under every genre, and so does **every keyword of
   the layout namespace** (`LAYOUT-ZONE-NAMESPACE`): that is `pin`,
   and nothing else.
-  Together those are what let an agent skip the layout zone (§3) without
-  first knowing the genre: `layout` marks where the zone starts, and `LAYOUT-ZONE-NAMESPACE`
-  guarantees that nothing inside it can be a genre's own semantics.
+  Together those are what let an agent ignore the layout namespace (§3)
+  without first knowing the genre: `LAYOUT-ZONE-NAMESPACE` guarantees that the one enumeration
+  in §10 (a′) is correct under every genre and that nothing in it can be
+  a genre's own semantics, and `layout` marks where authors conventionally
+  collect the members.
   **Status does not qualify this**, and the pair that made the point is
   the proof: `path` and `routing` were EXPERIMENTAL (`CONSTRUCT-STATUS-TIERS`)
   and genre-independent the whole time, and the status
@@ -5235,6 +5303,58 @@ not "new" versus "old".**
   `archive/0.1/figdown.html` is untouched by this release and MUST stay
   so, including the retirement message it carries — that engine implements
   `figdown 0.1`, where the message was true.
+
+#### 13.7.3 A discovered error in a frozen reading contract — the erratum path
+
+A `read/<X.Y>/` tree is frozen the moment its release ships (§13.5, and the
+`archive/MANIFEST.tsv` rows that hash it): it is the reading contract for
+language version `figdown X.Y`, and it preserves what that version *said*.
+Freezing has a consequence the project met for the first time at `GENRE-NAMESPACE`: a
+frozen tree can be found to say something **wrong** — not something that later
+changed, but a description that was already wrong on the day it shipped. `GENRE-NAMESPACE`'s
+case is the type specimen: `read/0.1/`, `read/0.2/` and `read/0.3/reading.md`
+each tell a reader to *"Ignore the layout zone. Everything from the `layout`
+keyword down is …"*, a **position** test, when the rule is **membership** — a
+`pin` may sit before the `layout` line and is ignored just the same. The engine
+never behaved otherwise, so nothing *changed*; the words were wrong from the
+start. This subsection states, once, what happens then.
+
+- **The frozen bytes are never edited.** Not to fix a wrong description, not
+  ever. The freeze (§13.5) preserves the released wording precisely *because*
+  it may not be second-guessed later; an in-place "correction" destroys the
+  record of what the version said and breaks every hash and every downstream
+  consumer pinned to those bytes. A frozen tree is right to preserve a wrong
+  sentence.
+
+- **The error is registered in [ERRATA.md](ERRATA.md), outside the frozen
+  trees.** One entry names the frozen file(s), quotes the wrong wording
+  verbatim, gives the correct wording, cites the **superseding ruling**, and
+  lists the affected language versions. `gate:errata` proves each entry against
+  the real files and the real ledger, so the registry cannot drift from what it
+  documents. This is *not* a MIGRATIONS entry and *not* a version change: an
+  erratum corrects a **description of behaviour**, and the behaviour did not
+  move, so the engine does not increment and no `figdown` header changes.
+
+- **The correction lands in the NEXT read tree written**, which — because
+  `read/` is indexed by language version, not release version (§13.0, §13.7.1)
+  — is `read/<the next language version X.Y>/`, created when that version ships,
+  written from the current tree *with the corrected wording substituted for the
+  wrong wording*. A `Z` patch release reuses the frozen `read/<X.Y>/` unchanged
+  and carries no correction.
+
+- **The honest gap, named and not papered over.** A correction that applies to
+  an **already-frozen language version** never reaches that version's `read/`
+  tree at all — those bytes stay wrong forever, by design. Between the erratum
+  being registered and a *new* language version's read tree being written,
+  every consumer of the frozen tree reaches the correction **only through
+  ERRATA.md** and whatever reader-facing pointer routes them to it (today:
+  `skill/figdown/SKILL.md`, the entry point that hands an agent the vendored
+  frozen contract). `GENRE-NAMESPACE` applies to `figdown` 0.1, 0.2 and 0.3, all frozen, so
+  its correction reaches a `read/` consumer through the erratum register until a
+  `figdown 0.4` writes a `read/0.4/` that states the rule correctly. There is no
+  mechanism that closes this gap without either editing frozen bytes (refused
+  above) or shipping a new language version; the register is the bridge, and the
+  gap is the price of the freeze being real.
 
 ### 13.8 What tier 2 costs, stated honestly
 

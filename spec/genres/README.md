@@ -44,10 +44,12 @@ zone `layout` opens holds `pin` (NORMATIVE) — and, until `EDGE-GEOMETRY-CONSTR
 **every member of it is genre-independent**: no genre may define, redefine
 or extend a keyword inside the zone. `GENRE-VOCABULARY-OBLIGATION` does not reach in there, and `GENRE-NAMESPACE`
 gains a carve-out for it, because layout-zone lines *are* top-level lines.
-The reason is `GENRE-NAMESPACE`'s own default — a reading agent skips the layout zone
-entirely, driven by the `layout` marker and never by inspecting the zone's
-contents, so that skip is safe only if no genre semantics can ever appear
-inside; `LAYOUT-ZONE-NAMESPACE` closes that crack. `layout` itself stays core because it is the
+The reason is `GENRE-NAMESPACE`'s own default — a reading agent ignores every member of the
+layout namespace, wherever in the document it appears (`GENRE-NAMESPACE` states the default
+over MEMBERSHIP, never over the zone's textual extent), so that default is
+actionable only if one enumeration of the members is correct under every genre,
+and safe only if no genre semantics can ever appear in the namespace; `LAYOUT-ZONE-NAMESPACE` closes
+that crack, and core §10 (a′) is the enumeration. `layout` itself stays core because it is the
 zone's **opener**, a structural marker recognisable before the genre is
 known; `pin` moved out of the core into the namespace it
 always lived in, and it absorbed `size` in the same release (`ELEMENT-GEOMETRY-DIRECTIVE`).
@@ -285,8 +287,9 @@ ability to declare that a composed region is *about* an element of its host
 document ("this table is about node `X`") — is `CROSS-BLOCK-REFERENCES`, v0.2, and is not
 designed here. One constraint on it is already fixed: subordination is
 SEMANTIC, so it must live in the content zone; it cannot be carried by `pin`
-or anything else in the layout zone, which reading agents ignore by default
-(§3, `GENRE-NAMESPACE`) and which no genre may extend (`LAYOUT-ZONE-NAMESPACE`). A new layout-zone keyword
+or anything else in the layout namespace, every member of which reading agents
+ignore by default wherever it is written (§3, `GENRE-NAMESPACE`) and which no genre may
+extend (`LAYOUT-ZONE-NAMESPACE`). A new layout-zone keyword
 would have to clear the `NEW-CONSTRUCT-EVIDENCE-GATE` gate, and it would be genre-independent too —
 which is exactly why subordination cannot go there.
 

@@ -131,6 +131,7 @@ const RC = require('./reference-coverage.js');
 const ROOT = RC.ROOT;
 const EXAMPLES = path.join(ROOT, 'examples');
 
+// ── Axis F — the declared structural capabilities, ONE ENTRY PER SITE ────────
 // id      : what is reported when it has no demonstrator — it must name the
 //           SITE, because "somewhere in the corpus" is the failure this
 //           granularity exists to prevent
