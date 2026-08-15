@@ -5448,3 +5448,152 @@ surveyed). Deprecation spends the cost after the fact, on every
 downstream reader, at a moment when no evidence can be gathered and no
 argument can be had. Freezing carefully spends it once, in advance, in a
 room where someone can still say no.
+
+## 14. Legibility floor (normative)
+
+### 14.1 What the floor is, and what it is not
+
+The standard secures **meaning** (§12: the semantic model, per-genre reading
+rules) and **bytes** (§13: byte-identical output per renderer version, `RENDERING-DETERMINISM`). It
+secures **nothing else** about whether the SVG a human opens can actually be
+read. That was, until this section, a property of the reference engine and not
+of the standard: a second conformant implementation could pass every §12 fixture
+and draw an unreadable figure.
+
+**The legibility floor** closes the checkable part of that hole. It is a set of
+**output constraints of the form "a conformant renderer MUST NOT emit this,"
+each decidable from the emitted SVG alone** — no knowledge of how the engine
+reasoned, only a predicate over the geometry it produced, with a stated
+tolerance. That decidability is the whole property that separates the floor from
+aesthetics: whether a figure is beautiful, whether its routing is elegant,
+whether its spine is a clean column are **implementation** questions the engine
+owns under **`DOMAIN-CONVENTION-DIRECTIVES`** (the engine owns drawing conventions), and the floor does not
+touch them. A floor is a floor, **never a ceiling**.
+
+The floor is **not a fourth promise.** COMPATIBLE / REPRODUCIBLE / AVAILABLE
+(§13.0.3) are each a clean guarantee under a stated condition. A "LEGIBLE"
+promise would read "the render is legible," and this section deliberately does
+not claim that — it covers only the SVG-checkable *part* of legibility, with a
+boundary (§14.4) it is careful to name. Promising LEGIBLE would overclaim
+exactly what the honest analysis withholds. The floor is therefore a **MUST-NOT
+list**, not a promise.
+
+Every rule in the floor is satisfiable **deterministically** (`RENDERING-DETERMINISM`); constrains
+the engine's **OUTPUT, never the author's meaning** (`DOMAIN-CONVENTION-DIRECTIVES`); and reads only markers
+that render a fact the model already carries, never one they introduce
+(**`PRESENTATION-AS-MEANING-CARRIER`**). A rule enters the floor only once it is proven to catch a real,
+maintainer-confirmed defect, is measured by a checked-in instrument, and does
+**not** fire on a figure the eye reads cleanly — a floor rule that charges a
+correct drawing is worse than no rule.
+
+### 14.2 The floor's height: no worse than a figure the eye reads cleanly
+
+The floor's calibration is stated once, as the height every rule is measured
+against: **a conformant figure must be no worse than one the eye reads cleanly.**
+The worked reference is [`turnstile`](../examples/statechart/turnstile.fd) — two
+states, two self-loops, an anti-parallel `coin`/`push` pair — which scores **0 on
+every axis of the reference instrument, F5 included**, precisely the geometry
+(self-loops, a tight anti-parallel fan) a naive rule would trip on. Any floor
+rule that flags `turnstile`, or any figure a reader takes in without hesitation,
+is miscalibrated and is rejected. The rules below are tuned to that height and
+verified against it.
+
+### 14.3 F5 — label-association margin (the first and currently only rule)
+
+> **F5 (normative).** A conformant renderer MUST NOT emit an edge label whose
+> distance to its **nearest** edge and to its **second-nearest distinct** edge
+> differ by less than **M = 4 px**, where every distance is measured from the
+> **centre of the label's rendered box** to the nearest point of the edge.
+
+**Why it is checkable from the SVG alone.** A reader who cannot tell which of two
+near-equidistant edges a label names is confused by exactly the quantity the
+predicate measures; the rule needs no knowledge of which edge the label *truly*
+belongs to, because a reader has none either. A second implementation checks it
+with three inputs all present in its own output: the label boxes, the edge
+polylines, and the distance from a box centre to a segment.
+
+**The measuring point is the rule.** The same label scored from its anchor, its
+box centre, and its box's nearest corner gives three different margins; only the
+**centre** matches the eye. A wide side-anchored label can graze its own line at
+one corner (a near-zero corner distance that reads CLEAN) while its *identity* —
+its centre, the locus a reader fixes on — floats out into a convergence where two
+lines are equidistant. Measuring from the centre is what lets F5 catch the
+flagship `tcp-state-machine` defect (`rcv ACK of FIN / x`, centre 64.5 px from
+its own line and 65.0 px from the next: a 0.5 px margin) that an anchor or
+corner metric passes.
+
+**M = 4 px, from evidence.** Post-filter margins of the real defects run
+**0.0–3.6 px**; the nearest *clean* things are an intended anti-parallel fan at
+**4.9 px** and `turnstile`'s tightest label at **7.0 px**. M = 4 sits in that
+gap: it catches every real defect and clears the fan and `turnstile`. M is not to
+be moved to enlarge or shrink the flagged set; moving a tolerance to change a
+finding is the move this standard refuses.
+
+**Four filters make the predicate honest.** F5 is charged only after four
+false-positive filters, each of which excludes a case the eye reads cleanly:
+
+1. **Per-edge distance.** The distance to an edge is the minimum over that edge's
+   own segments, so the two segments of one bent edge are never counted as a
+   label's "second edge."
+2. **Node-border proximity.** A label whose centre lies within **18 px** of any
+   node border is an endpoint/port label the reader associates with the node, not
+   an edge-vs-edge ambiguity. The test is **absolute**, not relative to the
+   nearest edge: a label that floats far from every edge is not excused merely
+   because a node happens to be nearer.
+3. **Edge-label identification.** Only labels that name an edge are subject to
+   F5; legends, titles, node labels and notes are not. In the reference engine an
+   edge label is identified by its **halo twin** (each edge label is drawn twice
+   at one point — a white halo then the coloured glyph — while non-edge text is
+   drawn once). A second implementation MAY identify its edge labels by any means
+   its own output makes decidable; the halo is the reference engine's signal, not
+   a required one.
+4. **Anti-parallel / self-loop exemption.** When a label's two nearest edges
+   share **both** endpoints (an `A→B`/`B→A` pair, or two loops on one node), the
+   small fan between them is intentional and colour disambiguates the pair, so F5
+   does not charge it — the same shape as §12's declaration-driven exemptions,
+   where an intended coincidence carries a marker the engine emits from the
+   author's meaning rather than a heuristic guess.
+
+On the current corpus F5 flags **9 labels across 6 figures** out of 201 edge
+labels considered; every figure the eye reads cleanly, `turnstile` included,
+scores 0.
+
+**F5 is enforced as a RATCHET, not yet a hard zero.** The 9 flagged labels are
+real defects, and they sit in figures still under layout repair (the ordering
+and label-aware-placement work, `decisions/registry.md` items 26/27). F5 is
+therefore **advisory now**: the reference gate (`tools/layout-lint.js`) prints
+the F5 count on every run against a **checked-in per-figure baseline** and
+**fails only on regression** — a figure whose F5 count exceeds its baseline,
+including a currently-clean figure that gains its first F5 defect. This catches a
+new ambiguity the moment it lands while not masking the known, filed residue as
+clean. **When the baseline reaches 0, F5 becomes a hard `--strict` zero and the
+ratchet is retired.** The baseline is not lowered by weakening M or a filter; it
+is lowered only by fixing placement.
+
+### 14.4 The boundary the floor deliberately does not cover (FRONTIER)
+
+Naming what the floor cannot yet check is load-bearing, not a caveat. Three
+things were measured this workstream and are recorded as **frontier, not floor**:
+
+- **F6 — a "floating label" ceiling** (a label with a clear margin that
+  nonetheless floats far from every line, so the reader hunts for its owner) is a
+  real, orthogonal dimension but has **no clean single-threshold predicate**: a
+  centre-distance ceiling is **width-confounded** (a wide peripheral label reads
+  perfectly yet sits far from a short stub), and a nearest-corner ceiling is too
+  lenient to see the harm. It needs a width-normalised or local-density measure
+  that does not yet exist. F6 is not a floor rule.
+- **The false-adjacency generalisation** ("nearest own edge vs nearest *any*
+  unrelated node/label/endpoint") **collapses into crowding-in-general**:
+  measured, **55 of 201** edge labels sit within 25 px of some foreign node
+  border or edge endpoint, `turnstile` among them. A rule that charges a quarter
+  of the corpus is not a floor predicate. It is not a floor rule.
+- **Label-aware placement is the fix; the floor is only the objective
+  function.** F5 *measures* an ambiguity; what *resolves* it is label-aware
+  placement (`decisions/registry.md` items 26/27). On a placement-saturated
+  figure the defect can only be moved, not removed, by the engine's current
+  routing — which is exactly why the floor states the target and the backlog owns
+  the optimiser. The floor is the objective, never the fix.
+
+These are the floor's declared frontier and its top future candidates. None
+becomes a rule until a proven, non-false-positive predicate exists for it —
+holding the same bar F5 met.

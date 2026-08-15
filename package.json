@@ -1,6 +1,6 @@
 {
   "name": "figdown",
-  "version": "0.3.1",
+  "version": "0.3.2",
   "description": "A missing edge still looks fine. Text doesn't. A closed, deterministic figure language for Markdown whose source states the meaning, so the next reader can check the figure instead of only looking at it.",
   "license": "MIT",
   "author": "FigDown <hello@figdown.org>",

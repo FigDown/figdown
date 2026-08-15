@@ -65,6 +65,43 @@ Statuses referred to above are defined in [`spec/README.md`](spec/README.md).
 
 Nothing yet.
 
+## v0.3.2 — 2026-08-15
+
+**Release `v0.3.2`, language version `0.3`.** A patch release: the language does
+not move — `figdown` stays `0.3`, no `.fd` source changes, every `figdown 0.1`,
+`0.2` and `0.3` conformance golden passes unmodified, and the engine
+([`editor/figdown.html`](editor/figdown.html)) is **byte-identical to v0.3.1**,
+so every figure renders exactly as it did. **There is no rendering change.** What
+ships is the standard's **first normative constraint on human readability**.
+
+**Added — a legibility floor, [`spec/core.md` §14](spec/core.md).** The floor is
+a MUST-NOT list of renderer *output* constraints, each decidable from the emitted
+SVG alone and never touching the author's meaning. It is deliberately **not a
+fourth promise** beside COMPATIBLE / REPRODUCIBLE / AVAILABLE, and a boundary
+(§14.4) names what it does not cover: a floor is never a ceiling. Its first and
+only rule, **F5 — label-association margin**, forbids an edge label whose
+distances to its nearest and second-nearest distinct edges differ by less than
+**M = 4 px**, measured from the label box centre — the geometry under which a
+reader cannot tell which line a label names. Four filters keep the predicate
+honest, so only genuine edge labels are ever charged.
+
+**Added — `gate:layout` measures F5 as an advisory ratchet.**
+[`tools/layout-lint.js`](tools/layout-lint.js) computes F5 as a named axis
+*outside* the score and prints its count every run against a checked-in
+per-figure baseline (currently **9 labels across 6 figures**, every one in a
+figure still under layout repair). The gate **fails only on regression** — a
+currently-clean figure that gains its first F5 defect, or any figure whose count
+exceeds its baseline — so a new ambiguity is caught the moment it lands while the
+filed residue is never masked as clean. When the baseline reaches 0, F5 becomes a
+hard `--strict` zero and the ratchet retires.
+
+**No `spec/migrations.md` entry, and no new author-facing spelling.** A normative
+constraint on renderer output and a gate axis are not a change to the language a
+`.fd` author writes, so — on the precedent for spec-only rulings with no engine
+source-state change — the public migration log does not move. The internal ruling
+ledger records the floor as its current watermark; that ledger is working record
+and is not published.
+
 ## v0.3.1 — 2026-08-14
 
 **Release `v0.3.1`, language version `0.3`.** A patch release: it is **rendering

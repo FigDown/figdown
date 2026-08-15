@@ -12,7 +12,7 @@
       "name": "figdown",
       "source": "./",
       "description": "A missing edge still looks fine. Text doesn't. FigDown keeps figures as text whose source states the meaning: participants, containment, field widths, table structure. The next reader can check it, not just look at it. Deterministic SVG, embedded in your Markdown — block diagrams, topologies, flowcharts, bit-level layouts, tables, timing waveforms.",
-      "version": "0.3.1",
+      "version": "0.3.2",
       "author": {
         "name": "FigDown",
         "email": "hello@figdown.org",

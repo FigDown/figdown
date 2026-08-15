@@ -500,6 +500,108 @@ function edgeLength(edge) {
   return len;
 }
 
+// ── F5: label-association margin (the legibility floor's first rule) ──────────
+// ADVISORY, RATCHETING axis — the first rule of the LEGIBILITY FLOOR
+// (spec/core.md §14). It is NOT part of score(): the floor is a MUST-NOT list a
+// conformant renderer must satisfy, not one more term in the aesthetic ranking.
+//
+// The rule. A label whose distance to its NEAREST edge (d1) and to its
+// SECOND-NEAREST DISTINCT edge (d2) differ by less than M=4px is ambiguous — a
+// reader cannot tell which edge it names. margin = d2 - d1; flag when margin < M.
+// Measured from the label box CENTRE, the only point that matches the eye: a
+// wide side-anchored label grazes its own line at one corner while its
+// *identity* floats out into a convergence (the tcp `rcv ACK of FIN / x` case,
+// centre 64.5px from its own line vs 65.0px from the next — a 0.5px margin).
+//
+// Four false-positive filters carry a naive 67 down to the honest 9 / 6 figures,
+// and every clean figure — turnstile included — stays at 0:
+//   (1) per-EDGE grouping — d(label,edge) is the MIN over that edge's segments,
+//       so the two segments of one bent edge can never be its own "second edge";
+//   (2) node-border proximity <18px — an endpoint/port label the reader ties to
+//       the node, not an edge-edge ambiguity. ABSOLUTE, not `nodeD < d1`: a
+//       label that floats far from every edge is not excused by a nearer node;
+//   (3) halo-twin edge-label test — the engine draws every edge label twice at
+//       one (x,y), a white halo (`stroke="#fff"`) then the coloured glyph;
+//       legends/titles/notes render once, so the twin tells an edge label from a
+//       non-edge label without a data-* role marker;
+//   (4) anti-parallel-pair / self-loop exemption — when the two nearest edges
+//       share BOTH endpoints the ±7px fan is intentional and colour
+//       disambiguates (turnstile's `coin`/`push`, tcp's CLOSED<->LISTEN fan).
+// M=4 sits in the measured gap: real defects span 0.0–3.6px; the clean
+// anti-parallel fan is at 4.9px and turnstile's tightest label at 7.0px.
+const F5_M = +(process.env.F5_M || 4);
+
+function f5HaloKeys(svgText, tx, ty) {
+  const keys = new Set();
+  const re = /<text x="([^"]*)" y="([^"]*)"([^>]*)>([\s\S]*?)<\/text>/g;
+  let m;
+  while ((m = re.exec(svgText)) !== null) {
+    if (!/stroke="#fff"/.test(m[3])) continue;
+    const x = parseFloat(m[1]) + tx, y = parseFloat(m[2]) + ty;
+    const body = m[4];
+    let lines;
+    if (body.indexOf('<tspan') >= 0) {
+      lines = []; const sp = /<tspan[^>]*>([\s\S]*?)<\/tspan>/g; let sm;
+      while ((sm = sp.exec(body)) !== null) lines.push(sm[1]);
+    } else lines = [body];
+    keys.add(x.toFixed(2) + ',' + y.toFixed(2) + ',' + lines.join('\n'));
+  }
+  return keys;
+}
+function f5EdgeMin(pt, e) {
+  let d = Infinity;
+  for (const [p, q] of e.segs)
+    d = Math.min(d, pointToSegDist(pt[0], pt[1], p[0], p[1], q[0], q[1]));
+  return d;
+}
+function f5NodeBorderDist(pt, n) {
+  const dx = Math.max(n.x - pt[0], 0, pt[0] - (n.x + n.w));
+  const dy = Math.max(n.y - pt[1], 0, pt[1] - (n.y + n.h));
+  return Math.hypot(dx, dy);
+}
+function f5Endpoints(e) { const s = e.segs; return [s[0][0], s[s.length - 1][1]]; }
+function f5Near2(p, q, tol) { return Math.hypot(p[0] - q[0], p[1] - q[1]) < tol; }
+// anti-parallel pair / self-loop twin: the two edges share BOTH endpoints.
+function f5AntiParallel(a, b, tol) {
+  const A = f5Endpoints(a), B = f5Endpoints(b);
+  return A[0] !== A[1] &&
+    A.every(p => B.some(q => f5Near2(p, q, tol))) &&
+    B.every(q => A.some(p => f5Near2(p, q, tol)));
+}
+
+// Returns { flagged: [text,...], considered } for one rendered scene SVG.
+// Faithful port of the verified F5 prototype (turnstile 0, 9 real defects).
+// It reuses this file's own readers.
+function computeF5(svgText, tx, ty, edges, nodes, labels) {
+  if (!edges.length) return { flagged: [], considered: 0 };
+  const halos = f5HaloKeys(svgText, tx, ty);
+  const flagged = [];
+  let considered = 0;
+  for (const L of labels) {
+    // filter (3): keep only labels with a white halo twin at their box (edge
+    // labels); drop legends/titles/notes, which the engine renders once.
+    const isEdge = [...halos].some(k => {
+      const i2 = k.lastIndexOf(',');
+      if (k.slice(i2 + 1) !== L.text) return false;
+      const hx = parseFloat(k.slice(0, i2).split(',')[0]);
+      const hy = parseFloat(k.slice(0, i2).split(',')[1]);
+      return hx >= L.x - 1 && hx <= L.x + L.w + 1 && hy >= L.y - 1 && hy <= L.y + L.h + 14;
+    });
+    if (!isEdge) continue;
+    const C = [L.x + L.w / 2, L.y + L.h / 2];
+    // filter (1): per-EDGE min distance, so a bent edge is one edge.
+    const ds = edges.map(e => ({ e, d: f5EdgeMin(C, e) })).sort((a, b) => a.d - b.d);
+    if (ds.length < 2) continue;
+    considered++;
+    const margin = ds[1].d - ds[0].d;
+    const nodeD = nodes.length ? Math.min(...nodes.map(n => f5NodeBorderDist(C, n))) : Infinity;
+    const anti = f5AntiParallel(ds[0].e, ds[1].e, 5);   // filter (4)
+    const nodeBorderFP = nodeD < 18;                     // filter (2)
+    if (margin < F5_M && !anti && !nodeBorderFP) flagged.push(L.text);
+  }
+  return { flagged, considered };
+}
+
 // ── Metrics ──────────────────────────────────────────────────────────────────
 
 function computeMetrics(edges, nodes, groups, labels) {
@@ -709,7 +811,12 @@ function analyzeSvg(svgText) {
   const groups  = extractGroups(svgText, tx, ty);
   const edges   = extractEdges(svgText, tx, ty);
   const labels  = extractLabels(svgText, tx, ty);
-  return computeMetrics(edges, nodes, groups, labels);
+  const m = computeMetrics(edges, nodes, groups, labels);
+  const f5 = computeF5(svgText, tx, ty, edges, nodes, labels);
+  m.f5 = f5.flagged.length;
+  m.f5Flagged = f5.flagged;
+  m.f5Considered = f5.considered;
+  return m;
 }
 
 // ── File collection ───────────────────────────────────────────────────────────
@@ -730,6 +837,31 @@ const NOT_JUDGED = [
   ['archive/', 'frozen releases'],
   ['read/',    'frozen releases'],
 ];
+
+// ── F5 RATCHET BASELINE (spec/core.md §14) ────────────────────────────────────
+// F5 lands ADVISORY. The 9 labels below are REAL defects, not false positives —
+// the list is the honest state and no filter or M was weakened to shrink it.
+// They are TOLERATED here (a warning, never a failure) because every one sits in
+// a figure still under layout repair: the DEFECT is the placement, and only
+// label-aware placement — the engine-backlog items 26/27, the frontier the
+// floor MEASURES but does not FIX — can clear them.
+//
+// The ratchet fails on REGRESSION, not on the residue. A figure whose current
+// F5 count EXCEEDS its baseline — including a currently-clean figure (baseline 0)
+// that gains its first F5 defect — fails the gate immediately, in --strict and
+// out of it, so a NEW ambiguity in a clean figure is caught the moment it lands
+// while the filed residue is not masked as clean. When items 26/27 clear a
+// figure, lower its entry (to 0, then delete it); when all reach 0, F5 becomes a
+// hard --strict 0 and the ratchet is retired. Keys are paths relative to the
+// project root, so the match is CWD-independent.
+const F5_BASELINE = {
+  'examples/statechart/dhcp-client.fd':           3, // saturated top band; label-aware placement only
+  'examples/statechart/bfd-session.fd':           2, // `rx Down`,`admin disable` — DOWN/INIT/UP column (item 26/27)
+  'examples/showcase/tcp-state-machine.fd':       1, // `rcv ACK of FIN / x` — TIME-WAIT convergence (0.5px margin)
+  'examples/layout-compare/srl-evpn-irb-auto.fd': 1, // `e1/12.24` — auto-layout comparison figure
+  'examples/patterns/state-b.fd':                 1, // `cond3` — IDLE fan, item-26 stranded-label figure
+  'examples/patterns/topology-a.fd':              1, // `p3` — port labels at a link crossing
+};
 
 // collectFd RECURSES. See the file header for what the non-recursive version
 // cost. `skips` accumulates {file, reason} for anything named but not usable.
@@ -935,7 +1067,8 @@ function main() {
       continue;
     }
 
-    rows.push({ file: rel, ...metrics, score: score(metrics) });
+    rows.push({ file: rel, relRoot: path.relative(projectRoot, fdPath),
+                ...metrics, score: score(metrics) });
   }
 
   // Sort worst-first by weighted score.
@@ -952,6 +1085,7 @@ function main() {
     lblcol:      6,
     offcv:       5,
     coinc:       5,
+    f5:          4,
     ink:         7,
     score:       5,
   };
@@ -966,6 +1100,7 @@ function main() {
     lpad('lblcol', COL.lblcol),
     lpad('offcv',  COL.offcv),
     lpad('coinc',  COL.coinc),
+    lpad('f5',     COL.f5),
     lpad('ink/e',  COL.ink),
     lpad('score',  COL.score),
   ].join('  ');
@@ -988,6 +1123,7 @@ function main() {
       lpad(r.lblcol,                  COL.lblcol),
       lpad(r.offcv || 0,              COL.offcv),
       lpad(r.coincident,              COL.coinc),
+      lpad(r.f5 || 0,                 COL.f5),
       lpad(r.inkPerEdge.toFixed(0),   COL.ink),
       lpad(r.score,                   COL.score),
     ].join('  ');
@@ -1051,6 +1187,51 @@ function main() {
     console.log('  renderer (the origin moves; the label does not) rather than nudging the');
     console.log('  text somewhere it no longer names what it is beside.');
     if (strict) anyFail = true;
+  }
+
+  // ── F5 RATCHET — legibility floor §14, advisory now, fails on REGRESSION ────
+  // Printed on every run, whether or not anything is flagged, with its
+  // denominator (edge labels considered) beside the flagged count — the
+  // denominator is stated so "F5 0" can never mean "the axis looked at nothing".
+  {
+    let considered = 0, flagged = 0;
+    const residue = [], regressed = [], cleared = [];
+    for (const r of rows) {
+      considered += (r.f5Considered || 0);
+      flagged    += (r.f5 || 0);
+      const base = F5_BASELINE[r.relRoot] || 0;
+      if (r.f5 > base)
+        regressed.push({ file: r.relRoot, base, now: r.f5, labels: r.f5Flagged || [] });
+      else if (r.f5 > 0)
+        residue.push({ file: r.relRoot, now: r.f5, base, labels: r.f5Flagged || [] });
+      else if (base > 0)
+        cleared.push({ file: r.relRoot, base });
+    }
+    console.log('');
+    console.log('F5 — label-association margin (legibility floor §14; ADVISORY ratchet, M='
+                + F5_M + 'px, measured from the label box centre):');
+    console.log('  ' + flagged + ' flagged / ' + considered
+                + ' edge labels considered   (a label < ' + F5_M
+                + 'px from telling two edges apart is ambiguous)');
+    for (const x of residue)
+      console.log('  baseline  ' + pad(x.file, 46) + 'F5 ' + x.now + '/' + x.base
+                  + '  ' + x.labels.map(t => JSON.stringify(t.replace(/\n/g, '|'))).join(', '));
+    for (const x of cleared)
+      console.log('  cleared   ' + pad(x.file, 46) + 'F5 0/' + x.base
+                  + '  — baseline may be lowered');
+    console.log('  baseline residue is the item-26/27 layout-repair set; it is TOLERATED,');
+    console.log('  never masked as clean. F5 becomes a hard --strict 0 when it reaches 0.');
+    if (regressed.length) {
+      console.log('');
+      console.log('F5 REGRESSION — a figure gained an F5 defect over its ratchet baseline:');
+      for (const x of regressed)
+        console.log('  ' + pad(x.file, 46) + 'F5 ' + x.now + ' > baseline ' + x.base
+                    + '   ' + x.labels.map(t => JSON.stringify(t.replace(/\n/g, '|'))).join(', '));
+      console.log('  A new ambiguity in a clean figure is a floor violation and fails this');
+      console.log('  gate now (the ratchet catches new defects immediately). Fix the');
+      console.log('  placement; do not raise the baseline to silence it.');
+      anyFail = true;
+    }
   }
 
   const unread = skips.filter(s => STRICT_SKIPS.has(s.reason));

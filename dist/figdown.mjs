@@ -1,8 +1,8 @@
-// figdown.mjs — FigDown embeddable library (0.3.1)
+// figdown.mjs — FigDown embeddable library (0.3.2)
 // GENERATED FILE, DO NOT EDIT. Built from editor/figdown.html.
 // Regenerate with: node tools/make-lib.js
 'use strict';
-var VERSION = "0.3.1";
+var VERSION = "0.3.2";
 
 // ---- engine (extracted verbatim from editor/figdown.html) ----
 var __engine = (function () {
@@ -16,7 +16,7 @@ const SHAPES = ['box','rounded','circle','ellipse','diamond','cylinder'];
 // input to that promise, and under core §13 a 0.x renderer may differ from
 // the next — which makes the recorded version the only thing that can
 // explain a diff between two renderings of one source.
-const FIGDOWN_VERSION = '0.3.1';
+const FIGDOWN_VERSION = '0.3.2';
 // `STATECHART-GENRE-SCOPE`: the language number moved for the first time. The dev
 // counter does NOT reset (core §13.0.4 — `N` counts source states of the
 // engine and only ever increases), so 0.1 is followed by
