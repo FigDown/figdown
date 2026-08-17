@@ -2,6 +2,8 @@
 
 > **Figures as text in Markdown — one source, two readers.**
 
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.21971166.svg)](https://doi.org/10.5281/zenodo.21971166)
+
 FigDown is an open standard for describing figures as plain text inside
 Markdown, so that **one** source serves two readers who need completely
 different things from it:

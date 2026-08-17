@@ -1,0 +1,10 @@
+{
+  "upload_type": "software",
+  "access_right": "open",
+  "license": "mit",
+  "creators": [
+    {
+      "name": "FigDown"
+    }
+  ]
+}
