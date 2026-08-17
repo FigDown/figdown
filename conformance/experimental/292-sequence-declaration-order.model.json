@@ -1,0 +1,93 @@
+{
+  "header": {
+    "version": "0.4",
+    "genre": "sequence"
+  },
+  "title": "Order is declaration order, and it is total",
+  "flow": "right",
+  "classes": [],
+  "planes": [
+    {
+      "id": "base",
+      "z": 0
+    }
+  ],
+  "nodes": [],
+  "groups": [],
+  "edges": [],
+  "ranks": [],
+  "pins": [],
+  "thresholds": [],
+  "bands": [],
+  "bundles": [],
+  "regions": [],
+  "lifelines": [
+    {
+      "id": "z",
+      "label": "Third column",
+      "line": 17
+    },
+    {
+      "id": "a",
+      "label": "First column",
+      "line": 18
+    },
+    {
+      "id": "m",
+      "label": "Second column",
+      "line": 19
+    }
+  ],
+  "messages": [
+    {
+      "a": "z",
+      "op": "->",
+      "b": "a",
+      "label": "1",
+      "line": 20
+    },
+    {
+      "a": "a",
+      "op": "->",
+      "b": "m",
+      "label": "2",
+      "line": 22
+    },
+    {
+      "a": "m",
+      "op": "->",
+      "b": "z",
+      "label": "3",
+      "line": 23
+    },
+    {
+      "a": "z",
+      "op": "<-",
+      "b": "m",
+      "label": "4",
+      "line": 26
+    }
+  ],
+  "states": [
+    {
+      "lifeline": "a",
+      "name": "OPEN",
+      "line": 21
+    },
+    {
+      "lifeline": "z",
+      "name": "BUSY",
+      "line": 24
+    },
+    {
+      "lifeline": "a",
+      "name": "CLOSED",
+      "line": 25
+    },
+    {
+      "lifeline": "m",
+      "name": "IDLE",
+      "line": 27
+    }
+  ]
+}

@@ -8,8 +8,9 @@ figdown 0.1 topology
 # HONEST LIMIT (guide/expressing.md known limits — "strict message ordering"):
 # message ORDER is carried only by the 1/2/3 numbering convention in the
 # labels, a naming convention that `MEANING-RECOVERY-SOURCE` does not treat as first-class order.
-# The sequence genre (`FLOWCHART-GENRE-DESIGN`, v0.2) will make order first-class semantics;
-# until then a reader must trust the ordinal prefixes below.
+# The sequence genre (`MESSAGE-ORDER-AND-STATE`, closed 0.4) makes order first-class;
+# this figure stays figdown 0.1 DELIBERATELY, so any released engine can
+# render it, and a reader here must trust the ordinal prefixes below.
 # Likewise, the canonical RFC 9293 figure carries the per-endpoint TCP
 # STATE (LISTEN, SYN-SENT, …) on the lifelines; the topology genre has no
 # lifeline-state construct, so the companion `table` block below carries

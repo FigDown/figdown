@@ -1,0 +1,79 @@
+{
+  "header": {
+    "version": "0.4",
+    "genre": "sequence"
+  },
+  "title": "Address lease",
+  "flow": "right",
+  "classes": [
+    {
+      "id": "dropped",
+      "meaning": "Sent, never delivered",
+      "line": 16
+    },
+    {
+      "id": "party",
+      "meaning": "Runs on the client host",
+      "line": 17
+    }
+  ],
+  "planes": [
+    {
+      "id": "base",
+      "z": 0
+    }
+  ],
+  "nodes": [],
+  "groups": [],
+  "edges": [],
+  "ranks": [],
+  "pins": [],
+  "thresholds": [],
+  "bands": [],
+  "bundles": [],
+  "regions": [],
+  "lifelines": [
+    {
+      "id": "c",
+      "label": "DHCP client",
+      "class": [
+        "party"
+      ],
+      "line": 18
+    },
+    {
+      "id": "s",
+      "label": "DHCP server",
+      "line": 19
+    }
+  ],
+  "messages": [
+    {
+      "a": "c",
+      "op": "->",
+      "b": "s",
+      "label": "DHCPDISCOVER",
+      "line": 20
+    },
+    {
+      "a": "c",
+      "op": "->",
+      "b": "s",
+      "label": "DHCPREQUEST (unicast, renewing)",
+      "class": [
+        "dropped"
+      ],
+      "line": 21
+    }
+  ],
+  "states": [
+    {
+      "lifeline": "c",
+      "name": "BOUND",
+      "class": [
+        "party"
+      ],
+      "line": 22
+    }
+  ]
+}

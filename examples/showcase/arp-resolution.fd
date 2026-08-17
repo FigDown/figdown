@@ -9,7 +9,8 @@ figdown 0.1 topology
 #
 # HONEST LIMIT (guide/expressing.md "strict message ordering"): step order rides on
 # the 1/2 label ordinals, a naming convention; the sequence genre
-# (`FLOWCHART-GENRE-DESIGN`, v0.2) will make it first-class. The cache update is a local
+# (`MESSAGE-ORDER-AND-STATE`, closed 0.4) makes it first-class, and this figure stays
+# figdown 0.1 deliberately for portability. The cache update is a local
 # action on A, not a message — it rides on the reply label and the prose
 # (mode 3: figure + prose are one deliverable), not on a self-edge.
 title "ARP Resolution"

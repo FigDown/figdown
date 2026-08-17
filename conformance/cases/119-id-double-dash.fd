@@ -10,7 +10,7 @@ node b "B"
 edge a--b
 node x--y "Double dash in a node id"
 class c--1 "meaning"
-# `plane l--1` stood here until this release — the whole directive left the
+# `plane l--1` stood here until 0.3 — the whole directive left the
 # language (`PAINT-ORDER-CONSTRUCT`), so that id position left with it.
 
 figdown 0.1 topology

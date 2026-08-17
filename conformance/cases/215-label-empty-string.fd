@@ -8,7 +8,7 @@ figdown 0.1 block
 # substitution is a RENDERING rule that applies only to absence, so
 # every label written below draws nothing at all.
 #
-# The fixture wrote NINE empty labels until this release and now writes
+# The fixture wrote NINE empty labels until 0.3 and now writes
 # eight: `plane over ""` stood after `title ""` and the directive left the
 # language (`PAINT-ORDER-CONSTRUCT`), taking its row with it. `bundle bl "" a--b` stood after
 # the `edge` line and did NOT leave — `bundle` is declared by `topology`

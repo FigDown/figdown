@@ -580,11 +580,19 @@ function computeF5(svgText, tx, ty, edges, nodes, labels) {
   for (const L of labels) {
     // filter (3): keep only labels with a white halo twin at their box (edge
     // labels); drop legends/titles/notes, which the engine renders once.
+    // The key is `x,y,text` and the TEXT may itself contain commas, so split
+    // from the FRONT at the first two separators.  Splitting from the back
+    // (lastIndexOf) recovered a truncated text for any label with a comma in
+    // it, the identity test then failed, and the label was dropped before
+    // `considered++` — silently absent from both numerator and denominator.
+    // That hid 13 of 223 corpus edge labels, concentrated in exactly the
+    // compound conditions dense state machines use (`rcv SYN,ACK / snd ACK`).
     const isEdge = [...halos].some(k => {
-      const i2 = k.lastIndexOf(',');
+      const i1 = k.indexOf(',');
+      const i2 = k.indexOf(',', i1 + 1);
       if (k.slice(i2 + 1) !== L.text) return false;
-      const hx = parseFloat(k.slice(0, i2).split(',')[0]);
-      const hy = parseFloat(k.slice(0, i2).split(',')[1]);
+      const hx = parseFloat(k.slice(0, i1));
+      const hy = parseFloat(k.slice(i1 + 1, i2));
       return hx >= L.x - 1 && hx <= L.x + L.w + 1 && hy >= L.y - 1 && hy <= L.y + L.h + 14;
     });
     if (!isEdge) continue;
@@ -600,6 +608,65 @@ function computeF5(svgText, tx, ty, edges, nodes, labels) {
     if (margin < F5_M && !anti && !nodeBorderFP) flagged.push(L.text);
   }
   return { flagged, considered };
+}
+
+// ── align: axis-free orthogonality (ADVISORY, never gates) ───────────────────
+//
+//   A = #{ edges : min(|Δcx|, |Δcy|) > TOL }        self-loops excluded
+//
+// Δcx/Δcy are the differences between the two endpoint node CENTRES, so an edge
+// is charged when it is neither horizontal nor vertical within tolerance. It
+// counts a property of the PLACEMENT, not of the routing: a bent orthogonal
+// route between two nodes that are not aligned still leaves the reader tracing
+// a staircase, and a straight diagonal between two aligned nodes is not
+// possible. This is the drawing-tool convention (a figure reads as columns and
+// rows), and it is the axis every other term in this file lacked — a clean
+// column scored no better than a staircase, and worse on `crossings`, because a
+// denser drawing crosses more per unit area.
+//
+// WHY IT IS ADVISORY AND NOT AN OBJECTIVE. The term was measured as a candidate
+// for the placement objective (decisions/registry.md). Against a
+// control with the same move set and no alignment term, the whole floor gain
+// belonged to the MOVE SET; the term's own contribution was A 132 -> 127, and
+// buying it needed two guards, each added to repair a measured regression (a
+// clean figure went crossings 0 -> 3; the fan-hub barycentre was pulled off
+// centre). A readability signal that needs two guards to stop it making figures
+// worse is a signal, not an objective. So it is REPORTED here and wired into
+// nothing: not `score()`, not `--max-score`, not `--strict`.
+//
+// WHY IT IS AXIS-FREE. `min(|Δcx|,|Δcy|)` never asks which way the figure
+// flows. It cannot: `examples/statechart/turnstile.fd` is `flow right` with
+// both states in ONE rank, so its clean straight-down transition has a
+// perpendicular offset of 80 px against the flow axis and 7.2 px along it. A
+// term keyed to the flow direction calls the project's calibration reference
+// misaligned; this one calls it aligned, as the eye does.
+//
+// TOL = 12 px, from the corpus rather than from taste. The 249 corpus edge
+// offsets cluster hard below 0.5 px (97 edges) and then stop; 12 px sits in the
+// widest gap of the sub-20 px distribution (11.8 -> 14.7) and is about one text
+// line-height, below which an offset reads as "the same line".
+const ALIGN_TOL = +(process.env.ALIGN_TOL || 12);
+
+// This is the one metric in this file that needs the PARSED DOCUMENT and not
+// just the SVG: it is about which two nodes an edge JOINS, and the rendered
+// path says only where ink went. Endpoints that are not drawn nodes (a port
+// stub, a group anchor) have no centre, so they are counted as `unresolved`
+// and named in the denominator rather than quietly dropped — the blind spot
+// this file's header, `corpus.js` and the F5 comma defect all record.
+function computeAlign(doc, nodes) {
+  const box = new Map();
+  for (const n of nodes)
+    if (!box.has(n.id)) box.set(n.id, { cx: n.x + n.w / 2, cy: n.y + n.h / 2 });
+  const edges = (doc && doc.edges) || [];
+  let count = 0, considered = 0, selfLoops = 0, unresolved = 0;
+  for (const e of edges) {
+    if (e.a === e.b) { selfLoops++; continue; }   // a self-loop has no direction to be off
+    const A = box.get(e.a), B = box.get(e.b);
+    if (!A || !B) { unresolved++; continue; }
+    considered++;
+    if (Math.min(Math.abs(A.cx - B.cx), Math.abs(A.cy - B.cy)) > ALIGN_TOL) count++;
+  }
+  return { count, considered, selfLoops, unresolved };
 }
 
 // ── Metrics ──────────────────────────────────────────────────────────────────
@@ -780,8 +847,16 @@ function renderWithRetry(engine, src, fdPath) {
     // A gate that reads section 1 of a 3-section figure and reports on the
     // figure is the same lie as a gate that does not recurse.
     const docs = (parsed.docs && parsed.docs.length) ? parsed.docs : [doc];
-    const svgs = docs.map(d => (d === doc ? result : engine.render(d)).svg);
-    return { ok: true, svg: result.svg, svgs, doc };
+    const rs = docs.map(d => (d === doc ? result : engine.render(d)));
+    // GEOMETRY-TIME REFUSAL. `render` can reject a figure that parsed cleanly
+    // — a group band that would enclose a node the source never put in the
+    // group is a picture that states something the document does not, so the
+    // engine returns diagnostics and the artifact is never written. There is
+    // then no drawing to lint, and measuring the coordinates the engine
+    // computed on the way to refusing would score ink no reader will ever see.
+    const gerrs = rs.reduce((a, r) => a.concat(r.errs || []), []);
+    if (gerrs.length) return { ok: false, refused: true, errs: gerrs };
+    return { ok: true, svg: result.svg, svgs: rs.map(r => r.svg), doc };
   }
   try {
     return attempt();
@@ -805,7 +880,7 @@ function parseTranslate(svgText) {
   return m ? [parseFloat(m[1]), parseFloat(m[2])] : [0, 0];
 }
 
-function analyzeSvg(svgText) {
+function analyzeSvg(svgText, doc) {
   const [tx, ty] = parseTranslate(svgText);
   const nodes   = extractNodes(svgText, tx, ty);
   const groups  = extractGroups(svgText, tx, ty);
@@ -816,6 +891,11 @@ function analyzeSvg(svgText) {
   m.f5 = f5.flagged.length;
   m.f5Flagged = f5.flagged;
   m.f5Considered = f5.considered;
+  const al = computeAlign(doc, nodes);
+  m.align           = al.count;
+  m.alignConsidered = al.considered;
+  m.alignSelfLoops  = al.selfLoops;
+  m.alignUnresolved = al.unresolved;
   return m;
 }
 
@@ -839,7 +919,7 @@ const NOT_JUDGED = [
 ];
 
 // ── F5 RATCHET BASELINE (spec/core.md §14) ────────────────────────────────────
-// F5 lands ADVISORY. The 9 labels below are REAL defects, not false positives —
+// F5 lands ADVISORY. The 8 labels below are REAL defects, not false positives —
 // the list is the honest state and no filter or M was weakened to shrink it.
 // They are TOLERATED here (a warning, never a failure) because every one sits in
 // a figure still under layout repair: the DEFECT is the placement, and only
@@ -854,11 +934,23 @@ const NOT_JUDGED = [
 // figure, lower its entry (to 0, then delete it); when all reach 0, F5 becomes a
 // hard --strict 0 and the ratchet is retired. Keys are paths relative to the
 // project root, so the match is CWD-independent.
+//
+// AN ENTRY THAT NOTHING MEASURES IS REMOVED, NOT KEPT AT ITS LAST VALUE.
+// `examples/layout-compare/srl-evpn-irb-auto.fd` held `1` (`e1/12.24`) until
+// 0.3 made the figure a geometry refusal: it is now skipped under
+// `geometry-refused`, so its baseline is consulted by no run and asserts a
+// measurement that no longer exists. Leaving it would also make the ratchet's
+// own retirement condition — every entry at 0 — unreachable by a figure that
+// cannot be measured at all. Its number is recorded HERE rather than deleted
+// (a removed entry with no note is how a later reader re-discovers a defect as
+// if it were new): if group-aware rank assignment lands and the figure renders
+// again (engine-backlog item 32), it returns with F5 1 on `e1/12.24` —
+// restore the entry in the same commit, because the ratchet would otherwise
+// read a pre-existing defect as a regression against baseline 0.
 const F5_BASELINE = {
   'examples/statechart/dhcp-client.fd':           3, // saturated top band; label-aware placement only
   'examples/statechart/bfd-session.fd':           2, // `rx Down`,`admin disable` — DOWN/INIT/UP column (item 26/27)
   'examples/showcase/tcp-state-machine.fd':       1, // `rcv ACK of FIN / x` — TIME-WAIT convergence (0.5px margin)
-  'examples/layout-compare/srl-evpn-irb-auto.fd': 1, // `e1/12.24` — auto-layout comparison figure
   'examples/patterns/state-b.fd':                 1, // `cond3` — IDLE fan, item-26 stranded-label figure
   'examples/patterns/topology-a.fd':              1, // `p3` — port labels at a link crossing
 };
@@ -905,6 +997,7 @@ function collectFd(arg, skips) {
 const SKIP_REASONS = [
   ['parse-error',            'the engine rejected the source'],
   ['render-error',           'render() threw'],
+  ['geometry-refused',       'render() refused the figure — no drawing to measure'],
   ['geometry-error',         'the SVG reader failed on the output'],
   ['no-scene-in-scene-genre','scene genre rendered 0 nodes and 0 edges'],
   ['unreadable',             'file could not be read'],
@@ -925,7 +1018,15 @@ const STRICT_SKIPS = new Set([
 
 // Genres whose figures HAVE scene geometry (engine: GENRE_NODE_KW plus
 // statechart). Used only to classify an empty render.
-const SCENE_GENRES = new Set(['block', 'topology', 'flowchart', 'statechart']);
+//
+// `sequence` is in this set even though the ladder is NOT the
+// scene renderer: what the set actually decides is whether an EMPTY render is
+// a correct answer or a defect. A bitfield has no nodes and no edges by
+// construction; a sequence figure has a `data-node` per lifeline and a
+// `stroke-width="1.6"` shaft per message, so nothing drawn means the tool
+// rendered a ladder and found none of it — a `no-scene-in-scene-genre` strict
+// skip, never the silent `no-scene-genre`.
+const SCENE_GENRES = new Set(['block', 'topology', 'flowchart', 'statechart', 'sequence']);
 
 // ── Formatting helpers ────────────────────────────────────────────────────────
 
@@ -935,6 +1036,12 @@ const SCENE_GENRES = new Set(['block', 'topology', 'flowchart', 'statechart']);
 // already states the ranking — an annotation the author wrote and the reader
 // never sees is "the worst outcome available" — and the score should agree
 // with it rather than rank a clipped label below a crossing.
+//
+// `align` and `f5` are DELIBERATELY ABSENT from this sum. Both are advisory:
+// `f5` is a floor rule under a ratchet, and `align` is a readability signal
+// whose own measured contribution to a placement objective was small and needed
+// two guards to stop it making figures worse. Neither may move a figure's rank,
+// and neither may fail the gate. They are columns, not terms.
 function score(m) {
   return m.crossings * 2 + m.thru * 3 + m.novlp * 3 + m.lblcol * 2 + m.coincident * 2
        + (m.offcv || 0) * 4;
@@ -1029,14 +1136,14 @@ function main() {
     const result = renderWithRetry(engine, src, fdPath);
     if (!result.ok) {
       const detail = result.errs[0];
-      const reason = (detail && detail.startsWith('render threw:'))
-        ? 'render-error' : 'parse-error';
+      const reason = result.refused ? 'geometry-refused'
+        : (detail && detail.startsWith('render threw:')) ? 'render-error' : 'parse-error';
       skips.push({ file: rel, reason, detail });
       continue;
     }
 
     let metrics;
-    try { metrics = analyzeSvg(result.svg); }
+    try { metrics = analyzeSvg(result.svg, result.doc); }
     catch (e) {
       skips.push({ file: rel, reason: 'geometry-error', detail: e.message });
       continue;
@@ -1086,6 +1193,7 @@ function main() {
     offcv:       5,
     coinc:       5,
     f5:          4,
+    align:       6,
     ink:         7,
     score:       5,
   };
@@ -1101,6 +1209,7 @@ function main() {
     lpad('offcv',  COL.offcv),
     lpad('coinc',  COL.coinc),
     lpad('f5',     COL.f5),
+    lpad('align',  COL.align),
     lpad('ink/e',  COL.ink),
     lpad('score',  COL.score),
   ].join('  ');
@@ -1124,6 +1233,7 @@ function main() {
       lpad(r.offcv || 0,              COL.offcv),
       lpad(r.coincident,              COL.coinc),
       lpad(r.f5 || 0,                 COL.f5),
+      lpad(r.align || 0,              COL.align),
       lpad(r.inkPerEdge.toFixed(0),   COL.ink),
       lpad(r.score,                   COL.score),
     ].join('  ');
@@ -1232,6 +1342,36 @@ function main() {
       console.log('  placement; do not raise the baseline to silence it.');
       anyFail = true;
     }
+  }
+
+  // ── align — axis-free orthogonality, ADVISORY, WIRED INTO NOTHING ──────────
+  // Printed on every run with its denominator beside it, whether or not
+  // anything is flagged, for the same reason F5 prints its own: `align 0` must
+  // never be able to mean "the axis looked at nothing". It states in the output
+  // that it does not gate, so a reader of a run cannot mistake it for a floor.
+  {
+    let flagged = 0, considered = 0, loops = 0, unres = 0, clean = 0;
+    for (const r of rows) {
+      flagged    += (r.align || 0);
+      considered += (r.alignConsidered || 0);
+      loops      += (r.alignSelfLoops || 0);
+      unres      += (r.alignUnresolved || 0);
+      if (r.alignConsidered && !r.align) clean++;
+    }
+    console.log('');
+    console.log('align — axis-free orthogonality (ADVISORY, TOL=' + ALIGN_TOL
+              + 'px: an edge whose two node CENTRES differ by more than TOL on');
+    console.log('  BOTH axes is neither horizontal nor vertical, so the reader traces a staircase):');
+    console.log('  ' + flagged + ' flagged / ' + considered
+              + ' edges between two placed nodes   ('
+              + clean + ' of ' + rows.filter(r => r.alignConsidered).length
+              + ' figures with edges score 0)');
+    console.log('  ' + loops + ' self-loop(s) excluded by definition; ' + unres
+              + ' edge(s) had an endpoint that is not a placed node');
+    console.log('  This axis DOES NOT GATE. It is not in score(), not in --max-score, not in');
+    console.log('  --strict: a readability signal, not a floor rule. It is also not derived');
+    console.log('  from `flow`, which is load-bearing — a flow-axis term calls a one-rank');
+    console.log('  figure with a clean cross-flow edge misaligned, and the corpus has those.');
   }
 
   const unread = skips.filter(s => STRICT_SKIPS.has(s.reason));

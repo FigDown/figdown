@@ -44,7 +44,16 @@ const REF_DIR = path.join(ROOT, 'examples', 'reference');
 // needs a gate — there is no missing keyword for a reader to trip over, so
 // nothing but this tool can notice if the genre document and the engine stop
 // agreeing about the emptiness.
-const GENRES = ['block', 'bitfield', 'table', 'topology', 'flowchart', 'statechart', 'timing'];
+// `sequence` joins, the release its RENDERER lands in — not the
+// release its vocabulary landed in. Membership of this list is what makes a
+// genre's reference figure AND its artifact required, and until the ladder
+// existed the artifact could not be built: the figure rendered an empty
+// canvas, so an `.svg` beside it would have recorded a drawing the language
+// did not have. The genre document (`spec/genres/experimental/sequence.md`)
+// is still owed; this tool reports its absence as the genre's gap rather than
+// hiding the genre until the prose catches up.
+const GENRES = ['block', 'bitfield', 'table', 'topology', 'flowchart', 'statechart', 'timing',
+                'sequence'];
 
 // Composition openers listed on scene genres — covered only if present in set;
 // not required for a pure scene reference figure.

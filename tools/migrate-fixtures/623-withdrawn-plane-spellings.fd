@@ -1,5 +1,5 @@
 figdown 0.1 topology
-# The current spellings, written by a document authored before this release.
+# The current spellings, written by a document authored before 0.3.
 # Both are reported and neither is rewritten: there is nothing to rewrite to.
 node a "A"
 node b "B"

@@ -1,0 +1,45 @@
+# `CLASS-CHANNEL-REACH`: a class must not declare paint that cannot reach the
+# member it joins, and the test is against the channel set that member's
+# DRAWING reads — not against what the directive tables accept. This case
+# pins the two edges of that rule at once:
+#
+#   REJECT  a class whose channels are ALL channels the member lacks
+#           (`style=`-only on a `field` or a `cell`: `style=` left both
+#           directives, `STYLE-KEY-SCOPE`, and no dash is drawn from a class
+#           on either) and `fill=` with no `stroke=` on an interior-less
+#           member (`INTERIOR-LESS-ELEMENT-PAINT`, 0.1, unchanged).
+#   ACCEPT  a class that claims a MEANING and declares NO paint, on any
+#           member. That was a line error on an `edge` to
+#           0.4 (`CLASS-PAINT-REQUIREMENT`'s second half) and is legal.
+#           The legend draws its meaning with no swatch, which is what the
+#           `field`-joined meaning-only classes in examples/gre.fd,
+#           examples/quic.fd and examples/srh.fd have always relied on.
+figdown 0.1 bitfield
+class fdash "Vendor-specific" style=dotted
+class fmean "Present only when the C bit is 1"
+bitfield w "Word" numbering=msb0
+field "A":16 class=fdash
+field "B":16 class=fmean
+
+figdown 0.1 table
+class cdash "Vendor-specific" style=dotted
+class cmean "Deprecated in the 2019 revision"
+table t "Registers"
+| Name | Width |
+|---|---|
+| CTRL | 32 |
+| STAT | 32 |
+cell (1,1) class=cdash
+cell (2,1) class=cmean
+
+figdown 0.1 block
+class emean "Physical underlay link"
+class efill "Hot path" fill=#fee2e2 style=dashed
+class eboth "Overlay tunnel" fill=#fee2e2 stroke=#dc2626
+node a "A"
+node b "B"
+node c "C"
+node d "D" class=efill
+edge a -> b class=emean
+edge a -> c class=efill
+edge a -> d class=eboth

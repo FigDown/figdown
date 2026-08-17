@@ -25,7 +25,16 @@ const ROOT = process.argv[2] || '.';
 // `normativeOnly` also absorbs `note=`, a NORMATIVE option key registered this
 // release that no reference figure writes yet — the one accepted gap inside
 // the v0.1 conformance surface.
-const ACCEPTED = { all: 4, normativeOnly: 4 };
+//
+// Moved again at v0.4.0, both by one and both for the same reason: `sequence`
+// joined the tool's genre list and its reference figure does not yet write the
+// genre's whole surface (`layout`/`pin`, the paint keys, the `style=` values
+// and the multi-value `class=` form). examples/reference/index.md records the
+// gap and why it is accepted — the gap is in DEMONSTRATION, not in the
+// standard. THIS FILE IS TARGET-OWNED and has no source counterpart, so no
+// publish rule can move the number for it; a release that widens the accepted
+// set has to say so here, which is the whole point of pinning it.
+const ACCEPTED = { all: 5, normativeOnly: 5 };
 
 function gaps(args) {
   let out = '';

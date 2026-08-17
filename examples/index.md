@@ -187,6 +187,40 @@ a branch point at all. Here the word carries it and the drawing is free.
 
 ![Packet ingress path](packet-ingress.svg)
 
+## Interactions (sequence — EXPERIMENTAL genre)
+
+Time-ordered exchanges drawn as ladders: `lifeline` columns, `message` rows in
+source order, `state` occurrences on a lifeline, and `fragment` frames saying
+what kind of run a group of messages is. Both figures and what each one is for
+are in [sequence/index.md](sequence/index.md); the genre is experimental and
+its withdrawal price is not one line per figure, so read
+[spec/genres/experimental/sequence.md](../spec/genres/experimental/sequence.md)
+before authoring one.
+
+### DHCP lease acquisition, renewal and release  — [source](sequence/dhcp-lease.fd)
+The genre's **showcase**, and the same protocol as
+[statechart/dhcp-client.fd](statechart/dhcp-client.fd) deliberately drawn in the
+other genre: that figure's lines are transitions of one machine, these are
+messages between three participants. It is the only figure in the corpus that
+says **when** a state change happens relative to the messages around it —
+SELECTING inside the retransmit loop, BOUND inside the operand that earned it,
+the whole reacquisition cycle as a loop with its state changes inside it — and
+it carries four honest limits in its source, starting with the one every
+message in this genre has: a message is one instant, with no separate send and
+receive.
+
+![DHCP lease acquisition, renewal and release](sequence/dhcp-lease.svg)
+
+### All twelve interaction operators  — [source](sequence/fragment-operators.fd)
+Every value of the fragment `type=` enum — `alt` `opt` `loop` `par` `strict`
+`seq` `critical` `neg` `assert` `ignore` `consider` `break` — each written on
+the part of one ordinary client/service session where it is actually true. Six
+of the twelve are the ones Mermaid documents; the other six have no other
+demonstrator here, which is what taking a closed enumeration whole costs and
+buys.
+
+![All twelve interaction operators](sequence/fragment-operators.svg)
+
 ## Algorithms & data structures
 
 ### Hash table with chaining  — [source](hash-chaining.fd)
@@ -220,18 +254,31 @@ live here; read them beside that document.
 
 ## Layout before / after set (`layout-compare/`)
 
-Two figures, each shown twice: once with an empty layout zone and once with
-layout intent added. The content zones are byte-identical within each pair —
-that is the point. The **tuned** side is the top-level example itself, not a
+Two figures, each shown with an empty layout zone and with layout intent added.
+The content zones are byte-identical within each pair — that is the point. The
+**tuned** side is the top-level example itself, not a
 copy: until 0.1 this directory held `*-tuned.fd` files that were
 md5-identical to `examples/evpn-fabric.fd` and `examples/srl-evpn-irb.fd`,
 which is a duplicate rather than a demonstration. Measurements and the reading of each pair are in
 [guide/layout.md §7](../guide/layout.md#7-before--after-the-same-semantics-different-layout-zones).
 
+**The second auto arm has no `.svg`, on purpose.** Auto-layout cannot place
+that figure's three leaf groups' members contiguously — each group's members
+land on different ranks with the other groups' members and five hosts between
+them, so a band would have to span the canvas — and the engine
+refuses to draw a `group` band around a non-member rather than state a
+membership the source never wrote. `node tools/build-svg.js
+layout-compare/srl-evpn-irb-auto.fd` reports `Line 25: group "leaf4" would
+enclose non-member "h2" and the layout pass could not separate them; the figure
+is not drawn rather than drawn wrongly.` (the named node may differ between
+runs) and writes nothing. The source stays: **the refusal is what the auto arm
+now demonstrates** — this topology needs `pin` until auto-layout learns
+group-aware rank assignment (engine-backlog item 32).
+
 | Pair | auto | tuned | What the tuning adds |
 |---|---|---|---|
 | VXLAN/EVPN leaf-spine fabric | [.fd](layout-compare/evpn-fabric-auto.fd) · [.svg](layout-compare/evpn-fabric-auto.svg) | [.fd](evpn-fabric.fd) · [.svg](evpn-fabric.svg) | `flow down` + two `rank` lines — three semantic lines, no `pin`; edge length halves |
-| EVPN-VXLAN IRB (16 nodes, three leaf groups) | [.fd](layout-compare/srl-evpn-irb-auto.fd) · [.svg](layout-compare/srl-evpn-irb-auto.svg) | [.fd](srl-evpn-irb.fd) · [.svg](srl-evpn-irb.svg) | 20 layout lines using groups as layout modules (two-level `pin`); lint gets *worse* while the figure becomes unambiguous |
+| EVPN-VXLAN IRB (16 nodes, three leaf groups) | [.fd](layout-compare/srl-evpn-irb-auto.fd) — **refused, no artifact** | [.fd](srl-evpn-irb.fd) · [.svg](srl-evpn-irb.svg) | 20 layout lines using groups as layout modules (two-level `pin`); they are what makes the figure renderable at all, not a polish pass |
 
 ---
 

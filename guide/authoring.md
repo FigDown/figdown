@@ -8,16 +8,19 @@
 ## Field-tested pitfalls (quick reference)
 
 For the full explanation of each entry see the per-genre reading files: scene
-pitfalls in [read/0.2/scene.md](../read/0.2/scene.md), bit-numbering in
-[read/0.2/bitfield.md](../read/0.2/bitfield.md), arrangement in
-[read/0.2/layout.md](../read/0.2/layout.md).
+pitfalls in [read/0.4/scene.md](../read/0.4/scene.md), bit-numbering in
+[read/0.4/bitfield.md](../read/0.4/bitfield.md), arrangement in
+[read/0.4/layout.md](../read/0.4/layout.md), ladders in
+[read/0.4/experimental/sequence.md](../read/0.4/experimental/sequence.md).
+(`read/` is versioned by **language** version and `0.4` is the live set;
+the older directories stay frozen beside it.)
 
 | Symptom | Correct spelling |
 |---|---|
 | Bit ruler reversed vs source figure | `numbering=` is required — read it off the source: `lsb0` draws N-1…0 L→R (hw register), `msb0` draws 0…N-1 L→R (IETF RFC). It relabels the ruler only: fields are declared L→R under both, so `lsb0` means declaring MSB-first (`DECLARATION-ORDER-SEMANTICS`) |
 | Containment drawn as an invented edge A → sub-block | `group` + `in=` on member node; `gap=0` for flush stacking |
 | Dashed/colored frame "not supported" | `style=dashed`, `fill=`, `stroke=` are legal on any element including groups, and all three are NORMATIVE since 0.1 (`STROKE-KEY-STATUS`). There are exactly TWO paint channels, SVG's own: `fill=` is the interior, `stroke=` the outline of a shape and the WHOLE of a line — so an `edge`/`bundle`/`threshold` takes `stroke=` and never `fill=`. There is no label-colour key: `color=`/`text=` are retired line errors and the label colour is derived from the background (`COLOUR-KEY-STATUS`/`LABEL-COLOUR-SOURCE`) |
-| Yes/No decision edges lose colors | An edge is a line with no interior, so `fill=` cannot paint it — `stroke=` does. Declare `class yes "…" stroke=…` and `class no "…" stroke=…`, then tag edges `class=yes` / `class=no`. Keep `fill=` on the same class only if nodes join it too (it paints members that have an interior). A `fill=`-only class joined by an edge is a line error (`INTERIOR-LESS-ELEMENT-PAINT`/`CLASS-PAINT-REQUIREMENT`) |
+| Yes/No decision edges lose colors | An edge is a line with no interior, so `fill=` cannot paint it — `stroke=` does. Declare `class yes "…" stroke=…` and `class no "…" stroke=…`, then tag edges `class=yes` / `class=no`. Keep `fill=` on the same class only if nodes join it too (it paints members that have an interior). A class joined by an edge that declares `fill=` with no `stroke=` is a line error (`INTERIOR-LESS-ELEMENT-PAINT`) — and a `style=` beside the `fill=` does not answer for the missing `stroke=`. A class that declares NO paint at all is legal: it claims a meaning and the edge keeps its default line (`CLASS-CHANNEL-REACH`) |
 | Literal `\n` shows in label | `\n` works only inside quoted strings: `node a "Line one\nLine two"` |
 | Inventing label for an unlabeled shape | Never fabricate. Shape has NO text in the original → `node a ""` (records `label: ""`, draws blank). Label merely unknown/unreadable → omit it and flag in a `#` comment (the id renders as a placeholder). A cloud in the source is `shape=ellipse` with what it is in the label — `shape=cloud` was retired at 0.1 (`SHAPE-ENUM-VOCABULARY`: geometry only) |
 | External I/O as a fake node | Use `external <id> "label"` — never drawn as a shape, edge ends open |
@@ -25,6 +28,7 @@ pitfalls in [read/0.2/scene.md](../read/0.2/scene.md), bit-numbering in
 | Topology/hierarchy figure comes out scrambled | Add `pin` hints + `flow` direction; auto-layout alone won't reproduce a specific arrangement |
 | Byte-block header forced into `bitfield` | No bit scale → use a single-row `table` or `node` sequence to avoid a misleading bit ruler |
 | `node` under `figdown 0.1 bitfield` (or `table`) | Genre allowlist (`GENRE-KEYWORD-ALLOWLIST`): a keyword is legal only in the genres that DECLARE it, and `bitfield`/`table` declare no scene vocabulary — use `block` / multi-section, or pure bitfield/table only. This cut runs between the scene genres too (`SUBJECT-VOCABULARY-SCOPE`): `group` under `flowchart`, `external` under `statechart`, and `plane` anywhere are all line errors (`SCENE-KEYWORD-MEMBERSHIP`/`PAINT-ORDER-CONSTRUCT`) — and since 0.3 the cut reaches OPTION KEYS: `in=` under `flowchart` or `statechart` is a line error naming the withdrawal, because it named a `group` id and neither genre can declare one (`MEMBERSHIP-KEY-ACCEPTANCE`) |
+| Ladder written with `node` / `edge` under `sequence` | The genre has its own five words and no scene vocabulary: `lifeline`, `message`, `state`, `fragment`, `operand`. On a `message` the undirected `--` is a line error — a message has a sender and a receiver — and `fragment` requires `type=`, which has no default. Three constructs an author arriving from another genre reaches for were argued and **REFUSED**, each with its own named diagnostic and the spelling that works instead: `gap` (`SEQUENCE-TIME-GAP`), `group` (`SEQUENCE-PARTICIPANT-GROUPING`) and the option key `lost=` (`UNDELIVERED-MESSAGE-MARKING`, replaced by a meaning-only `class`) |
 | Scene + table in one file nested under one header | Main standard: second section `figdown 0.1 table` (multi-section `MULTI-FIGURE-DOCUMENTS`); nested typed regions under a scene header are legacy, not the taught path |
 | Multi-line table cell via `\n` | Pipe cells: only HTML `<br>` / `<br/>` / `<br />` (normalized to a real newline); `\n` in a cell is two literal characters |
 
@@ -44,7 +48,7 @@ such as SVG/EMF — extract text and geometry structurally, infer topology
 from geometry, use vision only for the residue; Tier 3: raster-only —
 vision is legitimate but last resort and must be verified); state the tier
 in the provenance comment. The full check is
-[`read/0.2/transcribe.md`](../read/0.2/transcribe.md).
+[`read/0.4/transcribe.md`](../read/0.4/transcribe.md).
 
 ## Step 2 — Pick the genre (main standard first)
 
@@ -56,6 +60,7 @@ in the provenance comment. The full check is
 | devices and the links between them | `topology` | EXPERIMENTAL — prefer `block` when portable |
 | steps, decisions, and control flow | `flowchart` (defaults `flow down`; owns `process` / `decision` / `terminator`) | EXPERIMENTAL — prefer `block` + `flow down` when portable |
 | states a machine is IN, and transitions between them | `statechart` (**needs `figdown 0.2`**; a node is a `state`, a connector a `transition`) | EXPERIMENTAL — prefer `block` when portable. Choose it only when a node is a **mode endured**, not a step performed: a retry loop is a `flowchart` however its title reads |
+| participants and the messages they exchange, **in time order** | `sequence` (**needs `figdown 0.4`**; participants are `lifeline` columns, time runs down the page, and `flow`/`rank`/`pin` do nothing here) | EXPERIMENTAL — and its withdrawal price is **not** `statechart`'s: that genre added no syntax, this one adds five keywords, an enum and a whole layout. Choose it when many lines run between the SAME pair of blocks **and** those lines are a time-ordered exchange; if they are distinct transitions of one machine, that is a `statechart` with a layout problem |
 | signals changing over time cycles | `timing` | EXPERIMENTAL |
 
 **Prefer the three main-standard genres** (`block`, `bitfield`, `table`)
@@ -119,6 +124,12 @@ the language (`EDGE-GEOMETRY-CONSTRUCTS`) with no replacement spelling. Edges ar
 routed by the engine, so when `pin` is not enough the remaining moves are
 content-zone or structural (layout.md §2, §8), and the unserved need is
 recorded at spec core §9 **`EDGE-IDENTITY-AND-GEOMETRY`**.
+
+**None of that ladder applies to a `sequence` section.** Both of its axes are
+already ordered by the source — columns are `lifeline` declaration order, rows
+are `message` ∪ `state` declaration order — so `flow` and `rank` are not words
+in that genre at all, and a `pin` parses and moves nothing. If a ladder reads
+badly, the edit is to the **source order**, not to a layout line.
 
 ## Step 4 — Nothing fits? The escalation guideline
 

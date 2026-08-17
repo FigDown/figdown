@@ -6,8 +6,10 @@
 //
 //   figdown.html          <- editor/figdown.html
 //   build-svg.js          <- tools/build-svg.js
-//   reference/**.md       <- read/0.3/**.md          (GENRE-REFERENCE-ADDRESS;
-//                                                       repointed, STATECHART-GENRE-SCOPE)
+//   reference/**.md       <- read/0.4/**.md          (GENRE-REFERENCE-ADDRESS;
+//                                                       repointed, STATECHART-GENRE-SCOPE,
+//                                                       DRAWN-ANNOTATION-FORM, and
+//                                                       SEQUENCE-GENRE-VOCABULARY)
 //
 // SKILL.md is still hand-maintained SOURCE; this script neither writes nor
 // deletes it.
@@ -18,22 +20,28 @@
 // one is never touched again. STATECHART-GENRE-SCOPE exercised that for the first
 // time: `read/0.1/` is frozen at the bytes v0.1.0 shipped and hashed in
 // `archive/MANIFEST.tsv`, `read/0.2/` is the frozen figdown 0.2 contract, and
-// `read/0.3/` is the LIVE contract this script
+// `read/0.3/` is the frozen figdown 0.3 contract, and `read/0.4/` is the LIVE
+// contract this script
 // mirrors. The `figdown 0.1` reading is unchanged inside it — `Y` removes
-// nothing — plus what `figdown 0.2` added. The bundle still needs its own copy, because `skill/figdown/`
+// nothing — plus what `figdown 0.2`, `0.3` and `0.4` added. `read/0.4/` is also
+// where erratum E1 (spec/ERRATA.md, GENRE-NAMESPACE) is discharged: it states the
+// layout-zone rule by NAMESPACE MEMBERSHIP rather than by textual position, so
+// the vendored mirror carries the corrected wording and the
+// three frozen trees keep the wording they shipped.
+// The bundle still needs its own copy, because `skill/figdown/`
 // is copied standalone into `~/.claude/skills/` and must work with no network
 // and no repository, so a path out of the bundle would dangle. That is a
 // fourth vendored copy of a text this project has already shipped SEVEN
 // four-copy-drift incidents against, so it is generated here and byte-gated by
 // `tools/skill-coverage.js` (check 0, VENDOR). Never hand-edit
-// `skill/figdown/reference/`; edit `read/0.3/` and re-run this script.
+// `skill/figdown/reference/`; edit `read/0.4/` and re-run this script.
 'use strict';
 const fs = require('fs');
 const path = require('path');
 
 const ROOT = path.join(__dirname, '..');
 const DEST = path.join(ROOT, 'skill', 'figdown');
-const READ_SRC = path.join(ROOT, 'read', '0.3');
+const READ_SRC = path.join(ROOT, 'read', '0.4');
 const REF_DEST = path.join(DEST, 'reference');
 
 fs.mkdirSync(DEST, { recursive: true });
@@ -45,7 +53,7 @@ for (const [src, dst] of [
   console.log('OK  ' + path.relative(ROOT, dst));
 }
 
-// reference/: mirror read/0.3/ exactly. Files that no longer exist upstream are
+// reference/: mirror read/0.4/ exactly. Files that no longer exist upstream are
 // DELETED here, because a stale leftover is the same defect as a stale copy —
 // SKILL.md's router would go on naming a file that source no longer has.
 function mirror(srcDir, dstDir) {

@@ -1,0 +1,17 @@
+# `CLASS-CHANNEL-REACH`: the class-channel check reaches this genre's collections.
+# Until this release it ran over `doc.edges` alone, and a `message` is NOT an
+# edge (`SEQUENCE-ORDER-MODEL`: it has its own collection, because it has a position in time),
+# so `class k "K" fill=#eee` plus `message c -> s "m" class=k` was accepted,
+# painted nothing of the fill, and put the class in the derived legend.
+#
+# All three interior-less members of this genre are pinned — `message`,
+# `fragment` and `operand` — because they reached the model by three
+# different parse paths and one loop per collection is what closed them.
+figdown 0.4 sequence
+title "Class channels under sequence"
+class ghost "Sent, never delivered" fill=#eee
+lifeline c "Client"
+lifeline s "Server"
+fragment f "retry" type=loop class=ghost
+operand o "first attempt" in=f class=ghost
+message c -> s "request" in=o class=ghost

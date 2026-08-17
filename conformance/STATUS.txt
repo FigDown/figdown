@@ -105,7 +105,7 @@
 #     the others are presentation and lexical sweeps touching
 #     `extend=`, or running `threshold`/`band`/`bundle`/`timing` through a
 #     generic check; 259 is nonetheless
-#     experimental below, by its `topology` header). Until this release the
+#     experimental below, by its `topology` header). Until 0.3 the
 #     same sentence named `plane` and `plane=`/`z=` alongside them, and
 #     `115` ran `bundle` under a `block` header: `SCENE-KEYWORD-MEMBERSHIP`/`PAINT-ORDER-CONSTRUCT` withdrew `plane`
 #     from the language and `bundle` from `block`, so those writings left
@@ -241,6 +241,22 @@ default normative
 234-statechart-old-spellings-rejected  genre=statechart,construct=connector  `node` and `edge` under statechart are NAMED line errors (`GENRE-NODE-SPELLING`)
 244-statechart-withdrawn-cells    genre=statechart,construct=threshold,construct=band,construct=bundle  0.3 (`SUBJECT-VOCABULARY-SCOPE`/`SCENE-KEYWORD-MEMBERSHIP`): all five withdrawn cells. There is no KEEP fixture for this genre because it declares NO subject vocabulary at all — the empty declaration is what 230 and 233 already pin
 248-statechart-in-withdrawn       genre=statechart  0.3 (`MEMBERSHIP-KEY-ACCEPTANCE`): `in=` is WITHDRAWN here on a RESERVATION, not merely because it is stranded — its future domain is a `state` id (UML 2.5.1 §14.2.3.4 composite states), so the fixture writes `in=<state id>`, the exact form the reservation is about
+# sequence
+280-sequence-header               genre=sequence   the `sequence` genre header itself, and NOTHING else — the token lands as a dispatch point and the document is a header with a blank body (`SEQUENCE-GENRE-VOCABULARY`)
+281-sequence-requires-0-4         genre=sequence   `figdown 0.3 sequence` is a NAMED version error, not `unknown genre` — answered by `STATECHART-GENRE-SCOPE`'s later-version search with no code added for the second case (core §13.7, `SEQUENCE-GENRE-VOCABULARY`)
+282-sequence-vocabulary-scoped    genre=sequence,genre=block  0.4 (`SEQUENCE-GENRE-VOCABULARY`): the allowlist row the genre did not have one increment ago, both directions in one file — `fragment`/`operand` under `block`, and the region openers and other genres' subject words under `sequence`
+283-sequence-message-model        genre=sequence,construct=connector  0.4: the `message` model golden — all three operators, the trailing label, the [tail]/[head] positions, `in=` and the presentation keys. What it pins is that `edges` stays EMPTY: a message is an occurrence with a place in the total order, not an edge (`SEQUENCE-ORDER-MODEL`)
+284-sequence-wrong-word           genre=sequence,construct=connector  0.4: `GENRE-CONNECTOR-SPELLING`/`GENRE-NODE-SPELLING` applied a fourth time — `node`/`edge` under `sequence` and `lifeline`/`message` under `block` are NAMED line errors in both directions, with no version gate because the GENRE requires figdown 0.4
+285-sequence-in-acceptors         genre=sequence   0.4 (`SEQUENCE-CONTAINMENT-SCOPE`): all FIVE acceptors of `in=` in one valid document — message, operand, lifeline, state, fragment — so the acceptor list is pinned by a model golden and not only by its errors. The `lifeline in=` form has no authored use anywhere and this is its only demonstrator
+286-sequence-in-errors            genre=sequence   0.4 (`SEQUENCE-CONTAINMENT-SCOPE`): the OBJECT rule — `in=` names a fragment or an operand id, and a lifeline id there is a specific mistake with its own sentence. `operand in=` is narrower still and refuses another operand
+287-sequence-fragment-type        genre=sequence   0.4: `type=` is MANDATORY on `fragment` and its twelve values are UML's InteractionOperatorKind taken whole. The clause number in the diagnostics is §17.12.15.3 — the fixture is also what pins that the FALSE §17.6.2 citation (standards-claims S024) is not printed to authors
+288-sequence-nesting-and-contiguity  genre=sequence   0.4 (`SEQUENCE-CONTAINMENT-SCOPE`): the ONE-LEVEL fragment nesting cap, new at this increment, beside the contiguity rule ported from the prototype. One offending line is reported once, against the DEEPEST container it splits, because that is the container whose `in=` repairs the document
+289-sequence-refusals             genre=sequence   0.4 (`UNDELIVERED-MESSAGE-MARKING`/`SEQUENCE-TIME-GAP`/`SEQUENCE-PARTICIPANT-GROUPING`): `gap`, `group` and `lost=` — refused, never withdrawn, so each carries its own diagnostic shape. `gap` is consulted before the typed-block-child exemption (it is both), and `lost=` fires on the unknown-option path because refusing it means adding NO key to OPT_KEYS
+290-sequence-message-direction    genre=sequence,genre=block,construct=connector  0.4: `--` is a line error on `message` and still parses on `edge` under `block` in the same file — the operator set is per genre for the same reason the keywords are. Endpoint resolution is pinned here too
+291-sequence-flow-rank-refused    genre=sequence   0.4 (draft §7): `flow` and `rank` get the PLAIN allowlist message, not one of the three named refusals, because their absence is a consequence of both axes being declaration-ordered rather than a ruling of its own
+292-sequence-declaration-order    genre=sequence   0.4 (`SEQUENCE-ORDER-MODEL`): the order-derivation golden. `messages` and `states` INTERLEAVE, so neither array alone is the trace and a model that lost the order would still look plausible; the per-element `line` and the array order that follows from it are the only record
+293-sequence-class-channel       genre=sequence   0.4 (`CLASS-CHANNEL-REACH`/`INTERIOR-LESS-ELEMENT-PAINT`): a `fill=`-only class reaches nothing on this genre's three interior-less members, and all three are pinned because they reach the model by three different parse paths. Until this release the check ran over `edges` alone and a `message` is not an edge (`SEQUENCE-ORDER-MODEL`)
+294-sequence-class-meaning-only   genre=sequence   0.4 (`CLASS-CHANNEL-REACH`): the KEEP half — a class that claims a MEANING and declares NO paint is legal on every member. This is the genre's designed idiom, because `class` here carries what `group` (`SEQUENCE-PARTICIPANT-GROUPING`) and `lost=` (`UNDELIVERED-MESSAGE-MARKING`) were refused in favour of; it is what the genre's reference figure does, and it was a line error on an `edge` until `CLASS-PAINT-REQUIREMENT`'s second half retired
 # topology
 240-topology-subject-vocabulary   genre=topology,construct=bundle  0.3 (`SUBJECT-VOCABULARY-SCOPE`/`SCENE-KEYWORD-MEMBERSHIP`): the KEEP half of the grid for this genre — `group`, `external` and `bundle` all still parse
 249-in-legal-block-topology       genre=topology    0.3 (`MEMBERSHIP-KEY-ACCEPTANCE`): the KEEP half of the `in=` withdrawal — two sections, `block` and `topology`, both still resolving `in=` against a declared `group` id. A per-genre withdrawal is one declaration lapsing, never the key leaving the language
@@ -249,7 +265,7 @@ default normative
 258-edge-options                  genre=topology    edge option keys, authored as topology (the `plane` line and `plane=` it also carried LEFT, `PAINT-ORDER-CONSTRUCT` — incidental, and the subject is the option set)
 909-errors-band-chart-bundle      genre=topology,construct=chart error strings for band/chart/bundle — TWO sections (`SCENE-KEYWORD-MEMBERSHIP`), `block` for band/chart and `topology` for bundle, because the three no longer share a genre
 259-edge-order-preserved          genre=topology    written edge order, authored as topology
-265-enum-bare-experimental        construct=band,construct=chart  the two EXPERIMENTAL enum positions RULE 2.4 now reaches: `extend=` on a band, `type=` on a chart (`RULE-POSITION-ENUMERATION`). Its first section declared `topology` until this release (`SCENE-KEYWORD-MEMBERSHIP`) and is REWRITTEN to `block`, the genre that still declares `band` — it is one of the two topology `band` occurrences the withdrawal cites, and both were fixtures
+265-enum-bare-experimental        construct=band,construct=chart  the two EXPERIMENTAL enum positions RULE 2.4 now reaches: `extend=` on a band, `type=` on a chart (`RULE-POSITION-ENUMERATION`). Its first section declared `topology` until 0.3 (`SCENE-KEYWORD-MEMBERSHIP`) and is REWRITTEN to `block`, the genre that still declares `band` — it is one of the two topology `band` occurrences the withdrawal cites, and both were fixtures
 271-external-bundle-member        genre=topology,construct=bundle both: a topology header AND the bundle member-rule test
 390-bundle-basic                  genre=topology,construct=bundle both: a topology header AND the bundle test
 391-bundle-member-errors          genre=topology,construct=bundle both: bundle member errors
@@ -281,8 +297,8 @@ default normative
 914-retired-guide-keyword         construct=threshold guide → threshold retirement diagnostic (`THRESHOLD-KEYWORD-SPELLING`), plus the two-hop line → threshold
 # path / routing — NO RECORDS BELOW, deliberately
 # `EDGE-GEOMETRY-CONSTRUCTS` WITHDREW both keywords from the language, so there is no demoted
-# construct left for a fixture to be a dedicated test OF. HISTORICAL, at
-# 0.1: TEN fixtures were deleted (380, 381, 382, 383, 384, 385, 386,
+# construct left for a fixture to be a dedicated test OF. HISTORICAL,
+# TEN fixtures were deleted (380, 381, 382, 383, 384, 385, 386,
 # 397, 398, 399) and ONE moved to `cases/` (913, renamed
 # `913-withdrawn-edge-geometry-keys`): its subject is a retirement
 # diagnostic, which §10 has always classified NORMATIVE. Eleven fixtures left this

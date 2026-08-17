@@ -46,9 +46,12 @@ gap is real; this file is the only bridge across it.
   - `read/0.3/reading.md`
 
   and, transitively, `skill/figdown/reference/reading.md`, which
-  `gate:skill-coverage` (check 0, VENDOR) holds byte-identical to the live
-  `read/0.3/reading.md`, so it cannot be corrected independently of the frozen
-  source and is deliberately left matching it.
+  `gate:skill-coverage` (check 0, VENDOR) holds byte-identical to whichever
+  read tree is LIVE. From 0.1 to 0.3 the live tree was
+  `read/0.3/reading.md`, so the vendored copy carried the wrong wording with it
+  and could not be corrected independently of the frozen source.
+  The live tree became the 0.4 one, and the vendored copy now carries the
+  corrected wording — see the discharge note at the end of this file.
 
 - **Wrong wording** (verbatim, and present in every frozen file above):
 
@@ -81,11 +84,13 @@ gap is real; this file is the only bridge across it.
   and would destroy the record of the released wording. The frozen bytes are
   right to be wrong; the correction lives here.
 
-- **Apply to the next read tree.** The author who writes the next
-  `read/<X.Y>/` (see the version-scheme note below) MUST write the corrected
-  namespace-based wording there rather than copying the position-based wording
-  forward. Until that tree exists, this entry is the only correction a `read/`
-  consumer can reach.
+- **Apply to the next read tree — DONE.** The author who writes
+  the next `read/<X.Y>/` (see the version-scheme note below) MUST write the
+  corrected namespace-based wording there rather than copying the
+  position-based wording forward. That tree is the 0.4 one and it was written
+  that way; the discharge note at the end of this file records it. This entry
+  was the only correction a `read/` consumer could reach until then, and it
+  remains the only one for a consumer who reads a frozen 0.1–0.3 tree directly.
 
 ---
 
@@ -102,6 +107,33 @@ version `X.Y.Z` (core.md §13.0, §13.7.1). Consequences for E1:
   `read/0.3/` plus its own changes (the §13.7.1 rule that produced `read/0.2/`
   and `read/0.3/`). **`read/0.4/` is where E1's corrected wording lands.**
 
-Plainly, for the maintainer: **E1 is not reachable in any 0.3.z release.** It
-reaches `read/` consumers only through this register until `figdown 0.4` ships
+Plainly, for the maintainer: **E1 was not reachable in any 0.3.z release.** It
+reached `read/` consumers only through this register until `figdown 0.4` shipped
 its `read/0.4/` tree.
+
+---
+
+## Discharged — E1
+
+`figdown 0.4` landed (core.md §13.7.4) and with it `read/0.4/`, written from
+`read/0.3/`. `read/0.4/reading.md` states the rule by **namespace membership**:
+
+> Ignore the layout namespace. Its one member today is `pin`. Ignore every
+> member **wherever it appears** — membership decides, never position. A `pin`
+> written *before* the `layout` line is ignored on exactly the same terms as
+> one written after it …
+
+and the sentence that later said *"lets you skip the layout zone"* now says
+*"lets you skip the layout namespace"*. The position-based wording was **not**
+copied forward. `tools/make-skill.js` and `tools/skill-coverage.js` were
+repointed from `read/0.3/` to `read/0.4/` in the same increment, so
+`skill/figdown/reference/reading.md` carries the corrected wording too and
+`skill/figdown/SKILL.md` no longer has to print the correction beside it.
+
+**What is NOT discharged, and never will be.** `read/0.1/`, `read/0.2/` and
+`read/0.3/` still carry the position-based wording, byte for byte, and that is
+the freeze working rather than a residual defect. A consumer who reads one of
+those three trees directly still reaches the correction only through the E1
+entry above. That is why the entry stays here, green and unedited in its
+substance, after the fix has shipped: an erratum against a frozen version is
+never retired, because the bytes it corrects are never retired either.

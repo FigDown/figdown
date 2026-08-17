@@ -101,7 +101,7 @@ carrying the same construct into `block`.
 | `external` | `external <id> ["label"]` | T | NORMATIVE | **none** | never drawn (`EXTERNAL-EDGE-ENDPOINTS`); since 0.1 it took no paint key — `color=` was its only one and it is retired (`COLOUR-KEY-STATUS`) — and since 0.3 (`PAINT-ORDER-CONSTRUCT`) it takes **no option key at all**: `plane=` was its last one. No `note=` — it puts nothing on the page, so there is nothing for a note to stand beside |
 | `edge` | `edge <a> [tail] <op> [head] <b>` | T | NORMATIVE | `stroke` `style` `class` `note` (requires `figdown 0.3`) | op is written form; `[mid]` splits the operator; all three labels take the line's colour (`LABEL-COLOUR-SOURCE`); an edge is a LINK, physical or logical |
 | `bundle` | `bundle <id> ["label"] <a>--<b>,<c>--<d>` | T | **EXPERIMENTAL** | `stroke` `style` | a LAG, an ECMP set, an EVPN Ethernet Segment — see the declaration below. Ring drawn dashed; member list is ONE whitespace-free comma-delimited token (the space form was RETIRED at 0.1); no `fill=` — a ring has no interior (§8.4) |
-| `class` | `class <id> "<meaning>"` | H | NORMATIVE | `fill` `stroke` `style` | the meaning FIELD is REQUIRED, its VALUE may be `""` (= no meaning claimed, no legend entry — `CLASS-EMPTY-MEANING`); a class an `edge` joins MUST declare `stroke=` or `style=` (`INTERIOR-LESS-ELEMENT-PAINT`/`CLASS-PAINT-REQUIREMENT`) |
+| `class` | `class <id> "<meaning>"` | H | NORMATIVE | `fill` `stroke` `style` | the meaning FIELD is REQUIRED, its VALUE may be `""` (= no meaning claimed, no legend entry — `CLASS-EMPTY-MEANING`); a class an `edge` joins must not declare `fill=` without `stroke=` — an edge has no interior, so the two name ONE channel (`INTERIOR-LESS-ELEMENT-PAINT`). Declaring NO paint is legal: the class claims a meaning and the edge keeps its default line (`CLASS-PAINT-REQUIREMENT`'s second half RETIRED at 0.4, `CLASS-CHANNEL-REACH`) |
 | `flow` | `flow right\|down\|left\|up` | H | NORMATIVE | — | **`right`** |
 | `rank` | `rank <id>,<id>[,<id>…]` | H | NORMATIVE | — | two or more ids in ONE whitespace-free comma-delimited token; the space form was RETIRED at 0.1; the rest of the line is reserved for future options |
 | `layout` | `layout` | C | NORMATIVE | — | opens the layout zone (§3) |
@@ -192,7 +192,9 @@ networking word for "outside" is already an assertion about routing.
 **Contrast the other two declarations of this spelling, because they are
 genuinely different documents.** `flowchart`'s `external`
 has a **referent and a citation** — ISO 5807 §9.4.2's *Terminator*, the
-off-page terminus. `block`'s has **no source standard at all** and says so.
+off-page terminus (a citation still **PENDING VERIFICATION**: §9.4.2 sits
+past the readable pp. 1-8, so both the spelling and the clause number are
+unread; added 0.3.z, see `decisions/registry.md`). `block`'s has **no source standard at all** and says so.
 `topology`'s has neither a referent nor an innocent domain: it has a
 collision to warn about. One shared paragraph could carry exactly one of
 those three, and it carried none of them.
@@ -209,7 +211,7 @@ written order, and each resolves against a declared `edge`. No `fill=`: a
 ring has no interior (§8.4).
 
 **That is the whole definition, and it is shorter and stronger than the
-geometric one it replaces.** Until this release the shared text
+geometric one it replaces.** Until 0.3 the shared text
 defined `bundle` as *a dashed ring around parallel edges between the same
 pair* — a description of a drawing that asserts nothing. This genre does not
 need it: **the domain reading and the drawn reading are the same reading**,
@@ -331,7 +333,7 @@ does not.
 
 | Old | New | R | Why |
 |---|---|---|---|
-| `boundary` | `external` | `EXTERNAL-ENDPOINT-NAMING` | UML's «boundary» is an INTERNAL interface object, C4's `System_Boundary` is the dashed grouping container FigDown already spells `group`, and BPMN's Boundary Event is a third meaning — all three invert or displace the intended sense, which the spec's own prose already stated as "declares an external I/O endpoint" |
+| `boundary` | `external` | `EXTERNAL-ENDPOINT-NAMING` | the ECB analysis pattern's «boundary» is an INTERNAL interface object (CORRECTED 0.3.z: this said "UML's"; the stereotype is not in UML 2.5.1 or ISO/IEC 19505-2 — see decisions/registry.md), C4's `System_Boundary` is the dashed grouping container FigDown already spells `group`, and BPMN's Boundary Event is a third meaning — all three invert or displace the intended sense, which the spec's own prose already stated as "declares an external I/O endpoint" |
 | `layer` · `layer=` | *(nothing — the destination is gone)* | `PLANE-KEYWORD-SPELLING`, then `PAINT-ORDER-CONSTRUCT` | `PLANE-KEYWORD-SPELLING` renamed both to `plane` · `plane=` at 0.1, holding that no standard claimed `plane` for a conflicting meaning. **In this genre that was false when it was written**: a plane is the control / data / management partition of a device. `PAINT-ORDER-CONSTRUCT` withdrew `plane` · `plane=` from the language, so the diagnostic now states the whole chain (`layer=` → `plane=` → withdrawn) instead of ending at a spelling that no longer exists — the `route` → `path` precedent from 0.1 |
 | `plot` | `chart` | `CHART-BLOCK-NAMING` | `plot` reads as an imperative — the reason `render` was retired at 0.1 — while every other block opener is a noun, and ECharts, Chart.js and Mermaid all name the object a chart |
 | `kind=` | `type=` | `CHART-BLOCK-NAMING` | Vega, Chart.js and ECharts spell the chart-type key `type`; `kind=` was retired on `node` and live on `plot` at the same time, inside one namespace. Its one legal value was renamed `bars3d` → `bar3d` |
@@ -414,7 +416,7 @@ the operational sentence the topology cannot express as structure.
 
 ### How this differs from the other genres
 
-**Until this release this section said "today the only difference is a
+**Until 0.3 this section said "today the only difference is a
 default", and the sentence above it said this genre shared `block`'s
 vocabulary outright.** Neither is true now, and neither should have been
 comfortable then: a genre whose only difference from another is a default has
@@ -504,9 +506,9 @@ lives now, or that it lives nowhere:
 ```
 "threshold" is not allowed in genre topology — it was WITHDRAWN from this
 genre, not misspelled: `threshold` is now declared by `block` only. …
-Subject vocabulary is per genre (core §3, G2): a spelling accepted by several
+Subject vocabulary is per genre (core §3, `GENRE-VOCABULARY-OBLIGATION`): a spelling accepted by several
 genres is several independent declarations, and this genre's was withdrawn
-without touching any other's. (withdrawn, R160; MIGRATIONS
+without touching any other's. (withdrawn, `SCENE-KEYWORD-MEMBERSHIP`; MIGRATIONS
 0.3)
 ```
 

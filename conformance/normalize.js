@@ -85,7 +85,13 @@
 // Top-level key order:
 //   header, title, flow, classes, planes, nodes, groups,
 //   externals?, edges, ranks, pins, thresholds, bands,
-//   bundles, regions
+//   bundles, regions,
+//   lifelines?, messages?, states?, fragments?, operands?
+//     (SEQUENCE-GENRE-VOCABULARY: the `sequence` collections. All five are
+//      omit-when-absent — the `externals` rule — and all five are APPENDED
+//      after `regions` rather than interleaved, so no golden written before
+//      `figdown 0.4` moves a byte. Element key orders are at the bottom of
+//      this header.)
 //   (`routing?` sat after `flow` and `paths?` after `pins` until 0.1)
 //   (`thresholds` was spelled `guides` until 0.1, THRESHOLD-KEYWORD-SPELLING/NORMATIVE-SEMANTIC-MODEL)
 //
@@ -181,6 +187,38 @@
 //               when present; no source line: the engine does not record one)
 //     chart   : genre, table, type, line   (experimental in v0.1;
 //               `level` was deleted, CHART-LEVEL-KEY)
+//
+//   The `sequence` collections (SEQUENCE-GENRE-VOCABULARY). Every one of them
+//   carries `line`, and `line` is not decoration here: the figure's TIME AXIS
+//   is the union of `messages` and `states` sorted on it (draft §31 — order is
+//   declaration order and it is TOTAL). A consumer that discards `line` loses
+//   the figure's content, which is not true of any earlier collection.
+//   lifeline : id, label, in, fill, stroke, style, class, note, description,
+//              line   (`in` is a fragment or operand id — sense 1)
+//   message  : a, op, b, label, tail, head, in, stroke, style, class, note,
+//              description, line
+//              (`op` is `->`, `<-` or `<->`; `--` is a LINE ERROR in this
+//               genre, because every UML Message has a send event and a
+//               receive event. `label` is the message text and reaches the
+//               model from either the trailing quoted string or the inline
+//               `-[mid]->` form — writing both is a line error, so the model
+//               never holds two. No `plane`: `plane` left the language at
+//               0.3, PAINT-ORDER-CONSTRUCT. No `mid` key: on a message the mid position
+//               IS the label.)
+//   state    : lifeline, name, in, fill, stroke, style, class, note,
+//              description, line
+//              (`lifeline` REFERENCES a declared lifeline — slot 1 does not
+//               declare an id, which is the asymmetry with `statechart`'s
+//               `state`, draft §29 Q5 — and `name` is MANDATORY, which is why
+//               it is not spelled `label`)
+//   fragment : id, label, type, in, stroke, style, class, note, description,
+//              line   (`type` is MANDATORY and always present: one of alt opt
+//               loop par strict seq critical neg assert ignore consider break,
+//               UML 2.5.1 §17.12.15.3 InteractionOperatorKind taken whole.
+//               No `fill`: a fragment is a frame over the messages it holds)
+//   operand  : id, label, in, stroke, style, class, note, description, line
+//              (`in` is MANDATORY and always present: an operand is a
+//               compartment OF a fragment)
 
 function o(pairs) {
   // fixed-key-order object builder; skips absent (undefined/null) values.
@@ -355,6 +393,60 @@ function normalize(doc) {
     ['stroke', t.stroke],
     ['style', t.style], ['plane', t.plane], ['line', t.line]]));
   model.regions = (doc.blocks || []).map(region);
+  // SEQUENCE-GENRE-VOCABULARY: the `sequence` collections. They are OMITTED when
+  // empty — the `externals` rule, not the `nodes` rule — and they are appended
+  // AFTER `regions` rather than interleaved beside `nodes`/`edges`. Both
+  // choices have the same reason and it is DRAWN-ANNOTATION-FORM's: a `figdown 0.1`,
+  // `0.2` or `0.3` golden cannot carry any of them, so appending and omitting
+  // means not one existing golden moves a byte. A consumer written against an
+  // earlier 0.x therefore reads every document it could read before, and a
+  // `sequence` document is the only one where these keys appear at all.
+  //
+  // WHY THEY ARE NOT `nodes` AND `edges`. A message is not an Edge: an Edge is
+  // a relation between two nodes and the model says its order is not meaning
+  // (§12.4 rule 6 gives document order, and §12.6 says the drawing does not
+  // follow from it), while a message is an OCCURRENCE whose place in the total
+  // order IS the figure's content (draft §31). Projecting messages as edges
+  // would tell a second implementation it may reorder them.
+  const seq = [
+    ['lifelines', (doc.lifelines || []).map(l => o([
+      ['id', l.id], ['label', l.label], ['in', l.in],
+      ['fill', l.fill], ['stroke', l.stroke], ['style', l.style],
+      ['class', cls(l.cls)], ['note', l.note], ['description', l.desc],
+      ['line', l.line]]))],
+    // `label` is the message text, from either the trailing quoted string or
+    // the inline `-[mid]->` form; the parser makes writing both a line error,
+    // so exactly one can reach it. `tail` and `head` are different positions
+    // and keep their own keys.
+    ['messages', (doc.messages || []).map(m => o([
+      ['a', m.a], ['op', m.op], ['b', m.b],
+      ['label', m.label], ['tail', m.tail], ['head', m.head],
+      ['in', m.in], ['stroke', m.stroke], ['style', m.style],
+      ['class', cls(m.cls)], ['note', m.note], ['description', m.desc],
+      ['line', m.line]]))],
+    // `lifeline` is a REFERENCE, not a declaration (draft §29 Q5), and `name`
+    // is mandatory — which is why it is not spelled `label`: an omitted label
+    // is legal everywhere `label` appears and is a line error here.
+    ['states', (doc.states || []).map(s => o([
+      ['lifeline', s.ref], ['name', s.name], ['in', s.in],
+      ['fill', s.fill], ['stroke', s.stroke], ['style', s.style],
+      ['class', cls(s.cls)], ['note', s.note], ['description', s.desc],
+      ['line', s.line]]))],
+    // `type` is MANDATORY, so it is never absent — the one key in these five
+    // collections that is always present besides `id` and `line`.
+    ['fragments', (doc.fragments || []).map(f => o([
+      ['id', f.id], ['label', f.label], ['type', f.type], ['in', f.in],
+      ['stroke', f.stroke], ['style', f.style],
+      ['class', cls(f.cls)], ['note', f.note], ['description', f.desc],
+      ['line', f.line]]))],
+    // `in` is MANDATORY on an operand, so it too is always present.
+    ['operands', (doc.operands || []).map(p => o([
+      ['id', p.id], ['label', p.label], ['in', p.in],
+      ['stroke', p.stroke], ['style', p.style],
+      ['class', cls(p.cls)], ['note', p.note], ['description', p.desc],
+      ['line', p.line]]))],
+  ];
+  for (const [k, v] of seq) if (v.length) model[k] = v;
   return model;
 }
 

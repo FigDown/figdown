@@ -1,0 +1,893 @@
+{
+  "suite_version": "1.0.0",
+  "target": {
+    "floor": 0.7,
+    "ceiling": 0.8,
+    "statement": "a reader who has never opened the spec recovers 70-80% of what a .fd says from the syntax alone"
+  },
+  "generated_by": "tools/comprehension-check.js --write-baseline (scores recomputed from the stored transcripts; no model was called)",
+  "figures": {
+    "arp-resolution": {
+      "genre": "topology",
+      "figure": "examples/showcase/arp-resolution.fd",
+      "source": {
+        "standard": "RFC 826",
+        "locator": "Packet Generation / Packet Reception / An Example",
+        "url": "https://www.rfc-editor.org/rfc/rfc826.html",
+        "anchor_strength": "strong"
+      },
+      "conditions": {
+        "commented": {
+          "correct": 10,
+          "total": 16,
+          "score": 0.625,
+          "readers": [
+            {
+              "reader": 1,
+              "correct": 4,
+              "total": 8,
+              "not_stated": 3,
+              "unanswered": 0
+            },
+            {
+              "reader": 2,
+              "correct": 6,
+              "total": 8,
+              "not_stated": 2,
+              "unanswered": 0
+            }
+          ]
+        },
+        "syntax": {
+          "correct": 13,
+          "total": 24,
+          "score": 0.5417,
+          "readers": [
+            {
+              "reader": 1,
+              "correct": 3,
+              "total": 8,
+              "not_stated": 3,
+              "unanswered": 0
+            },
+            {
+              "reader": 2,
+              "correct": 5,
+              "total": 8,
+              "not_stated": 2,
+              "unanswered": 0
+            },
+            {
+              "reader": 3,
+              "correct": 5,
+              "total": 8,
+              "not_stated": 3,
+              "unanswered": 0
+            }
+          ]
+        },
+        "title-only": {
+          "correct": 21,
+          "total": 24,
+          "score": 0.875,
+          "readers": [
+            {
+              "reader": 1,
+              "correct": 6,
+              "total": 8,
+              "not_stated": 0,
+              "unanswered": 0
+            },
+            {
+              "reader": 2,
+              "correct": 7,
+              "total": 8,
+              "not_stated": 0,
+              "unanswered": 0
+            },
+            {
+              "reader": 3,
+              "correct": 8,
+              "total": 8,
+              "not_stated": 0,
+              "unanswered": 0
+            }
+          ]
+        }
+      },
+      "instrument_adjusted": {
+        "correct": 16,
+        "total": 21,
+        "score": 0.7619,
+        "means": "syntax condition, crediting answers the key wrongly rejected and dropping questions outside what the figure claims to show"
+      }
+    },
+    "dhcp-lease": {
+      "genre": "sequence",
+      "figure": "examples/sequence/dhcp-lease.fd",
+      "source": {
+        "standard": "RFC 2131",
+        "locator": "§3.1 (steps 1-6, Table 2, Figure 3), §3.2, §4.3.2, §4.4 (Figure 5), §4.4.1, §4.4.4, §4.4.5, §4.4.6",
+        "url": "https://www.rfc-editor.org/rfc/rfc2131.html",
+        "anchor_strength": "strong"
+      },
+      "conditions": {
+        "commented": {
+          "correct": 13,
+          "total": 16,
+          "score": 0.8125,
+          "readers": [
+            {
+              "reader": 1,
+              "correct": 6,
+              "total": 8,
+              "not_stated": 2,
+              "unanswered": 0
+            },
+            {
+              "reader": 2,
+              "correct": 7,
+              "total": 8,
+              "not_stated": 1,
+              "unanswered": 0
+            }
+          ]
+        },
+        "syntax": {
+          "correct": 21,
+          "total": 24,
+          "score": 0.875,
+          "readers": [
+            {
+              "reader": 1,
+              "correct": 7,
+              "total": 8,
+              "not_stated": 1,
+              "unanswered": 0
+            },
+            {
+              "reader": 2,
+              "correct": 7,
+              "total": 8,
+              "not_stated": 1,
+              "unanswered": 0
+            },
+            {
+              "reader": 3,
+              "correct": 7,
+              "total": 8,
+              "not_stated": 1,
+              "unanswered": 0
+            }
+          ]
+        },
+        "title-only": {
+          "correct": 24,
+          "total": 24,
+          "score": 1,
+          "readers": [
+            {
+              "reader": 1,
+              "correct": 8,
+              "total": 8,
+              "not_stated": 0,
+              "unanswered": 0
+            },
+            {
+              "reader": 2,
+              "correct": 8,
+              "total": 8,
+              "not_stated": 0,
+              "unanswered": 0
+            },
+            {
+              "reader": 3,
+              "correct": 8,
+              "total": 8,
+              "not_stated": 0,
+              "unanswered": 0
+            }
+          ]
+        }
+      },
+      "instrument_adjusted": {
+        "correct": 21,
+        "total": 24,
+        "score": 0.875,
+        "means": "syntax condition, crediting answers the key wrongly rejected and dropping questions outside what the figure claims to show"
+      }
+    },
+    "ethernet-frame": {
+      "genre": "table",
+      "figure": "examples/showcase/ethernet-frame.fd",
+      "source": {
+        "standard": "IEEE 802.3 + IEEE 802.1Q",
+        "locator": "IEEE 802.3 MAC frame format (Clause 3: Destination Address, Source Address, Length/Type, MAC Client Data, Pad, FCS) together with IEEE 802.1Q C-VLAN tag format (Clause 9.6: TPID 0x8100 + TCI = PCP/DEI/VID)",
+        "url": "https://en.wikipedia.org/wiki/IEEE_802.1Q",
+        "anchor_strength": "strong"
+      },
+      "conditions": {
+        "commented": {
+          "correct": 12,
+          "total": 16,
+          "score": 0.75,
+          "readers": [
+            {
+              "reader": 1,
+              "correct": 6,
+              "total": 8,
+              "not_stated": 2,
+              "unanswered": 0
+            },
+            {
+              "reader": 2,
+              "correct": 6,
+              "total": 8,
+              "not_stated": 2,
+              "unanswered": 0
+            }
+          ]
+        },
+        "syntax": {
+          "correct": 18,
+          "total": 24,
+          "score": 0.75,
+          "readers": [
+            {
+              "reader": 1,
+              "correct": 6,
+              "total": 8,
+              "not_stated": 2,
+              "unanswered": 0
+            },
+            {
+              "reader": 2,
+              "correct": 6,
+              "total": 8,
+              "not_stated": 2,
+              "unanswered": 0
+            },
+            {
+              "reader": 3,
+              "correct": 6,
+              "total": 8,
+              "not_stated": 2,
+              "unanswered": 0
+            }
+          ]
+        },
+        "title-only": {
+          "correct": 24,
+          "total": 24,
+          "score": 1,
+          "readers": [
+            {
+              "reader": 1,
+              "correct": 8,
+              "total": 8,
+              "not_stated": 0,
+              "unanswered": 0
+            },
+            {
+              "reader": 2,
+              "correct": 8,
+              "total": 8,
+              "not_stated": 0,
+              "unanswered": 0
+            },
+            {
+              "reader": 3,
+              "correct": 8,
+              "total": 8,
+              "not_stated": 0,
+              "unanswered": 0
+            }
+          ]
+        }
+      },
+      "instrument_adjusted": {
+        "correct": 18,
+        "total": 24,
+        "score": 0.75,
+        "means": "syntax condition, crediting answers the key wrongly rejected and dropping questions outside what the figure claims to show"
+      }
+    },
+    "fragment-operators": {
+      "genre": "sequence",
+      "figure": "examples/sequence/fragment-operators.fd",
+      "source": {
+        "standard": "OMG Unified Modeling Language (OMG UML), Version 2.5, formal/2015-03-01, clause 17 'Interactions'",
+        "locator": "§17.1.3 (partial ordering of event occurrences), §17.3.3.1 (Lifelines), §17.4.3.1 (Messages), §17.6.3 (Fragments — Semantics: Interaction Operands, Interaction Constraints, and the InteractionOperatorKind values), §17.6.4 (Notation), §17.12.15 (InteractionOperatorKind [Enumeration])",
+        "url": "https://www.omg.org/spec/UML/2.5/PDF",
+        "anchor_strength": "strong",
+        "note": "The author agent read the normative clause itself: the OMG UML specification PDF was fetched from omg.org and its clause 17 text extracted and read directly (§17.1, §17.3, §17.4, §17.6, §17.12.15). The version actually read was UML 2.5 (formal/2015-03-01), not 2.5.1 (formal/17-12-05), because the 2.5.1 PDF exceeded the fetch size limit; 2.5.1 is an errata revision of 2.5 and its clause 17 operator semantics text and section numbering are the same. Every quoted rule below was taken from the clause text, not from a secondary description."
+      },
+      "conditions": {
+        "commented": {
+          "correct": 12,
+          "total": 16,
+          "score": 0.75,
+          "readers": [
+            {
+              "reader": 1,
+              "correct": 6,
+              "total": 8,
+              "not_stated": 0,
+              "unanswered": 0
+            },
+            {
+              "reader": 2,
+              "correct": 6,
+              "total": 8,
+              "not_stated": 2,
+              "unanswered": 0
+            }
+          ]
+        },
+        "syntax": {
+          "correct": 20,
+          "total": 24,
+          "score": 0.8333,
+          "readers": [
+            {
+              "reader": 1,
+              "correct": 7,
+              "total": 8,
+              "not_stated": 0,
+              "unanswered": 0
+            },
+            {
+              "reader": 2,
+              "correct": 5,
+              "total": 8,
+              "not_stated": 2,
+              "unanswered": 0
+            },
+            {
+              "reader": 3,
+              "correct": 8,
+              "total": 8,
+              "not_stated": 0,
+              "unanswered": 0
+            }
+          ]
+        },
+        "title-only": {
+          "correct": 17,
+          "total": 24,
+          "score": 0.7083,
+          "readers": [
+            {
+              "reader": 1,
+              "correct": 5,
+              "total": 8,
+              "not_stated": 3,
+              "unanswered": 0
+            },
+            {
+              "reader": 2,
+              "correct": 6,
+              "total": 8,
+              "not_stated": 2,
+              "unanswered": 0
+            },
+            {
+              "reader": 3,
+              "correct": 6,
+              "total": 8,
+              "not_stated": 2,
+              "unanswered": 0
+            }
+          ]
+        }
+      },
+      "instrument_adjusted": {
+        "correct": 22,
+        "total": 23,
+        "score": 0.9565,
+        "means": "syntax condition, crediting answers the key wrongly rejected and dropping questions outside what the figure claims to show"
+      }
+    },
+    "l2-forwarding-logic": {
+      "genre": "flowchart",
+      "figure": "examples/showcase/l2-forwarding-logic.fd",
+      "source": {
+        "standard": "IEEE 802.1D / IEEE 802.1Q MAC bridge forwarding process (Learning, Forwarding, Flooding, Filtering)",
+        "locator": "802.1Q clause 8.6 'The Forwarding Process', clause 8.7 'The Learning Process', clause 8.8 'The Filtering Database' (equivalently 802.1D clause 7); primary IEEE text was unreachable, so the normative process is cited via a public secondary description: Cisco IOS 'Configuring Transparent Bridging' (Learning / Forwarding / Flooding / Filtering) and RFC 1493 (Bridge MIB), which itself points to IEEE 802.1D-1990 section 6.6 for the algorithm.",
+        "url": "https://www.cisco.com/c/en/us/td/docs/ios/bridging/configuration/guide/15-s/br-15-s-book/br_transprnt_brdg.html",
+        "anchor_strength": "medium"
+      },
+      "conditions": {
+        "commented": {
+          "correct": 5,
+          "total": 16,
+          "score": 0.3125,
+          "readers": [
+            {
+              "reader": 1,
+              "correct": 2,
+              "total": 8,
+              "not_stated": 4,
+              "unanswered": 0
+            },
+            {
+              "reader": 2,
+              "correct": 3,
+              "total": 8,
+              "not_stated": 3,
+              "unanswered": 0
+            }
+          ]
+        },
+        "syntax": {
+          "correct": 8,
+          "total": 24,
+          "score": 0.3333,
+          "readers": [
+            {
+              "reader": 1,
+              "correct": 3,
+              "total": 8,
+              "not_stated": 3,
+              "unanswered": 0
+            },
+            {
+              "reader": 2,
+              "correct": 3,
+              "total": 8,
+              "not_stated": 2,
+              "unanswered": 0
+            },
+            {
+              "reader": 3,
+              "correct": 2,
+              "total": 8,
+              "not_stated": 3,
+              "unanswered": 0
+            }
+          ]
+        },
+        "title-only": {
+          "correct": 19,
+          "total": 24,
+          "score": 0.7917,
+          "readers": [
+            {
+              "reader": 1,
+              "correct": 6,
+              "total": 8,
+              "not_stated": 0,
+              "unanswered": 0
+            },
+            {
+              "reader": 2,
+              "correct": 7,
+              "total": 8,
+              "not_stated": 0,
+              "unanswered": 0
+            },
+            {
+              "reader": 3,
+              "correct": 6,
+              "total": 8,
+              "not_stated": 0,
+              "unanswered": 0
+            }
+          ]
+        }
+      },
+      "instrument_adjusted": {
+        "correct": 17,
+        "total": 21,
+        "score": 0.8095,
+        "means": "syntax condition, crediting answers the key wrongly rejected and dropping questions outside what the figure claims to show"
+      }
+    },
+    "rpf-check": {
+      "genre": "block",
+      "figure": "examples/rpf-check.fd",
+      "source": {
+        "standard": "RFC 7761 / RFC 3704",
+        "locator": "RFC 7761 §2.1, §4.2; RFC 3704 §2.2",
+        "url": "https://www.rfc-editor.org/rfc/rfc7761 ; https://www.rfc-editor.org/rfc/rfc3704",
+        "anchor_strength": "moderate"
+      },
+      "conditions": {
+        "commented": {
+          "correct": 9,
+          "total": 16,
+          "score": 0.5625,
+          "readers": [
+            {
+              "reader": 1,
+              "correct": 5,
+              "total": 8,
+              "not_stated": 2,
+              "unanswered": 0
+            },
+            {
+              "reader": 2,
+              "correct": 4,
+              "total": 8,
+              "not_stated": 3,
+              "unanswered": 0
+            }
+          ]
+        },
+        "syntax": {
+          "correct": 15,
+          "total": 24,
+          "score": 0.625,
+          "readers": [
+            {
+              "reader": 1,
+              "correct": 5,
+              "total": 8,
+              "not_stated": 2,
+              "unanswered": 0
+            },
+            {
+              "reader": 2,
+              "correct": 5,
+              "total": 8,
+              "not_stated": 2,
+              "unanswered": 0
+            },
+            {
+              "reader": 3,
+              "correct": 5,
+              "total": 8,
+              "not_stated": 2,
+              "unanswered": 0
+            }
+          ]
+        },
+        "title-only": {
+          "correct": 24,
+          "total": 24,
+          "score": 1,
+          "readers": [
+            {
+              "reader": 1,
+              "correct": 8,
+              "total": 8,
+              "not_stated": 0,
+              "unanswered": 0
+            },
+            {
+              "reader": 2,
+              "correct": 8,
+              "total": 8,
+              "not_stated": 0,
+              "unanswered": 0
+            },
+            {
+              "reader": 3,
+              "correct": 8,
+              "total": 8,
+              "not_stated": 0,
+              "unanswered": 0
+            }
+          ]
+        }
+      },
+      "instrument_adjusted": {
+        "correct": 18,
+        "total": 24,
+        "score": 0.75,
+        "means": "syntax condition, crediting answers the key wrongly rejected and dropping questions outside what the figure claims to show"
+      }
+    },
+    "tcp-header": {
+      "genre": "bitfield",
+      "figure": "examples/showcase/tcp-header.fd",
+      "source": {
+        "standard": "RFC 9293",
+        "locator": "§3.1",
+        "url": "https://www.rfc-editor.org/rfc/rfc9293.html",
+        "anchor_strength": "strong"
+      },
+      "conditions": {
+        "commented": {
+          "correct": 8,
+          "total": 16,
+          "score": 0.5,
+          "readers": [
+            {
+              "reader": 1,
+              "correct": 4,
+              "total": 8,
+              "not_stated": 4,
+              "unanswered": 0
+            },
+            {
+              "reader": 2,
+              "correct": 4,
+              "total": 8,
+              "not_stated": 4,
+              "unanswered": 0
+            }
+          ]
+        },
+        "syntax": {
+          "correct": 12,
+          "total": 24,
+          "score": 0.5,
+          "readers": [
+            {
+              "reader": 1,
+              "correct": 4,
+              "total": 8,
+              "not_stated": 4,
+              "unanswered": 0
+            },
+            {
+              "reader": 2,
+              "correct": 4,
+              "total": 8,
+              "not_stated": 4,
+              "unanswered": 0
+            },
+            {
+              "reader": 3,
+              "correct": 4,
+              "total": 8,
+              "not_stated": 4,
+              "unanswered": 0
+            }
+          ]
+        },
+        "title-only": {
+          "correct": 20,
+          "total": 24,
+          "score": 0.8333,
+          "readers": [
+            {
+              "reader": 1,
+              "correct": 6,
+              "total": 8,
+              "not_stated": 0,
+              "unanswered": 0
+            },
+            {
+              "reader": 2,
+              "correct": 7,
+              "total": 8,
+              "not_stated": 0,
+              "unanswered": 0
+            },
+            {
+              "reader": 3,
+              "correct": 7,
+              "total": 8,
+              "not_stated": 0,
+              "unanswered": 0
+            }
+          ]
+        }
+      },
+      "instrument_adjusted": {
+        "correct": 12,
+        "total": 24,
+        "score": 0.5,
+        "means": "syntax condition, crediting answers the key wrongly rejected and dropping questions outside what the figure claims to show"
+      }
+    },
+    "tcp-state-machine": {
+      "genre": "statechart",
+      "figure": "examples/showcase/tcp-state-machine.fd",
+      "source": {
+        "standard": "RFC 9293",
+        "locator": "§3.3.2, Figure 5",
+        "url": "https://www.rfc-editor.org/rfc/rfc9293.html",
+        "anchor_strength": "strong"
+      },
+      "conditions": {
+        "commented": {
+          "correct": 13,
+          "total": 16,
+          "score": 0.8125,
+          "readers": [
+            {
+              "reader": 1,
+              "correct": 8,
+              "total": 8,
+              "not_stated": 0,
+              "unanswered": 0
+            },
+            {
+              "reader": 2,
+              "correct": 5,
+              "total": 8,
+              "not_stated": 0,
+              "unanswered": 0
+            }
+          ]
+        },
+        "syntax": {
+          "correct": 24,
+          "total": 24,
+          "score": 1,
+          "readers": [
+            {
+              "reader": 1,
+              "correct": 8,
+              "total": 8,
+              "not_stated": 0,
+              "unanswered": 0
+            },
+            {
+              "reader": 2,
+              "correct": 8,
+              "total": 8,
+              "not_stated": 0,
+              "unanswered": 0
+            },
+            {
+              "reader": 3,
+              "correct": 8,
+              "total": 8,
+              "not_stated": 0,
+              "unanswered": 0
+            }
+          ]
+        },
+        "title-only": {
+          "correct": 24,
+          "total": 24,
+          "score": 1,
+          "readers": [
+            {
+              "reader": 1,
+              "correct": 8,
+              "total": 8,
+              "not_stated": 0,
+              "unanswered": 0
+            },
+            {
+              "reader": 2,
+              "correct": 8,
+              "total": 8,
+              "not_stated": 0,
+              "unanswered": 0
+            },
+            {
+              "reader": 3,
+              "correct": 8,
+              "total": 8,
+              "not_stated": 0,
+              "unanswered": 0
+            }
+          ]
+        }
+      },
+      "instrument_adjusted": {
+        "correct": 24,
+        "total": 24,
+        "score": 1,
+        "means": "syntax condition, crediting answers the key wrongly rejected and dropping questions outside what the figure claims to show"
+      }
+    },
+    "timing-handshake": {
+      "genre": "timing",
+      "figure": "examples/patterns/timing-a.fd",
+      "source": {
+        "standard": "four-phase (return-to-zero) request/acknowledge handshake convention; digital timing-diagram reading conventions",
+        "locator": "four-phase / return-to-zero handshake protocol: phase 1 request asserts, phase 2 acknowledge asserts in response, phase 3 request de-asserts in response to acknowledge, phase 4 acknowledge de-asserts in response to request's de-assertion",
+        "url": "https://en.wikipedia.org/wiki/Asynchronous_circuit",
+        "anchor_strength": "weak"
+      },
+      "conditions": {
+        "commented": {
+          "correct": 16,
+          "total": 16,
+          "score": 1,
+          "readers": [
+            {
+              "reader": 1,
+              "correct": 8,
+              "total": 8,
+              "not_stated": 0,
+              "unanswered": 0
+            },
+            {
+              "reader": 2,
+              "correct": 8,
+              "total": 8,
+              "not_stated": 0,
+              "unanswered": 0
+            }
+          ]
+        },
+        "syntax": {
+          "correct": 24,
+          "total": 24,
+          "score": 1,
+          "readers": [
+            {
+              "reader": 1,
+              "correct": 8,
+              "total": 8,
+              "not_stated": 0,
+              "unanswered": 0
+            },
+            {
+              "reader": 2,
+              "correct": 8,
+              "total": 8,
+              "not_stated": 0,
+              "unanswered": 0
+            },
+            {
+              "reader": 3,
+              "correct": 8,
+              "total": 8,
+              "not_stated": 0,
+              "unanswered": 0
+            }
+          ]
+        },
+        "title-only": {
+          "correct": 24,
+          "total": 24,
+          "score": 1,
+          "readers": [
+            {
+              "reader": 1,
+              "correct": 8,
+              "total": 8,
+              "not_stated": 0,
+              "unanswered": 0
+            },
+            {
+              "reader": 2,
+              "correct": 8,
+              "total": 8,
+              "not_stated": 0,
+              "unanswered": 0
+            },
+            {
+              "reader": 3,
+              "correct": 8,
+              "total": 8,
+              "not_stated": 0,
+              "unanswered": 0
+            }
+          ]
+        }
+      },
+      "instrument_adjusted": {
+        "correct": 24,
+        "total": 24,
+        "score": 1,
+        "means": "syntax condition, crediting answers the key wrongly rejected and dropping questions outside what the figure claims to show"
+      }
+    }
+  },
+  "overall": {
+    "syntax": {
+      "correct": 155,
+      "total": 216,
+      "score": 0.7176
+    },
+    "control": {
+      "correct": 197,
+      "total": 216,
+      "score": 0.912
+    },
+    "instrument_adjusted": {
+      "correct": 172,
+      "total": 209,
+      "score": 0.823
+    },
+    "failure_classes": {
+      "reader-error": 1,
+      "not-in-file": 34,
+      "grading-artifact": 17,
+      "bad-question": 7,
+      "ambiguous-syntax": 2
+    },
+    "lift_points": -19.4,
+    "meets_floor": true
+  }
+}

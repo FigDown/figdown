@@ -33,6 +33,20 @@ the one genre that has it, in that genre's own normative document:
 | `bundle` | [genres/experimental/topology.md](genres/experimental/topology.md) | `block`, `flowchart`, `statechart` (`SCENE-KEYWORD-MEMBERSHIP`) |
 | `plane` (+ `plane=`, `z-index=`) | — | **WITHDRAWN FROM THE LANGUAGE** (`PAINT-ORDER-CONSTRUCT`) |
 
+**`sequence` (this release, `SEQUENCE-GENRE-VOCABULARY`) appears in no cell of that
+table, and the absence is the point.** It declares none of `threshold`,
+`band` or `bundle` and never did, so there was nothing to withdraw: writing
+one of them under `sequence` gets the plain allowlist message
+`"bundle" is not allowed in genre sequence`, not a withdrawal diagnostic, and
+no `.fd` was ever affected. The distinction between an **absence** and a
+**withdrawal** is the same one this file draws everywhere else, seen from the
+one genre that arrived after the withdrawals; conformance fixture
+`282-sequence-vocabulary-scoped` pins both directions. That genre does refuse
+three constructs of its own — `gap`, `group` and the option key `lost=`,
+each a **named** line error carrying its ground — and those are recorded in
+[genres/experimental/sequence.md](genres/experimental/sequence.md), which is
+EXPERIMENTAL throughout, because a refusal belongs to the genre that made it.
+
 What stays here is what is not a genre's to say: the STATUS ruling that
 separates frozen from experimental at the file level (this section), the
 conformance consequence of it (§E0.1), the semantic model the constructs
@@ -58,7 +72,7 @@ second genre to inherit even if the file offered it.
 **The count of experimental core constructs: six → four → three.** The
 file held **six** until 0.1, when `EDGE-GEOMETRY-CONSTRUCTS` withdrew `path` and
 `routing` with their option keys `points=`, `tailport=`, `headport=` and
-`routing=`; **four** until this release; and **three** now, because
+`routing=`; **four** until 0.3; and **three** now, because
 **`plane` is WITHDRAWN from the language** by `PAINT-ORDER-CONSTRUCT` — the keyword, the
 `plane=` option key that could only reference a declared plane, and
 `z-index=`, which was legal on `plane` and nowhere else. The engine

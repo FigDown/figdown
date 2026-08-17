@@ -1,5 +1,5 @@
-# Two rules on one directive. (1) `pin` is single-valued per id, and since
-# 0.1 that one rule covers the position and the extent together.
+# Two rules on one directive. (1) `pin` is single-valued per id, and
+# that one rule covers the position and the extent together.
 # (2) The DOMAIN is split: at= applies to nodes, groups and externals,
 # while width=/height= apply to NODES only — a group sizes to its members,
 # and an external endpoint or a typed block derives its geometry from its

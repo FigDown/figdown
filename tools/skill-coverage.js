@@ -29,7 +29,8 @@
  *
  *   0. VENDOR      `skill/figdown/reference/` is byte-identical to the LIVE
  *                  `read/<X.Y>/`, which is the source of truth (
- *                  GENRE-REFERENCE-ADDRESS; the live directory became `read/0.2/` at STATECHART-GENRE-SCOPE and `read/0.3/` at DRAWN-ANNOTATION-FORM). The bundle
+ *                  GENRE-REFERENCE-ADDRESS; the live directory became `read/0.2/` at STATECHART-GENRE-SCOPE, `read/0.3/` at DRAWN-ANNOTATION-FORM and
+ *                  `read/0.4/` at SEQUENCE-GENRE-VOCABULARY). The bundle
  *                  carries its own copy because it is installed standalone,
  *                  with no repository and no network; a generated copy that
  *                  nothing compares is the eighth four-copy-drift incident
@@ -83,7 +84,7 @@ const BUNDLE = path.join(ROOT, 'skill', 'figdown');
 const SKILL = path.join(BUNDLE, 'SKILL.md');
 // The source of truth for the per-genre reading files. `skill/figdown/reference/`
 // is a generated mirror of this directory — see check 0, VENDOR.
-const READ_SRC = path.join(ROOT, 'read', '0.3');
+const READ_SRC = path.join(ROOT, 'read', '0.4');
 // Reference files that answer a TASK rather than a genre, so no genre row can
 // name them. They are routed by SKILL.md's task list, which is prose an agent
 // reads and a regex cannot check.
@@ -485,9 +486,34 @@ function main() {
     return acc;
   };
 
+  // A genre's VOCABULARY SOURCE is its genre document, and this tool compares
+  // the skill bundle against it. A genre can reach `RC.GENRES` before that
+  // document is written — `sequence` did, when its renderer
+  // landed and its genre document was still owed — and there is then no
+  // surface to measure the bundle against. That is NOT a pass, so it is never
+  // silent: the genre is named in every section that skips it, exactly as
+  // `layout-lint` names the figures it could not score. It becomes a real
+  // answer the moment `spec/genres/experimental/<genre>.md` exists.
+  //
+  // `sequence`'s document landed and the branch closed the way
+  // it was built to: it keys on FILE EXISTENCE, so not a line here was edited
+  // and the genre started being measured on the same run. `DOCLESS` is empty
+  // today. The branch stays for the next genre that lands ahead of its
+  // document — deleting it would trade a named gap for a silent one.
+  const genreMd = (g) => {
+    const p = RC.genreDocFor(g);
+    return fs.existsSync(p) ? fs.readFileSync(p, 'utf8') : null;
+  };
+  const DOCLESS = RC.GENRES.filter(g => genreMd(g) === null);
+  const MEASURABLE = RC.GENRES.filter(g => genreMd(g) !== null);
+
   // ── 2. MISSING ─────────────────────────────────────────────────────────────
   console.log('\n[coverage]');
-  for (const g of RC.GENRES) gapsFor(g, args.normativeOnly, false, true);
+  for (const g of MEASURABLE) gapsFor(g, args.normativeOnly, false, true);
+  for (const g of DOCLESS)
+    console.log('  [' + g + '] NOT MEASURED — no genre document at '
+      + path.relative(ROOT, RC.genreDocFor(g))
+      + '; the bundle has nothing to be complete against yet');
 
   /**
    * @param normOnly  require only the v0.1 conformance surface
@@ -612,8 +638,8 @@ function main() {
     return false;
   }
   function isLiveOpt(k) {
-    for (const g of RC.GENRES) {
-      const md = fs.readFileSync(RC.genreDocFor(g), 'utf8');
+    for (const g of MEASURABLE) {
+      const md = genreMd(g);
       if (RC.extractVocab(g, md, false, FACTS).optionKeys.has(k)) return true;
     }
     return false;
@@ -656,7 +682,7 @@ function main() {
   const CODE_SHAPE = /(?:OQ-S|DISC-)\d{1,3}|0\.1-dev\.\d+|[A-Za-z]{1,3}\d{1,3}(?:-\d{1,2})?/g;
 
   // THE REFERENCE SIDE: the codes THIS PROJECT HAS ACTUALLY USED, harvested
-  // from `spec/`, `design/` and `conformance/` — outside the bundle, which is
+  // from `spec/` and `conformance/` — outside the bundle, which is
   // the thing under test. A token counts as a project code when it appears in
   // a DEFINING or CITING position: a heading (`### CLOSED-GRAMMAR — …`, `## COLOUR-VALUE-VALIDATION — …`,
   // `## 0.1`), the lead of a list item (`- **GENRE-NAMESPACE — …**`), a
@@ -673,7 +699,7 @@ function main() {
   ];
   const CODE_REGISTRY = (function () {
     const reg = new Set();
-    const roots = ['spec', 'design', 'conformance'].map(d => path.join(ROOT, d));
+    const roots = ['spec', 'conformance'].map(d => path.join(ROOT, d));
     (function walk(dirs) {
       for (const dir of dirs) {
         if (!fs.existsSync(dir)) continue;
@@ -775,7 +801,7 @@ function main() {
         // CATEGORICAL-MEANING-MAPPING — THE REFERENCE FILTER. A shape match the project has never used
         // as a code is not a code. This is the discriminator, not a shorter
         // pattern: the shape stays wide so a NEW family is caught the moment
-        // it is defined anywhere in spec/, design/ or conformance/.
+        // it is defined anywhere in spec/ or conformance/.
         if (!CODE_REGISTRY.has(t.toUpperCase())) continue;
         codes++;
         fail('UNDECODABLE CODE  ' + rel(f) + ':' + (i + 1) + '  ' + t +
@@ -795,8 +821,8 @@ function main() {
   // still cover the whole normative surface.
   console.log('\n[isolation]');
   let leaks = 0;
-  for (const g of RC.GENRES) {
-    const md = fs.readFileSync(RC.genreDocFor(g), 'utf8');
+  for (const g of MEASURABLE) {
+    const md = genreMd(g);
     if (!/Genre status:\s*NORMATIVE/i.test(md)) continue;
     for (const p of loadSet(g, true))
       if (isExpFile(p)) {

@@ -1,0 +1,59 @@
+{
+  "suite_version": "1.0.0",
+  "run": {
+    "utc": "2026-08-16T06:11:26Z",
+    "model_alias": "sonnet",
+    "model_used": "claude-sonnet-5",
+    "cli": "2.1.233 (Claude Code)",
+    "condition": "title-only",
+    "reader": 1
+  },
+  "figure": {
+    "id": "tcp-header",
+    "genre": "bitfield",
+    "path": "examples/showcase/tcp-header.fd",
+    "file_sha256": "a23de34b076f39286a2aff8e5458da2e552ef35e768e1b4aa99a6899867d7ef1",
+    "title_shown": "TCP Header",
+    "presented_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "presented_lines": 0,
+    "presented_chars": 0
+  },
+  "prompt": {
+    "system_sha256": "42d79e37b78275f219f2b1b70497abf709362f5fa68aa5427fb1f42b12b60425",
+    "user_sha256": "b88d6787b0476e8302308f50c00ba8ef617ac317392bb07f8461a1a793fbc696",
+    "question_set_sha256": "13d54a0f750eb9d80d080ab156f41230e7231cb39e135058c6fdb402f9128498"
+  },
+  "cold_room": {
+    "cwd": "an isolated empty temporary directory outside the repository",
+    "tools_offered": "none — every tool denied by name",
+    "mcp_servers": "none",
+    "settings": "safe-mode: no project or user settings, no memory file, no skills, no plugins, no hooks",
+    "session_persistence": false,
+    "shown": "the system prompt, the figure title, and the questions — nothing else",
+    "not_shown": "the specification, any genre document, any other .fd file, the file name, the name of the language, the repository"
+  },
+  "integrity": {
+    "turns": 1,
+    "permission_denials": 0,
+    "tool_calls_observed": false,
+    "is_error": false
+  },
+  "usage": {
+    "cost_usd": 0.011313,
+    "input_tokens": 756,
+    "output_tokens": 603,
+    "cache_creation_input_tokens": 0,
+    "duration_ms": 5909
+  },
+  "raw_answer_text": "A1: The first 32-bit word contains the Source Port and Destination Port fields, each 16 bits wide.\nA2: The Sequence Number normally indicates the sequence number of the first data byte in the segment; when SYN is set, it instead represents the Initial Sequence Number (ISN), and the first actual data byte (if any) is at sequence number ISN+1.\nA3: The Acknowledgment Number is valid only when the ACK control bit is set; when valid, it contains the next sequence number the sender of the segment expects to receive (i.e., one greater than the last byte successfully received).\nA4: Data Offset specifies the length of the TCP header in 32-bit words; its minimum valid value is 5, corresponding to a minimum header length of 20 bytes (no options).\nA5: The same word also contains a Reserved field (typically 3 or 4 bits, depending on the RFC version), the Control/Flag bits (6 or 9 bits such as URG, ACK, PSH, RST, SYN, FIN), and the Window field (16 bits).\nA6: The checksum covers the TCP header and data, plus a pseudo-header consisting of the source and destination IP addresses, the protocol number, and the TCP segment length (from the IP header), padded with zero if needed.\nA7: The Urgent Pointer is meaningful only when the URG control bit is set; when applicable, it indicates the offset from the sequence number in the segment to the last byte of urgent data, marking the end of urgent data within the segment.\nA8: The Options field appears only when the Data Offset value is greater than 5 (i.e., options are present, padded to a 32-bit boundary); the maximum total TCP header length, including options, is 60 bytes (Data Offset value of 15 × 4 bytes).",
+  "answers": {
+    "q1": "The first 32-bit word contains the Source Port and Destination Port fields, each 16 bits wide.",
+    "q2": "The Sequence Number normally indicates the sequence number of the first data byte in the segment; when SYN is set, it instead represents the Initial Sequence Number (ISN), and the first actual data byte (if any) is at sequence number ISN+1.",
+    "q3": "The Acknowledgment Number is valid only when the ACK control bit is set; when valid, it contains the next sequence number the sender of the segment expects to receive (i.e., one greater than the last byte successfully received).",
+    "q4": "Data Offset specifies the length of the TCP header in 32-bit words; its minimum valid value is 5, corresponding to a minimum header length of 20 bytes (no options).",
+    "q5": "The same word also contains a Reserved field (typically 3 or 4 bits, depending on the RFC version), the Control/Flag bits (6 or 9 bits such as URG, ACK, PSH, RST, SYN, FIN), and the Window field (16 bits).",
+    "q6": "The checksum covers the TCP header and data, plus a pseudo-header consisting of the source and destination IP addresses, the protocol number, and the TCP segment length (from the IP header), padded with zero if needed.",
+    "q7": "The Urgent Pointer is meaningful only when the URG control bit is set; when applicable, it indicates the offset from the sequence number in the segment to the last byte of urgent data, marking the end of urgent data within the segment.",
+    "q8": "The Options field appears only when the Data Offset value is greater than 5 (i.e., options are present, padded to a 32-bit boundary); the maximum total TCP header length, including options, is 60 bytes (Data Offset value of 15 × 4 bytes)."
+  }
+}

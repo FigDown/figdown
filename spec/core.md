@@ -20,7 +20,7 @@
 > language has to say what exists; it does not depend on them. (There were
 > six until 0.1, when `EDGE-GEOMETRY-CONSTRUCTS` **WITHDREW `path` and `routing`** — and
 > their option keys `points=`, `tailport=`, `headport=`, `routing=` — from
-> the language outright; and four until this release, when `PAINT-ORDER-CONSTRUCT` **WITHDREW
+> the language outright; and four until 0.3, when `PAINT-ORDER-CONSTRUCT` **WITHDREW
 > `plane`** — and its option keys `plane=` and `z-index=`. All three
 > withdrawals took EXPERIMENTAL constructs outside the freeze scope, so no
 > compatibility promise is broken; the need `path`/`routing` served is on
@@ -141,7 +141,8 @@ diagnostics name.
 
 **The genre token is REQUIRED (`HEADER-GENRE-REQUIREMENT`).** The header names the
 document's genre: `block` | `topology` | `flowchart` | `bitfield` |
-`table` | `timing` — and, from `figdown 0.2`, `statechart` (`STATECHART-GENRE-SCOPE`). `figdown 0.3` adds **no genre**: it carries one option key
+`table` | `timing` — and, from `figdown 0.2`, `statechart` (`STATECHART-GENRE-SCOPE`), and from `figdown 0.4`, `sequence` (`SEQUENCE-GENRE-VOCABULARY`).
+`figdown 0.3` adds **no genre**: it carries one option key
 (`note=`, `DRAWN-ANNOTATION-FORM`) and one resolver widening (`MARKER-TARGET-KINDS`), so its genre set is
 `0.2`'s exactly. A header with no genre is a line error. `bitfield`,
 `table` and `timing` documents also declare their kind in their content
@@ -163,6 +164,10 @@ document as `0.2` instead: guessing a version produces a figure that looks
 right and means something else. `Y` never removes (§13.0), so the genre set
 at a version is always a superset of the set below it, and a document
 declaring `figdown 0.1` resolves against exactly the six it always did.
+`sequence` repeats the pattern one version up (`SEQUENCE-GENRE-VOCABULARY`):
+`figdown 0.3 sequence` answers `genre "sequence" requires figdown 0.4 (this
+document declares 0.3) — write: figdown 0.4 sequence`, from the same search
+that produced `statechart`'s message and with no code added for it.
 **Sections carry the version independently.** A multi-section file (`MULTI-FIGURE-DOCUMENTS`) is a
 sequence of documents, each with its own header, so one file may legitimately
 hold a `figdown 0.2 statechart` section beside a `figdown 0.1 table` section.
@@ -358,6 +363,18 @@ The four scene genres — `block`, `topology`, `flowchart`, `statechart` —
 **each declare their own subject vocabulary**, and each may open nested
 `bitfield`/`table`/`timing` regions (`GENRE-COMPOSITION`).
 
+**`sequence` (`SEQUENCE-GENRE-VOCABULARY`) is neither pure nor scene**, and it is
+the first genre that is neither. It declares its own subject vocabulary —
+`lifeline` `message` `state` `fragment` `operand` — like a scene genre,
+and like a pure genre it has no scene: its two axes are ORDERED BY
+DECLARATION, columns by `lifeline` order and time by the order the
+occurrence lines are written, so `flow` and `rank` are not its keywords
+and there is nothing for a layout intent to set. It also opens no nested
+region, because there is no scene to stack one beside; that is an OPEN
+question rather than a refusal. And it is the one genre with **no
+renderer**: a `sequence` document parses to a complete model, reports no
+error, and draws an empty canvas.
+
 **Where several scene genres accept the same keyword, that is an
 INTERSECTION and not a shared surface** (`SUBJECT-VOCABULARY-SCOPE`). Each genre
 declared the word independently, in its own document under
@@ -375,9 +392,16 @@ wherever it appears, never a statement that a word is AVAILABLE
 everywhere (the same distinction `UNIVERSAL-CORE-KEYWORDS` draws for itself).
 
 The visible consequence is already in the language, at `GENRE-CONNECTOR-SPELLING`/`GENRE-NODE-SPELLING`: `block` and `topology` spell the connector `edge`,
-`flowchart` spells it `flowline`, `statechart` spells it `transition` —
-**four independent declarations, three spellings**, stated in four genre
-documents rather than in one shared one. The experimental constructs are
+`flowchart` spells it `flowline`, `statechart` spells it `transition`,
+and `sequence` spells it `message` —
+**five independent declarations, four spellings**, stated in five genre
+documents rather than in one shared one. The same release makes `state`
+the first spelling whose two declarations differ in GRAMMAR and not only
+in reading: under `statechart` its first slot DECLARES an id, under
+`sequence` it REFERENCES a lifeline. Two genres agreeing on a spelling was
+already two declarations; this is what it looks like when they do not
+agree on the grammar either, and the language accommodates it without a
+rename because `GENRE-VOCABULARY-OBLIGATION` was never a claim that the word means one thing. The experimental constructs are
 declared per genre on the same terms, and none of them
 is shared: `threshold` and `band` are `block`'s alone, `bundle` is
 `topology`'s alone, `flowchart` and `statechart` declare none, and
@@ -396,7 +420,7 @@ than `GENRE-VOCABULARY-OBLIGATION` — is a question this text does not open. Th
 `bitfield`/`table`/`timing`/`chart` are composition, not subject
 vocabulary, and are out of it for the same reason.
 
-*Until this release this paragraph read that the scene genres "share the
+*Until 0.3 this paragraph read that the scene genres "share the
 scene vocabulary", and it was wrong three times over: it named three
 genres when `STATECHART-GENRE-SCOPE`/`GENRE-NODE-SPELLING` had made four; it recorded an INTERSECTION as if it
 were a namespace, which is the defect `SUBJECT-VOCABULARY-SCOPE` exists to correct; and it had
@@ -446,7 +470,7 @@ Lexical rules:
   - an **id** or a **reference** — every declaration id, every endpoint,
     `in=`, `class=` and `rank`/`bundle` members — is **BARE**. A
     quoted token there is a line error. (`plane=` was the fourth key on
-    this list until this release, `PAINT-ORDER-CONSTRUCT`.);
+    this list until 0.3, `PAINT-ORDER-CONSTRUCT`.);
   - an **enum value** or a **bare keyword flag** — `shape=` `style=`
     `numbering=` `extend=` `type=`, the `figdown` version and genre, the
     `flow` direction, `cell … highlight` — is **BARE**, for the same reason:
@@ -584,6 +608,29 @@ one level (node in=group) in v0.1`): one level is the whole of v0.1's
 containment, so there is nothing for a group to be `in=`. `gap=` packs
 spacing (`gap=0` flush).
 
+**The band means membership, in both directions.** A `group` draws as a
+band around its members, and the reader's rule — *inside the box is in the
+group* — MUST hold: the band contains **every member and nothing else**.
+Membership is declared and never inferred from geometry (above), and this
+is the same statement read from the drawing: a picture that puts a
+non-member inside the band states a membership the source does not, and a
+reader who has to check the source to know what the box means is a reader
+the figure has failed. Responsibility follows **whoever chose the
+position**:
+
+- **The engine chose it** — auto-layout had freedom. The engine MUST place
+  the members contiguously so the band encloses exactly them. This is
+  silent: no author action, no diagnostic, no syntax.
+- **The author chose it** — a `pin` fixed the intruder, or fixed the
+  members whose extent *is* the band, and no freedom is left. The engine
+  then reports a geometry-time error naming the pin line and the enclosed
+  node (§8), and renders nothing. It never overrides the author's
+  coordinate, and never draws the false statement instead.
+
+An implementation that draws the band without this guarantee is **not
+conforming**, however many fixtures it passes: the defect is invisible in
+the source and visible only in the output.
+
 ### 2.3 Edges
 
 Normative: [genres/block.md](genres/block.md). Operators `->` `<-` `--`
@@ -641,16 +688,42 @@ candidate genre in §9). Listed on scene-genre allowlists; registry row:
 Normative: [genres/block.md](genres/block.md) and §5 / §12. Meaning rides
 on the class label (`MEANING-RECOVERY-SOURCE`), not on colour alone.
 
-**A class must declare a channel the member it joins actually has
-(`CLASS-PAINT-REQUIREMENT`).** A class is a bundle of channel defaults for
-HETEROGENEOUS members, so the rule is per CHANNEL, not per class: one
-class carries one meaning for a node and an edge alike (`class hot "…"
-fill=#fee2e2 stroke=#dc2626` paints the box of one and the line of the
-other), and no class has to be split. An `edge` has exactly two channels
-— `stroke=` and `style=` — so a class an edge joins is a line error when
-it declares neither: `fill=` with no `stroke=` (`INTERIOR-LESS-ELEMENT-PAINT`) and no
-paint at all (`CLASS-PAINT-REQUIREMENT`) both drop the edge's colour with nothing
-to warn on. `style=`-only is fine: the dash reaches the edge.
+**A class must not declare paint that cannot reach the member it joins
+(`INTERIOR-LESS-ELEMENT-PAINT`; reaching every collection, `CLASS-CHANNEL-REACH`).** A
+class is a bundle of channel defaults for HETEROGENEOUS members, so the
+rule is per CHANNEL, not per class: one class carries one meaning for a
+node and an edge alike (`class hot "…" fill=#fee2e2 stroke=#dc2626`
+paints the box of one and the line of the other), and no class has to be
+split. The channels a member HAS are the ones its drawing reads:
+
+| member | channels |
+|---|---|
+| `node`, `group`, `lifeline`, `state` | `fill` `stroke` `style` |
+| `edge`, `message`, `fragment`, `operand` | `stroke` `style` — no interior |
+| `field`, `cell` | `fill` `stroke` — `style=` left both at 0.1 (`STYLE-KEY-SCOPE`) |
+
+Two forms are line errors, and both are declared paint that cannot
+arrive. **`fill=` with no `stroke=` on a class an interior-less member
+joins** (`INTERIOR-LESS-ELEMENT-PAINT`): on a line `fill=` and `stroke=` name the SAME
+channel, so the author who wrote `fill=` meant the line's colour, and a
+`style=` beside it does not answer that. **A class whose channels are
+ALL channels the member lacks** (`CLASS-CHANNEL-REACH`) — `style=`-only on a
+`field` or a `cell` — for the same reason one key over. `style=`-only on
+an `edge` or a `message` is fine: the dash reaches the line.
+
+> **RETIRED (`CLASS-CHANNEL-REACH`): a class that declares NO paint was a
+> line error when an `edge` joined it (`CLASS-PAINT-REQUIREMENT`'s second half).**
+> It is now legal on every member, and the retirement is recorded rather
+> than performed silently. `CLASS-PAINT-REQUIREMENT`'s stated harm was that such a class
+> "shows nothing in the legend" — and the same release made the derived
+> legend draw the meaning with no swatch (below), so the meaning does
+> reach the reader. What survived was only "the member takes its default
+> paint", which is exactly what a meaning-only class on a `field` has
+> always given, legally, in four shipped example figures. A rule that
+> could not generalise past one collection was not a rule about channels.
+> Reopens on a measured case of an author writing a paint-less class
+> EXPECTING paint. [MIGRATIONS](migrations.md) 0.4;
+> requirements-notes `CLASS-CHANNEL-REACH`.
 
 **The meaning field is mandatory; its VALUE may be empty (
 `CLASS-EMPTY-MEANING`).** This is the language's own absent/`""`/`"text"` tri-state (`EMPTY-LABEL-STATE`,
@@ -1080,7 +1153,7 @@ classifiable diagrams (census.md).
 
 Optional on any element: `fill=` (the interior), `stroke=` (the outline of
 a shape and the whole of a line), `style=solid|dashed|dotted`;
-`gap=` on groups. **`plane=` was a fourth until this release**, when `PAINT-ORDER-CONSTRUCT`
+`gap=` on groups. **`plane=` was a fourth until 0.3**, when `PAINT-ORDER-CONSTRUCT`
 withdrew it with the `plane` keyword that declared its only legal values;
 this section's tables lost every row that named it. **There are exactly
 two paint channels, and they are
@@ -1233,7 +1306,7 @@ grammar is closed (§10):
 > carry its names in three `class` declarations all spelled "region".
 
 **`plane=`'s honesty note is discharged by `PAINT-ORDER-CONSTRUCT`, and the finding that
-forced it is why the withdrawal was easy to argue.** Until this release
+forced it is why the withdrawal was easy to argue.** Until 0.3
 this section had to record that the key was accepted on `node`, `group`
 and `external` and put in the model, while the only pass that acted on a
 plane's `z` as paint order was the annotation pass — edges, bundle rings,
@@ -1356,6 +1429,20 @@ transient). Deferred until the static core ships.
   `duplicate layout line`, `duplicate pin for "<id>"`.
 - A document with errors renders nothing (no partial/best-effort output —
   determinism over convenience).
+- **Geometry-time errors.** Not every error is visible in the source. A
+  parser cannot see a coordinate, so a document that is impeccable line by
+  line can still describe a drawing that states something it does not — the
+  `group` band that encloses a non-member (§2.2) is the recorded case. Such
+  an error is raised by the RENDERER, carries the same `Line N: <message>`
+  form as every other, and names the line the author can act on (the `pin`
+  that fixed the position; failing that, the `group` line). It costs
+  exactly what a parse error costs: **nothing is rendered and no artifact
+  is written** — a caller that writes `.svg` files MUST treat a non-empty
+  render diagnostic list exactly as it treats a non-empty parse error list,
+  because the alternative is publishing the picture the engine has just
+  said is wrong. The class is deliberately narrow: a geometry-time error
+  reports a FALSE STATEMENT in the drawing, never a matter of taste. Ugly
+  is not an error; wrong is.
 - **A repeated option key on ONE line is a line error**, never last-wins:
   `node a fill=red fill=blue` → `duplicate option "fill=" on one line`.
   It is a property of the **option lexer**, not of any keyword, so it
@@ -2519,7 +2606,7 @@ alone. Recorded as an open question in §9.
   signature of a half-padded row. It is a diagnostic, not a language change,
   and it belongs in `tools/`, not in the engine — filed in
   `decisions/registry.md`. v0.2.
-- OQ-S42: **several INDEPENDENT cells cannot be marked as one thing**
+- `MULTI-CELL-SINGLE-MARK`: **several INDEPENDENT cells cannot be marked as one thing**
   (2026-08-11). `class=` attaches to one `cell` and to one `field`, so
   four adjacent cells that share a class draw **four separate rings**, not one
   frame around the four. A MERGED region does not have this problem — it is one
@@ -2539,7 +2626,7 @@ alone. Recorded as an open question in §9.
   and three separate ones would be the drift this project keeps paying for.
   **What would reopen it:** a measured figure in the production corpus that
   needs the outer frame and cannot honestly merge. v0.2.
-- OQ-S43: **glyph advance widths are checked only against the engine
+- `GLYPH-WIDTH-GROUND-TRUTH`: **glyph advance widths are checked only against the engine
   itself** (2026-08-11). `gate:shape` verifies that emitted geometry is
   consistent with the character widths the engine used, but it takes `cw`
   **from** the engine under test, so it asserts self-consistency, not truth
@@ -2553,6 +2640,98 @@ alone. Recorded as an open question in §9.
   dependency to add for one defect. **What would reopen it:** a second
   glyph-width defect that ships, or a downstream figure whose correctness
   turns on an advance width the engine gets wrong. v0.2.
+- ~~`MESSAGE-ORDER-AND-STATE`: **the language cannot state message ORDER or per-participant
+  LIFELINE STATE, and the two corpus figures that need both are drawn in
+  scene genres that read them WRONG**~~ — **CLOSED
+  (2026-08-17)**, filed 2026-08-16 under `SEQUENCE-GENRE-VOCABULARY`.
+  **The subject that closes is THE LANGUAGE.** The `sequence` genre landed (`SEQUENCE-GENRE-VOCABULARY`) and the ladder drew. Both semantic
+  impossibilities this entry names are expressible in FigDown today: a
+  message's place in the ladder's row order **is** its place in time, so
+  relative order is stated in syntax and not parked in a label ordinal, and a
+  `state` occurrence sits on its own lifeline between the two messages it
+  falls between, so *this participant was in state S at this point in the
+  exchange* has a construct. The closing condition this entry wrote for
+  itself — **a genre landing that brings a ladder layout path with it**, the
+  cost `statechart` did not have and the one objection no scope ruling had
+  dissolved — is the condition that was met, layout path included.
+  **Neither killing condition occurred, and both are now moot.** The census
+  `other` bucket was not re-classified, and the reader-misreading rate was
+  not re-measured; nothing showed the 14 to be mostly misfiled, and nothing
+  demonstrated that readers of `tcp-handshake.fd` recover the order and the
+  states correctly today. A killing condition retires a question that is
+  still being asked. This one was answered instead, so neither trigger has
+  anything left to fire at.
+  **The two evidence figures stay exactly as they are, and that is
+  DELIBERATE.** `examples/showcase/tcp-handshake.fd` and
+  `examples/showcase/arp-resolution.fd` remain `figdown 0.1 topology` plus a
+  companion `table`, with their ordinal labels and their HONEST LIMIT
+  comments intact. The `BITFIELD-REPETITION-CONSTRUCT` condition described below still holds **inside
+  those two artifacts** — a reading agent asked how many links join the
+  client and the server still answers **3** there — but it now holds as a
+  **corpus and portability decision, not a language gap**: both are
+  `figdown 0.1` documents that any released engine can render, and moving
+  them to the new genre would spend that. The reasoning lives where the
+  figures are shown, not in this register.
+  **The residue is a portable SURFACE, and it is not this question's.**
+  `sequence` is EXPERIMENTAL and requires `figdown 0.4`, so *which surface a
+  portable figure may use* is still moving — but that is a **status**, and a
+  status is tracked by
+  [the genre's own status line](genres/experimental/sequence.md), which is
+  where a status changes, not by an open syntax question, which is where a
+  missing construct is recorded. The four post-landing findings are elsewhere
+  for the same reason — they are engine and gate defects, not gaps in the
+  language: the operand-aware restatement question, `in=` on a `lifeline`
+  drawing a full-height column, class membership emitted nowhere in the SVG,
+  and `sequence` figures left unmeasured by `gate:stability` are filed as
+  **items 35–39 of
+  engine-backlog.md** (with the one claim that
+  running it disproved), not as reopenings of this entry.
+  **THE REDIRECT SURVIVES THE CLOSURE — this is still the number, not
+  `FLOWCHART-GENRE-DESIGN`.** `FLOWCHART-GENRE-DESIGN` is flowchart genre design, and the sequence-genre
+  citations that had been miscited to it point HERE, to this entry, closed or
+  open. Closing a question does not vacate its number: a citation corrected
+  to `MESSAGE-ORDER-AND-STATE` stays correct, and this is still the entry that answers what the
+  sequence genre was filed as.
+  **The question as filed, kept whole — a deleted rejection is a trap, and
+  the paragraphs below are the evidence the genre was built from.** *Filed
+  2026-08-16 under `SEQUENCE-GENRE-VOCABULARY`:* This is the
+  `sequence` genre question, filed under its own number at last. Relative
+  order between two edges is not expressible by any composition of existing
+  constructs, and neither is *this participant was in state S at this point in
+  the exchange*. The in-repo evidence is two files:
+  `examples/showcase/tcp-handshake.fd` and
+  `examples/showcase/arp-resolution.fd`, both `topology` plus a companion
+  `table`, both carrying their own HONEST LIMIT comment, and both parking the
+  order in `1:`/`2:`/`3:` label ordinals — which `MEANING-RECOVERY-SOURCE` treats as naming, not as
+  semantics. **The failure is not "unstated"; it is wrong.** Under §12.7 an
+  `edge` is a relationship, so a reading agent asked how many links join the
+  client and the server answers **3** where the truth is one association
+  carrying three segments in time: a confidently wrong number with nothing
+  attached to warn the reader, which is the `BITFIELD-REPETITION-CONSTRUCT` condition. The same corpus
+  carries the tie case — `arp-resolution.fd` has two edges both prefixed `1:`
+  and the ordinal convention cannot say they are simultaneous. No existing
+  genre closes it: `flowchart` has order but no participants, `statechart`
+  states *no transition order* and is about one machine's modes, a `timing`
+  lane carries values over time with no construct for *lane A sends to lane
+  B*, and a `table` step column is prose under §12.7. **Measured demand:** 14
+  of 2,177 classified production images (**0.6%**) from 8 distinct source
+  documents, against `flowchart` 219 (10.1%), `topology` 95 (4.4%) and the
+  `state` bucket 25 (1.1%); in-repo, 2 of 59 non-fixture `.fd` files. So `NEW-CONSTRUCT-EVIDENCE-GATE`'s
+  WHETHER is met on semantic impossibility while `GENRE-EARNING-THRESHOLD`'s WHEN puts it **last** —
+  the lowest measured demand of any genre candidate this project has weighed.
+  The design record is
+  sequence-genre-draft.md; the vocabulary
+  is settled by `SEQUENCE-GENRE-VOCABULARY` (source standard, total order, `operand`, `lost=`,
+  `gap`, `group`, `in=`) and **whether and when it lands is not**. **What
+  would close it:** a genre landing that brings a ladder layout path with it —
+  the cost `statechart` did not have, and the one objection no scope ruling
+  has dissolved. **What would kill it:** a re-classification of the census
+  `other` bucket showing the 14 are mostly misclassified, or a measured
+  demonstration that readers of `tcp-handshake.fd` recover the order and the
+  states correctly today. **This is the number, not `FLOWCHART-GENRE-DESIGN`** — `FLOWCHART-GENRE-DESIGN` is
+  flowchart genre design and had been miscited for the sequence genre across
+  the corpus; those citations point here. v0.2.
+  *(End of the question as filed.)*
 - **A presence condition cannot reference a field** — `present="C = 1"`
   names `C`, and the language cannot resolve that to the `field "C"` three
   lines up: a bitfield field name is a **label**, not an id, and `class=` /
@@ -2803,14 +2982,28 @@ a `role` field, they share the node id namespace, and they take exactly
 derived geometry, the exclusion list and the `terminator` verification
 debt.
 
-*(b‴) The per-genre NODE and CONNECTOR spellings (3) — `GENRE-CONNECTOR-SPELLING`/`GENRE-NODE-SPELLING`,
-0.2:*
+*(b‴) The per-genre NODE and CONNECTOR spellings (5) — `GENRE-CONNECTOR-SPELLING`/`GENRE-NODE-SPELLING`,
+0.2; two more:*
 
 | Status | Keyword | Genre | Replaces |
 |---|---|---|---|
 | EXPERIMENTAL | `flowline` | `flowchart` only, and `figdown 0.2` only (`KEYWORD-RENAME-SCOPE`) | `edge` |
 | EXPERIMENTAL | `transition` | `statechart` only | `edge` |
 | EXPERIMENTAL | `state` | `statechart` only | `node` |
+| EXPERIMENTAL | `message` | `sequence` only, and `figdown 0.4` only | `edge` |
+| EXPERIMENTAL | `lifeline` | `sequence` only, and `figdown 0.4` only | `node` |
+
+`message` and `lifeline` need no version gate of their own, unlike
+`flowline`: the GENRE requires `figdown 0.4`, so neither spelling is
+reachable from an earlier document and neither replaced a spelling any
+document was written with. `state` is now declared by **two** genres and
+they are **two declarations, not one shared word** (§1, `GENRE-VOCABULARY-OBLIGATION`) — under
+`statechart` slot 1 DECLARES an id and the directive is `node` renamed;
+under `sequence` slot 1 REFERENCES a lifeline and the directive is a state
+occurrence with no id of its own. It is the first spelling in the language
+whose two declarations differ in GRAMMAR and not only in reading, which is
+why the engine carries a genre-conditional option row for it and why this
+table lists it once with the genre column doing the work.
 
 Each has `edge`'s or `node`'s grammar, option keys and model exactly, and
 REPLACES it in that genre rather than joining it. **This is (b) read
@@ -2821,8 +3014,37 @@ The version gate on `flowline` is the cost of having authored the rename
 against a shared surface: under `figdown 0.1 flowchart` the connector is
 still `edge`, because the 0.1 language cannot lose a spelling
 (MIGRATIONS 0.2). This row was missing from the
-partition sum below until this release, so every keyword total in this
+partition sum below until 0.3, so every keyword total in this
 project was three low for five releases.
+
+*(b⁗) `sequence`'s OWN subject vocabulary (2) — 0.4, `SEQUENCE-GENRE-VOCABULARY`:*
+
+| Status | Keywords | Count | Declared by |
+|---|---|---:|---|
+| EXPERIMENTAL | `fragment` `operand` | 2 | `sequence` only |
+
+Both name referents OMG UML 2.5.1 clause 17 defines — `CombinedFragment`
+(§17.12.3) and `InteractionOperand` (§17.12.14) — so they are subject
+vocabulary in (b)'s sense and not node/connector spellings. **`sequence`
+declares a THIRD subject word, `state`** (`StateInvariant`, §17.12.25),
+and it is not in this table because it is already counted once in (b‴) as
+`statechart`'s node spelling. Two genres declaring one spelling is two
+declarations of ONE entry in this registry, never two entries — the
+enumeration is of spellings the language has, and the column that says who
+declares each is the genre documents.
+
+**Three spellings are REFUSED by this genre and the refusals are part of
+the registry**, because a closed language has to say what does not exist as
+well as what does: `gap` (the vertical axis is non-proportional, so the
+line would assert nothing — `SEQUENCE-TIME-GAP`), `group` (no lifeline-grouping construct
+in clause 17, and `band` = membership is already locked into the scene
+genres — `SEQUENCE-PARTICIPANT-GROUPING`) and the option key `lost=` (the model it wanted is ITU-T
+Z.120 §4.3's under UML's spelling — `UNDELIVERED-MESSAGE-MARKING`). A refusal is NOT a withdrawal:
+the genre never declared any of the three, so no document loses a line and
+none of them appears in the withdrawal tables below. `flow` and `rank` are
+absent too, as a consequence rather than a ruling — both of this genre's
+axes are declaration-ordered, so a key that reordered a drawing would make
+it disagree with its source (`DECLARATION-ORDER-SEMANTICS`).
 
 *(b′) `bundle` and `plane` were NORMATIVE until 0.1 and were demoted by
 `CONSTRUCT-STATUS-TIERS`,* on the same evidence the genre statuses rest on. Measured over the
@@ -2882,11 +3104,12 @@ the construct — one option key, one legal value, and a data binding
 (rows→X, columns→Y) that no other keyword in the language uses. An agent
 writing a portable v0.1 figure leaves it alone.
 
-3 + 1 + 10 + 3 + 3 + 3 + 1 = **24 top-level**; 2 + 2 + 2 = **6 children**
+3 + 1 + 10 + 3 + 5 + 2 + 3 + 1 = **28 top-level**; 2 + 2 + 2 = **6 children**
 (the `|` token is a line-start token, not a keyword, and is counted
 separately — which is why `table` shows three entries in the row above and
-contributes two here). The seventh term is (b‴), the per-genre node and
-connector spellings `flowline` `transition` `state`.
+contributes two here). The fifth term is (b‴), the per-genre node and
+connector spellings `flowline` `transition` `state` `message` `lifeline`,
+and the sixth is (b⁗), `sequence`'s own subject vocabulary.
 `CONSTRUCT-STATUS-TIERS` changed no total — entries moved column only; 0.1 is the first
 release since that ADDS keywords, three of them, all EXPERIMENTAL, taking the
 total to 25, and 0.1 is the first that REMOVES one: `ELEMENT-GEOMETRY-DIRECTIVE` merged
@@ -2896,20 +3119,31 @@ rename**: `EDGE-GEOMETRY-CONSTRUCTS` took `path` and `routing` out of the langua
 24 − 2 = 22. **0.2 adds three** — `GENRE-CONNECTOR-SPELLING`/`GENRE-NODE-SPELLING` gave `flowchart`
 `flowline` and `statechart` `state` and `transition`, so 22 + 3 = 25 —
 and **0.3 removes one, the second WITHDRAWAL**: `PAINT-ORDER-CONSTRUCT` took `plane`
-out of the language, so 25 − 1 = **24**. `LAYOUT-ZONE-NAMESPACE`'s repartition, like `CONSTRUCT-STATUS-TIERS`'s,
+out of the language, so 25 − 1 = **24**. **0.4 adds four**:
+`sequence` lands with FIVE keywords — `lifeline` `message` `state`
+`fragment` `operand` — and `state` is not among the four, because that
+spelling already exists in this registry as `statechart`'s node word.
+`sequence` DECLARES it independently and the two declarations differ in
+grammar, but the registry enumerates spellings, so 24 + 4 = **28**. This
+is the first release in which one entry carries two genres' independent
+declarations with two different grammars, and the count is stated here
+rather than left to be recomputed.
+`LAYOUT-ZONE-NAMESPACE`'s repartition, like `CONSTRUCT-STATUS-TIERS`'s,
 moved entries between rows without changing any total. A retired or
 withdrawn keyword is not counted here — its spelling stays registered so
 it fires a named diagnostic (the tables below), but it is no longer a
-keyword of the language. Of the 24
+keyword of the language. Of the 28
 top-level keywords **13 are NORMATIVE** — the core of three (a), `pin` (a′), the
 seven normative scene spellings (b), and the `bitfield` and `table` openers
 (c) —
-and **11 are EXPERIMENTAL**: `threshold` `band` `bundle`
+and **15 are EXPERIMENTAL**: `threshold` `band` `bundle`
 `timing` `process` `decision` `terminator` `chart` `flowline` `transition`
-`state`. (Every withdrawal so far took EXPERIMENTAL spellings only, so NORMATIVE has
+`state` `lifeline` `message` `fragment` `operand`. (Every withdrawal so
+far took EXPERIMENTAL spellings only, so NORMATIVE has
 never moved; it is the EXPERIMENTAL side that carries every change, and it
-carried the `chart` that was missing until 0.1 and the `GENRE-CONNECTOR-SPELLING`/`GENRE-NODE-SPELLING`
-trio that was missing until this release.)
+carried the `chart` that was missing until 0.1, the `GENRE-CONNECTOR-SPELLING`/`GENRE-NODE-SPELLING`
+trio that was missing until 0.3, and the whole `sequence`
+vocabulary.)
 Reserved for the dynamic profile: `page set pulse` — the three the §6 <!-- fence-check: skip -->
 sketch uses. `step` was reserved until 0.1 and is now **released**
 (`CONSTRUCT-STATUS-TIERS`): it appeared in no sketch and no genre claimed it, so it is an
@@ -2992,12 +3226,17 @@ The rule as written has a live counterexample inside this very document
 set, and leaving it unremarked would make the rule read as violated rather
 than excepted. The `timing` child keyword `gap <cycle>` (a time break) and the
 scene option `gap=<px>` on `group` (member spacing) are **both live**, and
-they denote **different concepts** — the only such pair in v0.1. (The other
+they denote **different concepts** — the only such pair in v0.1. **It
+stayed a pair**: `sequence` was proposed a third `gap`, a
+discontinuity on its own time axis, and `SEQUENCE-TIME-GAP` REFUSED it — the axis there
+is non-proportional, so the line would assert nothing. The exception
+therefore has two arms and not three, which is the answer the ruling was
+asked for. (The other
 cross-namespace pairs — `class`/`class=`, `width`/`width=`
 — denote the SAME concept on both sides and are covered
 by the paragraph above, not by this exception. `routing`/`routing=` was a
 third such pair until 0.1, when `EDGE-GEOMETRY-CONSTRUCTS` withdrew both halves at once,
-and `plane`/`plane=` a fourth until this release, when `PAINT-ORDER-CONSTRUCT` did the same.
+and `plane`/`plane=` a fourth until 0.3, when `PAINT-ORDER-CONSTRUCT` did the same.
 Both withdrawals took the pair whole, which is the coupling (b′) states:
 neither half can outlive the other.)
 The reasoning is `GENRE-KEYWORD-ALLOWLIST`, and it is a **stronger** disjointness than the
@@ -3040,7 +3279,7 @@ standards for three concepts.
 
 | Retired | Live spelling | Why it went |
 |---|---|---|
-| `boundary` | `external` | it declares an external I/O endpoint — this spec's own words (§2.8) — while UML's «boundary» is an INTERNAL interface object, C4's `System_Boundary` is a dashed grouping container FigDown already spells `group`, and BPMN's Boundary Event is a third meaning. Three standards, three concepts, none of them this one. |
+| `boundary` | `external` | it declares an external I/O endpoint — this spec's own words (§2.8) — while the ECB analysis pattern's «boundary» is an INTERNAL interface object (CORRECTED 0.3.z: this said "UML's"; the stereotype is not in UML 2.5.1 or ISO/IEC 19505-2 — see decisions/registry.md), C4's `System_Boundary` is a dashed grouping container FigDown already spells `group`, and BPMN's Boundary Event is a third meaning. Three standards, three concepts, none of them this one. |
 | `layer` (+ `layer=`) | `plane` (+ `plane=`) | in mxGraph — the geometry model FigDown adopted — a layer is a CONTAINMENT PARENT that establishes coordinates, so `layer=overlay` reads as "reparent and re-origin this element", which FigDown does not do; Inkscape layers are `<g>` and may carry a transform; OGC WMS layers each carry an SRS; CSS `@layer` is cascade priority with no visual meaning; SVG has no layer concept at all. `plane` is claimed by no standard for a conflicting meaning, and it also closes the `layout`/`layer` near-miss recorded above. |
 | `wrap` (`bitfield` child) | `break` | in CSS and typography `wrap` is AUTOMATIC reflow — a MODE — while this directive is an EXPLICIT row break, an EVENT. CSS Fragmentation §4.3 calls that "a forced break … explicitly indicated by the style sheet author"; HTML spells it `br`. |
 | ~~`optional` (bare flag on `field`)~~ | ~~`conditional`~~ → **`present=`** | RFC 2119 defines OPTIONAL as optional to IMPLEMENT, which is not what a wire-format field marker means; the wire-format sense is "present only if" (RFC 2784). **REVERSED at 0.1 (`PRESENCE-FLAG-SPELLING`): `optional` became the live spelling again and `conditional` the retired one** — `conditional` has zero attestation as a wire-format field marker, RFC 2784's own diagram spells the concept `(optional)`, and "optional" appears in 34 downstream field LABELS against 0 for "conditional". **BOTH are retired at 0.1 (`PRESENCE-CONDITION-EXPRESSION`): the construct is now the option key `present=`, whose VALUE is the presence condition.** The row is struck through rather than deleted because a document written at any point in that history still needs to find it. |
@@ -3103,7 +3342,7 @@ its current spellings — keywords `threshold` `band` `bundle`
 `timing` `chart` `flowline` `transition` `state`, option keys
 `offset` `extend` `data`
 `type`, genres `topology` `flowchart` `statechart` `timing`.
-(`plane` and its keys `plane=` and `z-index=` were on this list until this release, when `PAINT-ORDER-CONSTRUCT` withdrew all three from the language.) (`stroke=` was on this list
+(`plane` and its keys `plane=` and `z-index=` were on this list until 0.3, when `PAINT-ORDER-CONSTRUCT` withdrew all three from the language.) (`stroke=` was on this list
 until 0.1 and is now NORMATIVE, `STROKE-KEY-STATUS`; `color=` was on it too and is
 now retired language-wide, `COLOUR-KEY-STATUS`; the keywords `path`/`routing` and the
 option keys `points`/`tailport`/`headport`/`routing` were on it until 0.1 and are WITHDRAWN, `EDGE-GEOMETRY-CONSTRUCTS`.)
@@ -3263,7 +3502,7 @@ scene `node`. Neither is a redefinition —
 each is one key with one meaning, registered on directives in two
 namespaces. Each is counted **once**, in the namespace of the registration
 that names it in the table above: `at` and `width`/`height` under layout.
-The `UNIVERSAL-CORE-KEYWORDS` core of three owned no option key at all until this release —
+The `UNIVERSAL-CORE-KEYWORDS` core of three owned no option key at all until 0.3 —
 `figdown`, `title` and `layout` took none — which is why the row that used
 to be spelled *core* is now spelled *layout*. No key moved and no count
 changed then. **`title` gained its FIRST option key:
@@ -3495,7 +3734,7 @@ pins the 0.1 three in the NORMATIVE corpus. (This list read
 **fourteen** until 0.1, having stopped at 0.1: `note=` and
 the four withdrawals were added to the language-wide row of the namespace
 table above — which said **19** — but never here. It read
-**nineteen** until this release, when `note=` LEFT this list
+**nineteen** until 0.3, when `note=` LEFT this list
 in the one direction no key had taken before: `DRAWN-ANNOTATION-FORM` revived it as a live
 key, so it no longer fires anywhere and no longer has a message to count.
 Eighteen is the engine's own table, key for key.) Moving to this list
@@ -3577,10 +3816,12 @@ addition and to the hundredth alike.
 document       = *insignificant header *line
 insignificant  = comment-line / blank-line
 header         = "figdown" SP version SP genre eol
-version        = "0.1" / "0.2" / "0.3"    ; wire major.minor token only
+version        = "0.1" / "0.2" / "0.3" / "0.4"
+                                          ; wire major.minor token only
 genre          = "block" / "topology" / "flowchart"
                / "bitfield" / "table" / "timing"
                / "statechart"             ; version "0.2" and up (STATECHART-GENRE-SCOPE)
+               / "sequence"               ; version "0.4" and up (SEQUENCE-GENRE-VOCABULARY)
 line           = directive-line / table-row / insignificant
 directive-line = keyword *(SP argument) [SP comment] eol
 argument       = qstring / option / bare-token
@@ -3726,6 +3967,26 @@ fields are **omitted** when the condition does not hold — see §12.3.
 | `bands` | array of *Band* | always (MAY be empty) | EXPERIMENTAL — same caveat; §2.6, [experimental.md](experimental.md) §E3; per-key shape in §E5 |
 | `bundles` | array of *Bundle* | always (MAY be empty) | EXPERIMENTAL — same caveat; §2.5, [experimental.md](experimental.md) §E2; per-key shape in §E5 |
 | `regions` | array of *Region* | always (MAY be empty) | §4, in document order |
+| `lifelines` | array of *Lifeline* | when the document declares at least one `lifeline` | EXPERIMENTAL — `sequence` only (`SEQUENCE-GENRE-VOCABULARY`). The participant columns, in declaration order, which IS their left-to-right order |
+| `messages` | array of *Message* | when the document declares at least one `message` | EXPERIMENTAL — `sequence` only. Each carries `line`, and the figure's TIME AXIS is `messages` ∪ `states` sorted on it |
+| `states` | array of *State occurrence* | when the document declares at least one `state` under `sequence` | EXPERIMENTAL — `sequence` only. Distinct from a `statechart` `state`, which is a *Node* |
+| `fragments` | array of *Fragment* | when the document declares at least one `fragment` | EXPERIMENTAL — `sequence` only |
+| `operands` | array of *Operand* | when the document declares at least one `operand` | EXPERIMENTAL — `sequence` only |
+
+**The five `sequence` collections are OMIT-WHEN-ABSENT and are APPENDED
+after `regions`**. They follow `externals`' rule rather than
+`nodes`' for one reason and it is the same one `DRAWN-ANNOTATION-FORM` gave for appending
+`note`: no `figdown 0.1`, `0.2` or `0.3` document can carry any of them, so
+appending and omitting means **not one golden written before `figdown 0.4`
+moves a byte**, and a consumer written against an earlier `0.x` reads every
+document it could read before.
+
+**A message is NOT an *Edge*, and the separation is normative.** An Edge is
+a relation between two Nodes and this model says its order is not meaning
+(§12.4 rule 6, §12.6); a Message is an OCCURRENCE whose place in the total
+order IS the figure's content. Projecting messages into `edges` would tell a
+consumer it may reorder them. In a `sequence` document `nodes`, `edges` and
+`groups` are all empty.
 
 **Correction: `thresholds`, `bands` and `bundles` are NOT
 empty everywhere on the normative surface.** The three rows above said
@@ -3751,8 +4012,8 @@ exceptions rather than unconditionally.
 
 | key | type | present | meaning |
 |---|---|---|---|
-| `version` | string | always | the wire-grammar version **as the document declared it** — `"0.1"`, `"0.2"` or `"0.3"` (§1; `"0.3"` since 0.3, §13.7). It stopped being a constant at `STATECHART-GENRE-SCOPE`: while exactly one version existed, "emit the literal `\"0.1\"`" and "copy the source token" were the same instruction, and they are not any more. **An engine MUST emit the token the header declared**, never the newest version it implements and never the one it would have preferred — the declared version is the contract the author wrote against, and §13.7 forbids a reader inferring it from anything else. It is NOT the dev increment (0.1), which appears in a rendered artifact's `data-engine-version` and never in the model (§12.6). Stated normatively at 0.1; it was a hard-coded constant in `conformance/normalize.js` until `STATECHART-GENRE-SCOPE` |
-| `genre` | string | always | one of the genre tokens legal at `version` (§1) — the six of `figdown 0.1`, or those plus `statechart` at `figdown 0.2` and `figdown 0.3` (0.3 added an option key, no genre). REQUIRED in the source since 0.1, so it can be absent only from a document that failed to parse. Since `GENRE-NAMESPACE` it also names the NAMESPACE the document's top-level keywords belong to — a consumer resolves every non-core keyword against it (§1 `GENRE-NAMESPACE`, §12.7) |
+| `version` | string | always | the wire-grammar version **as the document declared it** — `"0.1"`, `"0.2"`, `"0.3"` or `"0.4"` (§1; `"0.3"` since 0.3 and `"0.4"` since 0.4, §13.7). It stopped being a constant at `STATECHART-GENRE-SCOPE`: while exactly one version existed, "emit the literal `\"0.1\"`" and "copy the source token" were the same instruction, and they are not any more. **An engine MUST emit the token the header declared**, never the newest version it implements and never the one it would have preferred — the declared version is the contract the author wrote against, and §13.7 forbids a reader inferring it from anything else. It is NOT the dev increment (0.1), which appears in a rendered artifact's `data-engine-version` and never in the model (§12.6). Stated normatively at 0.1; it was a hard-coded constant in `conformance/normalize.js` until `STATECHART-GENRE-SCOPE` |
+| `genre` | string | always | one of the genre tokens legal at `version` (§1) — the six of `figdown 0.1`, those plus `statechart` at `figdown 0.2` and `figdown 0.3` (0.3 added an option key, no genre), or those plus `sequence` at `figdown 0.4` (`SEQUENCE-GENRE-VOCABULARY`). REQUIRED in the source since 0.1, so it can be absent only from a document that failed to parse. Since `GENRE-NAMESPACE` it also names the NAMESPACE the document's top-level keywords belong to — a consumer resolves every non-core keyword against it (§1 `GENRE-NAMESPACE`, §12.7) |
 
 **Class** — `class` (§2.7).
 
@@ -3878,6 +4139,86 @@ requirement is filed as §9 **`EDGE-IDENTITY-AND-GEOMETRY`**, not deferred to a 
 There was a fourth EXPERIMENTAL element, **Path**, whose per-key table had moved
 to [experimental.md](experimental.md); it went with the
 directive.
+
+**Lifeline**, **Message**, **State occurrence**, **Fragment** and
+**Operand** — the five `sequence` elements (`SEQUENCE-GENRE-VOCABULARY`). The
+genre is EXPERIMENTAL and so are all five; a document inside the v0.1
+conformance surface writes none of them and omits all five arrays.
+
+**Lifeline** — `lifeline` (this genre's *Node*).
+
+| key | type | present | meaning |
+|---|---|---|---|
+| `id` | string | always | the participant's id; shares the document-wide id namespace |
+| `label` | string | when written | the participant's name. Absent is ABSENT, never the id (§12.3) |
+| `in` | string | when `in=` is written | the `fragment` or `operand` id this participant exists inside (sense 1) |
+| `fill` `stroke` `style` | string | when written | §5 |
+| `class` | array of string | when written | §2.7 |
+| `note` `description` | string | when written | drawn aside, and never-drawn authored prose (§2.9, §12.7) |
+| `line` | number | always | 1-based source line |
+
+**Message** — `message` (this genre's *Edge*, and NOT an Edge).
+
+| key | type | present | meaning |
+|---|---|---|---|
+| `a` `b` | string | always | the two endpoints; each MUST be a declared `lifeline` id |
+| `op` | `"->"` \| `"<-"` \| `"<->"` | always | direction. **`"--"` cannot appear**: it is a line error in this genre, because a Message carries a sending AND a receiving event occurrence. `"<->"` is a sustained two-way exchange whose individual messages are not enumerated |
+| `label` | string | when written | the message text, from the trailing quoted string or the inline `-[mid]->` form. Writing both is a line error, so the key never holds two, and there is no `mid` key: on a message the mid position IS the label |
+| `tail` `head` | string | each when written | the end labels, as on an Edge |
+| `in` | string | when `in=` is written | the `fragment` or `operand` id this message occurs inside |
+| `stroke` `style` | string | when written | §5. No `fill`: a line has no interior |
+| `class` | array of string | when written | §2.7 |
+| `note` `description` | string | when written | §2.9, §12.7 |
+| `line` | number | always | 1-based source line — **and it is content here, not an address**: the total order is `messages` ∪ `states` sorted on it, and nothing else records it |
+
+**State occurrence** — `state` under `sequence` (UML 2.5.1 `StateInvariant`).
+It is NOT the `statechart` `state`, which is a *Node* with an id.
+
+| key | type | present | meaning |
+|---|---|---|---|
+| `lifeline` | string | always | the declared `lifeline` this state is OF. Slot 1 REFERENCES; it declares no id, because nothing in this genre refers to a state occurrence |
+| `name` | string | always | the state's name. MANDATORY in the source, which is why it is not spelled `label` — an omitted label is legal wherever `label` appears and is a line error here |
+| `in` | string | when `in=` is written | the `fragment` or `operand` id this occurrence sits inside |
+| `fill` `stroke` `style` | string | when written | §5 |
+| `class` | array of string | when written | §2.7 |
+| `note` `description` | string | when written | §2.9, §12.7 |
+| `line` | number | always | 1-based source line, and content — see *Message* |
+
+**Fragment** — `fragment` (UML 2.5.1 `CombinedFragment`).
+
+| key | type | present | meaning |
+|---|---|---|---|
+| `id` | string | always | shares the document-wide id namespace with `lifeline` and `operand` |
+| `label` | string | when written | the frame's caption |
+| `type` | string | **always** | one of `alt` `opt` `loop` `par` `strict` `seq` `critical` `neg` `assert` `ignore` `consider` `break` — UML `InteractionOperatorKind` (§17.12.15.3) taken whole. MANDATORY in the source: UML defaults the attribute to `seq` and FigDown declines the default, a declared divergence |
+| `in` | string | when `in=` is written | the enclosing `fragment` or `operand`. **Nesting is capped at ONE level**: a fragment may sit inside an operand of one enclosing fragment and no deeper |
+| `stroke` `style` | string | when written | §5. No `fill`: a fragment is a frame over the messages it holds |
+| `class` | array of string | when written | §2.7 |
+| `note` `description` | string | when written | §2.9, §12.7 |
+| `line` | number | always | 1-based source line. A fragment is a DECLARATION and carries no time position of its own: its extent is the span of the occurrences that name it |
+
+**Operand** — `operand` (UML 2.5.1 `InteractionOperand`).
+
+| key | type | present | meaning |
+|---|---|---|---|
+| `id` | string | always | shares the document-wide id namespace |
+| `label` | string | when written | the compartment's guard |
+| `in` | string | **always** | the `fragment` this compartment belongs to. MANDATORY, and it MUST resolve to a `fragment` — never to another operand, and never to a lifeline |
+| `stroke` `style` | string | when written | §5 |
+| `class` | array of string | when written | §2.7 |
+| `note` `description` | string | when written | §2.9, §12.7 |
+| `line` | number | always | 1-based source line; extent as for *Fragment* |
+
+**Two whole-document rules the five share**, both checked by the reference
+engine and both about the MODEL rather than the drawing:
+
+- **Contiguity.** The occurrences naming one container must be a
+  CONTIGUOUS run in declaration order. An operand denotes the ordered run
+  of the occurrences it contains, so an occurrence that is not in it cannot
+  happen between two that are; a non-contiguous membership denotes nothing.
+- **No restatement.** Two consecutive `state` entries with the same
+  `lifeline` and the same `name` are a line error. A state that has not
+  changed is never restated, and a change is derived from an adjacent pair.
 
 **Region** — the nested genre regions of §4, discriminated by `genre`.
 Regions appear in `regions` in document order. (`regions`/`genre` were
@@ -4116,7 +4457,7 @@ is a third state (`EMPTY-LABEL-STATE`). `node a ""`, `group g ""`, `bundle b ""`
 `bitfield` / `table` / `timing` all record `label: ""` — never the omitted
 key. A consumer that tests truthiness rather than key presence merges
 two distinguishable documents and is non-conforming. (`plane L ""` was on <!-- fence-check: skip -->
-this site list until this release, when `PAINT-ORDER-CONSTRUCT` withdrew the keyword; the
+this site list until 0.3, when `PAINT-ORDER-CONSTRUCT` withdrew the keyword; the
 eleventh site, `field ""`, is the `bitfield` genre's own name slot and is
 stated in [genres/bitfield.md](genres/bitfield.md), because what it draws
 — an unnamed CELL — is not what any of the others draw.)
@@ -4293,6 +4634,13 @@ implementation is compared against, byte for byte.
   figure-wide authored text there is. Appending rather than interleaving
   also means no `figdown 0.1` or `figdown 0.2` golden moves a byte, since
   none of them can carry the key.
+  **The five `sequence` collections follow the same rule at the top level**
+  (`SEQUENCE-GENRE-VOCABULARY`): `lifelines` `messages` `states` `fragments`
+  `operands` emit in that order, AFTER `regions`, and each is omitted when
+  empty. Same reason again — no document below `figdown 0.4` can carry one,
+  so no earlier golden moves — and it makes the top-level key order read as
+  history: the v0.1 shape first, then what each later version added, in the
+  order it was added.
 - **Array order**: document order, per §12.4 rule 6.
 - **Strings (the numeric-value rule = U)**: the model holds the author's
   text after source escapes are resolved (§12.4 rule 7) — real newlines,
@@ -5185,16 +5533,17 @@ still runnable for anyone who chooses not to move.
   document is checked against.
 
 - **The reference engine's accepted set, stated (`STATECHART-GENRE-SCOPE`, 0.2;
-  extended 0.3, `DRAWN-ANNOTATION-FORM`).**
+  extended 0.3, `DRAWN-ANNOTATION-FORM`; extended 0.4, `SEQUENCE-GENRE-VOCABULARY`).**
   `editor/figdown.html` and everything generated from it — `dist/`,
   `skill/figdown/figdown.html`, `tools/build-svg.js` — accept **`figdown
-  0.1`, `figdown 0.2` and `figdown 0.3`**, and nothing else. Any other
-  version token is
-  `unsupported version "<token>" (expected 0.1 or 0.2 or 0.3)` — the list
+  0.1`, `figdown 0.2`, `figdown 0.3` and `figdown 0.4`**, and nothing else.
+  Any other version token is
+  `unsupported version "<token>" (expected 0.1 or 0.2 or 0.3 or 0.4)` — the list
   is the constant joined, so the message grows with the set. The set lives in
-  one constant, `LANG_VERSIONS` — `['0.1','0.2','0.3']` — so this sentence
+  one constant, `LANG_VERSIONS` — `['0.1','0.2','0.3','0.4']` — so this sentence
   and the code cannot
-  drift. (It said "0.1 and 0.2" from 0.2 to 0.3. The constant
+  drift. (It said "0.1 and 0.2" from 0.2 to 0.3, and "0.1, 0.2
+  and 0.3" from 0.3 to 0.4. The constant
   is what kept that from becoming a silent lie: the sentence is checked
   against it whenever the set moves, which is the whole reason the set was
   put in one place.) The **archived** `v0.1.0` engine (`archive/0.1/figdown.html`)
@@ -5355,6 +5704,85 @@ start. This subsection states, once, what happens then.
   mechanism that closes this gap without either editing frozen bytes (refused
   above) or shipping a new language version; the register is the bridge, and the
   gap is the price of the freeze being real.
+  **That is now history rather than a live gap: `figdown 0.4` shipped
+  `read/0.4/` and it states the rule by membership. §13.7.4
+  records the discharge.**
+
+#### 13.7.4 The third `Y`, and what a genre token costs when it arrives empty
+
+`figdown 0.4` is the project's third `Y`, and it is the *first* one written to
+a shape the project had already rehearsed: `STATECHART-GENRE-SCOPE`'s. It is deliberately the same
+increment, one genre later.
+
+- **What it added: one genre token, and nothing else.** `sequence` joins the
+  genre set at `figdown 0.4` (`SEQUENCE-GENRE-VOCABULARY`). It adds **no keyword, no option key,
+  no enum value and no character** — §10's registry is byte-unchanged, and so
+  is every renderer path. `LANG_VERSIONS` becomes `['0.1','0.2','0.3','0.4']`
+  and `GENRES_BY_VERSION` gains a `'0.4'` row that is `'0.3'`'s plus the one
+  token. The engine constant moves 0.3 → 0.4: `N` counts
+  source states and never resets (§13.0.4), so 91 is followed by 92.
+- **It removed nothing**, which is `Y`'s definition (§13.0). Every `figdown
+  0.1`, `0.2` and `0.3` document produces the same model under 0.4
+  that it produced under 0.3, and every golden of all three versions
+  passes unmodified.
+- **Why the LANGUAGE number had to move, and not only the release.** A genre
+  token is language surface: it is a value the header's second position accepts,
+  and §13.0 defines `Z` as bug fixes with no new features. Shipping `sequence`
+  under a `v0.3.z` would make `figdown 0.3` name two different languages, the
+  same argument §13.7.2 made for `note=`. `STATECHART-GENRE-SCOPE` settled this for `statechart`;
+  nothing about the second genre changes it.
+- **The version gate is free, and stating that is the point.** No code was
+  written for `figdown 0.3 sequence`. The later-version search that `STATECHART-GENRE-SCOPE` added
+  for `statechart` — "is this token in the genre set of some version above the
+  one declared?" — answers `genre "sequence" requires figdown 0.4 (this
+  document declares 0.3) — write: figdown 0.4 sequence` on its own. A
+  mechanism that generalises to the *n*-th case without an *n*-th branch is the
+  return on having built it once.
+- **What the genre did NOT yet do, stated rather than left to
+  be found — and CLOSED.** `sequence` had no row in the engine's
+  per-genre allowlist (`GENRE_KW`), and the allowlist guard is written to skip a
+  genre with no row. So for one increment a `figdown 0.4 sequence` document
+  could write any registered keyword and it parsed: the genre **stated a
+  reading and constrained nothing**. The document that increment meant to land
+  was the header alone. **0.4 lands the vocabulary and the allowlist row
+  together**, as promised: five keywords (`lifeline` `message` `state`
+  `fragment` `operand`), no new option key, three named refusals (`gap`,
+  `group`, `lost=`), and a reading rule in `read/0.4/experimental/sequence.md`.
+  **One thing is still owed and is stated the same way: there is no RENDERER.**
+  A `sequence` document parses to a complete model, reports zero errors, and
+  draws an EMPTY CANVAS. Until the ladder layout lands, this genre states a
+  reading and draws nothing — which is why its reference figure ships with no
+  `.svg` beside it.
+- **It DID owe a new `read/<X.Y>/`**, on §13.7.1's rule unchanged: the reading
+  contract is indexed by language version, `read/0.1/`–`read/0.3/` are frozen,
+  and `figdown 0.4` is a version a reader may now meet. `read/0.4/` is written
+  from `read/0.3/`, and it carries **one substantive change beyond the copy**:
+  erratum **E1** ([ERRATA.md](ERRATA.md), `GENRE-NAMESPACE`) is discharged in it. §13.7.3
+  said the correction lands in the next read tree written, and this is that
+  tree: `read/0.4/reading.md` states the layout rule by **namespace
+  membership** — ignore every member of the layout namespace wherever it
+  appears — and does **not** carry the position-based sentence forward. The
+  three frozen trees keep the wording they shipped, which is the freeze working
+  and not a second defect. `tools/make-skill.js` and `tools/skill-coverage.js`
+  now mirror and gate against `read/0.4/`, so the vendored
+  `skill/figdown/reference/reading.md` carries the corrected wording too.
+- **It owes an `archive/0.4/figdown.html` at publish, not here**, on §13.5's
+  rule unchanged.
+- **A PRE-EXISTING archive debt, recorded here so the `0.4` publish does not
+  silently inherit it.** `archive/MANIFEST.tsv` holds **`0.1` rows only**.
+  `read/0.2/` and `read/0.3/` are frozen by this section and by §13.5 — nothing
+  edits them and nothing may — but they are hashed by **nothing**: `gate:archive`
+  reports its prefixes as `archive/0.1, read/0.1`, so its green is a statement
+  about `0.1` and about no other version. The freeze on `0.2` and `0.3` is
+  therefore a policy the project keeps, not a property a tool proves. The debt
+  was contracted at the `v0.2.0` and `v0.3.0` publishes (the `--write` step
+  §13.7.1 and §13.7.2 each describe was not run) and it is **recorded, not
+  fixed,** — writing `0.2`/`0.3` rows now would hash the bytes as
+  they are *today* and assert they are the bytes those releases shipped, which
+  is exactly the claim the manifest exists to make honestly and exactly the
+  claim nobody can make retroactively. The correct discharge is a publish-time
+  act, and the record here is what keeps `0.4` from adding a fourth
+  unhashed tree without anyone noticing.
 
 ### 13.8 What tier 2 costs, stated honestly
 

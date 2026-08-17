@@ -1,0 +1,59 @@
+{
+  "suite_version": "1.0.0",
+  "run": {
+    "utc": "2026-08-17T09:43:49Z",
+    "model_alias": "sonnet",
+    "model_used": "claude-sonnet-5",
+    "cli": "2.1.233 (Claude Code)",
+    "condition": "title-only",
+    "reader": 1
+  },
+  "figure": {
+    "id": "fragment-operators",
+    "genre": "sequence",
+    "path": "examples/sequence/fragment-operators.fd",
+    "file_sha256": "125ba6650b5fbdd44cadf286c24d68c81a1be6ab5d8892cf8215a33eda39d4b9",
+    "title_shown": "All twelve interaction operators, on one session",
+    "presented_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "presented_lines": 0,
+    "presented_chars": 0
+  },
+  "prompt": {
+    "system_sha256": "42d79e37b78275f219f2b1b70497abf709362f5fa68aa5427fb1f42b12b60425",
+    "user_sha256": "6900e18213b536e656839a6c7cf063f8105a135dcf5da49845566d110823104b",
+    "question_set_sha256": "93a6009ac666711f5bdb48006ce6581b97a457bc159c2a64781fcf1f5724f392"
+  },
+  "cold_room": {
+    "cwd": "an isolated empty temporary directory outside the repository",
+    "tools_offered": "none — every tool denied by name",
+    "mcp_servers": "none",
+    "settings": "safe-mode: no project or user settings, no memory file, no skills, no plugins, no hooks",
+    "session_persistence": false,
+    "shown": "the system prompt, the figure title, and the questions — nothing else",
+    "not_shown": "the specification, any genre document, any other .fd file, the file name, the name of the language, the repository"
+  },
+  "integrity": {
+    "turns": 1,
+    "permission_denials": 0,
+    "tool_calls_observed": false,
+    "is_error": false
+  },
+  "usage": {
+    "cost_usd": 0.008706,
+    "input_tokens": 867,
+    "output_tokens": 407,
+    "cache_creation_input_tokens": 0,
+    "duration_ms": 5597
+  },
+  "raw_answer_text": "A1: Top-to-bottom placement on a single lifeline asserts that the higher event occurrence happens strictly before the lower one in that participant's local time ordering.\nA2: Exactly one operand of the alt is executed on any given run; the choice is made by whichever guard evaluates to true (or, if none is stated true, an else guard/nondeterministic choice among true guards).\nA3: NOT STATED\nA4: The par fragment asserts that the messages/behaviors in its different operands may be interleaved in any order (or run concurrently) with no ordering guaranteed between operands, while still preserving the relative order of events within each individual operand and, for any single lifeline, the order in which it sends/receives events on that lifeline.\nA5: The opt fragment asserts that its single operand either executes in full or is skipped entirely, depending on whether its guard condition is true.\nA6: NOT STATED\nA7: NOT STATED\nA8: When the break guard is true, the break operand's content executes instead of, and the remainder of the enclosing interaction after the break fragment is skipped entirely.",
+  "answers": {
+    "q1": "Top-to-bottom placement on a single lifeline asserts that the higher event occurrence happens strictly before the lower one in that participant's local time ordering.",
+    "q2": "Exactly one operand of the alt is executed on any given run; the choice is made by whichever guard evaluates to true (or, if none is stated true, an else guard/nondeterministic choice among true guards).",
+    "q3": "NOT STATED",
+    "q4": "The par fragment asserts that the messages/behaviors in its different operands may be interleaved in any order (or run concurrently) with no ordering guaranteed between operands, while still preserving the relative order of events within each individual operand and, for any single lifeline, the order in which it sends/receives events on that lifeline.",
+    "q5": "The opt fragment asserts that its single operand either executes in full or is skipped entirely, depending on whether its guard condition is true.",
+    "q6": "NOT STATED",
+    "q7": "NOT STATED",
+    "q8": "When the break guard is true, the break operand's content executes instead of, and the remainder of the enclosing interaction after the break fragment is skipped entirely."
+  }
+}

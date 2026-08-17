@@ -1,0 +1,59 @@
+{
+  "suite_version": "1.0.0",
+  "run": {
+    "utc": "2026-08-17T09:42:21Z",
+    "model_alias": "sonnet",
+    "model_used": "claude-sonnet-5",
+    "cli": "2.1.233 (Claude Code)",
+    "condition": "syntax",
+    "reader": 1
+  },
+  "figure": {
+    "id": "fragment-operators",
+    "genre": "sequence",
+    "path": "examples/sequence/fragment-operators.fd",
+    "file_sha256": "125ba6650b5fbdd44cadf286c24d68c81a1be6ab5d8892cf8215a33eda39d4b9",
+    "title_shown": null,
+    "presented_sha256": "1cfd5f4f6cf39302dbd869811a61767316802358227892fc0b27e43c77f30c69",
+    "presented_lines": 63,
+    "presented_chars": 3021
+  },
+  "prompt": {
+    "system_sha256": "1a78658262dc29e7e24cbe3e1eb72659cf31990e85deddacf0b1625e40c5eac2",
+    "user_sha256": "977c1f7069df6b9e6c79f68e54844dde9df7d73738b4f181777cbe2696fb9f08",
+    "question_set_sha256": "93a6009ac666711f5bdb48006ce6581b97a457bc159c2a64781fcf1f5724f392"
+  },
+  "cold_room": {
+    "cwd": "an isolated empty temporary directory outside the repository",
+    "tools_offered": "none — every tool denied by name",
+    "mcp_servers": "none",
+    "settings": "safe-mode: no project or user settings, no memory file, no skills, no plugins, no hooks",
+    "session_persistence": false,
+    "shown": "the system prompt, the presented file text, and the questions — nothing else",
+    "not_shown": "the specification, any genre document, any other .fd file, the file name, the name of the language, the repository"
+  },
+  "integrity": {
+    "turns": 1,
+    "permission_denials": 0,
+    "tool_calls_observed": false,
+    "is_error": false
+  },
+  "usage": {
+    "cost_usd": 0.035817,
+    "input_tokens": 2,
+    "output_tokens": 1551,
+    "cache_creation_input_tokens": 2091,
+    "duration_ms": 16881
+  },
+  "raw_answer_text": "A1: It asserts that the earlier (higher) event on that lifeline occurs before the later (lower) event — a strict temporal ordering for that participant's occurrences.\n\nA2: Exactly one operand is executed on any run; which one runs is decided by which operand's guard condition holds — \"accepted\" or \"rejected.\"\n\nA3: The file only gives the guard \"while no response, and fewer than 3 attempts made,\" so the operand may run up to 3 times; NOT STATED for an explicit separate lower bound.\n\nA4: The `par` fragment asserts that the messages in its different operands (\"profile fetch\" and \"audit flush\") have no relative order between each other, but it still requires that the messages within each individual operand keep their own internal order.\n\nA5: The `opt` fragment asserts that its single operand's behaviour (the \"200 OK (expanded profile)\" message) occurs only when the stated guard — the client having asked for the expanded form — holds; otherwise it is skipped.\n\nA6: The critical fragment contains the message \"write: token issued\".\n\nA7: The second operand of the alt contains the message \"401 Unauthorized\".\n\nA8: When the break's guard is true, the remainder of the enclosing interaction that comes after the fragment is abandoned and not executed.",
+  "answers": {
+    "q1": "It asserts that the earlier (higher) event on that lifeline occurs before the later (lower) event — a strict temporal ordering for that participant's occurrences.",
+    "q2": "Exactly one operand is executed on any run; which one runs is decided by which operand's guard condition holds — \"accepted\" or \"rejected.\"",
+    "q3": "The file only gives the guard \"while no response, and fewer than 3 attempts made,\" so the operand may run up to 3 times; NOT STATED for an explicit separate lower bound.",
+    "q4": "The `par` fragment asserts that the messages in its different operands (\"profile fetch\" and \"audit flush\") have no relative order between each other, but it still requires that the messages within each individual operand keep their own internal order.",
+    "q5": "The `opt` fragment asserts that its single operand's behaviour (the \"200 OK (expanded profile)\" message) occurs only when the stated guard — the client having asked for the expanded form — holds; otherwise it is skipped.",
+    "q6": "The critical fragment contains the message \"write: token issued\".",
+    "q7": "The second operand of the alt contains the message \"401 Unauthorized\".",
+    "q8": "When the break's guard is true, the remainder of the enclosing interaction that comes after the fragment is abandoned and not executed."
+  }
+}

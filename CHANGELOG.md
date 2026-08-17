@@ -65,6 +65,78 @@ Statuses referred to above are defined in [`spec/README.md`](spec/README.md).
 
 Nothing yet.
 
+## v0.4.0 — 2026-08-17
+
+**Release `v0.4.0`, language version `figdown 0.4`.** The third `Y`: new
+language surface is added and nothing is removed. Every `figdown 0.1`, `0.2`
+and `0.3` document parses to the same model it always did. Two behaviour
+corrections act on documents that never change their header — both are listed
+under *Upgrading* below.
+
+**Added — the `sequence` genre (experimental, requires `figdown 0.4`),
+[`spec/genres/experimental/sequence.md`](spec/genres/experimental/sequence.md).**
+A ladder: participants are columns, time runs down the page, and **declaration
+order is the time order** — a message's place in the source *is* its place in
+the exchange, so nothing rides on label-numbering conventions. Five keywords,
+every one taken from OMG UML 2.5.1 clause 17 (standing on ISO/IEC 19505-2
+clause 14): `lifeline`, `message`, `state`, `fragment`, `operand`. A
+`fragment` carries one of UML's twelve interaction operators in a mandatory
+`type=`; `in=` states containment at five acceptors with nesting capped at one
+level; the order model is deliberately **stronger than the source standard's
+partial order**, and the genre document declares that divergence rather than
+hiding it. No activation bars, no new option key, and three constructs the
+design refused (`gap`, `group`, `lost=`) answer with named errors that say
+what to write instead. Worked figures at
+[`examples/sequence/`](examples/sequence/index.md) — the RFC 2131 DHCP lease
+ladder and a twelve-operator tour.
+
+**Added — the `figdown 0.4` reading contract, [`read/0.4/`](read/0.4/reading.md),
+frozen at this release.** Written from `read/0.3/` with one correction the
+[errata register](spec/ERRATA.md) has owed since three frozen trees shipped it:
+the layout zone is ignored by **namespace membership, never by textual
+position** — a `pin` before the `layout` line is ignored on the same terms as
+one after it.
+
+**Changed — the group band now means membership, in both directions.** A
+`group`'s band contains every member and nothing else. Where auto-layout has
+freedom, members are placed contiguously, silently. Where the author's `pin`
+forces a non-member inside the band, the engine reports a geometry-time error
+naming the pin line and renders nothing — it will not draw a membership the
+source does not state. One bundled comparison figure's auto arm now
+demonstrates exactly this refusal, and its artifact is removed rather than
+left as a picture the engine calls false
+([`examples/layout-compare/`](examples/layout-compare/)).
+
+**Changed — the class-channel rule reaches every collection, and half of an
+older rule retires.** A class that declares `fill=` and is joined by a member
+with no interior (an `edge`, a `message`) is the same line error everywhere it
+can occur. A class that declares a **meaning and no paint at all is now legal
+on every member** — it draws its meaning in the derived legend with no swatch
+— which only legalises: nothing that parsed before fails now, and the old
+paint-less error is retired on its own obsoleted premise.
+
+**Added — [`spec/standards-claims.tsv`](spec/standards-claims.tsv) and its
+gate.** Every claim this repository makes about an external standard — what
+ISO 5807, UML 2.5.1, a YANG RFC or an IEEE schema says, names, or lacks — now
+needs a register row carrying its kind and its evidence, and the gate fails a
+claim with no row. The register was seeded by an audit that read the source
+texts; the corrections it forced are in this tree.
+
+**Added — the cold-reader comprehension baseline crosses its floor.** The
+suite ([`tools/comprehension-check.js`](tools/comprehension-check.js)) now
+covers eight genres and nine figures; corpus raw comprehension stands at
+**71.8%** against the 70% floor, and the new genre measures **85.4% raw /
+91.5% adjusted** against the 80% bar it was commissioned under — readers who
+have never seen the spec, reading `.fd` source alone.
+
+**Upgrading.** No document changes its meaning by keeping its header. Two
+checks act regardless of header: a `pin` that forces a non-member inside a
+group band is now an error (move the pin clear, or state the membership with
+`in=`), and a class declaring `fill=` joined by an interior-less member is now
+an error everywhere (add `stroke=` to the class). Raise a document's header to
+`figdown 0.4` only to use the `sequence` genre. Full details:
+[`spec/migrations.md`](spec/migrations.md).
+
 ## v0.3.2 — 2026-08-15
 
 **Release `v0.3.2`, language version `0.3`.** A patch release: the language does

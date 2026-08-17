@@ -143,7 +143,7 @@ const ENGLISH_AMBIGUOUS = {
   // "an optional label", "optional attributes" in §12.3).
   conditional: 'ordinary English, and how BITFIELD-CONDITIONAL-OFFSETS describes per-case offsets',
   optional: 'ordinary English, RFC 2119\'s OPTIONAL, and "an optional attribute" throughout §12.3',
-  // `note` was HERE (DESCRIPTION-KEY-SPELLING) until this release (DRAWN-ANNOTATION-FORM), when the
+  // `note` was HERE (DESCRIPTION-KEY-SPELLING) until 0.3 (DRAWN-ANNOTATION-FORM), when the
   // option key was REVIVED under SYNTAX-STYLE RULE 4.9 and stopped being
   // retired vocabulary at all. The entry is dropped rather than kept "just in
   // case": this file's own start-up assertion below refuses an opt-out for a

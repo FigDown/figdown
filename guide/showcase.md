@@ -25,6 +25,17 @@ carries it machine-readably, rather than letting it ride on geometry or
 absence. Nested `table` under a single scene header is legacy, not the taught
 path.
 
+**A seventh figure family is missing from this page on purpose.** The
+`sequence` genre (`SEQUENCE-GENRE-VOCABULARY`) draws the interaction ladders these
+six cannot: time-ordered messages between participants, with each
+participant's state on its own column and framed runs saying what kind of run
+they are. It is **EXPERIMENTAL** and requires `figdown 0.4`; nothing below
+declares a version later than `figdown 0.2`, which is where a reader deciding
+whether to adopt the language actually has to judge it. Its two worked figures
+are collected in
+[examples/sequence/index.md](../examples/sequence/index.md), and the honest-limit
+notes under §2 and §5 say exactly what they buy.
+
 ---
 
 ## 1. TCP header — bit-exact machine-readable layout (`bitfield`)
@@ -112,7 +123,8 @@ This is a **multi-section hybrid**: a `topology` scene section *and* a
 9293 figure carries the per-endpoint state on the lifelines; the topology
 genre has no lifeline-state construct, so the companion table section carries
 those states machine-readably — multi-section composition is the main-standard
-interim until the sequence genre lands.
+answer, and it is what a `figdown 0.1` document still writes now that the
+`sequence` genre has landed (see the note below this section).
 
 **Human sees:** two endpoints and three numbered segments — SYN out, SYN-ACK
 back, ACK (with piggybacked data) out — with a state table below tracking each
@@ -129,10 +141,22 @@ endpoint's TCP state segment by segment.
   row 2 of the state table (`1: SYN →`, Server state). Answerable only because
   the companion table carries the RFC 9293 lifeline states.
 
-> **Honest limit (stated in the source):** message *order* rides on the 1/2/3
-> label ordinals, not a first-class construct — `MEANING-RECOVERY-SOURCE` does not treat numbering as
-> semantics. The v0.2 sequence genre (`FLOWCHART-GENRE-DESIGN`) closes this; see
-> [expressing.md](expressing.md), "strict message ordering".
+> **Honest limit (stated in the source), and what changed under it.** Message
+> *order* here rides on the 1/2/3 label ordinals, not on a first-class
+> construct — `MEANING-RECOVERY-SOURCE` does not treat numbering as semantics — and per-endpoint
+> state rides on the companion table. **The `sequence` genre landed at
+> 0.4 (`SEQUENCE-GENRE-VOCABULARY`) and expresses both structurally**: a `message`'s place
+> in the ladder's row order *is* its place in time, and a `state` occurrence
+> sits on a lifeline between the two messages it falls between. This figure
+> nonetheless stays as written, and the reason is worth stating: `sequence` is
+> **EXPERIMENTAL** and requires `figdown 0.4`, while this figure is a
+> `figdown 0.1` document that any released engine can render. So the
+> interim above is now a **choice this document can defend**, not a gap it is
+> waiting on. What the ladder does with an exchange of this shape is shown by
+> the genre's own figures, collected in
+> [examples/sequence/index.md](../examples/sequence/index.md) — a DHCP lease from
+> acquisition to release, and all twelve interaction operators. See also
+> [expressing.md](expressing.md), "message exchange between parties".
 
 ---
 
@@ -287,8 +311,12 @@ prose rather than on an edge of its own.
   cache table (`before the exchange` → `(no entry for B's IP)`). Answerable only
   because the companion table carries the before-state explicitly.
 
-> **Honest limit:** step order (1/2) rides on label ordinals, pending the v0.2
-> sequence genre (`FLOWCHART-GENRE-DESIGN`).
+> **Honest limit, and a stated choice rather than a lack:**
+> step order (1/2) rides on label ordinals, which `MEANING-RECOVERY-SOURCE` treats as naming and not
+> as semantics. The `sequence` genre now expresses it structurally — see §2's
+> note and [examples/sequence/](../examples/sequence/index.md) — but it is
+> EXPERIMENTAL and needs `figdown 0.4`, and this figure stays on the frozen
+> `figdown 0.1` surface on purpose.
 
 ---
 
@@ -419,14 +447,22 @@ arrow carrying its `event / action`.
 
 ## The honest limits, in one paragraph
 
-Two figures depend on a convention the language does not yet make first-class:
-**message/step ordering** in the handshake and ARP is carried by numbering edge
-labels `1:`/`2:`/`3:`, which `MEANING-RECOVERY-SOURCE` treats as naming, not semantics — the v0.2
-sequence genre (`FLOWCHART-GENRE-DESIGN`) will fix it, and the sources say so. Relatedly, the RFC
-9293 handshake carries **per-endpoint lifeline state** (LISTEN, SYN-SENT, …)
-that the topology genre has no construct for; the companion state table section
-carries it as multi-section composition (`MULTI-FIGURE-DOCUMENTS` main-standard interim, again
-pending the sequence genre, `FLOWCHART-GENRE-DESIGN`).
+Two figures depend on a convention `figdown 0.1` does not make first-class:
+**message/step ordering** in the handshake and ARP is carried by
+numbering edge labels `1:`/`2:`/`3:`, which `MEANING-RECOVERY-SOURCE` treats as naming, not
+semantics, and the RFC 9293 handshake's **per-endpoint lifeline state**
+(LISTEN, SYN-SENT, …) rides in a companion `table` section because the topology
+genre has no construct for it. **The language itself has stopped lacking
+both.** The `sequence` genre landed (`SEQUENCE-GENRE-VOCABULARY`) with a ladder
+layout of its own: row order *is* time order, and a `state` occurrence sits on
+its lifeline between the two messages it falls between. What keeps these two
+figures as they are is not absence but **status** — `sequence` is EXPERIMENTAL
+and requires `figdown 0.4`, and both figures are `figdown 0.1` documents any
+released engine can render. So both limits are now stated choices, and the
+genre's own worked figures are at
+[examples/sequence/index.md](../examples/sequence/index.md). `MESSAGE-ORDER-AND-STATE` in spec §9
+is CLOSED — the landing it asked for is the one that happened —
+with the question kept whole under the closure note.
 The Ethernet frame uses the **`BYTE-UNIT-PACKET-BLOCKS`** byte-unit workaround (single-row `table`,
 not `bitfield`) so byte order rides on cell order, and one of its facts — the
 FCS **coverage span** over a contiguous run of columns (DA through Payload) —

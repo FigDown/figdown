@@ -1,0 +1,6 @@
+Line 10: "fragment" is not allowed in genre block
+Line 11: "operand" is not allowed in genre block
+Line 20: "bitfield" is not allowed in genre sequence
+Line 21: "bundle" is not allowed in genre sequence
+Line 22: "threshold" is not allowed in genre sequence
+Line 23: "external" is not allowed in genre sequence

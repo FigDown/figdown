@@ -30,7 +30,7 @@ edge l1 -- l2
 bundle mh "multi-home" l1--l2
 # The MULTI-MEMBER form: the member list is ONE comma-delimited token, and each
 # member must resolve to a unique edge, as written (`s1--l1` is not `l1--s1`).
-# It was demonstrated in block-experimental.fd until this release, when `SCENE-KEYWORD-MEMBERSHIP`
+# It was demonstrated in block-experimental.fd until 0.3, when `SCENE-KEYWORD-MEMBERSHIP`
 # withdrew `bundle` from `block`; `topology` is now its only genre, so the form
 # is demonstrated here. `topology` is also where the word can be defined by its
 # REFERENT — an IEEE 802.1AX LAG, an ECMP set, an EVPN Ethernet Segment — which
@@ -38,7 +38,7 @@ bundle mh "multi-home" l1--l2
 bundle ecmp "ECMP uplink set" s1--l1,s2--l1
 # The WRITTEN-EMPTY label (`EMPTY-LABEL-STATE`): absent is omitted, `""` is a written value —
 # a third state, and the ring draws with no caption rather than falling back to
-# the id. This form was demonstrated on a `block` bundle until this release; it
+# the id. This form was demonstrated on a `block` bundle until 0.3; it
 # moved here with the keyword, because `topology` is the only genre that
 # declares it now.
 bundle unlabelled "" s2--l2

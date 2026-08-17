@@ -8,9 +8,10 @@
 //      cannot catch a framing bug, and framing is the half we hand-rolled.
 //   B. THE TOOLS. Call `handle()` in-process against REAL figures from
 //      examples/ — a multi-section topology, an experimental statechart, a
-//      published artifact read back through its own metadata, and a
-//      deliberately broken document — because a toy figure exercises none of
-//      the paths that have historically broken.
+//      sequence ladder whose model has no nodes and no edges, a published
+//      artifact read back through its own metadata, and a deliberately broken
+//      document — because a toy figure exercises none of the paths that have
+//      historically broken.
 //
 // Run: node integrations/mcp-server/test.js   (npm run gate:mcp)
 const assert = require('node:assert');
@@ -26,6 +27,7 @@ const { handle, TOOLS, HANDLERS } = require('./server.js');
 
 const TCP = path.join(ROOT, 'examples', 'showcase', 'tcp-handshake.fd');
 const BFD = path.join(ROOT, 'examples', 'statechart', 'bfd-session.fd');
+const SEQ = path.join(ROOT, 'examples', 'sequence', 'dhcp-lease.fd');
 
 let n = 0;
 function ok(what) { n++; console.log('  ok  ' + what); }
@@ -238,6 +240,28 @@ function testRead() {
   assert.ok(b.includes('figdown 0.2 statechart'), 'reads a 0.2 experimental genre:\n' + b.slice(0, 300));
   ok('read bfd-session.fd: figdown 0.2 statechart, the experimental surface');
 
+  // The sequence ladder, and it is not just a third genre to tick off. Its
+  // model has ZERO nodes and ZERO edges — a message is an occurrence in time,
+  // not an edge (SEQUENCE-ORDER-MODEL) — so a reader written against the scene collections
+  // reports a fifteen-message exchange as an empty figure and looks right
+  // doing it. That is the failure this case exists to catch.
+  const q = call('figdown_read', { path: SEQ });
+  const qt = joined(q);
+  assert.ok(!q.isError);
+  assert.ok(qt.includes('figdown 0.4 sequence'), 'reads a 0.4 experimental genre:\n' + qt.slice(0, 300));
+  const qm = JSON.parse(qt.slice(qt.indexOf('[\n')))[0];
+  assert.strictEqual(qm.nodes.length, 0, 'a ladder declares no nodes');
+  assert.strictEqual(qm.edges.length, 0, 'a message is NOT an edge (SEQUENCE-ORDER-MODEL) — `edges` must stay empty');
+  assert.ok(qm.lifelines.length >= 2 && qm.messages.length >= 5,
+    'the ladder\'s own collections carry the figure');
+  assert.ok(qm.messages.every(m => m.line), 'every message carries its source line — the order IS the model');
+  assert.ok(/\[[^\]]*\d+ lifelines[^\]]*\d+ messages/.test(qt),
+    'the section-shape line must NAME the ladder collections, not report "[N classes]" and nothing else');
+  assert.ok(qt.includes('`sequence` SECTION'),
+    'the reading contract gains the line that inverts two of its own rules for this genre');
+  ok('read dhcp-lease.fd: figdown 0.4 sequence, 0 nodes, 0 edges, '
+    + qm.lifelines.length + ' lifelines, ' + qm.messages.length + ' messages, shape line and contract both adapted');
+
   // An SVG that FigDown did not make has no meaning to recover.
   const foreign = call('figdown_read', { source: '<svg xmlns="http://www.w3.org/2000/svg"></svg>' });
   assert.strictEqual(foreign.isError, true);
@@ -256,6 +280,12 @@ function testReference() {
   // instead of breaking in an agent's context as an empty answer.
   const genres = [...idx.matchAll(/^ {2}([a-z]+) +-> /gm)].map(m => m[1]);
   assert.ok(genres.length >= 7, 'the router listed only ' + genres.length + ' genres');
+  // Named rather than counted: a genre lands by getting a router row, and the
+  // newest one is the row most likely to be forgotten. `sequence` is checked by
+  // name because a count would still pass if it were missing and a task file
+  // were added in the same release.
+  assert.ok(genres.includes('sequence'),
+    'the router must route `sequence` — it landed; listed: ' + genres.join(', '));
   for (const g of genres) {
     for (const exp of [false, true]) {
       const r = call('figdown_reference', { name: g, experimental: exp });
@@ -278,7 +308,15 @@ function testReference() {
   assert.ok(skill.includes('SKILL.md') && skill.includes('CLOSED'));
   ok('reference name:"skill" -> SKILL.md, which states the grammar is closed');
 
-  const bad = call('figdown_reference', { name: 'sequence' });
+  // The unknown-name probe was `sequence` until this release, when the genre
+  // landed its vocabulary and its router row and the probe started asking for
+  // a file that exists. That is the hazard of naming a PLAUSIBLE absent genre:
+  // it becomes present. `swimlane` is chosen instead because it is a construct
+  // this project has explicitly recorded as NOT a genre — a swimlane is the
+  // open question inside `flowchart`, never a header token — so the probe
+  // cannot go stale the same way, and a release that made it stale would be
+  // one that ought to break a test.
+  const bad = call('figdown_reference', { name: 'swimlane' });
   assert.strictEqual(bad.isError, true);
   assert.ok(joined(bad).includes('Genres:'), 'an unknown name is told what does exist');
   ok('reference for a genre that does not exist -> isError naming the ones that do');

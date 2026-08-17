@@ -1,0 +1,59 @@
+{
+  "suite_version": "1.0.0",
+  "run": {
+    "utc": "2026-08-16T06:15:12Z",
+    "model_alias": "sonnet",
+    "model_used": "claude-sonnet-5",
+    "cli": "2.1.233 (Claude Code)",
+    "condition": "syntax",
+    "reader": 1
+  },
+  "figure": {
+    "id": "l2-forwarding-logic",
+    "genre": "flowchart",
+    "path": "examples/showcase/l2-forwarding-logic.fd",
+    "file_sha256": "6b04f220f6f2037c5c0be2a29e6e5c588a48f19f299db0083a166fbbedb489fd",
+    "title_shown": null,
+    "presented_sha256": "5eef59a0f77fd537b2fcec4742a6bdd91ab7e5b62e7f6b595b39fbb37ed72079",
+    "presented_lines": 29,
+    "presented_chars": 1003
+  },
+  "prompt": {
+    "system_sha256": "1a78658262dc29e7e24cbe3e1eb72659cf31990e85deddacf0b1625e40c5eac2",
+    "user_sha256": "c8eed2937da109270c56e8e533a03a682874e1d4063db76d7427f5c880cc0d82",
+    "question_set_sha256": "a604d5c723d46b4c63b011304321063060dee58e1fe59a861cda229e93644ed5"
+  },
+  "cold_room": {
+    "cwd": "an isolated empty temporary directory outside the repository",
+    "tools_offered": "none — every tool denied by name",
+    "mcp_servers": "none",
+    "settings": "safe-mode: no project or user settings, no memory file, no skills, no plugins, no hooks",
+    "session_persistence": false,
+    "shown": "the system prompt, the presented file text, and the questions — nothing else",
+    "not_shown": "the specification, any genre document, any other .fd file, the file name, the name of the language, the repository"
+  },
+  "integrity": {
+    "turns": 1,
+    "permission_denials": 0,
+    "tool_calls_observed": false,
+    "is_error": false
+  },
+  "usage": {
+    "cost_usd": 0.016839,
+    "input_tokens": 2,
+    "output_tokens": 619,
+    "cache_creation_input_tokens": 1258,
+    "duration_ms": 7059
+  },
+  "raw_answer_text": "A1: The switch learns from the source address of every frame it receives, since the flow shows wire → learn → lookup, meaning learning happens before and independent of the destination lookup/forwarding outcome.\nA2: It associates the source MAC address (SA) with the ingress port.\nA3: Whether the destination MAC address is found as a single entry in the MAC table (a \"hit\") determines forwarding to one port; if not found, the switch floods.\nA4: The switch floods the frame to every port in the VLAN; the ingress port is always excluded.\nA5: NOT STATED\nA6: A switch filters (discards) a frame when the entry is found in the table and the looked-up egress port is the same as the ingress port.\nA7: NOT STATED beyond the general rule: before learning, the \"hit\" decision is \"no\" so the frame is flooded to all ports except ingress; once learned, the \"hit\" is \"yes\" and the frame is forwarded to the single learned port instead (unless that port equals the ingress port, in which case it is filtered).\nA8: NOT STATED",
+  "answers": {
+    "q1": "The switch learns from the source address of every frame it receives, since the flow shows wire → learn → lookup, meaning learning happens before and independent of the destination lookup/forwarding outcome.",
+    "q2": "It associates the source MAC address (SA) with the ingress port.",
+    "q3": "Whether the destination MAC address is found as a single entry in the MAC table (a \"hit\") determines forwarding to one port; if not found, the switch floods.",
+    "q4": "The switch floods the frame to every port in the VLAN; the ingress port is always excluded.",
+    "q5": "NOT STATED",
+    "q6": "A switch filters (discards) a frame when the entry is found in the table and the looked-up egress port is the same as the ingress port.",
+    "q7": "NOT STATED beyond the general rule: before learning, the \"hit\" decision is \"no\" so the frame is flooded to all ports except ingress; once learned, the \"hit\" is \"yes\" and the frame is forwarded to the single learned port instead (unless that port equals the ingress port, in which case it is filtered).",
+    "q8": "NOT STATED"
+  }
+}

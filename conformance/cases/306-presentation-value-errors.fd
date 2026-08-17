@@ -2,7 +2,7 @@ figdown 0.1 block
 # The value rules apply uniformly wherever an attribute is accepted: the
 # colour set and the style enum.
 #
-# There was a THIRD rule here until this release — `plane=` naming a declared
+# There was a THIRD rule here until 0.3 — `plane=` naming a declared
 # plane, which answered `unknown plane "ghost"`. That diagnostic no longer
 # exists: `plane=` was withdrawn with the `plane` keyword (`PAINT-ORDER-CONSTRUCT`), so there is
 # no plane to name and no name to get wrong, and the key is now refused

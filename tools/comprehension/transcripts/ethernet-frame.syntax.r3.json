@@ -1,0 +1,59 @@
+{
+  "suite_version": "1.0.0",
+  "run": {
+    "utc": "2026-08-16T06:08:40Z",
+    "model_alias": "sonnet",
+    "model_used": "claude-sonnet-5",
+    "cli": "2.1.233 (Claude Code)",
+    "condition": "syntax",
+    "reader": 3
+  },
+  "figure": {
+    "id": "ethernet-frame",
+    "genre": "table",
+    "path": "examples/showcase/ethernet-frame.fd",
+    "file_sha256": "cea7edf7194cecc134d020ca1fa4485c800da36439756602bddf7744632aafa4",
+    "title_shown": null,
+    "presented_sha256": "cfea82fa40e97a0ab17eefa0be4873916fd3051ddec3eba8429e49ceaf2d33f2",
+    "presented_lines": 15,
+    "presented_chars": 865
+  },
+  "prompt": {
+    "system_sha256": "1a78658262dc29e7e24cbe3e1eb72659cf31990e85deddacf0b1625e40c5eac2",
+    "user_sha256": "73f66d7654fb5ba43fe6c67cee3c9a3d054e15e6450b6976928442d237309a2a",
+    "question_set_sha256": "fdc8a2c35eef34d6fee5f0fb0d0ad3794fd320e61d5e8546a1895288968d398e"
+  },
+  "cold_room": {
+    "cwd": "an isolated empty temporary directory outside the repository",
+    "tools_offered": "none — every tool denied by name",
+    "mcp_servers": "none",
+    "settings": "safe-mode: no project or user settings, no memory file, no skills, no plugins, no hooks",
+    "session_persistence": false,
+    "shown": "the system prompt, the presented file text, and the questions — nothing else",
+    "not_shown": "the specification, any genre document, any other .fd file, the file name, the name of the language, the repository"
+  },
+  "integrity": {
+    "turns": 1,
+    "permission_denials": 0,
+    "tool_calls_observed": false,
+    "is_error": false
+  },
+  "usage": {
+    "cost_usd": 0.0043455,
+    "input_tokens": 2,
+    "output_tokens": 265,
+    "cache_creation_input_tokens": 0,
+    "duration_ms": 3211
+  },
+  "raw_answer_text": "A1: In an untagged frame, the EtherType field comes immediately after the Source Address field.\nA2: Each is 6 bytes long.\nA3: The 802.1Q tag is inserted after the Source Address and before the EtherType/Length field.\nA4: 4 bytes.\nA5: NOT STATED\nA6: 0x8100 (TPID).\nA7: 46–1500 bytes.\nA8: NOT STATED",
+  "answers": {
+    "q1": "In an untagged frame, the EtherType field comes immediately after the Source Address field.",
+    "q2": "Each is 6 bytes long.",
+    "q3": "The 802.1Q tag is inserted after the Source Address and before the EtherType/Length field.",
+    "q4": "4 bytes.",
+    "q5": "NOT STATED",
+    "q6": "0x8100 (TPID).",
+    "q7": "46–1500 bytes.",
+    "q8": "NOT STATED"
+  }
+}

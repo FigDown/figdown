@@ -1,0 +1,275 @@
+# FigDown — figures as text. Spec: https://github.com/FigDown/figdown
+
+figdown 0.4 sequence
+title "DHCP lease acquisition, renewal and release (RFC 2131 §3.1, §4.4)"
+
+# ── What this figure is ─────────────────────────────────────────────
+# The whole life of one DHCP lease, from a client with no address to
+# the DHCPRELEASE that gives it back: the four-message acquisition of
+# RFC 2131 §3.1 (drawn as Figure 3, "Timeline diagram of messages
+# exchanged between DHCP client and servers when allocating a new
+# network address"), the address check of §4.4.1, and the T1/T2
+# reacquisition cycle of §4.4.5. The per-client state names are the
+# ones RFC 2131 §4.4 Figure 5 uses.
+#
+# THIS IS THE `sequence` GENRE'S guide/showcase.md FIGURE, chosen the way
+# `tcp-state-machine.fd` was chosen for the state figures: one real,
+# well-known protocol exchange that exercises essentially every
+# construct the genre has, so a reader sees the whole genre at work on
+# one page. All five keywords appear (`lifeline` `message` `state`
+# `fragment` `operand`), four of the twelve operators (`loop` `par`
+# `alt` `opt`), all three message operators, `in=` on ALL FIVE of its
+# acceptors — message, operand, lifeline, state and fragment — a state
+# INSIDE a fragment, and one level of fragment nesting — twice.
+#
+# WHY THIS FIGURE IS A `sequence` AND NOT A `statechart`. The corpus
+# already holds examples/statechart/dhcp-client.fd — the SAME protocol,
+# and correctly a statechart, because its subject is one machine's
+# modes and the lines between them are TRANSITIONS. This figure's
+# subject is three participants exchanging messages in time, and the
+# lines between them are MESSAGES. The many lines running between this
+# client and one server are the same pair exchanging DISCOVER / OFFER /
+# REQUEST / ACK / REQUEST / ACK / RELEASE over time, so a scene genre
+# would fan seven edges into one span; the statechart's many lines back
+# to INIT are DIFFERENT transitions of one machine and stay where they
+# are. It is not a `topology` either: `topology` reads a repeated node
+# pair as parallel LINKS, so a reading agent would answer "seven links
+# join the client and the server", which is wrong and carries nothing
+# to warn the reader.
+#
+# THE SOURCE FIGURE, AND WHERE THIS ONE GOES FURTHER. RFC 2131
+# Figure 3's three columns are, left to right, "Server (not selected)",
+# "Client", "Server (selected)" — the first three lifelines below are
+# that order, because under this genre declaration order IS column
+# order. Figure 3 draws the acquisition only; §4.4.5's reacquisition
+# and §4.4.1's address check are prose in the RFC, and are drawn here.
+# The fourth lifeline is not in Figure 3 at all and is declared last so
+# that the RFC's own three columns keep their order.
+#
+# DIRECTION IS WRITTEN FROM THE CLIENT'S SIDE, consistently: what the
+# client SENDS is `message c -> …` and what it RECEIVES is
+# `message c <- …`. Both spellings draw the same arrow the same way;
+# writing them consistently is what makes the ladder scannable.
+
+# ── HONEST LIMIT — a message is ONE instant ─────────────────────────
+# Every message below is one row: it has no send event and no separate
+# receive event, so the figure cannot say that a DHCPDISCOVER left the
+# client before the DHCPOFFER that answers it was even formed, and it
+# cannot draw propagation delay, overtaking, or a message still in
+# flight when the next one leaves. UML gives a Message two occurrence
+# specifications and draws the arrow sloped when the gap matters; this
+# genre draws one horizontal row per message. Nothing in this protocol
+# needed the distinction — but a figure about a slow link, or about two
+# messages crossing on the wire, could not be drawn here at all.
+#
+# ── HONEST LIMIT — no GeneralOrdering, so `par` is all-or-nothing ────
+# Order in this genre is TOTAL: source order is time order. The one
+# escape is `type=par`, and it unorders EVERY pair inside it. UML's
+# escape from that is a GeneralOrdering — a constraint that re-orders
+# one chosen pair inside an otherwise unordered region — and this genre
+# deliberately does not spell it. The `offers` fragment below is where
+# it would be wanted: the two DHCPOFFERs genuinely have no relative
+# order, but if a figure wanted to say "A's offer may arrive before or
+# after B's, EXCEPT that both arrive before the DHCPREQUEST", the
+# second half of that sentence has no spelling. Here the containing
+# order gives it, so nothing is lost in THIS figure; a figure with two
+# interleaved concurrent exchanges would lose it.
+#
+# ── HONEST LIMIT — a lifeline's states are ONE sequence ─────────────
+# `state c "INIT"` appears in the `refused` operand, because RFC 2131
+# Figure 5 sends REQUESTING back to INIT on DHCPNAK. The DHCPDECLINE
+# path of §3.1 item 5 ALSO returns the client to INIT, and it cannot be
+# drawn as a state as well: a lifeline's state occurrences are read as
+# one sequence in document order, so a second INIT reads as restating a
+# state that has not changed and is refused as such. The two paths are
+# mutually exclusive in TIME — only one of them ever happens — and the
+# language has no way to say that two occurrences are alternatives
+# rather than neighbours. So the DHCPDECLINE restart travels in that
+# message's `description=` and the DHCPNAK restart is drawn.
+# The same shape has a second consequence a reader must carry: the
+# state drawn after a fragment follows whichever operand ran, and the
+# picture cannot mark which.
+#
+# ── HONEST LIMIT — a meaning-only class puts no ink on the page ────
+# `class dropped "Sent, never delivered"` declares no paint, so the
+# legend prints the MEANING and no swatch, and the message that joins
+# it is drawn exactly like a message that arrived. The fact is in the
+# source, in the legend and in that message's `description=`; what the
+# PICTURE alone cannot say is WHICH message it was. A reader of the
+# `.fd` gets it, a reader of the `.svg` gets the sentence without its
+# subject. That is the price of carrying the fact in a class, and it is
+# stated here rather than left for a reader to notice.
+#
+# ── HONEST LIMIT — fan-out: one broadcast, drawn as N messages ──────
+# DHCPDISCOVER and the broadcast DHCPREQUEST are ONE datagram that
+# every server on the subnet receives, and Figure 3 draws that with a
+# single fanning glyph. FigDown has no fan-out construct, so each
+# broadcast is written as one message per recipient, and the `bcast`
+# class is what tells a reader they are one datagram. Mermaid cannot
+# draw it either, so it is a real-figure gap and not a coverage gap.
+#
+# ── HONEST LIMIT — Figure 3's floating captions are not drawn ───────
+# Figure 3 writes "Determines configuration", "Collects replies",
+# "Selects configuration" and "Commits configuration" as captions
+# floating on a lifeline with NO arrow. There is no spelling for an
+# event with no arrow, and a self-message would draw an arrow the RFC
+# does not draw. They survive as `description=` prose on the
+# neighbouring messages.
+#
+# ── HONEST LIMIT — causal attribution ───────────────────────────────
+# The figure asserts that the client's state changed at a POINT in the
+# exchange; it does not assert that the change was CAUSED by the
+# message before it. That needs an annotation key aimed at a message,
+# and a message has no id to aim at.
+#
+# ── HONEST LIMIT — `in=` on the fourth lifeline is model-only ───────
+# `lifeline h … in=conflict` says that participant exists only inside
+# the address-conflict fragment, and the model records it. The drawing
+# does not shorten the column: h's dashed lifeline runs the full height
+# of the figure like every other. A reader who wants that fact reads it
+# from the source, which is the half of "one source, two readers" this
+# figure can still keep.
+
+# ── Semantic classes — the meaning behind every stroke ──────────────
+# A reading agent queries these to group messages by role; the colour
+# is only presentation, the meaning is the label. Every stroke in this
+# figure carries a keyed meaning.
+class bcast   "Broadcast to 255.255.255.255 — ONE datagram that every DHCP server on the subnet receives; drawn once per recipient because FigDown has no fan-out (RFC 2131 §4.1)" stroke=#2563eb
+class offer   "Server's unsolicited offer of configuration parameters; the server need not reserve the address it offers (RFC 2131 §3.1 item 2)" stroke=#0891b2
+class commit  "Server commits the binding to persistent storage and confirms it (RFC 2131 §3.1 item 4)" stroke=#16a34a
+class refuse  "Refusal or conflict — the client's notion of its address is wrong, or the address is already in use (RFC 2131 §3.1 items 4-5)" stroke=#dc2626 style=dashed
+class unicast "Addressed to one server only, using the address the client already holds (RFC 2131 §4.4.4)" stroke=#9333ea
+class probe   "The client's own check on the link before it trusts the address (RFC 2131 §4.4.1)" stroke=#b45309 style=dashed
+# The meaning-only class: it declares NO paint at all, so it adds no
+# swatch and cannot collide with any other entry — it puts its MEANING
+# in the legend and nothing else. This is the idiom for a message that
+# was sent and never delivered: the class carries the fact, and the
+# per-message reason goes in `description=`. The message below joins it
+# alongside `unicast`, so the stroke says how it was addressed and this
+# says what became of it.
+class dropped "Sent, never delivered"
+
+# ── The participants — RFC 2131 Figure 3's own column order ─────────
+# "not selected" / "selected" are Figure 3's own captions and describe
+# the ACQUISITION only: under §4.4.5 REBINDING, ANY server may extend
+# the lease, and below it is server A that does.
+lifeline sa "DHCP server A\n(not selected)"
+lifeline c  "DHCP client"
+lifeline sb "DHCP server B\n(selected)"
+# Not in Figure 3: the host that already holds 192.0.2.44, which is why
+# the address check of §4.4.1 finds a conflict at all. It takes part in
+# nothing outside that check, and `in=` says so.
+lifeline h  "Host already\nusing the address" in=conflict
+
+# ═══ Acquisition — RFC 2131 §3.1, drawn as Figure 3 ═════════════════
+
+# §4.4.1: "The client begins in INIT state and forms a DHCPDISCOVER
+# message." Figure 5 names the state.
+state c "INIT"
+
+# §3.1 item 1 + §3.1 item 3: "The client times out and retransmits the
+# DHCPDISCOVER message if the client receives no DHCPOFFER messages",
+# under the randomized exponential backoff of §4.1 (4s, 8s, … 64s).
+fragment discover "until a DHCPOFFER arrives — randomized exponential backoff, §4.1" type=loop
+message c -> sa "DHCPDISCOVER  xid=0x3d1f" in=discover class=bcast
+message c -> sb "DHCPDISCOVER  xid=0x3d1f" in=discover class=bcast description="ciaddr=0, chaddr = the client's hardware address; the client waits 1-10s before the first send to desynchronize startup (§4.4.1)"
+# THE STATE SITS INSIDE THE LOOP, which is where §4.4.1 puts it:
+# Figure 5's arc out of INIT is labelled "/Send DHCPDISCOVER", so the
+# client is already in SELECTING for every retransmission after the
+# first. Drawn here, the box says the retransmissions happen in
+# SELECTING and not in INIT.
+state c "SELECTING" in=discover
+
+# §3.1 item 2: "Each server may respond with a DHCPOFFER message." The
+# two replies have no relative order, which is what `par` says and the
+# total order otherwise forbids. Figure 3's "Determines configuration"
+# caption sits here on both server lifelines.
+fragment offers "each server may respond; the two replies have no relative order, §3.1 item 2" type=par
+operand oa "server A" in=offers
+message c <- sa "DHCPOFFER  yiaddr=192.0.2.10" in=oa class=offer
+operand ob "server B" in=offers
+message c <- sb "DHCPOFFER  yiaddr=192.0.2.44" in=ob class=offer description="lease=3600s, T1=1800s, T2=3150s; the server SHOULD check the address is not already in use, e.g. by an ICMP Echo Request (§3.1 item 2)"
+
+# §3.1 item 3: the client collects the offers, selects one, and
+# BROADCASTS the DHCPREQUEST — so the server it did not select also
+# receives it and reads it as a declined offer (§3.1 item 4).
+message c -> sa "DHCPREQUEST  server-id=B" class=bcast description="server A reads this as a declined offer and may return 192.0.2.10 to the pool (§3.1 item 4)"
+message c -> sb "DHCPREQUEST  server-id=B" class=bcast description="requested-ip=192.0.2.44, and the same 'secs' value and broadcast address as the DHCPDISCOVER, so every relay agent forwards it to the same servers (§3.1 item 3)"
+state c "REQUESTING"
+
+# §3.1 item 4: the selected server either commits the binding and
+# answers DHCPACK, or "SHOULD respond with a DHCPNAK message" if it
+# cannot satisfy the request.
+fragment commit "can the selected server still satisfy the request?  §3.1 item 4" type=alt
+operand granted "yes — the server commits the binding" in=commit
+message c <- sb "DHCPACK  yiaddr=192.0.2.44" in=granted class=commit description="the server commits the binding to persistent storage; 'yiaddr' carries the selected address and the lease options carry T1 and T2 (§3.1 item 4)"
+# THE STATE SITS INSIDE THE BRANCH THAT EARNED IT. §4.4.1: "Once the
+# DHCPACK message from the server arrives, the client is initialized
+# and moves to BOUND state." Only this operand reaches BOUND, and the
+# operand box is what says so.
+state c "BOUND" in=granted
+
+# §3.1 item 5 / §4.4.1: "The client SHOULD perform a final check on the
+# parameters (e.g., ARP for allocated network address)." This is the
+# nested fragment — one level, which is the whole of this genre's
+# containment — and the only genuinely OPTIONAL part of the exchange.
+fragment conflict "only if the address turns out to be in use, §3.1 item 5" type=opt in=granted
+# `<->` is ONE occurrence, not two: an exchange in both directions
+# whose individual messages are not enumerated. That is exactly what
+# this is — an ARP request broadcast with sender-ip 0.0.0.0 (so other
+# ARP caches are not confused) and the ARP reply that comes back from
+# whoever holds the address. Both are messages of another protocol, and
+# RFC 2131 does not enumerate them; it says only that the check is
+# performed and what the client does when it fails.
+message c <-> h "ARP: who-has 192.0.2.44 — and the reply" in=conflict class=probe description="the client broadcasts with sender-ip 0.0.0.0; a reply means the address is already in use (§4.4.1)"
+# §3.1 item 5: the client "MUST send a DHCPDECLINE message to the
+# server and restarts the configuration process", waiting at least ten
+# seconds first.
+message c -> sb "DHCPDECLINE  requested-ip=192.0.2.44" in=conflict class=refuse description="the client waits at least 10s and then restarts the configuration process from INIT (§3.1 item 5); that INIT is carried here and not drawn, because a lifeline's state occurrences are read as one sequence and this path and the DHCPNAK path both end there"
+
+operand refused "no — the address is not available" in=commit
+message c <- sb "DHCPNAK" in=refused class=refuse description="the selected server cannot satisfy the request; Figure 5 sends REQUESTING back to INIT on DHCPNAK (§4.4.5)"
+state c "INIT" in=refused
+
+# ═══ Reacquisition — RFC 2131 §4.4.5 ════════════════════════════════
+
+# §4.4.5 is a CYCLE, and it is drawn as one: every lease held long
+# enough runs T1 → T2 → reacquisition and then runs it again, with the
+# three state changes that are the whole point of the renewal half
+# INSIDE the box. The T1 and T2 firings are in the message labels
+# themselves, because vertical distance in this genre carries no
+# duration and a reader has nowhere else to get the numbers.
+fragment renew "the reacquisition cycle — a renewed lease runs it again, §4.4.5" type=loop
+operand held "while the client holds the lease" in=renew
+# §4.4.5: "T1 is the time at which the client enters the RENEWING state
+# and attempts to contact the server that originally issued the
+# client's network address."
+state c "RENEWING" in=held
+# The DHCPREQUEST is unicast to the server that issued the lease and
+# MUST NOT carry a 'server identifier' option (§4.4.5). It joins two
+# classes: `unicast` for how it was addressed, `dropped` for what
+# became of it — the meaning-only class that says it was sent and never
+# delivered, with the per-message reason here in `description=`.
+message c -> sb "DHCPREQUEST  ciaddr=192.0.2.44 — unicast at T1, 0.5 x the lease (1800s)" in=held class=unicast,dropped description="server B is unreachable; no DHCPACK arrives, which is what makes T2 fire (§4.4.5)"
+
+# §4.4.5: "If no DHCPACK arrives before time T2, the client moves to
+# REBINDING state and sends (via broadcast) a DHCPREQUEST message to
+# extend its lease." The second nesting, one level inside the loop's
+# operand: the whole T2 half happens only when T1 went unanswered.
+fragment rebind "only if no DHCPACK arrived before T2 — 0.875 x the lease (3150s), §4.4.5" type=opt in=held
+state c "REBINDING" in=rebind
+message c -> sa "DHCPREQUEST  ciaddr=192.0.2.44 — broadcast at T2" in=rebind class=bcast
+message c -> sb "DHCPREQUEST  ciaddr=192.0.2.44 — broadcast at T2" in=rebind class=bcast description="broadcast so that ANY server may extend the lease; this is why server A, which was not selected in §3.1, can answer it"
+# §4.4.5: "The client has successfully reacquired its network address,
+# returns to BOUND state and may continue network processing."
+message c <- sa "DHCPACK  lease=3600s" in=rebind class=commit description="the binding server is now A (§4.4.5)"
+state c "BOUND" in=rebind
+
+# ═══ Release — RFC 2131 §3.1 item 6 and §4.4.6 ══════════════════════
+
+# Figure 3's "Graceful shutdown" caption sits here. §4.4.6 notes that
+# "the correct operation of DHCP does not depend on the transmission of
+# DHCPRELEASE messages", which is why this is the last thing drawn and
+# not a required one.
+message c -> sa "DHCPRELEASE  ciaddr=192.0.2.44" class=unicast description="Figure 3 captions the server side 'Discards lease'"
+state c "INIT"

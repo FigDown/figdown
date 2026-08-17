@@ -9,5 +9,8 @@
 # LANG_VERSIONS, and this fixture moved on to `0.4` by the same rule. Expect
 # this line to move once per `Y` bump for as long as the fixture exists; that
 # is the fixture working, not rotting.
-figdown 0.4 block
+# `SEQUENCE-GENRE-VOCABULARY`: and again. The `sequence` genre token is language
+# surface, so it moved the language number 0.3 → 0.4 by the same core §13.0
+# rule, `0.4` joined LANG_VERSIONS, and this fixture moved on to `0.5`.
+figdown 0.5 block
 node a "A"

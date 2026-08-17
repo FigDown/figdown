@@ -307,7 +307,12 @@ function toolRead(args) {
   const shape = docs.map((d, i) =>
     '  section ' + (i + 1) + ': figdown ' + d.version + ' ' + d.genre
     + (d.title ? '  title ' + JSON.stringify(d.title) : '')
-    + '  [' + ['nodes', 'edges', 'groups', 'classes', 'blocks', 'boundaries']
+    // The collection list is per-genre, not scene-only: a `sequence` document
+    // carries no nodes and no edges (a message is NOT an edge — SEQUENCE-ORDER-MODEL), so a
+    // scene-only list reported a ladder of seventeen messages as "[3 classes]"
+    // and the shape line said nothing about the figure at all.
+    + '  [' + ['nodes', 'edges', 'groups', 'classes', 'blocks', 'boundaries',
+      'lifelines', 'messages', 'states', 'fragments', 'operands']
       .filter(k => Array.isArray(d[k]) && d[k].length)
       .map(k => d[k].length + ' ' + k).join(', ') + ']').join('\n');
 
@@ -327,7 +332,18 @@ function toolRead(args) {
     '    parsable — infer no participant, edge or category from them.',
     '  * Array order is not ranking or priority (§12.7).',
     '  * Everything below `layout` is geometry with no meaning. Skip it.',
-  ].join('\n');
+    // One conditional line. `sequence` is the single genre where two of the
+    // rules above read as false: it has no nodes and no edges, and its array
+    // order IS the figure's meaning. Adding it unconditionally would charge
+    // every other reader for a genre they are not holding.
+    docs.some(d => d.genre === 'sequence')
+      ? '  * THIS DOCUMENT HAS A `sequence` SECTION, where two of the rules above invert:\n'
+        + '    participants are `lifelines`, a `message` is an occurrence in time and NOT an\n'
+        + '    edge (which is why `edges` is empty), and `messages` ∪ `states` array order IS\n'
+        + '    the order of the exchange. A `state` names the condition its lifeline is in\n'
+        + '    from that point on. Nothing in the layout zone draws here.'
+      : null,
+  ].filter(Boolean).join('\n');
 
   const head = [
     'ok: true  ' + docs.length + ' section(s) in ' + s.label,
@@ -483,7 +499,7 @@ const TOOLS = [
     inputSchema: {
       type: 'object',
       properties: {
-        name: { type: 'string', description: 'A genre (block, bitfield, table, topology, flowchart, statechart, timing), a task (reading, transcribe), or "skill". Omit for the index.' },
+        name: { type: 'string', description: 'A genre (block, bitfield, table, topology, flowchart, statechart, timing, sequence), a task (reading, transcribe), or "skill". Omit for the index.' },
         experimental: { type: 'boolean', description: 'Include the genre\'s EXPERIMENTAL (experimental) files — outside the v0.1 conformance surface and its compatibility promise.' },
       },
     },

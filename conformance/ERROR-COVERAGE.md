@@ -140,6 +140,67 @@ by `907-errors-edge-form` (stem matching can miss special characters).
   it could be an `SCENE-KEYWORD-MEMBERSHIP` per-cell withdrawal and the message is provably
   arriving from the `PAINT-ORDER-CONSTRUCT` language-wide sweep. The two-hop chains are `334`
 
+### Diagnostics added or changed (`CLASS-CHANNEL-REACH`, `INTERIOR-LESS-ELEMENT-PAINT`)
+
+The class-channel check moved from `doc.edges` alone to **all ten collections
+that accept `class=`**, tested against the channel set each member's DRAWING
+reads. One diagnostic family generalises, one is new, and **one is RETIRED**.
+
+| message (leading text) | pinned by |
+|---|---|
+| `class "<id>" sets fill= but no stroke=, and <a member> has no interior — add stroke= to the class …` — `INTERIOR-LESS-ELEMENT-PAINT`'s own message, unchanged in shape and now naming the member. Reaches `message`, `fragment` and `operand` at this release | `293-class-channel-per-member` (the `edge` wording, normative), `experimental/293-sequence-class-channel` (all three sequence members in one document — they reach the model by three different parse paths) |
+| `class "<id>" declares only <key>=, and <a member> has no such channel — add fill= or stroke= to the class …` — NEW at 0.4. The general form of the same rule: a class whose channels are ALL channels the member lacks. Reachable today on `field` and `cell`, whose two-channel set dates from `STYLE-KEY-SCOPE` | `293-class-channel-per-member` (a `style=`-only class on a `field` and on a `cell`) |
+| ~~`class "<id>" declares no channel an edge has — add stroke= (an edge has only stroke= and style=: no interior …)`~~ — **RETIRED at 0.4 (`CLASS-CHANNEL-REACH`).** `CLASS-PAINT-REQUIREMENT`'s second half made a class that declares NO paint a line error when an `edge` joined it; it is legal on every member from this release, on the ground that the same release which raised it had already made the derived legend draw such a class's meaning with no swatch | *(no longer emitted)* |
+
+**The retired message was never covered by a fixture, and that is a finding in
+its own right.** `grep "no channel an edge" conformance/` returned nothing: the diagnostic shipped, stood for fifty-seven
+increments, and no golden ever recorded its text — so a second implementation
+had no way to learn it and §8.2's hole was already open here. Nothing re-pins
+now, which is why the retirement costs no fixture edit; the LEGALISATION it
+creates is pinned instead, positively, in three places: a meaning-only class
+joined by an `edge` in `293-class-channel-per-member` (no error line for it),
+and the model goldens `experimental/294-sequence-class-meaning-only` and
+`experimental/283-sequence-message-model`.
+
+**Nine of the ten collections were unchecked before this release**, so the
+generalisation is the fix for a whole class of silence rather than one
+message: `class k "K" fill=#eee` plus `message c -> s "m" class=k` parsed
+clean, painted nothing of the fill, and drew the class in the
+legend. Members with all three channels (`node`, `group`, `lifeline`, `state`)
+can never fail either form, and no fixture pretends otherwise.
+
+### Diagnostics added or changed (`SEQUENCE-GENRE-VOCABULARY`)
+
+The `sequence` genre got its five keywords, its allowlist row and its three
+refusals. **Six new diagnostic families**, and one existing family reached a
+fourth genre.
+
+The families that are NEW rather than reused are the two REFUSAL ones. A
+refusal is not a withdrawal and not an unknown word: the genre never declared
+the spelling, so the `SCENE-KEYWORD-MEMBERSHIP` message (*"it was WITHDRAWN from this genre"*) would
+state a migration that did not happen and would date it to a release nothing
+changed in. They are therefore separate tables in the engine
+(`REFUSED_IN`, `REFUSED_OPT_IN`) with their own message builders, and every
+existing `SCENE-KEYWORD-MEMBERSHIP`/`MEMBERSHIP-KEY-ACCEPTANCE` message is byte-unchanged.
+
+| message (leading text) | pinned by |
+|---|---|
+| `"<kw>" is not allowed in genre <g> — this genre REFUSED it, it is not a typo and not a withdrawal: …` — the KEYWORD refusal, one cell per ruling, each giving the ground and the spelling that works instead. `gap` (`SEQUENCE-TIME-GAP`) is consulted BEFORE the typed-block-child exemption, because it is both a `timing` child keyword and a refused word, and the child message would name the wrong reason | `289-sequence-refusals` — `group` (`SEQUENCE-PARTICIPANT-GROUPING`) and `gap` (`SEQUENCE-TIME-GAP`) |
+| `<key>= is not allowed in genre <g> — this genre REFUSED the key, it is not a typo and not a withdrawal: …` — the OPTION-KEY refusal, and the only diagnostic in the engine that fires for a key **not in `OPT_KEYS`**. That is the ruling working: refusing `lost=` means adding no key, so the message rides the UNKNOWN-OPTION path in `badOpts` and in the connector scanner rather than the inapplicable-key path | `289-sequence-refusals` — `lost=` (`UNDELIVERED-MESSAGE-MARKING`), written on a `message`, which is scanned by `parseEdgeLine` and therefore needs its own copy of the check |
+| `fragment needs type=<operator> — a fragment with no interaction operator asserts nothing (alt\|opt\|…\|break, UML 2.5.1 §17.12.15.3). UML defaults the attribute to seq and FigDown does not …` and `unknown interaction operator "<v>" — write one of …` — the MANDATORY-key and the ENUM diagnostics for `type=` on `fragment`. Both name **§17.12.15.3**; the draft's earlier §17.6.2 is registered FALSE (`spec/standards-claims.tsv` S024) and is printed nowhere | `287-sequence-fragment-type`, which also pins `type="alt"` reaching the existing RULE 2.4 bare-value message and `operand needs in=<fragment-id>` |
+| `unknown fragment or operand "<v>" — in= on a <what> names the fragment or operand this <what> occurs inside[, and "<v>" is a LIFELINE …]. Under sequence in= is accepted on message, operand, lifeline, state and fragment — five acceptors, all sense 1 …` — the `in=` OBJECT rule (`SEQUENCE-CONTAINMENT-SCOPE`). One builder for all five acceptors, because it is one rule; the lifeline clause is added only when the value resolves to one, which is the mistake an author actually makes | `286-sequence-in-errors`; the accepting direction is a MODEL golden, `285-sequence-in-acceptors`, which writes `in=` on all five |
+| `fragment "<id>" nests <n> levels deep (inside "<a>", inside "<b>") — fragment nesting is capped at ONE level in v1 …` — the NESTING CAP (`SEQUENCE-CONTAINMENT-SCOPE`), new at this increment and absent from the prototype. The message says the cap is the v0.1 `group` precedent and a SCOPE decision rather than a principle, so an author knows what would reopen it | `288-sequence-nesting-and-contiguity` |
+| `Line <n>: this <kind> line splits <fragment\|operand> "<id>" (lines <a>–<b>) — members must be CONTIGUOUS in declaration order …` — the CONTIGUITY rule, ported from the prototype. One offending line is reported ONCE, against the DEEPEST container it splits, because that is the container whose `in=` repairs the document | `288-sequence-nesting-and-contiguity` |
+| `message needs a direction: -> <- <-> — a Message has a sending event occurrence AND a receiving event occurrence (UML 2.5.1 §17.4.3.1 …)` — `--` is a line error in THIS genre and legal in every other | `290-sequence-message-direction`, whose second section is the KEEP half: `edge a -- b` under `block` still parses |
+| `"<surf>" is not the word genre <g> uses for this — write "<want>": …` — the `GENRE-CONNECTOR-SPELLING`/`GENRE-NODE-SPELLING` family, reaching a FOURTH genre. Not a new literal; what changed is the summary list at the end, which said *"Each scene genre …"* and enumerated three genres. A list that omits a live genre under-reports, so it now reads *"Each genre …"* and names `sequence lifeline message` | `284-sequence-wrong-word`, both directions. Four existing goldens carry the new tail: `226`, `227`, `234`, `238` |
+| `"<kw>" is not allowed in genre sequence` — the PLAIN allowlist message, for `flow`, `rank` and the region openers. These are NOT refusals with rulings of their own: `flow`/`rank` are absent as a CONSEQUENCE of both axes being declaration-ordered (draft §7), and the region openers are an OPEN question rather than a no | `291-sequence-flow-rank-refused`; `282-sequence-vocabulary-scoped` for the openers, and for the other direction — `fragment`/`operand` under `block` |
+
+**Positive coverage** (model goldens, no diagnostic): `283-sequence-message-model`
+(all three operators and every channel a message has, with `edges` staying
+empty), `285-sequence-in-acceptors` (all five `in=` acceptors),
+`292-sequence-declaration-order` (the total order, recorded only as per-element
+`line` and array order).
+
 ### Diagnostics added or changed (`SUBJECT-VOCABULARY-SCOPE`, `SCENE-KEYWORD-MEMBERSHIP`, `PAINT-ORDER-CONSTRUCT`)
 
 Subject vocabulary became **per genre** (`SUBJECT-VOCABULARY-SCOPE`), sixteen per-cell withdrawals
@@ -251,7 +312,8 @@ each with a fixture.
 | `note= draws and is not accepted on field; use description= for prose a machine reads. The two keys divide by AUDIENCE, not by length …` — the `field` REFUSAL, at EVERY version. `field` is listed in `DIRECTIVE_OPTS` as taking `note` for the sole purpose of reaching this message instead of the generic one. Emitted via a named constant, so the audit heuristic below cannot see it either | `803-note-on-field-refused` (under `0.3` and under `0.1`, same string); `479-bitfield-note-retired` — the 0.1 fixture, which SURVIVES under its old name with its subject changed from a retirement to a refusal |
 | `<directive> does not take note=` — the ORDINARY allowlist message, for the seven directives with no `note` row. Not a new literal; what is new is that these lines can never answer `unknown option "note="`, because the language now HAS the spelling | `804-note-refused-generic` — `cell`, `external`, `threshold`, `band`, `bundle`, `class`. There were SEVEN until 0.3; `plane` was the seventh and left the language (`PAINT-ORDER-CONSTRUCT`). The six now sit in three sections, because `SCENE-KEYWORD-MEMBERSHIP` leaves them in three genres |
 | `note= must be quoted: note="<v>" — whitespace also separates positionals …` — the existing `QUOTING-RULES` message, reaching a third prose key (after `description=` and `present=`) | `809-note-must-be-quoted` — `node`, `title`, and `edge`, which has its own option scanner and its own copy of the check |
-| `unsupported version "<v>" (expected 0.1 or 0.2 or 0.3)` — the enumeration widened when `LANG_VERSIONS` gained `0.3` | `016-header-major-version`; `014-header-bad-version` moved on to `figdown 0.4`, the next minor the engine does not implement, by the same rule `STATECHART-GENRE-SCOPE` applied to it at 0.2 |
+| `unsupported version "<v>" (expected 0.1 or 0.2 or 0.3 or 0.4)` — the enumeration widened when `LANG_VERSIONS` gained `0.3`, and again at 0.4 when it gained `0.4` (`SEQUENCE-GENRE-VOCABULARY`) | `016-header-major-version`; `014-header-bad-version` moved on to `figdown 0.5`, the next minor the engine does not implement, by the same rule `STATECHART-GENRE-SCOPE` applied to it at 0.2 and `DRAWN-ANNOTATION-FORM` at 0.3 |
+| `genre "<g>" requires figdown <v> (this document declares <d>) — write: figdown <v> <g>` — the GENRE version gate. INTERPOLATED and answered by a SEARCH over `GENRES_BY_VERSION`, not by a per-genre branch, so the second genre to need it cost no code (core §1, §13.7, §13.7.4) | `231-statechart-requires-0-2` (`STATECHART-GENRE-SCOPE`, the first); `281-sequence-requires-0-4` (`SEQUENCE-GENRE-VOCABULARY`, the second — same message, no new literal) |
 
 **Positive coverage** (model goldens, no diagnostic): `800-note-block-acceptors`
 (`node`, `group`, `edge`, `title`), `801-note-flowchart-acceptors` (`process`,

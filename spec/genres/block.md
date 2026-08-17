@@ -56,7 +56,7 @@ figure that is not a topology, a flowchart, or one of the typed blocks.
 | `shape` | `box` | The core-model default (§2.1); a block is a box |
 
 `block` is the genre whose defaults are the core model's own defaults. **What
-it does not have is a borrowed vocabulary.** Until this release this paragraph
+it does not have is a borrowed vocabulary.** Until 0.3 this paragraph
 said `block` "defines no keyword of its own", and its vocabulary table was
 "the scene namespace" — an INTERSECTION written down as if it were a
 namespace. `SUBJECT-VOCABULARY-SCOPE` dissolves it: `group`, `external`, `threshold` and `band` are
@@ -119,7 +119,7 @@ that carry it outside the conformance surface.
 | `group` | `group <id> ["label"]` | B | NORMATIVE | `fill` `stroke` `style` `class` `gap` `note` (requires `figdown 0.3`) | **one nesting level** — `block`'s own default, not a language-wide one (see the declaration below) |
 | `external` | `external <id> ["label"]` | B | NORMATIVE | **none** | never drawn (`EXTERNAL-EDGE-ENDPOINTS`); since 0.1 it took no paint key — `color=` was its only one and it is retired (`COLOUR-KEY-STATUS`) — and since 0.3 (`PAINT-ORDER-CONSTRUCT`) it takes **no option key at all**: `plane=` was the last one it accepted and it went with the `plane` keyword. No `note=` either — it is not drawn, so there is nothing for a note to sit beside |
 | `edge` | `edge <a> [tail] <op> [head] <b>` | B | NORMATIVE | `stroke` `style` `class` `note` (requires `figdown 0.3`) | op is written form; `[mid]` splits the operator; all three labels take the line's colour (`LABEL-COLOUR-SOURCE`) |
-| `class` | `class <id> "<meaning>"` | H | NORMATIVE | `fill` `stroke` `style` | the meaning FIELD is REQUIRED, its VALUE may be `""` (= no meaning claimed, no legend entry — `CLASS-EMPTY-MEANING`); a class an `edge` joins MUST declare `stroke=` or `style=` (`INTERIOR-LESS-ELEMENT-PAINT`/`CLASS-PAINT-REQUIREMENT`) |
+| `class` | `class <id> "<meaning>"` | H | NORMATIVE | `fill` `stroke` `style` | the meaning FIELD is REQUIRED, its VALUE may be `""` (= no meaning claimed, no legend entry — `CLASS-EMPTY-MEANING`); a class an `edge` joins must not declare `fill=` without `stroke=` — an edge has no interior, so the two name ONE channel (`INTERIOR-LESS-ELEMENT-PAINT`). Declaring NO paint is legal: the class claims a meaning and the edge keeps its default line (`CLASS-PAINT-REQUIREMENT`'s second half RETIRED at 0.4, `CLASS-CHANNEL-REACH`) |
 | `threshold` | `threshold "<label>" in=<id> offset=<0..100>%` | B | **EXPERIMENTAL** | `stroke` `style` `offset` `in` | dashed; the quoted label is REQUIRED; no `value=` and no `ref=` (`THRESHOLD-VALUE-SCOPE`). Spelled `guide` in an earlier release (`THRESHOLD-KEYWORD-SPELLING`). Withdrawn from the other three scene genres at 0.3 (`SCENE-KEYWORD-MEMBERSHIP`) and deliberately NOT renamed here (`GENRE-EARNING-THRESHOLD` interim — see the declaration below) |
 | `band` | `band "<label>" <pct>%\|<a>..<b>% in=<id>` | B | **EXPERIMENTAL** | `fill` `stroke` `style` `in` `extend` | `extend=up`, `fill=#e5e7eb`; the quoted label is REQUIRED and written FIRST (`BAND-LABEL-STATUS`). Withdrawn from the other three scene genres at 0.3 (`SCENE-KEYWORD-MEMBERSHIP`), and NOT renamed here for the same `GENRE-EARNING-THRESHOLD` reason |
 | `flow` | `flow right\|down\|left\|up` | H | NORMATIVE | — | **`right`** |
@@ -220,7 +220,9 @@ by taking a word from one of them.
 **That is half of a divergence that only becomes visible written out
 separately.** `flowchart` spells `external` too, and *its* declaration has a
 referent and a citation: **ISO 5807 §9.4.2 *Terminator***, the off-page
-terminus, plus the statement that FigDown's spelling is not ISO's
+terminus — a citation still **PENDING VERIFICATION**, since §9.4.2 sits past
+the readable pp. 1-8 (added 0.3.z, see `decisions/registry.md`) —
+plus the statement that FigDown's spelling is not ISO's
 ([experimental/flowchart.md](experimental/flowchart.md)). `topology`'s has a
 collision to warn about — the **external route** (OSPF Type 5/7 LSA, eBGP).
 `block`'s has neither. Same grammar, three different provenances and three
@@ -336,7 +338,7 @@ at `CONSTRUCT-STATUS-TIERS`; 56+ in-repo and 567 downstream edge-colouring sites
 no text channel — `color=` is retired language-wide (`COLOUR-KEY-STATUS`) and the label
 colour is derived from the background it sits on (core §5, `LABEL-COLOUR-SOURCE`). `extend=`
 is demoted only because the sole directive that accepts it (`band`) is.
-**`plane=` and `z-index=` had rows here until this release**: `PAINT-ORDER-CONSTRUCT` withdrew
+**`plane=` and `z-index=` had rows here until 0.3**: `PAINT-ORDER-CONSTRUCT` withdrew
 both from the language with the `plane` keyword — a keyword and its only
 declaration point move together, and `z-index=` was legal on `plane` and
 nowhere else. Neither names a replacement, because there is none.
@@ -369,7 +371,7 @@ retirement.
 
 | Old | New | R | Why |
 |---|---|---|---|
-| `boundary` | `external` | `EXTERNAL-ENDPOINT-NAMING` | UML's «boundary» is an INTERNAL interface object, C4's `System_Boundary` is the dashed grouping container FigDown already spells `group`, and BPMN's Boundary Event is a third meaning — all three invert or displace the intended sense, which the spec's own prose already stated as "declares an external I/O endpoint" |
+| `boundary` | `external` | `EXTERNAL-ENDPOINT-NAMING` | the ECB analysis pattern's «boundary» is an INTERNAL interface object (CORRECTED 0.3.z: this said "UML's"; the stereotype is not in UML 2.5.1 or ISO/IEC 19505-2 — see decisions/registry.md), C4's `System_Boundary` is the dashed grouping container FigDown already spells `group`, and BPMN's Boundary Event is a third meaning — all three invert or displace the intended sense, which the spec's own prose already stated as "declares an external I/O endpoint" |
 | `layer` · `layer=` | *(nothing — see below)* | `PLANE-KEYWORD-SPELLING`, then `PAINT-ORDER-CONSTRUCT` | `PLANE-KEYWORD-SPELLING` renamed both to `plane` · `plane=` at 0.1, on the ground that in mxGraph — the geometry model FigDown adopted — a layer is a CONTAINMENT PARENT that establishes coordinates, while no standard claimed `plane` for a conflicting meaning. **That last clause was false in one genre and nobody could see it**, because the claim was made in a paragraph belonging to no genre: in networking, "plane" is the control / data / management partition, and `topology` is precisely the genre network engineers author in. `PAINT-ORDER-CONSTRUCT` therefore **withdrew** `plane` · `plane=` from the language, so this row's destination no longer exists and its diagnostic now states the whole chain (`layer=` → `plane=` → withdrawn) instead of ending at a spelling that is gone — the `route` → `path` precedent from 0.1 |
 | `plot` | `chart` | `CHART-BLOCK-NAMING` | `plot` reads as an imperative — the reason `render` was retired at 0.1 — while every other block opener is a noun, and ECharts, Chart.js and Mermaid all name the object a chart |
 | `kind=` | `type=` | `CHART-BLOCK-NAMING` | Vega, Chart.js and ECharts spell the chart-type key `type`; `kind=` was retired on `node` and live on `plot` at the same time, inside one namespace. Its one legal value was renamed `bars3d` → `bar3d` |
@@ -449,7 +451,7 @@ prose a reader must interpret:
   still a label problem, not an annotation;
 - a **level marked across a node or a group** is a `threshold` or a `band`,
   each of which already carries a mandatory label of its own. (A **layer**
-  was `plane=` until this release; there is no such key now, and a set of
+  was `plane=` until 0.3; there is no such key now, and a set of
   elements that forms a logical layer of the SUBJECT is a `class` whose
   meaning says so — §5, `PRESENTATION-AS-MEANING-CARRIER`.)
 
@@ -458,7 +460,7 @@ the sentence the diagram is otherwise missing.
 
 ### How this differs from the other genres
 
-**Until this release this section said "today the only difference is a
+**Until 0.3 this section said "today the only difference is a
 default", and that sentence was false in both directions.** It had been false
 when `flowchart` landed `process`/`decision`/`terminator`;
 after `GENRE-CONNECTOR-SPELLING`/`GENRE-NODE-SPELLING` the node and connector spellings diverged too; and after `SUBJECT-VOCABULARY-SCOPE`

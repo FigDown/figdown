@@ -1,0 +1,173 @@
+# FigDown — figures as text. Spec: https://github.com/FigDown/figdown
+
+figdown 0.4 sequence
+title "All twelve interaction operators, on one session"
+
+# ── What this figure is ─────────────────────────────────────────────
+# `fragment … type=` takes one of TWELVE values, and the set is taken
+# whole from UML 2.5.1's InteractionOperatorKind literals rather than
+# picked from: `alt` `opt` `loop` `par` `strict` `seq` `critical` `neg`
+# `assert` `ignore` `consider` `break`. Six of them are what Mermaid
+# documents (loop, alt, opt, par, critical, break); the other six are
+# what taking the enumeration whole buys, and a value nothing in the
+# corpus writes is a value nobody has read.
+#
+# So this figure is the DEMONSTRATOR for the enum: one small session —
+# a client opening a session with a service that keeps an audit log —
+# with every one of the twelve stated on the part of that session where
+# it is actually true. The subject is chosen to be ordinary on purpose;
+# what is being shown is the OPERATOR, and an operator whose example
+# needs a paragraph of protocol to justify it teaches the protocol
+# instead.
+#
+# THE ORDER BELOW IS THE SESSION'S, NOT THE ENUM'S. A figure whose rows
+# are alphabetical is a table, and this one has a time axis that means
+# something. The enum order is in the paragraph above; the ladder order
+# is: loop, alt, assert, neg, critical, par, strict, seq, opt, break,
+# ignore, consider.
+#
+# EACH OPERATOR IS USED FOR WHAT IT MEANS, and the guard or the label
+# says which meaning:
+#   loop      the operand repeats; the guard carries the bound
+#   alt       at most ONE operand runs, chosen by the guards
+#   opt       one operand, run or not run
+#   par       the operands interleave in any order
+#   strict    the operands are TOTALLY ordered, across all lifelines
+#   seq       weak sequencing — ordered per lifeline, not between
+#   critical  the operand's occurrences may not be interleaved
+#   neg       the operand's traces are INVALID — they must not happen
+#   assert    the operand's traces are the ONLY valid continuation
+#   ignore    the named messages may occur and are insignificant
+#   consider  only the named messages are significant; others are not
+#   break     the operand runs INSTEAD OF the rest of the enclosing run
+
+# ── HONEST LIMIT — `ignore` and `consider` carry no argument ────────
+# In UML both operators take a SET OF MESSAGE NAMES — `ignore {t, u}` —
+# and that set is what makes the claim checkable. `fragment` has no
+# argument slot, so the names live in the fragment's label, where they
+# are prose: a reading agent can quote them and attribute them to the
+# figure, and cannot parse them. The same is true of `loop`'s bounds,
+# which UML writes `loop(1,3)` and this figure writes into the guard.
+#
+# ── HONEST LIMIT — one operator per frame, and no combination ───────
+# UML lets an operand of one fragment hold another fragment, and this
+# genre allows exactly ONE level of that. Twelve sibling frames is what
+# a demonstrator of the ENUM should be; a figure that also nested them
+# would be demonstrating the nesting. `dhcp-lease.fd` is where the
+# nesting is shown, twice.
+
+# ── Semantic classes ───────────────────────────────────────────────
+# Three roles, so a reading agent can group the messages by what they
+# do rather than by which frame they sit in.
+class session "Opens, uses or closes the session itself" stroke=#2563eb
+class audit   "Written to the audit log — never part of the reply the client sees" stroke=#16a34a
+class bad     "A trace this figure marks as forbidden or as a failure" stroke=#dc2626 style=dashed
+
+lifeline c "Client"
+lifeline s "Service"
+lifeline a "Audit log"
+
+# ── loop ────────────────────────────────────────────────────────────
+# The operand repeats. UML puts the bound in the operator itself,
+# `loop(1,3)`; here it is in the guard, which is the operand's own
+# quoted string.
+fragment open "opening the session" type=loop
+operand tries "while no response, and fewer than 3 attempts made" in=open
+message c -> s "POST /session  (credentials)" in=tries class=session
+
+# ── alt ─────────────────────────────────────────────────────────────
+# At most ONE operand runs, and the guards say which. Two operands is
+# the minimum that makes the operator mean anything.
+fragment auth "are the credentials accepted?" type=alt
+operand accepted "accepted" in=auth
+message c <- s "201 Created  (session token)" in=accepted class=session
+state c "AUTHORIZED" in=accepted
+operand rejected "rejected" in=auth
+message c <- s "401 Unauthorized" in=rejected class=bad
+
+# ── assert ──────────────────────────────────────────────────────────
+# The operand's traces are the ONLY valid continuation at this point:
+# every trace that reaches here and does something else is invalid.
+# This is the operator that says MUST, and it is why `type=` has no
+# default — a frame drawn with no operator would look like this one.
+fragment mandatory "once a token is issued this MUST follow — nothing else is a valid continuation" type=assert
+message s -> a "session opened  (subject, token id, time)" in=mandatory class=audit
+
+# ── neg ─────────────────────────────────────────────────────────────
+# The operand's traces are INVALID: the figure draws the message in
+# order to say it must never occur. Drawing a forbidden trace is the
+# only way to name it, and the frame is what stops it being read as
+# part of the protocol.
+fragment forbidden "INVALID traces — the token must never travel in a query string" type=neg
+message c -> s "GET /profile?token=…  (no TLS)" in=forbidden class=bad
+
+# ── critical ────────────────────────────────────────────────────────
+# The operand's occurrences may not be interleaved with anything else
+# on the lifelines it covers — a critical region, not a claim about
+# duration.
+fragment atomic "critical region — no other occurrence may interleave on these lifelines" type=critical
+message s -> a "write: token issued" in=atomic class=audit
+
+# ── par ─────────────────────────────────────────────────────────────
+# The operands interleave in any order, which is the ONE escape from
+# this genre's total order: two messages that are merely adjacent are
+# ORDERED, and only a `par` frame says they are not.
+fragment concurrent "the profile fetch and the audit flush have no relative order" type=par
+operand fetch "profile fetch" in=concurrent
+message c -> s "GET /profile" in=fetch class=session
+operand flush "audit flush" in=concurrent
+message s -> a "flush buffered records" in=flush class=audit
+
+# ── strict ──────────────────────────────────────────────────────────
+# The operands are TOTALLY ordered across every lifeline they cover:
+# nothing in the second may happen before anything in the first, even
+# on a lifeline the two do not share.
+fragment twophase "the two steps are totally ordered across BOTH lifelines" type=strict
+operand prepare "1 — prepare" in=twophase
+message c -> s "PUT /profile  (If-Match: etag)" in=prepare class=session
+operand commit "2 — commit" in=twophase
+message c <- s "204 No Content" in=commit class=session
+
+# ── seq ─────────────────────────────────────────────────────────────
+# Weak sequencing: order is preserved on each lifeline separately and
+# is unconstrained between lifelines. Here the two operands share the
+# service, so the service orders them — the client and the audit log
+# are unordered with respect to each other.
+fragment weak "weak sequencing — ordered only on the lifeline the two operands share" type=seq
+operand ask "on the client side" in=weak
+message c -> s "GET /settings" in=ask class=session
+operand log "on the audit side" in=weak
+message s -> a "read: settings" in=log class=audit
+
+# ── opt ─────────────────────────────────────────────────────────────
+# One operand, run or not run — `alt` with a single operand and no
+# alternative to choose between.
+fragment expanded "only when the client asked for the expanded form" type=opt
+message c <- s "200 OK  (expanded profile)" in=expanded class=session
+
+# ── break ───────────────────────────────────────────────────────────
+# The operand runs INSTEAD OF the rest of the enclosing run: everything
+# below this frame is abandoned when it fires. That is what makes it
+# different from `opt`, which returns to the flow it interrupted.
+fragment giveup "on 503 the remainder of the session is abandoned" type=break
+message c <- s "503 Service Unavailable" in=giveup class=bad
+state c "ABANDONED" in=giveup
+
+# ── ignore ──────────────────────────────────────────────────────────
+# The named messages MAY occur anywhere in this region and are not
+# significant — so a trace that contains them and a trace that does not
+# are the same trace as far as this figure is concerned. `<->` is ONE
+# occurrence: an exchange in both directions whose individual messages
+# are not enumerated, which is exactly what a heartbeat is.
+fragment insignificant "ignore {heartbeat} — heartbeats may occur here and mean nothing to this figure" type=ignore
+message c <-> s "heartbeat" in=insignificant
+
+# ── consider ────────────────────────────────────────────────────────
+# The mirror of `ignore`: ONLY the named messages are significant here,
+# and anything else that occurs is not. The two are not redundant —
+# `ignore` names what to drop, `consider` names what to keep, and which
+# one is shorter to write depends on the region.
+fragment onlythese "consider {DELETE /session, 204} — nothing else in this region is significant" type=consider
+message c -> s "DELETE /session" in=onlythese class=session
+message c <- s "204 No Content" in=onlythese class=session
+state c "CLOSED"

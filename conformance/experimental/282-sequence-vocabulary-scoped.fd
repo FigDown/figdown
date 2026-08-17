@@ -1,0 +1,23 @@
+# `SEQUENCE-GENRE-VOCABULARY`: the allowlist row `sequence` did not have at
+# 0.4, checked in BOTH directions in one file — which is the only way a
+# per-genre vocabulary claim is actually pinned. Section 1 writes this genre's
+# own subject words under `block`; section 2 writes another genre's under
+# `sequence`. `lifeline` and `message` do NOT appear here: they are this
+# genre's NODE and CONNECTOR spellings, so under `block` they get the WRONG
+# WORD diagnostic instead, which fixture 284 pins.
+figdown 0.1 block
+node a "A"
+fragment f "F" type=alt
+operand o "O" in=f
+
+# The other direction. `bitfield` is a REGION OPENER and `GENRE-COMPOSITION` composition makes
+# it legal at the top level of every scene genre — but `sequence` has no scene
+# to compose it into, so it is absent from this genre's row and is a line
+# error here. `bundle`, `threshold` and `external` are the same shape: never
+# declared by this genre, so never withdrawn from it either.
+figdown 0.4 sequence
+lifeline c "C"
+bitfield b "Header"
+bundle t "T"
+threshold "80%" in=c offset=80
+external x "outside"

@@ -105,8 +105,87 @@ const EMITTERS = [
     // GENRE-NODE-SPELLING added `state`: under `statechart` that is the node
     // spelling, and a delete that did not recognise it left the node line
     // behind while removing its pin.
+    // SEQUENCE-GENRE-VOCABULARY: the hand-written alternation is GONE. It went
+    // stale once per genre that adds a node word — `lifeline` was the third —
+    // so it now reads the engine's own `NODE_SPELLINGS` through `NODE_KW_ALT`,
+    // which is also what `nodeLineIdx` and `setNodeLabel` use. If this pattern
+    // ever goes back to spelling words by hand, the next genre breaks delete.
     what: 'deleteNode — the node/pin line-removal pattern',
-    emits: "new RegExp('^(node|state|pin)",
+    emits: "new RegExp('^('+NODE_KW_ALT+'|pin)",
+  },
+  {
+    // The single source the three GUI node-line patterns share.
+    what: 'NODE_KW_ALT — node-line patterns read the engine spelling set',
+    emits: "const NODE_KW_ALT=[...NODE_SPELLINGS].join('|');",
+  },
+  {
+    // SEQUENCE-GENRE-VOCABULARY: `sequence` REFUSES `flow`, so the GUI must not
+    // write one. This was the batch's headline defect: the first GUI insert
+    // into any sequence document authored `flow right`, i.e. a line error, and
+    // no fixture would have caught it because `ensureFlowDirective` writes a
+    // line that is legal in every genre it was written for.
+    what: 'ensureFlowDirective — the genres with no scene layout axis to set',
+    emits: "if(genre==='bitfield'||genre==='table'||genre==='timing'||genre==='sequence') return lines;",
+  },
+  {
+    // SEQUENCE-GENRE-VOCABULARY, residue 1: THE GESTURE THAT WRITES A LINE NOTHING
+    // READS. `pin` is genre-free vocabulary, so a drag on a lifeline head
+    // produced a LEGAL pin line — no parse error, no fixture here could have
+    // caught it — that the ladder does not read: the head sprang back and the
+    // document kept the dead layout. The exclusion is derived, not listed: a
+    // genre with no `flow` in its keyword set has no axis to turn and so no
+    // coordinate for a pin to set. Three call sites read it (the drag, the
+    // resize handle, and the Raise/Lower status line), and `count` is what
+    // keeps this fixture standing for all three: losing any one of them
+    // re-opens a gesture that authors dead layout.
+    what: 'drag/resize exclusion — a genre that positions itself takes no pin',
+    emits: "const genrePositionsByPin=(genre)=>!!(GENRE_KW[genre]&&GENRE_KW[genre].has('flow'));",
+  },
+  {
+    what: 'drag/resize exclusion — all three readers of the predicate',
+    emits: 'genrePositionsByPin(lastDoc&&lastDoc.genre)',
+    count: 3,
+  },
+  {
+    // SEQUENCE-GENRE-VOCABULARY, residue 2: THE ENABLEMENT TEST ASKS THE GENRE'S OWN
+    // COLLECTION. `GENRE_NODE_KW` says what the word is; `GENRE_NODE_COLL`
+    // says where the parser puts it, and only one genre so far answers
+    // anything but `nodes`. Fill/Delete/Raise/Lower were greyed out for every
+    // lifeline because `select()` asked `lastDoc.nodes`, which a `sequence`
+    // document never fills — the four edits underneath already worked.
+    what: 'select() enablement — node rows resolved through the genre registry',
+    emits: [
+      "const GENRE_NODE_COLL={block:'nodes',topology:'nodes',flowchart:'nodes',",
+      "const docNodes=(doc)=>(doc&&doc[GENRE_NODE_COLL[doc.genre]||'nodes'])||[];",
+      "const has=id!==null && docNodes(lastDoc).some(n=>n.id===id);",
+    ],
+  },
+  {
+    // The same defect class one layer down, and the one this batch MEASURED:
+    // `NODE_KW_ALT` is the union of every genre's node spelling, which is
+    // right for "any node-ish line" and wrong the moment two genres share a
+    // spelling for different grammars. Under `sequence`, `state c "BOUND"` is
+    // an OCCURRENCE, and the union pattern let Fill and Rename target it
+    // instead of `lifeline c`, and let Raise/Lower swap a lifeline past it —
+    // moving a ROW with a button that moves a COLUMN. Both patterns now read
+    // the DOCUMENT'S node word. There is no line to parse: the mis-targeted
+    // edits all produced documents that parse clean, which is exactly why
+    // this has to be a recognizer.
+    what: 'node-line patterns — the DOCUMENT\'S node word, not the union',
+    emits: [
+      "const nodeLineReAt=lines=>new RegExp('^\\\\s*'+guiNodeKw(lines)+'\\\\s+');",
+      "function nodeLineIdx(lines,id){ return lines.findIndex(l=>new RegExp('^\\\\s*'+guiNodeKw(lines)+'\\\\s+'+id+'\\\\b').test(l)); }",
+      "const isNode=l=>nodeLineReAt(lines).test(l);",
+    ],
+  },
+  {
+    // A cascade whose last member goes has to take the container with it, or
+    // the delete leaves a document the engine refuses.
+    what: 'deleteNode — a container emptied by the cascade drops its line',
+    emits: "$('src').value=dropEmptyContainers(lines, before).join('\\n'); refresh();",
+    sample: 'fragment f "F" type=loop',
+    doc: ['figdown 0.4 sequence', 'lifeline c "C"', 'lifeline s "S"', '@',
+          'message c -> s "m" in=f'],
   },
   {
     what: 'cell click — table cell fill',
@@ -125,7 +204,10 @@ const EMITTERS = [
     // is `guiNodeKw(lines)` rather than a literal. A GUI action is a text
     // edit, and a text edit that spells the wrong genre's word is a line error.
     what: 'new node button',
-    emits: "lines.splice(last+1,0,guiNodeKw(lines)+' '+nid+' \"Node '+nnum+'\"'+(kk!=='box'?' shape='+kk:''));",
+    // SEQUENCE-GENRE-VOCABULARY: `&&shaped` guards the kind picker. `lifeline`
+    // does not take `shape=`, so under `sequence` the picker writes nothing —
+    // the option table decides, the button does not.
+    emits: "lines.splice(last+1,0,guiNodeKw(lines)+' '+nid+' \"Node '+nnum+'\"'+(kk!=='box'&&shaped?' shape='+kk:''));",
     sample: 'node n1 "Node 1" shape=rounded',
     doc: ['figdown 0.1 block', '@'],
   },
@@ -172,6 +254,27 @@ const EMITTERS = [
     emits: "const guiNodeKw=lines=>GENRE_NODE_KW[guiGenre(lines)]||'node';",
     sample: 'state n1 "Node 1"',
     doc: ['figdown 0.2 statechart', '@'],
+  },
+  {
+    // SEQUENCE-GENRE-VOCABULARY: the same two emitters under the third genre that
+    // renames both words. `sequence` is the case that proves the emitters are
+    // table-driven rather than a two-branch special case for `statechart`:
+    // `node`/`edge` are BOTH the WRONG_WORD diagnostic here, so a GUI action
+    // that spelled either would author a line error in a document the user
+    // had done nothing wrong in.
+    what: 'link arm — sequence spells it `message`',
+    emits: "const guiConnKw=lines=>connectorKwAt(guiGenre(lines), guiVersion(lines))||'edge';",
+    sample: 'message a -> b',
+    doc: ['figdown 0.4 sequence', 'lifeline a "A"', 'lifeline b "B"', '@'],
+  },
+  {
+    // And the node half. The sample carries NO `shape=`: the kind picker is
+    // silent under this genre because `lifeline` does not take the key —
+    // see the `&&shaped` guard on the emitter above.
+    what: 'new node button — sequence spells it `lifeline`',
+    emits: "const guiNodeKw=lines=>GENRE_NODE_KW[guiGenre(lines)]||'node';",
+    sample: 'lifeline n1 "Node 1"',
+    doc: ['figdown 0.4 sequence', '@'],
   },
   {
     what: 'threshold drag — offset rewritten in place',

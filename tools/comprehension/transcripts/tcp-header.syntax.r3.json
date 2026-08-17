@@ -1,0 +1,59 @@
+{
+  "suite_version": "1.0.0",
+  "run": {
+    "utc": "2026-08-16T06:09:06Z",
+    "model_alias": "sonnet",
+    "model_used": "claude-sonnet-5",
+    "cli": "2.1.233 (Claude Code)",
+    "condition": "syntax",
+    "reader": 3
+  },
+  "figure": {
+    "id": "tcp-header",
+    "genre": "bitfield",
+    "path": "examples/showcase/tcp-header.fd",
+    "file_sha256": "a23de34b076f39286a2aff8e5458da2e552ef35e768e1b4aa99a6899867d7ef1",
+    "title_shown": null,
+    "presented_sha256": "f615b178e87ce9630383c54a733b417218688651eb5aa4812d5f8cf764b6fab5",
+    "presented_lines": 29,
+    "presented_chars": 1017
+  },
+  "prompt": {
+    "system_sha256": "1a78658262dc29e7e24cbe3e1eb72659cf31990e85deddacf0b1625e40c5eac2",
+    "user_sha256": "fa5940acbe6fe9b857de5725df49a0762281b8dabe5213a1bb46d56463820837",
+    "question_set_sha256": "13d54a0f750eb9d80d080ab156f41230e7231cb39e135058c6fdb402f9128498"
+  },
+  "cold_room": {
+    "cwd": "an isolated empty temporary directory outside the repository",
+    "tools_offered": "none — every tool denied by name",
+    "mcp_servers": "none",
+    "settings": "safe-mode: no project or user settings, no memory file, no skills, no plugins, no hooks",
+    "session_persistence": false,
+    "shown": "the system prompt, the presented file text, and the questions — nothing else",
+    "not_shown": "the specification, any genre document, any other .fd file, the file name, the name of the language, the repository"
+  },
+  "integrity": {
+    "turns": 1,
+    "permission_denials": 0,
+    "tool_calls_observed": false,
+    "is_error": false
+  },
+  "usage": {
+    "cost_usd": 0.0105459,
+    "input_tokens": 2,
+    "output_tokens": 677,
+    "cache_creation_input_tokens": 0,
+    "duration_ms": 6183
+  },
+  "raw_answer_text": "A1: Source Port and Destination Port, each 16 bits wide.\nA2: NOT STATED\nA3: NOT STATED\nA4: Data Offset specifies the header length in 32-bit words; its minimum valid value is 5, corresponding to a minimum header length of 20 bytes.\nA5: Reserved (4 bits), the flag bits CWR, ECE, URG, ACK, PSH, RST, SYN, FIN (1 bit each), and Window (16 bits) share the same 32-bit word as Data Offset.\nA6: NOT STATED\nA7: NOT STATED\nA8: The Options field appears only when Data Offset > 5, and the maximum header length once options are included is 60 bytes (Data Offset = 15).",
+  "answers": {
+    "q1": "Source Port and Destination Port, each 16 bits wide.",
+    "q2": "NOT STATED",
+    "q3": "NOT STATED",
+    "q4": "Data Offset specifies the header length in 32-bit words; its minimum valid value is 5, corresponding to a minimum header length of 20 bytes.",
+    "q5": "Reserved (4 bits), the flag bits CWR, ECE, URG, ACK, PSH, RST, SYN, FIN (1 bit each), and Window (16 bits) share the same 32-bit word as Data Offset.",
+    "q6": "NOT STATED",
+    "q7": "NOT STATED",
+    "q8": "The Options field appears only when Data Offset > 5, and the maximum header length once options are included is 60 bytes (Data Offset = 15)."
+  }
+}

@@ -601,7 +601,7 @@ present but retired, so they are not counted here): keywords `layout`,
 core, not borrowed for it, which is why the keyword tally and
 the option-key tally were always counted apart).
 
-**RULE 4.1 is measured PER GENRE, and until this release four genres had no
+**RULE 4.1 is measured PER GENRE, and until 0.3 four genres had no
 vocabulary to measure.** The rule says *a genre's vocabulary* — so a
 shared section holding `group`, `external`, `threshold`, `band`, `bundle`
 and `plane` for four scene genres at once made the question unanswerable
@@ -628,7 +628,8 @@ vocabulary of its own to collide inside.
 
 **Two of the sources this project actually borrows from are missing from
 the genre docs.** `->`/`--`'s DOT lineage and the `||`/`^^` mixing
-justification exist only in `design/`, which is not normative. If
+justification exist only in the project’s working record, which is not
+published and is not normative. If
 `vocabulary-sources.tsv` must be derivable from normative documents alone,
 those rows have no normative citation today. See §10.
 
@@ -1246,18 +1247,38 @@ is only the case that would be SILENT: a class that sets `fill=` and no
 nothing to warn on; honouring it would make `fill` mean "stroke" for that
 member, which is RULE 4.3's prohibition.
 
-**The half this scoping missed, closed (`CLASS-PAINT-REQUIREMENT`).** The same
-hole sat one key over: a class that painted NEITHER channel and was joined
-by an edge was accepted in silence. `class p "Path" color=#dc2626` plus
-`edge a -> b class=p` parsed, drew a `#555` line, and rendered a legend
-swatch showing nothing — the class's meaning invisible in the legend the
-language derives FOR it. `INTERIOR-LESS-ELEMENT-PAINT` fixed one key and left the identical hole one
-key over. It is now a line error naming `stroke=`, with the same per-
-channel shape: an edge has exactly `stroke=` and `style=`, so `style=`-only
-stays legal (the dash reaches the edge) and "declares neither" does not.
-Zero legitimate uses in either corpus; the three in-repo instances were one
-class, `underlay`, whose intent was the default line colour and which now
-says so.
+**The half this scoping thought it missed, closed (`CLASS-PAINT-REQUIREMENT`) —
+and RETIRED (`CLASS-CHANNEL-REACH`).** The reading at the time was that the
+same hole sat one key over: a class that painted NEITHER channel and was
+joined by an edge was accepted in silence. `class p "Path" color=#dc2626`
+plus `edge a -> b class=p` parsed, drew a `#555` line, and rendered a
+legend swatch showing nothing — the class's meaning invisible in the legend
+the language derives FOR it. That was a line error naming
+`stroke=`, on the same per-channel shape: an edge has exactly `stroke=` and
+`style=`, so `style=`-only stayed legal (the dash reaches the edge) and
+"declares neither" did not. Zero legitimate uses were found in either
+corpus; the three in-repo instances were one class, `underlay`, whose
+intent was the default line colour and which says so to this day.
+
+> **Correction, 0.4 (`CLASS-CHANNEL-REACH`): the error is RETIRED and this section's
+> reading of it was wrong.** It was never a hole one key over. The example
+> above carries `color=` on the class, and `color=` is a line error
+> language-wide from that very release (RULE 4.3) — so what the scoping
+> actually left behind, once `color=` was gone, is a class that declares a
+> meaning and no paint. That is not silent: the OTHER half of `CLASS-PAINT-REQUIREMENT`, landed
+> in the SAME release, made the derived legend draw such a meaning with no
+> swatch at all, so the meaning reaches the reader. What survived was only
+> "the edge takes its default line", which is what the author wrote. And
+> the rule could not generalise — applied by channel set to `field` it
+> condemns 14 members in four shipped example figures legal since 0.1, so
+> a rule that stops at one collection was not a rule about channels. A
+> class that claims a meaning and declares no paint is legal on every
+> member. What survives in this section is `INTERIOR-LESS-ELEMENT-PAINT`'s own rule, restated per
+> channel set: **paint that cannot reach the member is a line error** —
+> `fill=` with no `stroke=` on an interior-less member, and a class whose
+> channels are ALL channels the member lacks. Reopens on a measured case
+> of an author writing a paint-less class EXPECTING paint.
+> [MIGRATIONS](migrations.md) 0.4; [core.md §2.7](core.md).
 
 ### 8.5 `%` and `auto` on `pin width=` are a scope limit, not a second grammar
 
@@ -1375,7 +1396,7 @@ every retired row beside it.
 **Recount (`SUBJECT-VOCABULARY-SCOPE`, `PAINT-ORDER-CONSTRUCT`), and the partition above was already
 wrong twice over.** First, the running total `3 + 1 + 11 + 3 + 3 = 21`
 omits the `chart` term, which is the same registry omission core §10
-records having fixed and `vocabulary-sources.tsv` — this document never caught it, so its 0.1 figure
+records having fixed, and `vocabulary-sources.tsv` with it — this document never caught it, so its 0.1 figure
 should read **22**. Second, `GENRE-CONNECTOR-SPELLING`/`GENRE-NODE-SPELLING` registered `flowline`,
 `transition` and `state` — the per-genre connector and node spellings —
 and nobody recounted anywhere, so every file read a figure from before
@@ -1477,7 +1498,7 @@ Documentation corrections in the same release, all done:
 | 1 | `stroke=` promoted to NORMATIVE — SVG's own key, and SVG's own shape/line asymmetry stated as the reading rule. | 4.1 |
 | 2 | `color=` RETIRED language-wide, with NO replacement. It is the only key ever re-pointed to a second meaning, and retiring it is what makes the two eras diagnosable. | 4.3, 6.2 |
 | 3 | The default label colour is DERIVED from the background's WCAG relative luminance — not an option key, so it cannot be wrong (`UNSAFE-DEFAULT-ELIMINATION`). | — |
-| 4 | A class an edge joins must declare a channel an edge HAS; the legend swatch shows declared paint only. | §8.4 |
+| 4 | A class an edge joins must declare a channel an edge HAS; the legend swatch shows declared paint only. **The first clause was RETIRED at 0.4 (`CLASS-CHANNEL-REACH`)** — a class may claim a meaning and declare no paint, on every member; the swatch clause stands and is the ground the retirement rests on (§8.4). | §8.4 |
 
 **§9's "not implementable" note below is now moot, and how it was
 discharged matters.** The diagnostic this document demanded — *say which

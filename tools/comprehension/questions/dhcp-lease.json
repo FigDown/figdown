@@ -1,0 +1,210 @@
+{
+  "id": "dhcp-lease",
+  "genre": "sequence",
+  "figure": "examples/sequence/dhcp-lease.fd",
+  "subject": "DHCP lease acquisition, renewal and release",
+  "source": {
+    "standard": "RFC 2131",
+    "locator": "§3.1 (steps 1-6, Table 2, Figure 3), §3.2, §4.3.2, §4.4 (Figure 5), §4.4.1, §4.4.4, §4.4.5, §4.4.6",
+    "url": "https://www.rfc-editor.org/rfc/rfc2131.html",
+    "anchor_strength": "strong"
+  },
+  "authored": {
+    "protocol": "source-first: the author agent read only RFC 2131 and never saw the .fd file",
+    "saw_figure": false,
+    "key_discipline": "question-set v1.1: regex-tolerant keys, no compound questions"
+  },
+  "questions": [
+    {
+      "qid": "q1",
+      "ask": "A client with no address joins the network. Name the four messages of the address-allocation exchange in the order they occur, and say which participant sends the first one.",
+      "tests": "temporal ordering of the four-message exchange, and the originator of the opening message",
+      "source_locator": "RFC 2131 §3.1 steps 1-5, Figure 3",
+      "answer": "The order is DHCPDISCOVER, DHCPOFFER, DHCPREQUEST, DHCPACK. The client sends the first message, broadcasting the DHCPDISCOVER on its local subnet.",
+      "score": {
+        "all_of": [
+          [
+            "re:discover.*offer.*request.*ack"
+          ],
+          [
+            "client",
+            "host",
+            "station",
+            "endpoint"
+          ]
+        ],
+        "none_of": []
+      }
+    },
+    {
+      "qid": "q2",
+      "ask": "In that four-message exchange, which participant originates the DHCPOFFER and the DHCPACK - the client or a server?",
+      "tests": "role attribution: which side of the exchange is the sender of the two reply messages",
+      "source_locator": "RFC 2131 §3.1 steps 2 and 4, Table 2",
+      "answer": "Both are sent by a DHCP server to the client: a server answers the DHCPDISCOVER with a DHCPOFFER, and the selected server answers the DHCPREQUEST with a DHCPACK.",
+      "score": {
+        "all_of": [
+          [
+            "server"
+          ]
+        ],
+        "none_of": []
+      }
+    },
+    {
+      "qid": "q3",
+      "ask": "Which single message, when it arrives, makes the client consider the lease held - that is, moves the client into the BOUND state?",
+      "tests": "which message (not which state) is the commitment point of the exchange",
+      "source_locator": "RFC 2131 §4.4.1; §3.1 step 5",
+      "answer": "The DHCPACK from the selected server: once the DHCPACK arrives the client is initialized and moves to BOUND state.",
+      "score": {
+        "all_of": [
+          [
+            "ack"
+          ]
+        ],
+        "none_of": []
+      }
+    },
+    {
+      "qid": "q4",
+      "ask": "The client is BOUND and timer T1 expires. Which state does the client move into, and to whom does it address the DHCPREQUEST it then sends?",
+      "tests": "state entered on T1 expiry, and the addressing of the renewal request",
+      "source_locator": "RFC 2131 §4.4.5; §4.4 Figure 5",
+      "answer": "At T1 the client moves to RENEWING state and sends the DHCPREQUEST by unicast to the server that originally issued its lease.",
+      "score": {
+        "all_of": [
+          [
+            "renewing",
+            "renew"
+          ],
+          [
+            "unicast",
+            "leasing server",
+            "original server",
+            "originating server",
+            "re:(the )?same (server|box|machine|one|host)",
+            "re:(server|box|machine|one|host|it) ?[a-z ]{0,12}(that|which) (originally |first )?(issued|granted|gave|leased|assigned|allocated|provided|offered|handed)",
+            "re:(issued|granted|gave|leased|assigned|handed|provided) (it |the client )?(the |its )?(lease|address|ip)",
+            "re:(directly|direct|straight|one to one|point to point) to",
+            "re:not (a |by )?broadcast",
+            "re:its (own |current |existing )?(dhcp )?server"
+          ]
+        ],
+        "none_of": []
+      }
+    },
+    {
+      "qid": "q5",
+      "ask": "If no reply has come and timer T2 expires, which state does the client move into, and how is the DHCPREQUEST it sends then addressed differently from the one it sent at T1?",
+      "tests": "state entered on T2 expiry, and the change in addressing (broadcast to any server) versus renewal",
+      "source_locator": "RFC 2131 §4.4.5; §4.3.2 (DHCPREQUEST generated during REBINDING state)",
+      "answer": "At T2 the client moves to REBINDING state and broadcasts the DHCPREQUEST, so that any server rather than only the original leasing server may answer it.",
+      "score": {
+        "all_of": [
+          [
+            "rebinding",
+            "rebind"
+          ],
+          [
+            "broadcast",
+            "0xffffffff",
+            "re:broadcasts?",
+            "re:any (dhcp |other |available )?(server|box|machine|one)",
+            "re:(all|every|any) (dhcp )?servers?",
+            "re:(whole|entire|full|local) (subnet|network|segment|lan|wire)",
+            "re:(everyone|everybody|all of them|anyone listening)",
+            "re:shout"
+          ]
+        ],
+        "none_of": []
+      }
+    },
+    {
+      "qid": "q6",
+      "ask": "While the client is renewing or rebinding, may it go on using the network address it already has? And what must it do if the lease expires before any DHCPACK arrives?",
+      "tests": "validity of the address during the reacquisition states, and the consequence of lease expiry",
+      "source_locator": "RFC 2131 §4.3.2 (RENEWING/REBINDING DHCPREQUEST), §4.4.5",
+      "answer": "Yes - in both RENEWING and REBINDING the client is still completely configured and keeps using its address while it tries to extend the lease. If the lease expires before a DHCPACK arrives, the client must immediately stop using the address (halt other network processing) and return to INIT state.",
+      "score": {
+        "all_of": [
+          [
+            "yes",
+            "re:(keep|keeps|keeping|retain|retains|retaining|hold|holds|holding|continue|continues|carries on|carry on|goes on|go on|still|remain|remains)",
+            "re:(may|can|does|is allowed to) (still )?use",
+            "completely configured",
+            "fully configured",
+            "re:address (is |stays |remains )?(still )?(valid|usable|in use|fine|good)"
+          ],
+          [
+            "init",
+            "re:(must |has to |will |should )?(immediately )?(stop|halt|cease|abandon|give up|gives up|stops|halts|discard|drop|relinquish)",
+            "re:(must not|can no longer|no longer) (continue |keep )?(us|hold)",
+            "re:starts? (the )?(configuration|process|over|again)",
+            "re:back to the beginning"
+          ]
+        ],
+        "none_of": []
+      }
+    },
+    {
+      "qid": "q7",
+      "ask": "What is a DHCPRELEASE message for, and which participant sends it?",
+      "tests": "purpose and direction of the release message that ends the lease early",
+      "source_locator": "RFC 2131 §3.1 step 6, Table 2; §4.4.4; §4.4.6; §4.3.4",
+      "answer": "The client sends DHCPRELEASE to the server (unicast) when it no longer needs its address, relinquishing the network address and cancelling the remaining lease; the server then marks that address as not allocated.",
+      "score": {
+        "all_of": [
+          [
+            "client",
+            "host",
+            "workstation",
+            "machine",
+            "device",
+            "laptop",
+            "node",
+            "station",
+            "endpoint",
+            "lessee",
+            "re:the (one|side|party) (that|which|holding)"
+          ],
+          [
+            "re:(relinquish|releas|give up|gives up|giving up|hand back|hands back|handing back|return|cancel|end|ends|ending|terminat|discard|frees|free|no longer|done with|finish|shut|drop|surrender)"
+          ]
+        ],
+        "none_of": []
+      }
+    },
+    {
+      "qid": "q8",
+      "ask": "Suppose several servers answer the client's DHCPDISCOVER with offers. How does the client make clear which offer it has accepted, and what do the servers whose offers were not taken conclude from that?",
+      "tests": "disambiguation among multiple responders: the selection marker in the DHCPREQUEST and its meaning to the other servers",
+      "source_locator": "RFC 2131 §3.1 steps 3 and 4; §4.4.1",
+      "answer": "The client broadcasts a DHCPREQUEST carrying the 'server identifier' option naming the server whose offer it selected. The servers not named use that same broadcast message as notification that the client has declined their offers.",
+      "score": {
+        "all_of": [
+          [
+            "re:server( s)? id",
+            "identifier",
+            "re:(id|name|address) of the (server|box|one|machine|host)",
+            "re:(names|naming|indicates|indicating|identifies|identifying|specifies|specifying|marks|marking|points to) (the |its |which )?(one it |server it |it )?(selected|chosen|chose|accepted|picked)",
+            "re:(selected|chosen|accepted|picked|winning) (server|box|one|machine|host|offer)",
+            "re:(selected|selects|chose|chooses|chosen|picked|picks|accepted|accepts|took|takes|taken)",
+            "re:server (it |the client )?(selected|chose|picked|accepted)"
+          ],
+          [
+            "re:declin",
+            "re:(not|non|un)[ ]?(selected|chosen|picked)",
+            "re:(other|remaining|losing|rejected|passed over|unchosen) (servers?|boxes|ones|machines|hosts)",
+            "re:(free|frees|freed|release|releases|withdraw|withdraws|reclaim|reclaims|reuse|discard|drop|cancel)",
+            "re:(back (in|into|to) the pool|into the pool|to the pool|available again|pool)",
+            "re:(passed over|no thank you|turned down|rejected|refused|ignored|not taken|not wanted|left out)",
+            "re:their offers?"
+          ]
+        ],
+        "none_of": []
+      }
+    }
+  ],
+  "score_rules_reviewed": "Every key was run against its own canonical answer with --selftest (8/8), and then hand-checked against two freshly written paraphrase sets - one terse and technical, one deliberately colloquial that avoids the words 'server', 'client', 'unicast' and 'broadcast' entirely (e.g. 'the box asks first with a DISCOVER broadcast', 'the machine keeps the IP and has to drop it and start over when the lease runs out', 'it puts the chosen server's ID in the request and the losers free their offers'); alternatives were widened with re: patterns wherever the paraphrase would otherwise have failed. No question asks for more than two distinct facts, none_of is empty everywhere so that no correct contrastive answer ('unicast, not broadcast') can be rejected, and no rule was written or altered after seeing any reader answer."
+}

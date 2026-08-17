@@ -13,8 +13,10 @@ portable figures: `block`, `bitfield`, `table` (plus the `UNIVERSAL-CORE-KEYWORD
 Constructs marked EXPERIMENTAL — `threshold`, `band`, `bundle`,
 `chart`, option keys
 `extend=`/`data=`,
-and genres `topology`, `flowchart`, `timing` (`CONSTRUCT-STATUS-TIERS`, spec §10) — still parse and
-are not deprecated, but they sit **outside** the v0.1 compatibility promise
+and genres `topology`, `flowchart`, `timing` (`CONSTRUCT-STATUS-TIERS`, spec §10), plus the two
+that arrived later on the same footing, `statechart` (`STATECHART-GENRE-SCOPE`, needs
+`figdown 0.2`) and `sequence` (`SEQUENCE-GENRE-VOCABULARY`, needs `figdown 0.4`) — still parse
+and are not deprecated, but they sit **outside** the v0.1 compatibility promise
 and may change without a migration entry. **Do not use them when the figure
 must be portable.** `path` and `routing` (with `points=`, `tailport=`,
 `headport=`, `routing=`) were on that list until 0.1, when `EDGE-GEOMETRY-CONSTRUCTS`
@@ -49,7 +51,7 @@ is one place to look and nothing to reconcile.
 |---|---|---|
 | containment — node belongs inside a box | `group g "Label"` + `node n "…" in=g` | **`block` and `topology` only** — withdrawn from `flowchart` and `statechart` at 0.3 (`SCENE-KEYWORD-MEMBERSHIP`): no figure in the tree wrote one, and UML's word for the concept is *composite state*, not `group`. **The option key `in=` followed at 0.3 (`MEMBERSHIP-KEY-ACCEPTANCE`)** and is a named line error in those two genres: it named a `group` id and nothing else, so the `SCENE-KEYWORD-MEMBERSHIP` withdrawal left every value a dead end. Under `statechart` its spelling is additionally **RESERVED** — `in=` returns there with a `state`-id domain if UML 2.5.1 §14.2.3.4 composite states are earned. One level of nesting only (spec §2.2); for deeper, represent the inner group as a proxy node |
 | set membership / category (color + legend) | `class c "meaning" fill=… style=…` + `class=c` on members | legend derives automatically; bare `fill=` carries no named meaning |
-| one class used on both nodes and edges | `class c "meaning" fill=… stroke=…` — BOTH keys on the one class | Since 0.1 (`INTERIOR-LESS-ELEMENT-PAINT`) the rule is per CHANNEL: `fill=` paints members that have an interior (a node box) and is inapplicable to an edge, which has none; `stroke=` paints the edge line and a node's outline; `style=` applies to both. So one class still carries one meaning for both kinds of member — do NOT split it. A class an edge joins MUST declare `stroke=` or `style=`: `fill=`-only (`INTERIOR-LESS-ELEMENT-PAINT`) and no-paint-at-all (`CLASS-PAINT-REQUIREMENT`) are both line errors, because the edge would otherwise lose its colour silently. `fill=`, `stroke=` and `style=` are all NORMATIVE since 0.1 (`STROKE-KEY-STATUS`) |
+| one class used on both nodes and edges | `class c "meaning" fill=… stroke=…` — BOTH keys on the one class | Since 0.1 (`INTERIOR-LESS-ELEMENT-PAINT`) the rule is per CHANNEL: `fill=` paints members that have an interior (a node box) and is inapplicable to an edge, which has none; `stroke=` paints the edge line and a node's outline; `style=` applies to both. So one class still carries one meaning for both kinds of member — do NOT split it. A class an edge joins must not declare `fill=` without `stroke=` (`INTERIOR-LESS-ELEMENT-PAINT`): on a line those two name the SAME channel, so the edge would otherwise lose its colour silently, and a `style=` beside the `fill=` does not answer what the author asked for. Declaring NO paint at all is legal on every member (`CLASS-CHANNEL-REACH`) — the class claims a meaning, the derived legend draws it with no swatch, and the edge keeps its default line. `fill=`, `stroke=` and `style=` are all NORMATIVE since 0.1 (`STROKE-KEY-STATUS`) |
 | hierarchy / tree | directed `edge` chain; `flow down` to orient | the edges carry the tree; group is for spatial containment, not hierarchy |
 | adjacency without a link | `in=` on the same `group`, no `edge` between them | the shared frame communicates co-location |
 | cross-cutting category spanning groups | `class` + `class=` on elements in different groups | one class can mark nodes, edges, and fields across the whole document |
@@ -85,7 +87,8 @@ is one place to look and nothing to reconcile.
 | event → action | `edge src -[event]-> tgt` | mid-label is the trigger; head-label can name the action |
 | precedence / partial order | a DAG of directed edges | absence of an edge means no stated constraint |
 | fan-out / fan-in | edges from/to a common node | AND-vs-XOR join discipline: declare a `class` (`FLOWCHART-GENRE-DESIGN` — no first-class gateway yet) |
-| message exchange between parties | nodes as parties + labelled directed edges; ordinal labels for ordering | strict ordering: number labels consistently (`FLOWCHART-GENRE-DESIGN`) — see Known limits |
+| message exchange between parties, in time order | `figdown 0.4 sequence` — one `lifeline` per party, one `message` per exchange; the ladder's row order **is** declaration order | **The genre LANDED at 0.4 (`SEQUENCE-GENRE-VOCABULARY`), and this row's old advice retires with it**: nodes-as-parties plus `1:`/`2:` ordinal labels was the interim, and ordinals are naming, not semantics (`MEANING-RECOVERY-SOURCE`). Order is now structural — every message gets its own row, so no two share a span and nothing rides on a numbering convention. `state` puts a participant's condition on that participant's own lifeline, between two messages; `fragment` + `operand` say what kind of run a group of messages is (twelve UML operators, `type=` mandatory). It is **EXPERIMENTAL** and requires `figdown 0.4`, so a figure that must stay portable still writes the scene interim — and now does so as a *choice* it can state, not as a lack. See [spec/genres/experimental/sequence.md](../spec/genres/experimental/sequence.md) and [examples/sequence/](../examples/sequence/index.md) |
+| a participant's condition at a point in an exchange | under `sequence`: `state <lifeline-id> "BOUND"`, written between the two messages it sits between (add `in=<fragment\|operand>` to put it inside a frame) | slot 1 **references** a lifeline and declares nothing; the quoted state name is mandatory. Row order places it — there is no time coordinate to write. This is the fact a scene genre plus a companion `table` could only carry as prose (`examples/showcase/tcp-handshake.fd`'s state table). One limit to know before you rely on it: a lifeline's state occurrences are **one sequence**, so two mutually exclusive operands cannot both end in a drawn `INIT` |
 | a label too wide for its diamond / ellipse / cylinder | nothing — shapes size themselves from their **inscribed** area | do not declare an extent; see the note below |
 
 > **Delete declared extents added to make a shape fit its text.** Non-rectangular
@@ -104,6 +107,29 @@ is one place to look and nothing to reconcile.
 > (`at=` optional, and `width=`/`height=` apply to **nodes only**). A stale
 > document that still carries a `size` line gets a named migration diagnostic,
 > not `unrecognized line`.
+
+> **Choosing between `sequence` and `statechart` when many lines run between
+> the same two blocks.** The symptom is identical in every scene genre —
+> `block`, `flowchart` and `statechart` all crowd parallel edges into the one
+> span between two boxes, and the reader sees confused overlap. What settles
+> it is *what those lines are*:
+>
+> - **Time-ordered messages between one pair of participants → `sequence`.**
+>   The ladder spreads time down the page, so ten exchanges between A and B
+>   are ten rows on two lifelines and no two share a span. A figure like that
+>   is already a sequence; the scene genre is only where it was forced to
+>   live.
+> - **Distinct transitions between states → `statechart`, and fix the
+>   layout.** Many edges returning to one state are different triggers with
+>   different meanings, not messages in an order. That crowding is a **layout**
+>   problem, not a genre problem, and the answer is
+>   [layout.md](layout.md), not a new header line.
+>
+> In one sentence: *are these lines messages between one pair over time, or
+> transitions between states?* [`examples/sequence/dhcp-lease.fd`](../examples/sequence/dhcp-lease.fd)
+> and [`examples/statechart/dhcp-client.fd`](../examples/statechart/dhcp-client.fd)
+> are the same protocol answered both ways, which is the cheapest way to see
+> the difference.
 
 ---
 
@@ -135,7 +161,7 @@ is one place to look and nothing to reconcile.
 | threshold / watermark | `threshold "label" in=g offset=N%` on a `group` or `node` | spelled `guide` until 0.1 (`THRESHOLD-KEYWORD-SPELLING`). Label and the `%` are both mandatory; there is no `value=` and no `ref=` — the reference lives in the label (`THRESHOLD-VALUE-SCOPE`). `threshold` and `band` take the same two scopes (`AUTHORING-INTENT-OVER-RENDERING`). **EXPERIMENTAL** (`CONSTRUCT-STATUS-TIERS`), and **`block` only** since 0.3 (`SCENE-KEYWORD-MEMBERSHIP`). Even there, mind the irony the withdrawal turns on: in QoS a threshold is a queue depth **with a numeric value** (RFC 2309 `minth`/`maxth`, RFC 7567 — the very RFCs `THRESHOLD-KEYWORD-SPELLING` took the spelling from), while this one has no `value=` and its `offset=` is a fraction of the target's rendered extent, not a quantity |
 | quantity comparison | `table` with numeric columns | `▁▃▅▇` Unicode blocks as sparklines in cells (`TABLE-SPARKLINE`) |
 | signal values over time | `timing id "label"` + `signal name chars` (one char = one cycle) | lane alphabet: `0 1 p n x = .` (a strict subset of WaveDrom's; `2`–`9` retired at 0.1). `timing` is an **EXPERIMENTAL** genre (`CONSTRUCT-STATUS-TIERS`, spelled `wave` until 0.1) — the alphabet is settled, the surface around it is not |
-| event ordering without exact times | directed edges with ordinal mid-labels (`-[1: SYN]->`) | number labels consistently; no sequence genre yet |
+| event ordering without exact times | `figdown 0.4 sequence` — `message` declaration order **is** the order, and there are no times anywhere in the genre | vertical distance on a ladder carries no duration, so a delay or a timer belongs in the message label as prose. Under a scene genre the ordinal mid-label (`-[1: SYN]->`) remains the interim, and it remains a naming convention rather than semantics (`MEANING-RECOVERY-SOURCE`) — number consistently and say in a comment that you did |
 | visual code / legend | `class` — legend derives automatically from declaration order | each `class` line gives swatch + meaning text |
 | annotation explaining why — prose the **human** must see | `note="…"` on the element's OWN line: `node a "A" note="…"`, `group g "G" note="…"`, `edge a -> b note="…"`, `title "T" note="…"` (the figure-level one) | `figdown 0.3` (`DRAWN-ANNOTATION-FORM`). Attachment is by **syntactic position** — no id, no target key, so no ambiguity about which of several identically-labelled elements is meant. Not `description=`: the two divide by AUDIENCE — `description=` reaches the reading agent as an SVG `<title>` and puts **no ink** on the page, `note=` always draws. Both on one element is legal; neither is a fallback for the other. **You do not place the box** (`DOMAIN-CONVENTION-DIRECTIVES`): no `at=`, no `side=`; the engine sits it beside its carrier and takes a leader line only when adjacency fails. Refused on `field` (use `description=`) and on `cell`/`external`/`threshold`/`band`/`bundle`/`class` — zero measured demand (`plane` was on that list until `PAINT-ORDER-CONSTRUCT` withdrew the keyword itself). **Where a typed slot exists, a note is never the right answer**: a category is a `class` meaning, a containment is `in=`, a field's condition is `present=` |
 | cross-references within a scene | `edge` + `class` naming the relation | can't reference a table cell or bitfield field — see Known limits `CELL-EDGE-ANCHORS` / `CROSS-BLOCK-REFERENCES` |
@@ -149,7 +175,8 @@ is one place to look and nothing to reconcile.
 Each entry: what cannot be expressed today · OQ reference · sanctioned interim workaround.
 
 - **same entity in two views** — no way to assert two nodes are the same participant; OQ pending; interim: shared `class` + a note stating the identity.
-- **strict message ordering** — order carried only by label numbering convention; sequence genre candidate (v0.2, `FLOWCHART-GENRE-DESIGN`); interim: number labels consistently (e.g. `1: SYN`, `2: SYN-ACK`).
+- ~~**strict message ordering**~~ — **SOLVED (`SEQUENCE-GENRE-VOCABULARY`)** by the `sequence` genre. A message's place in the ladder's row order *is* its place in time, so nothing rides on `1:`/`2:` label ordinals and a reading agent no longer answers *three links join the client and the server* where the truth is one association carrying three segments in time. **`MESSAGE-ORDER-AND-STATE` (spec §9) is CLOSED** — the closing condition it stated, *a genre landing that brings a ladder layout path with it*, is the one that was met, and the question is kept whole under its closure note. What genuinely remains open is not the genre's absence but **which surface a portable figure may use**: `sequence` is EXPERIMENTAL and requires `figdown 0.4`, so the two figures `MESSAGE-ORDER-AND-STATE` cites as evidence (`examples/showcase/tcp-handshake.fd`, `examples/showcase/arp-resolution.fd`) deliberately stay `figdown 0.1 topology` + a companion `table` and keep the ordinal interim behind an honest-limit comment. Interim, unchanged, for any figure that must stay on `figdown 0.1`: number labels consistently (`1: SYN`, `2: SYN-ACK`) and carry per-participant state in a second section.
+- **the residual limits of `sequence` itself**, stated because the genre landing did not make them go away. A `message` is **one instant** — no separate send and receive, so no propagation delay and no two messages crossing on the wire. A `par` cannot re-order one chosen pair. A lifeline's `state` occurrences are **one sequence**, so two mutually exclusive operands cannot both end in a drawn `INIT`; the second carries the fact in `description=` instead. `ignore`/`consider` message sets and `loop` bounds live in the frame's label as prose a reader can quote and a parser cannot read, because `fragment` has no argument slot. And a **meaning-only `class`** — the sanctioned idiom for a message sent and never delivered, after `lost=` was refused (`UNDELIVERED-MESSAGE-MARKING`) — puts no ink on the page: the `.fd` reader learns which message was dropped and the `.svg` reader cannot. Every one of these is stated in the sources under `examples/sequence/`; the drawing-side ones are filed in decisions/registry.md.
 - **cell anchors** — an `edge` cannot target a `table` cell or `bitfield` field; `CELL-EDGE-ANCHORS`; interim: whole-table relation + cell name in the edge label.
 - **cross-block references** — no locator from one typed block to another, and no way to declare a composed region subordinate to a host element ("this table is about node X"); `CROSS-BLOCK-REFERENCES`; interim: prose note or a linking `edge` between the host nodes.
 - **a repeat COUNT that names another field** — `index=` says a `bitfield` field repeats and gives the range, but the last index can only be prose when the count lives in another field (`index="0..Last Entry"`), because no value in the language may name a field; `BITFIELD-REPETITION-CONSTRUCT`'s surviving half, downstream of the locator problem `ANNOTATION-LOCATOR-SPLIT`; interim: write the prose end — the run is then honestly indeterminate, which is the correct reading, and say so in a `description=` or a `class` meaning.

@@ -1,0 +1,59 @@
+{
+  "suite_version": "1.0.0",
+  "run": {
+    "utc": "2026-08-17T09:44:04Z",
+    "model_alias": "sonnet",
+    "model_used": "claude-sonnet-5",
+    "cli": "2.1.233 (Claude Code)",
+    "condition": "title-only",
+    "reader": 3
+  },
+  "figure": {
+    "id": "fragment-operators",
+    "genre": "sequence",
+    "path": "examples/sequence/fragment-operators.fd",
+    "file_sha256": "125ba6650b5fbdd44cadf286c24d68c81a1be6ab5d8892cf8215a33eda39d4b9",
+    "title_shown": "All twelve interaction operators, on one session",
+    "presented_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "presented_lines": 0,
+    "presented_chars": 0
+  },
+  "prompt": {
+    "system_sha256": "42d79e37b78275f219f2b1b70497abf709362f5fa68aa5427fb1f42b12b60425",
+    "user_sha256": "6900e18213b536e656839a6c7cf063f8105a135dcf5da49845566d110823104b",
+    "question_set_sha256": "93a6009ac666711f5bdb48006ce6581b97a457bc159c2a64781fcf1f5724f392"
+  },
+  "cold_room": {
+    "cwd": "an isolated empty temporary directory outside the repository",
+    "tools_offered": "none — every tool denied by name",
+    "mcp_servers": "none",
+    "settings": "safe-mode: no project or user settings, no memory file, no skills, no plugins, no hooks",
+    "session_persistence": false,
+    "shown": "the system prompt, the figure title, and the questions — nothing else",
+    "not_shown": "the specification, any genre document, any other .fd file, the file name, the name of the language, the repository"
+  },
+  "integrity": {
+    "turns": 1,
+    "permission_denials": 0,
+    "tool_calls_observed": false,
+    "is_error": false
+  },
+  "usage": {
+    "cost_usd": 0.010866,
+    "input_tokens": 867,
+    "output_tokens": 551,
+    "cache_creation_input_tokens": 0,
+    "duration_ms": 6554
+  },
+  "raw_answer_text": "A1: The order of the two events on that lifeline is fixed — the event drawn higher must occur before the event drawn lower, since a single lifeline without a coregion imposes a strict top-to-bottom (sequential) ordering of its own events.\n\nA2: Exactly one operand is executed; the operand whose guard evaluates to true at that point in the interaction is chosen (if several guards are true, one of them is chosen nondeterministically, unless one is marked \"else\").\n\nA3: It may execute anywhere from the lower bound up to the upper bound number of times, inclusive, with the exact number (within that range) left unspecified/nondeterministic.\n\nA4: The par fragment asserts that the messages/events in its different operands may be interleaved in any order (concurrent execution), but it still requires that the relative order of events within each individual operand be preserved.\n\nA5: The opt fragment asserts that its single operand either occurs exactly as shown or does not occur at all, i.e., it is optional behaviour guarded by a condition.\n\nA6: NOT STATED\n\nA7: NOT STATED\n\nA8: When the break guard is true, the break operand's content executes instead of, and in place of, the remainder of the enclosing interaction fragment, and everything that would otherwise follow in that enclosing fragment is skipped.",
+  "answers": {
+    "q1": "The order of the two events on that lifeline is fixed — the event drawn higher must occur before the event drawn lower, since a single lifeline without a coregion imposes a strict top-to-bottom (sequential) ordering of its own events.",
+    "q2": "Exactly one operand is executed; the operand whose guard evaluates to true at that point in the interaction is chosen (if several guards are true, one of them is chosen nondeterministically, unless one is marked \"else\").",
+    "q3": "It may execute anywhere from the lower bound up to the upper bound number of times, inclusive, with the exact number (within that range) left unspecified/nondeterministic.",
+    "q4": "The par fragment asserts that the messages/events in its different operands may be interleaved in any order (concurrent execution), but it still requires that the relative order of events within each individual operand be preserved.",
+    "q5": "The opt fragment asserts that its single operand either occurs exactly as shown or does not occur at all, i.e., it is optional behaviour guarded by a condition.",
+    "q6": "NOT STATED",
+    "q7": "NOT STATED",
+    "q8": "When the break guard is true, the break operand's content executes instead of, and in place of, the remainder of the enclosing interaction fragment, and everything that would otherwise follow in that enclosing fragment is skipped."
+  }
+}

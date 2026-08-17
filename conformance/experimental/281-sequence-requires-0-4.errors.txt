@@ -1,0 +1,1 @@
+Line 10: genre "sequence" requires figdown 0.4 (this document declares 0.3) — write: figdown 0.4 sequence

@@ -2,7 +2,7 @@ figdown 0.1 block
 # core §13.4: a document from ANY earlier version must reach the current one
 # in a SINGLE run. This is written in the oldest spellings the tool still
 # carries — six releases of them — and must land fully migrated after one pass.
-# The `layer`/`layer=` pair stood here until this release; `PAINT-ORDER-CONSTRUCT` WITHDREW their
+# The `layer`/`layer=` pair stood here until 0.3; `PAINT-ORDER-CONSTRUCT` WITHDREW their
 # target, so a chain containing them no longer completes and the halt is
 # pinned by its own fixture, 951-chain-halted-by-withdrawal.
 node b "B" shape=diamond

@@ -1,0 +1,59 @@
+{
+  "suite_version": "1.0.0",
+  "run": {
+    "utc": "2026-08-17T09:41:44Z",
+    "model_alias": "sonnet",
+    "model_used": "claude-sonnet-5",
+    "cli": "2.1.233 (Claude Code)",
+    "condition": "syntax",
+    "reader": 2
+  },
+  "figure": {
+    "id": "dhcp-lease",
+    "genre": "sequence",
+    "path": "examples/sequence/dhcp-lease.fd",
+    "file_sha256": "19c3cff8352138076d82fc44a9a4f2144a4d92b76d1ffecd22f551c7c0f26f7d",
+    "title_shown": null,
+    "presented_sha256": "eaefc2770abe7f316735a5f5f5cf24d1fbf4e8e93807c363ecf8c40f88fbc3eb",
+    "presented_lines": 69,
+    "presented_chars": 4921
+  },
+  "prompt": {
+    "system_sha256": "1a78658262dc29e7e24cbe3e1eb72659cf31990e85deddacf0b1625e40c5eac2",
+    "user_sha256": "afadb387bd571a02468426bcf8fd64f115a97bd8986c1b8ba15f552d331c85a4",
+    "question_set_sha256": "1d3c68113bc5b58b4f9aae9d0c6c12f85aa2b45e774ca1a1325a1442959abbe1"
+  },
+  "cold_room": {
+    "cwd": "an isolated empty temporary directory outside the repository",
+    "tools_offered": "none — every tool denied by name",
+    "mcp_servers": "none",
+    "settings": "safe-mode: no project or user settings, no memory file, no skills, no plugins, no hooks",
+    "session_persistence": false,
+    "shown": "the system prompt, the presented file text, and the questions — nothing else",
+    "not_shown": "the specification, any genre document, any other .fd file, the file name, the name of the language, the repository"
+  },
+  "integrity": {
+    "turns": 1,
+    "permission_denials": 0,
+    "tool_calls_observed": false,
+    "is_error": false
+  },
+  "usage": {
+    "cost_usd": 0.020805599999999997,
+    "input_tokens": 2,
+    "output_tokens": 1327,
+    "cache_creation_input_tokens": 0,
+    "duration_ms": 13571
+  },
+  "raw_answer_text": "A1: The four messages are DHCPDISCOVER, DHCPOFFER, DHCPREQUEST, and DHCPACK, in that order; the client sends the first one (DHCPDISCOVER).\n\nA2: A server originates both the DHCPOFFER and the DHCPACK.\n\nA3: The DHCPACK message (yiaddr=192.0.2.44) moves the client into the BOUND state.\n\nA4: The client moves into the RENEWING state, and it addresses the DHCPREQUEST via unicast directly to the server that holds the binding (server B).\n\nA5: The client moves into the REBINDING state, and unlike the unicast DHCPREQUEST sent at T1, this DHCPREQUEST is broadcast (sent to all servers, e.g. server A and server B) rather than sent to one specific server.\n\nA6: NOT STATED — the file does not explicitly say whether the client may keep using the address during renewal/rebinding, nor does it state what the client must do if the lease expires before a DHCPACK arrives.\n\nA7: A DHCPRELEASE message (ciaddr=192.0.2.44) is sent by the client to relinquish the address; it is unicast to the server, and the file notes the server side is captioned \"Discards lease.\"\n\nA8: The client broadcasts a DHCPREQUEST naming the chosen server (server-id=B); a server not named reads this as its offer being declined and may return its offered address to the pool.",
+  "answers": {
+    "q1": "The four messages are DHCPDISCOVER, DHCPOFFER, DHCPREQUEST, and DHCPACK, in that order; the client sends the first one (DHCPDISCOVER).",
+    "q2": "A server originates both the DHCPOFFER and the DHCPACK.",
+    "q3": "The DHCPACK message (yiaddr=192.0.2.44) moves the client into the BOUND state.",
+    "q4": "The client moves into the RENEWING state, and it addresses the DHCPREQUEST via unicast directly to the server that holds the binding (server B).",
+    "q5": "The client moves into the REBINDING state, and unlike the unicast DHCPREQUEST sent at T1, this DHCPREQUEST is broadcast (sent to all servers, e.g. server A and server B) rather than sent to one specific server.",
+    "q6": "NOT STATED — the file does not explicitly say whether the client may keep using the address during renewal/rebinding, nor does it state what the client must do if the lease expires before a DHCPACK arrives.",
+    "q7": "A DHCPRELEASE message (ciaddr=192.0.2.44) is sent by the client to relinquish the address; it is unicast to the server, and the file notes the server side is captioned \"Discards lease.\"",
+    "q8": "The client broadcasts a DHCPREQUEST naming the chosen server (server-id=B); a server not named reads this as its offer being declined and may return its offered address to the pool."
+  }
+}

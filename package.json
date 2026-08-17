@@ -1,6 +1,6 @@
 {
   "name": "figdown",
-  "version": "0.3.2",
+  "version": "0.4.0",
   "description": "A missing edge still looks fine. Text doesn't. A closed, deterministic figure language for Markdown whose source states the meaning, so the next reader can check the figure instead of only looking at it.",
   "license": "MIT",
   "author": "FigDown <hello@figdown.org>",
@@ -45,6 +45,7 @@
     "gate:registry": "node tools/registry-check.js --strict",
     "gate:capability": "node tools/capability-coverage.js --strict",
     "gate:archive": "node tools/archive-check.js --strict",
+    "gate:standards": "node tools/standards-check.js --strict",
     "gate:plugin": "node tools/plugin-check.js --strict",
     "gate:mcp": "node integrations/mcp-server/test.js",
     "gates:list": "node -e \"const s=require(process.cwd()+'/package.json').scripts||{};const g=Object.keys(s).filter(k=>k.startsWith('gate:'));if(!g.length){console.error('gates:list — no gate:* scripts found');process.exit(2);}if(process.env.GATES_JSON)console.log(JSON.stringify(g));else g.forEach(k=>console.log(k+'  ->  '+s[k]));\"",

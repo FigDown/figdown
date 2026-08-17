@@ -1,0 +1,196 @@
+{
+  "id": "rpf-check",
+  "genre": "block",
+  "figure": "examples/rpf-check.fd",
+  "subject": "reverse-path-forwarding check",
+  "source": {
+    "standard": "RFC 7761 / RFC 3704",
+    "locator": "RFC 7761 §2.1, §4.2; RFC 3704 §2.2",
+    "url": "https://www.rfc-editor.org/rfc/rfc7761 ; https://www.rfc-editor.org/rfc/rfc3704",
+    "anchor_strength": "moderate"
+  },
+  "authored": {
+    "protocol": "source-first: the author agent read only the source RFCs and never saw the .fd file",
+    "saw_figure": false
+  },
+  "revision": "re-authored once: questions were re-phrased to stand alone without naming the RFC in the ask, and narrowed to the decision path in the original brief. The author agent still never saw the diagram file.",
+  "questions": [
+    {
+      "qid": "q1",
+      "ask": "A router applies a reverse-path-forwarding check to a packet as it arrives on an interface. Which table does the router consult to perform the check?",
+      "tests": "that the table consulted is the ordinary unicast routing/forwarding table, not a special-purpose table",
+      "source_locator": "RFC 7761 §2.1 (Definitions, MRIB entry): the multicast topology table is \"typically derived from the unicast routing table\"; RFC 3704 §2.2 (Strict Reverse Path Forwarding): \"The source address is looked up in the Forwarding Information Base (FIB)...\"",
+      "answer": "It consults its unicast routing/forwarding table — the same table (RIB or FIB) that the router would normally use to route ordinary unicast traffic.",
+      "score": {
+        "all_of": [
+          [
+            "unicast rout",
+            "rib",
+            "fib",
+            "forwarding information base",
+            "routing information base",
+            "routing table",
+            "forwarding table",
+            "route table"
+          ]
+        ],
+        "none_of": []
+      }
+    },
+    {
+      "qid": "q2",
+      "ask": "In that table lookup, which address carried in the packet is used as the search key — its source address or its destination address?",
+      "tests": "that the lookup is keyed on the source address, not the destination address",
+      "source_locator": "RFC 3704 §2.2: \"The source address is looked up in the Forwarding Information Base (FIB)...\"; RFC 7761 §4.2: RPF_interface(S) is defined in terms of routing packets to S, the source.",
+      "answer": "The packet's source address is used as the lookup key.",
+      "score": {
+        "all_of": [
+          [
+            "source address",
+            "source addr",
+            "the source"
+          ]
+        ],
+        "none_of": []
+      }
+    },
+    {
+      "qid": "q3",
+      "ask": "Besides an interface, what else does the lookup for the packet's source tell the router about the path back toward that source?",
+      "tests": "that the route toward the source identifies a next-hop neighbor as well as an interface",
+      "source_locator": "RFC 7761 §2.1 (Definitions, RPF Neighbor entry): \"The RPF Neighbor of a router with respect to an address is the neighbor that the MRIB indicates should be used to forward packets to that address.\"",
+      "answer": "It also identifies the next-hop neighbor — the neighboring router that lies along the path back toward the source, not just the interface leading that way.",
+      "score": {
+        "all_of": [
+          [
+            "next hop",
+            "next-hop",
+            "neighbor",
+            "neighbour"
+          ]
+        ],
+        "none_of": []
+      }
+    },
+    {
+      "qid": "q4",
+      "ask": "After the router determines which interface routing would use to reach the packet's source, what does it compare that interface against?",
+      "tests": "that the comparison is between the routing-indicated interface and the interface the packet actually arrived on",
+      "source_locator": "RFC 7761 §4.2: \"if( iif == RPF_interface(S) ...)\" — iif is \"the incoming interface of the packet\"; RFC 3704 §2.2: \"...if the packet is received on the interface which would be used to forward the traffic to the source of the packet, it passes the check.\"",
+      "answer": "It compares that interface against the interface the packet actually arrived on (the incoming interface).",
+      "score": {
+        "all_of": [
+          [
+            "incoming interface",
+            "arriv",
+            "interface it arrived",
+            "interface the packet came in",
+            "receiv"
+          ]
+        ],
+        "none_of": []
+      }
+    },
+    {
+      "qid": "q5",
+      "ask": "Which happens first: the router looking up the route back toward the packet's source, or the router comparing that route to the interface the packet arrived on?",
+      "tests": "the order of steps: the routing lookup toward the source happens first and its result feeds the comparison against the arrival interface",
+      "source_locator": "RFC 7761 §4.2 pseudocode structure (RPF_interface(S) is evaluated, then compared to iif before any forwarding decision is made); RFC 3704 §2.2 (the source address is looked up first, then the arrival interface is checked against it).",
+      "answer": "The router first looks up the route back toward the source to determine which interface (and next hop) that would use; only then does it compare that result against the interface the packet actually arrived on.",
+      "score": {
+        "all_of": [
+          [
+            "first"
+          ],
+          [
+            "look up",
+            "lookup",
+            "looks up",
+            "determine",
+            "find"
+          ]
+        ],
+        "none_of": []
+      }
+    },
+    {
+      "qid": "q6",
+      "ask": "Under what condition does the packet pass this check, and what does the router do with it when it passes?",
+      "tests": "the pass condition (arrival interface matches the route back to the source) and the pass outcome (accept and forward)",
+      "source_locator": "RFC 3704 §2.2: \"...if the packet is received on the interface which would be used to forward the traffic to the source of the packet, it passes the check.\"",
+      "answer": "It passes when the packet arrived on the same interface that the router would use to send traffic back toward its source; when it passes, the router accepts the packet and forwards it onward normally.",
+      "score": {
+        "all_of": [
+          [
+            "same interface",
+            "matches",
+            "match the interface",
+            "identical interface",
+            "matching interface"
+          ],
+          [
+            "forward",
+            "accept"
+          ]
+        ],
+        "none_of": [
+          "re:packet is dropped",
+          "re:is discarded"
+        ]
+      }
+    },
+    {
+      "qid": "q7",
+      "ask": "Under what condition does the packet fail this check, and what does the router do with it when it fails?",
+      "tests": "the fail condition (arrival interface mismatches the route back to the source) and the fail outcome (drop)",
+      "source_locator": "RFC 3704 §2.2, describing strict RPF as an ingress filter that rejects traffic not matching the return path; RFC 7761 §4.2, the else branch of the iif/RPF_interface(S) comparison (\"RPF check failed\").",
+      "answer": "It fails when the packet arrived on a different interface than the one the route back to its source indicates; when it fails, the router does not forward the packet normally — the packet is dropped.",
+      "score": {
+        "all_of": [
+          [
+            "drop",
+            "discard",
+            "filtered",
+            "filter out",
+            "reject",
+            "denied",
+            "block"
+          ]
+        ],
+        "none_of": [
+          "re:packet is forwarded",
+          "re:is accepted and forwarded"
+        ]
+      }
+    },
+    {
+      "qid": "q8",
+      "ask": "Why does this check use the route toward the packet's source rather than the route toward its destination — what makes it a \"reverse\" check?",
+      "tests": "comprehension that ordinary forwarding is destination-keyed while this check is source-keyed, inspecting the path backward toward the origin",
+      "source_locator": "RFC 3704 §2.2 (\"The source address is looked up...\", contrasted with ordinary destination-based forwarding lookups); RFC 7761 §4.2 (RPF_interface(S) is defined via routing packets to S, the source, not to the packet's destination).",
+      "answer": "Ordinary forwarding looks up the packet's destination address to choose an outgoing interface; this check instead looks up the packet's source address and asks whether the packet arrived via the interface that traffic would take going back to that source — so it inspects the path backward toward the origin rather than forward toward the destination.",
+      "score": {
+        "all_of": [
+          [
+            "source"
+          ],
+          [
+            "toward the source",
+            "back to the source",
+            "back toward",
+            "to the source",
+            "reach the source",
+            "backward toward",
+            "back to that source",
+            "toward that source"
+          ]
+        ],
+        "none_of": [
+          "destination address is looked up",
+          "looks up the destination"
+        ]
+      }
+    }
+  ],
+  "score_rules_reviewed": "scoring rules reviewed by the suite maintainer BEFORE any reader ran: none_of lists that would have rejected a correct contrastive answer (e.g. 'dropped, not accepted') were relaxed or emptied. No question text and no canonical answer was changed, and no rule was touched after any reader answer was seen. A second review pass, driven by `--selftest` (a key must accept its own canonical answer) and still before any reader answer was consulted, repaired q8; every transcript taken against the earlier key was discarded and this figure was re-read from scratch."
+}

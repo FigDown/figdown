@@ -1,0 +1,59 @@
+{
+  "suite_version": "1.0.0",
+  "run": {
+    "utc": "2026-08-16T06:12:13Z",
+    "model_alias": "sonnet",
+    "model_used": "claude-sonnet-5",
+    "cli": "2.1.233 (Claude Code)",
+    "condition": "title-only",
+    "reader": 2
+  },
+  "figure": {
+    "id": "timing-handshake",
+    "genre": "timing",
+    "path": "examples/patterns/timing-a.fd",
+    "file_sha256": "751e714f90682ecdba9aa4737c02aefb01b973cba46e76bec28c2ef3fbab27ee",
+    "title_shown": "Clocked handshake: request / acknowledge",
+    "presented_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "presented_lines": 0,
+    "presented_chars": 0
+  },
+  "prompt": {
+    "system_sha256": "42d79e37b78275f219f2b1b70497abf709362f5fa68aa5427fb1f42b12b60425",
+    "user_sha256": "94bb6c3cf93897d8d9ee96989de0ac37304bbe94547bdff7f2cb4f87dd0c4622",
+    "question_set_sha256": "942d16dd9208ad34f5c012534ff7aea13b30e9531d05069416dbb15ff54fab25"
+  },
+  "cold_room": {
+    "cwd": "an isolated empty temporary directory outside the repository",
+    "tools_offered": "none — every tool denied by name",
+    "mcp_servers": "none",
+    "settings": "safe-mode: no project or user settings, no memory file, no skills, no plugins, no hooks",
+    "session_persistence": false,
+    "shown": "the system prompt, the figure title, and the questions — nothing else",
+    "not_shown": "the specification, any genre document, any other .fd file, the file name, the name of the language, the repository"
+  },
+  "integrity": {
+    "turns": 1,
+    "permission_denials": 0,
+    "tool_calls_observed": false,
+    "is_error": false
+  },
+  "usage": {
+    "cost_usd": 0.0069,
+    "input_tokens": 735,
+    "output_tokens": 313,
+    "cache_creation_input_tokens": 0,
+    "duration_ms": 3582
+  },
+  "raw_answer_text": "A1: The clock signal toggles at a constant, regular rate throughout the diagram.\nA2: All three signals (request, acknowledge, and completion) rest at low at the start.\nA3: The request signal asserts first.\nA4: No, the acknowledge signal cannot assert before the request signal, because acknowledge is generated in response to (and thus must follow) request.\nA5: The request signal returns low after it has been acknowledged, i.e., once the acknowledge signal has asserted in response.\nA6: The acknowledge signal returns low after the request signal has been deasserted, completing the four-phase handshake.\nA7: The completion signal indicates that the requested operation/transfer has finished; it occurs after the acknowledge has asserted, marking the end of the active data transfer within the handshake.\nA8: (1) Request asserts high, (2) Acknowledge asserts high in response, (3) Request deasserts low, (4) Acknowledge deasserts low.",
+  "answers": {
+    "q1": "The clock signal toggles at a constant, regular rate throughout the diagram.",
+    "q2": "All three signals (request, acknowledge, and completion) rest at low at the start.",
+    "q3": "The request signal asserts first.",
+    "q4": "No, the acknowledge signal cannot assert before the request signal, because acknowledge is generated in response to (and thus must follow) request.",
+    "q5": "The request signal returns low after it has been acknowledged, i.e., once the acknowledge signal has asserted in response.",
+    "q6": "The acknowledge signal returns low after the request signal has been deasserted, completing the four-phase handshake.",
+    "q7": "The completion signal indicates that the requested operation/transfer has finished; it occurs after the acknowledge has asserted, marking the end of the active data transfer within the handshake.",
+    "q8": "(1) Request asserts high, (2) Acknowledge asserts high in response, (3) Request deasserts low, (4) Acknowledge deasserts low."
+  }
+}

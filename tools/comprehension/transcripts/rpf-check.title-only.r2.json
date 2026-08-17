@@ -1,0 +1,59 @@
+{
+  "suite_version": "1.0.0",
+  "run": {
+    "utc": "2026-08-16T06:21:11Z",
+    "model_alias": "sonnet",
+    "model_used": "claude-sonnet-5",
+    "cli": "2.1.233 (Claude Code)",
+    "condition": "title-only",
+    "reader": 2
+  },
+  "figure": {
+    "id": "rpf-check",
+    "genre": "block",
+    "path": "examples/rpf-check.fd",
+    "file_sha256": "1500962db181dc5f6fd68653e24fcaa8f9153d1cffe0525c476075df57946ce6",
+    "title_shown": "RPF check on a multicast join",
+    "presented_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "presented_lines": 0,
+    "presented_chars": 0
+  },
+  "prompt": {
+    "system_sha256": "42d79e37b78275f219f2b1b70497abf709362f5fa68aa5427fb1f42b12b60425",
+    "user_sha256": "6c605616a3ae35a568785c7eeccce2172277ec7f40752fb8b61868492042bdec",
+    "question_set_sha256": "61aeae46aa0cc940551eea4a1d6d2e3ef9c67091350fd92995d2e5729e831406"
+  },
+  "cold_room": {
+    "cwd": "an isolated empty temporary directory outside the repository",
+    "tools_offered": "none — every tool denied by name",
+    "mcp_servers": "none",
+    "settings": "safe-mode: no project or user settings, no memory file, no skills, no plugins, no hooks",
+    "session_persistence": false,
+    "shown": "the system prompt, the figure title, and the questions — nothing else",
+    "not_shown": "the specification, any genre document, any other .fd file, the file name, the name of the language, the repository"
+  },
+  "integrity": {
+    "turns": 1,
+    "permission_denials": 0,
+    "tool_calls_observed": false,
+    "is_error": false
+  },
+  "usage": {
+    "cost_usd": 0.0060539999999999995,
+    "input_tokens": 703,
+    "output_tokens": 263,
+    "cache_creation_input_tokens": 0,
+    "duration_ms": 3706
+  },
+  "raw_answer_text": "A1: The unicast routing table (RIB).\nA2: The packet's source address is used as the lookup key.\nA3: It also tells the router the expected upstream (incoming) interface toward that source, i.e., the next-hop/outgoing interface used to reach it.\nA4: It compares that interface to the interface on which the packet actually arrived.\nA5: The router first looks up the route back toward the source, then compares it to the arrival interface.\nA6: It passes when the interface matches the one the packet arrived on; the router then forwards/accepts the packet for multicast forwarding.\nA7: It fails when the interface does not match the arrival interface; the router drops the packet.\nA8: Because it checks the path back toward where the packet came from (its source) rather than where it's going, reversing the normal forwarding lookup direction.",
+  "answers": {
+    "q1": "The unicast routing table (RIB).",
+    "q2": "The packet's source address is used as the lookup key.",
+    "q3": "It also tells the router the expected upstream (incoming) interface toward that source, i.e., the next-hop/outgoing interface used to reach it.",
+    "q4": "It compares that interface to the interface on which the packet actually arrived.",
+    "q5": "The router first looks up the route back toward the source, then compares it to the arrival interface.",
+    "q6": "It passes when the interface matches the one the packet arrived on; the router then forwards/accepts the packet for multicast forwarding.",
+    "q7": "It fails when the interface does not match the arrival interface; the router drops the packet.",
+    "q8": "Because it checks the path back toward where the packet came from (its source) rather than where it's going, reversing the normal forwarding lookup direction."
+  }
+}

@@ -1,0 +1,219 @@
+{
+  "id": "l2-forwarding-logic",
+  "genre": "flowchart",
+  "figure": "examples/showcase/l2-forwarding-logic.fd",
+  "subject": "L2 switch forwarding decision",
+  "source": {
+    "standard": "IEEE 802.1D / IEEE 802.1Q MAC bridge forwarding process (Learning, Forwarding, Flooding, Filtering)",
+    "locator": "802.1Q clause 8.6 'The Forwarding Process', clause 8.7 'The Learning Process', clause 8.8 'The Filtering Database' (equivalently 802.1D clause 7); primary IEEE text was unreachable, so the normative process is cited via a public secondary description: Cisco IOS 'Configuring Transparent Bridging' (Learning / Forwarding / Flooding / Filtering) and RFC 1493 (Bridge MIB), which itself points to IEEE 802.1D-1990 section 6.6 for the algorithm.",
+    "url": "https://www.cisco.com/c/en/us/td/docs/ios/bridging/configuration/guide/15-s/br-15-s-book/br_transprnt_brdg.html",
+    "anchor_strength": "medium"
+  },
+  "authored": {
+    "protocol": "source-first: the author agent read only public descriptions of the IEEE 802.1D/802.1Q standard and never saw the .fd file",
+    "saw_figure": false
+  },
+  "questions": [
+    {
+      "qid": "q1",
+      "ask": "When a switch receives a frame, does its source-address learning depend on whether the destination address is found in the address table for that same frame, or does the switch learn from the source address of every frame it receives, regardless of the forwarding outcome?",
+      "tests": "learning is independent of, and happens for every received frame regardless of, the forward/flood/filter decision made about the destination",
+      "source_locator": "IEEE 802.1Q clause 8.7 'The Learning Process' (802.1D clause 7.8): the Learning Process records the source address and receiving port of frames passed to it, independently of the Forwarding Process's destination decision; consistent with Cisco 'Configuring Transparent Bridging' description of the Learning function.",
+      "answer": "Learning happens for every frame the switch receives, independent of the destination lookup — the source address and receiving port are recorded whether that particular frame ends up being forwarded to one port, flooded to many, or filtered (discarded).",
+      "score": {
+        "all_of": [
+          [
+            "every frame",
+            "all frames",
+            "each frame",
+            "regardless",
+            "independent",
+            "irrespective",
+            "every received frame",
+            "any frame"
+          ],
+          [
+            "learn"
+          ]
+        ],
+        "none_of": [
+          "only if the destination",
+          "only when the destination",
+          "only unknown destination frames",
+          "only for unknown"
+        ]
+      }
+    },
+    {
+      "qid": "q2",
+      "ask": "When a switch learns from a received frame, what two things does it associate together in its address-table entry?",
+      "tests": "a learned entry pairs the frame's source MAC address with the port that frame arrived on",
+      "source_locator": "IEEE 802.1Q clause 8.7 Learning Process: creates or updates a Dynamic Filtering Entry that specifies the reception port for the frame's source address; Cisco 'Configuring Transparent Bridging' Learning description.",
+      "answer": "It associates the frame's source MAC address with the port on which that frame was received, so that address is now known to be reachable through that port.",
+      "score": {
+        "all_of": [
+          [
+            "source"
+          ],
+          [
+            "port"
+          ]
+        ],
+        "none_of": [
+          "destination address and port",
+          "destination mac address and port"
+        ]
+      }
+    },
+    {
+      "qid": "q3",
+      "ask": "What single condition determines whether a switch forwards a frame out one specific port versus floods it out multiple ports?",
+      "tests": "presence (known) vs. absence (unknown) of the destination address in the address/filtering table is the fork between forward-to-one-port and flood-to-many",
+      "source_locator": "Cisco 'Configuring Transparent Bridging': Forwarding — 'If the packet's destination address is known in the bridge table, it is forwarded on a single interface'; Flooding — 'If the packet's destination is unknown in the bridge table, it is flooded.' Same fork is IEEE 802.1Q clause 8.6 Forwarding Process querying the clause 8.8 Filtering Database.",
+      "answer": "Whether the destination MAC address is already present (known) in the switch's address table: if it is found there, the frame goes out only the single associated port; if it is not found (unknown), the frame is flooded out multiple ports.",
+      "score": {
+        "all_of": [
+          [
+            "known",
+            "found",
+            "already learned",
+            "exists in the table",
+            "in the table",
+            "in its table"
+          ],
+          [
+            "unknown",
+            "not found",
+            "not in the table",
+            "no entry",
+            "hasn t been learned",
+            "has not learned",
+            "hasn t learned"
+          ]
+        ],
+        "none_of": []
+      }
+    },
+    {
+      "qid": "q4",
+      "ask": "What does a switch do with a frame whose destination MAC address is not in its address table, and which port is always excluded from that action?",
+      "tests": "unknown-unicast destination triggers flooding out every port except the one the frame arrived on",
+      "source_locator": "Cisco 'Configuring Transparent Bridging' Flooding: 'If the packet's destination is unknown in the bridge table, it is flooded on all forwarding interfaces in the bridge group,' with the receiving interface excluded, per general transparent-bridging flooding behavior.",
+      "answer": "It floods the frame out every other port on the switch, excluding the port on which the frame was received.",
+      "score": {
+        "all_of": [
+          [
+            "flood"
+          ],
+          [
+            "except",
+            "excluding",
+            "other than",
+            "besides",
+            "not out",
+            "not the"
+          ]
+        ],
+        "none_of": [
+          "single port",
+          "one port only",
+          "only one port"
+        ]
+      }
+    },
+    {
+      "qid": "q5",
+      "ask": "How does a switch treat a frame with a broadcast or multicast destination address, compared with a frame whose (unicast) destination is unknown?",
+      "tests": "broadcast/multicast destinations get the same flood-to-all-ports-except-incoming treatment as an unknown unicast destination, rather than a single-port lookup result",
+      "source_locator": "General public description of the IEEE 802.1D/802.1Q flooding behavior: a destination that is unknown, or that is broadcast/multicast, is flooded out all ports except the one the frame arrived on.",
+      "answer": "The same way: broadcast and multicast destinations are always flooded out all ports except the receiving port, just as an unknown-unicast destination is, rather than being sent to one specific port from a table lookup.",
+      "score": {
+        "all_of": [
+          [
+            "flood"
+          ],
+          [
+            "broadcast"
+          ],
+          [
+            "multicast"
+          ]
+        ],
+        "none_of": [
+          "single port",
+          "one port only",
+          "only one port"
+        ]
+      }
+    },
+    {
+      "qid": "q6",
+      "ask": "Under what condition does a switch filter (discard) a frame instead of sending it out any port?",
+      "tests": "the filter/discard branch fires specifically when the destination's known port equals the port the frame was received on",
+      "source_locator": "Cisco 'Configuring Transparent Bridging' Filtering: 'Filtering occurs when the source and destination MAC addresses reside on the same bridge interface.'",
+      "answer": "When the destination address is known and its associated port is the same port the frame was received on — the destination is already reachable on the same interface as the source, so the switch discards the frame instead of forwarding it anywhere.",
+      "score": {
+        "all_of": [
+          [
+            "same port",
+            "same interface",
+            "same segment",
+            "the port it arrived",
+            "the receiving port",
+            "the port on which"
+          ],
+          [
+            "discard",
+            "filter",
+            "drop"
+          ]
+        ],
+        "none_of": [
+          "is flooded",
+          "gets flooded",
+          "floods it"
+        ]
+      }
+    },
+    {
+      "qid": "q7",
+      "ask": "Before a switch has learned which port a given station is reachable through, frames addressed to that station are flooded. How does that treatment change once the switch has learned that station's port?",
+      "tests": "learning converts future frames to that address from flood-to-all into forward-to-the-single-learned-port",
+      "source_locator": "Cisco 'Configuring Transparent Bridging' overview: contrast between Flooding (destination unknown, all forwarding interfaces) and Forwarding (destination known, single interface).",
+      "answer": "Once the station's address has been learned, later frames addressed to it are forwarded out only that one learned port instead of being flooded to every port.",
+      "score": {
+        "all_of": [
+          [
+            "flood"
+          ],
+          [
+            "single port",
+            "one port",
+            "only that port",
+            "that one port",
+            "learned port",
+            "specific port",
+            "just that port"
+          ]
+        ],
+        "none_of": []
+      }
+    },
+    {
+      "qid": "q8",
+      "ask": "For a switch to use a port as an output when flooding or forwarding a frame, what state must both the port the frame arrived on and the candidate output port be in?",
+      "tests": "relaying a frame (forward or flood) requires both the ingress port and the candidate egress port to be in the forwarding (spanning-tree) state",
+      "source_locator": "IEEE 802.1D relay condition on port state: a port is selected as a potential transmission port only if the port the frame was received on was in a forwarding state and the candidate transmission port is also in a forwarding state.",
+      "answer": "Both the port on which the frame was received and the candidate output port must be in the forwarding state; a port that is not in the forwarding state (for example, blocking) is not used to relay the frame in either direction.",
+      "score": {
+        "all_of": [
+          [
+            "forwarding state"
+          ]
+        ],
+        "none_of": []
+      }
+    }
+  ],
+  "score_rules_reviewed": "none_of lists were kept narrow per suite guidance: each entry rejects only an affirmative wrong-branch claim (e.g. 'is flooded' for the filter question, 'single port' for the flood questions), never a bare keyword like 'forward' or 'flood' that a correct contrastive answer might also legitimately contain. No question text or canonical answer was altered to satisfy scoring."
+}

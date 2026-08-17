@@ -1,0 +1,59 @@
+{
+  "suite_version": "1.0.0",
+  "run": {
+    "utc": "2026-08-16T06:11:17Z",
+    "model_alias": "sonnet",
+    "model_used": "claude-sonnet-5",
+    "cli": "2.1.233 (Claude Code)",
+    "condition": "title-only",
+    "reader": 3
+  },
+  "figure": {
+    "id": "ethernet-frame",
+    "genre": "table",
+    "path": "examples/showcase/ethernet-frame.fd",
+    "file_sha256": "cea7edf7194cecc134d020ca1fa4485c800da36439756602bddf7744632aafa4",
+    "title_shown": "Ethernet II Frame — Untagged vs 802.1Q Tagged",
+    "presented_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "presented_lines": 0,
+    "presented_chars": 0
+  },
+  "prompt": {
+    "system_sha256": "42d79e37b78275f219f2b1b70497abf709362f5fa68aa5427fb1f42b12b60425",
+    "user_sha256": "aa8c14b29042252c696c2554d651a8672ac2b88010cf638e16e6f3a0247c3a53",
+    "question_set_sha256": "fdc8a2c35eef34d6fee5f0fb0d0ad3794fd320e61d5e8546a1895288968d398e"
+  },
+  "cold_room": {
+    "cwd": "an isolated empty temporary directory outside the repository",
+    "tools_offered": "none — every tool denied by name",
+    "mcp_servers": "none",
+    "settings": "safe-mode: no project or user settings, no memory file, no skills, no plugins, no hooks",
+    "session_persistence": false,
+    "shown": "the system prompt, the figure title, and the questions — nothing else",
+    "not_shown": "the specification, any genre document, any other .fd file, the file name, the name of the language, the repository"
+  },
+  "integrity": {
+    "turns": 1,
+    "permission_denials": 0,
+    "tool_calls_observed": false,
+    "is_error": false
+  },
+  "usage": {
+    "cost_usd": 0.005109000000000001,
+    "input_tokens": 758,
+    "output_tokens": 189,
+    "cache_creation_input_tokens": 0,
+    "duration_ms": 2660
+  },
+  "raw_answer_text": "A1: The EtherType/Length field.\nA2: 6 bytes each.\nA3: It is inserted immediately after the Source Address field and before the EtherType/Length field.\nA4: 4 bytes.\nA5: Priority Code Point (PCP) — 3 bits, Drop Eligible Indicator (DEI/CFI) — 1 bit, VLAN Identifier (VID) — 12 bits.\nA6: 0x8100.\nA7: 46 to 1500 bytes.\nA8: The Preamble and Start Frame Delimiter (SFD).",
+  "answers": {
+    "q1": "The EtherType/Length field.",
+    "q2": "6 bytes each.",
+    "q3": "It is inserted immediately after the Source Address field and before the EtherType/Length field.",
+    "q4": "4 bytes.",
+    "q5": "Priority Code Point (PCP) — 3 bits, Drop Eligible Indicator (DEI/CFI) — 1 bit, VLAN Identifier (VID) — 12 bits.",
+    "q6": "0x8100.",
+    "q7": "46 to 1500 bytes.",
+    "q8": "The Preamble and Start Frame Delimiter (SFD)."
+  }
+}

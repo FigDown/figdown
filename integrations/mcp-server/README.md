@@ -87,7 +87,7 @@ particular there is no layout-lint tool and no "render to PNG".
 |---|---|
 | `figdown_build` | Turn one `.fd` into the deterministic, self-carrying SVG. The artifact embeds its own source, that source's SHA-256 and the engine version (core §7), so it round-trips back to text. |
 | `figdown_check` | Parse one document *or walk a whole tree*, render nothing, write nothing. This is the write → validate → fix loop and the corpus sweep; it exists separately from `build` so that iterating on a broken file costs no render and puts no SVG in the agent's context. |
-| `figdown_read` | The semantic model — participants, relationships and direction, containment, and the **stated meaning** of every class — shipped with the reading contract. Accepts a `.svg` too, recovering the source from its metadata and reporting the artifact stale if the `.fd` has moved on. |
+| `figdown_read` | The semantic model — participants, relationships and direction, containment, and the **stated meaning** of every class — shipped with the reading contract. Accepts a `.svg` too, recovering the source from its metadata and reporting the artifact stale if the `.fd` has moved on. A `sequence` section reports its own collections (lifelines, messages, states, fragments, operands) and gets one extra contract line, because in that genre a message is **not** an edge and array order **is** the meaning. |
 | `figdown_reference` | The per-genre reference, so an agent knows what a genre may and may not say. The grammar is **closed** and the parser **never warns about portability**, so this is the only place the frozen / EXPERIMENTAL split is visible. |
 
 ### `figdown_build`
@@ -118,8 +118,11 @@ than guessing at the picture.
 ### `figdown_reference`
 
 `name` — a genre (`block`, `bitfield`, `table`, `topology`, `flowchart`,
-`statechart`, `timing`), a task (`reading`, `transcribe`), or `skill`. Omit it
-for the index. `experimental: true` adds the genre's EXPERIMENTAL files, which sit
+`statechart`, `timing`, `sequence`), a task (`reading`, `transcribe`), or
+`skill`. Omit it for the index. The list is not restated here or in the tool's
+schema as the authority — it is **parsed out of `SKILL.md`'s router at call
+time**, so a genre that lands without a router row is invisible to this tool
+and `gate:mcp` fails rather than an agent receiving nothing. `experimental: true` adds the genre's EXPERIMENTAL files, which sit
 outside the v0.1 conformance surface and its compatibility promise.
 
 ## A parse error is a result, not an exception
@@ -168,7 +171,10 @@ node integrations/mcp-server/test.js     # npm run gate:mcp
 It speaks real JSON-RPC to a spawned subprocess (framing is the half that was
 hand-rolled, and an in-process test cannot catch a framing bug), then exercises
 every tool against real figures from `examples/` — a multi-section topology, an
-experimental `figdown 0.2 statechart`, a published artifact read back through
+experimental `figdown 0.2 statechart`, a `figdown 0.4 sequence` ladder whose
+model has no nodes and no edges at all, a published artifact read back through
 its own metadata, and a deliberately broken document. Two of its assertions are
 drift guards rather than feature tests: every genre in SKILL.md's router must
-still resolve to files that exist, and this server must contain no engine copy.
+still resolve to files that exist — `sequence` by name, since a genre that
+lands without a router row is the failure this guard exists for — and this
+server must contain no engine copy.

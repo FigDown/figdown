@@ -1,0 +1,216 @@
+{
+  "id": "arp-resolution",
+  "genre": "topology",
+  "figure": "examples/showcase/arp-resolution.fd",
+  "subject": "ARP address resolution",
+  "source": {
+    "standard": "RFC 826",
+    "locator": "Packet Generation / Packet Reception / An Example",
+    "url": "https://www.rfc-editor.org/rfc/rfc826.html",
+    "anchor_strength": "strong"
+  },
+  "authored": {
+    "protocol": "source-first: the author agent read only RFC 826 and never saw the .fd file",
+    "saw_figure": false
+  },
+  "questions": [
+    {
+      "qid": "q1",
+      "ask": "When the requesting host cannot resolve a target host's hardware address, how is the resulting ARP request packet addressed when it goes out on the Ethernet — to one specific station, or to every station on the segment?",
+      "tests": "the initial ARP request is broadcast, not sent to a single host",
+      "source_locator": "RFC 826, Packet Generation: \"It then causes this packet to be broadcast to all stations on the Ethernet cable originally determined by the routing mechanism.\"",
+      "answer": "The request is broadcast to all stations on the Ethernet cable/segment; it is not addressed to any single specific host.",
+      "score": {
+        "all_of": [
+          [
+            "broadcast"
+          ]
+        ],
+        "none_of": []
+      }
+    },
+    {
+      "qid": "q2",
+      "ask": "What is missing from the requesting host's own state, before it sends anything, that causes it to broadcast an ARP request in the first place?",
+      "tests": "a cache miss at the requester (no existing mapping for the target) triggers the request",
+      "source_locator": "RFC 826, Packet Generation and An Example: \"...because X was just started, it does not have this information. It throws the Internet packet away and instead creates an ADDRESS RESOLUTION packet...\"",
+      "answer": "The requester's own translation table does not yet hold a mapping from the target's protocol address to the target's hardware address, so it discards the packet it was trying to send and generates an ARP request instead.",
+      "score": {
+        "all_of": [
+          [
+            "doesn t have",
+            "does not have",
+            "lacks",
+            "missing",
+            "no entry",
+            "not have",
+            "hasn t",
+            "has not",
+            "unknown",
+            "no mapping",
+            "no translation",
+            "not in its table",
+            "not in the table",
+            "not yet",
+            "no mapping",
+            "absent"
+          ],
+          [
+            "mapping",
+            "translation",
+            "address",
+            "table",
+            "cache",
+            "entry"
+          ]
+        ],
+        "none_of": []
+      }
+    },
+    {
+      "qid": "q3",
+      "ask": "When the target host receives the ARP request, what two pieces of information from that packet does it store together as an entry in its own table?",
+      "tests": "the target caches the requester's <protocol address, hardware address> pair taken from the sender fields of the request",
+      "source_locator": "RFC 826, Packet Reception: \"...add the triplet <protocol type, sender protocol address, sender hardware address> to the translation table.\"",
+      "answer": "It stores the requester's protocol address (e.g. its IP address) together with the requester's hardware (Ethernet) address, taken from the sender fields of the request packet.",
+      "score": {
+        "all_of": [
+          [
+            "protocol address",
+            "ip address"
+          ],
+          [
+            "hardware address",
+            "ethernet address",
+            "mac address"
+          ]
+        ],
+        "none_of": []
+      }
+    },
+    {
+      "qid": "q4",
+      "ask": "If a host on the segment receives the broadcast request but is not the target protocol address, does it send any reply packet back?",
+      "tests": "only the target replies; other hosts on the segment that see the broadcast stay silent",
+      "source_locator": "RFC 826, Packet Reception: negative conditionals end processing and discard the packet when the \"Am I the target protocol address?\" check fails.",
+      "answer": "No. Only the host whose protocol address matches the target address sends a reply; any other host that receives the broadcast does not respond, and processing simply ends.",
+      "score": {
+        "all_of": [
+          [
+            "no reply",
+            "not reply",
+            "doesn t reply",
+            "does not reply",
+            "no response",
+            "not respond",
+            "does not respond",
+            "doesn t respond",
+            "nothing back",
+            "no packet back",
+            "not send anything",
+            "only the target replies",
+            "only the target responds",
+            "only target replies"
+          ]
+        ],
+        "none_of": [
+          "every host replies",
+          "all hosts reply",
+          "everyone replies",
+          "all stations reply"
+        ]
+      }
+    },
+    {
+      "qid": "q5",
+      "ask": "When the target host sends its reply back, is that reply broadcast to the whole segment, or sent directly to just the requesting host?",
+      "tests": "the reply is unicast back to the requester, unlike the broadcast request",
+      "source_locator": "RFC 826, An Example: \"...sends the packet directly (not broadcast) to EA(X).\"",
+      "answer": "The reply is sent directly to the requesting host's hardware address; it is not broadcast to the rest of the segment.",
+      "score": {
+        "all_of": [
+          [
+            "direct",
+            "unicast",
+            "directly"
+          ]
+        ],
+        "none_of": [
+          "re:is broadcast to",
+          "re:broadcasts the reply",
+          "re:reply is broadcast"
+        ]
+      }
+    },
+    {
+      "qid": "q6",
+      "ask": "After the requesting host receives the target's reply, what does it do with that information, and what results in its own table?",
+      "tests": "resulting cache state at the requester once the exchange completes",
+      "source_locator": "RFC 826, An Example: \"Machine X gets the reply packet from Y, forms the map from <ET(IP), IPA(Y)> to EA(Y), notices the packet is a reply and throws it away.\"",
+      "answer": "The requester adds a mapping from the target's protocol address to the target's hardware address in its own translation table, then discards the reply packet since it recognizes it as a REPLY.",
+      "score": {
+        "all_of": [
+          [
+            "map",
+            "mapping",
+            "entry",
+            "table",
+            "cache",
+            "translation",
+            "learns",
+            "learn",
+            "stores",
+            "added"
+          ]
+        ],
+        "none_of": []
+      }
+    },
+    {
+      "qid": "q7",
+      "ask": "In the original request packet, does the requesting host already know the target's hardware address, or is that precisely the information the request is meant to obtain?",
+      "tests": "the target hardware address is unknown/don't-care in the request, because it is exactly what is being resolved",
+      "source_locator": "RFC 826, Packet Generation: \"It does not set ar$tha to anything in particular, because it is this value that it is trying to determine.\"",
+      "answer": "The requester does not know the target's hardware address yet; that is exactly the value the request is trying to determine, so the field for it is left unset (or optionally set to the broadcast address) in the request.",
+      "score": {
+        "all_of": [
+          [
+            "doesn t know",
+            "does not know",
+            "unknown",
+            "don t know",
+            "not known",
+            "trying to determine",
+            "trying to find out",
+            "trying to discover",
+            "seeking",
+            "looking for",
+            "does not have"
+          ]
+        ],
+        "none_of": []
+      }
+    },
+    {
+      "qid": "q8",
+      "ask": "When a host receives an address-resolution request, does it merge the sender's address mapping into its own table before or after it looks at whether the opcode is a request or a reply?",
+      "tests": "order of operations: the sender's mapping is merged before the opcode is examined",
+      "source_locator": "RFC 826, Packet Reception: \"Notice that the <protocol type, sender protocol address, sender hardware address> triplet is merged into the table before the opcode is looked at.\"",
+      "answer": "Before — the receiving host merges/updates the sender's protocol-to-hardware address mapping in its table first, and only afterward examines whether the packet is a request or a reply.",
+      "score": {
+        "all_of": [
+          [
+            "before"
+          ]
+        ],
+        "none_of": [
+          "after the opcode",
+          "after it looks at the opcode",
+          "after checking the opcode",
+          "after examining the opcode"
+        ]
+      }
+    }
+  ],
+  "score_rules_reviewed": "scoring rules reviewed by the suite maintainer BEFORE any reader ran: none_of lists that would have rejected a correct contrastive answer (e.g. 'broadcast, not unicast') were relaxed or emptied. No question text and no canonical answer was changed, and no rule was touched after any reader answer was seen. A second review pass, driven by `--selftest` (a key must accept its own canonical answer) and still before any reader answer was consulted, repaired q2 and q5; every transcript taken against the earlier key was discarded and this figure was re-read from scratch."
+}

@@ -1,0 +1,105 @@
+{
+  "header": {
+    "version": "0.4",
+    "genre": "sequence"
+  },
+  "title": "Every acceptor of in=",
+  "flow": "right",
+  "classes": [],
+  "planes": [
+    {
+      "id": "base",
+      "z": 0
+    }
+  ],
+  "nodes": [],
+  "groups": [],
+  "edges": [],
+  "ranks": [],
+  "pins": [],
+  "thresholds": [],
+  "bands": [],
+  "bundles": [],
+  "regions": [],
+  "lifelines": [
+    {
+      "id": "c",
+      "label": "Client",
+      "line": 12
+    },
+    {
+      "id": "s",
+      "label": "Server",
+      "line": 13
+    },
+    {
+      "id": "probe",
+      "label": "Probe",
+      "in": "a1",
+      "line": 16
+    }
+  ],
+  "messages": [
+    {
+      "a": "c",
+      "op": "->",
+      "b": "s",
+      "label": "request",
+      "in": "a1",
+      "line": 17
+    },
+    {
+      "a": "c",
+      "op": "->",
+      "b": "probe",
+      "label": "poll",
+      "in": "b1",
+      "line": 21
+    },
+    {
+      "a": "c",
+      "op": "<-",
+      "b": "probe",
+      "label": "still waiting",
+      "in": "b1",
+      "line": 22
+    }
+  ],
+  "states": [
+    {
+      "lifeline": "c",
+      "name": "WAITING",
+      "in": "a1",
+      "line": 18
+    }
+  ],
+  "fragments": [
+    {
+      "id": "outer",
+      "label": "attempt",
+      "type": "opt",
+      "line": 14
+    },
+    {
+      "id": "inner",
+      "label": "retry",
+      "type": "loop",
+      "in": "a1",
+      "line": 19
+    }
+  ],
+  "operands": [
+    {
+      "id": "a1",
+      "label": "if reachable",
+      "in": "outer",
+      "line": 15
+    },
+    {
+      "id": "b1",
+      "label": "while no reply",
+      "in": "inner",
+      "line": 20
+    }
+  ]
+}

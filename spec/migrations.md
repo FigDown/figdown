@@ -172,6 +172,80 @@ too: they are **not** version-gated, so a newer engine reading an older
 header enforces them, and an archived engine is the only place a withdrawn
 spelling still runs.
 
+## 0.4  (2026-08-17, releasing as `v0.4.0`)
+
+The fourth released language version, and the project's **third `Y`**. It adds
+**one genre token** — `sequence`, EXPERIMENTAL, requiring `figdown 0.4` — and
+at the language surface it removes nothing: §10's option-key registry is
+byte-unchanged, no keyword is renamed or retired, and every `figdown 0.1`,
+`0.2` and `0.3` document parses to the same model under this release as it did
+under `v0.3.2`. This is deliberately the same increment `STATECHART-GENRE-SCOPE` made for
+`statechart`, one genre later (core §13.7.4).
+
+**Two things nevertheless act on documents that do not move their header**, and
+they are the sentences to read first, because neither is version-gated: a
+`class` that declares paint the member joining it cannot use is now a line
+error on **all ten** collections that accept `class=` and not on `edge` alone
+(`CLASS-CHANNEL-REACH`), and a `group` band that would enclose a node the source never put in it
+is now refused at geometry time rather than drawn. The first
+legalises more than it rejects and was measured to move **zero** of the
+repository's 524 `.fd`; the second refuses **one** published figure. The full
+account, and the only list an author can act on, is the `0.3 → 0.4` entry below.
+
+**The reading contract.** [`read/0.4/`](../read/0.4/reading.md) is the reading
+contract for `figdown 0.4` and is the **live** one from this release on:
+`read/0.3/` is frozen at the bytes `v0.3.0` shipped and is never edited again,
+on the same terms as `read/0.1/` and `read/0.2/`. `read/0.4/` carries the
+`sequence` genre's reading and **discharges erratum E1**
+([ERRATA.md](ERRATA.md), `GENRE-NAMESPACE`/`FROZEN-CONTRACT-CORRECTION`): the layout zone is ignorable by
+**namespace membership**, not by textual position, which is what a `pin` written
+above the `layout` line — 54% of the corpus's pins — always needed it to say.
+The three frozen trees keep the wording they shipped, so E1 stays in the
+register for anyone reading them directly; that is the freeze working, not a
+second defect. **`read/0.4/` itself freezes at this publish**, on the terms
+`read/0.1/` set: from `v0.4.0` on it is the bytes this release shipped, a later
+release that needs to say something different writes `read/0.5/`, and the
+`--write 0.4` run below is what makes that checkable rather than merely stated.
+
+**The archive (§13.5).**
+
+| | |
+|---|---|
+| **tag** | `v0.4.0` — created by the release act |
+| **runnable page** | `archive/0.4/figdown.html` — written at **publish**, from the published engine stamped `0.4.0` |
+
+Both are **owed at the release act and not before**, for the reason `0.1`'s
+entry states: the archived page is the engine *as users ran it*, and that
+artifact does not exist until `publish.py` stamps it — the source engine at this
+tag stamps 0.4 (§13.0.4) and is therefore the wrong bytes by
+definition. `node tools/archive-check.js --write 0.4` then appends the `0.4`
+rows — covering `archive/0.4/figdown.html` and every file under `read/0.4/` — to
+[`archive/MANIFEST.tsv`](../archive/MANIFEST.tsv), after which `gate:archive`
+holds them byte-frozen forever on the same terms as `0.1`.
+
+**A pre-existing archive debt this release inherits and does NOT quietly
+settle.** `archive/MANIFEST.tsv` holds **`0.1` rows only**: the `--write` step
+the `0.2` and `0.3` entries above each describe was not run at those publishes,
+so `read/0.2/` and `read/0.3/` are frozen by policy and hashed by nothing, and
+`gate:archive`'s green is a statement about `0.1` and about no other version.
+Back-filling them now would hash today's bytes and assert they are the bytes
+those releases shipped — the one claim the manifest exists to make honestly and
+the one claim nobody can make retroactively. So the debt is **recorded, not
+fixed** (core §13.7.4, and the `0.3 → 0.4` entry below), and the
+record is what keeps `0.4` from adding a fourth unhashed tree unnoticed. The
+`0.4` rows are written at the `0.4` publish, on time, for the first time since
+`0.1`.
+
+**An engine that accepts only `figdown 0.1`** — including
+[`archive/0.1/figdown.html`](../archive/0.1/figdown.html) — rejects a `figdown
+0.4` document by name (`unsupported version "0.4" (expected 0.1)`) rather than
+guessing, and an engine that stops at `0.2` or `0.3` names its own ceiling the
+same way. That is core §13.0.1's `Y` < `y` branch working as specified. The
+mirror image is stated in the `0.3` entry above and is unchanged here: `CLASS-CHANNEL-REACH`'s
+generalisation and the group-band refusal are **not** version-gated, so a newer
+engine reading an older header applies both, and an archived engine is the only
+place the older behaviour still runs.
+
 ## Entry format
 
 ```
@@ -495,3 +569,209 @@ Classification: **ADDITIVE where the compatibility promise reaches,
          still runs.
 
 Ruling:  `DRAWN-ANNOTATION-FORM`, `MARKER-TARGET-KINDS`, `SUBJECT-VOCABULARY-SCOPE`, `SCENE-KEYWORD-MEMBERSHIP`, `PAINT-ORDER-CONSTRUCT`, `RESERVED-SPELLINGS`, `MEMBERSHIP-KEY-ACCEPTANCE`.
+
+---
+
+## 0.3 → 0.4  (2026-08-17, what a document must change to declare `figdown 0.4`)
+Change:  **NOTHING IS FORCED BY THE HEADER, AND TWO THINGS ARE FORCED
+         WITHOUT IT.** A `figdown 0.3` document does not have to move: every
+         document legal at `v0.3.2` parses to the same model under this
+         release, no keyword is renamed or retired, and `figdown 0.4` buys
+         exactly one thing — the `sequence` genre. But **two changes in this
+         release do not read the declared version at all**, so staying at
+         `figdown 0.3` does not escape them. Those are items 1 and 2, and
+         they are the only sentences here an author may have to act on.
+
+         **1. A `class` must not declare paint that cannot reach the member
+         that joins it — and that check now runs over ALL TEN collections
+         that accept `class=`** (`CLASS-CHANNEL-REACH`). The rule is `INTERIOR-LESS-ELEMENT-PAINT`'s and its shape is unchanged; until this release the loop
+         ran over `edge`s only, so a class joined by a `message`, a
+         `fragment`, an `operand`, a `field` or a `cell` was never checked.
+         The channel sets are derived from what each renderer actually
+         READS — a key the drawing never consults is not a channel the
+         member has:
+
+         | member | channels it has |
+         |---|---|
+         | `node` `group` `lifeline` `state` | `fill` `stroke` `style` |
+         | `edge` `message` | `stroke` `style` — no interior |
+         | `fragment` `operand` | `stroke` `style` — a frame over its members |
+         | `field` `cell` | `fill` `stroke` — `style=` left both at 0.1 (`STYLE-KEY-SCOPE`) |
+
+         Two forms are line errors, both of them declared paint that cannot
+         arrive: `fill=` with no `stroke=` on a class an interior-less member
+         joins, and — new here — a class **all** of whose channels the member
+         lacks, reachable today as a `style=`-only class on a `field` or a
+         `cell`. A member with all three channels can never fail either form.
+         **Measured over all 524 `.fd` in the repository, this finds zero
+         instances**; you are only affected if your own figure joins a
+         paint-declaring class from one of the five newly-reached
+         collections. Both messages name the key to add.
+
+         **RETIRED IN THE SAME RULING, and it only ever legalises: a class
+         that declares NO paint at all is no longer a line error anywhere.**
+         From 0.1 to 0.4, `CLASS-PAINT-REQUIREMENT`'s second half made `class p
+         "Path"` plus `edge a -> b class=p` an error. `CLASS-CHANNEL-REACH` withdraws it: the
+         harm `CLASS-PAINT-REQUIREMENT` named was "shows nothing in the legend", and `CLASS-PAINT-REQUIREMENT`'s own
+         release made the derived legend draw the meaning with no swatch, so
+         the rule had already been paid off by its own increment. A
+         meaning-only `class` is now legal on every collection, as it has
+         always been on `field`. **No document is invalidated by the
+         retirement and none needs a rewrite for it.**
+
+         **2. A `group` band that would enclose a non-member is refused
+         rather than drawn**. A `group` renders as a band and the
+         reader's rule is *inside the box is in the group*; of the 34
+         published figures declaring a `group`, **2** drew a band around a
+         node their own source never put in it, with no diagnostic. Who
+         chose the position decides what happens now: if **auto-layout**
+         chose it, the engine places the members contiguously and moves the
+         intruder clear — silent, no author action, no syntax. If **a `pin`**
+         chose it, the freedom is gone and the renderer reports a
+         GEOMETRY-TIME error naming the `pin` line and the enclosed node, and
+         **renders nothing**. This is a new error class raised by the
+         RENDERER rather than the parser, because `parse` cannot see a
+         coordinate; core §2.2 states the containment guarantee normatively
+         and §8 opens the class. **A caller that writes `.svg` files MUST
+         treat a non-empty render-diagnostic list exactly as it treats a
+         non-empty parse-error list** — if you have your own build script,
+         that is the one integration change this release asks for.
+
+         **3. `sequence` — the one capability that requires raising the
+         header.** `figdown 0.4 sequence` is a new EXPERIMENTAL genre for
+         interaction diagrams
+         ([`genres/experimental/sequence.md`](genres/experimental/sequence.md)),
+         reachable only from `figdown 0.4`. Its source standard is OMG UML
+         2.5.1 clause 17, on ISO ground because ISO/IEC 19505-2 publishes the
+         same clause (`SEQUENCE-SOURCE-STANDARD`). It declares five keywords — `lifeline`,
+         `message`, `state`, `fragment`, `operand` — and **no new option
+         key**; §10's registry is byte-unchanged, which is why this `Y` adds
+         a genre token and nothing else. Message order is TOTAL, and the
+         divergence from both source standards is declared rather than
+         hidden (`SEQUENCE-ORDER-MODEL`). Three spellings a reader might expect are REFUSED by
+         name: `gap` (`SEQUENCE-TIME-GAP`), `group` (`SEQUENCE-PARTICIPANT-GROUPING`) and `lost=` (`UNDELIVERED-MESSAGE-MARKING`) — under
+         `sequence`, `class` is what carries the meaning those would have
+         carried, and a meaning-only `class` is that genre's designed idiom,
+         which item 1's retirement is what makes legal.
+
+         `figdown 0.3 sequence` answers `genre "sequence" requires figdown
+         0.4 (this document declares 0.3) — write: figdown 0.4 sequence`. It
+         is not `unknown genre`, which would send an author hunting a typo,
+         and it is never a silent promotion to `0.4`, which core §13.7
+         forbids. **A document that wants none of this is untouched**, and
+         declaring the LOWEST version that carries what the section needs is
+         still the rule — the showcase's own ARP figure stays `figdown 0.1`
+         deliberately, for exactly that reason.
+
+         **4. What is NOT in this entry, and why.** The release also corrects
+         one diagnostic's WORDING: the retired-`boundary` message attributed
+         «boundary» to UML, and the stereotype occurs zero times in OMG UML
+         2.5.1 and zero times in ISO/IEC 19505-2 — it belongs to the
+         Entity-Control-Boundary analysis pattern. The keyword is still
+         retired, `external` is still what replaces it, the advice is
+         unchanged, no document that parsed stops parsing and no figure
+         changes, so **no author acts on it** and it is not a migration item.
+         (If you quoted the old sentence in your own documentation, its claim
+         about UML was wrong.) Likewise not migration items: the editor's
+         direct-manipulation half no longer authors line errors under
+         `sequence` — a GUI fix writes text you
+         could always have written by hand — and `gate:standards`, which now
+         requires a register row behind every claim this project makes about
+         an external standard. Both change what the project ships, neither
+         changes what a document must say.
+
+Rule:    **NOTHING TO REWRITE, and `tools/migrate-figdown.js` gains no rule.**
+         Nothing was renamed, retired or moved, so there is no document the
+         tool could correctly change — the third `Y` in a row for which that
+         is the honest answer. Three author actions cover the whole entry,
+         and the first two apply only if a check fires against your own
+         figure:
+
+           ADD THE MISSING KEY   a class a `message` / `fragment` /
+                                 `operand` / `field` / `cell` joins that
+                                 declares only channels the member lacks:
+                                   class k "K" fill=#eee
+                                 →  class k "K" fill=#eee stroke=#333
+                                 Keep `fill=` on the same class when members
+                                 that HAVE an interior also join it — one
+                                 class carries one meaning for heterogeneous
+                                 members, which is why the test is per
+                                 channel.
+           MOVE THE PIN          `pin puts "<id>" inside the band of group
+                                 "<g>"` means the drawing was already saying
+                                 `<id>` is a member of `<g>`. Move the `pin`
+                                 clear of the group's extent, or say what the
+                                 drawing says and write `in=<g>`.
+           RAISE THE HEADER      only for `sequence`, and only in the section
+                                 that declares it.
+
+         **The header does not move for items 1 or 2.** Raising a section to
+         `figdown 0.4` neither causes nor cures either, and leaving it at
+         `figdown 0.3` does not defer either. A document that joins no
+         paint-declaring class from a newly-reached collection and pins no
+         node into a band is unaffected in every respect and needs no run of
+         the tool.
+
+         **Rebuild your artifacts.** `data-engine-version=` moves and, for
+         one reference figure, two band origins move with it; every other
+         drawing in this repository is byte-identical apart from the stamp.
+
+Example: `figdown 0.4 sequence`      → parses; the genre is EXPERIMENTAL
+         `figdown 0.3 sequence`      → genre "sequence" requires figdown 0.4
+                                       (this document declares 0.3) — write:
+                                       figdown 0.4 sequence
+         `class k "K" fill=#eee` + `message c -> s "m" class=k`
+                                   → line error naming the member and the
+                                     key to add; before this release it
+                                     parsed clean, painted none of the fill,
+                                     and put `k` in the legend anyway
+         `class v "Vendor" style=dotted` + `field "Flags":6 class=v`
+                                   → line error: every channel the class
+                                     declares is one a `field` lacks
+         `class dropped "Sent, never delivered"` + `message a -> b class=dropped`
+                                   → LEGAL, and newly so under `sequence`;
+                                     an unpainted meaning is that genre's
+                                     idiom, not an omission
+         `group g "Box"` / `node a "A" in=g` / `node m "M"` / `node b "B" in=g`
+                                   → `a` and `b` are placed adjacent and `M`
+                                     sits outside the band; before, `M` was
+                                     drawn inside the box with no diagnostic
+         `pin` fixing a non-member inside a group's extent
+                                   → geometry-time error naming the `pin`
+                                     line and the node; nothing is rendered
+                                     and no artifact is written
+
+Classification: **ADDITIVE at the language surface, and one figure becomes
+         UNAVAILABLE.** `sequence` adds a genre token behind a version gate
+         and removes nothing; every `figdown 0.1`, `0.2` and `0.3` document
+         parses to the same model and every golden of all three versions
+         passes unmodified. Two goldens moved for the version set and neither
+         is a compatibility break — `014-header-bad-version` now uses `0.5` as
+         its unsupported-minor example (expect this once per `Y`), and
+         `016-header-major-version`'s message text gained the fourth accepted
+         version. `CLASS-CHANNEL-REACH` is a widening and a reach in that order of risk, and
+         it moves **zero** of the repository's 524 `.fd`. What is genuinely
+         lost is one drawing: `examples/layout-compare/srl-evpn-irb-auto.fd`,
+         the auto-layout arm of the layout comparison, can no longer be
+         rendered — its three leaf groups interleave across ranks and no
+         placement the separation pass can reach clears every band, so the
+         engine refuses it. That the refusal fires is correct; that it fires
+         *there* is a limit of the layout and not of the document
+         (`decisions/registry.md` item 32), and the figure returns when
+         group-aware rank assignment lands. Its artifact is deleted rather
+         than left standing at the engine that last built it. Nothing else
+         becomes UNAVAILABLE:
+         [`archive/0.1/figdown.html`](../archive/0.1/figdown.html) and
+         [`read/0.1/`](../read/0.1/reading.md) are byte-untouched, `read/0.3/`
+         freezes here on the same terms as `read/0.2/`, and `gate:archive`
+         holds `0.1` so. **`read/0.4/` also discharges erratum E1** — the
+         layout zone is ignorable by namespace membership, not by textual
+         position — which is the first time the erratum path core §13.7.3
+         opened has actually been walked.
+
+Ruling:  `SEQUENCE-GENRE-VOCABULARY` (the `sequence` genre, its vocabulary and its three
+         refusals); `STATECHART-GENRE-SCOPE` (the version gate this genre reuses without an
+         `n`-th branch); `CLASS-CHANNEL-REACH` (the class-channel generalisation and `CLASS-PAINT-REQUIREMENT`'s
+         half-retirement); `INTERIOR-LESS-ELEMENT-PAINT` (the half of the channel rule that stands);
+         `GENRE-NAMESPACE`/`FROZEN-CONTRACT-CORRECTION` (E1, discharged in `read/0.4/`); `VOCABULARY-SOURCE-ATTRIBUTION` (the
+         retired-`boundary` wording, applied but not a migration item).

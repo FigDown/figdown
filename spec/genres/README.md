@@ -1,7 +1,8 @@
 # FigDown genre documents
 
-> Navigation index for the seven genres (`GENRE-DOCUMENT-CONTRACT` documentation contract) — the
-> six of `figdown 0.1`, plus `statechart`, which needs `figdown 0.2` (`STATECHART-GENRE-SCOPE`).
+> Navigation index for the eight genres (`GENRE-DOCUMENT-CONTRACT` documentation contract) — the
+> six of `figdown 0.1`, plus `statechart`, which needs `figdown 0.2` (`STATECHART-GENRE-SCOPE`),
+> plus `sequence`, which needs `figdown 0.4` (`SEQUENCE-SOURCE-STANDARD`).
 >
 > **Spec split:** the cross-genre framework is [../core.md](../core.md)
 > (formerly `spec/core.md`). Each file below is the **only** normative
@@ -9,8 +10,8 @@
 >
 > **Frozen and experimental are separated at the FILE level.**
 > The three NORMATIVE genres — `block`, `bitfield`, `table` — are the `.md`
-> files in this directory. The FOUR EXPERIMENTAL ones — `topology`,
-> `flowchart`, `timing`, `statechart` — are in [experimental/](experimental/). A reader or
+> files in this directory. The FIVE EXPERIMENTAL ones — `topology`,
+> `flowchart`, `timing`, `statechart`, `sequence` — are in [experimental/](experimental/). A reader or
 > an agent that wants nothing outside the v0.1 conformance surface can
 > ignore that subdirectory whole, and this index and the frozen genre
 > documents stay complete without it: nothing frozen is DEFINED there, and no
@@ -99,15 +100,16 @@ doc's prose.
 | `table` | 9.6% | nested genre | NORMATIVE | `table`, `\|` rows, `cell`, `width` | [complete vocabulary](table.md#complete-vocabulary-normative) | [table.md](table.md) |
 | `timing` | 7.2% | nested genre | **EXPERIMENTAL** | `timing`, `signal`, `gap` | [complete vocabulary](experimental/timing.md#complete-vocabulary-normative) | [experimental/timing.md](experimental/timing.md) |
 | `statechart` | 3 of 91 production docs | scene namespace | **EXPERIMENTAL** | `state`, `transition` (`GENRE-NODE-SPELLING`, OMG UML 2.5.1 §14) — they **replace** the scene `node` and `edge` here; needs `figdown 0.2` | [complete vocabulary](experimental/statechart.md#complete-vocabulary-normative) | [experimental/statechart.md](experimental/statechart.md) |
+| `sequence` | 14 of 2,177 production images (0.6%) | **ladder — its own family** | **EXPERIMENTAL** | `lifeline`, `message`, `state`, `fragment`, `operand` (`SEQUENCE-GENRE-VOCABULARY`, OMG UML 2.5.1 §17) — `lifeline`/`message` **replace** the scene `node` and `edge`, and the other three are this genre's own; plus the mandatory `type=` on `fragment`, whose twelve values are UML's `InteractionOperatorKind`; needs `figdown 0.4` | [complete vocabulary](experimental/sequence.md#complete-vocabulary-normative) | [experimental/sequence.md](experimental/sequence.md) |
 
 **Genre status (`CONSTRUCT-STATUS-TIERS`, core doc §10).** Each genre carries a
 status. The six of `figdown 0.1` split three and three; `statechart` (`STATECHART-GENRE-SCOPE`)
-made the experimental side four:
+made the experimental side four, and `sequence` (`SEQUENCE-SOURCE-STANDARD`) five:
 
 | Status | Genres | What it means |
 |---|---|---|
 | **NORMATIVE** (NORMATIVE) | `block`, `bitfield`, `table` | Inside the v0.1 **conformance surface** and inside the **compatibility promise**. A conforming implementation MUST support the genre; it changes only through a migration entry (`VERSION-MIGRATION-MODEL`). |
-| **EXPERIMENTAL** (EXPERIMENTAL) | `topology`, `flowchart`, `timing`, `statechart` | The reference engine accepts the genre and its documents keep working — but it is **outside** both. It may change or be withdrawn in a later `0.x` **without a migration entry**, and a document written in it is not a portable v0.1 document. |
+| **EXPERIMENTAL** (EXPERIMENTAL) | `topology`, `flowchart`, `timing`, `statechart`, `sequence` | The reference engine accepts the genre and its documents keep working — but it is **outside** both. It may change or be withdrawn in a later `0.x` **without a migration entry**, and a document written in it is not a portable v0.1 document. |
 
 The demotion is documentation only. The engine accepts all six genres
 unchanged, every existing document parses and renders exactly as before, and
@@ -125,7 +127,12 @@ excluded candidates (fork/join/merge, a loop construct, a default branch,
 edge roles, swimlanes) are recorded rather than settled.
 `timing`'s lane alphabet is settled (a strict SUBSET of prior art, `DESIGN-DECISION-METHOD`, and
 closed — `2`–`9` were retired for having been redefined), but the surface around it is not: `data=` and `gap` are both
-unresolved. Each genre document states its own status at the top.
+unresolved. `sequence` is experimental for the reason its own document states
+plainly: **0.6% is the lowest measured demand of any genre candidate this
+project has weighed**, and unlike `statechart` its withdrawal would not cost
+one line per figure — it brought five keywords, an enum and a whole ladder
+layout with it, so EXPERIMENTAL does not price this bet the way it priced the
+last one. Each genre document states its own status at the top.
 
 **The five demoted constructs — all EXPERIMENTAL, all DEFINED in
 [../experimental.md](../experimental.md).** Independently of genre status,
@@ -221,7 +228,7 @@ markers stay EXPERIMENTAL: a defect in an experimental construct is still a
 defect, but fixing it is not a promotion. The normative treatment is
 [block.md](block.md) §2.6.
 
-Two families, one language:
+Three families, one language:
 
 - **Scene namespace** (`block`, `topology`, `flowchart`, `statechart`) share
   one vocabulary — `group`, `class`, `flow`, `rank` and the rest of §2 — and
@@ -236,6 +243,17 @@ Two families, one language:
 - **Nested genres** (`bitfield`, `table`, `timing`) each own a closed
   sub-grammar and declare their kind in their content as well as in the
   header.
+- **The ladder** (`sequence`, EXPERIMENTAL) is neither, and the
+  difference is not a matter of taste: a scene genre draws a graph and has no
+  axis, while **both** of this genre's axes carry meaning and neither is the
+  author's to set — columns are `lifeline` declaration order, rows are
+  `message` ∪ `state` declaration order (`DECLARATION-ORDER-SEMANTICS`, twice). That is why it declares
+  no `flow` and no `rank`, why no key in it moves a coordinate, and why it
+  cannot host a composed region: there is no scene to host one in. It shares
+  the scene genres' per-genre node/connector rename (`lifeline`/`message`)
+  and nothing else. See
+  [experimental/sequence.md](experimental/sequence.md), which is EXPERIMENTAL
+  throughout.
 
 **Top-level allowlist (`GENRE-KEYWORD-ALLOWLIST`).** The header genre is an **allowlist**
 of legal top-level keywords for that section (enforced `GENRE-NAMESPACE`). `UNIVERSAL-CORE-KEYWORDS` core
@@ -327,3 +345,20 @@ the normative document is
 `final` and `mode` (draft §5.2) are NOT in the language, gated on `NEW-CONSTRUCT-EVIDENCE-GATE`
 evidence. A reader may not infer an initial or final state from a figure's
 shape.
+
+**`sequence` LANDED across this release (`SEQUENCE-GENRE-VOCABULARY`)**, EXPERIMENTAL, and
+it is the reason the language number moved to `0.4`: it is surface
+`figdown 0.3` does not have, so it requires `figdown 0.4` and
+`figdown 0.3 sequence` stays a line error. Unlike `statechart` it did **not**
+land as a header token alone — a dispatch point with no ladder would have
+produced a graph drawing of a time figure — so the increment brought five
+keywords (`lifeline`, `message`, `state`, `fragment`, `operand`), one
+mandatory enum key (`type=`, twelve values from OMG UML 2.5.1 §17), five
+acceptors for `in=` capped at one level of nesting, and a renderer. **Three
+constructs were REFUSED rather than withdrawn** — `gap` (`SEQUENCE-TIME-GAP`), `group`
+(`SEQUENCE-PARTICIPANT-GROUPING`) and `lost=` (`UNDELIVERED-MESSAGE-MARKING`) — because this genre never declared them; each is
+a named line error carrying its ground and its replacement. The design record
+is decisions/registry.md;
+the normative document is
+[experimental/sequence.md](experimental/sequence.md); the question that asked
+for it, closed, is core §9 `MESSAGE-ORDER-AND-STATE`.

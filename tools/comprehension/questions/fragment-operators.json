@@ -1,0 +1,310 @@
+{
+  "id": "fragment-operators",
+  "genre": "sequence",
+  "figure": "examples/sequence/fragment-operators.fd",
+  "subject": "the twelve UML interaction operators on one session",
+  "source": {
+    "standard": "OMG Unified Modeling Language (OMG UML), Version 2.5, formal/2015-03-01, clause 17 'Interactions'",
+    "locator": "§17.1.3 (partial ordering of event occurrences), §17.3.3.1 (Lifelines), §17.4.3.1 (Messages), §17.6.3 (Fragments — Semantics: Interaction Operands, Interaction Constraints, and the InteractionOperatorKind values), §17.6.4 (Notation), §17.12.15 (InteractionOperatorKind [Enumeration])",
+    "url": "https://www.omg.org/spec/UML/2.5/PDF",
+    "anchor_strength": "strong",
+    "note": "The author agent read the normative clause itself: the OMG UML specification PDF was fetched from omg.org and its clause 17 text extracted and read directly (§17.1, §17.3, §17.4, §17.6, §17.12.15). The version actually read was UML 2.5 (formal/2015-03-01), not 2.5.1 (formal/17-12-05), because the 2.5.1 PDF exceeded the fetch size limit; 2.5.1 is an errata revision of 2.5 and its clause 17 operator semantics text and section numbering are the same. Every quoted rule below was taken from the clause text, not from a secondary description."
+  },
+  "authored": {
+    "protocol": "source-first: the author agent read only the UML interaction clause and never saw the .fd file",
+    "saw_figure": false,
+    "key_discipline": "question-set v1.1: regex-tolerant keys, no compound questions"
+  },
+  "questions": [
+    {
+      "qid": "q1",
+      "ask": "Two of the messages in this figure touch the same lifeline, one drawn above the other, and neither of them is inside a par fragment or a coregion. What does that top-to-bottom placement assert about when that participant's two event occurrences happen?",
+      "tests": "meaning in time of the declared / vertical order of occurrences along a single lifeline",
+      "source_locator": "§17.1.3 (Partial ordering constraints on valid and invalid traces) and §17.3.3.1 (Lifelines): 'The order of OccurrenceSpecifications along a Lifeline is significant denoting the order in which these OccurrenceSpecifications will occur'; time runs from top to bottom along each lifeline and 'the absolute distances between the OccurrenceSpecifications on the Lifeline are irrelevant for the semantics'",
+      "answer": "The occurrence drawn higher happens before the occurrence drawn lower: along a lifeline time runs down the page, so the declared order is the order in which they occur. The gap between them carries no measurement of time, only that some non-zero time passed.",
+      "score": {
+        "all_of": [
+          [
+            "before",
+            "precede",
+            "earlier",
+            "first",
+            "prior",
+            "re:higher[a-z ]{0,30}(then|then the|then comes)"
+          ],
+          [
+            "order",
+            "sequence",
+            "time",
+            "occur",
+            "happen",
+            "down the page",
+            "top to bottom",
+            "after",
+            "later",
+            "then"
+          ]
+        ],
+        "none_of": []
+      }
+    },
+    {
+      "qid": "q2",
+      "ask": "The `alt` fragment in this figure has more than one operand, each labelled with a guard in square brackets. On any one run of the interaction, how many of those operands are executed, and what decides which one it is?",
+      "tests": "what an alt CombinedFragment asserts about its operands, and the role of the interaction constraint (guard) in selecting one",
+      "source_locator": "§17.6.3.7 (Alternatives) and §17.12.15.3 (alt): 'At most one of the operands will be chosen. The chosen operand must have an explicit or implicit guard expression that evaluates to true at this point in the interaction. An implicit true guard is implied if the operand has no guard.'",
+      "answer": "At most one of the operands is executed. The one chosen must be the operand whose guard (interaction constraint) evaluates to true at that point; an operand with no guard counts as having a true guard.",
+      "score": {
+        "all_of": [
+          [
+            "at most one",
+            "only one",
+            "just one",
+            "one operand",
+            "one branch",
+            "one alternative",
+            "one of the",
+            "exactly one",
+            "a single",
+            "one"
+          ],
+          [
+            "guard",
+            "condition",
+            "constraint",
+            "in brackets",
+            "square bracket"
+          ],
+          [
+            "true",
+            "holds",
+            "satisfied",
+            "met",
+            "evaluat",
+            "matches",
+            "applies"
+          ]
+        ],
+        "none_of": []
+      }
+    },
+    {
+      "qid": "q3",
+      "ask": "The `loop` fragment in this figure carries iteration bounds — a lower and an upper number. How many times may its operand be executed on one run of the interaction?",
+      "tests": "how a loop's lower and upper bounds constrain the number of executions of its operand",
+      "source_locator": "§17.6.3.17 (Loop): 'a loop will iterate minimum the minint number of times (given by the iteration expression in the guard) and at most the maxint number of times'; §17.6.4.9 gives the syntax loop(<minint>[,<maxint>]) with '*' meaning unlimited",
+      "answer": "The operand is repeated at least the lower bound (minint) number of times and at most the upper bound (maxint) number of times, so with bounds such as 1 and 3 it runs one, two or three times. An upper bound of `*` would mean unlimited.",
+      "score": {
+        "all_of": [
+          [
+            "at least",
+            "minimum",
+            "min",
+            "no fewer",
+            "lower bound",
+            "re:between \\d+ (and|to) \\d+",
+            "re:\\d+ (to|and) \\d+ times",
+            "re:from \\d+"
+          ],
+          [
+            "at most",
+            "maximum",
+            "max",
+            "up to",
+            "no more than",
+            "upper bound",
+            "re:between \\d+ (and|to) \\d+",
+            "re:\\d+ (to|and) \\d+ times",
+            "unlimited"
+          ]
+        ],
+        "none_of": []
+      }
+    },
+    {
+      "qid": "q4",
+      "ask": "What does the `par` fragment in this figure assert about the relative order of the messages sitting in its different operands, and what ordering does it nevertheless still require?",
+      "tests": "what par permits about interleaving between operands and what it preserves inside each operand",
+      "source_locator": "§17.6.3.10 (Parallel) and §17.12.15.3 (par): 'The OccurrenceSpecifications of the different operands can be interleaved in any way as long as the ordering imposed by each operand as such is preserved.'",
+      "answer": "The occurrences belonging to the different operands may be interleaved in any way, so no order is asserted between a message in one operand and a message in another. The order imposed within each operand is still preserved.",
+      "score": {
+        "all_of": [
+          [
+            "interleav",
+            "any order",
+            "any way",
+            "either order",
+            "no particular order",
+            "no order",
+            "concurrent",
+            "in parallel",
+            "parallel",
+            "simultaneous",
+            "at the same time",
+            "overlap",
+            "independent"
+          ],
+          [
+            "preserv",
+            "maintain",
+            "kept",
+            "keeps",
+            "retain",
+            "respect",
+            "in order",
+            "own order",
+            "internal order",
+            "order within",
+            "re:(within|inside|in) (each|its|the|that|one) (operand|branch|region|track|group)",
+            "re:order[a-z ]{0,30}(operand|branch|shown|holds|still)"
+          ]
+        ],
+        "none_of": []
+      }
+    },
+    {
+      "qid": "q5",
+      "ask": "What does the `opt` fragment in this figure assert about the behaviour drawn in its single operand?",
+      "tests": "what opt asserts — that its sole operand either happens or does not happen at all",
+      "source_locator": "§17.6.3.8 (Option) and §17.12.15.3 (opt): 'a choice of behavior where either the (sole) operand happens or nothing happens. An option is semantically equivalent to an alternative CombinedFragment where there is one operand with non-empty content and the second operand is empty.'",
+      "answer": "It asserts a choice where either the sole operand happens or nothing happens — the enclosed messages are executed when the guard is true and are skipped otherwise. That makes it equivalent to an alt with one non-empty operand and one empty operand.",
+      "score": {
+        "all_of": [
+          [
+            "happen",
+            "execut",
+            "occur",
+            "run",
+            "perform",
+            "take",
+            "place",
+            "fire",
+            "send",
+            "sent",
+            "carried out",
+            "done"
+          ],
+          [
+            "nothing",
+            "skip",
+            "omit",
+            "optional",
+            "none",
+            "without",
+            "empty",
+            "not"
+          ]
+        ],
+        "none_of": []
+      }
+    },
+    {
+      "qid": "q6",
+      "ask": "Name the message or messages that this figure places inside its `critical` fragment. Answer in a sentence of the form: \"The critical fragment contains <name the message(s)>.\"",
+      "tests": "containment — which messages of the session the figure encloses in the critical CombinedFragment (the extent of the fragment on the page)",
+      "source_locator": "§17.6.3.14 (Critical Region) and §17.12.15.3 (critical): a critical region's traces 'cannot be interleaved by other OccurrenceSpecifications (on those Lifelines covered by the region)' — the region is treated atomically, which is a statement about exactly the occurrences the fragment encloses; §17.6.4.3 says a CombinedFragment is the solid-outline rectangle with its operator in the pentagon, so its contents are the fragments drawn inside that rectangle",
+      "answer": "A correct answer names the actual message or messages that the figure draws inside the critical fragment's rectangle, and nothing that lies outside it; the standard fixes only the structural facts, namely that what a critical fragment encloses are messages (their send and receive occurrences) on the lifelines the region covers. This key can therefore only verify that the reader answered about the critical fragment's contents in the requested form; the names themselves must be checked by hand against the figure.",
+      "score": {
+        "all_of": [
+          [
+            "critical"
+          ],
+          [
+            "contain",
+            "includ",
+            "inside",
+            "enclos",
+            "wrap",
+            "holds",
+            "consists",
+            "covers",
+            "in the critical",
+            "within"
+          ]
+        ],
+        "none_of": []
+      }
+    },
+    {
+      "qid": "q7",
+      "ask": "Which message or messages does this figure place in the second operand of its `alt` fragment — the region below the dashed separator inside the alt rectangle? Answer in a sentence of the form: \"The second operand of the alt contains <name the message(s)>.\"",
+      "tests": "containment — which messages the figure assigns to the alt's second operand rather than to its first",
+      "source_locator": "§17.6.4.1 (InteractionOperand): 'InteractionOperands are separated by a dashed horizontal line. The InteractionOperands together make up the framed CombinedFragment'; §17.6.4.3 says the operands are shown by tiling the fragment's region with dashed horizontal lines. §17.6.3.7 (Alternatives) is what applies to the operand so delimited",
+      "answer": "A correct answer names the message or messages the figure draws in the alt's second operand — the region below the dashed separator — and does not list the first operand's messages; if the figure's second operand is empty, saying that it contains no messages is correct. The standard fixes only that the operands are the regions separated by the dashed horizontal line, so the key checks that the reader answered about that second operand's contents; the names must be checked by hand against the figure.",
+      "score": {
+        "all_of": [
+          [
+            "alt"
+          ],
+          [
+            "second",
+            "2nd",
+            "else",
+            "lower",
+            "bottom",
+            "last",
+            "other operand",
+            "only one operand",
+            "single operand"
+          ],
+          [
+            "contain",
+            "includ",
+            "inside",
+            "holds",
+            "has",
+            "consists",
+            "empty",
+            "no messages",
+            "in the second"
+          ]
+        ],
+        "none_of": []
+      }
+    },
+    {
+      "qid": "q8",
+      "ask": "When the guard on the `break` fragment is true, what happens to the part of the enclosing interaction that comes after that fragment?",
+      "tests": "what break does to the remainder of the enclosing interaction fragment",
+      "source_locator": "§17.6.3.9 (Break) and §17.12.15.3 (break): 'the operand is a scenario that is performed instead of the remainder of the enclosing InteractionFragment. A break operator with a guard is chosen when the guard is true and the rest of the enclosing Interaction Fragment is ignored.'",
+      "answer": "It is not performed: the break operand runs instead of the remainder of the enclosing interaction, and the rest of that interaction is ignored. (Were the guard false instead, the break operand would be ignored and the rest would be executed.)",
+      "score": {
+        "all_of": [
+          [
+            "remain",
+            "rest",
+            "what follows",
+            "the following",
+            "after",
+            "subsequent",
+            "later",
+            "below",
+            "further down",
+            "everything else",
+            "the others",
+            "next"
+          ],
+          [
+            "ignor",
+            "skip",
+            "not perform",
+            "not execut",
+            "not run",
+            "abandon",
+            "instead",
+            "in place of",
+            "terminat",
+            "stop",
+            "abort",
+            "exit",
+            "discard",
+            "drop",
+            "never"
+          ]
+        ],
+        "none_of": []
+      }
+    }
+  ],
+  "score_rules_reviewed": "Authored source-first from the UML clause 17 text; then every key was run against its own canonical answer with --selftest (8/8 accept) and hand-checked against three deliberately reworded paraphrases per question, written in different vocabulary from the canonical answer ('higher up runs first' for q1, 'no more than a single branch, the one whose bracketed condition holds' for q2, 'between 1 and 3 times' for q3, 'no fixed order across the two tracks but each track keeps its own order' for q4, 'it either takes place or none of it does' for q5, template-form namings including an empty-operand answer for q6/q7, 'everything below the break is skipped' for q8) — 24/24 paraphrases match after two keys were widened (q5 gained 'take'/'place'/'fire'/'send', q8 gained 'below'/'everything else'/'next', because a reader may say 'takes place' or 'everything below it' rather than 'happens' or 'the remainder'). none_of is empty on every question, so no correct contrastive answer can be rejected. q6 and q7 are figure-specific containment questions whose keys deliberately verify only the structural facts the standard fixes (which fragment, which operand, and that the answer states its contents); the named messages must be hand-checked against the figure."
+}

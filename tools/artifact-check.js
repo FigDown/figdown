@@ -38,6 +38,31 @@
 //                a stale artifact is a wrong figure already shipped, not a
 //                lint opinion. (This is the one place this repository's
 //                tools deviate from "--strict is what makes it fail".)
+//                STALE stays fatal for every figure the engine will still
+//                draw; it is *superseded*, not weakened, for a figure the
+//                engine refuses (below), where "rebuild it" is advice that
+//                cannot be followed.
+//   geometry-refused
+//                the `.fd` parses, and `render` then REFUSES it (core §8,
+//                the geometry-time error class added): the
+//                drawing would state something the source does not — a
+//                `group` band enclosing a node the source never put in the
+//                group. `build-svg` writes nothing for such a figure and
+//                `layout-lint` skips it under this same name. For it, a
+//                MISSING artifact is the CORRECT state, not an omission:
+//                counted here, listed by name, and clean. The `.fd` stays
+//                in the corpus — the refusal is what it now demonstrates.
+//   REFUSED-ARTIFACT
+//                the engine refuses the figure and an `.svg` is on disk
+//                anyway. FAIL, exit 1, with or without --strict, for the
+//                same reason STALE is: the artifact pins a drawing the
+//                engine now calls false, and no rebuild can replace it —
+//                the only correct action is to DELETE it. Both halves of
+//                that pair have to be enforced or the ruling is optional:
+//                without this verdict an artifact left behind by an older
+//                engine keeps shipping the picture the current engine
+//                declines to draw, and looks perfectly consistent doing it
+//                (its recorded hash still matches its own source).
 //   engine-lag   hash agrees, but the artifact was rendered by an engine
 //                OLDER than the current one. WARN normally, FAIL under
 //                --strict. RENDERING-DETERMINISM promises byte-identical output for the same
@@ -58,11 +83,24 @@
 //                                (hand-drawn, or from another tool)
 //                  no-source   — an artifact with metadata whose paired
 //                                `.fd` is absent
+//                  no-artifact — a `.fd` the engine WILL draw that has no
+//                                `.svg` built from it (run build-svg). A
+//                                refused source is NOT reported here: for
+//                                that one the absence is the right answer.
 //
-// It RECURSES. Six tools in this repository were once non-recursive, and
-// 40% of the gallery had therefore never been gated by any of them. A gate
-// that does not recurse is a gate that lies; check the `files=` count in the
-// header against `find <dir> -name '*.svg' | wc -l`.
+// It RECURSES, and it enumerates BOTH SIDES of the pair. Six tools in this
+// repository were once non-recursive, and 40% of the gallery had therefore
+// never been gated by any of them. A gate that does not recurse is a gate
+// that lies; check the `files=` count in the header against
+// `find <dir> -name '*.svg' | wc -l`, and `sources=` against `-name '*.fd'`.
+// Walking only the `.svg` side would have made the whole refusal question
+// invisible — a refused figure's correct state is to have no artifact, and a
+// tool that only ever looks at artifacts cannot see a figure that has none.
+//
+// EVERY `.fd` in scope is classified, not a subset. Classification costs one
+// parse plus one render each (~1.2 s for the 57-source corpus, on the order
+// of the SHA-256 pass it sits beside), so there is no sampling rule to get
+// wrong and no figure whose refusal this gate learns about late.
 //
 // Usage:
 //   node tools/artifact-check.js [--strict] [--verbose] [<file.svg | file.fd | dir> ...]
@@ -72,7 +110,8 @@
 //   --strict   also exit 1 on engine-lag / engine-ahead
 //   --verbose  print every artifact, not only the flagged ones
 //
-// Exit codes: 0 clean · 1 stale (always) or flagged (--strict) · 2 tool error.
+// Exit codes: 0 clean · 1 stale or a refused figure's artifact (always), or
+//             flagged (--strict) · 2 tool error.
 
 'use strict';
 
@@ -96,19 +135,63 @@ const ENGINE_CANDIDATES = [
  * constant kept here: a hand-mirrored version number is the defect this tool
  * would then be unable to see (`tools/make-lib.js` carried a stale mirror for
  * four releases).
+ *
+ * `parse` and `render` come out of the same slice, for the same reason: the
+ * question "does this engine refuse this figure?" has exactly one authority,
+ * and it is the engine, not a list of known-bad filenames kept in a tool.
  */
-function engineVersion() {
+function loadEngine() {
   const p = ENGINE_CANDIDATES.find(f => fs.existsSync(f));
   if (!p) throw new Error('figdown.html not found (set FIGDOWN_HTML)');
   const h = fs.readFileSync(p, 'utf8');
   const start = h.indexOf('const SHAPES');
   const end   = h.indexOf('// 3. UI');
   if (start < 0 || end < 0) throw new Error('cannot locate engine in ' + p);
-  const { FIGDOWN_VERSION } =
-    new Function(h.slice(start, end) + '\nreturn {FIGDOWN_VERSION};')();
-  if (typeof FIGDOWN_VERSION !== 'string' || !FIGDOWN_VERSION)
+  const api =
+    new Function(h.slice(start, end) + '\nreturn {parse, render, FIGDOWN_VERSION};')();
+  if (typeof api.FIGDOWN_VERSION !== 'string' || !api.FIGDOWN_VERSION)
     throw new Error('engine drift: no FIGDOWN_VERSION in ' + path.relative(ROOT, p));
-  return { version: FIGDOWN_VERSION, path: p };
+  if (typeof api.parse !== 'function' || typeof api.render !== 'function')
+    throw new Error('engine drift: parse/render not found in ' + path.relative(ROOT, p));
+  return { version: api.FIGDOWN_VERSION, path: p, parse: api.parse, render: api.render };
+}
+
+// ── Geometry-time classification ─────────────────────────────────────────────
+
+/**
+ * What the ENGINE says about a source, independent of what is on disk beside
+ * it. Returns one of:
+ *
+ *   renders           parse and render both clean — an artifact is expected
+ *   geometry-refused  parses, and `render` returns diagnostics (core §8): the
+ *                     figure is not drawn, so no artifact may exist
+ *   parse-error       the source does not parse; the artifact question does
+ *                     not arise, and gate:conformance / the editor own it
+ *   parse-threw / render-threw / unreadable — reported, never swallowed
+ *
+ * Render options are deliberately left at their defaults. `--with-title` adds
+ * a caption band above the figure; it cannot create or clear a group-band
+ * containment error, so the refusal verdict does not depend on which options
+ * the artifact recorded — and for a source with no artifact there would be no
+ * recorded options to consult.
+ */
+function classifySource(engine, fdPath) {
+  let src;
+  try { src = fs.readFileSync(fdPath, 'utf8'); }
+  catch (e) { return { state: 'unreadable', errs: [String(e.message || e)] }; }
+  let parsed;
+  try { parsed = engine.parse(src); }
+  catch (e) { return { state: 'parse-threw', errs: [String(e.message || e)] }; }
+  const perrs = parsed.errs || parsed.errors || [];
+  if (perrs.length) return { state: 'parse-error', errs: perrs };
+  const docs = parsed.docs && parsed.docs.length ? parsed.docs
+             : (parsed.doc ? [parsed.doc] : []);
+  let gerrs = [];
+  try {
+    for (const d of docs) gerrs = gerrs.concat(engine.render(d).errs || []);
+  } catch (e) { return { state: 'render-threw', errs: [String(e.message || e)] }; }
+  return gerrs.length ? { state: 'geometry-refused', errs: gerrs }
+                      : { state: 'renders', errs: [] };
 }
 
 // ── Metadata ─────────────────────────────────────────────────────────────────
@@ -186,6 +269,27 @@ function collect(p, out) {
   return out;
 }
 
+/**
+ * The other side of the same pair: the `.fd` SOURCES in scope. An `.svg` named
+ * on the command line resolves to its source, symmetrically with `collect`, so
+ * `artifact-check X.svg` and `artifact-check X.fd` ask the same question.
+ */
+function collectSources(p, out) {
+  const abs = path.isAbsolute(p) ? p : path.resolve(ROOT, p);
+  if (!fs.existsSync(abs)) throw new Error('no such path: ' + p);
+  const st = fs.statSync(abs);
+  if (st.isFile()) {
+    if (abs.endsWith('.fd')) out.push(abs);
+    else if (abs.endsWith('.svg')) out.push(abs.replace(/\.svg$/, '.fd'));
+    return out;
+  }
+  for (const e of fs.readdirSync(abs, { withFileTypes: true }).sort((a, b) => a.name < b.name ? -1 : 1)) {
+    if (e.name.startsWith('.')) continue;
+    collectSources(path.join(abs, e.name), out);
+  }
+  return out;
+}
+
 // ── Report ───────────────────────────────────────────────────────────────────
 
 const pad = (s, n) => String(s).padEnd(n);
@@ -208,23 +312,33 @@ function main() {
   }
   const paths = args.filter(a => !a.startsWith('-'));
 
-  const engine = engineVersion();
-  const files  = [...new Set((paths.length ? paths : DEFAULT_PATHS)
-    .flatMap(p => collect(p, [])))].sort();
+  const engine  = loadEngine();
+  const inPaths = paths.length ? paths : DEFAULT_PATHS;
+  const files   = [...new Set(inPaths.flatMap(p => collect(p, [])))].sort();
+  const sources = [...new Set(inPaths.flatMap(p => collectSources(p, [])))]
+    .filter(fd => fs.existsSync(fd)).sort();
+
+  // The engine's own verdict on every source in scope, computed once. See
+  // classifySource: the refusal question is asked of the ENGINE, for ALL of
+  // them, so the tool never carries a list of figures it "knows" are refused.
+  const state = new Map(sources.map(fd => [fd, classifySource(engine, fd)]));
 
   console.log('artifact-check  engine=' + path.relative(ROOT, engine.path) +
-    ' (' + engine.version + ')  files=' + files.length);
+    ' (' + engine.version + ')  files=' + files.length +
+    '  sources=' + sources.length);
   console.log('  pairing: X.svg <-> X.fd, same basename (core §7, normative)');
 
   const rows = [];
-  const skipped = { noMeta: [], noSource: [] };
+  const skipped = { noMeta: [], noSource: [], noArtifact: [] };
 
   for (const svg of files) {
     const relSvg = rel(svg);
-    if (!fs.existsSync(svg)) {                 // a `.fd` named on the command line with no artifact
-      skipped.noSource.push({ rel: relSvg, why: 'no artifact built for the named .fd' });
-      continue;
-    }
+    // A `.fd` with no artifact. `collect` maps every source it walks to the
+    // artifact it WOULD have, so this is where a missing one shows up; the
+    // source pass below owns it, because only there is the engine's verdict
+    // on the source available to say whether the absence is a defect or the
+    // correct state.
+    if (!fs.existsSync(svg)) continue;
     const meta = readMeta(svg);
     if (!meta) { skipped.noMeta.push({ rel: relSvg }); continue; }
 
@@ -247,19 +361,50 @@ function main() {
       else if (c > 0) engineState = 'engine-ahead';
     }
 
+    // REFUSED OUTRANKS STALE. Both say "this artifact is wrong", but they
+    // prescribe opposite actions, and only one of them is possible: a stale
+    // artifact is repaired by rebuilding, and a refused figure cannot be
+    // rebuilt at all. Telling the operator to run build-svg on a source the
+    // engine declines to draw is advice that fails when followed, so the
+    // refusal is reported first and its remedy — delete the file — is the
+    // only one printed.
+    const src = state.get(fd);
+    const refused = !!src && src.state === 'geometry-refused';
+
     rows.push({
-      rel: relSvg, fd: rel(fd), stale, engineState,
+      rel: relSvg, fd: rel(fd), stale, engineState, refused,
+      refusal: refused ? src.errs : null,
       recorded: meta.sha256, actual, engine: meta.engine, options: meta.options,
-      verdict: stale ? 'STALE'
+      verdict: refused ? 'REFUSED-ARTIFACT'
+        : stale ? 'STALE'
         : engineState === 'engine-lag' || engineState === 'engine-ahead' || engineState === 'unknown-version'
           ? engineState : 'ok',
     });
   }
 
-  const stale   = rows.filter(r => r.stale);
-  const flagged = rows.filter(r => !r.stale && r.verdict !== 'ok' && r.verdict !== 'no-version');
-  const noVer   = rows.filter(r => !r.stale && r.engineState === 'no-version');
-  const shown   = verbose ? rows : [...stale, ...flagged];
+  // The source side of the pair: a `.fd` with no `.svg` beside it. For a
+  // refused figure that absence is the CORRECT state and is reported as a
+  // clean, counted verdict; for a figure the engine will draw it means an
+  // artifact was never built; and a source that does not parse belongs to
+  // gate:conformance, not here — each is named rather than lumped together.
+  const refusedClean = [];
+  for (const fd of sources) {
+    if (fs.existsSync(fd.replace(/\.fd$/, '.svg'))) continue;
+    const relFd = rel(fd);
+    const src = state.get(fd);
+    if (src.state === 'geometry-refused') { refusedClean.push({ rel: relFd, errs: src.errs }); continue; }
+    if (src.state === 'renders') {
+      skipped.noArtifact.push({ rel: relFd, why: 'the source renders — run node tools/build-svg.js ' + relFd });
+      continue;
+    }
+    skipped.noArtifact.push({ rel: relFd, why: src.state + ': ' + (src.errs[0] || '') });
+  }
+
+  const refusedRows = rows.filter(r => r.refused);
+  const stale   = rows.filter(r => r.stale && !r.refused);
+  const flagged = rows.filter(r => !r.stale && !r.refused && r.verdict !== 'ok' && r.verdict !== 'no-version');
+  const noVer   = rows.filter(r => !r.stale && !r.refused && r.engineState === 'no-version');
+  const shown   = verbose ? rows : [...refusedRows, ...stale, ...flagged];
 
   if (shown.length) {
     const w = Math.max(4, ...shown.map(r => r.rel.length));
@@ -268,6 +413,20 @@ function main() {
     console.log('-'.repeat(w) + '  ' + '-'.repeat(12) + '  -------');
     for (const r of shown)
       console.log(pad(r.rel, w) + '  ' + pad(r.engine || '-', 12) + '  ' + r.verdict);
+  }
+
+  if (refusedRows.length) {
+    console.log('');
+    console.log('REFUSED figures that still have an artifact — the engine will not draw');
+    console.log('these, so the .svg pins a drawing the engine now calls false:');
+    for (const r of refusedRows) {
+      console.log('');
+      console.log('  ' + r.rel);
+      console.log('    ' + r.fd + ' is refused at geometry time (core §8):');
+      for (const e of r.refusal) console.log('      ' + e);
+      console.log('    DELETE the artifact: rm ' + r.rel);
+      console.log('    It cannot be rebuilt — build-svg writes nothing for a refused figure.');
+    }
   }
 
   if (stale.length) {
@@ -297,18 +456,33 @@ function main() {
   console.log('checked ' + rows.length + '  ok ' + rows.filter(r => r.verdict === 'ok').length +
     ' (of which no-engine-version ' + noVer.length + ')' +
     '  stale ' + stale.length + '  engine-mismatch ' + flagged.length +
-    '  skipped ' + (skipped.noMeta.length + skipped.noSource.length) +
-    ' (no-metadata ' + skipped.noMeta.length + ', no-source ' + skipped.noSource.length + ')');
+    '  geometry-refused ' + (refusedClean.length + refusedRows.length) +
+    ' (artifact correctly absent ' + refusedClean.length +
+    ', still on disk ' + refusedRows.length + ')' +
+    '  skipped ' + (skipped.noMeta.length + skipped.noSource.length + skipped.noArtifact.length) +
+    ' (no-metadata ' + skipped.noMeta.length + ', no-source ' + skipped.noSource.length +
+    ', no-artifact ' + skipped.noArtifact.length + ')');
 
   if (noVer.length)
     console.log('  no-engine-version: built before 0.1, which is where the attribute ' +
       'was added; no version is inferred for them (MIGRATIONS 0.1).');
+  for (const r of refusedClean) {
+    console.log('  geometry-refused, no artifact — the CORRECT state (core §8): ' + r.rel);
+    for (const e of r.errs) console.log('      ' + e);
+  }
   for (const s of skipped.noMeta)
     console.log('  skip (no figdown-source metadata): ' + s.rel);
   for (const s of skipped.noSource)
     console.log('  skip (' + s.why + '): ' + s.rel);
+  for (const s of skipped.noArtifact)
+    console.log('  skip (no artifact — ' + s.why + '): ' + s.rel);
 
   console.log('');
+  if (refusedRows.length) {
+    console.log('FAIL  ' + refusedRows.length +
+      ' artifact(s) belong to a figure the engine refuses to draw — delete them');
+    process.exit(1);
+  }
   if (stale.length) {
     console.log('FAIL  ' + stale.length + ' artifact(s) disagree with their source');
     process.exit(1);
@@ -319,7 +493,9 @@ function main() {
     if (strict) process.exit(1);
     process.exit(0);
   }
-  console.log('OK  ' + rows.length + ' artifact(s) agree with their sources');
+  console.log('OK  ' + rows.length + ' artifact(s) agree with their sources' +
+    (refusedClean.length ? ', and ' + refusedClean.length +
+      ' refused figure(s) correctly have none' : ''));
   process.exit(0);
 }
 

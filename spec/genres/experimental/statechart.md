@@ -29,11 +29,28 @@ genre's two keywords; protocol RFC state diagrams (TCP RFC 9293 Figure 5,
 DHCP RFC 2131 §4.4) as the corpus that motivated it.
 
 **Why OMG UML 2.5.1 and not ISO/IEC 19505**, cited the ISO
-number and that was the wrong edition to name: ISO/IEC 19505 is **paywalled**
-and is the older **2.4.1** text. OMG publishes 2.5.1 for free, so the clause
-that defines `State` and `Transition` was actually **read** before either word
-was taken. A vocabulary row that cannot be checked by a reader of this
-repository is a claim, not a citation.
+number and that was the wrong edition to name: **ISO/IEC 19505-2:2012 is the
+older 2.4.1 text**, and 2.5.1 is newer and complete. Both are free, so the
+choice is an edition choice and nothing else — and the clause that defines
+`State` and `Transition` was actually **read** before either word was taken.
+A vocabulary row that cannot be checked by a reader of this repository is a
+claim, not a citation.
+
+*(Correction, 0.3.z: this paragraph used to give a second reason — "ISO/IEC
+19505 is **paywalled**" — and that reason is **false**. ISO/IEC 19505-1:2012
+and 19505-2:2012 are obtainable **free of charge**: OMG hosts the normative
+text at `omg.org/spec/UML/ISO/19505-2/PDF`, and the project has since fetched
+and read it (`decisions/registry.md` cites clauses from it
+first-hand — 14.3.17 `Lifeline`, 14.3.18 `Message`, 14.3.15
+`InteractionOperatorKind`). ISO also carries them on its Publicly Available
+Standards page — recorded here as reported, not as read. What was true is
+that the ISO **storefront** copy is priced; a priced storefront was mistaken
+for an unobtainable document, and the mistake was never checked against the
+document. The **edition** half of the old sentence is correct, is untouched,
+and is now the whole of the reason. Same defect class as `VOCABULARY-SOURCE-ATTRIBUTION` and as the
+Terminator correction two sections below: prose asserted something about a
+standards document that nobody had opened. This is the third time, which is
+why `decisions/registry.md` exists.)*
 
 ## Purpose
 
@@ -58,7 +75,7 @@ either.
 ## Complete vocabulary (normative)
 
 **This is the whole of what a `statechart` document may write at top level.**
-Until this release this section was a CROSS-REFERENCE — "every row of
+Until 0.3 this section was a CROSS-REFERENCE — "every row of
 `topology.md`'s vocabulary table applies here unchanged, with three
 substitutions" — on the ground that two copies of a twenty-row table drift.
 That reasoning was sound about drift and wrong about ownership: `GENRE-VOCABULARY-OBLIGATION`'s exchange
@@ -90,7 +107,7 @@ which is what an author needs when carrying it into `block`.
 | `title` | `title "<text>"` | C | NORMATIVE | `note` (requires `figdown 0.3`) | absent |
 | `state` | `state <id> ["label"]` | **S** | **EXPERIMENTAL** | `shape` `fill` `stroke` `style` `class` `note` (requires `figdown 0.3`) | `shape=box`, label absent; `role` is recorded ABSENT, exactly as a bare `node` records it. OMG UML 2.5.1 §14 |
 | `transition` | `transition <a> [tail] <op> [head] <b>` | **S** | **EXPERIMENTAL** | `stroke` `style` `class` `note` (requires `figdown 0.3`) | op is written form; `[mid]` splits the operator and carries the inscription; all three labels take the line's colour (`LABEL-COLOUR-SOURCE`). OMG UML 2.5.1 §14 |
-| `class` | `class <id> "<meaning>"` | H | NORMATIVE | `fill` `stroke` `style` | the meaning FIELD is REQUIRED, its VALUE may be `""` (`CLASS-EMPTY-MEANING`); a class a `transition` joins MUST declare `stroke=` or `style=` (`INTERIOR-LESS-ELEMENT-PAINT`/`CLASS-PAINT-REQUIREMENT`) |
+| `class` | `class <id> "<meaning>"` | H | NORMATIVE | `fill` `stroke` `style` | the meaning FIELD is REQUIRED, its VALUE may be `""` (`CLASS-EMPTY-MEANING`); a class a `transition` joins must not declare `fill=` without `stroke=` — a transition has no interior, so the two name ONE channel (`INTERIOR-LESS-ELEMENT-PAINT`). Declaring NO paint is legal: the class claims a meaning and the transition keeps its default line (`CLASS-PAINT-REQUIREMENT`'s second half RETIRED at 0.4, `CLASS-CHANNEL-REACH`) |
 | `flow` | `flow right\|down\|left\|up` | H | NORMATIVE | — | **`right`** |
 | `rank` | `rank <id>,<id>[,<id>…]` | H | NORMATIVE | — | two or more ids in ONE whitespace-free comma-delimited token |
 | `layout` | `layout` | C | NORMATIVE | — | opens the layout zone (§3) |
@@ -114,7 +131,7 @@ RESERVED; see the next subsection. `plane=` and `z-index=` are absent because
 ### `in=` is reserved for composite states (`MEMBERSHIP-KEY-ACCEPTANCE`)
 
 **`in=` is not this genre's option key, and writing it is a named line
-error.** Until this release the parser accepted it on `state`, resolving it
+error.** Until 0.3 the parser accepted it on `state`, resolving it
 against declared `group` ids — of which a statechart document can have none,
 since this genre declares no subject vocabulary at all (`SUBJECT-VOCABULARY-SCOPE`). Every value was
 therefore a dead end: `state s "S" in=g` answered `unknown group "g"` and no
@@ -301,7 +318,8 @@ prose:
 This list is one item shorter than it was. It used to end
 "which composite or region a state sits in is `in=` or the enclosing
 `group`", and that item was wrong three times over: `group` never made a
-composite state or a region (reading rule 9 said so on the same page), this genre does not declare `group` at all, and
+composite state or a region (reading rule 9 said so on the same page),
+this genre does not declare `group` at all, and
 `in=` is not this genre's key either (`MEMBERSHIP-KEY-ACCEPTANCE` — and its spelling is RESERVED for
 the composite-state domain, which is the one thing the old item got right about
 where nesting would eventually live). **The honest position is that there is no
@@ -501,7 +519,7 @@ the core profile, plus four that follow from the version and the allowlist:
   source standard "external" already names A TRANSITION THAT EXITS AND
   RE-ENTERS ITS SOURCE STATE. FigDown's `external` means an endpoint outside
   the figure that is never drawn — same word, same genre, same standard,
-  unrelated meanings. … (withdrawn, R160; MIGRATIONS
+  unrelated meanings. … (withdrawn, `SCENE-KEYWORD-MEMBERSHIP`; MIGRATIONS
   0.3)
   ```
 
@@ -526,20 +544,43 @@ one-line edit per figure, and §Status should be read with that in mind.
 ## No start keyword — considered and rejected (`START-STATE-KEYWORD`)
 
 **There is no `start`, `initial` or `entry` keyword, and the reason is not
-that nobody asked.** The premise usually offered for one — "`terminator` is
-already the end symbol, so the start needs its own word" — is **false**. ISO
-5807 §9.4.2's Terminator is *an exit to, or an entry from, the outside of the
-procedure — a start, an end, or a halt*: **one symbol for both ends**,
-distinguished by its label text, which is `flowchart`'s business anyway.
+that nobody asked.** It is also **not** that the domain has no word to lend.
+It has two: UML 2.5.1 §14.2.3.7 defines an `initial` Pseudostate and
+§14.2.3.6 a FinalState — **separate words for the two ends**, which is
+exactly what a borrower would want. This genre's vocabulary comes from UML,
+so those are the words on the table, and the rejection has to survive their
+existence rather than lean on their absence.
 
-So there is **no word to borrow** from the source standard, and RULE 4.1
-forbids coining one when the domain has not. A reader who lacks the word
-answers **"unstated"**, which is *safe* rather than *wrong* — a materially
-different failure from the 22%-misreading rate that earned
-`process`/`decision`/`terminator` their place.
+It does. A reader who lacks the word answers **"unstated"**, which is *safe*
+rather than *wrong* — a materially different failure from the 22%-misreading
+rate that earned `process`/`decision`/`terminator` their place in
+`flowchart`. Under RULE 4.1 an available word is necessary but not
+sufficient: the earning bar is a **measured** misreading rate, and no
+statechart figure in the corpus has produced one. So `initial` and `final`
+are **unadopted, not unavailable** — held in reserve by their own standard,
+where a later measurement can still claim them.
+
+*(Correction, 0.3.z: this section previously argued that ISO 5807 §9.4.2's
+Terminator is "one symbol for both ends" and concluded there was "no word to
+borrow from the source standard". That is `flowchart`'s standard, not this
+genre's — the text said as much and then drew the conclusion anyway. The
+premise was false here; the rejection was not, and stands on the earning bar
+alone. Same defect class as `VOCABULARY-SOURCE-ATTRIBUTION`.)*
+
+*(Second correction, 0.3.z: **the first correction miscited its own
+replacement clause.** It gave FinalState as UML 2.5.1 §14.2.3.2, and
+§14.2.3.2 is **Regions** — the number this very document cites correctly two
+hundred lines above, in §*`in=` is reserved for composite states*. FinalState
+is **§14.2.3.6**: *"FinalState is a special kind of State signifying that the
+enclosing Region has completed."* The `initial` half was right: §14.2.3.7 is
+*Pseudostate and PseudostateKind*. Both words exist and the argument is
+unchanged; the pointer was wrong. Recorded rather than quietly renumbered
+because of what it shows — **the correction of a false standards claim
+introduced a new one in the same sentence**, which is the case for a
+mechanism rather than more care. See `decisions/registry.md`.)*
 
 **What would reopen it:** measured evidence that readers name the **wrong**
-terminator as the start. That is the bar; an argument that the word would be
+state as the start. That is the bar; an argument that the word would be
 convenient is not.
 
 ## Example

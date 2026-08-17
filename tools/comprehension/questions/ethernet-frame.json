@@ -1,0 +1,208 @@
+{
+  "id": "ethernet-frame",
+  "genre": "table",
+  "figure": "examples/showcase/ethernet-frame.fd",
+  "subject": "Ethernet II frame, untagged vs 802.1Q tagged",
+  "source": {
+    "standard": "IEEE 802.3 + IEEE 802.1Q",
+    "locator": "IEEE 802.3 MAC frame format (Clause 3: Destination Address, Source Address, Length/Type, MAC Client Data, Pad, FCS) together with IEEE 802.1Q C-VLAN tag format (Clause 9.6: TPID 0x8100 + TCI = PCP/DEI/VID)",
+    "url": "https://en.wikipedia.org/wiki/IEEE_802.1Q",
+    "anchor_strength": "strong"
+  },
+  "authored": {
+    "protocol": "source-first: the author agent read only the source standards and never saw the .fd file",
+    "saw_figure": false
+  },
+  "questions": [
+    {
+      "qid": "q1",
+      "ask": "In an untagged Ethernet II frame, which field comes immediately after the Source Address field, in on-the-wire order?",
+      "tests": "field order: Source Address is directly followed by EtherType/Length, not by the payload or FCS",
+      "source_locator": "IEEE 802.3, Clause 3.1, MAC frame format field order",
+      "answer": "The EtherType/Length field (2 bytes) comes immediately after the Source Address field.",
+      "score": {
+        "all_of": [
+          [
+            "ethertype",
+            "ether type",
+            "type length",
+            "length type",
+            "type len"
+          ]
+        ],
+        "none_of": [
+          "fcs",
+          "frame check",
+          "preamble",
+          "destination address"
+        ]
+      }
+    },
+    {
+      "qid": "q2",
+      "ask": "How many bytes long is each of the Destination Address and Source Address fields in an Ethernet II frame?",
+      "tests": "field size: both MAC address fields are 6 bytes (48 bits) each",
+      "source_locator": "IEEE 802.3, Clause 3.1, address field lengths",
+      "answer": "Each address field is 6 bytes (48 bits) long.",
+      "score": {
+        "all_of": [
+          [
+            "6 byte",
+            "6 bytes",
+            "6b",
+            "48 bit",
+            "48 bits"
+          ]
+        ],
+        "none_of": []
+      }
+    },
+    {
+      "qid": "q3",
+      "ask": "Where in the frame is the 802.1Q VLAN tag inserted, relative to the Source Address and EtherType/Length fields?",
+      "tests": "insertion point: the tag sits between Source Address and EtherType/Length, not before Source Address or after the payload",
+      "source_locator": "IEEE 802.1Q, Clause 9.6, tag insertion point",
+      "answer": "The tag is inserted immediately after the Source Address field and before the EtherType/Length field.",
+      "score": {
+        "all_of": [
+          [
+            "source"
+          ],
+          [
+            "ethertype",
+            "ether type",
+            "type length",
+            "length type"
+          ]
+        ],
+        "none_of": [
+          "before source",
+          "after destination address",
+          "after fcs",
+          "end of frame",
+          "after data",
+          "after the data"
+        ]
+      }
+    },
+    {
+      "qid": "q4",
+      "ask": "What is the total size, in bytes, of the 802.1Q tag inserted into the frame?",
+      "tests": "tag size: the whole tag (TPID + TCI) is 4 bytes, not just the TCI or VID alone",
+      "source_locator": "IEEE 802.1Q, Clause 9.6, tag format (TPID + TCI)",
+      "answer": "The 802.1Q tag is 4 bytes (32 bits) total: 2 bytes of TPID plus 2 bytes of TCI.",
+      "score": {
+        "all_of": [
+          [
+            "4 byte",
+            "4 bytes",
+            "4b",
+            "32 bit",
+            "32 bits"
+          ]
+        ],
+        "none_of": [
+          "8 byte",
+          "8 bytes",
+          "12 byte",
+          "12 bytes"
+        ]
+      }
+    },
+    {
+      "qid": "q5",
+      "ask": "The Tag Control Information (TCI) part of the 802.1Q tag is made up of three subfields. Name them and give the bit width of each.",
+      "tests": "tag content structure: TCI decomposes into PCP (3 bits), DEI (1 bit), VID (12 bits)",
+      "source_locator": "IEEE 802.1Q, Clause 9.6, TCI subfields",
+      "answer": "PCP (Priority Code Point), 3 bits; DEI (Drop Eligible Indicator), 1 bit; and VID (VLAN Identifier), 12 bits.",
+      "score": {
+        "all_of": [
+          [
+            "pcp",
+            "priority code point",
+            "3 bit"
+          ],
+          [
+            "dei",
+            "drop eligible",
+            "cfi",
+            "1 bit"
+          ],
+          [
+            "vid",
+            "vlan id",
+            "vlan identifier",
+            "12 bit"
+          ]
+        ],
+        "none_of": []
+      }
+    },
+    {
+      "qid": "q6",
+      "ask": "What 2-byte hexadecimal value occupies the first two bytes of the 802.1Q tag, marking the frame as tagged?",
+      "tests": "tag content: the TPID value that distinguishes a tagged frame from an untagged one where EtherType would otherwise sit",
+      "source_locator": "IEEE 802.1Q, Clause 9.6, TPID value",
+      "answer": "0x8100.",
+      "score": {
+        "all_of": [
+          [
+            "8100"
+          ]
+        ],
+        "none_of": [
+          "8200",
+          "9100",
+          "0800",
+          "88a8"
+        ]
+      }
+    },
+    {
+      "qid": "q7",
+      "ask": "What is the allowed size range, in bytes, of the payload (MAC Client Data) field in a standard untagged Ethernet frame?",
+      "tests": "payload size range distinct from overall frame size or address field sizes",
+      "source_locator": "IEEE 802.3, Clause 3.1/4.2.3, Data field length bounds (min frame size 64 bytes drives the 46-byte floor; max 1500-byte MTU is the ceiling)",
+      "answer": "The payload (Data field) ranges from 46 bytes to 1500 bytes.",
+      "score": {
+        "all_of": [
+          [
+            "46 byte",
+            "46 bytes",
+            "46b",
+            "46"
+          ],
+          [
+            "1500 byte",
+            "1500 bytes",
+            "1500b",
+            "1500"
+          ]
+        ],
+        "none_of": []
+      }
+    },
+    {
+      "qid": "q8",
+      "ask": "Besides the FCS field itself, what part of the transmitted frame is excluded from the FCS's CRC calculation?",
+      "tests": "coverage: FCS covers Destination Address through Data/Pad, but not the leading Preamble/SFD",
+      "source_locator": "IEEE 802.3, Clause 3.1, FCS field, CRC computation range",
+      "answer": "The Preamble and Start Frame Delimiter (SFD) at the start of the frame are excluded from the FCS's CRC calculation.",
+      "score": {
+        "all_of": [
+          [
+            "preamble",
+            "sfd",
+            "start frame delimiter"
+          ]
+        ],
+        "none_of": [
+          "destination address is excluded",
+          "source address is excluded",
+          "data field is excluded"
+        ]
+      }
+    }
+  ],
+  "score_rules_reviewed": "scoring rules reviewed by the suite maintainer BEFORE any reader ran: none_of lists that would have rejected a correct contrastive answer (e.g. 'broadcast, not unicast') were relaxed or emptied. No question text and no canonical answer was changed, and no rule was touched after any reader answer was seen."
+}

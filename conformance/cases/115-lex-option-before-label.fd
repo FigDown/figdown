@@ -15,7 +15,7 @@ figdown 0.1 block
 # subject is the generic option/positional rule, not the demoted constructs
 # it uses to prove it (STATUS.txt criterion).
 #
-# It exercised EIGHT until this release, when the ruling on per-genre subject
+# It exercised EIGHT until 0.3, when the ruling on per-genre subject
 # vocabulary took two of them out (`SCENE-KEYWORD-MEMBERSHIP`/`PAINT-ORDER-CONSTRUCT`):
 #   - `plane z-index=2 L1 "Overlay"` stood after the `class` line until
 #     0.3 — the whole directive left the language, and both of its

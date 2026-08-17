@@ -1,0 +1,176 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1251 1674" width="1251" height="1674" font-family="system-ui,sans-serif"><defs><marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#555"/></marker><pattern id="hatch" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><line x1="0" y1="0" x2="0" y2="6" stroke="#bbb" stroke-width="2"/></pattern></defs><g transform="translate(18,6)"><line x1="48" y1="40" x2="48" y2="1636" stroke="#94a3b8" stroke-width="1" stroke-dasharray="4 4"/><g data-node="c" data-x="10" data-y="8"><rect x="10" y="8" width="76" height="32" rx="4" fill="#eef2ff" stroke="#4f46e5"/><text x="48" y="28.5" font-size="13" text-anchor="middle" fill="#1d1d1b">Client</text></g><line x1="611.6" y1="40" x2="611.6" y2="1636" stroke="#94a3b8" stroke-width="1" stroke-dasharray="4 4"/><g data-node="s" data-x="573.4" data-y="8"><rect x="573.4" y="8" width="76.4" height="32" rx="4" fill="#eef2ff" stroke="#4f46e5"/><text x="611.6" y="28.5" font-size="13" text-anchor="middle" fill="#1d1d1b">Service</text></g><line x1="1175.2" y1="40" x2="1175.2" y2="1636" stroke="#94a3b8" stroke-width="1" stroke-dasharray="4 4"/><g data-node="a" data-x="1129.8" data-y="8"><rect x="1129.8" y="8" width="90.8" height="32" rx="4" fill="#eef2ff" stroke="#4f46e5"/><text x="1175.2" y="28.5" font-size="13" text-anchor="middle" fill="#1d1d1b">Audit log</text></g><rect x="26" y="62" width="607.6" height="92" fill="none" stroke="#64748b" stroke-width="1"/><path d="M26 62 h42.4 l6,9 v6 h-48.4 z" fill="#f8fafc" stroke="#64748b" stroke-width="1"/><text x="33" y="73" font-size="10.5" text-anchor="start" fill="#334155">loop</text><text x="82.4" y="73" font-size="10.5" text-anchor="start" fill="#fff" stroke="#fff" stroke-width="3" stroke-linejoin="round">[opening the session]</text><text x="82.4" y="73" font-size="10.5" text-anchor="start" fill="#475569">[opening the session]</text><rect x="-6" y="172" width="639.6" height="190" fill="none" stroke="#64748b" stroke-width="1"/><path d="M-6 172 h35.8 l6,9 v6 h-41.8 z" fill="#f8fafc" stroke="#64748b" stroke-width="1"/><text x="1" y="183" font-size="10.5" text-anchor="start" fill="#334155">alt</text><text x="43.8" y="183" font-size="10.5" text-anchor="start" fill="#fff" stroke="#fff" stroke-width="3" stroke-linejoin="round">[are the credentials accepted?]</text><text x="43.8" y="183" font-size="10.5" text-anchor="start" fill="#475569">[are the credentials accepted?]</text><rect x="589.6" y="380" width="607.6" height="72" fill="none" stroke="#64748b" stroke-width="1"/><path d="M589.6 380 h55.6 l6,9 v6 h-61.6 z" fill="#f8fafc" stroke="#64748b" stroke-width="1"/><text x="596.6" y="391" font-size="10.5" text-anchor="start" fill="#334155">assert</text><text x="659.2" y="391" font-size="10.5" text-anchor="start" fill="#fff" stroke="#fff" stroke-width="3" stroke-linejoin="round">[once a token is issued this MUST follow — nothing else is a valid continuation]</text><text x="659.2" y="391" font-size="10.5" text-anchor="start" fill="#475569">[once a token is issued this MUST follow — nothing else is a valid continuation]</text><rect x="26" y="470" width="607.6" height="72" fill="none" stroke="#64748b" stroke-width="1"/><path d="M26 470 h35.8 l6,9 v6 h-41.8 z" fill="#f8fafc" stroke="#64748b" stroke-width="1"/><text x="33" y="481" font-size="10.5" text-anchor="start" fill="#334155">neg</text><text x="75.8" y="481" font-size="10.5" text-anchor="start" fill="#fff" stroke="#fff" stroke-width="3" stroke-linejoin="round">[INVALID traces — the token must never travel in a query string]</text><text x="75.8" y="481" font-size="10.5" text-anchor="start" fill="#475569">[INVALID traces — the token must never travel in a query string]</text><rect x="589.6" y="560" width="607.6" height="72" fill="none" stroke="#64748b" stroke-width="1"/><path d="M589.6 560 h68.8 l6,9 v6 h-74.8 z" fill="#f8fafc" stroke="#64748b" stroke-width="1"/><text x="596.6" y="571" font-size="10.5" text-anchor="start" fill="#334155">critical</text><text x="672.4" y="571" font-size="10.5" text-anchor="start" fill="#fff" stroke="#fff" stroke-width="3" stroke-linejoin="round">[critical region — no other occurrence may interleave on these lifelines]</text><text x="672.4" y="571" font-size="10.5" text-anchor="start" fill="#475569">[critical region — no other occurrence may interleave on these lifelines]</text><rect x="26" y="650" width="1171.2" height="156" fill="none" stroke="#64748b" stroke-width="1"/><path d="M26 650 h35.8 l6,9 v6 h-41.8 z" fill="#f8fafc" stroke="#64748b" stroke-width="1"/><text x="33" y="661" font-size="10.5" text-anchor="start" fill="#334155">par</text><text x="75.8" y="661" font-size="10.5" text-anchor="start" fill="#fff" stroke="#fff" stroke-width="3" stroke-linejoin="round">[the profile fetch and the audit flush have no relative order]</text><text x="75.8" y="661" font-size="10.5" text-anchor="start" fill="#475569">[the profile fetch and the audit flush have no relative order]</text><rect x="26" y="824" width="607.6" height="156" fill="none" stroke="#64748b" stroke-width="1"/><path d="M26 824 h55.6 l6,9 v6 h-61.6 z" fill="#f8fafc" stroke="#64748b" stroke-width="1"/><text x="33" y="835" font-size="10.5" text-anchor="start" fill="#334155">strict</text><text x="95.6" y="835" font-size="10.5" text-anchor="start" fill="#fff" stroke="#fff" stroke-width="3" stroke-linejoin="round">[the two steps are totally ordered across BOTH lifelines]</text><text x="95.6" y="835" font-size="10.5" text-anchor="start" fill="#475569">[the two steps are totally ordered across BOTH lifelines]</text><rect x="26" y="998" width="1171.2" height="156" fill="none" stroke="#64748b" stroke-width="1"/><path d="M26 998 h35.8 l6,9 v6 h-41.8 z" fill="#f8fafc" stroke="#64748b" stroke-width="1"/><text x="33" y="1009" font-size="10.5" text-anchor="start" fill="#334155">seq</text><text x="75.8" y="1009" font-size="10.5" text-anchor="start" fill="#fff" stroke="#fff" stroke-width="3" stroke-linejoin="round">[weak sequencing — ordered only on the lifeline the two operands share]</text><text x="75.8" y="1009" font-size="10.5" text-anchor="start" fill="#475569">[weak sequencing — ordered only on the lifeline the two operands share]</text><rect x="26" y="1172" width="607.6" height="72" fill="none" stroke="#64748b" stroke-width="1"/><path d="M26 1172 h35.8 l6,9 v6 h-41.8 z" fill="#f8fafc" stroke="#64748b" stroke-width="1"/><text x="33" y="1183" font-size="10.5" text-anchor="start" fill="#334155">opt</text><text x="75.8" y="1183" font-size="10.5" text-anchor="start" fill="#fff" stroke="#fff" stroke-width="3" stroke-linejoin="round">[only when the client asked for the expanded form]</text><text x="75.8" y="1183" font-size="10.5" text-anchor="start" fill="#475569">[only when the client asked for the expanded form]</text><rect x="3.3" y="1262" width="630.3" height="106" fill="none" stroke="#64748b" stroke-width="1"/><path d="M3.3 1262 h49 l6,9 v6 h-55 z" fill="#f8fafc" stroke="#64748b" stroke-width="1"/><text x="10.299999999999997" y="1273" font-size="10.5" text-anchor="start" fill="#334155">break</text><text x="66.3" y="1273" font-size="10.5" text-anchor="start" fill="#fff" stroke="#fff" stroke-width="3" stroke-linejoin="round">[on 503 the remainder of the session is abandoned]</text><text x="66.3" y="1273" font-size="10.5" text-anchor="start" fill="#475569">[on 503 the remainder of the session is abandoned]</text><rect x="26" y="1386" width="607.6" height="72" fill="none" stroke="#64748b" stroke-width="1"/><path d="M26 1386 h55.6 l6,9 v6 h-61.6 z" fill="#f8fafc" stroke="#64748b" stroke-width="1"/><text x="33" y="1397" font-size="10.5" text-anchor="start" fill="#334155">ignore</text><text x="95.6" y="1397" font-size="10.5" text-anchor="start" fill="#fff" stroke="#fff" stroke-width="3" stroke-linejoin="round">[ignore {heartbeat} — heartbeats may occur here and mean nothing to this figure]</text><text x="95.6" y="1397" font-size="10.5" text-anchor="start" fill="#475569">[ignore {heartbeat} — heartbeats may occur here and mean nothing to this figure]</text><rect x="26" y="1476" width="607.6" height="106" fill="none" stroke="#64748b" stroke-width="1"/><path d="M26 1476 h68.8 l6,9 v6 h-74.8 z" fill="#f8fafc" stroke="#64748b" stroke-width="1"/><text x="33" y="1487" font-size="10.5" text-anchor="start" fill="#334155">consider</text><text x="108.8" y="1487" font-size="10.5" text-anchor="start" fill="#fff" stroke="#fff" stroke-width="3" stroke-linejoin="round">[consider {DELETE /session, 204} — nothing else in this region is significant]</text><text x="108.8" y="1487" font-size="10.5" text-anchor="start" fill="#475569">[consider {DELETE /session, 204} — nothing else in this region is significant]</text><text x="34" y="101" font-size="10.5" text-anchor="start" fill="#fff" stroke="#fff" stroke-width="3" stroke-linejoin="round">[while no response, and fewer than 3 attempts made]</text><text x="34" y="101" font-size="10.5" text-anchor="start" fill="#475569">[while no response, and fewer than 3 attempts made]</text><text x="2" y="211" font-size="10.5" text-anchor="start" fill="#fff" stroke="#fff" stroke-width="3" stroke-linejoin="round">[accepted]</text><text x="2" y="211" font-size="10.5" text-anchor="start" fill="#475569">[accepted]</text><line x1="-6" y1="300" x2="633.6" y2="300" stroke="#94a3b8" stroke-width="1" stroke-dasharray="5 4"/><text x="2" y="309" font-size="10.5" text-anchor="start" fill="#fff" stroke="#fff" stroke-width="3" stroke-linejoin="round">[rejected]</text><text x="2" y="309" font-size="10.5" text-anchor="start" fill="#475569">[rejected]</text><text x="34" y="689" font-size="10.5" text-anchor="start" fill="#fff" stroke="#fff" stroke-width="3" stroke-linejoin="round">[profile fetch]</text><text x="34" y="689" font-size="10.5" text-anchor="start" fill="#475569">[profile fetch]</text><line x1="26" y1="744" x2="1197.2" y2="744" stroke="#94a3b8" stroke-width="1" stroke-dasharray="5 4"/><text x="34" y="753" font-size="10.5" text-anchor="start" fill="#fff" stroke="#fff" stroke-width="3" stroke-linejoin="round">[audit flush]</text><text x="34" y="753" font-size="10.5" text-anchor="start" fill="#475569">[audit flush]</text><text x="34" y="863" font-size="10.5" text-anchor="start" fill="#fff" stroke="#fff" stroke-width="3" stroke-linejoin="round">[1 — prepare]</text><text x="34" y="863" font-size="10.5" text-anchor="start" fill="#475569">[1 — prepare]</text><line x1="26" y1="918" x2="633.6" y2="918" stroke="#94a3b8" stroke-width="1" stroke-dasharray="5 4"/><text x="34" y="927" font-size="10.5" text-anchor="start" fill="#fff" stroke="#fff" stroke-width="3" stroke-linejoin="round">[2 — commit]</text><text x="34" y="927" font-size="10.5" text-anchor="start" fill="#475569">[2 — commit]</text><text x="34" y="1037" font-size="10.5" text-anchor="start" fill="#fff" stroke="#fff" stroke-width="3" stroke-linejoin="round">[on the client side]</text><text x="34" y="1037" font-size="10.5" text-anchor="start" fill="#475569">[on the client side]</text><line x1="26" y1="1092" x2="1197.2" y2="1092" stroke="#94a3b8" stroke-width="1" stroke-dasharray="5 4"/><text x="34" y="1101" font-size="10.5" text-anchor="start" fill="#fff" stroke="#fff" stroke-width="3" stroke-linejoin="round">[on the audit side]</text><text x="34" y="1101" font-size="10.5" text-anchor="start" fill="#475569">[on the audit side]</text><line x1="49.5" y1="125" x2="610.1" y2="125" stroke="#2563eb" stroke-width="1.6"/><line x1="610.1" y1="235" x2="49.5" y2="235" stroke="#2563eb" stroke-width="1.6"/><rect x="6" y="258" width="84" height="22" rx="9" fill="#fff7ed" stroke="#c2410c" stroke-width="1"/><line x1="610.1" y1="333" x2="49.5" y2="333" stroke="#dc2626" stroke-width="1.6" stroke-dasharray="6 4"/><line x1="613.1" y1="423" x2="1173.7" y2="423" stroke="#16a34a" stroke-width="1.6"/><line x1="49.5" y1="513" x2="610.1" y2="513" stroke="#dc2626" stroke-width="1.6" stroke-dasharray="6 4"/><line x1="613.1" y1="603" x2="1173.7" y2="603" stroke="#16a34a" stroke-width="1.6"/><line x1="49.5" y1="713" x2="610.1" y2="713" stroke="#2563eb" stroke-width="1.6"/><line x1="613.1" y1="777" x2="1173.7" y2="777" stroke="#16a34a" stroke-width="1.6"/><line x1="49.5" y1="887" x2="610.1" y2="887" stroke="#2563eb" stroke-width="1.6"/><line x1="610.1" y1="951" x2="49.5" y2="951" stroke="#2563eb" stroke-width="1.6"/><line x1="49.5" y1="1061" x2="610.1" y2="1061" stroke="#2563eb" stroke-width="1.6"/><line x1="613.1" y1="1125" x2="1173.7" y2="1125" stroke="#16a34a" stroke-width="1.6"/><line x1="610.1" y1="1215" x2="49.5" y2="1215" stroke="#2563eb" stroke-width="1.6"/><line x1="610.1" y1="1305" x2="49.5" y2="1305" stroke="#dc2626" stroke-width="1.6" stroke-dasharray="6 4"/><rect x="9.3" y="1328" width="77.4" height="22" rx="9" fill="#fff7ed" stroke="#c2410c" stroke-width="1"/><line x1="49.5" y1="1429" x2="610.1" y2="1429" stroke="#334155" stroke-width="1.6"/><line x1="49.5" y1="1519" x2="610.1" y2="1519" stroke="#2563eb" stroke-width="1.6"/><line x1="610.1" y1="1553" x2="49.5" y2="1553" stroke="#2563eb" stroke-width="1.6"/><rect x="19.2" y="1598" width="57.6" height="22" rx="9" fill="#fff7ed" stroke="#c2410c" stroke-width="1"/><path d="M610.1 125 L600.02 130.6 L600.02 119.4 z" fill="#2563eb" stroke="none"/><text x="329.8" y="117" font-size="11" text-anchor="middle" fill="#fff" stroke="#fff" stroke-width="3" stroke-linejoin="round">POST /session  (credentials)</text><text x="329.8" y="117" font-size="11" text-anchor="middle" fill="#1d1d1b">POST /session  (credentials)</text><path d="M49.5 235 L59.58 229.4 L59.58 240.6 z" fill="#2563eb" stroke="none"/><text x="329.8" y="227" font-size="11" text-anchor="middle" fill="#fff" stroke="#fff" stroke-width="3" stroke-linejoin="round">201 Created  (session token)</text><text x="329.8" y="227" font-size="11" text-anchor="middle" fill="#1d1d1b">201 Created  (session token)</text><text x="48" y="273" font-size="11" text-anchor="middle" fill="#7c2d12">AUTHORIZED</text><path d="M49.5 333 L59.58 327.4 L59.58 338.6 z" fill="#dc2626" stroke="none"/><text x="329.8" y="325" font-size="11" text-anchor="middle" fill="#fff" stroke="#fff" stroke-width="3" stroke-linejoin="round">401 Unauthorized</text><text x="329.8" y="325" font-size="11" text-anchor="middle" fill="#1d1d1b">401 Unauthorized</text><path d="M1173.7 423 L1163.62 428.6 L1163.62 417.4 z" fill="#16a34a" stroke="none"/><text x="893.4000000000001" y="415" font-size="11" text-anchor="middle" fill="#fff" stroke="#fff" stroke-width="3" stroke-linejoin="round">session opened  (subject, token id, time)</text><text x="893.4000000000001" y="415" font-size="11" text-anchor="middle" fill="#1d1d1b">session opened  (subject, token id, time)</text><path d="M610.1 513 L600.02 518.6 L600.02 507.4 z" fill="#dc2626" stroke="none"/><text x="329.8" y="505" font-size="11" text-anchor="middle" fill="#fff" stroke="#fff" stroke-width="3" stroke-linejoin="round">GET /profile?token=…  (no TLS)</text><text x="329.8" y="505" font-size="11" text-anchor="middle" fill="#1d1d1b">GET /profile?token=…  (no TLS)</text><path d="M1173.7 603 L1163.62 608.6 L1163.62 597.4 z" fill="#16a34a" stroke="none"/><text x="893.4000000000001" y="595" font-size="11" text-anchor="middle" fill="#fff" stroke="#fff" stroke-width="3" stroke-linejoin="round">write: token issued</text><text x="893.4000000000001" y="595" font-size="11" text-anchor="middle" fill="#1d1d1b">write: token issued</text><path d="M610.1 713 L600.02 718.6 L600.02 707.4 z" fill="#2563eb" stroke="none"/><text x="329.8" y="705" font-size="11" text-anchor="middle" fill="#fff" stroke="#fff" stroke-width="3" stroke-linejoin="round">GET /profile</text><text x="329.8" y="705" font-size="11" text-anchor="middle" fill="#1d1d1b">GET /profile</text><path d="M1173.7 777 L1163.62 782.6 L1163.62 771.4 z" fill="#16a34a" stroke="none"/><text x="893.4000000000001" y="769" font-size="11" text-anchor="middle" fill="#fff" stroke="#fff" stroke-width="3" stroke-linejoin="round">flush buffered records</text><text x="893.4000000000001" y="769" font-size="11" text-anchor="middle" fill="#1d1d1b">flush buffered records</text><path d="M610.1 887 L600.02 892.6 L600.02 881.4 z" fill="#2563eb" stroke="none"/><text x="329.8" y="879" font-size="11" text-anchor="middle" fill="#fff" stroke="#fff" stroke-width="3" stroke-linejoin="round">PUT /profile  (If-Match: etag)</text><text x="329.8" y="879" font-size="11" text-anchor="middle" fill="#1d1d1b">PUT /profile  (If-Match: etag)</text><path d="M49.5 951 L59.58 945.4 L59.58 956.6 z" fill="#2563eb" stroke="none"/><text x="329.8" y="943" font-size="11" text-anchor="middle" fill="#fff" stroke="#fff" stroke-width="3" stroke-linejoin="round">204 No Content</text><text x="329.8" y="943" font-size="11" text-anchor="middle" fill="#1d1d1b">204 No Content</text><path d="M610.1 1061 L600.02 1066.6 L600.02 1055.4 z" fill="#2563eb" stroke="none"/><text x="329.8" y="1053" font-size="11" text-anchor="middle" fill="#fff" stroke="#fff" stroke-width="3" stroke-linejoin="round">GET /settings</text><text x="329.8" y="1053" font-size="11" text-anchor="middle" fill="#1d1d1b">GET /settings</text><path d="M1173.7 1125 L1163.62 1130.6 L1163.62 1119.4 z" fill="#16a34a" stroke="none"/><text x="893.4000000000001" y="1117" font-size="11" text-anchor="middle" fill="#fff" stroke="#fff" stroke-width="3" stroke-linejoin="round">read: settings</text><text x="893.4000000000001" y="1117" font-size="11" text-anchor="middle" fill="#1d1d1b">read: settings</text><path d="M49.5 1215 L59.58 1209.4 L59.58 1220.6 z" fill="#2563eb" stroke="none"/><text x="329.8" y="1207" font-size="11" text-anchor="middle" fill="#fff" stroke="#fff" stroke-width="3" stroke-linejoin="round">200 OK  (expanded profile)</text><text x="329.8" y="1207" font-size="11" text-anchor="middle" fill="#1d1d1b">200 OK  (expanded profile)</text><path d="M49.5 1305 L59.58 1299.4 L59.58 1310.6 z" fill="#dc2626" stroke="none"/><text x="329.8" y="1297" font-size="11" text-anchor="middle" fill="#fff" stroke="#fff" stroke-width="3" stroke-linejoin="round">503 Service Unavailable</text><text x="329.8" y="1297" font-size="11" text-anchor="middle" fill="#1d1d1b">503 Service Unavailable</text><text x="48" y="1343" font-size="11" text-anchor="middle" fill="#7c2d12">ABANDONED</text><path d="M610.1 1429 L600.02 1434.6 L600.02 1423.4 z" fill="#334155" stroke="none"/><path d="M49.5 1429 L59.58 1423.4 L59.58 1434.6 z" fill="#334155" stroke="none"/><text x="329.8" y="1421" font-size="11" text-anchor="middle" fill="#fff" stroke="#fff" stroke-width="3" stroke-linejoin="round">heartbeat</text><text x="329.8" y="1421" font-size="11" text-anchor="middle" fill="#1d1d1b">heartbeat</text><path d="M610.1 1519 L600.02 1524.6 L600.02 1513.4 z" fill="#2563eb" stroke="none"/><text x="329.8" y="1511" font-size="11" text-anchor="middle" fill="#fff" stroke="#fff" stroke-width="3" stroke-linejoin="round">DELETE /session</text><text x="329.8" y="1511" font-size="11" text-anchor="middle" fill="#1d1d1b">DELETE /session</text><path d="M49.5 1553 L59.58 1547.4 L59.58 1558.6 z" fill="#2563eb" stroke="none"/><text x="329.8" y="1545" font-size="11" text-anchor="middle" fill="#fff" stroke="#fff" stroke-width="3" stroke-linejoin="round">204 No Content</text><text x="329.8" y="1545" font-size="11" text-anchor="middle" fill="#1d1d1b">204 No Content</text><text x="48" y="1613" font-size="11" text-anchor="middle" fill="#7c2d12">CLOSED</text><rect x="0" y="1647" width="16" height="11" fill="#fff" stroke="#2563eb"/><text x="21" y="1656.5" font-size="11" fill="#1d1d1b">Opens, uses or closes the session itself</text><rect x="308" y="1647" width="16" height="11" fill="#fff" stroke="#16a34a"/><text x="329" y="1656.5" font-size="11" fill="#1d1d1b">Written to the audit log — never part of the reply the client sees</text><rect x="787.5999999999999" y="1647" width="16" height="11" fill="#fff" stroke="#dc2626" stroke-dasharray="6 4"/><text x="808.5999999999999" y="1656.5" font-size="11" fill="#1d1d1b">A trace this figure marks as forbidden or as a failure</text></g><metadata id="figdown-source" data-sha256="125ba6650b5fbdd44cadf286c24d68c81a1be6ab5d8892cf8215a33eda39d4b9" data-engine-version="0.4.0"><![CDATA[
+# FigDown — figures as text. Spec: https://github.com/FigDown/figdown
+
+figdown 0.4 sequence
+title "All twelve interaction operators, on one session"
+
+# ── What this figure is ─────────────────────────────────────────────
+# `fragment … type=` takes one of TWELVE values, and the set is taken
+# whole from UML 2.5.1's InteractionOperatorKind literals rather than
+# picked from: `alt` `opt` `loop` `par` `strict` `seq` `critical` `neg`
+# `assert` `ignore` `consider` `break`. Six of them are what Mermaid
+# documents (loop, alt, opt, par, critical, break); the other six are
+# what taking the enumeration whole buys, and a value nothing in the
+# corpus writes is a value nobody has read.
+#
+# So this figure is the DEMONSTRATOR for the enum: one small session —
+# a client opening a session with a service that keeps an audit log —
+# with every one of the twelve stated on the part of that session where
+# it is actually true. The subject is chosen to be ordinary on purpose;
+# what is being shown is the OPERATOR, and an operator whose example
+# needs a paragraph of protocol to justify it teaches the protocol
+# instead.
+#
+# THE ORDER BELOW IS THE SESSION'S, NOT THE ENUM'S. A figure whose rows
+# are alphabetical is a table, and this one has a time axis that means
+# something. The enum order is in the paragraph above; the ladder order
+# is: loop, alt, assert, neg, critical, par, strict, seq, opt, break,
+# ignore, consider.
+#
+# EACH OPERATOR IS USED FOR WHAT IT MEANS, and the guard or the label
+# says which meaning:
+#   loop      the operand repeats; the guard carries the bound
+#   alt       at most ONE operand runs, chosen by the guards
+#   opt       one operand, run or not run
+#   par       the operands interleave in any order
+#   strict    the operands are TOTALLY ordered, across all lifelines
+#   seq       weak sequencing — ordered per lifeline, not between
+#   critical  the operand's occurrences may not be interleaved
+#   neg       the operand's traces are INVALID — they must not happen
+#   assert    the operand's traces are the ONLY valid continuation
+#   ignore    the named messages may occur and are insignificant
+#   consider  only the named messages are significant; others are not
+#   break     the operand runs INSTEAD OF the rest of the enclosing run
+
+# ── HONEST LIMIT — `ignore` and `consider` carry no argument ────────
+# In UML both operators take a SET OF MESSAGE NAMES — `ignore {t, u}` —
+# and that set is what makes the claim checkable. `fragment` has no
+# argument slot, so the names live in the fragment's label, where they
+# are prose: a reading agent can quote them and attribute them to the
+# figure, and cannot parse them. The same is true of `loop`'s bounds,
+# which UML writes `loop(1,3)` and this figure writes into the guard.
+#
+# ── HONEST LIMIT — one operator per frame, and no combination ───────
+# UML lets an operand of one fragment hold another fragment, and this
+# genre allows exactly ONE level of that. Twelve sibling frames is what
+# a demonstrator of the ENUM should be; a figure that also nested them
+# would be demonstrating the nesting. `dhcp-lease.fd` is where the
+# nesting is shown, twice.
+
+# ── Semantic classes ───────────────────────────────────────────────
+# Three roles, so a reading agent can group the messages by what they
+# do rather than by which frame they sit in.
+class session "Opens, uses or closes the session itself" stroke=#2563eb
+class audit   "Written to the audit log — never part of the reply the client sees" stroke=#16a34a
+class bad     "A trace this figure marks as forbidden or as a failure" stroke=#dc2626 style=dashed
+
+lifeline c "Client"
+lifeline s "Service"
+lifeline a "Audit log"
+
+# ── loop ────────────────────────────────────────────────────────────
+# The operand repeats. UML puts the bound in the operator itself,
+# `loop(1,3)`; here it is in the guard, which is the operand's own
+# quoted string.
+fragment open "opening the session" type=loop
+operand tries "while no response, and fewer than 3 attempts made" in=open
+message c -> s "POST /session  (credentials)" in=tries class=session
+
+# ── alt ─────────────────────────────────────────────────────────────
+# At most ONE operand runs, and the guards say which. Two operands is
+# the minimum that makes the operator mean anything.
+fragment auth "are the credentials accepted?" type=alt
+operand accepted "accepted" in=auth
+message c <- s "201 Created  (session token)" in=accepted class=session
+state c "AUTHORIZED" in=accepted
+operand rejected "rejected" in=auth
+message c <- s "401 Unauthorized" in=rejected class=bad
+
+# ── assert ──────────────────────────────────────────────────────────
+# The operand's traces are the ONLY valid continuation at this point:
+# every trace that reaches here and does something else is invalid.
+# This is the operator that says MUST, and it is why `type=` has no
+# default — a frame drawn with no operator would look like this one.
+fragment mandatory "once a token is issued this MUST follow — nothing else is a valid continuation" type=assert
+message s -> a "session opened  (subject, token id, time)" in=mandatory class=audit
+
+# ── neg ─────────────────────────────────────────────────────────────
+# The operand's traces are INVALID: the figure draws the message in
+# order to say it must never occur. Drawing a forbidden trace is the
+# only way to name it, and the frame is what stops it being read as
+# part of the protocol.
+fragment forbidden "INVALID traces — the token must never travel in a query string" type=neg
+message c -> s "GET /profile?token=…  (no TLS)" in=forbidden class=bad
+
+# ── critical ────────────────────────────────────────────────────────
+# The operand's occurrences may not be interleaved with anything else
+# on the lifelines it covers — a critical region, not a claim about
+# duration.
+fragment atomic "critical region — no other occurrence may interleave on these lifelines" type=critical
+message s -> a "write: token issued" in=atomic class=audit
+
+# ── par ─────────────────────────────────────────────────────────────
+# The operands interleave in any order, which is the ONE escape from
+# this genre's total order: two messages that are merely adjacent are
+# ORDERED, and only a `par` frame says they are not.
+fragment concurrent "the profile fetch and the audit flush have no relative order" type=par
+operand fetch "profile fetch" in=concurrent
+message c -> s "GET /profile" in=fetch class=session
+operand flush "audit flush" in=concurrent
+message s -> a "flush buffered records" in=flush class=audit
+
+# ── strict ──────────────────────────────────────────────────────────
+# The operands are TOTALLY ordered across every lifeline they cover:
+# nothing in the second may happen before anything in the first, even
+# on a lifeline the two do not share.
+fragment twophase "the two steps are totally ordered across BOTH lifelines" type=strict
+operand prepare "1 — prepare" in=twophase
+message c -> s "PUT /profile  (If-Match: etag)" in=prepare class=session
+operand commit "2 — commit" in=twophase
+message c <- s "204 No Content" in=commit class=session
+
+# ── seq ─────────────────────────────────────────────────────────────
+# Weak sequencing: order is preserved on each lifeline separately and
+# is unconstrained between lifelines. Here the two operands share the
+# service, so the service orders them — the client and the audit log
+# are unordered with respect to each other.
+fragment weak "weak sequencing — ordered only on the lifeline the two operands share" type=seq
+operand ask "on the client side" in=weak
+message c -> s "GET /settings" in=ask class=session
+operand log "on the audit side" in=weak
+message s -> a "read: settings" in=log class=audit
+
+# ── opt ─────────────────────────────────────────────────────────────
+# One operand, run or not run — `alt` with a single operand and no
+# alternative to choose between.
+fragment expanded "only when the client asked for the expanded form" type=opt
+message c <- s "200 OK  (expanded profile)" in=expanded class=session
+
+# ── break ───────────────────────────────────────────────────────────
+# The operand runs INSTEAD OF the rest of the enclosing run: everything
+# below this frame is abandoned when it fires. That is what makes it
+# different from `opt`, which returns to the flow it interrupted.
+fragment giveup "on 503 the remainder of the session is abandoned" type=break
+message c <- s "503 Service Unavailable" in=giveup class=bad
+state c "ABANDONED" in=giveup
+
+# ── ignore ──────────────────────────────────────────────────────────
+# The named messages MAY occur anywhere in this region and are not
+# significant — so a trace that contains them and a trace that does not
+# are the same trace as far as this figure is concerned. `<->` is ONE
+# occurrence: an exchange in both directions whose individual messages
+# are not enumerated, which is exactly what a heartbeat is.
+fragment insignificant "ignore {heartbeat} — heartbeats may occur here and mean nothing to this figure" type=ignore
+message c <-> s "heartbeat" in=insignificant
+
+# ── consider ────────────────────────────────────────────────────────
+# The mirror of `ignore`: ONLY the named messages are significant here,
+# and anything else that occurs is not. The two are not redundant —
+# `ignore` names what to drop, `consider` names what to keep, and which
+# one is shorter to write depends on the region.
+fragment onlythese "consider {DELETE /session, 204} — nothing else in this region is significant" type=consider
+message c -> s "DELETE /session" in=onlythese class=session
+message c <- s "204 No Content" in=onlythese class=session
+state c "CLOSED"
+
+]]></metadata></svg>

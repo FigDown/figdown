@@ -85,6 +85,26 @@ const cited = new Set();
 // construction" because `cited` was filtered against `rows` as it was built --
 // which made the claim true of the variable and false of the tree. Collect
 // ID-SHAPED tokens instead, and report the ones with no row.
+//
+// A TOOL'S OWN VOCABULARY IS NOT A CITATION. `artifact-check.js` emits the
+// verdict `REFUSED-ARTIFACT`, and `tools/README.md` documents it backticked in
+// the verdict table — UPPERCASE-KEBAB, and so indistinguishable from a decision
+// ID by shape alone. It names a state the tool reports, not a ruling, and the
+// registry must not grow a row for it. The discriminator is where the token is
+// DEFINED: a name a program compares against appears as a COMPLETE string
+// literal in that program's source (`verdict: 'REFUSED-ARTIFACT'`), which a
+// decision citation never does — a citation appears inside a sentence, or
+// backticked inside a diagnostic, never as the whole string.
+const VOCAB = new Set();
+(function walkVocab(dir) {
+  for (const e of fs.readdirSync(dir, { withFileTypes: true })) {
+    if (e.isDirectory()) { if (!SKIP_DIR.has(e.name)) walkVocab(path.join(dir, e.name)); continue; }
+    if (!/\.(js|mjs)$/.test(e.name)) continue;
+    let t; try { t = fs.readFileSync(path.join(dir, e.name), 'utf8'); } catch { continue; }
+    for (const m of t.matchAll(/['"]([A-Z][A-Z0-9]*(?:-[A-Z][A-Z0-9]*)+)['"]/g)) VOCAB.add(m[1]);
+  }
+})(ROOT);
+
 const undefinedIds = [];
 (function walk2(dir) {
   for (const e of fs.readdirSync(dir, { withFileTypes: true })) {
@@ -100,7 +120,7 @@ const undefinedIds = [];
     if (rel === path.join('decisions', 'registry.md'))
       t = t.split('\n').filter(l => !ROW_RE.test(l)).join('\n');
     for (const m of t.matchAll(IDLIKE))
-      if (!rows.has(m[1])) undefinedIds.push(rel + ':' + m[1]);
+      if (!rows.has(m[1]) && !VOCAB.has(m[1])) undefinedIds.push(rel + ':' + m[1]);
   }
 })(ROOT);
 const badStatus = [...rows.entries()].filter(([, r]) => !STATUSES.has(r.status));

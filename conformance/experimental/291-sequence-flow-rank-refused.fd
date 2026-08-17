@@ -1,0 +1,15 @@
+# Draft §7, consequence 1: `flow` and `rank` are NOT keywords of
+# this genre, and their absence is a CONSEQUENCE rather than a refusal ruling
+# of its own — which is why they get the plain allowlist message and not one of
+# the three named refusal diagnostics.
+#
+# The reason: both of this genre's axes are already ordered by the source.
+# Columns are in `lifeline` declaration order and time runs down the page in
+# the order the occurrence lines are written, so a key that reordered either
+# would make the drawing disagree with the text (`DECLARATION-ORDER-SEMANTICS`). There is nothing for
+# them to set.
+figdown 0.4 sequence
+lifeline c "C"
+lifeline s "S"
+flow down
+rank c,s

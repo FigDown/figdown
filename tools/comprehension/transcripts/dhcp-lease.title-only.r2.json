@@ -1,0 +1,59 @@
+{
+  "suite_version": "1.0.0",
+  "run": {
+    "utc": "2026-08-17T09:42:09Z",
+    "model_alias": "sonnet",
+    "model_used": "claude-sonnet-5",
+    "cli": "2.1.233 (Claude Code)",
+    "condition": "title-only",
+    "reader": 2
+  },
+  "figure": {
+    "id": "dhcp-lease",
+    "genre": "sequence",
+    "path": "examples/sequence/dhcp-lease.fd",
+    "file_sha256": "19c3cff8352138076d82fc44a9a4f2144a4d92b76d1ffecd22f551c7c0f26f7d",
+    "title_shown": "DHCP lease acquisition, renewal and release (RFC 2131 §3.1, §4.4)",
+    "presented_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "presented_lines": 0,
+    "presented_chars": 0
+  },
+  "prompt": {
+    "system_sha256": "42d79e37b78275f219f2b1b70497abf709362f5fa68aa5427fb1f42b12b60425",
+    "user_sha256": "da1b7c58fde1d546e33fd6cdeccf87f841e576b9b805054bb88f51da82eb9709",
+    "question_set_sha256": "1d3c68113bc5b58b4f9aae9d0c6c12f85aa2b45e774ca1a1325a1442959abbe1"
+  },
+  "cold_room": {
+    "cwd": "an isolated empty temporary directory outside the repository",
+    "tools_offered": "none — every tool denied by name",
+    "mcp_servers": "none",
+    "settings": "safe-mode: no project or user settings, no memory file, no skills, no plugins, no hooks",
+    "session_persistence": false,
+    "shown": "the system prompt, the figure title, and the questions — nothing else",
+    "not_shown": "the specification, any genre document, any other .fd file, the file name, the name of the language, the repository"
+  },
+  "integrity": {
+    "turns": 1,
+    "permission_denials": 0,
+    "tool_calls_observed": false,
+    "is_error": false
+  },
+  "usage": {
+    "cost_usd": 0.008664,
+    "input_tokens": 808,
+    "output_tokens": 416,
+    "cache_creation_input_tokens": 0,
+    "duration_ms": 5099
+  },
+  "raw_answer_text": "A1: The four messages are DHCPDISCOVER, DHCPOFFER, DHCPREQUEST, and DHCPACK, in that order, with the client sending the first one (DHCPDISCOVER).\nA2: A server originates both the DHCPOFFER and the DHCPACK.\nA3: The DHCPACK message moves the client into the BOUND state.\nA4: The client moves into the RENEWING state and unicasts the DHCPREQUEST directly to the server that granted the original lease.\nA5: The client moves into the REBINDING state and broadcasts the DHCPREQUEST to any available server (not unicast to a specific one).\nA6: Yes, the client may continue using its address while renewing or rebinding; if the lease expires with no DHCPACK received, it must stop using the address and return to the INIT state to acquire a new one.\nA7: A DHCPRELEASE message tells the server the client is done with the address so it can be reclaimed; the client sends it.\nA8: The client broadcasts a DHCPREQUEST that names the selected server's address (and requested IP) so all servers see which offer was accepted; servers not selected treat their offers as declined and return the offered addresses to their available pools.",
+  "answers": {
+    "q1": "The four messages are DHCPDISCOVER, DHCPOFFER, DHCPREQUEST, and DHCPACK, in that order, with the client sending the first one (DHCPDISCOVER).",
+    "q2": "A server originates both the DHCPOFFER and the DHCPACK.",
+    "q3": "The DHCPACK message moves the client into the BOUND state.",
+    "q4": "The client moves into the RENEWING state and unicasts the DHCPREQUEST directly to the server that granted the original lease.",
+    "q5": "The client moves into the REBINDING state and broadcasts the DHCPREQUEST to any available server (not unicast to a specific one).",
+    "q6": "Yes, the client may continue using its address while renewing or rebinding; if the lease expires with no DHCPACK received, it must stop using the address and return to the INIT state to acquire a new one.",
+    "q7": "A DHCPRELEASE message tells the server the client is done with the address so it can be reclaimed; the client sends it.",
+    "q8": "The client broadcasts a DHCPREQUEST that names the selected server's address (and requested IP) so all servers see which offer was accepted; servers not selected treat their offers as declined and return the offered addresses to their available pools."
+  }
+}

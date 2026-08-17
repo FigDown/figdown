@@ -1,0 +1,4 @@
+Line 15: fragment needs type=<operator> — a fragment with no interaction operator asserts nothing (alt|opt|loop|par|strict|seq|critical|neg|assert|ignore|consider|break, UML 2.5.1 §17.12.15.3). UML defaults the attribute to seq and FigDown does not: a default would draw a frame that looks like an assertion and is not one
+Line 16: unknown interaction operator "maybe" — write one of alt|opt|loop|par|strict|seq|critical|neg|assert|ignore|consider|break (UML 2.5.1 §17.12.15.3 InteractionOperatorKind, taken whole)
+Line 17: this position takes a BARE value: write type=alt — quoting a value drawn from a closed set suggests the position accepts arbitrary text, when it accepts only the listed spellings (SYNTAX-STYLE RULE 2.4)
+Line 18: operand needs in=<fragment-id> — an operand is a compartment OF a fragment and has no meaning apart from one (UML 2.5.1 §17.12.14)

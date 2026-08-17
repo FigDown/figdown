@@ -112,7 +112,7 @@ under `SIZE-AND-DIRECTION-KEY-NAMING`/`GENRE-DOCUMENT-CONTRACT` §6(b). See *Sou
     terminator <id> ["label"]
 
 Option keys are **identical to `node`**: `shape` `fill` `stroke` `style`
-`class` `note`. `in` was a seventh until this release (`MEMBERSHIP-KEY-ACCEPTANCE`) withdrew it from
+`class` `note`. `in` was a seventh until 0.3 (`MEMBERSHIP-KEY-ACCEPTANCE`) withdrew it from
 this genre — it named a `group`, which this genre stopped declaring (`SCENE-KEYWORD-MEMBERSHIP`), so every value was a dead end; see *`in=` is withdrawn from
 `flowchart` at 0.3*. `plane` was an eighth until `PAINT-ORDER-CONSTRUCT` withdrew it from
 the language. A role line shares the node / external / typed-block **id
@@ -198,7 +198,16 @@ and four line symbols (`spec/vocabulary-sources.tsv`). This genre spells
 fourth as presentation only. Nine stage symbols have no word here: Predefined
 process, Manual operation, Preparation, Parallel mode, Loop limit, Data,
 Stored data, Manual input, Document. Each is a gap in the ledger with its own
-evidence, not a licence to write `node` and move on. (Earlier drafts of this
+evidence, not a licence to write `node` and move on. **[CORRECTED 0.3.z: the
+sixteen is the REPOSITORY'S record, and the record is short. Counted against
+ISO 5807's readable pp. 1–8, clause 9 names twenty-one symbols — ten data,
+seven process, four line — so the record omits six readable data symbols
+(Internal storage, Sequential access storage, Direct access storage, Card,
+Punched tape, Display) and includes one, Terminator, that sits past p. 8 and
+is unread. The stage gap is **fifteen**, not nine. The three spelled roles do
+not change; the denominator does. Enumeration and evidence in
+the project’s working record; class analysis in
+`decisions/registry.md`.]** (Earlier drafts of this
 document said *"around ten symbol kinds"*; that understated the repository's
 own record and is corrected here.)
 
@@ -462,7 +471,7 @@ carrying the same construct into `block`.
 | `terminator` | `terminator <id> ["label"]` | **F** | **EXPERIMENTAL** | `shape` `fill` `stroke` `style` `class` `note` (requires `figdown 0.3`) | `role="terminator"`, `shape=rounded` DERIVED; spelling PENDING VERIFICATION (§Roles) |
 | `external` | `external <id> ["label"]` | **F** | NORMATIVE | **none** | the OFF-PAGE terminus — see the declaration below. Never drawn (`EXTERNAL-EDGE-ENDPOINTS`); since 0.1 it took no paint key (`color=` was its only one, retired by `COLOUR-KEY-STATUS`) and since 0.3 (`PAINT-ORDER-CONSTRUCT`) **no option key at all**; no `note=` either — nothing of it is drawn, so a note would have nothing to stand beside |
 | `flowline` | `flowline <a> [tail] <op> [head] <b>` | **F** | **EXPERIMENTAL** | `stroke` `style` `class` `note` (requires `figdown 0.3`) | **`edge` under this genre is a line error (`GENRE-CONNECTOR-SPELLING`)**; op is written form; `[mid]` splits the operator; all three labels take the line's colour (`LABEL-COLOUR-SOURCE`) |
-| `class` | `class <id> "<meaning>"` | H | NORMATIVE | `fill` `stroke` `style` | the meaning FIELD is REQUIRED, its VALUE may be `""` (= no meaning claimed, no legend entry — `CLASS-EMPTY-MEANING`); a class a `flowline` joins MUST declare `stroke=` or `style=` (`INTERIOR-LESS-ELEMENT-PAINT`/`CLASS-PAINT-REQUIREMENT`) |
+| `class` | `class <id> "<meaning>"` | H | NORMATIVE | `fill` `stroke` `style` | the meaning FIELD is REQUIRED, its VALUE may be `""` (= no meaning claimed, no legend entry — `CLASS-EMPTY-MEANING`); a class a `flowline` joins must not declare `fill=` without `stroke=` — a flowline has no interior, so the two name ONE channel (`INTERIOR-LESS-ELEMENT-PAINT`). Declaring NO paint is legal: the class claims a meaning and the flowline keeps its default line (`CLASS-PAINT-REQUIREMENT`'s second half RETIRED at 0.4, `CLASS-CHANNEL-REACH`) |
 | `flow` | `flow right\|down\|left\|up` | H | NORMATIVE | — | **`down`** |
 | `rank` | `rank <id>,<id>[,<id>…]` | H | NORMATIVE | — | two or more ids in ONE whitespace-free comma-delimited token; the space form was RETIRED at 0.1; the rest of the line is reserved for future options |
 | `layout` | `layout` | C | NORMATIVE | — | opens the layout zone (§3) |
@@ -543,7 +552,7 @@ compatibility promise, and `EDGE-GEOMETRY-CONSTRUCTS`'s withdrawal of `path`/`ro
 the job.** `in=` states membership and its only value domain is *the id of a
 containing `group`* — so once this genre stopped declaring `group`, no such id
 could exist in a `flowchart` document and **every value of the key was a dead
-end**. In this release, `process a "A" in=g` answered
+end**. In an earlier release, `process a "A" in=g` answered
 `unknown group "g"` and **no spelling of `g` succeeded**. An unknown-option
 error that names the reason beats a dangling reference no author can satisfy,
 so the key is withdrawn from this genre rather than left accepted.
@@ -628,7 +637,7 @@ does not.
 
 | Old | New | R | Why |
 |---|---|---|---|
-| `boundary` | `external` | `EXTERNAL-ENDPOINT-NAMING` | UML's «boundary» is an INTERNAL interface object, C4's `System_Boundary` is the dashed grouping container FigDown already spells `group`, and BPMN's Boundary Event is a third meaning — all three invert or displace the intended sense, which the spec's own prose already stated as "declares an external I/O endpoint" |
+| `boundary` | `external` | `EXTERNAL-ENDPOINT-NAMING` | the ECB analysis pattern's «boundary» is an INTERNAL interface object (CORRECTED 0.3.z: this said "UML's"; the stereotype is not in UML 2.5.1 or ISO/IEC 19505-2 — see decisions/registry.md), C4's `System_Boundary` is the dashed grouping container FigDown already spells `group`, and BPMN's Boundary Event is a third meaning — all three invert or displace the intended sense, which the spec's own prose already stated as "declares an external I/O endpoint" |
 | `layer` · `layer=` | *(nothing — the destination is gone)* | `PLANE-KEYWORD-SPELLING`, then `PAINT-ORDER-CONSTRUCT` | `PLANE-KEYWORD-SPELLING` renamed both to `plane` · `plane=` at 0.1, holding that no standard claimed `plane` for a conflicting meaning — a claim made in a paragraph belonging to no genre, and false in `topology`, where a plane is the control / data / management partition. `PAINT-ORDER-CONSTRUCT` withdrew `plane` · `plane=` from the language, so the diagnostic now states the whole chain (`layer=` → `plane=` → withdrawn) rather than ending at a spelling that no longer exists — the `route` → `path` precedent from 0.1 |
 | `plot` | `chart` | `CHART-BLOCK-NAMING` | `plot` reads as an imperative — the reason `render` was retired at 0.1 — while every other block opener is a noun, and ECharts, Chart.js and Mermaid all name the object a chart |
 | `kind=` | `type=` | `CHART-BLOCK-NAMING` | Vega, Chart.js and ECharts spell the chart-type key `type`; `kind=` was retired on `node` and live on `plot` at the same time, inside one namespace. Its one legal value was renamed `bars3d` → `bar3d` |
@@ -821,7 +830,8 @@ inapplicable option, unknown `shape`, duplicate id, dangling flowline
 endpoint, and the single-valued-directive rules of §8 — all line errors.
 (`in=` cycle is a category core §8 reserves and **no `flowchart` document can
 reach**: this genre declares no `group` at all, so there is
-nothing for `in=` to name and nothing to make a cycle out of — and the key itself is not this genre's, so every `in=` here is the
+nothing for `in=` to name and nothing to make a cycle out of — and
+the key itself is not this genre's, so every `in=` here is the
 named withdrawal error rather than the dangling reference it was for one
 release.)
 
@@ -839,9 +849,10 @@ The genre-scoped errors. The first two come from the header genre's allowlist
    "edge" is not the word genre flowchart uses for this — write "flowline":
    the connecting line in a flowchart is a FLOWLINE — the term the flowchart
    domain commonly uses for the symbol ISO 5807 §9.3.1 names "Line". Each
-   scene genre takes the term its own domain uses (block/topology `node`
-   `edge`, flowchart `node` `flowline`, statechart `state` `transition`) —
-   run tools/migrate-figdown.js to rewrite it (MIGRATIONS 0.2)
+   genre takes the term its own domain uses (block/topology `node` `edge`,
+   flowchart `node` `flowline`, statechart `state` `transition`, sequence
+   `lifeline` `message`) — run tools/migrate-figdown.js to rewrite it
+   (MIGRATIONS 0.2)
    ```
 
    The author has written a **real construct under the wrong spelling**, which
@@ -857,9 +868,9 @@ The genre-scoped errors. The first two come from the header genre's allowlist
    ```
    "group" is not allowed in genre flowchart — it was WITHDRAWN from this
    genre, not misspelled: `flowchart` no longer declares `group`. … Subject
-   vocabulary is per genre (core §3, G2): a spelling accepted by several
+   vocabulary is per genre (core §3, `GENRE-VOCABULARY-OBLIGATION`): a spelling accepted by several
    genres is several independent declarations, and this genre's was withdrawn
-   without touching any other's. (withdrawn, R160; MIGRATIONS
+   without touching any other's. (withdrawn, `SCENE-KEYWORD-MEMBERSHIP`; MIGRATIONS
    0.3)
    ```
 

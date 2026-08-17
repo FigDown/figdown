@@ -1,0 +1,129 @@
+{
+  "about": "The cold-reader comprehension measurement for the `sequence` genre — the run decisions/registry.md said the genre would get when it landed. Written as a separate results file rather than folded into baseline.json: baseline.json is the frozen record of the seven-genre baseline of 2026-08-16 that decisions/registry.md and §11 publish, and refreshing it would move that published headline. Refreshing is one command (`node tools/comprehension-check.js --write-baseline`) once the maintainer accepts these numbers; the nine-figure roll-up that command would produce is recorded below so the decision can be made without running anything.",
+  "suite_version": "1.0.0",
+  "measured": "2026-08-17 (UTC)",
+  "instrument": "tools/comprehension-check.js, unmodified; no vocabulary, spec, engine or example file was touched by this measurement",
+  "reader": {
+    "model_alias": "sonnet",
+    "cli": "2.1.233 (Claude Code)",
+    "conditions": "syntax 3 readers, title-only 3 readers, commented 2 readers — the baseline's own allocation",
+    "cold_room": "as §2 of the design write-up: isolated empty temp dir outside the repo, every tool denied by name, no MCP, --safe-mode, no session persistence; the specification, the genre document, the file name and the name of the language were never shown",
+    "integrity": "16 readings, every one num_turns=1 (no reader took a tool turn), 0 permission denials, 0 errors",
+    "cost_usd": 0.464
+  },
+  "corpus": {
+    "figures_measured": [
+      "examples/sequence/dhcp-lease.fd",
+      "examples/sequence/fragment-operators.fd"
+    ],
+    "figures_excluded": {
+      "examples/reference/experimental/sequence.fd": "excluded under §1's source-first rule, not for convenience: a reference figure is a catalogue of the notation, and its only 'source' is the FigDown specification — the very document a cold reader may not see and the thing under test. A question set authored from it would be authored from the .fd, which is the one trap the instrument is built around."
+    },
+    "note": "Two figures for one genre, against the baseline's one-per-genre. 16 source-authored questions and 48 cold answers make this the largest per-genre denominator in the suite; §8 of the design write-up names one-figure-per-genre as the baseline's first weakness."
+  },
+  "question_sets": {
+    "protocol": "§1 unchanged: the scope of each set was fixed by the suite maintainer from the source's own sections with only the figure's one-line title consulted, and the eight questions, canonical answers, per-question locators and scoring keys were written by two independent author agents that were forbidden to open any .fd or anything under examples/, spec/, read/ or skill/. Both record saw_figure: false.",
+    "dhcp-lease": {
+      "source": "RFC 2131 §3.1, §3.2, §4.3.2, §4.4 (Figure 5), §4.4.1, §4.4.4-6",
+      "anchor_strength": "strong"
+    },
+    "fragment-operators": {
+      "source": "OMG UML 2.5 (formal/2015-03-01) clause 17 — §17.1.3, §17.3.3.1, §17.4.3, §17.6.3, §17.6.4, §17.12.15",
+      "anchor_strength": "strong",
+      "note": "The author fetched and read the normative clause itself. It read 2.5 rather than 2.5.1 because the 2.5.1 PDF exceeded the fetch limit; 2.5.1 is an errata revision and clause 17's operator semantics and numbering are the same. This is the same standard the genre's vocabulary was borrowed from, which makes it the sharpest possible test of the borrow and also means the questions name the operators in the standard's own words — see instrument_caveats.priming."
+    },
+    "key_discipline": "Both sets were authored under the v1.1 key discipline queued in §7: regex-tolerant alternatives with optional intensifiers, no compound questions, none_of empty everywhere, and each key hand-checked against a written paraphrase of its own canonical answer as well as against --selftest. The baseline's seven sets were not. Grading artifacts should therefore be rarer here BY CONSTRUCTION, and raw-versus-raw comparison with the baseline is biased in this genre's favour; adjusted-versus-adjusted is the fairer comparison. --selftest is 72/72 across the whole suite."
+  },
+  "results": {
+    "dhcp-lease": {
+      "genre": "sequence",
+      "syntax_raw": { "correct": 21, "total": 24, "score": 0.875 },
+      "instrument_adjusted": { "correct": 21, "total": 24, "score": 0.875 },
+      "control_title_only": { "correct": 24, "total": 24, "score": 1.0 },
+      "commented": { "correct": 13, "total": 16, "score": 0.8125 },
+      "lift_points": -12.5,
+      "per_question_syntax": {
+        "q1 order of the four-message exchange + first sender": "3/3",
+        "q2 which side sends OFFER and ACK": "3/3",
+        "q3 which message moves the client to BOUND": "3/3",
+        "q4 T1 -> RENEWING, unicast to the leasing server": "3/3",
+        "q5 T2 -> REBINDING, broadcast instead": "3/3",
+        "q6 address still usable while renewing; what happens at expiry": "0/3",
+        "q7 what DHCPRELEASE is for and who sends it": "3/3",
+        "q8 server-identifier selection and what the other servers conclude": "3/3"
+      }
+    },
+    "fragment-operators": {
+      "genre": "sequence",
+      "syntax_raw": { "correct": 20, "total": 24, "score": 0.8333 },
+      "instrument_adjusted": { "correct": 22, "total": 23, "score": 0.9565 },
+      "control_title_only": { "correct": 17, "total": 24, "score": 0.7083 },
+      "commented": { "correct": 12, "total": 16, "score": 0.75 },
+      "lift_points": 12.5,
+      "per_question_syntax": {
+        "q1 what declared top-to-bottom order asserts in time": "2/3",
+        "q2 what alt asserts + what its operand guards select": "3/3",
+        "q3 how the loop's bounds constrain repetitions": "2/3",
+        "q4 what par permits between operands and preserves within one": "1/3",
+        "q5 what opt asserts about its single operand": "3/3",
+        "q6 CONTAINMENT: which message is inside the critical fragment": "3/3",
+        "q7 CONTAINMENT: which message is in the alt's second operand": "3/3",
+        "q8 what break does to the rest of the interaction": "3/3"
+      },
+      "hand_checked": "q6 and q7 cannot be keyed from the standard alone — the author said so in the file and left the names for hand checking. Checked by the maintainer against the presented text: all three syntax readers and both commented readers named exactly the right messages (`write: token issued` for the critical fragment; `401 Unauthorized` for the alt's second operand), and none named anything from outside the fragment. 5/5 genuinely correct, no false credit."
+    },
+    "genre_overall": {
+      "syntax_raw": { "correct": 41, "total": 48, "score": 0.8542 },
+      "instrument_adjusted": { "correct": 43, "total": 47, "score": 0.9149 },
+      "control_title_only": { "correct": 41, "total": 48, "score": 0.8542 },
+      "commented": { "correct": 25, "total": 32, "score": 0.78125 },
+      "lift_points": 0.0
+    },
+    "hand_corrections_the_tool_cannot_make": {
+      "fragment-operators/q3, reader 1": "CREDITED BY ACCIDENT. The answer denied the very thing the key was testing — 'the operand may run up to 3 times; NOT STATED for an explicit separate lower bound' — and the literal words 'lower bound' satisfied the key's first group. Docking it puts the figure at 19/24 = 79.2% raw and the genre at 40/48 = 83.3% raw.",
+      "fragment-operators/q3, whole question": "If instead the question is dropped for every reader as the bad-question class implies, the figure is 18/21 = 85.7% raw. Both corrections are reported; neither is applied to the headline, which stays the mechanical raw score."
+    }
+  },
+  "against_the_baseline": {
+    "baseline_2026-08-16_seven_genres": { "syntax_raw": 0.6786, "instrument_adjusted": 0.7963, "control": 0.9286 },
+    "sequence_2026-08-17_two_figures": { "syntax_raw": 0.8542, "instrument_adjusted": 0.9149, "control": 0.8542 },
+    "nine_figure_rollup_if_the_baseline_were_refreshed": {
+      "syntax_raw": { "correct": 155, "total": 216, "score": 0.7176 },
+      "instrument_adjusted": { "correct": 172, "total": 209, "score": 0.8230 },
+      "control": { "correct": 197, "total": 216, "score": 0.9120 },
+      "lift_points": -19.4,
+      "note": "Adding the sequence genre moves the whole-corpus raw score from 67.9% (below the claimed floor) to 71.8% (above it). That is a real consequence of accepting these numbers into the published baseline and the maintainer should decide it deliberately, not have it happen as a side effect of a --write-baseline run."
+    },
+    "failure_classes_this_genre": {
+      "not-in-file": 3,
+      "grading-artifact": 2,
+      "ambiguous-syntax": 1,
+      "bad-question": 1,
+      "misleading-keyword": 0,
+      "reader-error": 0
+    }
+  },
+  "findings": {
+    "misleading_keyword_count": 0,
+    "operand": "R178 / OQ-S44 left `operand` on probation with an explicit reopening condition: the comprehension suite measuring `operand` actually misleading a reader, at the bar `decision` cleared (22% over 216 nodes). MEASURED, AND IT DOES NOT REOPEN. Across 24 syntax answers on the figure that uses `operand` seven times, no reader read it as arithmetic, as an algebraic term, or as anything but a branch of a combined fragment: readers wrote 'which operand's guard holds', 'the fetch operand and the flush operand', 'the messages within each individual operand keep their own internal order'. The measured misreading rate for `operand` is 0/24 = 0%, against a reopening bar of 22%. A scan of every syntax answer for arithmetic/algebra/confusion language returns nothing. CAVEAT, stated so the finding is not overclaimed: the questions were authored from UML, so five of the eight name the operator (`alt`, `loop`, `par`, `opt`, `break`) and two use the word `operand` themselves. The exam therefore tests whether a reader who is handed the standard's word can map it onto the file — not whether a reader unprimed by the word would coin the right sense. It is evidence against misdirection, not evidence of unaided recognition.",
+    "containment_is_the_clean_experiment": "q6 and q7 ask which messages a fragment encloses. Control: 0/3 and 0/3 — a model with only the title cannot know, and declined every time. Syntax: 3/3 and 3/3, naming the exact messages. That is a lift of +100 points on the only two questions in the entire suite whose content no model can have memorised, and it is the experiment §5 of the design write-up said the instrument was missing ('a synthetic figure whose content no model can know'). `in=` containment survives a cold read.",
+    "the_genre_semantic_nobody_wrote_down": "fragment-operators/q1 is the one language-class failure. That declaration order along a lifeline IS time is never stated by any keyword; it is carried by the shape of the file. Two readers in three recovered it, one refused to commit precisely because the file never says it. No reader got it backwards. Classified ambiguous-syntax, the same class as arp-resolution/q4 in the baseline, and the same generalisation applies: this genre can draw an ordering and cannot state one.",
+    "silence_again": "The three not-in-file misses are all dhcp-lease/q6 — whether the address stays usable during renewal and what happens at lease expiry. The figure has the carrier (`description=`, used on eleven other lines of the same file) and did not use it on that path. The failure mode is silence, not misdirection, in this genre exactly as in the other seven."
+  },
+  "instrument_caveats": {
+    "priming": "Both question sets name the subject's own vocabulary — DHCP message names, UML operator names — because both were authored from the standard, as §1 requires. Where that vocabulary IS the figure's keyword (`alt`, `loop`, `par`, `opt`, `break`), the question hands the reader the token to look for. This inflates the sequence syntax score relative to genres whose keywords are not the source's words, and it is the structural cost of borrowing a whole vocabulary from one standard: the sharper the borrow, the more the source-first exam primes the reader.",
+    "description_prose": "dhcp-lease carries long `description=` strings, several of them citing RFC sections. They are option values, not comments, so they survive into the `syntax` condition — correctly, per §2, and consistently with how the baseline credited `description=` on the bitfield figure. The consequence must be read with the number: part of what dhcp-lease's 87.5% measures is authoring effort in `description=`, not the bare keyword line.",
+    "loose_keys": "dhcp-lease/q2 passes on the token `server` and q3 on the token `ack`; fragment-operators/q1's second group accepts `then` or `occur`. These are as loose as the timing set §8 flagged. No answer in this run passed on a loose key while being substantively wrong (every one was read by hand), but the keys would not catch a wrong answer that happened to contain the token.",
+    "unkeyable_questions": "q6 and q7 are keyed only on structure; the tool cannot verify the names. Their scores are hand-checked above and are honest, but they are not deterministic in the way the rest of the suite is — a future reader could echo the answer template and be credited without naming anything correctly.",
+    "coverage_gaps": "Two constructs the genre carries were not probed by any of the sixteen questions, because neither has a clean anchor in either source clause: the meaning-only `class` (what `class dropped \"Sent, never delivered\"` asserts about the messages that carry it) and the one-instant message (`c <-> s`). Both figures use both. They are the first thing a v1.1 sequence question set should cover.",
+    "pre_existing_staleness": "`--verify` was already red before this run: the eight arp-resolution transcripts no longer match their figure, which changed in commit 6a29d2f. Nothing in this measurement caused it and nothing here fixes it."
+  },
+  "verdict": {
+    "target": "a reader who has never opened the spec recovers 70-80% of what a .fd says from the syntax alone; the maintainer's bar for this genre, set before the vocabulary was chosen, is 80%+",
+    "dhcp-lease": "MET — 87.5% raw, 87.5% adjusted",
+    "fragment-operators": "MET — 83.3% raw (79.2% if reader 1's accidental credit on q3 is docked), 95.7% adjusted",
+    "genre_overall": "MET — 85.4% raw, 91.5% adjusted, against a bar of 80%. Docking the one accidental credit leaves 83.3% raw, still above the bar. The bar is cleared on the raw number under every correction considered.",
+    "misleading_keywords": "NONE. No keyword in this genre pulled any reader toward a wrong meaning; the `operand` probation closes on the data at 0/24 against a 22% bar.",
+    "what_this_does_not_say": "It does not say the genre is understood rather than recognised, except on q6 and q7 where the control proves it. It does not say `operand` would be recovered by a reader who was never handed the word. And it is one model, one vendor, one version, three readers, sixteen questions."
+  }
+}

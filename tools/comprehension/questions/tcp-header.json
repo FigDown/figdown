@@ -1,0 +1,206 @@
+{
+  "id": "tcp-header",
+  "genre": "bitfield",
+  "figure": "examples/showcase/tcp-header.fd",
+  "subject": "TCP header format",
+  "source": {
+    "standard": "RFC 9293",
+    "locator": "§3.1",
+    "url": "https://www.rfc-editor.org/rfc/rfc9293.html",
+    "anchor_strength": "strong"
+  },
+  "authored": {
+    "protocol": "source-first: the author agent read only RFC 9293 and never saw the .fd file",
+    "saw_figure": false
+  },
+  "questions": [
+    {
+      "qid": "q1",
+      "ask": "Which two fields occupy the very first 32-bit word of the TCP header (bits 0-31), and how wide is each one?",
+      "tests": "field order at the start of the header and the fixed 16/16 split of the first word",
+      "source_locator": "RFC 9293 §3.1, header diagram and Source Port / Destination Port descriptions",
+      "answer": "Source Port comes first, followed by Destination Port; each field is 16 bits wide.",
+      "score": {
+        "all_of": [
+          [
+            "source port"
+          ],
+          [
+            "destination port"
+          ],
+          [
+            "16 bit",
+            "16 bits"
+          ]
+        ],
+        "none_of": []
+      }
+    },
+    {
+      "qid": "q2",
+      "ask": "What does the Sequence Number field normally indicate, and how does its meaning change when the SYN control bit is set in that segment?",
+      "tests": "meaning of the Sequence Number field and its conditional reinterpretation under SYN",
+      "source_locator": "RFC 9293 §3.1, Sequence Number field description",
+      "answer": "Normally it is the sequence number of the first data octet in the segment; but when SYN is set, this field instead carries the Initial Sequence Number (ISN), and the first actual data octet is ISN+1.",
+      "score": {
+        "all_of": [
+          [
+            "first data octet",
+            "first octet of data"
+          ],
+          [
+            "syn"
+          ],
+          [
+            "initial sequence number",
+            "isn"
+          ]
+        ],
+        "none_of": []
+      }
+    },
+    {
+      "qid": "q3",
+      "ask": "Under what condition does the Acknowledgment Number field contain a valid value, and what does that value represent when it is valid?",
+      "tests": "conditionality of the Acknowledgment Number field on the ACK control bit, and its meaning",
+      "source_locator": "RFC 9293 §3.1, Acknowledgment Number field description",
+      "answer": "It is only significant when the ACK control bit is set; when set, it holds the value of the next sequence number the sender of the segment expects to receive.",
+      "score": {
+        "all_of": [
+          [
+            "ack"
+          ],
+          [
+            "next sequence number",
+            "next expecting",
+            "expecting to receive",
+            "expects to receive"
+          ]
+        ],
+        "none_of": [
+          "urg flag",
+          "syn flag is set"
+        ]
+      }
+    },
+    {
+      "qid": "q4",
+      "ask": "What does the Data Offset field specify and in what unit, and what is its minimum valid value together with the minimum TCP header length that corresponds to it?",
+      "tests": "meaning/unit of the Data Offset field and the minimum header length it encodes",
+      "source_locator": "RFC 9293 §3.1, Data Offset field description",
+      "answer": "Data Offset specifies the length of the TCP header, measured in 32-bit words, i.e. where the data begins; its minimum valid value is 5, corresponding to a 20-byte header.",
+      "score": {
+        "all_of": [
+          [
+            "32 bit word",
+            "32 bit words",
+            "4 byte word",
+            "4 byte words"
+          ],
+          [
+            "5"
+          ],
+          [
+            "20 byte",
+            "20 bytes"
+          ]
+        ],
+        "none_of": []
+      }
+    },
+    {
+      "qid": "q5",
+      "ask": "Besides Data Offset itself, which other fields share the same 32-bit word of the header as Data Offset, and what are their bit widths?",
+      "tests": "structural packing of Reserved, Control Bits, and Window into the fourth 32-bit word alongside Data Offset",
+      "source_locator": "RFC 9293 §3.1, header diagram (fourth word)",
+      "answer": "The Reserved field (4 bits), the Control Bits/flags (8 bits, e.g. CWR ECE URG ACK PSH RST SYN FIN), and the Window field (16 bits) all share that same 32-bit word with Data Offset.",
+      "score": {
+        "all_of": [
+          [
+            "reserved"
+          ],
+          [
+            "control bit",
+            "control bits",
+            "flags",
+            "cwr"
+          ],
+          [
+            "window"
+          ]
+        ],
+        "none_of": []
+      }
+    },
+    {
+      "qid": "q6",
+      "ask": "What is covered by the computation of the TCP Checksum field's value — that is, what parts of the segment, and what additional data outside the segment itself, are included?",
+      "tests": "checksum coverage: TCP header + data plus the IP-derived pseudo-header",
+      "source_locator": "RFC 9293 §3.1, Checksum field description",
+      "answer": "The checksum covers the TCP header and the TCP data (text), computed together with a pseudo-header built from IP-layer information (source address, destination address, protocol, and TCP length).",
+      "score": {
+        "all_of": [
+          [
+            "pseudo header",
+            "pseudo-header"
+          ],
+          [
+            "header"
+          ],
+          [
+            "data",
+            "text"
+          ]
+        ],
+        "none_of": []
+      }
+    },
+    {
+      "qid": "q7",
+      "ask": "Under what condition is the Urgent Pointer field's value meaningful, and what does that value indicate when it applies?",
+      "tests": "conditionality of Urgent Pointer on the URG control bit and its meaning as an offset",
+      "source_locator": "RFC 9293 §3.1, Urgent Pointer field description",
+      "answer": "The Urgent Pointer is only meaningful when the URG control bit is set; its value is a positive offset from the segment's sequence number that points to the octet following the urgent data.",
+      "score": {
+        "all_of": [
+          [
+            "urg"
+          ],
+          [
+            "offset",
+            "points to",
+            "pointer to",
+            "pointing to"
+          ]
+        ],
+        "none_of": [
+          "ack flag is set",
+          "syn flag is set"
+        ]
+      }
+    },
+    {
+      "qid": "q8",
+      "ask": "Under what condition does the Options field appear at all in the TCP header, and what is the maximum possible total length of the TCP header once options are included?",
+      "tests": "conditionality of the Options field on Data Offset exceeding its minimum, and the resulting maximum header length",
+      "source_locator": "RFC 9293 §3.1, Options field description and Data Offset field description",
+      "answer": "Options are present only when Data Offset is greater than 5 (i.e., the header is longer than 20 bytes); the maximum possible header length, with options, is 60 bytes, corresponding to a Data Offset value of 15.",
+      "score": {
+        "all_of": [
+          [
+            "data offset"
+          ],
+          [
+            "60 byte",
+            "60 bytes"
+          ],
+          [
+            "15"
+          ]
+        ],
+        "none_of": []
+      }
+    }
+  ],
+  "score_rules_reviewed": "scoring rules reviewed by the suite maintainer BEFORE any reader ran: none_of lists that would have rejected a correct contrastive answer (e.g. 'broadcast, not unicast') were relaxed or emptied. No question text and no canonical answer was changed, and no rule was touched after any reader answer was seen."
+}

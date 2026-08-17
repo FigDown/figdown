@@ -63,7 +63,7 @@ per-edge control — is recorded as an open question, `spec/core.md` §9
 is:* this document told readers to write `path … via=(310,95)` for ten  <!-- fence-check: skip -->
 releases after `via=` was renamed `points=`. Nobody noticed, and
 there were two reasons rather than one. `fence-check.js` did not reach
-`examples/` at all — its default roots were `.`, `spec/`, `design/` and
+`examples/` at all — its default roots were `.`, `spec/` and
 `skill/` — and the snippet was not in a fence anyway: it sat in an inline code
 span, which the tool did not read in any file. Both holes were closed; the three withdrawn spellings above survive here only as history,
 each marked as such, and the gate now reads them. A workflow document that

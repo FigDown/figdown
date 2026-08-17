@@ -410,7 +410,7 @@ RFC 2784, ASN.1 X.680, draft-mcquistin-augmented-ascii-diagrams, SystemRDL,
 IP-XACT, Kaitai Struct and protobuf; `condition` is the same root with the
 same zero attestation, so adopting it would reinstate one layer down the word
 just removed one layer up. `present` has **four** sources: X.680
-`PresenceConstraint ::= PRESENT | ABSENT | OPTIONAL`, IP-XACT/IEEE 1685
+`PresenceConstraint ::= PRESENT | ABSENT | OPTIONAL | empty` **[CORRECTED 0.3.z: every printing of this production in this file used to stop at `OPTIONAL`. X.680 §51.8.10 has a fourth alternative, `| empty`, and the quote was written as verbatim. A substring match would have passed it — see `decisions/registry.md`]**, IP-XACT/IEEE 1685
 `isPresent`, SystemRDL `ispresent`, and RFC 2784's "present only if" /
 draft-mcquistin's "present only when".
 

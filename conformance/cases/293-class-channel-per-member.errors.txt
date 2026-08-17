@@ -1,0 +1,3 @@
+Line 21: class "fdash" declares only style=, and a field has no such channel — add fill= or stroke= to the class (they paint the field; the key it declares keeps painting members that have that channel) (MIGRATIONS 0.4)
+Line 32: class "cdash" declares only style=, and a cell has no such channel — add fill= or stroke= to the class (they paint the cell; the key it declares keeps painting members that have that channel) (MIGRATIONS 0.4)
+Line 44: class "efill" sets fill= but no stroke=, and an edge has no interior — add stroke= to the class (it paints the edge; fill= keeps painting members that have an interior) (MIGRATIONS 0.1)

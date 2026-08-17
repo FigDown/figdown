@@ -28,6 +28,7 @@ The experimental half of the corpus, in [experimental/](experimental/):
 | `topology` | EXPERIMENTAL genre | [experimental/topology.fd](experimental/topology.fd) | [experimental/topology.svg](experimental/topology.svg) |
 | `flowchart` | EXPERIMENTAL genre | [experimental/flowchart.fd](experimental/flowchart.fd) | [experimental/flowchart.svg](experimental/flowchart.svg) |
 | `timing` | EXPERIMENTAL genre | [experimental/timing.fd](experimental/timing.fd) | [experimental/timing.svg](experimental/timing.svg) |
+| `sequence` | EXPERIMENTAL genre | [experimental/sequence.fd](experimental/sequence.fd) | [experimental/sequence.svg](experimental/sequence.svg) |
 
 ```
 node tools/build-svg.js examples/reference examples/reference/experimental
@@ -58,9 +59,18 @@ all four checks under both runs.
 
 | Command | Exit | Reported |
 |---|---|---|
-| `node tools/reference-coverage.js --strict` | **1** | `FAIL  4 genre(s) with gaps` — `block`, `topology`, `flowchart`, `statechart` |
-| `node tools/reference-coverage.js --normative-only --strict` | **1** | `FAIL  4 genre(s) with gaps` — the same four (it was 2 until 0.3: `note=` (`DRAWN-ANNOTATION-FORM`) is a NORMATIVE option key no reference figure writes yet, and 3 until 0.3 added `statechart` to the genre list) |
-| `node tools/reference-coverage.js --normative-only` | 0 | the same four genres, printed as gaps; without `--strict` the exit code does not carry them |
+| `node tools/reference-coverage.js --strict` | **1** | `FAIL  5 genre(s) with gaps` — `block`, `topology`, `flowchart`, `statechart`, `sequence` |
+| `node tools/reference-coverage.js --normative-only --strict` | **1** | `FAIL  5 genre(s) with gaps` — the same five (it was 2 until 0.3: `note=` (`DRAWN-ANNOTATION-FORM`) is a NORMATIVE option key no reference figure writes yet, 3 until 0.3 added `statechart` to the genre list, and 4 until 0.4 added `sequence`) |
+| `node tools/reference-coverage.js --normative-only` | 0 | the same five genres, printed as gaps; without `--strict` the exit code does not carry them |
+
+**`sequence`'s gap is its genre document, not its figure.** The genre joined
+this tool's list, the release its RENDERER landed in — before
+that, the figure drew an empty canvas and an `.svg` beside it would have
+recorded a drawing the language did not have. The reference figure and its
+artifact are now both here and both required; what is still owed is
+`spec/genres/experimental/sequence.md`, which is the vocabulary source this
+tool measures a figure against, so the genre reports `MISSING
+spec/genres/sequence.md` until that document exists.
 
 The third row is the one to hold on to. The non-strict form prints exactly the
 gaps the row above it fails on, and still exits 0 — so a clean prompt from it
@@ -296,7 +306,7 @@ The experimental genres' documents are in
 [spec/genres/experimental/](../../spec/genres/experimental/), and the **three**
 experimental constructs — `bundle`, `threshold`, `band` — in
 [spec/experimental.md](../../spec/experimental.md). (It read *six* until 0.1, when `EDGE-GEOMETRY-CONSTRUCTS` withdrew `path` and `routing`, and *four*
-until this release, when `PAINT-ORDER-CONSTRUCT` withdrew `plane` from the language.) They are no
+until 0.3, when `PAINT-ORDER-CONSTRUCT` withdrew `plane` from the language.) They are no
 longer "core" constructs in any sense: `SUBJECT-VOCABULARY-SCOPE` made subject vocabulary **per
 genre**, so `bundle` is declared by `topology` and `threshold`/`band` by
 `block`, and each of those declarations stands on its own even where the

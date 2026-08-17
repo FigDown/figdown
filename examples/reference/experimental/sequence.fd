@@ -1,0 +1,88 @@
+# FigDown — figures as text. Spec: https://github.com/FigDown/figdown
+
+# Reference figure for genre `sequence` — EXPERIMENTAL GENRE, and one step
+# further out than the others: this genre HAS NO RENDERER YET. The document
+# below parses to a complete model and reports zero errors, and drawing it
+# produces an empty canvas. That is why there is NO sequence.svg beside this
+# file: an artifact would record a drawing the language does not have.
+#
+# What the file is for today is therefore the MODEL, not the picture. It
+# demonstrates every form of every keyword the genre has, so a reader can see
+# the whole surface on one page and a coverage tool can count it.
+#
+# EVERY line below is outside the compatibility promise: the genre is
+# experimental (`CONSTRUCT-STATUS-TIERS`'s rule, applied to `sequence`). Read
+# spec/genres/experimental/sequence.md first — when it exists; until then the
+# ruled surface is decisions/registry.md and the reading rule is
+# read/0.4/experimental/sequence.md.
+figdown 0.4 sequence
+title "Address lease and renewal"
+
+# `class` declares a meaning ONCE and elements join it with class=. Under this
+# genre it carries two jobs no keyword does, because both keywords were
+# refused: it is what `group` would have expressed (a set of participants with
+# something in common — `SEQUENCE-PARTICIPANT-GROUPING`) and what `lost=` would have expressed (a message
+# that was sent and not delivered — `UNDELIVERED-MESSAGE-MARKING`). A class earns a legend entry, so
+# the meaning reaches the reader without a spelling of its own.
+class dropped "Sent, never delivered"
+
+# ---- lifeline: the participant column -----------------------------------
+# `lifeline` is this genre's NODE spelling — the slot `node` fills in block and
+# `state` fills in statechart (UML 2.5.1 §17.3.3.1). Column order is
+# DECLARATION order and there is no key that changes it: `flow` and `rank` are
+# not keywords of this genre, because both axes here are already ordered by the
+# source and a key that reordered the drawing would make the picture disagree
+# with the text.
+# Label optional, exactly as on `node`: `lifeline c` is legal and displays "c".
+lifeline c "DHCP client"
+lifeline s "DHCP server"
+
+# ---- message: the line between two participants --------------------------
+# `message` is this genre's CONNECTOR spelling (UML 2.5.1 §17.4.4.1) and it
+# takes all three operators. The trailing quoted string is the message text.
+# `--` is a LINE ERROR here and legal in every other genre: a Message has a
+# sending AND a receiving event occurrence, so a direction-less message is not
+# a thing this domain has.
+message c -> s "DHCPDISCOVER"
+message c <- s "DHCPOFFER"
+message c -> s "DHCPREQUEST"
+message c <- s "DHCPACK"
+
+# ---- state: a named state OF a lifeline ----------------------------------
+# Slot 1 REFERENCES a lifeline; it does not declare an id, because nothing in
+# this genre refers to a state occurrence. That is the one asymmetry with
+# `statechart`'s `state`, where slot 1 declares. Slot 2 is the state name and
+# is MANDATORY — a state occurrence with no name asserts nothing.
+state c "BOUND"
+
+# ---- fragment + operand: the combined fragment and its compartments -------
+# `type=` is MANDATORY and its value is one of the twelve UML
+# InteractionOperatorKind literals taken whole. UML defaults the attribute to
+# `seq`; FigDown does not, because a default draws a frame that looks like an
+# assertion and is not one.
+fragment renew "renewal cycle" type=loop
+# An `operand` is a compartment OF a fragment, so its `in=` is MANDATORY. The
+# quoted string is the guard.
+operand t1 "at T1 — 0.5x the lease" in=renew
+
+# Membership is `in=`, sense 1: the element this one lives inside. Members must
+# be CONTIGUOUS in declaration order, because an operand denotes the ORDERED
+# RUN of the occurrences it contains.
+message c -> s "DHCPREQUEST (unicast, renewing)" in=t1 class=dropped description="the issuing server does not answer, which is what makes T2 fire"
+
+# `in=` on a `state` too (five acceptors: message, operand, lifeline, state,
+# fragment). A state occurrence can sit inside a fragment.
+state c "RENEWING" in=t1
+
+# ONE level of fragment nesting: this fragment sits inside an operand of the
+# fragment above, and no deeper. Two levels is a line error in v1 — the v0.1
+# `group` precedent, and a scope decision rather than a principle.
+fragment fallback "if T1 expires" type=alt in=t1
+operand t2 "at T2 — 0.875x the lease" in=fallback
+message c <-> s "DHCPREQUEST (broadcast, rebinding)" in=t2
+
+# `in=` on a `lifeline` is the fifth acceptor. It is legal and it is rare: it
+# says a participant exists only inside a fragment. Not used here, because
+# both participants exist for the whole exchange — and a reference figure
+# demonstrates forms that are true of the figure, never forms invented to fill
+# a table. The form is exercised by conformance fixture 285 instead.

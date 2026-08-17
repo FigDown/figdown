@@ -1,0 +1,59 @@
+{
+  "suite_version": "1.0.0",
+  "run": {
+    "utc": "2026-08-16T06:10:36Z",
+    "model_alias": "sonnet",
+    "model_used": "claude-sonnet-5",
+    "cli": "2.1.233 (Claude Code)",
+    "condition": "syntax",
+    "reader": 3
+  },
+  "figure": {
+    "id": "timing-handshake",
+    "genre": "timing",
+    "path": "examples/patterns/timing-a.fd",
+    "file_sha256": "751e714f90682ecdba9aa4737c02aefb01b973cba46e76bec28c2ef3fbab27ee",
+    "title_shown": null,
+    "presented_sha256": "1e0f5c5c0d1517ac71e67fe6244ce80ce297468dee4456057436dea716b6c0cd",
+    "presented_lines": 6,
+    "presented_chars": 191
+  },
+  "prompt": {
+    "system_sha256": "1a78658262dc29e7e24cbe3e1eb72659cf31990e85deddacf0b1625e40c5eac2",
+    "user_sha256": "ff4ddbf135ac23eb4233da7f5f052f76f03ccdab7e9715b5833e6781b9294ce4",
+    "question_set_sha256": "942d16dd9208ad34f5c012534ff7aea13b30e9531d05069416dbb15ff54fab25"
+  },
+  "cold_room": {
+    "cwd": "an isolated empty temporary directory outside the repository",
+    "tools_offered": "none — every tool denied by name",
+    "mcp_servers": "none",
+    "settings": "safe-mode: no project or user settings, no memory file, no skills, no plugins, no hooks",
+    "session_persistence": false,
+    "shown": "the system prompt, the presented file text, and the questions — nothing else",
+    "not_shown": "the specification, any genre document, any other .fd file, the file name, the name of the language, the repository"
+  },
+  "integrity": {
+    "turns": 1,
+    "permission_denials": 0,
+    "tool_calls_observed": false,
+    "is_error": false
+  },
+  "usage": {
+    "cost_usd": 0.024221999999999997,
+    "input_tokens": 889,
+    "output_tokens": 1437,
+    "cache_creation_input_tokens": 0,
+    "duration_ms": 13700
+  },
+  "raw_answer_text": "A1: The clk signal (constant pulse pattern \"p\" throughout).\nA2: All three (req, ack, done) rest at low (0) at the start.\nA3: The request signal asserts first, followed later by the acknowledge signal.\nA4: No — in the trace, ack only rises after req has already risen (ack goes high at the point where req is already high), so ack cannot assert before req does.\nA5: The request line falls back to low only after the acknowledge signal has asserted (gone high), i.e., once the request has been acknowledged.\nA6: The acknowledge signal falls back to low only after the request signal has already fallen back to low.\nA7: The completion (done) signal indicates that the handshake cycle has finished; it asserts after the request has fallen (while acknowledge is still high) and then deasserts after acknowledge falls, marking the end of the exchange.\nA8: (1) req rises (0→1), (2) ack rises (0→1), (3) req falls (1→0), (4) ack falls (1→0).",
+  "answers": {
+    "q1": "The clk signal (constant pulse pattern \"p\" throughout).",
+    "q2": "All three (req, ack, done) rest at low (0) at the start.",
+    "q3": "The request signal asserts first, followed later by the acknowledge signal.",
+    "q4": "No — in the trace, ack only rises after req has already risen (ack goes high at the point where req is already high), so ack cannot assert before req does.",
+    "q5": "The request line falls back to low only after the acknowledge signal has asserted (gone high), i.e., once the request has been acknowledged.",
+    "q6": "The acknowledge signal falls back to low only after the request signal has already fallen back to low.",
+    "q7": "The completion (done) signal indicates that the handshake cycle has finished; it asserts after the request has fallen (while acknowledge is still high) and then deasserts after acknowledge falls, marking the end of the exchange.",
+    "q8": "(1) req rises (0→1), (2) ack rises (0→1), (3) req falls (1→0), (4) ack falls (1→0)."
+  }
+}

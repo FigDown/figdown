@@ -12,6 +12,13 @@
 > (`block`, `bitfield`, `table`) when the figure must be portable — see
 > [authoring.md](authoring.md).
 >
+> **One genre this guide does not reach: `sequence`.** A ladder's two axes are
+> both declaration order — columns are `lifeline` order, rows are
+> `message` ∪ `state` order — so `flow` and `rank` are not words in that genre
+> at all, and a `pin` parses and moves nothing. There is no rung to climb
+> there: the edit is always to the source order. Everything below is about
+> **scene** sections and the typed blocks beside them.
+>
 > Lessons come from field observation of a downstream authoring pass.
 
 ## 1. The two-zone mindset
@@ -58,7 +65,8 @@ define, redefine or extend a keyword inside the zone; `GENRE-VOCABULARY-OBLIGATI
 words", does not reach in. That is what makes the default safe *for ever* and
 what makes it usable: ONE enumeration of the members is correct under every
 genre, so a reader may apply it without even resolving the header's genre
-token. That enumeration is **core §10 (a′)**, it is NORMATIVE, and it has exactly **one** member — `pin`, NORMATIVE. `layout` is not a
+token. That enumeration is **core §10 (a′)**, it is NORMATIVE, and
+it has exactly **one** member — `pin`, NORMATIVE. `layout` is not a
 member: it is the zone's OPENER and lives in the universal core of three
 (§10 (a)) alongside `figdown` and `title`. The withdrawal of `path` and
 `routing` left `LAYOUT-ZONE-NAMESPACE` whole and took its only experimental members with it.) If a
@@ -103,8 +111,11 @@ as the figure reads clearly.** The lowest rung that works is the right choice.
 | 3 | `pin … at=(x,y)` / `pin … width= height=` | Topology/spatial where placement IS the message. One directive, three optional keys: `at=` places (nodes, groups, `external` endpoints), `width=`/`height=` extend (**nodes only** — groups, external endpoints and typed blocks size to their content). `size` was retired into `pin` at 0.1 (`ELEMENT-GEOMETRY-DIRECTIVE`). **This is the top rung** |
 
 **Rung 1 is where authoring should begin** for **scene** sections (`block`,
-or experimental `topology` / `flowchart`). A pure `bitfield` or `table`
-section usually has no `flow`/`rank`/`pin` — geometry follows content. For a
+or experimental `topology` / `flowchart` / `statechart`). A pure `bitfield` or
+`table` section usually has no `flow`/`rank`/`pin` — geometry follows content,
+and a `sequence` section has no rung at all (see the note at the top of this
+guide): both its axes are declaration order, so the whole ladder is the
+engine's and the only edit available is to the source order. For a
 scene section, a `flow` line costs one line and gives the layout engine the
 single most useful piece of intent it can receive. "Write nothing" (rung 0)
 is reasonable only for a figure small enough that direction is obvious — or
@@ -329,11 +340,27 @@ like at scale. When the graph has a cycle, go to §9 and arrange it: explicit
 arrangement is the expected cost of a cyclic figure, not a workaround for a
 defect.
 
+**A crowd of parallel edges may not be a layout problem at all — check the
+genre before you tune.** When many lines run between the SAME pair of blocks, a
+scene genre has one span to fan them into and no rung of the ladder changes
+that: the crowding is in the shape of the figure, not in its arrangement. What
+settles it is what those lines *are*. If they are **time-ordered messages
+between two participants**, the figure is a ladder wearing a scene genre —
+`sequence` (`figdown 0.4`, EXPERIMENTAL) gives every message its own row, so no
+two share a span and nothing has to be tuned. If they are **distinct
+transitions between states** — different triggers with different meanings,
+several of them returning to one state — it is a `statechart` and the crowding
+really is a layout problem, which is what §9 is for.
+`examples/statechart/bfd-session.fd` is the second case and stays where it is;
+`examples/sequence/dhcp-lease.fd` is the first, drawn as the ladder it always
+was. Same protocol as `examples/statechart/dhcp-client.fd`, deliberately, so
+the two answers can be compared on one subject.
+
 ## 7. Before / after: the same semantics, different layout zones
 
 The first two entries are pairs, byte-identical in the content zone. The third is the counter-case: no pair, because the fix was not in the layout zone at all. In both pairs the **tuned** side is the top-level example itself (`examples/evpn-fabric.fd`, `examples/srl-evpn-irb.fd`) — only the *auto* variant needs its own file, since the tuned figure is the one the corpus already ships. 0.1 removed the duplicate copies that used to sit under `layout-compare/`; they were byte-identical to the originals and taught nothing a second time. Score = `cross×2 + thru×3 + novlp×3 + lblcol×2 + coinc×2`.
 
-**Lint scores are a smoke alarm, not a judge.** The srl-evpn-irb pair below shows lint getting *worse* (ink/e 109→117) while the figure becomes dramatically more readable — because the metrics do not measure group containment, overlap, or reading order. Always look at the render; the ladder ends when a human can read it. One variant of that example scored better on lint but had lost its column alignment — and the alignment was the peer signal; only looking at the render caught it.
+**Lint scores are a smoke alarm, not a judge.** The srl-evpn-irb entry below shows lint getting *worse* (ink/e 109→117) while the figure becomes dramatically more readable — and its auto arm has since stopped rendering at all, which no lint score would ever have told you — because the metrics do not measure group containment, overlap, or reading order. Always look at the render; the ladder ends when a human can read it. One variant of that example scored better on lint but had lost its column alignment — and the alignment was the peer signal; only looking at the render caught it.
 
 ### Leaf-spine fabric — `+flow down +rank sp1 sp2 +rank lf1 lf2 lf3`
 
@@ -346,16 +373,31 @@ Eight-node VXLAN/EVPN topology. Auto-layout scatters spines and leaves; three se
 
 [auto .fd](../examples/layout-compare/evpn-fabric-auto.fd) · [auto .svg](../examples/layout-compare/evpn-fabric-auto.svg) · [tuned .fd](../examples/evpn-fabric.fd) · [tuned .svg](../examples/evpn-fabric.svg)
 
-### srl-evpn-irb — two-level pins + groups (20 layout lines)
+### srl-evpn-irb — two-level pins + groups (20 layout lines), and an auto arm that does not render
 
-Sixteen-node EVPN-VXLAN IRB figure with three leaf groups. Auto-layout lets group boxes overlap each other and member nodes escape their frames, producing a tall chaotic column (691×955 px). The tuned version pins each group as a layout module (spec §3 `PIN-COORDINATE-SCOPE`: a pinned group anchors its local origin in canvas px; members are group-local), giving three clean leaf boxes under the fabric overlay (1228×656 px). Aspect ratio flips from portrait to landscape. Lint ink/e gets *worse* (109→117) while the figure becomes unambiguous — the metrics do not measure group containment or overlap.
+Sixteen-node EVPN-VXLAN IRB figure with three leaf groups. The tuned version pins each group as a layout module (spec §3 `PIN-COORDINATE-SCOPE`: a pinned group anchors its local origin in canvas px; members are group-local), giving three clean leaf boxes under the fabric overlay (1228×656 px).
+
+**The auto arm has no artifact, and that is the result.** The engine guarantees that a `group` band contains only that group's members — the reader's rule is *inside the box is in the group*, so a band around a non-member states a membership the source never wrote. **Auto-layout cannot place these three groups' members contiguously.** Each leaf group's members land on different ranks, with the other groups' members and five hosts interleaved between them, so the band that has to enclose `leaf4`'s members ends up spanning most of the canvas — and no position the separation pass can reach clears every band at once. Reordering the source does not help: the ranks come from the fabric edges, not from the order the nodes are declared in. The engine therefore refuses the figure rather than drawing it:
+
+```
+$ node tools/build-svg.js examples/layout-compare/srl-evpn-irb-auto.fd
+examples/layout-compare/srl-evpn-irb-auto.fd:
+  Line 25: group "leaf4" would enclose non-member "h2" and the layout pass could not separate them; the figure is not drawn rather than drawn wrongly. Give "h2" a pin outside the group, or add it with in=leaf4.
+built 0 artifact(s) from 1 path argument(s)  —  1 of 1 .fd file(s) FAILED and wrote nothing
+```
+
+(Which non-member gets named can differ between runs — several are enclosed, and the message reports the ones the pass gave up on. The refusal itself is the stable part.)
+
+So the pair no longer compares two pictures. **It compares a picture with a refusal, and that is the sharper lesson:** for this topology the pinned arm is not a polish pass over a working auto layout, it is the only layout that exists. `pin` is what makes the figure renderable at all, and it stays that way until auto-layout learns **group-aware rank assignment** — placing a group's members in adjacent ranks so contiguous clustering can succeed (engine-backlog item 32). The `.fd` stays in the corpus as the one figure the containment guarantee cannot place; `node tools/artifact-check.js` reports it as `geometry-refused` and treats its *missing* `.svg` as the correct state.
+
+The measurements below are the last ones taken before the refusal, and they are why the ratio mattered: lint ink/e got *worse* (109→117) while the figure became unambiguous, because the metrics never measured group containment or overlap — the very property the engine now enforces outright.
 
 | variant | cross | novlp | ink/e | score |
 |---------|-------|-------|-------|-------|
-| auto    | 0 | 1 | 109 | 3 |
+| auto (no longer renders) | 0 | 1 | 109 | 3 |
 | `+pin` ×20 | 0 | 1 | 117 | 3 |
 
-[auto .fd](../examples/layout-compare/srl-evpn-irb-auto.fd) · [auto .svg](../examples/layout-compare/srl-evpn-irb-auto.svg) · [tuned .fd](../examples/srl-evpn-irb.fd) · [tuned .svg](../examples/srl-evpn-irb.svg)
+[auto .fd](../examples/layout-compare/srl-evpn-irb-auto.fd) (refused — no artifact) · [tuned .fd](../examples/srl-evpn-irb.fd) · [tuned .svg](../examples/srl-evpn-irb.svg)
 
 ### vxlan-encap — when layout tuning is the wrong fix (0 layout lines)
 
@@ -479,8 +521,10 @@ class that mutes the bundle so it recedes — `class discard "Discard reasons"
 stroke=#b8b6b0 style=dashed` on the terminal-bound edges, used to good effect
 by a corpus author. An edge is a line with no interior, so `stroke=` is the
 channel that paints it; `fill=` paints only members that have an interior, and
-a `fill=`-only class joined by an edge is a line error (spec/core.md §5,
-`INTERIOR-LESS-ELEMENT-PAINT`/`CLASS-PAINT-REQUIREMENT`).
+a class joined by an edge that declares `fill=` with no `stroke=` is a line
+error (spec/core.md §5, `INTERIOR-LESS-ELEMENT-PAINT`). A class that declares no paint at all is legal
+— it claims a meaning and the edge keeps its default line — so mute the
+bundle by writing the channel you want, not by omitting all of them.
 
 **Use `rank` for a lateral bypass, not for the mainline.** Under `flow down` a
 `rank` shares a *row*, so ranking the main chain flattens the figure sideways.

@@ -1,7 +1,7 @@
 figdown 0.3 block
 # `DRAWN-ANNOTATION-FORM`: the directives that refuse `note=` with the GENERIC
 # message — `cell`, `external`, `threshold`, `band`, `bundle` and `class`.
-# There were SEVEN until this release; `plane` was the seventh and it left the
+# There were SEVEN until 0.3; `plane` was the seventh and it left the
 # language (`PAINT-ORDER-CONSTRUCT`), so `plane over "Overlay" note="…"` is gone from section 1
 # and the set is six. The six sit in three sections because they no longer
 # sit in one genre: `block` declares `threshold`, `band`, `external` and

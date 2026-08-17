@@ -1,0 +1,27 @@
+# `SEQUENCE-ORDER-MODEL`: the ORDER DERIVATION fixture. This genre's time axis is
+# the `message` and `state` lines in the order they were written, the order is
+# TOTAL, and NOTHING ELSE IN THE MODEL RECORDS IT — so what a second
+# implementation must reproduce is the per-element `line` number and the array
+# order that follows from it.
+#
+# The document is written so that a model which lost the order would still
+# look plausible: the two collections INTERLEAVE, so `messages` and `states`
+# each carry a non-contiguous run of line numbers and neither array alone is
+# the trace. The trace is the union of the two sorted on `line`, and the
+# golden is the only place that is checkable.
+#
+# The ids are deliberately NOT in alphabetical or any other order that a
+# sorting implementation could accidentally reproduce.
+figdown 0.4 sequence
+title "Order is declaration order, and it is total"
+lifeline z "Third column"
+lifeline a "First column"
+lifeline m "Second column"
+message z -> a "1"
+state a "OPEN"
+message a -> m "2"
+message m -> z "3"
+state z "BUSY"
+state a "CLOSED"
+message z <- m "4"
+state m "IDLE"

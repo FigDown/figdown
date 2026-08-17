@@ -40,9 +40,10 @@
  *   C. enum values   — every value of every closed enum, from the engine:
  *                      `shape` `style` `extend` `numbering` (via
  *                      reference-coverage's `engineEnums`), the `chart`
- *                      `type=` value set, and the KEYWORD-ARGUMENT enum
- *                      `flow`, which reference-coverage cannot check.
- *                      No list here.
+ *                      `type=` value set, the `sequence` fragment `type=`
+ *                      value set (`SEQ_OPERATORS_FRAG`, twelve), and the
+ *                      KEYWORD-ARGUMENT enum `flow`, which
+ *                      reference-coverage cannot check. No list here.
  *   D. comma forms   — `reference-coverage.MULTIVALUE`, required rather than
  *                      restated, and probe-verified against the engine there.
  *   E. escapes       — parsed out of the ABNF `escape` production in
@@ -231,7 +232,7 @@ const STRUCTURAL = [
   { id: 'written-empty label (EMPTY-LABEL-STATE) — `field ""` (an unnamed cell)',
     anchor: ['spec/genres/bitfield.md', 'field "<name>"'],
     detect: t => /^\s*field\s+""(?:\s|:|$)/m.test(t) },
-  { id: 'field wider than `word=` — one field spanning rows (R128)',
+  { id: 'field wider than `word=` — one field spanning rows (FIELD-WIDER-THAN-WORD)',
     anchor: ['spec/genres/bitfield.md', 'word'],
     detect: (t, doc) => !!doc && (doc.blocks || []).some(b =>
       b.type === 'bitfield' && +b.word > 0 &&
@@ -338,6 +339,30 @@ function derivedSpace(engine) {
   const chartType = /ptype!=='([a-z0-9]+)'/.exec(src);
   if (!chartType) throw new Error('engine drift: cannot read the chart type= enum — update this tool');
   enumVals.push({ kind: 'opt', key: 'type', val: chartType[1] });
+  // The SECOND closed set behind the SAME key, and the reason it needs its own
+  // grab: `type=` is `chart`'s projection above and the `sequence` genre's
+  // interaction operator here, and one value of one of them says nothing about
+  // the other. The set is UML 2.5.1's `InteractionOperatorKind` literals taken
+  // whole (twelve), which is exactly the case reference-coverage cannot ask a
+  // single figure for: a fragment carries ONE operator, so twelve values need a
+  // corpus. Six of the twelve are what Mermaid documents; the other six exist
+  // only because the enumeration was taken whole, and a value no figure writes
+  // is a value nobody has read — which is this gate's whole premise.
+  const fragType = /const SEQ_OPERATORS_FRAG=\[([\s\S]*?)\];/.exec(src);
+  if (!fragType) throw new Error('engine drift: cannot read the fragment type= enum ' +
+    '(SEQ_OPERATORS_FRAG) — update this tool');
+  const fragVals = fragType[1].split(',').map(s => s.trim().replace(/^'|'$/g, ''))
+    .filter(x => /^[a-z][\w-]*$/.test(x));
+  // Fail-closed on a SHRINKING read: the enum is twelve because the standard's
+  // is, so anything less means the declaration moved and the tool is now
+  // demanding demonstrators for a subset it happened to still match. A LARGER
+  // read is passed through on purpose — a thirteenth literal should be demanded
+  // the day it lands, with no edit here.
+  if (fragVals.length < 12)
+    throw new Error('engine drift: SEQ_OPERATORS_FRAG parsed to ' + fragVals.length +
+      ' operator(s) (' + fragVals.join(', ') + '); UML 2.5.1 InteractionOperatorKind ' +
+      'is twelve and this genre takes it whole — update this tool');
+  for (const v of fragVals) enumVals.push({ kind: 'opt', key: 'type', val: v });
   const flow = /\[((?:'[a-z]+',?\s*)+)\]\.includes\(pos\[1\]\)/.exec(src);
   if (!flow) throw new Error('engine drift: cannot read the flow direction enum — update this tool');
   for (const v of flow[1].split(',').map(s => s.trim().replace(/'/g, '')))

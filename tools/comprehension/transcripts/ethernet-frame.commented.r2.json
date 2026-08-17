@@ -1,0 +1,59 @@
+{
+  "suite_version": "1.0.0",
+  "run": {
+    "utc": "2026-08-16T06:12:56Z",
+    "model_alias": "sonnet",
+    "model_used": "claude-sonnet-5",
+    "cli": "2.1.233 (Claude Code)",
+    "condition": "commented",
+    "reader": 2
+  },
+  "figure": {
+    "id": "ethernet-frame",
+    "genre": "table",
+    "path": "examples/showcase/ethernet-frame.fd",
+    "file_sha256": "cea7edf7194cecc134d020ca1fa4485c800da36439756602bddf7744632aafa4",
+    "title_shown": null,
+    "presented_sha256": "a7e82ae553b8e2fb2a535abf792d80751f849fb16683bee6abe6d78291f102f8",
+    "presented_lines": 34,
+    "presented_chars": 2102
+  },
+  "prompt": {
+    "system_sha256": "1a78658262dc29e7e24cbe3e1eb72659cf31990e85deddacf0b1625e40c5eac2",
+    "user_sha256": "b86cd5316ac7c8b4868ffcf9ad4eda7dd7a46f5eb9e8deecbe1c7a60222eb48a",
+    "question_set_sha256": "fdc8a2c35eef34d6fee5f0fb0d0ad3794fd320e61d5e8546a1895288968d398e"
+  },
+  "cold_room": {
+    "cwd": "an isolated empty temporary directory outside the repository",
+    "tools_offered": "none — every tool denied by name",
+    "mcp_servers": "none",
+    "settings": "safe-mode: no project or user settings, no memory file, no skills, no plugins, no hooks",
+    "session_persistence": false,
+    "shown": "the system prompt, the presented file text, and the questions — nothing else",
+    "not_shown": "the specification, any genre document, any other .fd file, the file name, the name of the language, the repository"
+  },
+  "integrity": {
+    "turns": 1,
+    "permission_denials": 0,
+    "tool_calls_observed": false,
+    "is_error": false
+  },
+  "usage": {
+    "cost_usd": 0.0052116,
+    "input_tokens": 2,
+    "output_tokens": 313,
+    "cache_creation_input_tokens": 0,
+    "duration_ms": 4181
+  },
+  "raw_answer_text": "A1: The 802.1Q Tag (if present) or EtherType — the file states the tag is inserted after Source MAC, immediately followed by EtherType.\nA2: 6 bytes each.\nA3: It is inserted immediately after the Source MAC field and immediately before the EtherType field.\nA4: 4 bytes.\nA5: NOT STATED.\nA6: 0x8100 (TPID).\nA7: 46–1500 bytes.\nA8: NOT STATED.",
+  "answers": {
+    "q1": "The 802.1Q Tag (if present) or EtherType — the file states the tag is inserted after Source MAC, immediately followed by EtherType.",
+    "q2": "6 bytes each.",
+    "q3": "It is inserted immediately after the Source MAC field and immediately before the EtherType field.",
+    "q4": "4 bytes.",
+    "q5": "NOT STATED.",
+    "q6": "0x8100 (TPID).",
+    "q7": "46–1500 bytes.",
+    "q8": "NOT STATED."
+  }
+}

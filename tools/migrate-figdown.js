@@ -488,7 +488,7 @@ const OPT_RENAMES = [
   // rewrites would have produced hard errors; the six keys are now handled by
   // the report-only withdrawal detection (see WITHDRAWN_RE below).
   [/(^|\s)labels=/g, '$1data=', 'labels=→data='],
-  // `layer=`→`plane=` (`PLANE-KEYWORD-SPELLING`) stood here until this release. `PAINT-ORDER-CONSTRUCT`
+  // `layer=`→`plane=` (`PLANE-KEYWORD-SPELLING`) stood here until 0.3. `PAINT-ORDER-CONSTRUCT`
   // withdrew its TARGET, so the rewrite would have produced a hard error; the
   // key is now handled by the report-only withdrawal detection below, exactly
   // as `via=`/`src=`/`dst=` have been.
@@ -1243,7 +1243,7 @@ function migrateText(text, colorMeans) {
         : []),
       // 0.1 (the terminology batch)
       [/^(\s*)boundary(\b)/, '$1external$2', 'boundary→external'],
-      // `layer`→`plane` (`PLANE-KEYWORD-SPELLING`) stood here until this release — same
+      // `layer`→`plane` (`PLANE-KEYWORD-SPELLING`) stood here until 0.3 — same
       // reason as `layer=` above, and the same reason `route`→`path` left at
       // 0.1: `PAINT-ORDER-CONSTRUCT` withdrew `plane`, so the output would not parse.
       [/^(\s*)wrap(\b)/, '$1break$2', 'wrap→break'],
@@ -1493,7 +1493,7 @@ function migrateText(text, colorMeans) {
     }
 
     // ---- 0.1: guide at= -> offset= ----
-    // `z=`→`z-index=` stood here until this release. `z-index=` was legal on
+    // `z=`→`z-index=` stood here until 0.3. `z-index=` was legal on
     // `plane` and on nothing else, so `PAINT-ORDER-CONSTRUCT` took it with the keyword and the
     // rewrite lost its target; `z=` is reported, not rewritten.
     if (/^\s*threshold(\s|$)/.test(stripComment(next))) {

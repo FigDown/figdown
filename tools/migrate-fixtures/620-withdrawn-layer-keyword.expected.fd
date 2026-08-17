@@ -1,5 +1,5 @@
 figdown 0.1 block
-# `layer`→`plane` was a live rewrite (`PLANE-KEYWORD-SPELLING`) until this release.
+# `layer`→`plane` was a live rewrite (`PLANE-KEYWORD-SPELLING`) until 0.3.
 # `PAINT-ORDER-CONSTRUCT` withdrew `plane`, so the rewrite's TARGET no longer exists and the
 # output would not parse. Report-only, the `route`→`path` shape from `EDGE-GEOMETRY-CONSTRUCTS`.
 layer over "Overlay"

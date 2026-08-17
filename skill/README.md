@@ -26,11 +26,17 @@ reference/transcribe.md                  transcribing an existing figure
 reference/experimental/block.md          block's EXPERIMENTAL markers and zones
 reference/experimental/chart.md          a chart from a table (any genre
                                          that can host one)
-reference/experimental/topology.md       the four EXPERIMENTAL genres, each
+reference/experimental/topology.md       the five EXPERIMENTAL genres, each
 reference/experimental/flowchart.md      declaring its OWN vocabulary in
 reference/experimental/statechart.md     its own file, so an agent can
 reference/experimental/timing.md         ignore the ones it is not using
+reference/experimental/sequence.md       — the ladder genre, and the one
+                                         whose load set has no layout file
 ```
+
+`sequence` is the exception to the "genre file + layout file" pairing above:
+both of its axes are declaration order, so nothing in the layout namespace
+moves a mark there and its own file is the whole of what an author needs.
 
 **Every scene genre's file is self-sufficient (`SUBJECT-VOCABULARY-SCOPE`).** There is
 no shared scene-vocabulary file and there was never meant to be one: only
@@ -43,9 +49,9 @@ a different domain. The file this list used to call
 `reference/experimental/constructs.md` was that shared file; it was removed
 with the ruling, and its contents went to the genres that own them.
 
-The `reference/` files are a generated copy of [`read/0.3/`](../read/0.3/reading.md),
+The `reference/` files are a generated copy of [`read/0.4/`](../read/0.4/reading.md),
 which is the source of truth; see "Keeping the bundle fresh" below. If you only
-want to READ a `.fd` from this repository, go to `read/0.3/` and install
+want to READ a `.fd` from this repository, go to `read/0.4/` and install
 nothing.
 
 An agent *reading* a figure loads `SKILL.md` + `reference/reading.md`
@@ -107,7 +113,7 @@ it teaches no syntax, because this bundle owns that.
 `figdown/figdown.html`, `figdown/build-svg.js` and everything under
 `figdown/reference/` are **build artifacts** regenerated from their single
 sources (`editor/figdown.html`, `tools/build-svg.js`, and — since `GENRE-REFERENCE-ADDRESS` —
-[`read/0.3/`](../read/0.3/reading.md)) — never edited by hand:
+[`read/0.4/`](../read/0.4/reading.md)) — never edited by hand:
 
 ```sh
 node tools/make-skill.js
@@ -116,9 +122,9 @@ node tools/make-skill.js
 `SKILL.md` is the one hand-maintained source left in the bundle;
 `make-skill.js` does not own it and does not delete it.
 
-**Why `reference/` is vendored rather than linked.** `read/0.3/` is where a
+**Why `reference/` is vendored rather than linked.** `read/0.4/` is where a
 reader of this repository is sent — nothing to install. This directory is
 copied out of the repository into `~/.claude/skills/`, so a path pointing back
-at `read/0.3/` would dangle the moment it is installed. The copy is therefore
+at `read/0.4/` would dangle the moment it is installed. The copy is therefore
 generated, and `node tools/skill-coverage.js --strict` fails on any byte of
-difference (check 0, VENDOR). Edit `read/0.3/`, then re-run `make-skill.js`.
+difference (check 0, VENDOR). Edit `read/0.4/`, then re-run `make-skill.js`.

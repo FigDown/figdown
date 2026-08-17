@@ -97,10 +97,6 @@
 //     it is not a decision that the work is unnecessary, and this exclusion
 //     must not be cited as one.
 //
-//   `design/` — the append-only research record. Left standing for the reason
-//     `.github/CONTRIBUTING.md` §3.1 already gives for leaving a historical row in
-//     place: an append-only record is falsified by editing it.
-//
 // THE CHECKS
 // ----------
 //   dangling-link        [tier 1] a relative markdown link whose target does

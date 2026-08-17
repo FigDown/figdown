@@ -113,21 +113,32 @@ so you know which file you need before you need it.
 | `flowchart` | `reference/experimental/flowchart.md`, `reference/layout.md` | `reference/experimental/chart.md` |
 | `statechart` | `reference/experimental/statechart.md`, `reference/layout.md` | `reference/experimental/chart.md` |
 | `timing` | — | `reference/experimental/timing.md` |
+| `sequence` — message exchanges over time | — | `reference/experimental/sequence.md` |
+
+**`sequence` draws a ladder**, and you place nothing in it: participants are
+columns and time runs down the page, both in the order the source declares
+them, so no key in that genre moves a coordinate — not even a layout-zone one,
+which parses and changes nothing there. Its file is the whole of its
+vocabulary, and it is the one genre where the layout file buys you nothing.
+Three constructs an author arriving from another genre reaches for were
+argued and REFUSED there — a time-gap line, a band over participants, and a
+per-message "sent but never delivered" flag; each is a line error that names
+its ground and the spelling to write instead, so write the source and read
+the message rather than guessing. Its file says how.
 
 Two more files answer a **task** rather than a genre:
 
 - **Reading a `.fd` someone else wrote, to summarise or answer from it** →
   `reference/reading.md`. It is the contract for what you may conclude and
   what you must not infer, and it is all you need: a reader can skip every
-  genre file above. **One correction applies to it.** `reference/reading.md` is
-  a byte-frozen copy of a released reading contract, and one sentence in it is
-  wrong: where it says *"Ignore the layout zone. Everything from the `layout`
-  keyword down is …"*, do not read it as a rule about **position**. Ignore the
-  layout **namespace** — its one member is `pin` — **wherever a member
-  appears**, because a `pin` may legally sit *before* the `layout` line, and
-  about half of them do. Membership decides, not position. The frozen file is
-  left as-is on purpose; apply this rule instead, the same one stated above
-  under "layout and pin".
+  genre file above. **The correction that used to be printed here is now in the
+  file itself**, so read `reference/reading.md` as it stands. If you ever meet
+  an OLDER copy of that contract — one that says *"Ignore the layout zone.
+  Everything from the `layout` keyword down is …"* — do not read that as a rule
+  about **position**. Ignore the layout **namespace** — its one member is `pin`
+  — **wherever a member appears**, because a `pin` may legally sit *before* the
+  `layout` line, and about half of them do. Membership decides, not position.
+  It is the same rule stated above under "layout and pin".
 - **Transcribing an existing figure** — a drawing, a screenshot, another
   format → `reference/transcribe.md`.
 

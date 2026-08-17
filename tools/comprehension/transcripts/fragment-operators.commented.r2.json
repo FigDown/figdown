@@ -1,0 +1,59 @@
+{
+  "suite_version": "1.0.0",
+  "run": {
+    "utc": "2026-08-17T09:45:01Z",
+    "model_alias": "sonnet",
+    "model_used": "claude-sonnet-5",
+    "cli": "2.1.233 (Claude Code)",
+    "condition": "commented",
+    "reader": 2
+  },
+  "figure": {
+    "id": "fragment-operators",
+    "genre": "sequence",
+    "path": "examples/sequence/fragment-operators.fd",
+    "file_sha256": "125ba6650b5fbdd44cadf286c24d68c81a1be6ab5d8892cf8215a33eda39d4b9",
+    "title_shown": null,
+    "presented_sha256": "a22410a03b7ea62350e847722a6e3e5926a40526ea4753ea46557f2e9dc96e37",
+    "presented_lines": 171,
+    "presented_chars": 9518
+  },
+  "prompt": {
+    "system_sha256": "1a78658262dc29e7e24cbe3e1eb72659cf31990e85deddacf0b1625e40c5eac2",
+    "user_sha256": "50df6ab85752bc29661f297b1a141b3f83ec253e2d6e019812700562cffdc272",
+    "question_set_sha256": "93a6009ac666711f5bdb48006ce6581b97a457bc159c2a64781fcf1f5724f392"
+  },
+  "cold_room": {
+    "cwd": "an isolated empty temporary directory outside the repository",
+    "tools_offered": "none — every tool denied by name",
+    "mcp_servers": "none",
+    "settings": "safe-mode: no project or user settings, no memory file, no skills, no plugins, no hooks",
+    "session_persistence": false,
+    "shown": "the system prompt, the presented file text, and the questions — nothing else",
+    "not_shown": "the specification, any genre document, any other .fd file, the file name, the name of the language, the repository"
+  },
+  "integrity": {
+    "turns": 1,
+    "permission_denials": 0,
+    "tool_calls_observed": false,
+    "is_error": false
+  },
+  "usage": {
+    "cost_usd": 0.0337386,
+    "input_tokens": 2,
+    "output_tokens": 2162,
+    "cache_creation_input_tokens": 0,
+    "duration_ms": 23491
+  },
+  "raw_answer_text": "A1: NOT STATED.\nA2: Exactly one operand executes on any run; the guard that evaluates true (whether the credentials are \"accepted\" or \"rejected\") decides which one.\nA3: NOT STATED — the figure's loop guard only says \"fewer than 3 attempts made\" (an upper limit), with no explicit lower bound given.\nA4: The `par` fragment asserts that the fetch and flush operands have no relative order and may interleave in any order, but it still requires that the messages within each individual operand keep their own order.\nA5: The `opt` fragment asserts that its single operand's behaviour either runs or does not run, with no alternative to choose between.\nA6: The critical fragment contains the message \"write: token issued\" (Service → Audit log).\nA7: The second operand of the alt contains the message \"401 Unauthorized\" (Service → Client).\nA8: The remainder of the enclosing session is abandoned — the break operand runs instead of everything that would otherwise follow.",
+  "answers": {
+    "q1": "NOT STATED.",
+    "q2": "Exactly one operand executes on any run; the guard that evaluates true (whether the credentials are \"accepted\" or \"rejected\") decides which one.",
+    "q3": "NOT STATED — the figure's loop guard only says \"fewer than 3 attempts made\" (an upper limit), with no explicit lower bound given.",
+    "q4": "The `par` fragment asserts that the fetch and flush operands have no relative order and may interleave in any order, but it still requires that the messages within each individual operand keep their own order.",
+    "q5": "The `opt` fragment asserts that its single operand's behaviour either runs or does not run, with no alternative to choose between.",
+    "q6": "The critical fragment contains the message \"write: token issued\" (Service → Audit log).",
+    "q7": "The second operand of the alt contains the message \"401 Unauthorized\" (Service → Client).",
+    "q8": "The remainder of the enclosing session is abandoned — the break operand runs instead of everything that would otherwise follow."
+  }
+}

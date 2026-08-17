@@ -174,7 +174,7 @@ for (const s of parsed) {
       console.log('      in the spec table, NOT accepted by the engine: ' + only.join(', '));
     if (miss.length)
       console.log('      accepted by the engine, NOT in the spec table: ' + miss.join(', '));
-    console.log('      §3\'s default is stated over MEMBERSHIP (R168), so a reader');
+    console.log('      §3\'s default is stated over MEMBERSHIP (GENRE-NAMESPACE), so a reader');
     console.log('      applies this table. A table the engine disagrees with is a');
     console.log('      promise that does not do what it says.');
   }
@@ -194,7 +194,7 @@ for (const s of parsed) {
   const flat = s.src.replace(/\s+/g, ' ');
   if (!flat.includes(s.must))
     finding('PROMISE MISSING  ' + rel(s.file) + ' does not state the default over ' +
-            'membership — expected the phrase "' + s.must + '" (§3, R168)');
+            'membership — expected the phrase "' + s.must + '" (§3, GENRE-NAMESPACE)');
   else
     console.log('  ' + rel(s.file) + ': states the default over membership');
   if (flat.includes(s.mustNot))

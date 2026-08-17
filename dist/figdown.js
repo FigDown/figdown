@@ -1,4 +1,4 @@
-// figdown.js — FigDown embeddable library (0.3.2)
+// figdown.js — FigDown embeddable library (0.4.0)
 // GENERATED FILE, DO NOT EDIT. Built from editor/figdown.html.
 // Regenerate with: node tools/make-lib.js
 (function (root, factory) {
@@ -10,7 +10,7 @@
   }
 }(typeof globalThis !== 'undefined' ? globalThis : this, function () {
   'use strict';
-var VERSION = "0.3.2";
+var VERSION = "0.4.0";
 
 // ---- engine (extracted verbatim from editor/figdown.html) ----
 var __engine = (function () {
@@ -24,7 +24,7 @@ const SHAPES = ['box','rounded','circle','ellipse','diamond','cylinder'];
 // input to that promise, and under core §13 a 0.x renderer may differ from
 // the next — which makes the recorded version the only thing that can
 // explain a diff between two renderings of one source.
-const FIGDOWN_VERSION = '0.3.2';
+const FIGDOWN_VERSION = '0.4.0';
 // `STATECHART-GENRE-SCOPE`: the language number moved for the first time. The dev
 // counter does NOT reset (core §13.0.4 — `N` counts source states of the
 // engine and only ever increases), so 0.1 is followed by
@@ -39,14 +39,34 @@ const FIGDOWN_VERSION = '0.3.2';
 // fixes only. No new features. The language does not move." Shipping `note=`
 // under `v0.2.z` would make `figdown 0.2` name two different languages: the one
 // `v0.2.0` published and the one with `note=`. So the language number moves.
-const LANG_VERSIONS = ['0.1', '0.2', '0.3'];
+// `SEQUENCE-SOURCE-STANDARD`-R182: `figdown 0.4` joins the set, and it joins it for the
+// same reason `0.2` did — a GENRE token is language surface, and core §13.0
+// makes added surface a `Y` and never a `Z`. `sequence` is that token. It adds
+// no keyword yet (see GENRES_BY_VERSION below), which is exactly `STATECHART-GENRE-SCOPE`'s shape:
+// the dispatch point lands first and the vocabulary follows it.
+const LANG_VERSIONS = ['0.1', '0.2', '0.3', '0.4'];
 // Genres per declared language version. `Y` never removes (core §13.0), so
 // each row is a superset of the one above it, and `figdown 0.1 <anything>`
 // resolves against exactly the list it resolved against before `STATECHART-GENRE-SCOPE`.
 const GENRES_BY_VERSION = {
   '0.1': ['block','topology','flowchart','bitfield','table','timing'],
   '0.2': ['block','topology','flowchart','bitfield','table','timing','statechart'],
-  '0.3': ['block','topology','flowchart','bitfield','table','timing','statechart']
+  '0.3': ['block','topology','flowchart','bitfield','table','timing','statechart'],
+  // `SEQUENCE-SOURCE-STANDARD`-R182: `sequence` is dispatchable from here on. Like
+  // `statechart` at `STATECHART-GENRE-SCOPE` it arrived with NO vocabulary of its own, and the
+  // consequence was stated here rather than left to be discovered: there was no
+  // `GENRE_KW.sequence` row, and the allowlist guard is written
+  // `GENRE_KW[doc.genre] && !GENRE_KW[doc.genre].has(kw)`, so a genre with no
+  // row is NOT narrowed — a `figdown 0.4 sequence` document could write any
+  // registered keyword and it parsed. The document that increment meant to
+  // land was the header ALONE.
+  // `SEQUENCE-SOURCE-STANDARD`-R182: CLOSED. `GENRE_KW.sequence` exists below, so the
+  // genre now constrains what it names — five keywords of its own, `class`,
+  // and the genre-free core — and `flow`/`rank`/`group` are line errors under
+  // it. The genre still has NO RENDERER: a valid `sequence` document parses to
+  // a model and draws an empty canvas, which is the state this increment means
+  // to land and is pinned by a fixture rather than left to be noticed.
+  '0.4': ['block','topology','flowchart','bitfield','table','timing','statechart','sequence']
 };
 // The version an OPTION KEY first becomes legal in — the `CONNECTOR_MIN_VERSION`
 // device, applied to the option namespace. `DRAWN-ANNOTATION-FORM`: `note=` is gated on the
@@ -354,6 +374,26 @@ const DIRECTIVE_OPTS={
   // keyed by the surface word an author actually wrote.
   flowline:['style','class','fill','stroke','label','taillabel','headlabel','note'],
   transition:['style','class','fill','stroke','label','taillabel','headlabel','note'],
+  // `SEQUENCE-SOURCE-STANDARD`-R182: the `sequence` genre's four own rows. `message` is
+  // the fourth connector spelling and takes the connector set — `fill=` and
+  // the three retired label keys stay listed for the same reason they are
+  // listed on the other three, so their dedicated diagnostics fire instead of
+  // a bare `does not take` — plus `in=` (sense 1: the fragment or operand this
+  // message occurs inside) and `description=`. It does NOT gain a key of its
+  // own: `lost=` was proposed and refused (`UNDELIVERED-MESSAGE-MARKING`), and `OPT_KEYS` is unchanged
+  // by this whole increment.
+  message:['style','class','fill','stroke','label','taillabel','headlabel','note','in','description'],
+  // A lifeline is drawn as a head box over a dashed line, so it has an
+  // interior and takes `fill=`. `in=` is sense 1.
+  lifeline:['class','fill','stroke','style','in','note','description'],
+  // `type=` is MANDATORY on `fragment` and is checked in `parseSeqDirective`,
+  // not here: a missing key is not an inapplicable key. No `fill=` — a
+  // combined fragment is a FRAME drawn over the messages it contains, and
+  // painting its interior would hide them.
+  fragment:['type','class','stroke','style','in','note','description'],
+  // `in=` is MANDATORY on `operand` (an operand is a compartment OF a
+  // fragment) and is likewise checked in `parseSeqDirective`.
+  operand:['in','class','stroke','style','note','description'],
   // `PAINT-ORDER-CONSTRUCT`: the `plane` row is GONE, not emptied — the keyword is
   // withdrawn from the language, so it has no acceptor row at all, the shape
   // `path`/`routing` left behind. `z-index=` goes with it: it
@@ -400,6 +440,31 @@ const DIRECTIVE_OPTS={
   cell:['fill','stroke','class'], width:[],
   signal:['data','fill','stroke'], gap:[]
 };
+// `SEQUENCE-SOURCE-STANDARD`-R182: the FIRST genre-conditional option row, and it
+// exists because `DIRECTIVE_OPTS` is keyed by the SURFACE WORD an author
+// wrote, while `GENRE-VOCABULARY-OBLIGATION` makes a surface word a per-genre declaration. Every other
+// shared spelling in the language names the same construct in every genre
+// that has it — `state` under `statechart` IS `node` renamed (`GENRE-NODE-SPELLING`), so it
+// takes `node`'s row exactly — but `state` under `sequence` is a DIFFERENT
+// construct under the same spelling: a StateInvariant (UML 2.5.1 §17.12.25)
+// that REFERENCES a lifeline rather than declaring an id. It has no shape and
+// no extent of its own, so `shape=`, `width=` and `height=` name nothing on
+// it; it can sit inside a fragment, so it takes `in=` (`SEQUENCE-CONTAINMENT-SCOPE`); and it takes
+// `description=` like the rest of this genre's directives.
+//
+// The lookup is one table indexed genre-first, so a genre with no entry falls
+// through to `DIRECTIVE_OPTS` untouched and the whole 0.1/0.2/0.3 surface is
+// byte-identical. It is NOT a second registry: every key named here is
+// already an `OPT_KEYS` member accepted by some directive, so nothing about
+// the closed option namespace changes.
+const GENRE_DIRECTIVE_OPTS={
+  sequence:{
+    state:['class','fill','stroke','style','in','note','description']
+  }
+};
+const directiveOpts=(kw,genre)=>
+  (genre && GENRE_DIRECTIVE_OPTS[genre] && GENRE_DIRECTIVE_OPTS[genre][kw])
+    || DIRECTIVE_OPTS[kw];
 const STYLES=['solid','dashed','dotted'];
 // `RULE-POSITION-ENUMERATION`: every LIVE option key whose value grammar is an enum,
 // read off spec/vocabulary-sources.tsv (`shape` column = `enum`, `status`
@@ -498,7 +563,7 @@ const RETIRED_OPT_KEYS={
   // appears.
   'z-index':'z-index= has been WITHDRAWN with the `plane` keyword (`PAINT-ORDER-CONSTRUCT`): it was legal on `plane` and on nothing else, so it left with its only acceptor. There is no replacement spelling and no other directive to move it to. Delete the key: paint order is document order, and a later line paints on top (MIGRATIONS 0.3)',
   z:'z= has been WITHDRAWN: it was renamed z-index=, and z-index= was withdrawn with the `plane` keyword (`PAINT-ORDER-CONSTRUCT`) — it was legal on `plane` and on nothing else. There is no replacement spelling. Delete the key: paint order is document order, a later line paints on top (MIGRATIONS 0.3)',
-  // `note` was HERE (`DESCRIPTION-KEY-SPELLING`) until this release (`DRAWN-ANNOTATION-FORM`), and its
+  // `note` was HERE (`DESCRIPTION-KEY-SPELLING`) until 0.3 (`DRAWN-ANNOTATION-FORM`), and its
   // row is gone because the key is LIVE again — SYNTAX-STYLE RULE 4.9
   // obligation 3 forbids leaving the retirement message standing past the
   // revival, on the ground that a message telling an author to write
@@ -566,7 +631,7 @@ const RETIRED_LAYER='layer has been WITHDRAWN: it was renamed plane, and plane w
 // `THRESHOLD-KEYWORD-SPELLING`: the scene keyword `guide` became `threshold`.
 const RETIRED_GUIDE='guide has been renamed: use threshold (in Illustrator, Inkscape, Figma and draw.io a "guide" is an author-only construction line that is NEVER rendered, while FigDown\'s is drawn output — an INVERTED name, which `UNSAFE-DEFAULT-ELIMINATION` rates worse than an unfamiliar one, and no counter-example was found where "guide" names rendered output. `guide` was also a FigDown coinage, and `SIZE-AND-DIRECTION-KEY-NAMING` makes coining a last resort; `threshold` comes whole from Grafana, whose "Show thresholds" render option offers "As lines", "As filled regions" and "As filled regions and lines" — FigDown\'s marker + region pair, split the same way — with IETF RED/AQM as the secondary source (RFC 2309: "Two RED parameters, minth (minimum threshold) and maxth (maximum threshold)"; RFC 7567: "an AQM algorithm configured with a threshold"). 78% of the measured corpus marks are thresholds; target/mean/reference marks: 0) (MIGRATIONS 0.1)';
 // `EXTERNAL-ENDPOINT-NAMING`: the scene keyword `boundary` became `external`.
-const RETIRED_BOUNDARY='boundary has been renamed: use external (it declares an external I/O endpoint — the spec\'s own words — while UML\'s «boundary» is an INTERNAL interface object, C4\'s System_Boundary is a dashed grouping container FigDown already spells `group`, and BPMN\'s Boundary Event is a third meaning) (MIGRATIONS 0.1)';
+const RETIRED_BOUNDARY='boundary has been renamed: use external (it declares an external I/O endpoint — the spec\'s own words — while the Entity-Control-Boundary analysis pattern\'s «boundary» is an INTERNAL interface object, C4\'s System_Boundary is a dashed grouping container FigDown already spells `group`, and BPMN\'s Boundary Event is a third meaning) (MIGRATIONS 0.1)';
 // `ROW-BREAK-NAMING`: the `bitfield` child keyword `wrap` became `break`.
 const RETIRED_WRAP='wrap has been renamed: use break (in CSS and typography `wrap` is AUTOMATIC reflow — a mode — while this directive is an EXPLICIT row break, an event; CSS Fragmentation calls it "a forced break … explicitly indicated by the … author", HTML spells it `br`) (MIGRATIONS 0.1)';
 // `PRESENCE-FLAG-SPELLING`: the 0.1 rename `optional` -> `conditional` (`PRESENCE-FLAG-SPELLING`)
@@ -958,6 +1023,25 @@ const FLOWCHART_SUBJECT_KW=['external'];
 // none of the six; `external` is additionally UML 2.5.1 §14's own
 // `TransitionKind` literal and is reserved for it (`RESERVED-SPELLINGS`).
 const STATECHART_SUBJECT_KW=[];
+// `sequence` (EXPERIMENTAL, 0.4, `SEQUENCE-SOURCE-STANDARD`-R182): THREE, and the array is
+// this genre's whole declaration of what a sequence figure is OF. `state` and
+// `fragment` and `operand` describe referents UML clause 17 defines —
+// `StateInvariant` (§17.12.25), `CombinedFragment` (§17.12.3) and
+// `InteractionOperand` (§17.12.14) — so they are subject vocabulary in exactly
+// `SUBJECT-VOCABULARY-SCOPE`'s sense, while `lifeline` and `message` are this genre's NODE and
+// CONNECTOR spellings and live in `GENRE_NODE_KW`/`GENRE_CONNECTOR_KW` with
+// the other genres' (`GENRE-CONNECTOR-SPELLING`/`GENRE-NODE-SPELLING`). None of the six words the four scene genres
+// declare is here: `group` is REFUSED (`SEQUENCE-PARTICIPANT-GROUPING`, below), `external` `threshold`
+// `band` `bundle` have no measured need and no clause-17 referent, and
+// `flow`/`rank` are refused as a CONSEQUENCE of the genre's two axes being
+// declaration-ordered (draft §7) — they are simply absent from `GENRE_KW`.
+// `state` is SHARED with `statechart` as a spelling and is a SEPARATE
+// declaration with a different grammar: there slot 1 declares an id, here it
+// REFERENCES a lifeline (draft §29 Q5). Two genres agreeing on a spelling is
+// two declarations that agree, never one inherited — which is the whole of
+// `SUBJECT-VOCABULARY-SCOPE`, and is why this genre's `state` also takes its own option row
+// (GENRE_DIRECTIVE_OPTS).
+const SEQUENCE_SUBJECT_KW=['state','fragment','operand'];
 // `FLOWCHART-ROLE-KEYWORDS`: the flowchart ROLE vocabulary — the FIRST exercise of
 // `GENRE-NAMESPACE` `GENRE-VOCABULARY-OBLIGATION` ("a genre owns its words"). These three are legal ONLY under
 // `figdown 0.1 flowchart`; `GENRE-NAMESPACE`'s allowlist is what makes `decision x` a line
@@ -993,10 +1077,50 @@ const ROLE_SHAPE={process:'box',decision:'diamond',terminator:'rounded'};
 // symbol this genre cannot spell is a COVERAGE GAP in FigDown, not a state
 // of the figure, and `node` is not its spelling — see
 // the project’s working record for the coverage ledger.
-const GENRE_NODE_KW={block:'node',topology:'node',flowchart:'node',statechart:'state'};
-const GENRE_CONNECTOR_KW={block:'edge',topology:'edge',flowchart:'flowline',statechart:'transition'};
-const NODE_SPELLINGS=new Set(['node','state']);
-const CONNECTOR_SPELLINGS=new Set(['edge','flowline','transition']);
+//   sequence          lifeline  message     (OMG UML 2.5.1 §17)
+const GENRE_NODE_KW={block:'node',topology:'node',flowchart:'node',statechart:'state',sequence:'lifeline'};
+const GENRE_CONNECTOR_KW={block:'edge',topology:'edge',flowchart:'flowline',statechart:'transition',sequence:'message'};
+const NODE_SPELLINGS=new Set(['node','state','lifeline']);
+const CONNECTOR_SPELLINGS=new Set(['edge','flowline','transition','message']);
+// `SEQUENCE-SOURCE-STANDARD`-R182: WHERE EACH GENRE'S NODE ROWS LIVE IN THE PARSED DOC.
+// `GENRE_NODE_KW` above says what the WORD is; this says which `doc`
+// collection the parser puts that word's rows in. The two are separate facts
+// and only one of them is `nodes`: `statechart` renames the word and keeps the
+// collection (a `state` is a scene node), while `sequence` renames BOTH — a
+// `lifeline` is not a scene node and lands in `doc.lifelines`. Any GUI test of
+// the form "is this id a thing this genre declares" has to ask through here.
+// Hand-writing `doc.nodes` is the defect it closes: the Fill/Delete/Raise/
+// Lower enablement asked `lastDoc.nodes` and so was permanently false under
+// `sequence`, greying out four buttons whose edits (`SEQUENCE-SOURCE-STANDARD`-R182) already worked.
+const GENRE_NODE_COLL={block:'nodes',topology:'nodes',flowchart:'nodes',
+                       statechart:'nodes',sequence:'lifelines'};
+const docNodes=(doc)=>(doc&&doc[GENRE_NODE_COLL[doc.genre]||'nodes'])||[];
+// `SEQUENCE-SOURCE-STANDARD`-R182: the four `sequence` directives that have their own
+// parser (`message` rides the connector scanner). The set is what dispatches
+// to `parseSeqDirective`, and it is scoped by `doc.genre` at the call site so
+// `state` still reaches `statechart`'s node parser under `statechart`.
+const SEQ_KW=new Set(['lifeline','state','fragment','operand']);
+// UML 2.5.1 `InteractionOperatorKind` (§17.12.15.3), taken WHOLE — twelve
+// values, every one the standard's own single lowercase spelling, so RULE 4.2
+// admits the abbreviations `alt` `opt` `par` `neg` `seq` unchanged. The clause
+// number matters: §17.6.2 was cited for this enum in an earlier draft and is
+// registered FALSE in spec/standards-claims.tsv (S024). FigDown makes the key
+// MANDATORY where UML gives the attribute a default of `seq`
+// (`interactionOperator : InteractionOperatorKind [1..1] = seq`, §17.12.3.5) —
+// a DECLARED divergence: a default would let a fragment assert nothing while
+// looking like it asserts something, which is the `numbering=` precedent.
+const SEQ_OPERATORS_FRAG=['alt','opt','loop','par','strict','seq','critical',
+                          'neg','assert','ignore','consider','break'];
+const SEQ_FRAG_CLAUSE='UML 2.5.1 §17.12.15.3';
+// Draft §8.2/§15.4: every UML Message has a sendEvent AND a receiveEvent, so
+// a direction-less message is not a thing this domain has. `--` is a LINE
+// ERROR under `sequence` and legal in every other genre — the operator set is
+// per genre for the same reason the keywords are.
+const SEQ_OPERATORS=new Set(['->','<-','<->']);
+// Every connector spelling in the language reaches the dedicated scanner —
+// the WRONG one for the genre must get the named diagnostic, not
+// `unrecognized line` (`GENRE-CONNECTOR-SPELLING`/`GENRE-NODE-SPELLING`), so the dispatch is over the whole set.
+const CONN_LINE_RE=new RegExp('^('+[...CONNECTOR_SPELLINGS].join('|')+')(\\s|$)');
 // `KEYWORD-RENAME-SCOPE`: the flowchart rename is GATED BY THE DECLARED LANGUAGE
 // VERSION, because `GENRE-CONNECTOR-SPELLING` applied it to `figdown 0.1` and that BROKE documents
 // legal at v0.1.8 — `figdown 0.1 flowchart` + `edge` stopped parsing, with
@@ -1010,7 +1134,12 @@ const CONNECTOR_SPELLINGS=new Set(['edge','flowline','transition']);
 // forbids; two spellings across VERSIONS is ordinary language evolution, and
 // each version accepts exactly one. `statechart` needs no gate of its own —
 // the GENRE requires 0.2 (GENRES_BY_VERSION), so `state`/`transition` cannot
-// be reached from a 0.1 document at all.
+// be reached from a 0.1 document at all. `sequence` inherits that argument
+// unchanged: its genre token requires `figdown 0.4`, so
+// `lifeline`/`message` are unreachable from any earlier document and there is
+// no earlier spelling for them to have replaced. A `CONNECTOR_MIN_VERSION`
+// row for `message` would therefore gate nothing and would make the engine
+// claim a rename that never happened.
 const GENRE_CONNECTOR_KW_AT={
   '0.1':{block:'edge',topology:'edge',flowchart:'edge'},
   '0.2':GENRE_CONNECTOR_KW
@@ -1033,17 +1162,22 @@ const WORD_WHY={
   flowline:'the connecting line in a flowchart is a FLOWLINE — the term the flowchart domain commonly uses for the symbol ISO 5807 §9.3.1 names "Line"',
   transition:'the connecting line in a statechart is a TRANSITION — the term UML 2.5.1 §14 uses for it',
   node:'this genre has more kinds of thing than it has words for, so `node` is the general one',
-  state:'a statechart has exactly ONE kind of node and it is a STATE (UML 2.5.1 §14)'
+  state:'a statechart has exactly ONE kind of node and it is a STATE (UML 2.5.1 §14)',
+  // `SEQUENCE-SOURCE-STANDARD`-R182: both are WHOLE borrows from the genre's source
+  // standard, verified against the clause text rather than against a
+  // secondary description (spec/standards-claims.tsv).
+  lifeline:'a sequence figure has exactly ONE kind of participant column and it is a LIFELINE — the term UML 2.5.1 §17.3.3.1 defines and §17.3.4.1 draws',
+  message:'the line between two participants in a sequence figure is a MESSAGE — the term UML 2.5.1 §17.4.4.1 uses for its notation'
 };
 // The named diagnostic `GENRE-CONNECTOR-SPELLING`/`GENRE-NODE-SPELLING` owe: it says WHICH word this genre uses and
 // WHY, and it names the migration, because every connector line in a
 // reclassified document has to be rewritten (the cost `GENRE-CONNECTOR-SPELLING` accepted).
 const WRONG_WORD=(surf,want,genre)=>
   '"'+surf+'" is not the word genre '+genre+' uses for this — write "'+want+'": '+WORD_WHY[want]+
-  '. Each scene genre takes the term its own domain uses (block/topology `node` `edge`, flowchart `node` `flowline`, statechart `state` `transition`) — run tools/migrate-figdown.js to rewrite it (MIGRATIONS 0.2)';
+  '. Each genre takes the term its own domain uses (block/topology `node` `edge`, flowchart `node` `flowline`, statechart `state` `transition`, sequence `lifeline` `message`) — run tools/migrate-figdown.js to rewrite it (MIGRATIONS 0.2)';
 // `SCENE-KEYWORD-MEMBERSHIP`: a word WITHDRAWN FROM ONE GENRE is not an unknown word,
 // and `"threshold" is not allowed in genre topology` would send an author
-// looking for a typo. Each cell below was legal until this release and states
+// looking for a typo. Each cell below was legal until 0.3 and states
 // WHY that genre no longer declares it — the ruling's own ground, per cell,
 // because the grounds differ and a single sentence could not carry them.
 // Every one of these withdrawals was FREE: `topology`, `flowchart` and
@@ -1078,6 +1212,33 @@ const WITHDRAWN_FROM_GENRE=(kw,genre)=>
   GENRE_WITHDRAWN[genre][kw]+
   ' Subject vocabulary is per genre (core §3, `GENRE-VOCABULARY-OBLIGATION`): a spelling accepted by several genres is several '+
   'independent declarations, and this genre\'s was withdrawn without touching any other\'s.'+WITHDREW_AT;
+// `SEQUENCE-TIME-GAP`/`SEQUENCE-PARTICIPANT-GROUPING`: THE OTHER HALF OF `SCENE-KEYWORD-MEMBERSHIP` — a spelling a genre REFUSED
+// AT BIRTH. It is a SEPARATE table from `GENRE_WITHDRAWN` and not a sixth row
+// of it, because the two state different facts and only one of them is a
+// migration: a WITHDRAWAL took a word away from documents that legally used
+// it (so the message names the release and the rewrite tool), while a REFUSAL
+// means the genre never declared the word and no document can have been
+// written against it. Folding them would make the engine tell a `sequence`
+// author "it was WITHDRAWN from this genre" about a keyword this genre has
+// never had, and would date every refusal to a migration that did not happen.
+// What the two SHARE is the thing `SCENE-KEYWORD-MEMBERSHIP` was for: the author gets the GROUND,
+// and what to write instead, rather than a spellcheck.
+//
+// The refusal is FREE in the `EDGE-GEOMETRY-CONSTRUCTS` sense — `sequence` is EXPERIMENTAL and this
+// is the release that gives it a vocabulary at all, so no document loses a
+// line. Each cell states its own ruling's ground, because the grounds differ.
+const REFUSED_IN={
+  sequence:{
+    gap:'`sequence` does not declare `gap`, and the refusal is about the AXIS, not the spelling (`SEQUENCE-TIME-GAP`). UML 2.5.1 §17.3.3.1 makes the vertical axis NON-PROPORTIONAL — "The distance between two events on a time-line does not represent any literal measurement of time, only that non-zero time has passed" — so non-zero time has ALREADY passed between every adjacent pair of events in every sequence figure, by the source\'s own semantics. A `gap` line would therefore state a fact the reading rule gives everywhere, and what the author actually wants — draw more vertical space here — is a RENDERING request, which `PRESENTATION-AS-MEANING-CARRIER` keeps off the language\'s side of the line. `timing`\'s `gap` is a different construct: there the horizontal axis IS a tick count, so a break in it removes ticks that would otherwise be asserted. WRITE INSTEAD: put the elapsed time in the following message\'s label — `message c -> s "DHCPREQUEST (T1, 0.5x lease)"` — or in its `description=`. Reopens if this genre ever lands a construct that makes vertical position denote a quantity, because a discontinuity then has something to interrupt.',
+    group:'`sequence` does not declare `group` (`SEQUENCE-PARTICIPANT-GROUPING`), on three grounds. ZERO measured need: the row was admitted as Mermaid `box` parity and the genre was then re-scoped to real-figure coverage without the row being re-tested. NOTHING TO BORROW: UML clause 17 has no lifeline-grouping construct — `PartDecomposition` (§17.7.3.2) decomposes ONE lifeline into a sub-interaction, and gates and the frame bound an interaction rather than a subset of its lifelines. And the GEOMETRY IS ALREADY TAKEN: `band` = membership is locked into the scene genres (the band contains every member and nothing else, core §2.6), while a `group` here would span min..max COLUMNS with no contiguity rule, so a band over two non-adjacent lifelines silently encloses a third that is not a member — one word carrying two different geometric promises, which `GENRE-VOCABULARY-OBLIGATION` forbids opening without evidence. WRITE INSTEAD: `class` naming what the participants have in common, plus `class=` on each `lifeline` — it earns a legend entry and asserts membership without asserting adjacency. Reopens on a count of real figures whose lifelines are drawn in labelled bands, and the re-proposal owes a contiguity check either way.'
+  }
+};
+const REFUSED_AT=' (refused; MIGRATIONS 0.4)';
+const REFUSED_IN_GENRE=(kw,genre)=>
+  '"'+kw+'" is not allowed in genre '+genre+' — this genre REFUSED it, it is not a typo and not a withdrawal: '+
+  REFUSED_IN[genre][kw]+
+  ' Subject vocabulary is per genre (core §3, `GENRE-VOCABULARY-OBLIGATION`), so a spelling another genre declares is that genre\'s '+
+  'declaration and never this one\'s.'+REFUSED_AT;
 // `MEMBERSHIP-KEY-ACCEPTANCE`: THE OPTION-KEY HALF OF `SCENE-KEYWORD-MEMBERSHIP`. A per-genre withdrawal can
 // strand an option KEY as easily as it strands a keyword: `in=` states
 // membership and its ONLY value domain is the id of a containing `group`, so
@@ -1113,6 +1274,25 @@ const WITHDRAWN_OPT_FROM_GENRE=(key,genre)=>
   ' An option key is per genre for the same reason a keyword is (core §3, `GENRE-VOCABULARY-OBLIGATION`): the key is accepted '+
   'by the directive AND by the genre, and this genre\'s acceptance was withdrawn without touching any other\'s.'+
   WITHDREW_OPT_AT;
+// `UNDELIVERED-MESSAGE-MARKING`: the OPTION-KEY half of the refusal table, and the one
+// place in this engine where a diagnostic fires for a key that is NOT in
+// `OPT_KEYS`. That is deliberate and is the ruling's headline: `lost=` was
+// proposed and REFUSED, so registering the spelling to get a named message
+// would put the key in the language's closed option registry — the exact
+// thing the ruling declines — and a reader counting `OPT_KEYS` would find a
+// key no directive accepts. So the refusal rides the UNKNOWN-OPTION path
+// instead: `badOpts` and the connector scanner both consult this table before
+// they say `unknown option`, which costs one lookup and adds no surface.
+const REFUSED_OPT_IN={
+  sequence:{
+    lost:'`sequence` does not accept `lost=`; it was proposed and REFUSED (`UNDELIVERED-MESSAGE-MARKING`), and NO option key was added to the language for this genre. The model it wanted is not UML\'s: UML 2.5.1 §17.4.3.1\'s lost Message is one whose "destination ... is outside the scope of the description" — the recipient is NOT MODELLED — while the proposed key meant the recipient is modelled, named and drawn AND DELIVERY FAILED, which is ITU-T Z.120 §4.3\'s model ("a message is sent but not consumed") under UML\'s spelling. Carrying one standard\'s word with another standard\'s meaning is the cross-source mix RULE 4.1 calls a last resort, and it was undeclared. WRITE INSTEAD: declare the meaning once and reference it — `class dropped "Sent, never delivered"` then `message c -> s "DHCPREQUEST" class=dropped description="renewal unicast never reaches the issuing server"`. The class carries the fact and earns a legend entry; `description=` carries the per-message reason. The NEED stays on the record: reopens on a measured rate of readers taking a dropped message for a delivered one, at 22%, and any re-proposal must be grounded on Z.120 §4.3 rather than on UML §17.4.3.1.'
+  }
+};
+const REFUSED_OPT_IN_GENRE=(key,genre)=>
+  key+'= is not allowed in genre '+genre+' — this genre REFUSED the key, it is not a typo and not a withdrawal: '+
+  REFUSED_OPT_IN[genre][key]+
+  ' The spelling is not in the language\'s option registry at all, so no other genre accepts it either.'+
+  REFUSED_AT;
 const GENRE_KW={
   block:new Set(SCENE_HOST_KW.concat(BLOCK_SUBJECT_KW, ['node','edge'])),
   topology:new Set(SCENE_HOST_KW.concat(TOPOLOGY_SUBJECT_KW, ['node','edge'])),
@@ -1131,7 +1311,28 @@ const GENRE_KW={
   bitfield:new Set(GENRE_FREE_KW.concat(['class','bitfield'])),
   // chart is experimental and attaches to a table id in the same document
   table:new Set(GENRE_FREE_KW.concat(['class','table','chart'])),
-  timing:new Set(GENRE_FREE_KW.concat(['class','timing']))
+  timing:new Set(GENRE_FREE_KW.concat(['class','timing'])),
+  // `SEQUENCE-SOURCE-STANDARD`-R182: `sequence` gets its row, and the row is what
+  // closes the Batch-1 finding that the genre "states a reading and constrains
+  // nothing". It is NOT built on `SCENE_HOST_KW`, and the three absences are
+  // each a decision rather than an oversight:
+  //  - `flow` and `rank` are REFUSED. A sequence figure's two axes are BOTH
+  //    declaration-ordered — lifelines left-to-right in declaration order,
+  //    occurrences top-to-bottom in declaration order (draft §7) — so a key
+  //    that reverses or re-ranks a drawing would make the picture disagree
+  //    with the source, which `DECLARATION-ORDER-SEMANTICS` forbids. There is nothing for them to set.
+  //  - `group` is REFUSED (`SEQUENCE-PARTICIPANT-GROUPING`, `REFUSED_IN` above).
+  //  - the REGION openers `bitfield`/`table`/`timing`/`chart` are absent
+  //    because this genre has no scene to compose them into: `GENRE-COMPOSITION` composition
+  //    stacks a region OUTSIDE the scene, and a ladder has no outside yet.
+  //    They are absent, not refused — a `sequence` document that wanted a
+  //    register layout beside its exchange is a real want with no ruling, and
+  //    it stays an open question rather than a silent no.
+  // What is left is the genre-free core, `class`, this genre's two spellings
+  // and its three subject words — nine top-level keywords, and that is the
+  // whole of what a `figdown 0.4 sequence` document may write.
+  sequence:new Set(GENRE_FREE_KW.concat(['class'], SEQUENCE_SUBJECT_KW,
+                                        ['lifeline','message']))
 };
 const CHILD_KW=new Set(['field','break','cell','width','signal','gap']);
 
@@ -1155,6 +1356,59 @@ function splitFigdownSections(text){
   return secs;
 }
 
+// `SEQUENCE-SOURCE-STANDARD`-R182: the `sequence` genre's DERIVED reading, in one
+// function so the parser's checks and (from a later increment) the renderer
+// cannot disagree about what a document says.
+//
+// Two things are derived and nothing else is:
+//   ROWS  — the figure's total order. `messages` and `states` are the two
+//           collections that carry an occurrence; each element records the
+//           source `line` it was written on, and sorting the union of the two
+//           on that number IS the order (draft §31: declaration order, and
+//           the order is TOTAL — a declared divergence from UML's partial
+//           order, taken so a reader never has to compute one).
+//   CHAIN — the containment tree from `in=`. A fragment or an operand may
+//           name a fragment or an operand, so the chain alternates in
+//           practice but the walk does not assume it.
+// EXTENT is the span of row slots a container owns, transitively: an occurrence
+// inside an operand is inside that operand's fragment too. `cycles` names any
+// container that reaches itself, so a caller can refuse to read a tree that is
+// not one instead of walking it to a guard.
+function seqModel(doc){
+  const rows=[];
+  for(const m of doc.messages||[]) rows.push({kind:'message',el:m,line:m.line});
+  for(const s of doc.states||[])   rows.push({kind:'state',  el:s,line:s.line});
+  rows.sort((a,b)=>a.line-b.line);
+  rows.forEach((r,i)=>{ r.slot=i; });
+  const cont={};
+  for(const f of doc.fragments||[]) cont[f.id]={kind:'fragment',el:f,parent:f['in']||null};
+  for(const o of doc.operands||[])  cont[o.id]={kind:'operand', el:o,parent:o['in']||null};
+  const cycles=[];
+  const chain=(id)=>{
+    const out=[], seen=new Set();
+    let c=id;
+    while(c && cont[c]){
+      if(seen.has(c)) break;
+      seen.add(c); out.push(c); c=cont[c].parent;
+    }
+    return out;
+  };
+  for(const id in cont){
+    const seen=new Set(); let c=cont[id].parent;
+    while(c && cont[c] && !seen.has(c)){ if(c===id){ cycles.push(id); break; } seen.add(c); c=cont[c].parent; }
+  }
+  const owned={}; for(const id in cont) owned[id]=[];
+  for(const r of rows){
+    const inId=r.el['in']||null;
+    r.chain=inId?chain(inId):[];
+    for(const id of r.chain) if(owned[id]) owned[id].push(r.slot);
+  }
+  const extent={};
+  for(const id in cont)
+    extent[id]=owned[id].length?{lo:Math.min(...owned[id]),hi:Math.max(...owned[id])}:null;
+  return {rows,cont,owned,extent,chain,cycles};
+}
+
 // parse(text) -> {doc, errs, docs}
 // Single-section: docs=[doc] (backward-compatible doc/errs).
 // Multi-section: one doc per figdown header; errs use full-file line numbers;
@@ -1175,6 +1429,11 @@ function parse(text){
   const docs=[]; const errs=[];
   for(const sec of secs){
     const r=parseOne(sec.text);
+    // A section's element `.line` values are section-local, and a GEOMETRY-time
+    // error (one only `render` can raise) is built long after this loop has
+    // finished re-basing the parse messages. Record the offset on the doc so
+    // that error can quote the same full-file line the author is looking at.
+    r.doc.lineOffset=sec.startLine-1;
     for(const e of r.errs){
       const m=/^Line (\d+): (.*)$/.exec(e);
       if(m) errs.push('Line '+(+m[1]+sec.startLine-1)+': '+m[2]);
@@ -1195,7 +1454,27 @@ function parseOne(text){
   // a distinction the model must keep.
   const doc={title:null,note:null,nodes:[],groups:[],edges:[],planes:[{id:'base',label:null,z:0}],
              flow:'right',ranks:[],pins:{},blocks:[],trunks:[],thresholds:[],bands:[],
-             classes:[],boundaries:[]};
+             classes:[],boundaries:[],
+             // `SEQUENCE-SOURCE-STANDARD`-R182: the `sequence` model. FIVE collections,
+             // one per keyword, and they are separate arrays rather than
+             // aliases of `nodes`/`edges` because a message is not an edge: an
+             // edge is a relation between two nodes and has no position, while
+             // a message is an OCCURRENCE with a place in a total order (draft
+             // §31 — order is declaration order and it is TOTAL). Folding them
+             // into `nodes`/`edges` would let the scene renderer reach them
+             // and would put a time-ordered thing in a collection whose model
+             // says order is not meaning.
+             //
+             // The ORDER of `messages`, `states` and the containment they
+             // declare is recovered from the `line` each element carries: the
+             // parser appends in source order, so each array is already
+             // ordered and the union of `messages` and `states` sorted on
+             // `line` is the figure's trace. Nothing else records time.
+             //
+             // These stay EMPTY in every non-`sequence` document, and the
+             // canonical JSON binding omits an empty one (the `externals`
+             // rule), so no existing golden moves a byte.
+             lifelines:[],messages:[],states:[],fragments:[],operands:[]};
   const nodeIds=new Set(), groupIds=new Set(), planeIds=new Set(['base']), classIds=new Set(),
         bundleIds=new Set(), boundaryIds=new Set(), blockIds=new Set();
   // §1: "IDs are ... unique per document" — nodes, groups, boundaries AND the
@@ -1318,17 +1597,40 @@ function parseOne(text){
     if(idHere()){ err(n,ID_RULE); return; }
     const tk2=tokenize(s.slice(i).trim());
     if(tk2.error){ err(n,tk2.error); return; }
-    const {pos:p2,opts:o2,optT:oT2,unk:u2,dup:d2}=splitOpts(tk2.toks);
+    const {pos:p2,posq:pq2,opts:o2,optT:oT2,unk:u2,dup:d2}=splitOpts(tk2.toks);
     if(d2){ err(n,'duplicate option "'+d2+'=" on one line'); return; }
-    if(u2.length){ err(n,'unknown option "'+u2[0]+'="'); return; }
-    if(p2.length){ err(n,'unexpected argument "'+p2[0]+'"'); return; }
+    // `UNDELIVERED-MESSAGE-MARKING`: the connector's copy of the genre REFUSAL check for
+    // an option key the language does not register. It sits on the
+    // unknown-option path because `lost=` is not in `OPT_KEYS` — see
+    // `REFUSED_OPT_IN` — and it must be here as well as in `badOpts` because
+    // `message` is scanned by this function and never reaches that one.
+    if(u2.length){
+      const ro=(doc.genre&&REFUSED_OPT_IN[doc.genre])||null;
+      if(ro && ro[u2[0]]!==undefined) err(n,REFUSED_OPT_IN_GENRE(u2[0],doc.genre));
+      else err(n,'unknown option "'+u2[0]+'="');
+      return; }
+    // `SEQUENCE-SOURCE-STANDARD`-R182: `message` adds ONE trailing positional — the
+    // quoted message label — to the connector grammar, because that is where
+    // every sequence source in the corpus writes it and the `[mid]` form
+    // reads as an annotation rather than as the message itself. Every other
+    // connector spelling keeps the grammar unchanged, so the surplus-argument
+    // error is still the right answer for them.
+    let seqLabel=null;
+    if(kw==='message'){
+      if(p2.length>1){ err(n,'unexpected argument "'+p2[1]+'"'); return; }
+      if(p2.length===1){
+        if(!pq2[0]){ err(n,'message label must be quoted: message '+a+' '+op+' '+b+' "'+p2[0]+'" — '+Q_WHY); return; }
+        if(mid!==null){ err(n,'message has two labels — the inline -['+mid+']-> mid-label and the trailing "'+p2[0]+'". Write one'); return; }
+        seqLabel=p2[0];
+      }
+    } else if(p2.length){ err(n,'unexpected argument "'+p2[0]+'"'); return; }
     // 0.1: `edge` has its own scanner, so the language-wide retired
     // keys need their own check here or `edge` would be the one directive
     // that reports the generic message for a retired spelling.
     for(const rk in RETIRED_OPT_KEYS)
       if(o2[rk]!==undefined){ err(n,RETIRED_OPT_KEYS[rk]); return; }
     for(const k in o2)
-      if(!DIRECTIVE_OPTS[kw].includes(k)){ err(n,kw+' does not take '+k+'='); return; }
+      if(!directiveOpts(kw,doc.genre).includes(k)){ err(n,kw+' does not take '+k+'='); return; }
     for(const k of ['label','taillabel','headlabel'])
       if(o2[k]!==undefined){ err(n,k+'= is retired — write the label inline: '+kw+' A [tail] -[mid]-> [head] B (MIGRATIONS 0.1)'); return; }
     if(o2.fill!==undefined){ err(n,FILL_NO_INTERIOR(kw)); return; }
@@ -1366,12 +1668,132 @@ function parseOne(text){
       if(!pc.ok){ err(n,pc.err); return; }
       ecls=pc.ids;
     }
+    // `SEQUENCE-SOURCE-STANDARD`-R182: the `sequence` fork. It is the SAME scanner with
+    // a different reading, and the model it writes is a different collection:
+    // a message is an OCCURRENCE with a place in the figure's total order
+    // (draft §31), an edge is a relation with no position at all.
+    if(kw==='message'){
+      // Draft §8.2/§15.4. `--` parses everywhere else and is a line error
+      // here, so the check is at the fork rather than in the operator scanner.
+      if(!SEQ_OPERATORS.has(op)){
+        err(n,'message needs a direction: -> <- <-> — a Message has a sending event occurrence AND a receiving event occurrence (UML 2.5.1 §17.4.3.1 defines the LOST case as the one where the receiving occurrence is absent), so a message with unstated direction is not a thing this genre has. "--" is a line error under sequence; for a sustained two-way exchange whose individual messages are not enumerated write <->');
+        return; }
+      if(o2['in']!==undefined){
+        const e=idErr(o2['in'], optHasQ(oT2,'in'), null);
+        if(e){ err(n,e); return; }
+      }
+      if(o2.description!==undefined && !optQ(oT2,'description')){
+        err(n,'description= must be quoted: description="'+o2.description+'" — '+Q_WHY); return; }
+      // ONE label field, fed by either spelling. The shared scanner also
+      // accepts the inline `-[mid]->` form, and the check above makes writing
+      // both a line error, so the model can never hold two — but the model
+      // must not hold the same text under two keys either, so `mid` is NOT
+      // projected beside `label` here the way it is on an edge. That the two
+      // spellings both reach this field at all is an ALIAS in `IDENTITY-ASSERTION`'s sense
+      // and is a FINDING for the genre document (Batch 5) rather than a
+      // ruling taken here: the draft settles the trailing form and says
+      // nothing about the brackets. `[tail]` and `[head]` are kept — they are
+      // different positions, not a second spelling of the same one.
+      doc.messages.push({a,b,op,tail,head,
+                         label:seqLabel!==null?seqLabel:mid,
+                         style:o2.style,cls:ecls,stroke:o2.stroke,note:o2.note,
+                         desc:o2.description,in:o2['in']||null,line:n});
+      return;
+    }
     // §5 on an edge: the line IS a stroke and has no interior, so `stroke=`
     // and `fill=` name the same channel (`stroke=` wins when both are
     // written); `text=` colours the [tail]/[mid]/[head] labels.
     doc.edges.push({a,b,op,tail,mid,head,style:o2.style,cls:ecls,
                     stroke:o2.stroke,note:o2.note,
                     plane:o2.plane||'base',line:n});
+  }
+
+  // `SEQUENCE-SOURCE-STANDARD`-R182: the four `sequence` directives that are not the
+  // connector. Reached only from the `doc.genre==='sequence'` dispatch, so
+  // `state` under `statechart` never arrives here. Every option-VALUE check
+  // (colours, `style=` enum, `class=` list, `in=` id spelling, `note=` and
+  // `description=` quoting, `type=`'s bare-value rule) has already run in
+  // `badOpts`; what is left is arity, mandatory arguments, and this genre's
+  // own enum.
+  const seqCls=(opts,optT)=>opts['class']!==undefined
+    ? parseClassList(opts['class'],optList(optT,'class')).ids : undefined;
+  function parseSeqDirective(kw,n,pos,posq,opts,optT){
+    if(kw==='lifeline'){
+      // `lifeline <id> ["label"]` — the participant column. It DECLARES an id
+      // and joins the document-wide id namespace, so a lifeline cannot share
+      // a spelling with a fragment or an operand.
+      const id=pos[1];
+      const e=idErr(id,!!posq[1],'lifeline needs <id> ["label"]');
+      if(e){ err(n,e); return; }
+      if(dupId(id)||doc.lifelines.some(l=>l.id===id)){ err(n,'duplicate id "'+id+'"'); return; }
+      if(BLK_LBL(n,'lifeline',id,pos,posq)) return;
+      if(pos[3]!==undefined){ err(n,'unexpected argument "'+pos[3]+'"'); return; }
+      nodeIds.add(id);
+      doc.lifelines.push({id,label:pos[2]!==undefined?pos[2]:null,in:opts['in']||null,
+                          cls:seqCls(opts,optT),fill:opts.fill,stroke:opts.stroke,
+                          style:opts.style,note:opts.note,desc:opts.description,line:n});
+      return;
+    }
+    if(kw==='state'){
+      // `state <lifeline-id> "<state name>"` — a StateInvariant (UML 2.5.1
+      // §17.12.25). Slot 1 REFERENCES a lifeline; it does NOT declare an id,
+      // because nothing in this genre refers to a state occurrence. That is
+      // the asymmetry with `statechart`'s `state`, where slot 1 declares
+      // (draft §29, Q5), and it is why the two share a spelling and nothing
+      // else. Slot 2 is MANDATORY: a state occurrence with no name asserts
+      // nothing at all.
+      const ref=pos[1];
+      const e=idErr(ref,!!posq[1],'state needs <lifeline-id> "<state name>"');
+      if(e){ err(n,e); return; }
+      if(pos[2]===undefined){ err(n,'state needs a quoted state name: state '+ref+' "LISTEN" — under sequence a state occurrence names the lifeline it is ON and the state it is IN, and a state with no name asserts nothing'); return; }
+      if(!posq[2]){ err(n,'state name must be quoted: state '+ref+' "'+pos[2]+'" — '+Q_WHY); return; }
+      if(pos[3]!==undefined){ err(n,'unexpected argument "'+pos[3]+'"'); return; }
+      doc.states.push({ref,name:pos[2],in:opts['in']||null,
+                       cls:seqCls(opts,optT),fill:opts.fill,stroke:opts.stroke,
+                       style:opts.style,note:opts.note,desc:opts.description,line:n});
+      return;
+    }
+    if(kw==='fragment'){
+      // `fragment <id> ["label"] type=<operator>` — a CombinedFragment
+      // (§17.12.3). `type=` is MANDATORY where UML defaults it to `seq`: a
+      // fragment with no interaction operator draws a box that asserts
+      // nothing, and a default would make the box look like an assertion.
+      const id=pos[1];
+      const e=idErr(id,!!posq[1],'fragment needs <id> ["label"] type=<operator>');
+      if(e){ err(n,e); return; }
+      if(dupId(id)||doc.fragments.some(f=>f.id===id)||doc.operands.some(o=>o.id===id)){
+        err(n,'duplicate id "'+id+'"'); return; }
+      if(BLK_LBL(n,'fragment',id,pos,posq)) return;
+      if(pos[3]!==undefined){ err(n,'unexpected argument "'+pos[3]+'"'); return; }
+      if(opts.type===undefined){
+        err(n,'fragment needs type=<operator> — a fragment with no interaction operator asserts nothing ('+
+              SEQ_OPERATORS_FRAG.join('|')+', '+SEQ_FRAG_CLAUSE+'). UML defaults the attribute to seq and FigDown does not: a default would draw a frame that looks like an assertion and is not one'); return; }
+      if(!SEQ_OPERATORS_FRAG.includes(opts.type)){
+        err(n,'unknown interaction operator "'+opts.type+'" — write one of '+
+              SEQ_OPERATORS_FRAG.join('|')+' ('+SEQ_FRAG_CLAUSE+' InteractionOperatorKind, taken whole)'); return; }
+      doc.fragments.push({id,label:pos[2]!==undefined?pos[2]:null,type:opts.type,
+                          in:opts['in']||null,cls:seqCls(opts,optT),stroke:opts.stroke,
+                          style:opts.style,note:opts.note,desc:opts.description,line:n});
+      return;
+    }
+    if(kw==='operand'){
+      // `operand <id> ["guard"] in=<fragment-id>` — an InteractionOperand
+      // (§17.12.14). `in=` is MANDATORY: an operand is a COMPARTMENT OF a
+      // fragment and has no meaning apart from one.
+      const id=pos[1];
+      const e=idErr(id,!!posq[1],'operand needs <id> ["guard"] in=<fragment-id>');
+      if(e){ err(n,e); return; }
+      if(dupId(id)||doc.fragments.some(f=>f.id===id)||doc.operands.some(o=>o.id===id)){
+        err(n,'duplicate id "'+id+'"'); return; }
+      if(BLK_LBL(n,'operand',id,pos,posq)) return;
+      if(pos[3]!==undefined){ err(n,'unexpected argument "'+pos[3]+'"'); return; }
+      if(opts['in']===undefined){
+        err(n,'operand needs in=<fragment-id> — an operand is a compartment OF a fragment and has no meaning apart from one (UML 2.5.1 §17.12.14)'); return; }
+      doc.operands.push({id,label:pos[2]!==undefined?pos[2]:null,in:opts['in'],
+                         cls:seqCls(opts,optT),stroke:opts.stroke,style:opts.style,
+                         note:opts.note,desc:opts.description,line:n});
+      return;
+    }
   }
 
   for(let li=0; li<lines.length; li++){
@@ -1448,7 +1870,11 @@ function parseOne(text){
     // the dispatch cannot be narrowed to the genre's own word — a `flowline`
     // under `block` would then fall through to `unrecognized line`, which is
     // exactly the answer these rulings owe an author better than.
-    const mConn=/^(edge|flowline|transition)(\s|$)/.exec(raw.trim());
+    // `SEQUENCE-SOURCE-STANDARD`-R182: `message` is the FOURTH spelling scanned here,
+    // and it is derived from `CONNECTOR_SPELLINGS` rather than spelled again,
+    // so a fifth genre's connector reaches the named diagnostic by joining
+    // that set and not by remembering to edit a regex.
+    const mConn=CONN_LINE_RE.exec(raw.trim());
     if(mConn){
       const ckw=mConn[1];
       if(firstContent){ firstContent=false; err(n,'first line must be "figdown 0.1 <genre>"'); }
@@ -1490,12 +1916,25 @@ function parseOne(text){
     // Directives not in DIRECTIVE_OPTS (title's single quoted string, unknown
     // keywords) are handled by their own paths.
     const badOpts=(k)=>{
-      const allowed=DIRECTIVE_OPTS[k];
+      // `SEQUENCE-SOURCE-STANDARD`-R182: the row is read GENRE-FIRST. `state` is one
+      // spelling with two declarations and two option sets (`GENRE-VOCABULARY-OBLIGATION`), and
+      // `GENRE_DIRECTIVE_OPTS` is the only place that fact is recorded.
+      const allowed=directiveOpts(k,doc.genre);
       if(!allowed) return false;
       let bad=false;
       // same-line repeated option key (last-wins was silent data loss)
       if(dup){ err(n,'duplicate option "'+dup+'=" on one line'); bad=true; }
-      for(const u of unk){ err(n,'unknown option "'+u+'="'); bad=true; }
+      // `UNDELIVERED-MESSAGE-MARKING`: a genre REFUSAL of a key the language never
+      // registered is answered here, on the unknown-option path, because that
+      // is the only path it can reach: `lost=` is deliberately absent from
+      // `OPT_KEYS` (the ruling adds no option key), so `splitOpts` reports it
+      // as unknown. Checked BEFORE the generic message so the author gets the
+      // ground and the replacement spelling instead of a spellcheck.
+      const roOpt=(doc.genre&&REFUSED_OPT_IN[doc.genre])||null;
+      for(const u of unk){
+        if(roOpt && roOpt[u]!==undefined) err(n,REFUSED_OPT_IN_GENRE(u,doc.genre));
+        else err(n,'unknown option "'+u+'="');
+        bad=true; }
       // `MEMBERSHIP-KEY-ACCEPTANCE`: the PER-GENRE option-key withdrawal, checked here —
       // after `unknown option`, so a key the LANGUAGE does not have keeps its
       // own answer, and before every value check, so a withdrawn key is never
@@ -1990,6 +2429,19 @@ function parseOne(text){
     // Dynamic-profile reserved words keep their dedicated message (before `GENRE-KEYWORD-ALLOWLIST`).
     if(kw==='page'||kw==='set'||kw==='pulse'){
       err(n,'"'+kw+'" is reserved for the dynamic profile (not in v0.1)'); continue; }
+    // `SEQUENCE-TIME-GAP`: a genre REFUSAL is consulted BEFORE the typed-block
+    // child exemption below, because `gap` is BOTH — `timing`'s child keyword
+    // and the one spelling `sequence` refused that is also a child word. Left
+    // in the old order, `gap "T1 fires"` in a sequence document answered
+    // `"gap" is a typed-block child — it needs a bitfield/table/timing block
+    // above it`, which is TRUE OF THE LANGUAGE and says nothing about the
+    // ruling the author has actually run into. This clause fires only for a
+    // spelling that is a child keyword AND refused by this genre, so no other
+    // genre's answer moves; every other refused or withdrawn word reaches its
+    // own message through the ordinary chain below.
+    if(sawHeader && doc.genre && CHILD_KW.has(kw) &&
+       REFUSED_IN[doc.genre] && REFUSED_IN[doc.genre][kw]){
+      err(n, REFUSED_IN_GENRE(kw, doc.genre)); continue; }
     // `GENRE-KEYWORD-ALLOWLIST`: after closing a typed region, top-level keywords
     // must be in the header genre allowlist. Child keywords still use the
     // "needs a bitfield/table/timing above" path when they appear with no cur.
@@ -2007,6 +2459,11 @@ function parseOne(text){
       // needs the ground, not a spellcheck.
       else if(GENRE_WITHDRAWN[doc.genre] && GENRE_WITHDRAWN[doc.genre][kw])
         err(n, WITHDRAWN_FROM_GENRE(kw, doc.genre));
+      // `SEQUENCE-TIME-GAP`/`SEQUENCE-PARTICIPANT-GROUPING`: and one step further again. A word this genre
+      // REFUSED is not an unknown word either, and it is not a withdrawal —
+      // the author needs the ruling's ground and the spelling that works.
+      else if(REFUSED_IN[doc.genre] && REFUSED_IN[doc.genre][kw])
+        err(n, REFUSED_IN_GENRE(kw, doc.genre));
       else
         err(n,'"'+kw+'" is not allowed in genre '+doc.genre);
       continue;
@@ -2018,6 +2475,13 @@ function parseOne(text){
       err(n,'"'+kw+'" is a semantic directive — it must appear before the layout zone (`CONTENT-LAYOUT-ZONE-SPLIT`)');
       continue;
     }
+
+    // `SEQUENCE-SOURCE-STANDARD`-R182: the `sequence` genre's four own directives.
+    // Dispatched BEFORE the switch and scoped by `doc.genre`, which is what
+    // keeps `state` reaching `statechart`'s node parser under `statechart` —
+    // `GENRE-VOCABULARY-OBLIGATION` in the dispatcher, not only in the allowlist.
+    if(doc.genre==='sequence' && SEQ_KW.has(kw)){
+      parseSeqDirective(kw,n,pos,posq,opts,optT); continue; }
 
     switch(kw){
       case 'title': {
@@ -2520,6 +2984,117 @@ function parseOne(text){
     else if(groupIds.has(e.b)) errs.push('Line '+e.line+': edge endpoint "'+e.b+'" is a group — connect to a member node (group edges are not in v0.1)');
     if(e.plane && !planeIds.has(e.plane)) errs.push('Line '+e.line+': unknown plane "'+e.plane+'"');
   }
+  // ── `SEQUENCE-SOURCE-STANDARD`-R182: the `sequence` genre's semantic checks ────────
+  // Everything here needs the WHOLE document, so none of it can live in
+  // `parseSeqDirective`: forward references are legal (fixture 021 pins that
+  // for the scene genres and the rule is language-wide), so an id can only be
+  // resolved once every declaration has been read.
+  if(doc.genre==='sequence'){
+    const llIds=new Set(doc.lifelines.map(l=>l.id));
+    const fragIds=new Set(doc.fragments.map(f=>f.id));
+    const opIds=new Set(doc.operands.map(o=>o.id));
+    // The `in=` OBJECT rule (`SEQUENCE-CONTAINMENT-SCOPE`), in one place because it is one rule: on
+    // all five acceptors `in=` is sense 1 — *the element this one lives
+    // inside* — and its value domain is a `fragment` or an `operand` id and
+    // nothing else. The message names the domain AND the acceptor list,
+    // because an author who wrote a lifeline id there has the relation right
+    // and the object wrong, and needs to be told which.
+    const IN_ACCEPTORS='message, operand, lifeline, state and fragment';
+    const inErr=(line,val,what)=>{
+      if(fragIds.has(val)||opIds.has(val)) return;
+      errs.push('Line '+line+': unknown fragment or operand "'+val+'" — in= on a '+what+
+        ' names the fragment or operand this '+what+' occurs inside'+
+        (llIds.has(val)?', and "'+val+'" is a LIFELINE. A message already names its lifelines through its two endpoints; a state names its lifeline in slot 1. in= is containment, not participation':'')+
+        '. Under sequence in= is accepted on '+IN_ACCEPTORS+' — five acceptors, all sense 1 (UML 2.5.1 §17.12.13: a StateInvariant and a CombinedFragment are both InteractionFragments, so an InteractionOperand contains them both) — and its value is always a fragment or an operand id (draft §33.7)');
+    };
+    for(const l of doc.lifelines) if(l['in']) inErr(l.line,l['in'],'lifeline');
+    for(const m of doc.messages){
+      if(!llIds.has(m.a)) errs.push('Line '+m.line+': unknown lifeline "'+m.a+'"');
+      if(!llIds.has(m.b)) errs.push('Line '+m.line+': unknown lifeline "'+m.b+'"');
+      if(m['in']) inErr(m.line,m['in'],'message');
+    }
+    for(const st of doc.states){
+      if(!llIds.has(st.ref)) errs.push('Line '+st.line+': unknown lifeline "'+st.ref+'" — state slot 1 REFERENCES a lifeline (it does not declare one: nothing in this genre refers to a state occurrence, so it takes no id of its own)');
+      if(st['in']) inErr(st.line,st['in'],'state');
+    }
+    for(const f of doc.fragments) if(f['in']) inErr(f.line,f['in'],'fragment');
+    // An operand's `in=` is MANDATORY and its object is narrower than the
+    // general rule: a compartment belongs to a FRAGMENT, never to another
+    // compartment, so an operand id there is a specific mistake with a
+    // specific answer.
+    for(const o of doc.operands)
+      if(!fragIds.has(o['in']))
+        errs.push('Line '+o.line+': unknown fragment "'+o['in']+'" — operand in= names a FRAGMENT'+
+          (opIds.has(o['in'])?', not another operand: an operand is a compartment of a fragment, and a compartment has no compartments of its own (UML 2.5.1 §17.12.3: a CombinedFragment owns its operands)'
+           :llIds.has(o['in'])?', not a lifeline: an operand is a compartment of a fragment, and a fragment spans lifelines rather than belonging to one'
+           :''));
+    // Two CONSECUTIVE `state` lines naming the same lifeline and the same
+    // state name are a line error (draft §23.2). A state that has not changed
+    // is never restated, so a genuine duplicate is always a mistake — and
+    // because a transition is DERIVED from an adjacent pair, a reader
+    // "tidying duplicates" could otherwise silently delete a fact.
+    const lastState={};
+    for(const st of doc.states.slice().sort((a,b)=>a.line-b.line)){
+      if(lastState[st.ref]===st.name)
+        errs.push('Line '+st.line+': lifeline "'+st.ref+'" is already in state "'+st.name+
+          '" — a state that has not changed is never restated, and a transition is derived from the adjacent pair, so a restatement would assert a transition that did not happen (draft §23.2)');
+      lastState[st.ref]=st.name;
+    }
+    const SM=seqModel(doc);
+    // A containment CYCLE is checked before anything that walks the chain, or
+    // the walk terminates on a guard and every downstream answer is arbitrary.
+    for(const id of SM.cycles)
+      errs.push('Line '+SM.cont[id].el.line+': '+SM.cont[id].kind+' "'+id+
+        '" is inside itself — in= containment is a tree, and a cycle denotes nothing at all');
+    if(!SM.cycles.length){
+      // THE ONE-LEVEL NESTING CAP (`SEQUENCE-CONTAINMENT-SCOPE`). A fragment may sit inside an
+      // operand of ONE enclosing fragment and no deeper. The cap is taken on
+      // the v0.1 `group` precedent — "one level is the whole of v0.1's
+      // containment" (core §2.2, and the diagnostic `group does not take
+      // in=`) — and it is a SCOPE decision, not a principle: a second level
+      // lands on measured need, the same evidence any other cell needs.
+      for(const f of doc.fragments){
+        const anc=SM.chain(f['in']).filter(id=>SM.cont[id].kind==='fragment');
+        if(anc.length>1)
+          errs.push('Line '+f.line+': fragment "'+f.id+'" nests '+anc.length+
+            ' levels deep (inside "'+anc[0]+'", inside "'+anc[anc.length-1]+'") — fragment nesting is capped at ONE level in v1: a fragment may sit in an operand of one enclosing fragment and no deeper. This is the v0.1 `group` precedent, where one level is the whole of the language\'s containment, and it is a scope decision rather than a principle — a second level lands on measured need (draft §33.7). Write the inner interaction as a sibling fragment, or state it in description=');
+      }
+      // CONTIGUITY (draft §28.1). A fragment's or operand's members must be a
+      // CONTIGUOUS run in declaration order, and the reason is the MODEL and
+      // not the drawing: an operand denotes the ORDERED RUN of the
+      // occurrences it contains, so an occurrence that is not in it cannot
+      // happen between two that are. Non-contiguous membership denotes
+      // nothing (UML 2.5.1 §17.6).
+      // One offending row is reported ONCE, against the DEEPEST container it
+      // splits. A row inside an operand's span is inside that operand's
+      // fragment too, so an un-deduplicated pass reports the same line twice
+      // and the outer report's advice is wrong: writing `in=<fragment>` would
+      // repair the fragment and leave the operand split. The deepest
+      // container is the one whose `in=` actually fixes the document.
+      const split=new Map();                      // row slot -> container id
+      for(const id in SM.cont){
+        const e=SM.extent[id];
+        const kind=SM.cont[id].kind, aKind=(kind==='operand'?'an ':'a ')+kind;
+        if(!e){
+          errs.push('Line '+SM.cont[id].el.line+': '+kind+' "'+id+
+            '" has no members — '+aKind+"'s extent is the span of the lines carrying in="+id+
+            ', and a container with no extent asserts nothing');
+          continue; }
+        const own=new Set(SM.owned[id]);
+        for(let s=e.lo;s<=e.hi;s++){
+          if(own.has(s)) continue;
+          const prev=split.get(s);
+          if(prev===undefined || SM.chain(id).length>SM.chain(prev).length) split.set(s,id);
+          break;
+        }
+      }
+      for(const [s,id] of [...split.entries()].sort((a,b)=>a[0]-b[0])){
+        const r=SM.rows[s], e=SM.extent[id];
+        errs.push('Line '+r.line+': this '+r.kind+' line splits '+SM.cont[id].kind+' "'+id+
+          '" (lines '+SM.rows[e.lo].line+'–'+SM.rows[e.hi].line+') — members must be CONTIGUOUS in declaration order. An operand denotes the ordered run of the occurrences it contains, so an occurrence that is not in it cannot happen between two that are (UML 2.5.1 §17.6; draft §28.1). Write in='+id+' on it, or move it outside the run');
+      }
+    }
+  }
   for(const r of doc.ranks) for(const id of r.ids)
     if(!nodeIds.has(id)) errs.push('Line '+r.line+': unknown node "'+id+'" in rank');
   // `MARKER-TARGET-KINDS`: `in=` on `threshold`/`band` also resolves a REGION id —
@@ -2605,32 +3180,102 @@ function parseOne(text){
     // `fill=` and no `stroke=`, used by an edge. Ignoring it would drop the
     // edge's colour with nothing to warn on; honouring it would make `fill`
     // mean "stroke" for that member. So it is a line error that names the
-    // key to add. `edge` is the only interior-less construct taking `class=`.
+    // key to add. `edge` was the only interior-less construct taking `class=`
+    // until the `sequence` genre added three more (`message`, `fragment`,
+    // `operand`), which is what 0.4 below is about.
     //
-    // 0.1 (`CLASS-PAINT-REQUIREMENT`): the SAME hole sat one key over and was left open.
-    // 0.1 rejected `fill=`-only and said nothing about a class that
-    // paints NEITHER channel — `class p "Path" color=#dc2626` plus `edge a ->
-    // b class=p` was accepted, drew a #555 line, and rendered a legend swatch
-    // that showed nothing, so the class's meaning was invisible in its own
-    // derived legend. With `color=` retired (`COLOUR-KEY-STATUS`) the remaining shape of the
-    // hole is a class carrying only `style=`, or nothing at
-    // all: the edge silently takes the default colour and the author who
-    // declared a class to CLASSIFY the edge gets no colour and no warning.
-    // Both halves are the same rule — a class an edge joins must declare at
-    // least one channel an edge HAS — so they share one diagnostic shape.
-    // An edge has exactly two: `stroke` (its colour) and `style` (its dash).
-    // `style=`-only is therefore FINE and must stay fine: the dash reaches the
-    // edge, nothing is lost, and it is how a multi-class cascade splits one
-    // meaning across two declarations (`class=hot,deprecated`). The test is
-    // per class, per channel — the same shape `INTERIOR-LESS-ELEMENT-PAINT` chose, for the same reason.
-    for(const e of doc.edges) for(const cid of (e.cls||[])){
-      const c=doc.classes.find(x=>x.id===cid);
-      if(!c||c.stroke!==undefined) continue;
-      if(c.fill===undefined&&c.style!==undefined) continue;
-      if(c.fill!==undefined)
-        errs.push('Line '+e.line+': class "'+cid+'" sets fill= but no stroke=, and an edge has no interior — add stroke= to the class (it paints the edge; fill= keeps painting members that have an interior) (MIGRATIONS 0.1)');
-      else
-        errs.push('Line '+e.line+': class "'+cid+'" declares no channel an edge has — add stroke= (an edge has only stroke= and style=: no interior, and v0.1 has no label-colour key). Without one the edge takes the default colour and the class shows nothing in the legend (MIGRATIONS 0.1)');
+    // 0.1 (`CLASS-PAINT-REQUIREMENT`) added a SECOND half — a class that paints NEITHER
+    // channel, joined by an edge, was a line error too — and 0.4 (`CLASS-CHANNEL-REACH`)
+    // RETIRES that half. It is not deleted quietly: `CLASS-PAINT-REQUIREMENT`'s own release fixed
+    // the harm it named. The stated defect was that such a class "shows
+    // nothing in the legend", and the same release made the derived legend
+    // draw the meaning with NO swatch (see the legend strip in `render`), so
+    // the meaning does reach the reader. What survived was only "the member
+    // takes its default paint" — which is exactly what 14 shipped `field`
+    // members already get, legally, from meaning-only classes in
+    // examples/gre.fd, quic.fd, srh.fd and showcase/tcp-header.fd. A rule that
+    // cannot generalise past one collection was not a rule about channels. A
+    // class that claims a meaning and declares no paint is therefore legal on
+    // EVERY member (`CLASS-CHANNEL-REACH`, MIGRATIONS 0.4), which is also the form the
+    // `sequence` genre is built on: `class` there carries what `group` (`SEQUENCE-PARTICIPANT-GROUPING`)
+    // and `lost=` (`UNDELIVERED-MESSAGE-MARKING`) were refused in favour of, so a meaning with no paint
+    // is that genre's designed idiom, not an oversight.
+    //
+    // `INTERIOR-LESS-ELEMENT-PAINT`'s half stands and now reaches EVERY collection that accepts
+    // `class=` (`CLASS-CHANNEL-REACH`). Until this release the loop below ran over `doc.edges`
+    // alone, so `class k "K" fill=#eee` plus `message c -> s "m" class=k` was
+    // accepted, painted nothing, and put the class in the legend — a message
+    // has its own collection because it has a position in time (`SEQUENCE-ORDER-MODEL`), and
+    // the check never looked there.
+    //
+    // THE CHANNEL SETS ARE DERIVED FROM WHAT EACH RENDERER READS, not from
+    // what the directive tables accept — a key the drawing never consults is
+    // not a channel the member HAS. Read off the `chan()` call sites in
+    // `renderSequence` and the `rsAll`/`dashOf` sites in `render`:
+    //   node, group, lifeline, state  fill, stroke, style   (box/pill: all three)
+    //   edge, message                 stroke, style         (no interior)
+    //   fragment, operand             stroke, style         (frame/rule; a
+    //                                 fragment's interior would hide its own
+    //                                 members, so it has no `fill=` to set)
+    //   field, cell                   fill, stroke          (`style=` left both
+    //                                 directives at `STYLE-KEY-SCOPE` and no `dashOf` reads
+    //                                 `f.style`/`mk.style`)
+    // A member with all three channels can never fail this test; the rows are
+    // listed anyway, because the table is the rule and a missing row would
+    // read as "not considered".
+    //
+    // TWO CASES FIRE, and both are declared paint that cannot arrive:
+    //  (a) `fill=` with no `stroke=` on a class an INTERIOR-LESS member joins.
+    //      Not caught by (b), because `fill=` plus `style=` would pass it: on
+    //      a line `fill=` and `stroke=` NAME THE SAME CHANNEL (the same reason
+    //      `fill=` on an `edge` LINE is refused), so an author who wrote
+    //      `fill=` meant the line's colour and `style=` does not answer that.
+    //  (b) a class whose channels are ALL channels the member lacks — the
+    //      general shape, which reaches `style=`-only on a `field` or a `cell`.
+    //      Guarded on the class declaring at least one channel, so a
+    //      meaning-only class falls through it (`CLASS-CHANNEL-REACH`).
+    // Both are per class, per channel — `INTERIOR-LESS-ELEMENT-PAINT`'s shape, for `INTERIOR-LESS-ELEMENT-PAINT`'s reason. A class
+    // that also declares a channel the member HAS is fine and must stay fine:
+    // `class hot "…" fill=#fee2e2 stroke=#dc2626` paints a node's box and an
+    // edge's line from one meaning, and `class=hot,deprecated` splits one
+    // meaning across two declarations (conformance case 308).
+    const CLASS_CHANNELS={
+      node:     {has:['fill','stroke','style'], a:'a node'},
+      group:    {has:['fill','stroke','style'], a:'a group'},
+      lifeline: {has:['fill','stroke','style'], a:'a lifeline'},
+      state:    {has:['fill','stroke','style'], a:'a state'},
+      edge:     {has:['stroke','style'],        a:'an edge'},
+      message:  {has:['stroke','style'],        a:'a message'},
+      fragment: {has:['stroke','style'],        a:'a fragment'},
+      operand:  {has:['stroke','style'],        a:'an operand'},
+      field:    {has:['fill','stroke'],         a:'a field'},
+      cell:     {has:['fill','stroke'],         a:'a cell'},
+    };
+    const clsChan=(x,kind)=>{
+      const K=CLASS_CHANNELS[kind];
+      for(const cid of (x.cls===undefined||x.cls===null?[]:(Array.isArray(x.cls)?x.cls:[x.cls]))){
+        const c=doc.classes.find(y=>y.id===cid);
+        if(!c) continue;                                   // unknown id: its own error
+        const decl=['fill','stroke','style'].filter(k=>c[k]!==undefined);
+        if(!decl.length) continue;                         // meaning only — legal (`CLASS-CHANNEL-REACH`)
+        if(!K.has.includes('fill')&&c.fill!==undefined&&c.stroke===undefined){
+          errs.push('Line '+x.line+': class "'+cid+'" sets fill= but no stroke=, and '+K.a+' has no interior — add stroke= to the class (it paints '+K.a.replace(/^an? /,'the ')+'; fill= keeps painting members that have an interior) (MIGRATIONS 0.1)');
+          continue; }
+        if(!decl.some(k=>K.has.includes(k)))
+          errs.push('Line '+x.line+': class "'+cid+'" declares only '+decl.map(k=>k+'=').join(' and ')+', and '+K.a+' has no such channel — add '+K.has.map(k=>k+'=').join(' or ')+' to the class (they paint '+K.a.replace(/^an? /,'the ')+'; the key it declares keeps painting members that have that channel) (MIGRATIONS 0.4)');
+      }
+    };
+    for(const x of doc.nodes) clsChan(x,'node');
+    for(const x of doc.groups) clsChan(x,'group');
+    for(const x of doc.edges) clsChan(x,'edge');
+    for(const x of (doc.messages||[])) clsChan(x,'message');
+    for(const x of (doc.lifelines||[])) clsChan(x,'lifeline');
+    for(const x of (doc.states||[])) clsChan(x,'state');
+    for(const x of (doc.fragments||[])) clsChan(x,'fragment');
+    for(const x of (doc.operands||[])) clsChan(x,'operand');
+    for(const b of doc.blocks){
+      if(b.fields) for(const f of b.fields) clsChan(f,'field');
+      if(b.marks)  for(const mk of b.marks) clsChan(mk,'cell');
     }
   }
   { // class references must resolve (closed grammar)
@@ -3226,13 +3871,37 @@ function render(doc,ropts){
     if(b.fields) for(const f of b.fields) rsAll(f);
     if(b.marks)  for(const mk of b.marks) rsAll(mk);
   }
+  // GEOMETRY-TIME DIAGNOSTICS. `parse` cannot see a coordinate, so a defect
+  // that is only visible in the DRAWING (a group band enclosing a non-member
+  // the author pinned there) has no channel to report through today. The scene
+  // hands its diagnostics back here and `render` returns them beside the SVG;
+  // a caller that writes an artifact must treat a non-empty list exactly as it
+  // treats a parse error, because the alternative is writing a picture that
+  // states something the source does not.
+  let sceneErrs=[];
   const parts=[]; let y=0, maxW=0;
   if(doc.title && RO.title===true){ parts.push('<text x="0" y="16" font-size="15" font-weight="600">'+esc(doc.title)+'</text>'); y=30;
     maxW=Math.max(maxW, cw(doc.title)*8.6); }  // canvas must fit the title
   let sceneMeta=null;
-  if(doc.nodes.length||doc.edges.length||(doc.boundaries||[]).length){
+  // THE LADDER. A sequence figure has NO SCENE: both of its axes
+  // are declaration-ordered, so there is nothing for the scene layout to
+  // place, and its elements live in their own five collections rather than in
+  // `nodes`/`edges` — which is why the scene branch could never have drawn
+  // one. The branch is an `else if` and not a second pass because the two
+  // renderers are alternatives, never neighbours: `lifeline` and `node` cannot
+  // both appear in one document (one genre, one node spelling).
+  //
+  // Everything AFTER this point is shared and unchanged — the region stack,
+  // the derived `class` legend, the figure-level note, the canvas padding and
+  // the title. A `class` on a `message` earns its legend entry from the same
+  // code that derives a topology figure's.
+  if(doc.genre==='sequence'&&(doc.lifelines||[]).length){
+    const s=renderSequence(doc,y); parts.push(s.svg); y=s.y; maxW=Math.max(maxW,s.w);
+  }
+  else if(doc.nodes.length||doc.edges.length||(doc.boundaries||[]).length){
     const s=renderScene(doc,y); parts.push(s.svg); y=s.y; maxW=Math.max(maxW,s.w);
     sceneMeta=s.meta;
+    if(s.errs&&s.errs.length) sceneErrs=sceneErrs.concat(s.errs);
   }
   // `MARKER-TARGET-KINDS`: a region-scope `threshold`/`band` is drawn HERE and not
   // in `renderScene`, because a region is not in the scene. Typed blocks stack
@@ -3351,12 +4020,23 @@ function render(doc,ropts){
     +'<pattern id="hatch" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">'
     +'<line x1="0" y1="0" x2="0" y2="6" stroke="#bbb" stroke-width="2"/></pattern></defs>'
     +'<g transform="translate('+PADL+','+PADT+')">'+parts.join('')+'</g></svg>', w:W, h:H,
-    sceneMeta:sceneMeta, pad:{x:PADL,y:PADT}};
+    sceneMeta:sceneMeta, pad:{x:PADL,y:PADT}, errs:sceneErrs};
 }
 
 // ---- scene ----
 function renderScene(doc,y0){
   const nodes=doc.nodes.map(n=>({...n}));
+  // Band padding around a group's members — the ONE place it is written. The
+  // contiguity pass and the drawn rect must agree to the pixel: a pass that
+  // separates against a slightly different rectangle from the one painted is a
+  // pass that reports clean on a picture that is not.
+  const BAND={l:14,r:14,t:26,b:12};
+  // A geometry-time diagnostic carries a SOURCE line like every other error in
+  // this engine, and in a multi-section document the line the author reads is
+  // the FULL-FILE one. `parse` re-bases its own messages; a render error is
+  // built here, after that pass, so the doc carries the offset itself (0 for a
+  // single-section document, where the two numberings coincide).
+  const srcLine=n=>(n===null||n===undefined)?null:n+(doc.lineOffset||0);
   // §2.4 plane z = paint order, applied by every pass that stacks annotations
   // (edges, bundle rings, threshold lines, zone bands). The sort is stable, so
   // same-plane items keep document order — "a later line paints on top".
@@ -3576,7 +4256,45 @@ function renderScene(doc,y0){
     for(let i=r0;i<r1;i++) mainGap[i]=Math.max(mainGap[i],need);
   }
   const center=n=>n.cross+cs(n)/2;
+  // GROUP CONTIGUITY, ORDERING HALF. A group's band is the bounding box of its
+  // members, so a non-member that the lane order happens to place BETWEEN two
+  // of them is drawn inside the band — the picture then states a membership the
+  // source never declared. The geometry pass further down can always evict the
+  // intruder, but eviction leaves the members where they were and the band
+  // keeps a hole where the intruder used to be; ordering them adjacent HERE,
+  // before any coordinate exists, costs nothing and packs the group properly.
+  //
+  // Sorting by a key that is CONSTANT ACROSS A GROUP is what makes members
+  // contiguous — equal keys land together — and the key is the group's MEAN
+  // desired position, so the cluster still sits where the incoming order put
+  // it. The sort is stable, so members keep the order they arrived in and a
+  // lane with nothing interleaved is not reordered at all.
+  //
+  // A group with a PINNED member is left alone: the pin is the author's
+  // coordinate, this pass cannot move it, and clustering the rest around a slot
+  // the pin will overwrite only displaces free nodes for nothing. That figure
+  // is the AUTHOR's half of the ruling and is reported, not redrawn.
+  const clusterGroups=arr=>{                 // arr of {n, d}; reordered in place
+    if(!arr.some(x=>x.n.group)) return arr;
+    const mean=new Map();
+    for(const x of arr){ const g=x.n.group; if(!g) continue;
+      if(!mean.has(g)) mean.set(g,{s:0,k:0,pin:false});
+      const t=mean.get(g); t.s+=x.d; t.k++; if(pinned(x.n.id)) t.pin=true; }
+    if(![...mean.values()].some(t=>!t.pin&&t.k>1)) return arr;
+    const live=g=>g&&mean.has(g)&&!mean.get(g).pin;
+    const key=x=>live(x.n.group)?mean.get(x.n.group).s/mean.get(x.n.group).k:x.d;
+    const tag=x=>live(x.n.group)?x.n.group:'';
+    arr.sort((p,q)=>key(p)-key(q)||(tag(p)<tag(q)?-1:tag(p)>tag(q)?1:0));
+    return arr;
+  };
   ranksArr.forEach(lane=>{ if(!lane) return; let c=0;    // seed: doc order
+    // The seed is the ONLY ordering a single-rank figure ever gets: `sweep`
+    // walks rank boundaries, so a scene with no edges never reaches `place`.
+    // The six-line reproduction (`group g` + three nodes, the middle one not a
+    // member) is exactly that figure, which is why the clustering runs here too
+    // and not only in the sweep.
+    const ord=clusterGroups(lane.map((n,k)=>({n,d:k}))).map(x=>x.n);
+    lane.length=0; ord.forEach(n=>lane.push(n));
     lane.forEach((n,k)=>{ n.cross=c; c+=cs(n)+(k<lane.length-1?gapOf(n,lane[k+1]):0); }); });
   // WHERE THE HOLD YIELDS, WHICH IS MOST OF THE RULE. Holding a chain node on
   // its chain neighbour puts every OTHER neighbour of that node on one side of
@@ -3782,6 +4500,148 @@ function renderScene(doc,y0){
     if(o){ n.x=o.x+p.fx; n.y=o.y+p.fy; }
     else { n.x=p.fx; n.y=y0+20+p.fy; }
   }
+  // ── GROUP BAND CONTIGUITY ────────────────────────────────────────────────
+  // A group's band is the BOUNDING BOX of its members (see gBox below), and
+  // until this pass nothing checked that the box contained only members. A
+  // non-member the layout happened to place between two members was therefore
+  // drawn INSIDE the band, with no error and no warning: six legal lines
+  // (`group g`, three nodes of which the middle one is not `in=g`, `layout`)
+  // produced a picture that says the middle node is in the group. That is the
+  // worst failure class this project has — a legal document that reads
+  // confidently and wrongly — and it contradicts this genre's own rule that
+  // membership is DECLARED and never inferred from rendered geometry.
+  //
+  // WHOEVER CHOSE THE POSITION BEARS THE RESPONSIBILITY. That single principle
+  // splits the fix in two:
+  //
+  //   the ENGINE chose it — auto-layout had freedom, so the engine MUST place
+  //     the members contiguously and the situation cannot arise. It is fixed
+  //     here, silently, at no cost to the author.
+  //   the AUTHOR chose it — a `pin` fixed the intruder (or fixed the members
+  //     whose extent IS the band) and the engine has no freedom left. It then
+  //     reports, naming the pin line, and the artifact is not written. The
+  //     engine never overrides the author's coordinate, and never draws a
+  //     statement the source did not make.
+  //
+  // It runs HERE — after pins are applied and before the group origins are
+  // taken — because the defect exists in the final geometry and nowhere else.
+  // The source looks fine; that is the whole point of the defect.
+  const gErrs=[];
+  {
+    const SEP=16;         // clearance left between a band and what is pushed out
+    const MAXPASS=60;     // resolution is monotone (always outward); this bounds
+                          // pathological alternation rather than expected work
+    const real=nodes.filter(n=>!n.boundary);
+    const memOf=id=>real.filter(n=>n.group===id);
+    const cLo=n=>horiz?n.y:n.x, cSz=n=>horiz?n.h:n.w;
+    const mv=(n,d)=>{ if(horiz) n.y+=d; else n.x+=d; };
+    const groups=doc.groups.filter(g=>memOf(g.id).length);
+    const minCross=()=>lay.length?Math.min(...lay.map(cLo)):0;
+    const cross0=minCross();      // the envelope the layout had before this pass
+    const bandOf=g=>{
+      const m=memOf(g.id);
+      const B={x0:Math.min(...m.map(n=>n.x))-BAND.l, x1:Math.max(...m.map(n=>n.x+n.w))+BAND.r,
+               yA:Math.min(...m.map(n=>n.y))-BAND.t, yB:Math.max(...m.map(n=>n.y+n.h))+BAND.b};
+      B.lo=horiz?B.yA:B.x0; B.hi=horiz?B.yB:B.x1;
+      return B;
+    };
+    const inBand=(n,B)=>n.x<B.x1&&n.x+n.w>B.x0&&n.y<B.yB&&n.y+n.h>B.yA;
+    const pinLine=id=>doc.pins[id]?doc.pins[id].line:null;
+    // The MOVER is a whole group or a single free node — never half a group,
+    // because moving one member of a group reshapes THAT group's band and the
+    // next pass would only find the same class of defect one group along.
+    const unitOf=n=>n.group?memOf(n.group):[n];
+    const canMove=u=>u.every(n=>!pinned(n.id))
+                  && !(u[0].group&&doc.pins[u[0].group]&&doc.pins[u[0].group].fx!==null);
+    const said=new Set();
+    const collect=()=>{
+      const out=[];
+      for(const g of groups){
+        const B=bandOf(g);
+        for(const n of real){
+          if(n.group===g.id||said.has(g.id+' '+n.id)) continue;
+          if(inBand(n,B)) out.push({g,n});
+        }
+      }
+      return out;
+    };
+    let left=[];
+    // EVERY conflict gets attention on every pass, and the band is recomputed
+    // immediately before each resolution. Taking only the first conflict each
+    // pass was tried and is wrong: one pair that alternates starves every other
+    // pair for the whole iteration budget, and the run then reports as
+    // "unresolvable" figures the pass had never once looked at.
+    for(let pass=0;pass<MAXPASS;pass++){
+      left=collect();
+      if(!left.length) break;
+      for(const c of left){
+        const B=bandOf(c.g);
+        if(!inBand(c.n,B)) continue;          // an earlier resolution cleared it
+        const gMem=memOf(c.g.id);
+        // Who yields: the intruder if the engine placed it, otherwise the group
+        // if the engine placed THAT, otherwise nobody and the author is told.
+        let unit=unitOf(c.n), obst=B;
+        if(!canMove(unit)){
+          if(canMove(gMem)){ unit=gMem;
+            obst={lo:cLo(c.n), hi:cLo(c.n)+cSz(c.n)}; }
+          else {
+            // No freedom anywhere: report, name the line that took it away, and
+            // stop considering this pair so the loop still terminates.
+            const who=pinned(c.n.id)?c.n.id
+                     :(c.n.group&&doc.pins[c.n.group]&&doc.pins[c.n.group].fx!==null?c.n.group
+                     :(gMem.find(m=>pinned(m.id))||{id:c.g.id}).id);
+            const ln=srcLine(pinLine(who));
+            gErrs.push('Line '+(ln!==null?ln:srcLine(c.g.line))+': pin puts "'+c.n.id
+              +'" inside the band of group "'+c.g.id+'" — a band is the bounding box of the '
+              +'group\'s members, so this draws "'+c.n.id+'" as one of them. Move the pin clear '
+              +'of the group\'s extent, or say what the drawing says with in='+c.g.id+'.');
+            said.add(c.g.id+' '+c.n.id); continue;
+          }
+        }
+        const uLo=Math.min(...unit.map(cLo)), uHi=Math.max(...unit.map(n=>cLo(n)+cSz(n)));
+        const dNeg=(obst.lo-SEP)-uHi, dPos=(obst.hi+SEP)-uLo;
+        // NEARER SIDE, BUT NEVER OFF THE CANVAS. The obvious rule — move
+        // whichever way is shorter — sends the unit past the layout's own
+        // starting edge often enough to matter (`reference/topology` put L1 at
+        // x=-90 and the viewBox clipped it away). Growing the canvas the other
+        // way is not available either: the only uniform-shift machinery this
+        // renderer has moves PINNED nodes with everything else, and a pinned
+        // node that drifts because an unrelated node was added is the `RENDERING-DETERMINISM`
+        // stability violation this engine has already paid for once. So the
+        // constraint is applied HERE, to the choice: the negative direction is
+        // taken only when the unit still lands inside the envelope the layout
+        // had before this pass ran. Nothing outside the mover ever moves.
+        const dNegOK=uLo+dNeg>=cross0;
+        const d=(Math.abs(dNeg)<=Math.abs(dPos)&&dNegOK)?dNeg:dPos;
+        const ranks=new Set(unit.map(n=>n.rank));
+        const keep=new Set(unit.concat(unit===gMem?[]:gMem));
+        // Everything the mover would be pushed ONTO travels with it: same rank,
+        // same side, clear of the obstacle. Relative order and spacing inside a
+        // lane are preserved, so the fix cannot manufacture an overlap.
+        // A node that BELONGS to a group never travels this way — a group moves
+        // whole or not at all, and dragging half of one along would reshape its
+        // band, which is the same defect one group further on.
+        for(const m of lay){
+          if(keep.has(m)||!ranks.has(m.rank)) continue;
+          if(!m.virtual&&m.group) continue;
+          const mLo=cLo(m), mHi=mLo+cSz(m);
+          if(d<0 ? (mHi<=uHi&&mHi<=obst.lo) : (mLo>=uLo&&mLo>=obst.hi)) mv(m,d);
+        }
+        for(const n of unit) mv(n,d);
+      }
+    }
+    left=collect();
+    // The invariant is CHECKED, not assumed: anything the pass could not place
+    // is named. A figure that reaches this line with a hit is a defect in this
+    // pass, and saying so beats drawing the false statement quietly.
+    for(const c of left){
+      if(said.has(c.g.id+' '+c.n.id)) continue;
+      gErrs.push('Line '+srcLine(c.g.line)+': group "'+c.g.id+'" would enclose non-member "'
+        +c.n.id+'" and the layout pass could not separate them; the figure is not drawn rather '
+        +'than drawn wrongly. Give "'+c.n.id+'" a pin outside the group, or add it with in='
+        +c.g.id+'.');
+    }
+  }
   // Pass 3: an unpinned group has no anchor of its own; its display origin
   // (drag anchor / data-gx,gy) is the top-left of its members' FINAL positions,
   // so it reflects any pinned members and matches the group box drawn below.
@@ -3958,8 +4818,8 @@ function renderScene(doc,y0){
     const mem=nodes.filter(n=>n.group===g.id);
     if(!mem.length) continue;
     const o=gOrigin[g.id];
-    const x0=Math.min(...mem.map(n=>n.x))-14, x1=Math.max(...mem.map(n=>n.x+n.w))+14;
-    const yA=Math.min(...mem.map(n=>n.y))-26, yB=Math.max(...mem.map(n=>n.y+n.h))+12;
+    const x0=Math.min(...mem.map(n=>n.x))-BAND.l, x1=Math.max(...mem.map(n=>n.x+n.w))+BAND.r;
+    const yA=Math.min(...mem.map(n=>n.y))-BAND.t, yB=Math.max(...mem.map(n=>n.y+n.h))+BAND.b;
     gBox[g.id]={x0,x1,yA,yB};
     const gdash=g.style==='dashed'?' stroke-dasharray="6 4"':(g.style==='dotted'?' stroke-dasharray="2 4"':'');
     gsvg.push('<g data-group="'+g.id+'" data-gx="'+o.x+'" data-gy="'+o.y+'" style="cursor:move">'
@@ -4989,7 +5849,7 @@ function renderScene(doc,y0){
   }
   const yEnd=y0+20+Hh+10;
   return {svg:gsvg.join('')+esvg.join('')+nsvg.join('')+tsvg.join('')+lblsvg.join(''), y:yEnd, w:W+2,
-          meta:{W:W, top:y0+20+chShift, Hh:Hh, left:bShift}};
+          meta:{W:W, top:y0+20+chShift, Hh:Hh, left:bShift}, errs:gErrs};
 }
 // borderPoint: where the ray from n's centre toward (tx,ty) leaves the shape.
 // It must leave the DRAWN outline: a rectangle clip on a diamond or an ellipse
@@ -5152,6 +6012,393 @@ function edgeRuns(v, p, n, span, ownAt){
   }
   return out;
 }
+
+// ---- ladder (the `sequence` genre) ----
+//
+// THE ORDERING RULE, stated once, because everything below depends on it:
+//
+//   The TIME axis is the declaration order of the `message` and `state` lines
+//   taken JOINTLY. Line m above line n asserts that m occurs before n.
+//   `lifeline` declaration order is the COLUMN axis, left to right. Both axes
+//   are declaration-ordered, and that is why this genre has no `flow` and no
+//   `rank`: a key that reordered the drawing would make the picture disagree
+//   with the text (`SEQUENCE-SOURCE-STANDARD`-R182). `fragment` and `operand` lines are
+//   DECLARATIONS and carry no time position of their own; a container's drawn
+//   extent is the span of its members' positions. Implementation: every
+//   element carries its source line number, so the row order is recovered by
+//   ONE sort on that number in `seqModel` — the model never stores an ordinal.
+//
+// Everything else in this function is a DRAWING CONVENTION the engine owns
+// under `DOMAIN-CONVENTION-DIRECTIVES` and is marked CHOSEN where it is not obvious. The author names
+// MEANING (who talks to whom, in what order, inside which fragment); the
+// engine decides every coordinate, and there is no key that moves one.
+//
+// The layout is SIX DETERMINISTIC PASSES and no fixed-point iteration:
+//   1. container column spans   (which columns each fragment/operand covers)
+//   2. the column axis          (centre-to-centre distances, widened to fit)
+//   3. the time axis            (one slot per row, plus container headroom)
+//   4. container box geometry   (from the tops/bottoms the cursor recorded)
+//   5. paint                    (background, mid, ink — three ordered layers)
+//   6. the canvas extent        (widest of columns, boxes and overhanging ink)
+//
+// NOT DRAWN: activation bars. UML's ExecutionSpecification is a separate
+// referent with a separate spelling, and the genre has no keyword for it — so
+// the renderer must not invent one out of message adjacency, which would put
+// an assertion in the picture that the source does not make.
+function renderSequence(doc,y0){
+  const M=seqModel(doc);
+  const lls=doc.lifelines;
+  if(!lls.length) return {svg:'',y:y0,w:0};
+  const col={}; lls.forEach((l,i)=>{ col[l.id]=i; });
+  // `OMITTED-LABEL-RECORDING`/`EMPTY-LABEL-STATE` display fallback, applied here rather than in `render`: the model
+  // records an omitted label as absent (null) and the RENDERER substitutes the
+  // id, so `lifeline c` draws "c". An explicitly empty label draws nothing.
+  const lblOf=(x)=>(x.label===null||x.label===undefined)?x.id:x.label;
+  // class cascade — the same rule `render` applies to nodes and edges, applied
+  // to this genre's elements (a `class` on a `message` is what `lost=` was
+  // refused in favour of, `UNDELIVERED-MESSAGE-MARKING`). Read-only: the element is never patched.
+  const C={}; for(const c of doc.classes||[]) C[c.id]=c;
+  const clsIds=(x)=>x.cls===undefined||x.cls===null?[]:(Array.isArray(x.cls)?x.cls:[x.cls]);
+  const chan=(x,k)=>{ if(x[k]!==undefined) return x[k];
+    let v; for(const id of clsIds(x)) if(C[id]&&C[id][k]!==undefined) v=C[id][k]; return v; };
+  // `seqModel` reports the containment chain; DEPTH is a view of it and lives
+  // here because only the drawing needs it (nesting inset, paint order).
+  const depth=(id)=>M.chain(id).length-1;
+
+  // ── geometry constants (CHOSEN, `DOMAIN-CONVENTION-DIRECTIVES`) ────────────────────────────────────
+  const HEAD_H=32, HEAD_PADX=13, HEAD_MINW=76;
+  const ROW_H=34;              // base row pitch. See the F5 note below.
+  const SELF_W=40, SELF_EXTRA=26, STATE_H=22;
+  const LBL_FS=11, LBL_LIFT=8; // label sits LBL_LIFT px above its own arrow
+  const FRAG_TOP=26, FRAG_BOT=12, OPERAND_TOP=20, FRAG_PADX=22, FRAG_INSET=9;
+  const ENC_PAD=6;             // clearance a container's frame keeps off its members
+  // F5 (spec/core.md §14.3) is a CONSTRAINT ON ROW_H, not an afterthought.
+  // A message label's centre sits LBL_LIFT + fs*0.55 ≈ 14 px above its own
+  // arrow, so its margin against the arrow one row away is ROW_H - 2*14.
+  // F5 requires that to exceed M = 4 px, i.e. ROW_H > 32. ROW_H = 34 gives a
+  // computed margin of 6 px at the worst case (two consecutive messages over
+  // the same span) and much more in practice. This is the whole reason a
+  // ladder is F5-cheap: the geometry separates labels by CONSTRUCTION, so the
+  // margin is a property of the row pitch and not of any per-figure search.
+
+  const headW=lls.map(l=>Math.max(HEAD_MINW, cwMax(lblOf(l))*CH+2*HEAD_PADX));
+  const lblPx=(s)=>s?cwMax(s)*(6.5*LBL_FS/11)+8:0;
+  // A state pill's width is needed in TWO passes — the container-enclosure
+  // pass and the paint pass — so it is written once. A pill wider than its
+  // container's padding is exactly the case that made the enclosure pass
+  // necessary (see PASS 4).
+  const statePillW=(el)=>Math.max(46, cwMax(el.name)*6.6+18);
+
+  // ── PASS 1 — container column spans (needed BEFORE the column axis,
+  //    because a fragment's operator tab and label have to fit inside its
+  //    own box) ────────────────────────────────────────────────────────────
+  const cspan={};
+  for(const id in M.cont){
+    const slots=M.owned[id];
+    let cmin=Infinity,cmax=-Infinity;
+    for(const sl of slots){ const r=M.rows[sl];
+      if(r.kind==='message'){ const a=col[r.el.a],b=col[r.el.b];
+        if(a!==undefined){cmin=Math.min(cmin,a);cmax=Math.max(cmax,a);}
+        if(b!==undefined){cmin=Math.min(cmin,b);cmax=Math.max(cmax,b);} }
+      else { const a=col[r.el.ref];
+        if(a!==undefined){cmin=Math.min(cmin,a);cmax=Math.max(cmax,a);} } }
+    cspan[id]=isFinite(cmin)?{cmin,cmax}:null;
+  }
+  // a fragment must be at least as wide as the operands it holds
+  for(const id in M.cont){
+    if(M.cont[id].kind!=='operand') continue;
+    const p=M.cont[id].parent;
+    if(p&&cspan[p]&&cspan[id]){ cspan[p].cmin=Math.min(cspan[p].cmin,cspan[id].cmin);
+                                cspan[p].cmax=Math.max(cspan[p].cmax,cspan[id].cmax); }
+  }
+  const tabW=(id)=>cwMax(M.cont[id].el.type||'')*6.6+16;
+  const capW=(id)=>{ const c=M.cont[id];
+    const lab=(c.el.label===null||c.el.label===undefined)?'':('['+c.el.label+']');
+    return (c.kind==='fragment'?tabW(id)+14:8)+cwMax(lab)*6.6+10; };
+
+  // ── PASS 2 — the column axis: centre-to-centre distances ────────────────
+  const nc=lls.length, cd=[];
+  for(let k=0;k+1<nc;k++) cd.push(headW[k]/2+headW[k+1]/2+26);
+  let rightPad=0;
+  const widen=(i,j,need)=>{                       // need = required span i..j
+    if(j<=i) return;
+    let have=0; for(let k=i;k<j;k++) have+=cd[k];
+    if(have>=need) return;
+    const add=(need-have)/(j-i); for(let k=i;k<j;k++) cd[k]+=add;
+  };
+  for(const r of M.rows){
+    if(r.kind!=='message') continue;
+    const ci=col[r.el.a], cj=col[r.el.b];
+    if(ci===undefined||cj===undefined) continue;
+    const w=lblPx(r.el.label)+26;
+    if(ci===cj){                                   // self-message
+      const need=SELF_W+lblPx(r.el.label)+16;
+      if(ci+1<nc) widen(ci,ci+1,need); else rightPad=Math.max(rightPad,need);
+    } else widen(Math.min(ci,cj),Math.max(ci,cj),w);
+  }
+  // the fragment caption is INSIDE the box, so it constrains the columns the
+  // box spans — a caption that overflows its own box names nothing.
+  for(const id in M.cont){
+    const cs=cspan[id]; if(!cs) continue;
+    const d=depth(id), pad=Math.max(6,FRAG_PADX-d*FRAG_INSET);
+    if(cs.cmin===cs.cmax) rightPad=Math.max(rightPad,capW(id)-pad-headW[cs.cmax]/2);
+    else widen(cs.cmin,cs.cmax,capW(id)-2*pad);
+  }
+  // The LEFT margin is structural too. Column 0's head box normally sets it,
+  // but two things drawn on that column are wider than it: a `state` pill (as
+  // wide as its state name) and a container frame whose left edge sits a
+  // padding outside the column. Whichever overhangs furthest pushes the whole
+  // axis right, so nothing is ever drawn at a negative x — the canvas has no
+  // room there and the ink would simply be clipped away.
+  let leftPad=0;
+  for(const r of M.rows)
+    if(r.kind==='state'&&col[r.el.ref]===0)
+      leftPad=Math.max(leftPad, statePillW(r.el)/2+ENC_PAD-headW[0]/2);
+  for(const id in M.cont){
+    const cs=cspan[id]; if(!cs||cs.cmin!==0) continue;
+    const d=depth(id), pad=Math.max(6,FRAG_PADX-d*FRAG_INSET);
+    leftPad=Math.max(leftPad, pad+ENC_PAD+6-headW[0]/2);
+  }
+  const x=[]; x[0]=headW[0]/2+Math.max(0,leftPad);
+  for(let k=1;k<nc;k++) x[k]=x[k-1]+cd[k-1];
+
+  // ── PASS 3 — the time axis: one slot per row, plus the space containers
+  //    need for their frames ────────────────────────────────────────────────
+  const opensAt={}, closesAt={};
+  for(const id in M.cont){ const e=M.extent[id]; if(!e) continue;
+    (opensAt[e.lo]=opensAt[e.lo]||[]).push(id);
+    (closesAt[e.hi]=closesAt[e.hi]||[]).push(id); }
+  const sortDeep=(a)=>a.slice().sort((p,q)=>depth(p)-depth(q));
+  const yTop=y0;
+  let y=yTop+HEAD_H+22;
+  // Box tops and bottoms are recorded AS THE CURSOR PASSES THEM, so an outer
+  // fragment and the operand that opens with it get DIFFERENT tops and their
+  // captions cannot land on each other. (Deriving both from the member row
+  // overlapped them — visible in the rendered pixels, not in any metric.)
+  const boxTop={}, boxBot={};
+  for(const r of M.rows){
+    for(const id of sortDeep(opensAt[r.slot]||[])){
+      // a top-level fragment gets clear air above it, or two consecutive
+      // fragments share a border and read as one box.
+      if(depth(id)===0&&M.cont[id].kind==='fragment') y+=8;
+      boxTop[id]=y; y+=(M.cont[id].kind==='fragment'?FRAG_TOP:OPERAND_TOP); }
+    r.y0=y;
+    let h=ROW_H;
+    if(r.kind==='message'&&r.el.a===r.el.b) h+=SELF_EXTRA;
+    // A label is drawn ABOVE its own arrow, so every extra line of it is
+    // extra row pitch — otherwise line 2 lands ON the arrow.
+    if(r.kind==='message') h+=Math.max(0,String(r.el.label||'').split('\n').length-1)*LBL_FS*1.3;
+    // NOTE what is NOT here: `description=` reserves no row height, because it
+    // puts NO INK on the page (core §10, §12.7 — "description= addresses the
+    // machine and draws nothing, note= addresses the human and always draws").
+    // The ladder honours that division: a description becomes an SVG <title>
+    // on the element it names and nothing else. (The prototype this was ported
+    // from drew it as grey prose under the arrow, which is the one thing the
+    // key is defined not to do.)
+    r.yMid=y+h/2;
+    y+=h;
+    r.y1=y;
+    for(const id of sortDeep(closesAt[r.slot]||[]).reverse()){
+      if(M.cont[id].kind==='fragment') y+=FRAG_BOT;
+      boxBot[id]=y; }
+    // The NEXT row's label is drawn ABOVE its own arrow, so a row that follows
+    // a closing frame starts its label ~3 px under that frame's border and the
+    // two read as one mark. A frame that closes therefore buys clear air below
+    // it, on the same ground as the clear air a top-level fragment buys above.
+    if((closesAt[r.slot]||[]).length && r.slot+1<M.rows.length) y+=10;
+  }
+  const bottom=y+10;
+
+  // ── PASS 4 — containers: box geometry ───────────────────────────────────
+  const fbox={};
+  for(const id in M.cont){
+    const e=M.extent[id]; if(!e) continue;
+    const cs=cspan[id]||{cmin:0,cmax:nc-1};
+    const d=depth(id), pad=Math.max(6,FRAG_PADX-d*FRAG_INSET);
+    fbox[id]={x0:x[cs.cmin]-pad, x1:Math.max(x[cs.cmax]+pad, x[cs.cmin]-pad+capW(id)),
+              y0:boxTop[id], y1:boxBot[id],
+              cmin:cs.cmin,cmax:cs.cmax,d,kind:M.cont[id].kind};
+  }
+  // A container's frame must ENCLOSE THE INK OF ITS MEMBERS, and the column
+  // span alone does not guarantee that: a member's drawing can be wider than
+  // the column it sits on. A `state` pill is centred on its lifeline and is as
+  // wide as its state name, so a long name overhangs the fixed padding and the
+  // pill pokes out through the frame that is supposed to contain it — visible
+  // in the rendered pixels of the reference figure ("RENEWING" inside `loop`)
+  // and invisible to every metric. The frame is therefore grown to the drawn
+  // extent of what it owns. `owned` is TRANSITIVE, so an inner operand's
+  // members widen the enclosing fragment too.
+  for(const id in fbox){
+    for(const sl of M.owned[id]){
+      const r=M.rows[sl];
+      let lo,hi;
+      if(r.kind==='state'){ const ci=col[r.el.ref]; if(ci===undefined) continue;
+        const w=statePillW(r.el); lo=x[ci]-w/2; hi=x[ci]+w/2; }
+      else { const a=col[r.el.a], b=col[r.el.b]; if(a===undefined||b===undefined) continue;
+        lo=Math.min(x[a],x[b]);
+        hi=(a===b)?x[a]+SELF_W+8+lblPx(r.el.label):Math.max(x[a],x[b]); }
+      fbox[id].x0=Math.min(fbox[id].x0,lo-ENC_PAD);
+      fbox[id].x1=Math.max(fbox[id].x1,hi+ENC_PAD);
+    }
+  }
+  // a fragment must contain its operands' boxes
+  for(const id in fbox){
+    if(fbox[id].kind!=='operand') continue;
+    const p=M.cont[id].parent;
+    if(p&&fbox[p]){ fbox[p].y1=Math.max(fbox[p].y1,fbox[id].y1);
+                    fbox[p].x0=Math.min(fbox[p].x0,fbox[id].x0-6);
+                    fbox[p].x1=Math.max(fbox[p].x1,fbox[id].x1+6); }
+  }
+  // An operand is a COMPARTMENT OF its fragment, so it is exactly as wide as
+  // the fragment: its separator rule DIVIDES the frame and must reach both
+  // borders, and its guard is read against the frame's left edge. Derived from
+  // the parent LAST, after the parent has finished growing, so the divider can
+  // never be shorter than the box it divides (UML 2.5.1 §17.12.3/§17.12.14).
+  for(const id in fbox){
+    if(fbox[id].kind!=='operand') continue;
+    const p=M.cont[id].parent;
+    if(p&&fbox[p]){ fbox[id].x0=fbox[p].x0; fbox[id].x1=fbox[p].x1; }
+  }
+
+  // ── PASS 5 — paint ──────────────────────────────────────────────────────
+  const bg=[], mid=[], ink=[];
+  const HALO=' paint-order="stroke" stroke="#fff" stroke-width="3"';
+  const arrowTri=(tip,from,c)=>{
+    const dx=tip[0]-from[0], dy=tip[1]-from[1], L=Math.hypot(dx,dy)||1;
+    const ux=dx/L, uy=dy/L, arm=10.08, hw=5.6;
+    const bx=tip[0]-ux*arm, by=tip[1]-uy*arm;
+    ink.push('<path d="M'+r2(tip[0])+' '+r2(tip[1])+' L'+r2(bx-uy*hw)+' '+r2(by+ux*hw)
+            +' L'+r2(bx+uy*hw)+' '+r2(by-ux*hw)+' z" fill="'+c+'" stroke="none"/>');
+  };
+  const inkExtent=[];
+  // `description=` → an SVG <title> and nothing else (core §10). `DESCRIPTION-KEY-SPELLING`'s rule
+  // applies: a <title> names its PARENT, so it is never a loose sibling in the
+  // figure's single <g> — where every description in the figure would name the
+  // same element and a conforming UA would show one arbitrary tooltip for the
+  // whole picture. Here each one wraps its own shape in a one-element <g>,
+  // which keeps the shape SELF-CLOSING so the reference linter's edge and node
+  // readers still find it.
+  const titleEl=(s)=>(s===undefined||s===null)?'':'<title>'+esc(s)+'</title>';
+  const withTitle=(s,shape)=>s===undefined||s===null?shape:'<g>'+titleEl(s)+shape+'</g>';
+
+  // lifelines: head box + descending dashed line.
+  // The head is emitted as a `data-node` group — it IS the participant, and
+  // the reference linter's node reader finds it there.
+  lls.forEach((l,i)=>{
+    const w=headW[i], hx=x[i]-w/2, lab=lblOf(l);
+    const f=chan(l,'fill')||'#eef2ff', st=chan(l,'stroke')||'#4f46e5';
+    bg.push('<line x1="'+r2(x[i])+'" y1="'+r2(yTop+HEAD_H+8)+'" x2="'+r2(x[i])+'" y2="'+r2(bottom)
+      +'" stroke="#94a3b8" stroke-width="1" stroke-dasharray="4 4"/>');
+    bg.push('<g data-node="'+esc(l.id)+'" data-x="'+r2(hx)+'" data-y="'+r2(yTop+8)+'">'
+      +titleEl(l.desc)
+      +'<rect x="'+r2(hx)+'" y="'+r2(yTop+8)+'" width="'+r2(w)+'" height="'+HEAD_H
+      +'" rx="4" fill="'+f+'" stroke="'+st+'"'+dashOf(chan(l,'style'),'')+'/>'
+      +textEl(x[i], yTop+8+HEAD_H/2+4.5, 13, 'middle', labelInk(f,'#1d1d1b'), lab, '')
+      +'</g>');
+  });
+
+  // fragment / operand boxes, outermost first so nesting paints correctly
+  const boxIds=Object.keys(fbox).sort((a,b)=>fbox[a].d-fbox[b].d);
+  for(const id of boxIds){
+    const B=fbox[id], c=M.cont[id];
+    // both containers take `stroke=` and `class=`; the DEFAULT differs,
+    // because a fragment's frame is a border and an operand's rule is a
+    // divider inside one (CHOSEN, `DOMAIN-CONVENTION-DIRECTIVES`).
+    const st=chan(c.el,'stroke')||(c.kind==='fragment'?'#64748b':'#94a3b8');
+    if(c.kind==='fragment'){
+      mid.push(withTitle(c.el.desc,
+        '<rect x="'+r2(B.x0)+'" y="'+r2(B.y0)+'" width="'+r2(B.x1-B.x0)+'" height="'+r2(B.y1-B.y0)
+        +'" fill="none" stroke="'+st+'" stroke-width="1"'+dashOf(chan(c.el,'style'),'')+'/>'));
+      // the operator tab — UML's pentagon in the top-left corner (§17.12.3;
+      // the operator vocabulary itself is §17.12.15.3's InteractionOperatorKind)
+      const tw0=cwMax(c.el.type)*6.6+16, th=15;
+      mid.push('<path d="M'+r2(B.x0)+' '+r2(B.y0)+' h'+r2(tw0)+' l6,'+r2(th-6)+' v'+r2(6)
+        +' h'+r2(-tw0-6)+' z" fill="#f8fafc" stroke="'+st+'" stroke-width="1"/>');
+      mid.push(textEl(B.x0+7, B.y0+11, 10.5, 'start', '#334155', c.el.type, ''));
+      if(c.el.label!==null&&c.el.label!==undefined)
+        mid.push(textEl(B.x0+tw0+14, B.y0+11, 10.5, 'start', '#475569', '['+c.el.label+']', HALO));
+    } else {
+      // an operand compartment: a dashed rule above it (except the first) and
+      // its guard at the left. UML draws the guard in square brackets.
+      const p=M.cont[id].parent, sibs=doc.operands.filter(o=>o['in']===p);
+      const first=sibs.length&&sibs[0].id===id;
+      const rule=first?''
+        :'<line x1="'+r2(B.x0)+'" y1="'+r2(B.y0+4)+'" x2="'+r2(B.x1)+'" y2="'+r2(B.y0+4)
+         +'" stroke="'+st+'" stroke-width="1" stroke-dasharray="5 4"/>';
+      const guard=(c.el.label!==null&&c.el.label!==undefined)
+        ? textEl(B.x0+8, B.y0+13, 10.5, 'start', '#475569', '['+c.el.label+']', HALO) : '';
+      // An operand has no box of its own, so its <title> names the group
+      // holding the two marks it DOES draw — the separator rule and the guard.
+      if(rule||guard) mid.push(withTitle(c.el.desc, rule+guard));
+    }
+  }
+
+  // rows
+  for(const r of M.rows){
+    if(r.kind==='state'){
+      // a state occurrence is a pill CENTRED ON ITS OWN COLUMN — the lifeline
+      // it names in slot 1 (UML 2.5.1 §17.12.25's StateInvariant).
+      const ci=col[r.el.ref]; if(ci===undefined) continue;
+      const f=chan(r.el,'fill')||'#fff7ed', st=chan(r.el,'stroke')||'#c2410c';
+      const w=statePillW(r.el);
+      mid.push(withTitle(r.el.desc,
+        '<rect x="'+r2(x[ci]-w/2)+'" y="'+r2(r.yMid-STATE_H/2)+'" width="'+r2(w)+'" height="'+STATE_H
+        +'" rx="9" fill="'+f+'" stroke="'+st+'" stroke-width="1"'+dashOf(chan(r.el,'style'),'')+'/>'));
+      ink.push(textEl(x[ci], r.yMid+4, LBL_FS, 'middle', labelInk(f,'#7c2d12'), r.el.name, ''));
+      inkExtent.push(x[ci]+w/2);
+      continue;
+    }
+    // message
+    const e=r.el, ci=col[e.a], cj=col[e.b];
+    if(ci===undefined||cj===undefined) continue;
+    const st=chan(e,'stroke')||'#334155';
+    const dash=dashOf(chan(e,'style'),'');
+    if(ci===cj){                                   // self-message
+      // a rectangular loop off the column and back to it. The shaft is one
+      // `path` at the same stroke-width as a straight message, so the axis
+      // readers see one edge and not three.
+      const sx=x[ci], top=r.yMid-11, bot=r.yMid+11, ex=sx+SELF_W;
+      mid.push(withTitle(e.desc,
+        '<path d="M'+r2(sx)+' '+r2(top)+' L'+r2(ex)+' '+r2(top)+' L'+r2(ex)+' '+r2(bot)
+        +' L'+r2(sx+11)+' '+r2(bot)+'" fill="none" stroke="'+st+'" stroke-width="1.6"'+dash+'/>'));
+      arrowTri([sx+2,bot],[sx+12,bot],st);
+      if(e.label){ ink.push(textEl(ex+8, r.yMid+4, LBL_FS, 'start', '#1d1d1b', e.label, HALO));
+                   inkExtent.push(ex+8+lblPx(e.label)); }
+      continue;
+    }
+    // A message between NON-ADJACENT columns crosses the lifelines between
+    // them: the shaft is drawn straight from source centre to target centre
+    // and the dashed columns it passes are left intact. This is UML's drawing
+    // and it is also the honest one — a jog around an intervening lifeline
+    // would suggest the message went somewhere it did not.
+    const fwd=(e.op==='<-')?false:true;            // '->' and '<->' read a→b
+    let sx=fwd?x[ci]:x[cj], tx0=fwd?x[cj]:x[ci];
+    const dir=Math.sign(tx0-sx)||1;
+    sx+=dir*1.5;
+    const ex=tx0-dir*1.5;
+    mid.push(withTitle(e.desc,
+      '<line x1="'+r2(sx)+'" y1="'+r2(r.yMid)+'" x2="'+r2(ex)+'" y2="'+r2(r.yMid)
+      +'" stroke="'+st+'" stroke-width="1.6"'+dash+'/>'));
+    arrowTri([ex,r.yMid],[ex-dir*10,r.yMid],st);
+    // `<->` is ONE shaft with TWO heads: the model says one occurrence, so
+    // the drawing must not show two lines and invite a reader to count two.
+    if(e.op==='<->') arrowTri([sx,r.yMid],[sx+dir*10,r.yMid],st);
+    if(e.label){
+      const nl=String(e.label).split('\n').length;
+      ink.push(textEl((sx+ex)/2, r.yMid-LBL_LIFT-(nl-1)*LBL_FS*1.3/2, LBL_FS, 'middle', '#1d1d1b', e.label, HALO));
+    }
+  }
+
+  // ── PASS 6 — the canvas extent ──────────────────────────────────────────
+  const W=Math.max(x[nc-1]+headW[nc-1]/2, ...Object.keys(fbox).map(k=>fbox[k].x1),
+                   ...inkExtent)+rightPad+4;
+  return {svg:bg.join('')+mid.join('')+ink.join(''), y:bottom, w:W,
+          box:{x0:0,x1:W,yA:yTop,yB:bottom}};
+}
+// coordinates are emitted at 2 decimal places: the ladder's arithmetic divides
+// (`widen` spreads a shortfall over a run of columns), and an unrounded double
+// would put a 17-digit tail in the artifact for no reader's benefit.
+function r2(v){ return Math.round(v*100)/100; }
 
 // ---- bitfield ----
 function renderBitfield(b,y0){

@@ -25,9 +25,6 @@
 //
 // top-level *.md only (README, guide/expressing.md, guide/authoring.md, …)
 //   spec/          the normative spec
-//   design/        append-only research record (PROCESS §3.1(f): historical
-//                  rows are MARKED historical, never corrected — use the
-//                  skip markers below rather than rewriting them)
 //   skill/         the agent skill
 //   conformance/   discrepancy + error-coverage notes, full of syntax
 //   examples/      including reference/, patterns/, statechart/
@@ -60,8 +57,8 @@
 //       There used to be `routing orthogonal`. <!-- fence-check: skip -->
 //
 // (c) A per-SECTION / per-FILE marker, for documents whose subject IS the set
-//     of retired spellings (MIGRATIONS, SYNTAX-STYLE, error catalogues,
-//     historical design/ rows).  On a line of its own:
+//     of retired spellings (MIGRATIONS, SYNTAX-STYLE, error catalogues).
+//     On a line of its own:
 //
 //       <!-- fence-check: skip-inline -->
 //

@@ -38,9 +38,23 @@ function buildOne(engine, fdPath) {
     for (const e of errs) console.error('  ' + e);
     return false;
   }
+  // GEOMETRY-TIME DIAGNOSTICS gate the artifact exactly as parse errors do.
+  // `parse` cannot see a coordinate, so a figure whose SOURCE is impeccable can
+  // still draw a false statement — a `group` band is the bounding box of its
+  // members, and a non-member sitting inside it tells the reader it is one.
+  // The engine reports those from `render`; writing the `.svg` anyway would
+  // publish the picture the engine has just said is wrong, which is the whole
+  // failure this gate exists to stop.
+  const rendered = docs.map(d => engine.render(d, RENDER_OPTS));
+  const gerrs = rendered.reduce((a, r) => a.concat(r.errs || []), []);
+  if (gerrs.length) {
+    console.error(fdPath + ':');
+    for (const e of gerrs) console.error('  ' + e);
+    return false;
+  }
   const svg = docs.length > 1
-    ? engine.stackSectionSvgs(docs.map(d => engine.render(d, RENDER_OPTS)))
-    : engine.render(docs[0], RENDER_OPTS).svg;
+    ? engine.stackSectionSvgs(rendered)
+    : rendered[0].svg;
   const hash = crypto.createHash('sha256').update(src, 'utf8').digest('hex');
   // The artifact records three things (spec core §7): the SHA-256 OF THE
   // SOURCE, the ENGINE VERSION that rendered it, and any non-default render

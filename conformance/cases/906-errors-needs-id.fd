@@ -7,7 +7,7 @@ external
 bitfield
 table
 timing
-# `plane` stood after `bundle` until this release — the directive left the
+# `plane` stood after `bundle` until 0.3 — the directive left the
 # language (`PAINT-ORDER-CONSTRUCT`), so its `needs an id` message left with it: a bare `plane`
 # now answers the withdrawal diagnostic instead, which case 918 pins.
 
