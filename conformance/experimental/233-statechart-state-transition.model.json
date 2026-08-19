@@ -23,7 +23,7 @@
     {
       "id": "locked",
       "label": "LOCKED",
-      "shape": "box",
+      "shape": "rounded",
       "plane": "base",
       "class": [
         "mode"
@@ -33,7 +33,7 @@
     {
       "id": "unlocked",
       "label": "UNLOCKED",
-      "shape": "box",
+      "shape": "rounded",
       "plane": "base",
       "class": [
         "mode"

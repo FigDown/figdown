@@ -1,10 +1,10 @@
 {
   "suite_version": "1.0.0",
   "run": {
-    "utc": "2026-08-16T06:11:55Z",
+    "utc": "2026-08-18T00:30:19Z",
     "model_alias": "sonnet",
     "model_used": "claude-sonnet-5",
-    "cli": "2.1.233 (Claude Code)",
+    "cli": "2.1.234 (Claude Code)",
     "condition": "title-only",
     "reader": 2
   },
@@ -12,7 +12,7 @@
     "id": "tcp-state-machine",
     "genre": "statechart",
     "path": "examples/showcase/tcp-state-machine.fd",
-    "file_sha256": "8a207b6cedc203c7f3d1bfefefc7cdd6d44ef4e3448a236bd83e41f6b4334827",
+    "file_sha256": "10f50b758555b42ba0861f693de1db15f68b9849f60155bd7549a7b5dded7251",
     "title_shown": "TCP Connection State Machine (RFC 9293, Figure 5)",
     "presented_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
     "presented_lines": 0,
@@ -39,13 +39,13 @@
     "is_error": false
   },
   "usage": {
-    "cost_usd": 0.00582,
-    "input_tokens": 825,
-    "output_tokens": 223,
+    "cost_usd": 0.006273,
+    "input_tokens": 891,
+    "output_tokens": 240,
     "cache_creation_input_tokens": 0,
-    "duration_ms": 2709
+    "duration_ms": 3214
   },
-  "raw_answer_text": "A1: It moves to SYN-RECEIVED and sends a SYN,ACK segment.\nA2: It enters SYN-SENT and sends a SYN segment.\nA3: It sends an ACK and the connection reaches ESTABLISHED.\nA4: It moves to FIN-WAIT-1 and sends a FIN segment.\nA5: It moves to CLOSE-WAIT and sends an ACK.\nA6: The local application issuing a CLOSE moves it to LAST-ACK, and the TCP sends a FIN.\nA7: It moves to CLOSING.\nA8: It must remain for twice the Maximum Segment Lifetime (2MSL).",
+  "raw_answer_text": "A1: It moves to SYN-RECEIVED and sends a SYN,ACK segment.\nA2: It enters SYN-SENT and sends a SYN segment.\nA3: It sends an ACK and the connection reaches ESTABLISHED.\nA4: It moves to FIN-WAIT-1 and sends a FIN segment.\nA5: It moves to CLOSE-WAIT and sends an ACK.\nA6: The local application issuing a CLOSE moves it to LAST-ACK, and the TCP sends a FIN.\nA7: It moves to CLOSING.\nA8: It must wait for a period of 2*MSL (twice the Maximum Segment Lifetime) before transitioning to CLOSED.",
   "answers": {
     "q1": "It moves to SYN-RECEIVED and sends a SYN,ACK segment.",
     "q2": "It enters SYN-SENT and sends a SYN segment.",
@@ -54,6 +54,6 @@
     "q5": "It moves to CLOSE-WAIT and sends an ACK.",
     "q6": "The local application issuing a CLOSE moves it to LAST-ACK, and the TCP sends a FIN.",
     "q7": "It moves to CLOSING.",
-    "q8": "It must remain for twice the Maximum Segment Lifetime (2MSL)."
+    "q8": "It must wait for a period of 2*MSL (twice the Maximum Segment Lifetime) before transitioning to CLOSED."
   }
 }

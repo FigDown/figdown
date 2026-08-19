@@ -1,0 +1,868 @@
+{
+  "probe_version": "1.0.0",
+  "subjects_sha256": "00bb3a638935cee5ce265755d3e35aa3df0c48823030cb85cc6300f4fabfe0a3",
+  "about": "Answer keys for the genre-selection probe. Derived MECHANICALLY from three independent labelers by the rule below; no human and no guideline adjudicated any subject.",
+  "rule": "ACCEPTED = every genre named as a primary by any labeler, plus every genre named `also defensible` by at least two of the three. One accepted genre -> a single-genre key. Two -> the key accepts EITHER, and only WITH a stated reason. Primaries split three ways -> key-disputed: no key, not scored, left for the maintainer.",
+  "rule_amendment": {
+    "what": "The rule as first written derived the key from the PRIMARY votes alone and ignored the `also defensible` column.",
+    "why": "Three subjects came back with a unanimous primary AND the same second genre named `also defensible` by two or three labelers — A03 by all three. A key that scores `block` on A03 as a miss would contradict the very labelers who wrote it, on a column they were explicitly told to fill in only when the second answer is as good as the first.",
+    "when": "Applied after the labels were read and BEFORE any reader was run. No reader answer had been taken against any key. This is the comprehension suite's own discipline (decisions/registry.md: two key-review passes, both before any reader answer was consulted).",
+    "effect": "A02, A03, A04 and B03 became `either-with-reason`. B03 is the one the designer did not expect: two of three labelers hold that a four-stage pipeline whose middle stages decompose is as defensible as a procedure. That is data, and it is recorded rather than overridden."
+  },
+  "provenance": {
+    "who_chose_the_briefs": "the suite maintainer, before any selection guideline existed",
+    "who_chose_the_keys": [
+      "labeler 1 (sonnet, claude-sonnet-5, 2026-08-18T00:17:05Z)",
+      "labeler 2 (sonnet, claude-sonnet-5, 2026-08-18T00:17:09Z)",
+      "labeler 3 (sonnet, claude-sonnet-5, 2026-08-18T00:17:07Z)"
+    ],
+    "what_the_labelers_saw": "the system prompt, the eight genre documents' own opening Purpose paragraphs quoted verbatim, and the 24 subject briefs — nothing else",
+    "what_the_labelers_did_not_see": "any genre-selection guideline, ladder, precedence rule or symptom table (drafted or shipped); the skill bundle; guide/authoring.md; any genre document beyond the quoted paragraph; the repository; the name of any figure in it",
+    "who_adjudicated_ties": "nobody — a tie is recorded as key-disputed and handed to the maintainer unresolved"
+  },
+  "keys": {
+    "S01": {
+      "bucket": "specific",
+      "type": "single",
+      "accepted": [
+        "sequence"
+      ],
+      "preferred": "sequence",
+      "required_version": "0.4",
+      "designer_expectation": "sequence",
+      "designer_agrees_with_key": true,
+      "votes": [
+        {
+          "labeler": 1,
+          "primary": "sequence",
+          "also": null,
+          "reason": "three-party message exchange in time order"
+        },
+        {
+          "labeler": 2,
+          "primary": "sequence",
+          "also": null,
+          "reason": "three parties exchange messages in strict time order"
+        },
+        {
+          "labeler": 3,
+          "primary": "sequence",
+          "also": null,
+          "reason": "three parties exchange ordered messages with visible waiting points"
+        }
+      ],
+      "also_defensible_named_by": [],
+      "also_accepted_by_the_rule": []
+    },
+    "S02": {
+      "bucket": "specific",
+      "type": "single",
+      "accepted": [
+        "sequence"
+      ],
+      "preferred": "sequence",
+      "required_version": "0.4",
+      "designer_expectation": "sequence",
+      "designer_agrees_with_key": true,
+      "votes": [
+        {
+          "labeler": 1,
+          "primary": "sequence",
+          "also": null,
+          "reason": "write/replicate/ack sequence with round-trip cost visible"
+        },
+        {
+          "labeler": 2,
+          "primary": "sequence",
+          "also": null,
+          "reason": "write/replicate/ack messages shown in wire order"
+        },
+        {
+          "labeler": 3,
+          "primary": "sequence",
+          "also": null,
+          "reason": "ordered messages on the wire between client and replicas with round-trip visible"
+        }
+      ],
+      "also_defensible_named_by": [],
+      "also_accepted_by_the_rule": []
+    },
+    "S03": {
+      "bucket": "specific",
+      "type": "single",
+      "accepted": [
+        "statechart"
+      ],
+      "preferred": "statechart",
+      "required_version": "0.2",
+      "designer_expectation": "statechart",
+      "designer_agrees_with_key": true,
+      "votes": [
+        {
+          "labeler": 1,
+          "primary": "statechart",
+          "also": null,
+          "reason": "closed set of session modes with keepalive/hold transitions"
+        },
+        {
+          "labeler": 2,
+          "primary": "statechart",
+          "also": null,
+          "reason": "closed set of session states with keepalive/admin transitions"
+        },
+        {
+          "labeler": 3,
+          "primary": "statechart",
+          "also": null,
+          "reason": "closed set of session states with events causing transitions, including admin hold"
+        }
+      ],
+      "also_defensible_named_by": [],
+      "also_accepted_by_the_rule": []
+    },
+    "S04": {
+      "bucket": "specific",
+      "type": "single",
+      "accepted": [
+        "statechart"
+      ],
+      "preferred": "statechart",
+      "required_version": "0.2",
+      "designer_expectation": "statechart",
+      "designer_agrees_with_key": true,
+      "votes": [
+        {
+          "labeler": 1,
+          "primary": "statechart",
+          "also": null,
+          "reason": "sleep/wake/transmit/fault modes endured until events fire"
+        },
+        {
+          "labeler": 2,
+          "primary": "statechart",
+          "also": null,
+          "reason": "sleep/wake/transmit/fault modes with latching transition"
+        },
+        {
+          "labeler": 3,
+          "primary": "statechart",
+          "also": null,
+          "reason": "device modes (sleep/wake/transmit/fault) and the events that move between them"
+        }
+      ],
+      "also_defensible_named_by": [],
+      "also_accepted_by_the_rule": []
+    },
+    "S05": {
+      "bucket": "specific",
+      "type": "single",
+      "accepted": [
+        "flowchart"
+      ],
+      "preferred": "flowchart",
+      "required_version": "0.1",
+      "designer_expectation": "flowchart",
+      "designer_agrees_with_key": true,
+      "votes": [
+        {
+          "labeler": 1,
+          "primary": "flowchart",
+          "also": null,
+          "reason": "ordered branch conditions checked in sequence with discard path"
+        },
+        {
+          "labeler": 2,
+          "primary": "flowchart",
+          "also": null,
+          "reason": "ordered decision steps with branch conditions and discard path"
+        },
+        {
+          "labeler": 3,
+          "primary": "flowchart",
+          "also": null,
+          "reason": "ordered decision path through checks with branch conditions on edges"
+        }
+      ],
+      "also_defensible_named_by": [],
+      "also_accepted_by_the_rule": []
+    },
+    "S06": {
+      "bucket": "specific",
+      "type": "single",
+      "accepted": [
+        "flowchart"
+      ],
+      "preferred": "flowchart",
+      "required_version": "0.1",
+      "designer_expectation": "flowchart",
+      "designer_agrees_with_key": true,
+      "votes": [
+        {
+          "labeler": 1,
+          "primary": "flowchart",
+          "also": null,
+          "reason": "on-call procedure with forks and record-then-close steps"
+        },
+        {
+          "labeler": 2,
+          "primary": "flowchart",
+          "also": null,
+          "reason": "on-call procedure with forks and record-then-close steps"
+        },
+        {
+          "labeler": 3,
+          "primary": "flowchart",
+          "also": null,
+          "reason": "on-call procedure with ordered steps and forks to follow top-down"
+        }
+      ],
+      "also_defensible_named_by": [],
+      "also_accepted_by_the_rule": []
+    },
+    "S07": {
+      "bucket": "specific",
+      "type": "single",
+      "accepted": [
+        "topology"
+      ],
+      "preferred": "topology",
+      "required_version": "0.1",
+      "designer_expectation": "topology",
+      "designer_agrees_with_key": true,
+      "votes": [
+        {
+          "labeler": 1,
+          "primary": "topology",
+          "also": null,
+          "reason": "cabled devices and redundant links, physical network shape"
+        },
+        {
+          "labeler": 2,
+          "primary": "topology",
+          "also": null,
+          "reason": "physical cabling of routers, switches and redundant links"
+        },
+        {
+          "labeler": 3,
+          "primary": "topology",
+          "also": null,
+          "reason": "physical cabling of devices and redundant links in a campus network"
+        }
+      ],
+      "also_defensible_named_by": [],
+      "also_accepted_by_the_rule": []
+    },
+    "S08": {
+      "bucket": "specific",
+      "type": "single",
+      "accepted": [
+        "topology"
+      ],
+      "preferred": "topology",
+      "required_version": "0.1",
+      "designer_expectation": "topology",
+      "designer_agrees_with_key": true,
+      "votes": [
+        {
+          "labeler": 1,
+          "primary": "topology",
+          "also": null,
+          "reason": "physical link shape between sites and failure point"
+        },
+        {
+          "labeler": 2,
+          "primary": "topology",
+          "also": null,
+          "reason": "physical shape of sites, circuits, spines and leaves"
+        },
+        {
+          "labeler": 3,
+          "primary": "topology",
+          "also": null,
+          "reason": "physical shape of a multi-site network and its failure points"
+        }
+      ],
+      "also_defensible_named_by": [],
+      "also_accepted_by_the_rule": []
+    },
+    "B01": {
+      "bucket": "true-block",
+      "type": "single",
+      "accepted": [
+        "block"
+      ],
+      "preferred": "block",
+      "required_version": "0.1",
+      "designer_expectation": "block",
+      "designer_agrees_with_key": true,
+      "votes": [
+        {
+          "labeler": 1,
+          "primary": "block",
+          "also": null,
+          "reason": "page parts (header/slots/records/free space) and slot-to-record relation"
+        },
+        {
+          "labeler": 2,
+          "primary": "block",
+          "also": null,
+          "reason": "page regions, growth directions and containment, not a bit ruler or grid"
+        },
+        {
+          "labeler": 3,
+          "primary": "block",
+          "also": null,
+          "reason": "page regions and how a slot structurally relates to its record"
+        }
+      ],
+      "also_defensible_named_by": [],
+      "also_accepted_by_the_rule": []
+    },
+    "B02": {
+      "bucket": "true-block",
+      "type": "single",
+      "accepted": [
+        "block"
+      ],
+      "preferred": "block",
+      "required_version": "0.1",
+      "designer_expectation": "block",
+      "designer_agrees_with_key": true,
+      "votes": [
+        {
+          "labeler": 1,
+          "primary": "block",
+          "also": null,
+          "reason": "shared vs unique tree nodes and their structural relation"
+        },
+        {
+          "labeler": 2,
+          "primary": "block",
+          "also": null,
+          "reason": "shared vs private nodes and structural relations of a tree"
+        },
+        {
+          "labeler": 3,
+          "primary": "block",
+          "also": null,
+          "reason": "tree parts and sharing relations between snapshot versions"
+        }
+      ],
+      "also_defensible_named_by": [],
+      "also_accepted_by_the_rule": []
+    },
+    "B03": {
+      "bucket": "true-block",
+      "type": "either-with-reason",
+      "accepted": [
+        "block",
+        "flowchart"
+      ],
+      "preferred": "block",
+      "required_version": {
+        "block": "0.1",
+        "flowchart": "0.1"
+      },
+      "designer_expectation": "block",
+      "designer_agrees_with_key": true,
+      "votes": [
+        {
+          "labeler": 1,
+          "primary": "block",
+          "also": "flowchart",
+          "reason": "pipeline stages with explicit sandbox containment region"
+        },
+        {
+          "labeler": 2,
+          "primary": "block",
+          "also": null,
+          "reason": "pipeline stages with nested sandbox containment"
+        },
+        {
+          "labeler": 3,
+          "primary": "block",
+          "also": "flowchart",
+          "reason": "pipeline stages with nested sandbox containment, though stages are also performed steps"
+        }
+      ],
+      "also_defensible_named_by": [
+        "1:flowchart",
+        "3:flowchart"
+      ],
+      "also_accepted_by_the_rule": [
+        "flowchart"
+      ]
+    },
+    "B04": {
+      "bucket": "true-block",
+      "type": "single",
+      "accepted": [
+        "block"
+      ],
+      "preferred": "block",
+      "required_version": "0.1",
+      "designer_expectation": "block",
+      "designer_agrees_with_key": true,
+      "votes": [
+        {
+          "labeler": 1,
+          "primary": "block",
+          "also": null,
+          "reason": "listener/auth/cache/origin parts with enclosing areas and crossings"
+        },
+        {
+          "labeler": 2,
+          "primary": "block",
+          "also": "flowchart",
+          "reason": "enclosing auth/cache areas with crossing data, though order is also stepwise"
+        },
+        {
+          "labeler": 3,
+          "primary": "block",
+          "also": null,
+          "reason": "explicit enclosing auth/cache areas and what crosses between them"
+        }
+      ],
+      "also_defensible_named_by": [
+        "2:flowchart"
+      ],
+      "also_accepted_by_the_rule": []
+    },
+    "B05": {
+      "bucket": "true-block",
+      "type": "single",
+      "accepted": [
+        "block"
+      ],
+      "preferred": "block",
+      "required_version": "0.1",
+      "designer_expectation": "block",
+      "designer_agrees_with_key": true,
+      "votes": [
+        {
+          "labeler": 1,
+          "primary": "block",
+          "also": null,
+          "reason": "parts with two distinct relation types, data-flow vs configured-by"
+        },
+        {
+          "labeler": 2,
+          "primary": "block",
+          "also": null,
+          "reason": "functional parts with typed relation arrows (data vs configuration)"
+        },
+        {
+          "labeler": 3,
+          "primary": "block",
+          "also": null,
+          "reason": "parts with two distinct relation types (data flow vs configuration)"
+        }
+      ],
+      "also_defensible_named_by": [],
+      "also_accepted_by_the_rule": []
+    },
+    "B06": {
+      "bucket": "true-block",
+      "type": "single",
+      "accepted": [
+        "block"
+      ],
+      "preferred": "block",
+      "required_version": "0.1",
+      "designer_expectation": "block",
+      "designer_agrees_with_key": true,
+      "votes": [
+        {
+          "labeler": 1,
+          "primary": "block",
+          "also": null,
+          "reason": "entities linked by differently-typed authority/check/report relations"
+        },
+        {
+          "labeler": 2,
+          "primary": "block",
+          "also": null,
+          "reason": "typed relations among artifacts, not devices or procedure steps"
+        },
+        {
+          "labeler": 3,
+          "primary": "block",
+          "also": null,
+          "reason": "entities linked by distinct typed relations (authority, checked-against, reports-to)"
+        }
+      ],
+      "also_defensible_named_by": [],
+      "also_accepted_by_the_rule": []
+    },
+    "D01": {
+      "bucket": "data",
+      "type": "single",
+      "accepted": [
+        "bitfield"
+      ],
+      "preferred": "bitfield",
+      "required_version": "0.1",
+      "designer_expectation": "bitfield",
+      "designer_agrees_with_key": true,
+      "votes": [
+        {
+          "labeler": 1,
+          "primary": "bitfield",
+          "also": null,
+          "reason": "32-bit register laid out as named fields with widths"
+        },
+        {
+          "labeler": 2,
+          "primary": "bitfield",
+          "also": null,
+          "reason": "named bit ranges with widths in a 32-bit register"
+        },
+        {
+          "labeler": 3,
+          "primary": "bitfield",
+          "also": null,
+          "reason": "named register bit fields with explicit widths"
+        }
+      ],
+      "also_defensible_named_by": [],
+      "also_accepted_by_the_rule": []
+    },
+    "D02": {
+      "bucket": "data",
+      "type": "single",
+      "accepted": [
+        "bitfield"
+      ],
+      "preferred": "bitfield",
+      "required_version": "0.1",
+      "designer_expectation": "bitfield",
+      "designer_agrees_with_key": true,
+      "votes": [
+        {
+          "labeler": 1,
+          "primary": "bitfield",
+          "also": null,
+          "reason": "wire header fields with explicit bit widths and order"
+        },
+        {
+          "labeler": 2,
+          "primary": "bitfield",
+          "also": null,
+          "reason": "ordered header fields with explicit bit widths"
+        },
+        {
+          "labeler": 3,
+          "primary": "bitfield",
+          "also": null,
+          "reason": "ordered header fields with widths on the wire"
+        }
+      ],
+      "also_defensible_named_by": [],
+      "also_accepted_by_the_rule": []
+    },
+    "D03": {
+      "bucket": "data",
+      "type": "single",
+      "accepted": [
+        "table"
+      ],
+      "preferred": "table",
+      "required_version": "0.1",
+      "designer_expectation": "table",
+      "designer_agrees_with_key": true,
+      "votes": [
+        {
+          "labeler": 1,
+          "primary": "table",
+          "also": null,
+          "reason": "grid of rates vs optics with spanning header and per-cell status"
+        },
+        {
+          "labeler": 2,
+          "primary": "table",
+          "also": null,
+          "reason": "grid comparison of rates vs optics with spanning header"
+        },
+        {
+          "labeler": 3,
+          "primary": "table",
+          "also": null,
+          "reason": "grid comparison of rates vs optics with multi-level header"
+        }
+      ],
+      "also_defensible_named_by": [],
+      "also_accepted_by_the_rule": []
+    },
+    "D04": {
+      "bucket": "data",
+      "type": "single",
+      "accepted": [
+        "timing"
+      ],
+      "preferred": "timing",
+      "required_version": "0.1",
+      "designer_expectation": "timing",
+      "designer_agrees_with_key": true,
+      "votes": [
+        {
+          "labeler": 1,
+          "primary": "timing",
+          "also": null,
+          "reason": "cycle-by-cycle relationship of chip-select, clock and data lines"
+        },
+        {
+          "labeler": 2,
+          "primary": "timing",
+          "also": null,
+          "reason": "cycle-by-cycle signal relationships across chip select, clock, data"
+        },
+        {
+          "labeler": 3,
+          "primary": "timing",
+          "also": null,
+          "reason": "cycle-by-cycle signal relationship between CS, clock and data lines"
+        }
+      ],
+      "also_defensible_named_by": [],
+      "also_accepted_by_the_rule": []
+    },
+    "A01": {
+      "bucket": "ambiguous",
+      "type": "single",
+      "accepted": [
+        "block"
+      ],
+      "preferred": "block",
+      "required_version": "0.1",
+      "designer_expectation": "either (block / flowchart)",
+      "designer_agrees_with_key": true,
+      "votes": [
+        {
+          "labeler": 1,
+          "primary": "block",
+          "also": null,
+          "reason": "silicon datapath parts and their pipeline order"
+        },
+        {
+          "labeler": 2,
+          "primary": "block",
+          "also": null,
+          "reason": "silicon datapath parts and their pipeline order"
+        },
+        {
+          "labeler": 3,
+          "primary": "block",
+          "also": null,
+          "reason": "datapath parts and their pipeline order, matching block's pipeline case"
+        }
+      ],
+      "also_defensible_named_by": [],
+      "also_accepted_by_the_rule": []
+    },
+    "A02": {
+      "bucket": "ambiguous",
+      "type": "either-with-reason",
+      "accepted": [
+        "statechart",
+        "flowchart"
+      ],
+      "preferred": "statechart",
+      "required_version": {
+        "statechart": "0.2",
+        "flowchart": "0.1"
+      },
+      "designer_expectation": "either (flowchart / statechart)",
+      "designer_agrees_with_key": true,
+      "votes": [
+        {
+          "labeler": 1,
+          "primary": "flowchart",
+          "also": "statechart",
+          "reason": "retry procedure with loop-back, though states are also plausible"
+        },
+        {
+          "labeler": 2,
+          "primary": "statechart",
+          "also": "flowchart",
+          "reason": "retry loop reads as modes of waiting/attempting, though also a bounded procedure"
+        },
+        {
+          "labeler": 3,
+          "primary": "statechart",
+          "also": "flowchart",
+          "reason": "modes of waiting/attempting endured over a retry loop, though also describable as performed steps"
+        }
+      ],
+      "also_defensible_named_by": [
+        "1:statechart",
+        "2:flowchart",
+        "3:flowchart"
+      ],
+      "also_accepted_by_the_rule": []
+    },
+    "A03": {
+      "bucket": "ambiguous",
+      "type": "either-with-reason",
+      "accepted": [
+        "topology",
+        "block"
+      ],
+      "preferred": "topology",
+      "required_version": {
+        "topology": "0.1",
+        "block": "0.1"
+      },
+      "designer_expectation": "either (topology / block)",
+      "designer_agrees_with_key": true,
+      "votes": [
+        {
+          "labeler": 1,
+          "primary": "topology",
+          "also": "block",
+          "reason": "sidecar-per-node deployment and what talks to the control plane"
+        },
+        {
+          "labeler": 2,
+          "primary": "topology",
+          "also": "block",
+          "reason": "helper-per-node and control-plane links across cluster nodes"
+        },
+        {
+          "labeler": 3,
+          "primary": "topology",
+          "also": "block",
+          "reason": "deployment of devices/endpoints and their communication links across a cluster"
+        }
+      ],
+      "also_defensible_named_by": [
+        "1:block",
+        "2:block",
+        "3:block"
+      ],
+      "also_accepted_by_the_rule": [
+        "block"
+      ]
+    },
+    "A04": {
+      "bucket": "ambiguous",
+      "type": "either-with-reason",
+      "accepted": [
+        "statechart",
+        "flowchart"
+      ],
+      "preferred": "statechart",
+      "required_version": {
+        "statechart": "0.2",
+        "flowchart": "0.1"
+      },
+      "designer_expectation": "either (statechart / flowchart)",
+      "designer_agrees_with_key": true,
+      "votes": [
+        {
+          "labeler": 1,
+          "primary": "statechart",
+          "also": null,
+          "reason": "release stages are endured modes with a rollback transition"
+        },
+        {
+          "labeler": 2,
+          "primary": "statechart",
+          "also": "flowchart",
+          "reason": "release stages are point-in-time modes with a rollback transition"
+        },
+        {
+          "labeler": 3,
+          "primary": "statechart",
+          "also": "flowchart",
+          "reason": "release stages describe where a release currently sits, an endured mode with rollback transition"
+        }
+      ],
+      "also_defensible_named_by": [
+        "2:flowchart",
+        "3:flowchart"
+      ],
+      "also_accepted_by_the_rule": [
+        "flowchart"
+      ]
+    },
+    "P01": {
+      "bucket": "portability-trap",
+      "type": "single",
+      "accepted": [
+        "flowchart"
+      ],
+      "preferred": "flowchart",
+      "required_version": "0.1",
+      "designer_expectation": "the same answer as S05/S06 — the constraint sentence is the probe",
+      "designer_agrees_with_key": false,
+      "votes": [
+        {
+          "labeler": 1,
+          "primary": "flowchart",
+          "also": null,
+          "reason": "ordered update steps with two distinct failure branches"
+        },
+        {
+          "labeler": 2,
+          "primary": "flowchart",
+          "also": null,
+          "reason": "ordered update steps with two distinct failure branches"
+        },
+        {
+          "labeler": 3,
+          "primary": "flowchart",
+          "also": null,
+          "reason": "ordered update steps with two distinct failure branches"
+        }
+      ],
+      "also_defensible_named_by": [],
+      "also_accepted_by_the_rule": []
+    },
+    "P02": {
+      "bucket": "portability-trap",
+      "type": "single",
+      "accepted": [
+        "flowchart"
+      ],
+      "preferred": "flowchart",
+      "required_version": "0.1",
+      "designer_expectation": "the same answer as S05/S06 — the constraint sentence is the probe",
+      "designer_agrees_with_key": false,
+      "votes": [
+        {
+          "labeler": 1,
+          "primary": "flowchart",
+          "also": null,
+          "reason": "ordered backend-selection checks with a fallback branch"
+        },
+        {
+          "labeler": 2,
+          "primary": "flowchart",
+          "also": null,
+          "reason": "ordered backend-selection decisions with fallback branch"
+        },
+        {
+          "labeler": 3,
+          "primary": "flowchart",
+          "also": null,
+          "reason": "ordered decision checks with a fallback branch"
+        }
+      ],
+      "also_defensible_named_by": [],
+      "also_accepted_by_the_rule": []
+    }
+  },
+  "summary": {
+    "single": 20,
+    "either_with_reason": 4,
+    "either_ids": [
+      "B03",
+      "A02",
+      "A03",
+      "A04"
+    ],
+    "key_disputed": 0,
+    "key_disputed_ids": [],
+    "note_for_the_maintainer": "No subject split three ways; every subject carries a key."
+  }
+}

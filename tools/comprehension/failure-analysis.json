@@ -1,5 +1,5 @@
 {
-  "about": "Why each missed question was missed, in the `syntax` (comment-stripped) condition — the classification that makes the score actionable. Assigned by the suite maintainer after reading every reader answer against the presented file text; the answers themselves are in tools/comprehension/transcripts/ so any judgement here can be re-checked without re-running a model.",
+  "about": "Why each missed question was missed, in the `syntax` (comment-stripped) condition — the classification that makes the score actionable. Assigned by the suite maintainer after reading every reader answer against the presented file text; the answers themselves are in tools/comprehension/transcripts/ so any judgement here can be re-checked without re-running a model. Re-checked 2026-08-17 for the three figures whose transcripts were re-taken that day (`rpf-check` after its block->flowchart conversion, `arp-resolution` and `tcp-state-machine` to clear `--verify`). No class changed. `tcp-state-machine` has no entry because it has never missed an answer.",
   "classes": {
     "ambiguous-syntax": "the file does carry the meaning, but the spelling admits another reading and the reader would not commit to one",
     "misleading-keyword": "a keyword pulled the reader toward the wrong meaning",
@@ -12,26 +12,26 @@
   "failures": {
     "arp-resolution/q2": {
       "class": "reader-error",
-      "note": "Only reader 1 missed it, and it answered NOT STATED while quoting the very row that answers it: the `table cache` states 'before the exchange | (no entry for B's IP)'. The other two readers quoted the same row and were accepted."
+      "note": "Only reader 1 missed it, and it answered NOT STATED while quoting the very row that answers it: the `table cache` states 'before the exchange | (no entry for B's IP)'. The other two readers quoted the same row and were accepted. RE-CHECKED 2026-08-17 against the transcripts re-taken after the eb0724b comment edit: the class did not move. WHICH readers missed it did — the re-run is a fresh sample of the same presentation (the `syntax` text is byte-identical to what the 2026-08-15 readers saw, verified by hash), so the per-reader sentences above describe the superseded reading and are kept as the record of it. In the 2026-08-17 sample no reader missed q2 at all, which is why the corpus's `reader-error` count is now 0; the entry is retained because the class is a judgement about an answer that was really given, and deleting it would hide it."
     },
     "arp-resolution/q3": {
       "class": "not-in-file",
-      "note": "RFC 826 has the target merge the sender's protocol/hardware pair on receipt. The figure draws only what Host A learns; nothing states what Host B stores. All three readers answered NOT STATED, correctly."
+      "note": "RFC 826 has the target merge the sender's protocol/hardware pair on receipt. The figure draws only what Host A learns; nothing states what Host B stores. All three readers answered NOT STATED, correctly. RE-CHECKED 2026-08-17 against the transcripts re-taken after the eb0724b comment edit: the class did not move. WHICH readers missed it did — the re-run is a fresh sample of the same presentation (the `syntax` text is byte-identical to what the 2026-08-15 readers saw, verified by hash), so the per-reader sentences above describe the superseded reading and are kept as the record of it."
     },
     "arp-resolution/q4": {
       "class": "ambiguous-syntax",
-      "note": "The figure says it twice and neither saying is a statement: an edge labelled '1: heard, ignored' to the rest of the LAN, and the ABSENCE of a reply edge from that node. Reader 3 refused to commit ('does not explicitly say whether they send a reply'); reader 1 committed correctly and was rejected by the key (see per_reader). A missing edge carries no meaning — this project's own founding observation — and 'ignored' is prose inside a label, not a construct.",
+      "note": "The figure says it twice and neither saying is a statement: an edge labelled '1: heard, ignored' to the rest of the LAN, and the ABSENCE of a reply edge from that node. Reader 3 refused to commit ('does not explicitly say whether they send a reply'); reader 1 committed correctly and was rejected by the key (see per_reader). A missing edge carries no meaning — this project's own founding observation — and 'ignored' is prose inside a label, not a construct. RE-CHECKED 2026-08-17 against the transcripts re-taken after the eb0724b comment edit: the class did not move. WHICH readers missed it did — the re-run is a fresh sample of the same presentation (the `syntax` text is byte-identical to what the 2026-08-15 readers saw, verified by hash), so the per-reader sentences above describe the superseded reading and are kept as the record of it.",
       "per_reader": {
         "1": "grading-artifact"
       }
     },
     "arp-resolution/q7": {
       "class": "grading-artifact",
-      "note": "Both misses are the key's fault. Reader 1: 'The request is meant to obtain B's hardware address'. Reader 2: 'A does not already know B's hardware address'. Both are right; the key lists 'does not know' and 'trying to determine', and neither 'does not already know' nor 'meant to obtain' is a substring of any listed alternative. The same brittleness the --selftest pass caught in q2 and q5, in a question whose canonical answer happened to pass."
+      "note": "Both misses are the key's fault. Reader 1: 'The request is meant to obtain B's hardware address'. Reader 2: 'A does not already know B's hardware address'. Both are right; the key lists 'does not know' and 'trying to determine', and neither 'does not already know' nor 'meant to obtain' is a substring of any listed alternative. The same brittleness the --selftest pass caught in q2 and q5, in a question whose canonical answer happened to pass. RE-CHECKED 2026-08-17 against the transcripts re-taken after the eb0724b comment edit: the class did not move. WHICH readers missed it did — the re-run is a fresh sample of the same presentation (the `syntax` text is byte-identical to what the 2026-08-15 readers saw, verified by hash), so the per-reader sentences above describe the superseded reading and are kept as the record of it."
     },
     "arp-resolution/q8": {
       "class": "bad-question",
-      "note": "Whether the receiver merges the sender's mapping BEFORE it examines the opcode is an ordering inside RFC 826's packet-reception algorithm, not part of the exchange between hosts that this figure depicts. No notation would have carried it. Reported, not dropped."
+      "note": "Whether the receiver merges the sender's mapping BEFORE it examines the opcode is an ordering inside RFC 826's packet-reception algorithm, not part of the exchange between hosts that this figure depicts. No notation would have carried it. Reported, not dropped. RE-CHECKED 2026-08-17 against the transcripts re-taken after the eb0724b comment edit: the class did not move. WHICH readers missed it did — the re-run is a fresh sample of the same presentation (the `syntax` text is byte-identical to what the 2026-08-15 readers saw, verified by hash), so the per-reader sentences above describe the superseded reading and are kept as the record of it."
     },
     "ethernet-frame/q5": {
       "class": "not-in-file",
@@ -70,15 +70,19 @@
     },
     "rpf-check/q3": {
       "class": "not-in-file",
-      "note": "All three readers answered NOT STATED. The file's only candidate is the edge label `next-hop ge-0/0/1`, which spells 'next-hop' but carries an INTERFACE name, never a neighbour. What the source-ward lookup yields besides an interface is not in the figure."
+      "note": "RE-CLASSIFIED 2026-08-17 against the `flowchart` version of the figure; the class did not move. All three readers still answered NOT STATED. The file's only candidate is the edge label `next-hop ge-0/0/1`, which spells 'next-hop' but carries an INTERFACE name, never a neighbour. What the source-ward lookup yields besides an interface is not in the figure, and the genre conversion touched no edge label."
     },
     "rpf-check/q6": {
       "class": "grading-artifact",
-      "note": "All three readers answered in the figure's own vocabulary: 'it passes when the packet arrived on the \"upstream\" interface (the one indicated by the RIB lookup); the router accepts and forwards it'. That is the decision node's label read correctly. The key was written from the RFC's vocabulary and demands 'same interface'/'matches'. The reading was right; the two vocabularies never met."
+      "note": "RE-CLASSIFIED 2026-08-17 against the `flowchart` version; the class did not move, and this is the clearest evidence that the conversion did not fix what was broken. All three readers again answered in the figure's own vocabulary — 'it passes when the packet arrived on the \"upstream\" interface (yes branch), and the router accepts and forwards it'. That is the `decision` node's label read correctly, and two of the three now cite the branch by its `yes` label, which is new. The key was written from the RFC's vocabulary and demands 'same interface'/'matches'. The reading was right; the two vocabularies never met. This one is the instrument's fault in both readings."
     },
     "rpf-check/q8": {
       "class": "not-in-file",
-      "note": "All three readers answered NOT STATED. The class label states the failure CONDITION ('arrived on an interface that is not the route back to the source'); the file never states the contrast with ordinary destination-based forwarding, which is what the question asks."
+      "per_reader": {
+        "1": "not-in-file",
+        "2": "not-in-file"
+      },
+      "note": "RE-CLASSIFIED 2026-08-17 against the `flowchart` version. Under `block` all three readers answered NOT STATED; under `flowchart` reader 3 answered it correctly from the `class fail` meaning plus the `terminator`/`decision` structure, and readers 1 and 2 still declined. That single answer is the whole of the +4.2-point move from 62.5% to 66.7%, and one answer out of 24 is inside this suite's own stated ±10-point question noise. The class label states the failure CONDITION ('arrived on an interface that is not the route back to the source'); the file still never states the contrast with ordinary destination-based forwarding, which is what the question asks."
     },
     "tcp-header/q2": {
       "class": "not-in-file",

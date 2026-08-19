@@ -15,14 +15,14 @@
     {
       "id": "locked",
       "label": "LOCKED",
-      "shape": "box",
+      "shape": "rounded",
       "plane": "base",
       "line": 8
     },
     {
       "id": "unlocked",
       "label": "UNLOCKED",
-      "shape": "box",
+      "shape": "rounded",
       "plane": "base",
       "line": 9
     }

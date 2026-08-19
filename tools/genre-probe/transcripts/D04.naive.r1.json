@@ -1,0 +1,63 @@
+{
+  "probe_version": "1.0.0",
+  "run": {
+    "utc": "2026-08-18T00:19:53Z",
+    "model_alias": "sonnet",
+    "model_used": "claude-sonnet-5",
+    "cli": "2.1.234 (Claude Code)",
+    "condition": "naive",
+    "reader": 1
+  },
+  "subject": {
+    "sid": "D04",
+    "bucket": "data",
+    "subjects_sha256": "00bb3a638935cee5ce265755d3e35aa3df0c48823030cb85cc6300f4fabfe0a3",
+    "brief_sha256": "3bed563db811223bdac7319feff7492684ee5e8d42567d11f393cbda4261ff45"
+  },
+  "presented": {
+    "what": "the subject brief and the eight genre names, one \"use when\" line each, taken verbatim from PURPOSE_SHORT in this tool",
+    "bundle_path": null,
+    "bundle_sha256": null,
+    "bundle_chars": 0
+  },
+  "prompt": {
+    "system_sha256": "f0c9d216983b082a65bb1ba2a4c4224d7faf8950a8d5487f4fd85d9badfce1bd",
+    "user_sha256": "8016292a7034d1f015acb276b5464735696bb34cc8871ba3a71b641ded87afe1",
+    "user_chars": 1442
+  },
+  "cold_room": {
+    "cwd": "an isolated empty temporary directory outside the repository",
+    "tools_offered": "none — every tool denied by name",
+    "mcp_servers": "none",
+    "settings": "safe-mode: no project or user settings, no memory file, no skills, no plugins, no hooks",
+    "session_persistence": false,
+    "shown": "the system prompt, eight genre names with one \"use when\" line each, and the subject brief — nothing else",
+    "not_shown": "the specification, any genre document, any genre-selection guideline (none exists), guide/authoring.md, any .fd file, the repository, the answer key"
+  },
+  "integrity": {
+    "turns": 1,
+    "permission_denials": 0,
+    "tool_calls_observed": false,
+    "is_error": false
+  },
+  "usage": {
+    "cost_usd": 0.004341,
+    "input_tokens": 967,
+    "output_tokens": 96,
+    "duration_ms": 2536
+  },
+  "raw_answer_text": "# <redacted-account-email> 2026-08-17\nfigdown 0.1 timing # cycle-by-cycle multi-signal relationship (CS, CLK, MOSI/MISO)",
+  "answer": {
+    "version": "0.1",
+    "genre": "timing",
+    "reason": "cycle-by-cycle multi-signal relationship (CS, CLK, MOSI/MISO)",
+    "reason_source": "trailing comment on the header line",
+    "header_line": "figdown 0.1 timing # cycle-by-cycle multi-signal relationship (CS, CLK, MOSI/MISO)"
+  },
+  "redaction": {
+    "what": "one email address, replaced with <redacted-account-email>",
+    "where": "raw_answer_text only",
+    "why": "The reader invented a provenance comment line and put the running account's email address in it. No repository file may carry a personal identifier. The redacted string is not part of any scored field: the score is the genre token of the header line, and no hash in this transcript covers raw_answer_text.",
+    "how_it_got_there": "the reader was never given a provenance line to copy in this condition and had the account identity in its harness context — a COLD-ROOM LEAK, recorded in decisions/registry.md rather than smoothed away"
+  }
+}

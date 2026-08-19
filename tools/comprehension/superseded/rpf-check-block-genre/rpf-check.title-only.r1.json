@@ -1,0 +1,59 @@
+{
+  "suite_version": "1.0.0",
+  "run": {
+    "utc": "2026-08-16T06:21:06Z",
+    "model_alias": "sonnet",
+    "model_used": "claude-sonnet-5",
+    "cli": "2.1.233 (Claude Code)",
+    "condition": "title-only",
+    "reader": 1
+  },
+  "figure": {
+    "id": "rpf-check",
+    "genre": "block",
+    "path": "examples/rpf-check.fd",
+    "file_sha256": "1500962db181dc5f6fd68653e24fcaa8f9153d1cffe0525c476075df57946ce6",
+    "title_shown": "RPF check on a multicast join",
+    "presented_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "presented_lines": 0,
+    "presented_chars": 0
+  },
+  "prompt": {
+    "system_sha256": "42d79e37b78275f219f2b1b70497abf709362f5fa68aa5427fb1f42b12b60425",
+    "user_sha256": "6c605616a3ae35a568785c7eeccce2172277ec7f40752fb8b61868492042bdec",
+    "question_set_sha256": "61aeae46aa0cc940551eea4a1d6d2e3ef9c67091350fd92995d2e5729e831406"
+  },
+  "cold_room": {
+    "cwd": "an isolated empty temporary directory outside the repository",
+    "tools_offered": "none — every tool denied by name",
+    "mcp_servers": "none",
+    "settings": "safe-mode: no project or user settings, no memory file, no skills, no plugins, no hooks",
+    "session_persistence": false,
+    "shown": "the system prompt, the figure title, and the questions — nothing else",
+    "not_shown": "the specification, any genre document, any other .fd file, the file name, the name of the language, the repository"
+  },
+  "integrity": {
+    "turns": 1,
+    "permission_denials": 0,
+    "tool_calls_observed": false,
+    "is_error": false
+  },
+  "usage": {
+    "cost_usd": 0.008514,
+    "input_tokens": 703,
+    "output_tokens": 427,
+    "cache_creation_input_tokens": 0,
+    "duration_ms": 4806
+  },
+  "raw_answer_text": "A1: The router consults its unicast routing table (routing/forwarding information base) to perform the RPF check.\nA2: The packet's source address is used as the search key, not its destination address.\nA3: The lookup also tells the router the next-hop (upstream) router and outgoing interface that would be used to reach that source — i.e., the RPF interface.\nA4: It compares that (RPF) interface against the interface on which the packet actually arrived.\nA5: The router first looks up the route back toward the source, then compares it to the arrival interface.\nA6: The packet passes if the RPF interface matches the interface it arrived on; the router accepts it and forwards/processes it (e.g., forwards the multicast traffic or processes the join).\nA7: The packet fails if the RPF interface does not match the arrival interface; the router drops the packet.\nA8: It's called \"reverse\" because instead of routing toward the destination, the router checks the path back toward the source to verify the packet arrived via the correct upstream path, preventing loops and spoofed traffic in multicast distribution trees.",
+  "answers": {
+    "q1": "The router consults its unicast routing table (routing/forwarding information base) to perform the RPF check.",
+    "q2": "The packet's source address is used as the search key, not its destination address.",
+    "q3": "The lookup also tells the router the next-hop (upstream) router and outgoing interface that would be used to reach that source — i.e., the RPF interface.",
+    "q4": "It compares that (RPF) interface against the interface on which the packet actually arrived.",
+    "q5": "The router first looks up the route back toward the source, then compares it to the arrival interface.",
+    "q6": "The packet passes if the RPF interface matches the interface it arrived on; the router accepts it and forwards/processes it (e.g., forwards the multicast traffic or processes the join).",
+    "q7": "The packet fails if the RPF interface does not match the arrival interface; the router drops the packet.",
+    "q8": "It's called \"reverse\" because instead of routing toward the destination, the router checks the path back toward the source to verify the packet arrived via the correct upstream path, preventing loops and spoofed traffic in multicast distribution trees."
+  }
+}

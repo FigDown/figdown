@@ -1,0 +1,506 @@
+{
+  "probe_version": "1.0.0",
+  "generated_by": "tools/genre-probe/genre-probe.js --write-results (recomputed from the stored transcripts; no model was called)",
+  "subjects_sha256": "00bb3a638935cee5ce265755d3e35aa3df0c48823030cb85cc6300f4fabfe0a3",
+  "bundle_measured": {
+    "path": "skill/figdown/SKILL.md",
+    "sha256": "5c1e6d4a711089761d8d085552b46f14617f2e23c167ae21827d54218d6f6d4c"
+  },
+  "keys_summary": {
+    "single": 20,
+    "either_with_reason": 4,
+    "either_ids": [
+      "B03",
+      "A02",
+      "A03",
+      "A04"
+    ],
+    "key_disputed": 0,
+    "key_disputed_ids": [],
+    "note_for_the_maintainer": "No subject split three ways; every subject carries a key."
+  },
+  "conditions": {
+    "naive": {
+      "genre_match": {
+        "correct": 72,
+        "total": 72,
+        "rate": 1
+      },
+      "genre_match_reason_blind": {
+        "correct": 72,
+        "total": 72,
+        "rate": 1,
+        "means": "the same answers with the stated-reason requirement on either-keys switched off"
+      },
+      "honest_fallback": {
+        "with_reason": 21,
+        "block_answers": 21,
+        "rate": 1
+      },
+      "version_correctness_statechart_sequence": {
+        "correct": 0,
+        "total": 17,
+        "rate": 0,
+        "errors": [
+          "A02/r1: figdown 0.1 statechart (needs 0.2)",
+          "A02/r3: figdown 0.1 statechart (needs 0.2)",
+          "A04/r1: figdown 0.1 statechart (needs 0.2)",
+          "A04/r2: figdown 0.1 statechart (needs 0.2)",
+          "A04/r3: figdown 0.1 statechart (needs 0.2)",
+          "S01/r1: figdown 0.1 sequence (needs 0.4)",
+          "S01/r2: figdown 0.1 sequence (needs 0.4)",
+          "S01/r3: figdown 0.1 sequence (needs 0.4)",
+          "S02/r1: figdown 0.1 sequence (needs 0.4)",
+          "S02/r2: figdown 0.1 sequence (needs 0.4)",
+          "S02/r3: figdown 0.1 sequence (needs 0.4)",
+          "S03/r1: figdown 0.1 statechart (needs 0.2)",
+          "S03/r2: figdown 0.1 statechart (needs 0.2)",
+          "S03/r3: figdown 0.1 statechart (needs 0.2)",
+          "S04/r1: figdown 0.1 statechart (needs 0.2)",
+          "S04/r2: figdown 0.1 statechart (needs 0.2)",
+          "S04/r3: figdown 0.1 statechart (needs 0.2)"
+        ]
+      },
+      "version_correctness_all_genres": {
+        "correct": 54,
+        "total": 72
+      },
+      "failure_classes": {},
+      "readings": 72,
+      "excluded_key_disputed": 0,
+      "spend_usd": 0.3335
+    },
+    "cold": {
+      "genre_match": {
+        "correct": 66,
+        "total": 72,
+        "rate": 0.9167
+      },
+      "genre_match_reason_blind": {
+        "correct": 66,
+        "total": 72,
+        "rate": 0.9167,
+        "means": "the same answers with the stated-reason requirement on either-keys switched off"
+      },
+      "honest_fallback": {
+        "with_reason": 25,
+        "block_answers": 25,
+        "rate": 1
+      },
+      "version_correctness_statechart_sequence": {
+        "correct": 8,
+        "total": 18,
+        "rate": 0.4444,
+        "errors": [
+          "A02/r3: figdown 0.1 statechart (needs 0.2)",
+          "S01/r1: figdown 0.1 sequence (needs 0.4)",
+          "S01/r2: figdown 0.1 sequence (needs 0.4)",
+          "S01/r3: figdown 0.1 sequence (needs 0.4)",
+          "S02/r1: figdown 0.1 sequence (needs 0.4)",
+          "S02/r2: figdown 0.1 sequence (needs 0.4)",
+          "S02/r3: figdown 0.1 sequence (needs 0.4)",
+          "S04/r1: figdown 0.1 statechart (needs 0.2)",
+          "S04/r2: figdown 0.1 statechart (needs 0.2)",
+          "S04/r3: figdown 0.1 statechart (needs 0.2)"
+        ]
+      },
+      "version_correctness_all_genres": {
+        "correct": 62,
+        "total": 72
+      },
+      "failure_classes": {
+        "portability-override": 6
+      },
+      "readings": 72,
+      "excluded_key_disputed": 0,
+      "spend_usd": 1.2887
+    }
+  },
+  "per_subject": {
+    "S01": {
+      "bucket": "specific",
+      "key": "sequence",
+      "conds": {
+        "naive": {
+          "answers": "sequence* sequence* sequence*",
+          "correct": 3,
+          "total": 3
+        },
+        "cold": {
+          "answers": "sequence* sequence* sequence*",
+          "correct": 3,
+          "total": 3
+        }
+      }
+    },
+    "S02": {
+      "bucket": "specific",
+      "key": "sequence",
+      "conds": {
+        "naive": {
+          "answers": "sequence* sequence* sequence*",
+          "correct": 3,
+          "total": 3
+        },
+        "cold": {
+          "answers": "sequence* sequence* sequence*",
+          "correct": 3,
+          "total": 3
+        }
+      }
+    },
+    "S03": {
+      "bucket": "specific",
+      "key": "statechart",
+      "conds": {
+        "naive": {
+          "answers": "statechart* statechart* statechart*",
+          "correct": 3,
+          "total": 3
+        },
+        "cold": {
+          "answers": "statechart* statechart* statechart*",
+          "correct": 3,
+          "total": 3
+        }
+      }
+    },
+    "S04": {
+      "bucket": "specific",
+      "key": "statechart",
+      "conds": {
+        "naive": {
+          "answers": "statechart* statechart* statechart*",
+          "correct": 3,
+          "total": 3
+        },
+        "cold": {
+          "answers": "statechart* statechart* statechart*",
+          "correct": 3,
+          "total": 3
+        }
+      }
+    },
+    "S05": {
+      "bucket": "specific",
+      "key": "flowchart",
+      "conds": {
+        "naive": {
+          "answers": "flowchart* flowchart* flowchart*",
+          "correct": 3,
+          "total": 3
+        },
+        "cold": {
+          "answers": "flowchart* flowchart* flowchart*",
+          "correct": 3,
+          "total": 3
+        }
+      }
+    },
+    "S06": {
+      "bucket": "specific",
+      "key": "flowchart",
+      "conds": {
+        "naive": {
+          "answers": "flowchart* flowchart* flowchart*",
+          "correct": 3,
+          "total": 3
+        },
+        "cold": {
+          "answers": "flowchart* flowchart* flowchart*",
+          "correct": 3,
+          "total": 3
+        }
+      }
+    },
+    "S07": {
+      "bucket": "specific",
+      "key": "topology",
+      "conds": {
+        "naive": {
+          "answers": "topology* topology* topology*",
+          "correct": 3,
+          "total": 3
+        },
+        "cold": {
+          "answers": "topology* topology* topology*",
+          "correct": 3,
+          "total": 3
+        }
+      }
+    },
+    "S08": {
+      "bucket": "specific",
+      "key": "topology",
+      "conds": {
+        "naive": {
+          "answers": "topology* topology* topology*",
+          "correct": 3,
+          "total": 3
+        },
+        "cold": {
+          "answers": "topology* topology* topology*",
+          "correct": 3,
+          "total": 3
+        }
+      }
+    },
+    "B01": {
+      "bucket": "true-block",
+      "key": "block",
+      "conds": {
+        "naive": {
+          "answers": "block* block* block*",
+          "correct": 3,
+          "total": 3
+        },
+        "cold": {
+          "answers": "block* block* block*",
+          "correct": 3,
+          "total": 3
+        }
+      }
+    },
+    "B02": {
+      "bucket": "true-block",
+      "key": "block",
+      "conds": {
+        "naive": {
+          "answers": "block* block* block*",
+          "correct": 3,
+          "total": 3
+        },
+        "cold": {
+          "answers": "block* block* block*",
+          "correct": 3,
+          "total": 3
+        }
+      }
+    },
+    "B03": {
+      "bucket": "true-block",
+      "key": "block|flowchart",
+      "conds": {
+        "naive": {
+          "answers": "block* block* block*",
+          "correct": 3,
+          "total": 3
+        },
+        "cold": {
+          "answers": "block* block* block*",
+          "correct": 3,
+          "total": 3
+        }
+      }
+    },
+    "B04": {
+      "bucket": "true-block",
+      "key": "block",
+      "conds": {
+        "naive": {
+          "answers": "block* block* block*",
+          "correct": 3,
+          "total": 3
+        },
+        "cold": {
+          "answers": "block* block* block*",
+          "correct": 3,
+          "total": 3
+        }
+      }
+    },
+    "B05": {
+      "bucket": "true-block",
+      "key": "block",
+      "conds": {
+        "naive": {
+          "answers": "block* block* block*",
+          "correct": 3,
+          "total": 3
+        },
+        "cold": {
+          "answers": "block* block* block*",
+          "correct": 3,
+          "total": 3
+        }
+      }
+    },
+    "B06": {
+      "bucket": "true-block",
+      "key": "block",
+      "conds": {
+        "naive": {
+          "answers": "block* block* block*",
+          "correct": 3,
+          "total": 3
+        },
+        "cold": {
+          "answers": "block* block* block*",
+          "correct": 3,
+          "total": 3
+        }
+      }
+    },
+    "D01": {
+      "bucket": "data",
+      "key": "bitfield",
+      "conds": {
+        "naive": {
+          "answers": "bitfield* bitfield* bitfield*",
+          "correct": 3,
+          "total": 3
+        },
+        "cold": {
+          "answers": "bitfield* bitfield* bitfield*",
+          "correct": 3,
+          "total": 3
+        }
+      }
+    },
+    "D02": {
+      "bucket": "data",
+      "key": "bitfield",
+      "conds": {
+        "naive": {
+          "answers": "bitfield* bitfield* bitfield*",
+          "correct": 3,
+          "total": 3
+        },
+        "cold": {
+          "answers": "bitfield* bitfield* bitfield",
+          "correct": 3,
+          "total": 3
+        }
+      }
+    },
+    "D03": {
+      "bucket": "data",
+      "key": "table",
+      "conds": {
+        "naive": {
+          "answers": "table* table* table*",
+          "correct": 3,
+          "total": 3
+        },
+        "cold": {
+          "answers": "table* table* table*",
+          "correct": 3,
+          "total": 3
+        }
+      }
+    },
+    "D04": {
+      "bucket": "data",
+      "key": "timing",
+      "conds": {
+        "naive": {
+          "answers": "timing* timing* timing*",
+          "correct": 3,
+          "total": 3
+        },
+        "cold": {
+          "answers": "timing* timing* timing*",
+          "correct": 3,
+          "total": 3
+        }
+      }
+    },
+    "A01": {
+      "bucket": "ambiguous",
+      "key": "block",
+      "conds": {
+        "naive": {
+          "answers": "block* block* block*",
+          "correct": 3,
+          "total": 3
+        },
+        "cold": {
+          "answers": "block* block* block*",
+          "correct": 3,
+          "total": 3
+        }
+      }
+    },
+    "A02": {
+      "bucket": "ambiguous",
+      "key": "statechart|flowchart",
+      "conds": {
+        "naive": {
+          "answers": "statechart* flowchart* statechart*",
+          "correct": 3,
+          "total": 3
+        },
+        "cold": {
+          "answers": "statechart* statechart* statechart*",
+          "correct": 3,
+          "total": 3
+        }
+      }
+    },
+    "A03": {
+      "bucket": "ambiguous",
+      "key": "topology|block",
+      "conds": {
+        "naive": {
+          "answers": "topology* topology* topology*",
+          "correct": 3,
+          "total": 3
+        },
+        "cold": {
+          "answers": "topology* topology* topology*",
+          "correct": 3,
+          "total": 3
+        }
+      }
+    },
+    "A04": {
+      "bucket": "ambiguous",
+      "key": "statechart|flowchart",
+      "conds": {
+        "naive": {
+          "answers": "statechart* statechart* statechart*",
+          "correct": 3,
+          "total": 3
+        },
+        "cold": {
+          "answers": "statechart* statechart* statechart*",
+          "correct": 3,
+          "total": 3
+        }
+      }
+    },
+    "P01": {
+      "bucket": "portability-trap",
+      "key": "flowchart",
+      "conds": {
+        "naive": {
+          "answers": "flowchart* flowchart* flowchart*",
+          "correct": 3,
+          "total": 3
+        },
+        "cold": {
+          "answers": "block* block* block*",
+          "correct": 0,
+          "total": 3
+        }
+      }
+    },
+    "P02": {
+      "bucket": "portability-trap",
+      "key": "flowchart",
+      "conds": {
+        "naive": {
+          "answers": "flowchart* flowchart* flowchart*",
+          "correct": 3,
+          "total": 3
+        },
+        "cold": {
+          "answers": "table* table* block*",
+          "correct": 0,
+          "total": 3
+        }
+      }
+    }
+  },
+  "cold_minus_naive_points": -8.3
+}

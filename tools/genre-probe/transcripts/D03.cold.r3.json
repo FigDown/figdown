@@ -1,0 +1,57 @@
+{
+  "probe_version": "1.0.0",
+  "run": {
+    "utc": "2026-08-18T00:21:12Z",
+    "model_alias": "sonnet",
+    "model_used": "claude-sonnet-5",
+    "cli": "2.1.234 (Claude Code)",
+    "condition": "cold",
+    "reader": 3
+  },
+  "subject": {
+    "sid": "D03",
+    "bucket": "data",
+    "subjects_sha256": "00bb3a638935cee5ce265755d3e35aa3df0c48823030cb85cc6300f4fabfe0a3",
+    "brief_sha256": "8cab98ed1470b7924b9b6981c2470a758e47e4327911c178febff7dc2119e3a1"
+  },
+  "presented": {
+    "what": "the subject brief and skill/figdown/SKILL.md, pasted verbatim into the message",
+    "bundle_path": "skill/figdown/SKILL.md",
+    "bundle_sha256": "5c1e6d4a711089761d8d085552b46f14617f2e23c167ae21827d54218d6f6d4c",
+    "bundle_chars": 14990
+  },
+  "prompt": {
+    "system_sha256": "f0c9d216983b082a65bb1ba2a4c4224d7faf8950a8d5487f4fd85d9badfce1bd",
+    "user_sha256": "d45369a9a74281674740a5dfcf08f2a40e6d59bc2a9aceb220582b56b3b4f2e0",
+    "user_chars": 15453
+  },
+  "cold_room": {
+    "cwd": "an isolated empty temporary directory outside the repository",
+    "tools_offered": "none — every tool denied by name",
+    "mcp_servers": "none",
+    "settings": "safe-mode: no project or user settings, no memory file, no skills, no plugins, no hooks",
+    "session_persistence": false,
+    "shown": "the system prompt, skill/figdown/SKILL.md verbatim, and the subject brief — nothing else",
+    "not_shown": "the specification, any genre document, any genre-selection guideline (none exists), guide/authoring.md, any .fd file, the repository, the answer key"
+  },
+  "integrity": {
+    "turns": 1,
+    "permission_denials": 0,
+    "tool_calls_observed": false,
+    "is_error": false
+  },
+  "usage": {
+    "cost_usd": 0.0033174,
+    "input_tokens": 2,
+    "output_tokens": 104,
+    "duration_ms": 2856
+  },
+  "raw_answer_text": "# FigDown — figures as text. Spec: https://github.com/FigDown/figdown\nfigdown 0.1 table # grid of rate x optic combinations with per-cell conditions (supported/limited/unavailable) and a grouped column heading — comparison across rows/cols, no connectors, so table not flowchart",
+  "answer": {
+    "version": "0.1",
+    "genre": "table",
+    "reason": "grid of rate x optic combinations with per-cell conditions (supported/limited/unavailable) and a grouped column heading — comparison across rows/cols, no connectors, so table not flowchart",
+    "reason_source": "trailing comment on the header line",
+    "header_line": "figdown 0.1 table # grid of rate x optic combinations with per-cell conditions (supported/limited/unavailable) and a grouped column heading — comparison across rows/cols, no connectors, so table not flowchart"
+  }
+}

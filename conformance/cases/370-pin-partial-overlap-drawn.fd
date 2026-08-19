@@ -1,0 +1,13 @@
+# The companion to 369: PARTIAL overlap is not that error and never becomes
+# one. Two boxes that clip each other are ugly and both readable, which is the
+# `novlp` axis's business in tools/layout-lint.js — "ugly is not an error;
+# wrong is", and the line between them is whether any ink of the covered node
+# survives. Both nodes below are pinned to overlap by 40x20 px, and the figure
+# renders with no geometry diagnostic at all.
+figdown 0.1 block
+title "Two boxes that clip each other are drawn"
+node a "A"
+node b "B"
+pin a at=(0,0) width=120 height=60
+pin b at=(80,40) width=120 height=60
+edge a -> b

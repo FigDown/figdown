@@ -1,10 +1,10 @@
 {
   "suite_version": "1.0.0",
   "run": {
-    "utc": "2026-08-16T06:21:28Z",
+    "utc": "2026-08-18T00:29:44Z",
     "model_alias": "sonnet",
     "model_used": "claude-sonnet-5",
-    "cli": "2.1.233 (Claude Code)",
+    "cli": "2.1.234 (Claude Code)",
     "condition": "commented",
     "reader": 1
   },
@@ -12,15 +12,15 @@
     "id": "arp-resolution",
     "genre": "topology",
     "path": "examples/showcase/arp-resolution.fd",
-    "file_sha256": "46c8123b88838d5b17d5cccf91518f966ba83eadbb0787d36a00e5f734e45145",
+    "file_sha256": "ad44cf31f71c479899a9d34665f9033a4dc343ee1e15407a0c1f38a2531af9d9",
     "title_shown": null,
-    "presented_sha256": "636098cba4dcb750d0ef0a2e038cb3565a5145513839d97706bbfcc8fb356c2f",
-    "presented_lines": 48,
-    "presented_chars": 2449
+    "presented_sha256": "1c55f100a653aee61d81c11959a7bcf469d1c2e82b2e7f31749c2e46329894e7",
+    "presented_lines": 49,
+    "presented_chars": 2524
   },
   "prompt": {
     "system_sha256": "1a78658262dc29e7e24cbe3e1eb72659cf31990e85deddacf0b1625e40c5eac2",
-    "user_sha256": "bc61c74b921a03d61c6d71fb4ffb1db905a8160f027f113eeb0a7aec9ade1846",
+    "user_sha256": "e5c99a9d99d2cd44de28906d848cf40657608f529883968764f9f4fe4b63d2c8",
     "question_set_sha256": "d9d8582ddf508c6d8e38fde7421a0b578072c3b00b22c75dbf8f1be1dfb16010"
   },
   "cold_room": {
@@ -39,21 +39,21 @@
     "is_error": false
   },
   "usage": {
-    "cost_usd": 0.0124305,
+    "cost_usd": 0.024543000000000002,
     "input_tokens": 2,
-    "output_tokens": 792,
-    "cache_creation_input_tokens": 0,
-    "duration_ms": 9038
+    "output_tokens": 871,
+    "cache_creation_input_tokens": 1912,
+    "duration_ms": 9108
   },
-  "raw_answer_text": "A1: Every station on the segment — it is broadcast (dst MAC ff:ff:ff:ff:ff:ff), not sent to one specific station.\nA2: NOT STATED.\nA3: NOT STATED.\nA4: No — the file states other hosts on the LAN only receive \"heard, ignored,\" with no reply edge shown.\nA5: Sent directly to just the requesting host — it is unicast (dst MAC = A's MAC).\nA6: A caches the IP→MAC binding as a local action, resulting in an entry in its ARP cache table (B's IP → aa:bb:cc:..., learned from the reply).\nA7: The request is meant to obtain that information — A \"wants MAC for B's IP\" and asks \"who-has B?\", implying it does not already know it.\nA8: NOT STATED.",
+  "raw_answer_text": "A1: Every station on the segment — the request is sent as a broadcast (dst MAC ff:ff:ff:ff:ff:ff), reaching all hosts, not just the target.\nA2: A lacks the MAC address mapping for B's IP (\"Host A wants MAC for B's IP\"), which is why it must broadcast the request.\nA3: NOT STATED — the file describes A's cache update but does not state that B stores any information from the request.\nA4: No — other hosts on the LAN receive the broadcast but are described as hearing it and ignoring it, with no reply sent.\nA5: It is sent directly to just the requesting host — the reply is unicast, \"delivered only to the requester (dst MAC = A's MAC).\"\nA6: A caches the IP → MAC binding from the reply; the result is a new entry in A's ARP cache mapping B's IP to aa:bb:cc:..., learned from the reply.\nA7: A does not know B's hardware address in the request — obtaining that MAC address is precisely the purpose of the request (\"who-has B?\").\nA8: NOT STATED.",
   "answers": {
-    "q1": "Every station on the segment — it is broadcast (dst MAC ff:ff:ff:ff:ff:ff), not sent to one specific station.",
-    "q2": "NOT STATED.",
-    "q3": "NOT STATED.",
-    "q4": "No — the file states other hosts on the LAN only receive \"heard, ignored,\" with no reply edge shown.",
-    "q5": "Sent directly to just the requesting host — it is unicast (dst MAC = A's MAC).",
-    "q6": "A caches the IP→MAC binding as a local action, resulting in an entry in its ARP cache table (B's IP → aa:bb:cc:..., learned from the reply).",
-    "q7": "The request is meant to obtain that information — A \"wants MAC for B's IP\" and asks \"who-has B?\", implying it does not already know it.",
+    "q1": "Every station on the segment — the request is sent as a broadcast (dst MAC ff:ff:ff:ff:ff:ff), reaching all hosts, not just the target.",
+    "q2": "A lacks the MAC address mapping for B's IP (\"Host A wants MAC for B's IP\"), which is why it must broadcast the request.",
+    "q3": "NOT STATED — the file describes A's cache update but does not state that B stores any information from the request.",
+    "q4": "No — other hosts on the LAN receive the broadcast but are described as hearing it and ignoring it, with no reply sent.",
+    "q5": "It is sent directly to just the requesting host — the reply is unicast, \"delivered only to the requester (dst MAC = A's MAC).\"",
+    "q6": "A caches the IP → MAC binding from the reply; the result is a new entry in A's ARP cache mapping B's IP to aa:bb:cc:..., learned from the reply.",
+    "q7": "A does not know B's hardware address in the request — obtaining that MAC address is precisely the purpose of the request (\"who-has B?\").",
     "q8": "NOT STATED."
   }
 }

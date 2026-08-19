@@ -131,6 +131,31 @@ is one place to look and nothing to reconcile.
 > are the same protocol answered both ways, which is the cheapest way to see
 > the difference.
 
+> **Three symptoms that ask you to CONFIRM the genre — and none of them
+> decides it.** Each one means: go back to [authoring.md Step 2](authoring.md#step-2--pick-the-genre-main-standard-first)'s
+> gate, ask the three questions again, and then either KEEP the figure where it
+> is with the reason written down, or MOVE it. Confirming and keeping is a
+> result; there is deliberately no lint on any of the three, because a symptom
+> that fires on correct figures is not a rule.
+>
+> - **A hand-written `shape=diamond` with `yes`/`no` edges under a scene
+>   genre.** The full row, with the measured reason there is no lint and the
+>   two live instances that are right for opposite reasons, is in the
+>   [authoring.md pitfall table](authoring.md#field-tested-pitfalls-quick-reference)
+>   — read it there rather than twice.
+> - **Ordinal mid-labels — `-[1: SYN]->`, `-[2: SYN-ACK]->`.** These are the
+>   sanctioned interim for time order under a scene genre and they are *naming,
+>   not semantics* (`MEANING-RECOVERY-SOURCE`; the rows above and the Known-limits entry below say
+>   so). Keeping them is the **deliberate-portability** pattern and it is only
+>   correct when the document SAYS so: a comment naming `sequence` as the genre
+>   not taken (it needs `figdown 0.4`) and stating that the numbers are a
+>   convention no parser reads. `examples/showcase/tcp-handshake.fd` is that
+>   pattern written out. Unstated ordinals are the failure case.
+> - **Many parallel edges crowding one pair of boxes.** Settled by the boxed
+>   note immediately above — *messages between one pair over time* versus
+>   *distinct transitions between states* — and in the second case the answer
+>   is [layout.md](layout.md), not a new header line.
+
 ---
 
 ## Data & format

@@ -1,0 +1,36 @@
+# FigDown — figures as text. Spec: https://github.com/FigDown/figdown
+
+# Demonstrator for `flow left` (maintainer review): direction is
+# a property of the FIGURE, and a response path is the natural subject for it
+# — the request went rightward off-stage, and this figure shows the reply
+# travelling back, so the flow axis runs right to left and the drawing reads
+# the way the sentence does. One `flow` line per document; a second is a line
+# error.
+figdown 0.1 block
+title "Response path — the reply travels right to left"
+
+class reply "Response — travels opposite to the request path" stroke=#2563eb
+
+node origin "Origin server"
+node cache  "Edge cache"
+node client "Client"
+
+flow left
+
+edge origin -[200 OK]-> cache class=reply
+edge cache -[200 OK (cached copy)]-> client class=reply
+
+# Layout zone — and the corpus's negative-coordinate demonstrator, moved here
+# from the RPF figure when that one went fully automatic. `at=`
+# is canvas px and the origin is a reference point, not a wall: the parser
+# accepts a negative component and the layout honours it. Here it lifts the
+# cache above the reply line, the way a side cache is drawn.
+#
+# WHAT A NEGATIVE COORDINATE DOES NOT DO — verified by rendering: it does not
+# move the page. The canvas grows RIGHT and DOWN only, so a negative
+# coordinate spends the margin that already exists above the content and
+# nothing more; past that the element is CLIPPED, not merely misplaced (the
+# layout gate's offcv axis reports exactly that). A negative x has no margin
+# to spend at all and always clips.
+layout
+pin cache at=(210,-16)

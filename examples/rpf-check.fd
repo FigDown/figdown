@@ -1,6 +1,24 @@
 # FigDown — figures as text. Spec: https://github.com/FigDown/figdown
 
-# Reverse-path-forwarding check — a small figure that reads RIGHT TO LEFT.
+# Reverse-path-forwarding check — a PROCEDURE that reads RIGHT TO LEFT.
+#
+# GENRE: `flowchart`, and it was `block` until this release. What the figure IS
+# never changed — a chain of stages, one decision, two terminal outcomes — but
+# under `block` the roles were carried by `shape=`: a diamond MEANT "decision"
+# and a rounded box MEANT "outcome", to a reader who had learned that. Shape is
+# presentation (`MEANING-RECOVERY-SOURCE`) and a convention has to be learned, while a word is read,
+# so those facts were asserted by nothing a reading agent could recover. Under
+# `flowchart` they are the keywords `process`, `decision` and `terminator`, the
+# geometry DERIVES from the role (box, diamond, rounded), and the figure states
+# what each stage is instead of drawing a hint at it (`DOMAIN-CONVENTION-DIRECTIVES`).
+#
+# THE PRICE, STATED: genre `flowchart` is EXPERIMENTAL — outside the
+# v0.1 conformance surface, so it may change or be withdrawn in a later `0.x`,
+# where `block` is normative. The declared version does NOT move: `flowchart`
+# has been dispatchable under `figdown 0.1` since the genre existed, and `edge`
+# is its connector word at this version (`flowline` is the 0.2 spelling and a
+# line error here). The four demonstrators below are genre-independent and all
+# four still execute — which is the only reason the trade was payable.
 #
 # What this figure probes: four constructs that had no demonstrator anywhere in
 # the corpus before 0.1. They are gathered into one small document on
@@ -14,55 +32,65 @@
 #      bracketed        comment mark loses its meaning inside one, so an edge
 #      edge label       label may carry a `#` without quoting or escaping it.
 #   4. a NEGATIVE   — `at=` is canvas px and the origin is not a wall. A pin may
-#      `at=` pin        sit at a negative coordinate; the engine translates the
-#                       whole scene so the canvas still starts at (0,0).
+#      `at=` pin        sit at a negative coordinate; the canvas still starts at
+#                       (0,0) because it grows right and down only, so what the
+#                       negative value spends is the margin already above the
+#                       content — and no more than that. See the pin's own note.
 #
 # The subject fits the direction: an RPF check runs BACKWARDS along the path a
 # packet arrived on, so a figure that reads right to left is the honest layout,
 # not a stunt. That is the test for `flow left` in real use — if reversing the
 # reading order does not say something about the subject, use `flow right`.
-figdown 0.1 block
+figdown 0.1 flowchart
 title "RPF check on a multicast join"
 
 class fail "RPF failure — the packet arrived on an interface that is not the route back to the source" stroke=#b91c1c style=dashed
 
-# The source is on the RIGHT because the check walks back TOWARDS it.
+# The source is on the RIGHT because the check walks back TOWARDS it. It is an
+# `external`, not a `terminator`: the packet's origin is outside this procedure
+# and this figure does not describe it, so the edge simply ends open at a label.
 external src "from 198.51.100.7"
 # `\n` (a line break) and `\\` (a literal backslash) are the other two escapes
 # the grammar defines — core §11 lists exactly three, and all three are in this
 # file. The interface filter is a regex, which is where a backslash occurs
 # naturally in a network figure rather than as a demonstration of itself.
-node rx "Ingress ge-0/0/1\nfilter ge-0/0/\\d+" shape=rounded
-node lookup "Unicast RIB lookup" shape=box
+#
+# NO `shape=` KEY SURVIVES THE CONVERSION, on purpose: the role supplies the
+# geometry, and re-stating it would put the drawing back in the author's hands
+# where the word already decides it. One visible delta and it is the honest one
+# — the ingress stage used to be drawn `shape=rounded` and now draws as a plain
+# box, because that is what `process` derives. The rounded corner was never
+# meaning; `terminator` (accept, drop) is where rounded means "this is where the
+# procedure ends", and those two still draw rounded because their ROLE says so.
+process rx "Ingress ge-0/0/1\nfilter ge-0/0/\\d+"
+process lookup "Unicast RIB lookup"
 # The escape `\"` puts a literal double quote inside a quoted label. The label
 # is one token to the parser either way — the quotes delimit it, the backslash
 # says "this quote is data".
-node verdict "Arrived on the \"upstream\" interface?" shape=diamond
-node accept "Accept and forward" shape=rounded
-node drop "Drop (RPF fail)" shape=rounded class=fail
+decision verdict "Arrived on the \"upstream\" interface?"
+terminator accept "Accept and forward"
+terminator drop "Drop (RPF fail)" class=fail
 
 # `#` inside a bracketed edge label. Before `VERBATIM-REGION-SCOPE` this needed quoting, because
 # the comment scanner ran before the label scanner and ate the rest of the line;
 # the ruling made a verbatim region protect EVERY mark, not just the one that
-# earned the rule. So `[VRF #7]` is four characters of label, not a comment.
+# earned the rule. So `[VRF #7]` is six characters of label, not a comment.
 edge src -[VRF #7]-> rx
 edge rx -> lookup
 edge lookup -[next-hop ge-0/0/1]-> verdict
 edge verdict -[yes]-> accept
 edge verdict -[no]-> drop class=fail
 
-# `left` is the whole point of this document: the scene's flow axis runs from
-# the source on the right back to the verdict on the left. One `flow` line per
-# document (a second is a line error) — direction is a property of the figure.
-flow left
-rank accept,drop
-
-# Layout zone: geometry only, no meaning. Strip it and the figure still says
-# the same thing (`GUI-WRITEBACK-STRUCTURE`).
-layout
-# A negative coordinate. `at=` is canvas px, and the canvas origin is a
-# reference point, not a wall: this nudge places the two verdict outcomes
-# above the main axis, and the engine shifts the whole scene so the rendered
-# canvas still begins at (0,0). Nothing is clipped and no other pin has to be
-# rewritten to compensate.
-pin drop at=(-30,0)
+# NO layout zone, on purpose (maintainer review). This figure
+# spent its whole life hand-tuned — `flow left`, a `rank`, and the corpus's
+# only negative-coordinate `pin` — and the maintainer compared the tuned
+# drawing against the genre's own default and ruled the default better: a
+# top-down flowchart with the verdict fanning to its two outcomes is the
+# drawing every reader already knows how to read. So the tuning went, which
+# is itself the demonstration `GUI-WRITEBACK-STRUCTURE` makes: strip the layout zone and the figure
+# says the same thing — here the stripped form is not merely equivalent but
+# preferred. The negative-coordinate findings that used to live beside the
+# pin (what `at=` does and does not do to the canvas) moved to
+# examples/patterns/block-c.fd, whose side-cache lift is a subject that
+# actually wants a negative coordinate, instead of riding a figure that no
+# longer needs one.

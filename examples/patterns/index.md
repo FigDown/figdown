@@ -12,6 +12,8 @@
   ![block-a](block-a.svg)
 - [block-b](block-b.fd) — containment tiers with cross-tier dashed feedback
   ![block-b](block-b.svg)
+- [block-c](block-c.fd) — a right-to-left response path (`flow left`), with the side cache lifted by the corpus's negative-coordinate pin
+  ![block-c](block-c.svg)
 
 ## Register / packet bit layouts
 - [bitfield-a](bitfield-a.fd) — one control word: flag run + wide fields + reserved (lsb0)

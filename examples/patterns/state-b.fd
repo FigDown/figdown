@@ -3,11 +3,11 @@
 figdown 0.2 statechart
 title "Hub Pattern: Multiple States Converging to Reset"
 
-state idle    "IDLE"     shape=rounded fill=#dbeafe
-state state_a "STATE_A"  shape=rounded
-state state_b "STATE_B"  shape=rounded
-state state_c "STATE_C"  shape=rounded
-state state_d "STATE_D"  shape=rounded
+state idle    "IDLE"     fill=#dbeafe
+state state_a "STATE_A"
+state state_b "STATE_B"
+state state_c "STATE_C"
+state state_d "STATE_D"
 
 flow down
 

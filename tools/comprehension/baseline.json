@@ -18,15 +18,36 @@
       },
       "conditions": {
         "commented": {
-          "correct": 10,
+          "correct": 11,
           "total": 16,
-          "score": 0.625,
+          "score": 0.6875,
           "readers": [
             {
               "reader": 1,
-              "correct": 4,
+              "correct": 6,
               "total": 8,
-              "not_stated": 3,
+              "not_stated": 2,
+              "unanswered": 0
+            },
+            {
+              "reader": 2,
+              "correct": 5,
+              "total": 8,
+              "not_stated": 2,
+              "unanswered": 0
+            }
+          ]
+        },
+        "syntax": {
+          "correct": 16,
+          "total": 24,
+          "score": 0.6667,
+          "readers": [
+            {
+              "reader": 1,
+              "correct": 6,
+              "total": 8,
+              "not_stated": 2,
               "unanswered": 0
             },
             {
@@ -35,31 +56,10 @@
               "total": 8,
               "not_stated": 2,
               "unanswered": 0
-            }
-          ]
-        },
-        "syntax": {
-          "correct": 13,
-          "total": 24,
-          "score": 0.5417,
-          "readers": [
-            {
-              "reader": 1,
-              "correct": 3,
-              "total": 8,
-              "not_stated": 3,
-              "unanswered": 0
-            },
-            {
-              "reader": 2,
-              "correct": 5,
-              "total": 8,
-              "not_stated": 2,
-              "unanswered": 0
             },
             {
               "reader": 3,
-              "correct": 5,
+              "correct": 4,
               "total": 8,
               "not_stated": 3,
               "unanswered": 0
@@ -67,9 +67,9 @@
           ]
         },
         "title-only": {
-          "correct": 21,
+          "correct": 20,
           "total": 24,
-          "score": 0.875,
+          "score": 0.8333,
           "readers": [
             {
               "reader": 1,
@@ -87,7 +87,7 @@
             },
             {
               "reader": 3,
-              "correct": 8,
+              "correct": 7,
               "total": 8,
               "not_stated": 0,
               "unanswered": 0
@@ -96,9 +96,9 @@
         }
       },
       "instrument_adjusted": {
-        "correct": 16,
+        "correct": 17,
         "total": 21,
-        "score": 0.7619,
+        "score": 0.8095,
         "means": "syntax condition, crediting answers the key wrongly rejected and dropping questions outside what the figure claims to show"
       }
     },
@@ -484,7 +484,7 @@
       }
     },
     "rpf-check": {
-      "genre": "block",
+      "genre": "flowchart",
       "figure": "examples/rpf-check.fd",
       "source": {
         "standard": "RFC 7761 / RFC 3704",
@@ -494,30 +494,30 @@
       },
       "conditions": {
         "commented": {
-          "correct": 9,
+          "correct": 8,
           "total": 16,
-          "score": 0.5625,
+          "score": 0.5,
           "readers": [
             {
               "reader": 1,
-              "correct": 5,
+              "correct": 3,
               "total": 8,
-              "not_stated": 2,
+              "not_stated": 4,
               "unanswered": 0
             },
             {
               "reader": 2,
-              "correct": 4,
+              "correct": 5,
               "total": 8,
-              "not_stated": 3,
+              "not_stated": 2,
               "unanswered": 0
             }
           ]
         },
         "syntax": {
-          "correct": 15,
+          "correct": 16,
           "total": 24,
-          "score": 0.625,
+          "score": 0.6667,
           "readers": [
             {
               "reader": 1,
@@ -535,17 +535,17 @@
             },
             {
               "reader": 3,
-              "correct": 5,
+              "correct": 6,
               "total": 8,
-              "not_stated": 2,
+              "not_stated": 1,
               "unanswered": 0
             }
           ]
         },
         "title-only": {
-          "correct": 24,
+          "correct": 23,
           "total": 24,
-          "score": 1,
+          "score": 0.9583,
           "readers": [
             {
               "reader": 1,
@@ -556,7 +556,7 @@
             },
             {
               "reader": 2,
-              "correct": 8,
+              "correct": 7,
               "total": 8,
               "not_stated": 0,
               "unanswered": 0
@@ -572,9 +572,9 @@
         }
       },
       "instrument_adjusted": {
-        "correct": 18,
+        "correct": 19,
         "total": 24,
-        "score": 0.75,
+        "score": 0.7917,
         "means": "syntax condition, crediting answers the key wrongly rejected and dropping questions outside what the figure claims to show"
       }
     },
@@ -684,9 +684,9 @@
       },
       "conditions": {
         "commented": {
-          "correct": 13,
+          "correct": 16,
           "total": 16,
-          "score": 0.8125,
+          "score": 1,
           "readers": [
             {
               "reader": 1,
@@ -697,7 +697,7 @@
             },
             {
               "reader": 2,
-              "correct": 5,
+              "correct": 8,
               "total": 8,
               "not_stated": 0,
               "unanswered": 0
@@ -866,28 +866,27 @@
   },
   "overall": {
     "syntax": {
-      "correct": 155,
+      "correct": 159,
       "total": 216,
-      "score": 0.7176
+      "score": 0.7361
     },
     "control": {
-      "correct": 197,
+      "correct": 195,
       "total": 216,
-      "score": 0.912
+      "score": 0.9028
     },
     "instrument_adjusted": {
-      "correct": 172,
+      "correct": 174,
       "total": 209,
-      "score": 0.823
+      "score": 0.8325
     },
     "failure_classes": {
-      "reader-error": 1,
-      "not-in-file": 34,
-      "grading-artifact": 17,
+      "not-in-file": 33,
       "bad-question": 7,
-      "ambiguous-syntax": 2
+      "ambiguous-syntax": 2,
+      "grading-artifact": 15
     },
-    "lift_points": -19.4,
+    "lift_points": -16.7,
     "meets_floor": true
   }
 }

@@ -78,21 +78,21 @@ class admin   "Administrative control — an operator action from outside BFD, n
 class hold    "No state change: the event has a defined outcome and that outcome is to stay put (RFC 5880 §6.8.6)" stroke=#64748b style=dotted
 
 # ── The four states (RFC 5880 §6.2; Sta encoding from §4.1) ──────────
-state down "DOWN\nSta=1" shape=rounded class=states
+state down "DOWN\nSta=1" class=states
 # Session is down, or has just been created. §6.2: it remains Down until
 # the remote system agrees the session is down by sending State other
 # than Up. Semantically the forwarding path is unavailable. A system MAY
 # hold a session here indefinitely by simply refusing to advance.
 
-state init "INIT\nSta=2" shape=rounded class=states
+state init "INIT\nSta=2" class=states
 # The remote system is communicating and the local system wants the
 # session up, but the remote system does not yet realise it. §6.2.
 
-state up "UP\nSta=3" shape=rounded class=states
+state up "UP\nSta=3" class=states
 # The session is established; connectivity between the systems is
 # working. §6.2.
 
-state admindown "ADMINDOWN\nSta=0" shape=rounded class=states
+state admindown "ADMINDOWN\nSta=0" class=states
 # Held administratively down. §6.2: this causes the REMOTE system to
 # enter Down and remain there until the local system leaves AdminDown,
 # and it has no semantic implication for the availability of the

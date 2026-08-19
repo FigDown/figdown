@@ -1,0 +1,149 @@
+{
+  "probe_version": "1.0.0",
+  "run": {
+    "utc": "2026-08-18T00:17:07Z",
+    "model_alias": "sonnet",
+    "model_used": "claude-sonnet-5",
+    "cli": "2.1.234 (Claude Code)",
+    "labeler": 3
+  },
+  "saw": {
+    "shown": "the system prompt, the eight genre documents' own opening Purpose paragraphs quoted verbatim, and the 24 subject briefs — nothing else",
+    "not_shown": "any genre-selection guideline, ladder, precedence rule or symptom table (drafted or shipped); the skill bundle; guide/authoring.md; any genre document beyond the quoted paragraph; the repository; the name of any figure in it",
+    "subjects_sha256": "00bb3a638935cee5ce265755d3e35aa3df0c48823030cb85cc6300f4fabfe0a3",
+    "system_sha256": "4b97a58a2f458b85c568b07f9c959bd00823f04bdbe68c6b4889b6ce4d2e9f48",
+    "user_sha256": "ff2f1da1c6f97269003dc691c1bfc1b2ee3351c381c25a686e4171fcfcf4d7c1"
+  },
+  "integrity": {
+    "turns": 1,
+    "permission_denials": 0,
+    "is_error": false
+  },
+  "usage": {
+    "cost_usd": 0.074178,
+    "duration_ms": 37946
+  },
+  "raw_answer_text": "SID S01 primary=sequence also=none reason=three parties exchange ordered messages with visible waiting points\nSID S02 primary=sequence also=none reason=ordered messages on the wire between client and replicas with round-trip visible\nSID S03 primary=statechart also=none reason=closed set of session states with events causing transitions, including admin hold\nSID S04 primary=statechart also=none reason=device modes (sleep/wake/transmit/fault) and the events that move between them\nSID S05 primary=flowchart also=none reason=ordered decision path through checks with branch conditions on edges\nSID S06 primary=flowchart also=none reason=on-call procedure with ordered steps and forks to follow top-down\nSID S07 primary=topology also=none reason=physical cabling of devices and redundant links in a campus network\nSID S08 primary=topology also=none reason=physical shape of a multi-site network and its failure points\nSID B01 primary=block also=none reason=page regions and how a slot structurally relates to its record\nSID B02 primary=block also=none reason=tree parts and sharing relations between snapshot versions\nSID B03 primary=block also=flowchart reason=pipeline stages with nested sandbox containment, though stages are also performed steps\nSID B04 primary=block also=none reason=explicit enclosing auth/cache areas and what crosses between them\nSID B05 primary=block also=none reason=parts with two distinct relation types (data flow vs configuration)\nSID B06 primary=block also=none reason=entities linked by distinct typed relations (authority, checked-against, reports-to)\nSID D01 primary=bitfield also=none reason=named register bit fields with explicit widths\nSID D02 primary=bitfield also=none reason=ordered header fields with widths on the wire\nSID D03 primary=table also=none reason=grid comparison of rates vs optics with multi-level header\nSID D04 primary=timing also=none reason=cycle-by-cycle signal relationship between CS, clock and data lines\nSID A01 primary=block also=none reason=datapath parts and their pipeline order, matching block's pipeline case\nSID A02 primary=statechart also=flowchart reason=modes of waiting/attempting endured over a retry loop, though also describable as performed steps\nSID A03 primary=topology also=block reason=deployment of devices/endpoints and their communication links across a cluster\nSID A04 primary=statechart also=flowchart reason=release stages describe where a release currently sits, an endured mode with rollback transition\nSID P01 primary=flowchart also=none reason=ordered update steps with two distinct failure branches\nSID P02 primary=flowchart also=none reason=ordered decision checks with a fallback branch",
+  "labels": {
+    "S01": {
+      "primary": "sequence",
+      "also": null,
+      "reason": "three parties exchange ordered messages with visible waiting points"
+    },
+    "S02": {
+      "primary": "sequence",
+      "also": null,
+      "reason": "ordered messages on the wire between client and replicas with round-trip visible"
+    },
+    "S03": {
+      "primary": "statechart",
+      "also": null,
+      "reason": "closed set of session states with events causing transitions, including admin hold"
+    },
+    "S04": {
+      "primary": "statechart",
+      "also": null,
+      "reason": "device modes (sleep/wake/transmit/fault) and the events that move between them"
+    },
+    "S05": {
+      "primary": "flowchart",
+      "also": null,
+      "reason": "ordered decision path through checks with branch conditions on edges"
+    },
+    "S06": {
+      "primary": "flowchart",
+      "also": null,
+      "reason": "on-call procedure with ordered steps and forks to follow top-down"
+    },
+    "S07": {
+      "primary": "topology",
+      "also": null,
+      "reason": "physical cabling of devices and redundant links in a campus network"
+    },
+    "S08": {
+      "primary": "topology",
+      "also": null,
+      "reason": "physical shape of a multi-site network and its failure points"
+    },
+    "B01": {
+      "primary": "block",
+      "also": null,
+      "reason": "page regions and how a slot structurally relates to its record"
+    },
+    "B02": {
+      "primary": "block",
+      "also": null,
+      "reason": "tree parts and sharing relations between snapshot versions"
+    },
+    "B03": {
+      "primary": "block",
+      "also": "flowchart",
+      "reason": "pipeline stages with nested sandbox containment, though stages are also performed steps"
+    },
+    "B04": {
+      "primary": "block",
+      "also": null,
+      "reason": "explicit enclosing auth/cache areas and what crosses between them"
+    },
+    "B05": {
+      "primary": "block",
+      "also": null,
+      "reason": "parts with two distinct relation types (data flow vs configuration)"
+    },
+    "B06": {
+      "primary": "block",
+      "also": null,
+      "reason": "entities linked by distinct typed relations (authority, checked-against, reports-to)"
+    },
+    "D01": {
+      "primary": "bitfield",
+      "also": null,
+      "reason": "named register bit fields with explicit widths"
+    },
+    "D02": {
+      "primary": "bitfield",
+      "also": null,
+      "reason": "ordered header fields with widths on the wire"
+    },
+    "D03": {
+      "primary": "table",
+      "also": null,
+      "reason": "grid comparison of rates vs optics with multi-level header"
+    },
+    "D04": {
+      "primary": "timing",
+      "also": null,
+      "reason": "cycle-by-cycle signal relationship between CS, clock and data lines"
+    },
+    "A01": {
+      "primary": "block",
+      "also": null,
+      "reason": "datapath parts and their pipeline order, matching block's pipeline case"
+    },
+    "A02": {
+      "primary": "statechart",
+      "also": "flowchart",
+      "reason": "modes of waiting/attempting endured over a retry loop, though also describable as performed steps"
+    },
+    "A03": {
+      "primary": "topology",
+      "also": "block",
+      "reason": "deployment of devices/endpoints and their communication links across a cluster"
+    },
+    "A04": {
+      "primary": "statechart",
+      "also": "flowchart",
+      "reason": "release stages describe where a release currently sits, an endured mode with rollback transition"
+    },
+    "P01": {
+      "primary": "flowchart",
+      "also": null,
+      "reason": "ordered update steps with two distinct failure branches"
+    },
+    "P02": {
+      "primary": "flowchart",
+      "also": null,
+      "reason": "ordered decision checks with a fallback branch"
+    }
+  }
+}

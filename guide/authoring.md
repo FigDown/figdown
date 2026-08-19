@@ -21,6 +21,7 @@ the older directories stay frozen beside it.)
 | Containment drawn as an invented edge A → sub-block | `group` + `in=` on member node; `gap=0` for flush stacking |
 | Dashed/colored frame "not supported" | `style=dashed`, `fill=`, `stroke=` are legal on any element including groups, and all three are NORMATIVE since 0.1 (`STROKE-KEY-STATUS`). There are exactly TWO paint channels, SVG's own: `fill=` is the interior, `stroke=` the outline of a shape and the WHOLE of a line — so an `edge`/`bundle`/`threshold` takes `stroke=` and never `fill=`. There is no label-colour key: `color=`/`text=` are retired line errors and the label colour is derived from the background (`COLOUR-KEY-STATUS`/`LABEL-COLOUR-SOURCE`) |
 | Yes/No decision edges lose colors | An edge is a line with no interior, so `fill=` cannot paint it — `stroke=` does. Declare `class yes "…" stroke=…` and `class no "…" stroke=…`, then tag edges `class=yes` / `class=no`. Keep `fill=` on the same class only if nodes join it too (it paints members that have an interior). A class joined by an edge that declares `fill=` with no `stroke=` is a line error (`INTERIOR-LESS-ELEMENT-PAINT`) — and a `style=` beside the `fill=` does not answer for the missing `stroke=`. A class that declares NO paint at all is legal: it claims a meaning and the edge keeps its default line (`CLASS-CHANNEL-REACH`) |
+| Hand-written `shape=diamond` with `yes`/`no` edges under a scene genre | **CONFIRM the genre — this symptom does not decide it** (`GENRE-SELECTION-PRECEDENCE`). Run Step 2's gate again: if the figure as a whole is a procedure with branches, `flowchart` says `decision` in a word instead of drawing a hint at it; if it is not, the diamond is fine where it stands. There is deliberately **no lint** on this shape, and three reasons why: of 216 question-labelled nodes in the production corpus only 78% are diamond (14% ellipse, 8% no shape), so the geometry has no inverse mapping; `shape=diamond` is the **sanctioned interim** for the mux/selector gap (expressing.md *Known limits*) and a gate must not condemn the language's own workaround; and `STATECHART-GENRE-SCOPE` already refused dispatching a genre from structure. Both live instances are right for opposite reasons — [`examples/annotated-datapath.fd`](../examples/annotated-datapath.fd) keeps its diamond under `block` because the figure needs `group`/`in=`, which `flowchart` does not have (Q3, `SCENE-KEYWORD-MEMBERSHIP`/`MEMBERSHIP-KEY-ACCEPTANCE`), and [`examples/rpf-check.fd`](../examples/rpf-check.fd) moved to `flowchart` and states the trade in its header comment |
 | Literal `\n` shows in label | `\n` works only inside quoted strings: `node a "Line one\nLine two"` |
 | Inventing label for an unlabeled shape | Never fabricate. Shape has NO text in the original → `node a ""` (records `label: ""`, draws blank). Label merely unknown/unreadable → omit it and flag in a `#` comment (the id renders as a placeholder). A cloud in the source is `shape=ellipse` with what it is in the label — `shape=cloud` was retired at 0.1 (`SHAPE-ENUM-VOCABULARY`: geometry only) |
 | External I/O as a fake node | Use `external <id> "label"` — never drawn as a shape, edge ends open |
@@ -57,18 +58,62 @@ in the provenance comment. The full check is
 | bit positions in a packet header / register | `bitfield` | **MAIN STANDARD** (NORMATIVE) |
 | rows × columns of values (configs, states, maps) | `table` | **MAIN STANDARD** (NORMATIVE) |
 | components, containment, dataflow — box-and-wire | `block` | **MAIN STANDARD** (NORMATIVE) |
-| devices and the links between them | `topology` | EXPERIMENTAL — prefer `block` when portable |
-| steps, decisions, and control flow | `flowchart` (defaults `flow down`; owns `process` / `decision` / `terminator`) | EXPERIMENTAL — prefer `block` + `flow down` when portable |
-| states a machine is IN, and transitions between them | `statechart` (**needs `figdown 0.2`**; a node is a `state`, a connector a `transition`) | EXPERIMENTAL — prefer `block` when portable. Choose it only when a node is a **mode endured**, not a step performed: a retry loop is a `flowchart` however its title reads |
+| devices and the links between them | `topology` | EXPERIMENTAL — EXPERIMENTAL **status** only: it is dispatchable under `figdown 0.1`, so choosing it costs **no version movement** |
+| steps, decisions, and control flow | `flowchart` (defaults `flow down`; owns `process` / `decision` / `terminator`) | EXPERIMENTAL — EXPERIMENTAL **status** only, same as `topology`: dispatchable under `figdown 0.1`, **no version movement** |
+| states a machine is IN, and transitions between them | `statechart` (**needs `figdown 0.2`**; a node is a `state`, a connector a `transition`) | EXPERIMENTAL — and it charges **both** prices: EXPERIMENTAL status **and** a declared version off `0.1`. Choose it only when a node is a **mode endured**, not a step performed: a retry loop is a `flowchart` however its title reads |
 | participants and the messages they exchange, **in time order** | `sequence` (**needs `figdown 0.4`**; participants are `lifeline` columns, time runs down the page, and `flow`/`rank`/`pin` do nothing here) | EXPERIMENTAL — and its withdrawal price is **not** `statechart`'s: that genre added no syntax, this one adds five keywords, an enum and a whole layout. Choose it when many lines run between the SAME pair of blocks **and** those lines are a time-ordered exchange; if they are distinct transitions of one machine, that is a `statechart` with a layout problem |
 | signals changing over time cycles | `timing` | EXPERIMENTAL |
 
-**Prefer the three main-standard genres** (`block`, `bitfield`, `table`)
-for anything that must stay portable across implementations and across
-v0.1. EXPERIMENTAL genres still parse and are not deprecated, but they
-sit outside the compatibility promise (`CONSTRUCT-STATUS-TIERS`, spec §10) and may change
-without a migration entry. Use them only when the figure truly needs
-them and portability is not a goal.
+### The gate: three questions, in this order (`GENRE-SELECTION-PRECEDENCE`)
+
+**Q1 — IDENTITY, and it decides.** Read the table above **downwards** and stop
+at the first row that describes the figure **as a whole**. Not its subject, not
+its domain, not the tool it came from: what the figure *is*. **The table is
+ordered by STATUS, not by precedence, and `block` is the one row you read
+LAST** wherever it sits: it is the **RESIDUAL on identity**, right only when no
+*other* row names the figure, and never right merely because it is the row you
+know best. (Its own genre document says the same from the other side: `block`
+is chosen positively for structural relations and containment, or as the
+residual for subjects no genre names — and the residual reading carries an
+obligation to state what is lost.)
+
+**Q2 — PORTABILITY, which MAY overrule Q1 — but only as a trade you STATE.**
+Portability is two prices, and they are charged by different rows. Keep them
+apart, because conflating them is the measured way authors get this wrong:
+
+| The price | What it costs | Which rows charge it |
+|---|---|---|
+| **the declared version** | the header leaves `figdown 0.1`, so a reader pinned to an older language version cannot read the file at all | `statechart` (`0.2`) · `sequence` (`0.4`) |
+| **the EXPERIMENTAL status** | the construct parses today but sits outside the v0.1 conformance surface and its compatibility promise (`CONSTRUCT-STATUS-TIERS`, spec §10), so it may change or be withdrawn in a later `0.x` | every EXPERIMENTAL row, `topology` and `flowchart` included |
+
+- **`topology` and `flowchart` cost NO version movement.** Both have been
+  dispatchable under `figdown 0.1` since they existed. So *"I need this to
+  render on any released version"* is **not** an argument for leaving those two
+  rungs, and it **must not be offered as one**. What you are trading there is
+  status alone — the withdrawal risk — and that is a real risk to weigh, not
+  the same risk.
+- **`statechart` and `sequence` cost a real version move**, so taking the lower
+  rung is a legitimate choice. It is a **DECLARED** choice: write a comment
+  that names the genre you did not take and states what the reader must **not**
+  conclude from the one you did.
+  [`examples/showcase/tcp-handshake.fd`](../examples/showcase/tcp-handshake.fd) is
+  the pattern — it stays `figdown 0.1`, says which genre it is not using, and
+  says that its `1:`/`2:` ordinals are a naming convention and not an ordering
+  the language can read.
+- **Silence is the failure.** An approximation you state is a transitional
+  position with an upgrade path recorded in it; an approximation you do not
+  state is terminal by default, and `GENRE-EARNING-THRESHOLD` §4 is where that stops being acceptable.
+
+**Q3 — CAPACITY, which disqualifies.** A genre that names the figure and
+cannot hold it is the wrong genre. `flowchart` and `statechart` declare no
+`group` and take no `in=` (`SCENE-KEYWORD-MEMBERSHIP`/`MEMBERSHIP-KEY-ACCEPTANCE`), so if the figure's content is nested
+regions, **containment is a POSITIVE reason** to write `block` or `topology` —
+a reason of its own, not a portability excuse wearing one.
+
+**The choice recurs per section, and the version follows the genre.** A
+multi-section file asks all three questions again at every
+`figdown <version> <genre>` line, and each section declares its own version:
+write the **lowest** one that carries **that section** (`STATECHART-GENRE-SCOPE`).
 
 The genre is the header's second token — `figdown 0.1 <genre>` — and it
 is **required**: a header with no genre is a line error. (The header

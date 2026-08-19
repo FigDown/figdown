@@ -1,10 +1,10 @@
 {
   "suite_version": "1.0.0",
   "run": {
-    "utc": "2026-08-16T06:13:20Z",
+    "utc": "2026-08-18T00:30:34Z",
     "model_alias": "sonnet",
     "model_used": "claude-sonnet-5",
-    "cli": "2.1.233 (Claude Code)",
+    "cli": "2.1.234 (Claude Code)",
     "condition": "commented",
     "reader": 1
   },
@@ -12,15 +12,15 @@
     "id": "tcp-state-machine",
     "genre": "statechart",
     "path": "examples/showcase/tcp-state-machine.fd",
-    "file_sha256": "8a207b6cedc203c7f3d1bfefefc7cdd6d44ef4e3448a236bd83e41f6b4334827",
+    "file_sha256": "10f50b758555b42ba0861f693de1db15f68b9849f60155bd7549a7b5dded7251",
     "title_shown": null,
-    "presented_sha256": "edb67c03151d621ca0b6c7700d43a84665d8032b4ea487d3a67937da9ea4c72d",
-    "presented_lines": 169,
-    "presented_chars": 9591
+    "presented_sha256": "504a95d5b4d1440f490e227610fa64f0eb634e517ebddae66177a6e614a026d6",
+    "presented_lines": 198,
+    "presented_chars": 11528
   },
   "prompt": {
     "system_sha256": "1a78658262dc29e7e24cbe3e1eb72659cf31990e85deddacf0b1625e40c5eac2",
-    "user_sha256": "d1dcd27cadabab52522f41ddeb43419c8874db0d01c4d3828ac9ff80f8bc4f2e",
+    "user_sha256": "ba81e6151e32f3f9d0eb74042b9aa0f3c31fb800b3ee15d6f8bb239a6023bdc1",
     "question_set_sha256": "641cf227e8e4da669d9b113d4db05d74b8a3f3c764dfeaea231677895a57621d"
   },
   "cold_room": {
@@ -39,21 +39,21 @@
     "is_error": false
   },
   "usage": {
-    "cost_usd": 0.038769,
+    "cost_usd": 0.046676999999999996,
     "input_tokens": 2,
-    "output_tokens": 579,
-    "cache_creation_input_tokens": 5013,
-    "duration_ms": 5776
+    "output_tokens": 721,
+    "cache_creation_input_tokens": 5976,
+    "duration_ms": 6628
   },
-  "raw_answer_text": "A1: It moves to SYN-RECEIVED and sends a SYN,ACK segment.\nA2: It enters SYN-SENT and sends a SYN segment (after creating the TCB).\nA3: It sends an ACK and the connection reaches the ESTABLISHED state.\nA4: It moves to FIN-WAIT-1 and sends a FIN.\nA5: It moves to CLOSE-WAIT and sends an ACK.\nA6: A local CLOSE event moves it to LAST-ACK, and the TCP sends a FIN.\nA7: It moves to CLOSING (sending an ACK).\nA8: 2MSL (Timeout=2MSL) before deleting the TCB and moving to CLOSED.",
+  "raw_answer_text": "A1: It moves to SYN-RECEIVED and sends a SYN,ACK segment.\nA2: It enters SYN-SENT and sends a SYN segment (after creating the TCB).\nA3: It sends an ACK and the connection reaches the ESTABLISHED state.\nA4: It moves to FIN-WAIT-1 and sends a FIN.\nA5: It moves to CLOSE-WAIT and sends an ACK.\nA6: A local CLOSE call moves it to LAST-ACK, and the TCP sends a FIN.\nA7: It moves to CLOSING (via the \"rcv FIN / snd ACK\" transition).\nA8: 2MSL (Timeout=2MSL) before deleting the TCB and moving to CLOSED.",
   "answers": {
     "q1": "It moves to SYN-RECEIVED and sends a SYN,ACK segment.",
     "q2": "It enters SYN-SENT and sends a SYN segment (after creating the TCB).",
     "q3": "It sends an ACK and the connection reaches the ESTABLISHED state.",
     "q4": "It moves to FIN-WAIT-1 and sends a FIN.",
     "q5": "It moves to CLOSE-WAIT and sends an ACK.",
-    "q6": "A local CLOSE event moves it to LAST-ACK, and the TCP sends a FIN.",
-    "q7": "It moves to CLOSING (sending an ACK).",
+    "q6": "A local CLOSE call moves it to LAST-ACK, and the TCP sends a FIN.",
+    "q7": "It moves to CLOSING (via the \"rcv FIN / snd ACK\" transition).",
     "q8": "2MSL (Timeout=2MSL) before deleting the TCB and moving to CLOSED."
   }
 }

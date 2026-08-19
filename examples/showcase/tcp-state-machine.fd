@@ -73,18 +73,18 @@ class server  "Passive-close path (typically the server) — receives the peer's
 class rare    "Rare / simultaneous transition — simultaneous open or close, or a reset/abort (RST, close from a half-open state)" stroke=#9333ea style=dashed
 
 # ── The 11 states (CLOSED drawn twice; see `IDENTITY-ASSERTION` note above) ────────
-state closed "CLOSED"        shape=rounded class=states
-state listen "LISTEN"        shape=rounded class=states
-state synsent "SYN-SENT"     shape=rounded class=states
-state synrcvd "SYN-RECEIVED" shape=rounded class=states
-state estab  "ESTABLISHED"   shape=rounded class=states
-state fw1    "FIN-WAIT-1"    shape=rounded class=states
-state fw2    "FIN-WAIT-2"    shape=rounded class=states
-state closing "CLOSING"      shape=rounded class=states
-state closewait "CLOSE-WAIT" shape=rounded class=states
-state lastack "LAST-ACK"     shape=rounded class=states
-state timewait "TIME-WAIT"   shape=rounded class=states
-state closed2 "CLOSED"       shape=rounded class=states
+state closed "CLOSED"        class=states
+state listen "LISTEN"        class=states
+state synsent "SYN-SENT"     class=states
+state synrcvd "SYN-RECEIVED" class=states
+state estab  "ESTABLISHED"   class=states
+state fw1    "FIN-WAIT-1"    class=states
+state fw2    "FIN-WAIT-2"    class=states
+state closing "CLOSING"      class=states
+state closewait "CLOSE-WAIT" class=states
+state lastack "LAST-ACK"     class=states
+state timewait "TIME-WAIT"   class=states
+state closed2 "CLOSED"       class=states
 
 flow down
 
@@ -127,17 +127,46 @@ layout
 # list than it used to be.
 #
 # The grid reproduces the CANONICAL Figure 5 composition, mirrored about
-# one central vertical axis (x≈430, the shared centre of CLOSED, LISTEN
-# and ESTABLISHED):
+# one central vertical axis (x≈430, the shared centre of LISTEN and
+# ESTABLISHED):
 #   row0 CLOSED · row1 LISTEN · row2 SYN-RECEIVED | SYN-SENT (a mirrored
 #   pair) · row3 ESTABLISHED · row4 FIN-WAIT-1 | CLOSE-WAIT (same mirror)
-#   · row5 FIN-WAIT-2, CLOSING, LAST-ACK · row6 TIME-WAIT, CLOSED
+#   · row4½ CLOSING · row5 FIN-WAIT-2, LAST-ACK · row6 TIME-WAIT, CLOSED
 #   (terminus, under LAST-ACK as the RFC draws it).
-# Column discipline: CLOSED→LISTEN, SYN-RECEIVED→FIN-WAIT-1→FIN-WAIT-2,
-# CLOSING→TIME-WAIT, CLOSE-WAIT→LAST-ACK→CLOSED run dead vertical; the
-# simultaneous-open transition SYN-SENT→SYN-RECEIVED runs dead horizontal
-# between the mirrored pair. All meaning is in the transitions; this is
-# layout, not knowledge.
+#
+# COLUMN DISCIPLINE, AS IT ACTUALLY IS. This block used to
+# claim four dead-vertical chains and only two of them were: measuring
+# the centres found SYN-RECEIVED→FIN-WAIT-1 off by 32 px and
+# CLOSE-WAIT→LAST-ACK off by 7 px, both of which had been read as
+# vertical since the pins were written. A comment that names a chain the
+# pins below it do not honour is worse than no comment, so this is the
+# measured list and nothing else is claimed:
+#   DEAD VERTICAL   FIN-WAIT-1→FIN-WAIT-2 (centre x 209 both)
+#                   LAST-ACK→CLOSED       (732.8 / 732.6)
+#   DEAD HORIZONTAL SYN-SENT→SYN-RECEIVED (centre y 328 both) — the
+#                   simultaneous-open transition, across the mirrored pair
+#   NEAR, NOT DEAD  CLOSE-WAIT→LAST-ACK (7.2 px), the passive-close column
+#   DELIBERATELY OFF-AXIS  CLOSED (535.6) sits right of the LISTEN column
+#                   (429.6), and CLOSING (439.2) right of TIME-WAIT (350.4)
+# The last row is the 0.4 pin change and both offsets are load-
+# bearing, not taste. CLOSED sat dead above LISTEN, which ran the
+# CLOSED↔SYN-SENT diagonal pair straight through the `passive OPEN /
+# create TCB` label on the CLOSED→LISTEN line; moving CLOSED right (and
+# LISTEN 50 px down) gives each of `CLOSE / delete TCB`, `passive OPEN /
+# create TCB` and `active OPEN / create TCB, snd SYN` its own line to
+# belong to. CLOSING sat dead above TIME-WAIT, and that vertical ran
+# through the `rcv FIN,ACK / snd ACK` label of the FIN-WAIT-1→TIME-WAIT
+# diagonal (RFC Note 2's transition); lifting CLOSING up and right opens
+# the channel that label needs. Measured: `layout-lint` lblcol 2→0 and
+# F5 1→0, figure score 4→0.
+# DROPPING FIN-WAIT-2 DEEPER WAS TRIED AND REJECTED. It is the obvious
+# way to widen the same channel, and the measurement says it never is:
+# across 150 combinations of CLOSING and TIME-WAIT positions taken at
+# y=690 and y=700, FIN-WAIT-2 deeper is worse in 30 and better in NONE.
+# What goes wrong is the neighbour: the FIN-WAIT-2→TIME-WAIT diagonal
+# shortens onto its own `rcv FIN / snd ACK` label. At the pins used here
+# it costs exactly one lblcol strike. FIN-WAIT-2 stays on row 5 at y=670.
+# All meaning is in the transitions; this is layout, not knowledge.
 #
 # WHAT CHANGED, AND WHY THE TOP ROWS ARE WIDER.
 # Hand-routed corridors used to sit below these pins: the active
@@ -158,15 +187,15 @@ layout
 # anti-parallel fan-out is the language's answer to a same-pair transition, and
 # the class colours (blue = setup, purple = rare) say which stroke is
 # which.
-pin closed    at=(394,20)
-pin listen    at=(394,170)
+pin closed    at=(500,20)
+pin listen    at=(394,220)
 pin synrcvd   at=(120,290)
 pin synsent   at=(700,290)
 pin estab     at=(376,410)
 pin fw1       at=(159,540)
 pin closewait at=(690,540)
 pin fw2       at=(159,670)
-pin closing   at=(311,670)
+pin closing   at=(400,620)
 pin lastack   at=(690,670)
 pin timewait  at=(304,800)
 pin closed2   at=(697,800)

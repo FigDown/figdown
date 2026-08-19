@@ -1,6 +1,6 @@
 ---
 name: figdown
-description: Draw a figure a human can read and an agent can read too — FigDown .fd text that states the meaning, with a deterministic SVG embedded in Markdown. Use when asked to create, edit, fix, or read diagrams/figures in docs — block and architecture diagrams, topologies, flowcharts, bit-level layouts (packet headers, hardware registers), tables, timing waveforms — or when a .md contains an SVG with a "source: *.fd" footer.
+description: Draw a figure a human can read and an agent can read too — FigDown .fd text that states the meaning, with a deterministic SVG embedded in Markdown. Use when asked to create, edit, fix, or read diagrams/figures in docs — block and architecture diagrams, topologies, flowcharts, state machines, message-sequence exchanges between parties, bit-level layouts (packet headers, hardware registers), tables, timing waveforms — or when a .md contains an SVG with a "source: *.fd" footer.
 ---
 
 # FigDown — figures as text, one source, two readers
@@ -67,7 +67,11 @@ everything it produces is a hypothesis until checked.
 is not a graph: it is a `table`. Conditions with one outcome per combination is
 a `table`, not a `flowchart` — drawn as a chart it buys crossing edges and
 nothing else. Two mirrored mechanisms are two figures. A run in which most of a
-page's figures become tables is a correct run.
+page's figures become tables is a correct run. **The SHAPES in the source
+drawing are the tempting signal and they carry nothing** — the original author
+picked them by habit, by stencil and by tool default, and no two drawings agree;
+what decides the genre is the ROLES and the QUESTIONS in it, which is what the
+extraction gives you and the picture does not.
 
 **3 — Separate what the source states from what you concluded.** Write the
 stated thing; for the rest, leave a `#` comment at the point of doubt and list
@@ -143,8 +147,21 @@ Two more files answer a **task** rather than a genre:
   format → `reference/transcribe.md`.
 
 Pick the genre by what the figure IS, not by its subject: the left-hand
-column above says what each is for. Prefer the first three — they are the
-portable ones.
+column above says what each is for.
+
+**Where portability and that answer disagree, the ANSWER decides.** `block`,
+`bitfield` and `table` are the portable three — inside the v0.1 conformance
+surface and its compatibility promise — and taking one of them *against* the
+answer is a trade you STATE, never a default. State it in a `#` comment that
+names the genre you did not write and what the reader must not conclude from
+the one you did. Two different prices hide under the word "portable" and they
+are charged by different rows: `topology` and `flowchart` are dispatchable at
+`figdown 0.1`, so choosing them moves no version and only carries the EXPERIMENTAL
+withdrawal risk; `statechart` and `sequence` move the declared version as well.
+"It must render on any released version" is therefore not an argument for
+leaving the first two. An approximation you do not state is indistinguishable
+from a judgement about what the figure is, so the reader inherits the wrong
+one.
 
 **Load the genre file BEFORE you write line 2, not only when something
 fails.** A scene genre may spell the thing and the line with **its own
@@ -186,11 +203,14 @@ figdown 0.1 block           # REQUIRED first significant line; comments and
                             # A later `figdown 0.1 <genre>` starts a new
                             # section with its own genre; one file still
                             # renders to one SVG.
-                            # The VERSION is `0.1` or `0.2`. Write the LOWEST
-                            # one that carries what the figure needs — `0.2`
-                            # only for `statechart`, which does not exist at
-                            # `0.1`. Sections may differ; each declares its
-                            # own.
+                            # The VERSION is `0.1`, `0.2` or `0.4`. Write the
+                            # LOWEST one that carries what the figure needs.
+                            # `0.1` carries every other genre. `0.2` is the
+                            # floor for `statechart` and `0.4` the floor for
+                            # `sequence`: neither exists at `0.1`, and a
+                            # version below a genre's floor is a line error
+                            # (`figdown 0.3 sequence` does not parse).
+                            # Sections may differ; each declares its own.
 title "Some Title"          # optional; the quotes are REQUIRED
 # comments start with '#'; inside quotes the only escapes are \n \" \\
 class hot "Congested path" stroke=#dc2626   # meaning + style, declared once

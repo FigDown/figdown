@@ -1,0 +1,59 @@
+{
+  "suite_version": "1.0.0",
+  "run": {
+    "utc": "2026-08-16T06:09:10Z",
+    "model_alias": "sonnet",
+    "model_used": "claude-sonnet-5",
+    "cli": "2.1.233 (Claude Code)",
+    "condition": "syntax",
+    "reader": 1
+  },
+  "figure": {
+    "id": "tcp-state-machine",
+    "genre": "statechart",
+    "path": "examples/showcase/tcp-state-machine.fd",
+    "file_sha256": "8a207b6cedc203c7f3d1bfefefc7cdd6d44ef4e3448a236bd83e41f6b4334827",
+    "title_shown": null,
+    "presented_sha256": "b8581914e85d6e591146a24cea1306b1abbcbfebc4cd5df3fea196794f45fea5",
+    "presented_lines": 63,
+    "presented_chars": 3135
+  },
+  "prompt": {
+    "system_sha256": "1a78658262dc29e7e24cbe3e1eb72659cf31990e85deddacf0b1625e40c5eac2",
+    "user_sha256": "ede9b3c0d0cd568d394a292c91f71c09ebaeac089dc14f6dd4ec5be26f28d1ca",
+    "question_set_sha256": "641cf227e8e4da669d9b113d4db05d74b8a3f3c764dfeaea231677895a57621d"
+  },
+  "cold_room": {
+    "cwd": "an isolated empty temporary directory outside the repository",
+    "tools_offered": "none — every tool denied by name",
+    "mcp_servers": "none",
+    "settings": "safe-mode: no project or user settings, no memory file, no skills, no plugins, no hooks",
+    "session_persistence": false,
+    "shown": "the system prompt, the presented file text, and the questions — nothing else",
+    "not_shown": "the specification, any genre document, any other .fd file, the file name, the name of the language, the repository"
+  },
+  "integrity": {
+    "turns": 1,
+    "permission_denials": 0,
+    "tool_calls_observed": false,
+    "is_error": false
+  },
+  "usage": {
+    "cost_usd": 0.017949,
+    "input_tokens": 2,
+    "output_tokens": 257,
+    "cache_creation_input_tokens": 2348,
+    "duration_ms": 2997
+  },
+  "raw_answer_text": "A1: It moves to SYN-RECEIVED and sends a SYN,ACK segment.\nA2: It enters SYN-SENT and sends a SYN segment (also creating the TCB).\nA3: It sends an ACK, and the connection reaches the ESTABLISHED state.\nA4: It moves to FIN-WAIT-1 and sends a FIN.\nA5: It moves to CLOSE-WAIT and sends an ACK.\nA6: A CLOSE from the local application moves it to LAST-ACK, and the TCP sends a FIN.\nA7: It moves to CLOSING (it sends an ACK in response to the FIN).\nA8: It must wait for a timeout of 2MSL before transitioning to CLOSED.",
+  "answers": {
+    "q1": "It moves to SYN-RECEIVED and sends a SYN,ACK segment.",
+    "q2": "It enters SYN-SENT and sends a SYN segment (also creating the TCB).",
+    "q3": "It sends an ACK, and the connection reaches the ESTABLISHED state.",
+    "q4": "It moves to FIN-WAIT-1 and sends a FIN.",
+    "q5": "It moves to CLOSE-WAIT and sends an ACK.",
+    "q6": "A CLOSE from the local application moves it to LAST-ACK, and the TCP sends a FIN.",
+    "q7": "It moves to CLOSING (it sends an ACK in response to the FIN).",
+    "q8": "It must wait for a timeout of 2MSL before transitioning to CLOSED."
+  }
+}

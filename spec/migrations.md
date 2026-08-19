@@ -246,6 +246,26 @@ generalisation and the group-band refusal are **not** version-gated, so a newer
 engine reading an older header applies both, and an archived engine is the only
 place the older behaviour still runs.
 
+**`v0.4.1` — a `Z` release under this language version (2026-08-18).** The
+language does not move: `figdown` stays `0.4`, no `.fd` gains or loses a
+spelling, no conformance golden changes, and `read/0.4/` is reused
+byte-for-byte as the frozen reading contract this release does NOT rewrite
+(core §13.7.3). What ships is the repair line 0.4 → 0.4,
+every state of it entered below. **Two of its changes act on documents that do
+not move their header**, and they are the sentences to read first, because
+neither is version-gated. A `pin` whose box covers another node **completely**
+is refused at geometry time when at least one of the two boxes sits at a
+coordinate the author never wrote; a cover both of whose boxes are pinned is an
+author statement in the one paint order the language has and is still drawn,
+and **partial** overlap stays an advisory and never becomes an error. And
+`sequence`'s no-restatement check is now **operand-scoped**, which only
+legalises: a `state` restated in a *sibling* operand of the same fragment was
+refused and is now accepted, because at most one operand of a fragment occurs.
+Both are the `0.4` entry below. **A `Z` carries no
+archive obligation of its own**: the runnable page and the manifest rows are
+indexed by **language** version, are listed in this section's table, and are
+owed at the `0.4` publish — a `Z` adds no second page beside the first.
+
 ## Entry format
 
 ```

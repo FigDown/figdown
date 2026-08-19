@@ -1,0 +1,63 @@
+{
+  "probe_version": "1.0.0",
+  "run": {
+    "utc": "2026-08-18T00:20:05Z",
+    "model_alias": "sonnet",
+    "model_used": "claude-sonnet-5",
+    "cli": "2.1.234 (Claude Code)",
+    "condition": "naive",
+    "reader": 1
+  },
+  "subject": {
+    "sid": "A04",
+    "bucket": "ambiguous",
+    "subjects_sha256": "00bb3a638935cee5ce265755d3e35aa3df0c48823030cb85cc6300f4fabfe0a3",
+    "brief_sha256": "92ced9d2558e5b8f8939959c639358b4a2af7009d312161c3312449318138216"
+  },
+  "presented": {
+    "what": "the subject brief and the eight genre names, one \"use when\" line each, taken verbatim from PURPOSE_SHORT in this tool",
+    "bundle_path": null,
+    "bundle_sha256": null,
+    "bundle_chars": 0
+  },
+  "prompt": {
+    "system_sha256": "f0c9d216983b082a65bb1ba2a4c4224d7faf8950a8d5487f4fd85d9badfce1bd",
+    "user_sha256": "47c772a58ad49e851010153f73eaafca2691fce54aa1b8b526c218c5707899f5",
+    "user_chars": 1357
+  },
+  "cold_room": {
+    "cwd": "an isolated empty temporary directory outside the repository",
+    "tools_offered": "none — every tool denied by name",
+    "mcp_servers": "none",
+    "settings": "safe-mode: no project or user settings, no memory file, no skills, no plugins, no hooks",
+    "session_persistence": false,
+    "shown": "the system prompt, eight genre names with one \"use when\" line each, and the subject brief — nothing else",
+    "not_shown": "the specification, any genre document, any genre-selection guideline (none exists), guide/authoring.md, any .fd file, the repository, the answer key"
+  },
+  "integrity": {
+    "turns": 1,
+    "permission_denials": 0,
+    "tool_calls_observed": false,
+    "is_error": false
+  },
+  "usage": {
+    "cost_usd": 0.004383,
+    "input_tokens": 931,
+    "output_tokens": 106,
+    "duration_ms": 2557
+  },
+  "raw_answer_text": "<!-- author: <redacted-account-email>; date: 2026-08-17; release lifecycle tracker -->\nfigdown 0.1 statechart # closed set of stages + rollback transitions, tracking current state",
+  "answer": {
+    "version": "0.1",
+    "genre": "statechart",
+    "reason": "closed set of stages + rollback transitions, tracking current state",
+    "reason_source": "trailing comment on the header line",
+    "header_line": "figdown 0.1 statechart # closed set of stages + rollback transitions, tracking current state"
+  },
+  "redaction": {
+    "what": "one email address, replaced with <redacted-account-email>",
+    "where": "raw_answer_text only",
+    "why": "The reader invented a provenance comment line and put the running account's email address in it. No repository file may carry a personal identifier. The redacted string is not part of any scored field: the score is the genre token of the header line, and no hash in this transcript covers raw_answer_text.",
+    "how_it_got_there": "the reader was never given a provenance line to copy in this condition and had the account identity in its harness context — a COLD-ROOM LEAK, recorded in decisions/registry.md rather than smoothed away"
+  }
+}

@@ -35,7 +35,9 @@
 //   - if the parse reports errors: compare the SORTED error lines against
 //     NNN-name.errors.txt;
 //   - otherwise: project the doc through normalize.js and compare against
-//     NNN-name.model.json (pretty-printed, trailing newline).
+//     NNN-name.model.json (pretty-printed, trailing newline), AND compare any
+//     GEOMETRY-TIME diagnostics from render() against NNN-name.geometry.txt
+//     (absent when the figure renders clean).
 // Additionally every valid case gets a determinism self-check: parse+render
 // twice, the SVG byte streams must be identical. SVG output itself has no
 // goldens (renderer-version-specific by spec section 3: only same source +
@@ -252,6 +254,7 @@ for (const entry of files) {
   const src = fs.readFileSync(path.join(CASES, entry.file), 'utf8');
   const errPath = path.join(CASES, base + '.errors.txt');
   const modelPath = path.join(CASES, base + '.model.json');
+  const geoPath = path.join(CASES, base + '.geometry.txt');
   let parsed;
   try { parsed = engine.parse(src); }
   catch (e) { report(base, false, 'parse threw: ' + e.message); continue; }
@@ -296,6 +299,33 @@ for (const entry of files) {
     const svg2 = renderParsed(engine.parse(src));
     if (svg1 !== svg2) { report(base, false, 'determinism self-check: two renders of the same source differ'); continue; }
   } catch (e) { report(base, false, 'render threw: ' + e.message); continue; }
+
+  // GEOMETRY-TIME DIAGNOSTICS. A figure whose SOURCE is
+  // impeccable can still draw a false statement — a group band that encloses a
+  // non-member, a pin that covers a node completely — and the engine reports
+  // those from `render`, not from `parse`. Until now nothing in this corpus
+  // could express one: the runner rendered only to compare two byte streams and
+  // threw the diagnostics away, so the whole channel `tools/build-svg.js` gates
+  // artifacts on was untested. A case that renders with diagnostics is pinned by
+  // NNN-name.geometry.txt, exactly as a parse error is pinned by
+  // NNN-name.errors.txt; a case that renders clean must have no such golden.
+  let gerrs;
+  try {
+    const p2 = engine.parse(src);
+    const ds = p2.docs && p2.docs.length ? p2.docs : [p2.doc];
+    gerrs = ds.reduce((a, d) => a.concat(engine.render(d).errs || []), []);
+  } catch (e) { report(base, false, 'render threw: ' + e.message); continue; }
+  const gActual = gerrs.length ? gerrs.slice().sort().join('\n') + '\n' : '';
+  if (update) {
+    if (gerrs.length) { fs.writeFileSync(geoPath, gActual); updated++; console.log('UPDT  ' + base + '  (' + gerrs.length + ' geometry diagnostic' + (gerrs.length > 1 ? 's' : '') + ')'); }
+    else if (fs.existsSync(geoPath)) fs.unlinkSync(geoPath);
+  } else if (gerrs.length) {
+    if (!fs.existsSync(geoPath)) { report(base, false, 'missing golden ' + base + '.geometry.txt — actual geometry diagnostics:\n' + gActual); continue; }
+    const gExpected = fs.readFileSync(geoPath, 'utf8');
+    if (gExpected !== gActual) { report(base, false, 'geometry mismatch\n--- expected\n' + gExpected + '--- actual\n' + gActual); continue; }
+  } else if (fs.existsSync(geoPath)) {
+    report(base, false, 'stale golden: case now renders clean but ' + base + '.geometry.txt exists'); continue;
+  }
 
   if (update) {
     fs.writeFileSync(modelPath, actual);

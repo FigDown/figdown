@@ -1,10 +1,10 @@
 {
   "suite_version": "1.0.0",
   "run": {
-    "utc": "2026-08-16T06:20:49Z",
+    "utc": "2026-08-18T00:29:23Z",
     "model_alias": "sonnet",
     "model_used": "claude-sonnet-5",
-    "cli": "2.1.233 (Claude Code)",
+    "cli": "2.1.234 (Claude Code)",
     "condition": "title-only",
     "reader": 1
   },
@@ -12,7 +12,7 @@
     "id": "arp-resolution",
     "genre": "topology",
     "path": "examples/showcase/arp-resolution.fd",
-    "file_sha256": "46c8123b88838d5b17d5cccf91518f966ba83eadbb0787d36a00e5f734e45145",
+    "file_sha256": "ad44cf31f71c479899a9d34665f9033a4dc343ee1e15407a0c1f38a2531af9d9",
     "title_shown": "ARP Resolution",
     "presented_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
     "presented_lines": 0,
@@ -39,21 +39,21 @@
     "is_error": false
   },
   "usage": {
-    "cost_usd": 0.007551,
-    "input_tokens": 762,
-    "output_tokens": 351,
+    "cost_usd": 0.007854,
+    "input_tokens": 828,
+    "output_tokens": 358,
     "cache_creation_input_tokens": 0,
-    "duration_ms": 4064
+    "duration_ms": 4486
   },
-  "raw_answer_text": "A1: It is broadcast to every station on the Ethernet segment (broadcast address FF:FF:FF:FF:FF:FF).\nA2: It lacks the mapping of the target's IP (protocol) address to its hardware (MAC) address in its ARP cache/table.\nA3: It stores the requesting host's IP (protocol) address together with its hardware (MAC) address.\nA4: No, non-target hosts silently discard the request (though they may update their own cache with the sender's mapping) without sending a reply.\nA5: The reply is sent directly (unicast) to the requesting host, not broadcast.\nA6: It stores the target's IP-to-hardware address mapping in its ARP cache/table for future use.\nA7: No, obtaining the target's hardware address is precisely the purpose of the request; the host only knows the target's protocol (IP) address beforehand.\nA8: It merges the sender's address mapping into its table before checking whether the opcode is a request or a reply.",
+  "raw_answer_text": "A1: It is broadcast to every station on the Ethernet segment (broadcast MAC address), since the sender doesn't know which specific station holds the target.\nA2: It lacks the mapping between the target's IP (protocol) address and its Ethernet (hardware) address in its ARP cache/table.\nA3: It stores the requesting host's protocol (IP) address paired with its hardware (MAC) address.\nA4: No, hosts that are not the target simply discard the request without replying.\nA5: The reply is sent directly (unicast) to the requesting host, not broadcast.\nA6: The requesting host stores the target's protocol/hardware address pair in its own ARP table (cache), completing the resolution so it can now send the intended packet.\nA7: The requesting host does not know the target's hardware address; obtaining that address is exactly the purpose of the request.\nA8: Per RFC 826 procedure, a host merges the sender's address mapping into its table first, and only afterward checks the opcode to decide whether to also send a reply.",
   "answers": {
-    "q1": "It is broadcast to every station on the Ethernet segment (broadcast address FF:FF:FF:FF:FF:FF).",
-    "q2": "It lacks the mapping of the target's IP (protocol) address to its hardware (MAC) address in its ARP cache/table.",
-    "q3": "It stores the requesting host's IP (protocol) address together with its hardware (MAC) address.",
-    "q4": "No, non-target hosts silently discard the request (though they may update their own cache with the sender's mapping) without sending a reply.",
+    "q1": "It is broadcast to every station on the Ethernet segment (broadcast MAC address), since the sender doesn't know which specific station holds the target.",
+    "q2": "It lacks the mapping between the target's IP (protocol) address and its Ethernet (hardware) address in its ARP cache/table.",
+    "q3": "It stores the requesting host's protocol (IP) address paired with its hardware (MAC) address.",
+    "q4": "No, hosts that are not the target simply discard the request without replying.",
     "q5": "The reply is sent directly (unicast) to the requesting host, not broadcast.",
-    "q6": "It stores the target's IP-to-hardware address mapping in its ARP cache/table for future use.",
-    "q7": "No, obtaining the target's hardware address is precisely the purpose of the request; the host only knows the target's protocol (IP) address beforehand.",
-    "q8": "It merges the sender's address mapping into its table before checking whether the opcode is a request or a reply."
+    "q6": "The requesting host stores the target's protocol/hardware address pair in its own ARP table (cache), completing the resolution so it can now send the intended packet.",
+    "q7": "The requesting host does not know the target's hardware address; obtaining that address is exactly the purpose of the request.",
+    "q8": "Per RFC 826 procedure, a host merges the sender's address mapping into its table first, and only afterward checks the opcode to decide whether to also send a reply."
   }
 }

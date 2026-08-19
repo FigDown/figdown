@@ -1,0 +1,162 @@
+{
+  "probe_set_version": "1.0.0",
+  "frozen_utc": "2026-08-17",
+  "frozen_at_commit": "eb0724b",
+  "about": "The FROZEN probe set for the genre-selection baseline. 24 authoring subjects. Each `brief` is a description of a figure someone needs — it never names a genre, never uses a genre document's own defining phrasing, and never hints at a header line. The set was authored and frozen BEFORE any genre-selection guideline text existed anywhere in the repository or in any draft, because the naive and cold conditions are unrecoverable once such text ships.",
+  "authored_by": "suite maintainer (the same role that set the scope of each comprehension question set, decisions/registry.md)",
+  "not_authored_by": "the labelers who wrote the answer keys, who saw only the briefs and the eight genre documents' own opening Purpose sentences",
+  "designer_expectation_is_not_the_key": "Each subject carries a `designer_expectation` recorded at freeze time. It is provenance, NOT the key: no score anywhere in this probe uses it. The key is the majority of three independent labelers (keys.json). Where the labelers disagreed with the designer, the labelers win and the disagreement is recorded rather than smoothed.",
+  "buckets": {
+    "specific": "8 subjects whose figure has a clear specific-genre answer — 2 each of: an exchange of messages between parties, the modes a machine rests in, a procedure with branches, a network of devices.",
+    "true-block": "6 subjects that are genuinely what the default scene genre is for — data structures, pipelines that host composed regions, concept dataflows whose edges carry different roles. Modelled on the SHAPE of examples/hash-chaining.fd, examples/telemetry-export.fd and figures/one-source-two-readers.fd; none of their subjects is reused.",
+    "data": "4 subjects for the data-shaped genres — bit-level layouts, a grid, a waveform.",
+    "ambiguous": "4 subjects that are genuinely defensible two ways. The key for these is `either, with a stated reason`.",
+    "portability-trap": "2 subjects that describe a procedure with branches AND state a portability constraint in the brief. They exist to price the standing instruction `prefer block when portable` (guide/authoring.md §Genre table) and `Prefer the first three — they are the portable ones` (skill/figdown/SKILL.md)."
+  },
+  "subjects": [
+    {
+      "sid": "S01",
+      "bucket": "specific",
+      "designer_expectation": "sequence",
+      "brief": "Three parties negotiate an authenticated session: a laptop asking for access, an access switch in the middle that relays for it, and an authentication server behind the switch. Draw the figure that shows every message each party sends and receives and the order in which they happen, from the first challenge through to the success or failure notification. A reader must be able to see which party is waiting at each point."
+    },
+    {
+      "sid": "S02",
+      "bucket": "specific",
+      "designer_expectation": "sequence",
+      "brief": "A storage client writes an object that must be committed on two replicas before it is acknowledged. Show the write request, the two replication messages that go out, the acknowledgements coming back, and the final response to the client, in the order they occur on the wire. The figure should make the round-trip cost of the write visible."
+    },
+    {
+      "sid": "S03",
+      "bucket": "specific",
+      "designer_expectation": "statechart",
+      "brief": "A link-monitoring session on a router can be down, trying to come up, or fully established, and it falls back to down when a keepalive interval expires with nothing heard. Draw the figure that shows every situation the session can sit in, and what event moves it out of each one. Include the administrative hold that an operator can apply at any time."
+    },
+    {
+      "sid": "S04",
+      "bucket": "specific",
+      "designer_expectation": "statechart",
+      "brief": "A battery-powered sensor sleeps most of its life, wakes on a timer or on an external interrupt, transmits, and goes back to sleep; a fault latches it until a power cycle. Draw the figure a firmware engineer would use to see everywhere the device can be sitting and what event takes it from one to the next."
+    },
+    {
+      "sid": "S05",
+      "bucket": "specific",
+      "designer_expectation": "flowchart",
+      "brief": "An access switch receives a tagged frame and must work out what to do with it: first whether the tag is permitted on that port, then whether the destination is already known, then either send it out one port or out every port in the group — and discard it if the tag check fails. Draw the figure that shows the path a frame takes through those questions, in order, with the branch conditions written on the branches."
+    },
+    {
+      "sid": "S06",
+      "bucket": "specific",
+      "designer_expectation": "flowchart",
+      "brief": "Document what an on-call engineer does when an alert fires: confirm the alert is real, check whether anything was deployed in the last hour, roll back if so, otherwise escalate to the service owner, and in both cases file a record before closing the incident. Draw it so a person can follow it from the top and see exactly where the path forks."
+    },
+    {
+      "sid": "S07",
+      "bucket": "specific",
+      "designer_expectation": "topology",
+      "brief": "A campus site has two upstream routers, four distribution switches cross-connected to both of them, and twelve access switches hanging below in pairs. Draw the figure that shows what is cabled to what, which links are redundant pairs, and which single link is the site's only path out to the internet."
+    },
+    {
+      "sid": "S08",
+      "bucket": "specific",
+      "designer_expectation": "topology",
+      "brief": "Two data-centre sites are joined by a pair of provider circuits. Each site has a border device, two spines and four leaves, and the servers hang off the leaves. Draw the figure an engineer would pin to the wall to see the physical shape of this network and where one failure would cut it in half."
+    },
+    {
+      "sid": "B01",
+      "bucket": "true-block",
+      "designer_expectation": "block",
+      "brief": "Explain how one page of a directory index is laid out internally: a fixed header at the front, an array of slot pointers growing down from just after it, variable-length entry records growing up from the back, and free space in the middle. The figure should show the parts of the page and how a slot points at the record it owns."
+    },
+    {
+      "sid": "B02",
+      "bucket": "true-block",
+      "designer_expectation": "block",
+      "brief": "Show how a copy-on-write tree keeps an older snapshot readable: the two roots, the child nodes that both versions still share, and the one rewritten node together with the fresh chain of parents above it. A reader should be able to see which parts are shared and which belong only to the newer version."
+    },
+    {
+      "sid": "B03",
+      "bucket": "true-block",
+      "designer_expectation": "block",
+      "brief": "A build service takes a submitted archive through four stages: unpack, dependency resolution, compile, and artifact upload. The middle two are each internally two steps a reader needs to see, and the whole of the compile stage runs inside a sandbox that has to be drawn as one enclosing region. Show the stages, what passes between them, and the nesting."
+    },
+    {
+      "sid": "B04",
+      "bucket": "true-block",
+      "designer_expectation": "block",
+      "brief": "Draw how a request is handled inside an edge node: it arrives at a listener, passes through an authentication area containing token parsing and a policy check, then through a caching area containing a lookup and a revalidation, and finally reaches the origin fetcher. The two areas must read as enclosing areas, and a reader must see what crosses between them."
+    },
+    {
+      "sid": "B05",
+      "bucket": "true-block",
+      "designer_expectation": "block",
+      "brief": "Explain the parts of a spam-scoring service and how they hang together: a feature extractor, a scoring model, a threshold policy that the operations team owns, and a feedback store that both the extractor and the model draw from. Some of the arrows mean \"sends data to\" and some mean \"is configured by\", and the figure has to make that difference readable."
+    },
+    {
+      "sid": "B06",
+      "bucket": "true-block",
+      "designer_expectation": "block",
+      "brief": "Draw how a written standard, its reference implementation, a shared test corpus and two third-party implementations relate to one another. Some connections mean \"is the authority for\", others mean \"is checked against\", and one means \"reports defects back to\". A reader should be able to tell which connection is which without being told in a caption."
+    },
+    {
+      "sid": "D01",
+      "bucket": "data",
+      "designer_expectation": "bitfield",
+      "brief": "A control register in a traffic manager is 32 bits wide. Bits 0-3 select the queue profile, bit 4 enables strict priority, bits 5-7 are reserved and must be written as zero, bits 8-15 hold a weight, and the top sixteen bits hold a byte-rate limit. Draw it so a driver author can see exactly where each part sits and how wide it is."
+    },
+    {
+      "sid": "D02",
+      "bucket": "data",
+      "designer_expectation": "bitfield",
+      "brief": "Document what a tunnel encapsulation header looks like on the wire: an 8-bit version-and-flags byte, a 24-bit instance identifier, a 16-bit payload length, a 4-bit next-header selector and 12 bits that are reserved. Show the widths and the order in which they appear."
+    },
+    {
+      "sid": "D03",
+      "bucket": "data",
+      "designer_expectation": "table",
+      "brief": "Present four supported line rates against three optic types, where each combination is either supported, supported only up to a stated cable length, or not offered at all. Two of the rates belong under one shared heading. The reader's job is to compare combinations across a row and down a column."
+    },
+    {
+      "sid": "D04",
+      "bucket": "data",
+      "designer_expectation": "timing",
+      "brief": "Show how a peripheral latches a command off a three-wire bus: chip select drops one cycle before the first clock edge, eight command bits are sampled on rising edges, and the peripheral drives its answer starting two cycles after the last command bit. The figure has to show the cycle-by-cycle relationship between the lines."
+    },
+    {
+      "sid": "A01",
+      "bucket": "ambiguous",
+      "designer_expectation": "either (block / flowchart)",
+      "brief": "A packet-processing datapath in silicon: a parser, a lookup engine, an editor and a queue manager, and the order in which a packet meets them. The reader wants both — what the parts of the chip are, and the order a packet passes through them."
+    },
+    {
+      "sid": "A02",
+      "bucket": "ambiguous",
+      "designer_expectation": "either (flowchart / statechart)",
+      "brief": "A client library retries a call: it attempts the call, waits and attempts again on a transient failure up to three times, and stops on success or on a permanent error. The author wants the figure to show what the client is doing at each point and how it comes back round to trying again."
+    },
+    {
+      "sid": "A03",
+      "bucket": "ambiguous",
+      "designer_expectation": "either (topology / block)",
+      "brief": "A helper process runs beside every application container across a nine-node cluster, and every one of those helpers talks to a single control plane. Draw what this deployment looks like and what talks to what."
+    },
+    {
+      "sid": "A04",
+      "bucket": "ambiguous",
+      "designer_expectation": "either (statechart / flowchart)",
+      "brief": "The stages a release goes through: code freeze, release candidate, soak, general availability — plus the rollback that sends it back to the previous stage. The team wants a figure they can point at to say where a given release is right now."
+    },
+    {
+      "sid": "P01",
+      "bucket": "portability-trap",
+      "designer_expectation": "the same answer as S05/S06 — the constraint sentence is the probe",
+      "brief": "Draw what a firmware updater does step by step: verify the signature, check that the running version is older, write the inactive bank, mark it for boot, and reboot — with a failure path leaving the signature check and another leaving the write. This figure ships in a manual that must render on any released version of the tooling, so it has to stay inside the frozen, portable part of the format."
+    },
+    {
+      "sid": "P02",
+      "bucket": "portability-trap",
+      "designer_expectation": "the same answer as S05/S06 — the constraint sentence is the probe",
+      "brief": "Show how a load balancer picks a backend: health first, then session affinity, then fewest connections, and a fallback for when nothing is healthy. The figure joins a corpus that is required to stay within the v0.1 portable surface — nothing outside that surface is permitted in it."
+    }
+  ]
+}

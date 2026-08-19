@@ -1,0 +1,22 @@
+# The companion to 295: what the operand scope did NOT widen. Three
+# restatements, each refused, each for the reason the scope rule gives.
+#   line 15  LINEAR — two occurrences on the open lifeline with nothing but a
+#            message between them. Unchanged since the rule was written.
+#   line 20  SAME OPERAND — two occurrences inside one branch are consecutive
+#            on that branch; exclusivity is between SIBLING operands, not
+#            within one.
+#   line 22  ENCLOSING SCOPE — an occurrence inside an operand restates one
+#            written outside the fragment, because the outer state is on every
+#            path into the branch.
+figdown 0.4 sequence
+title "Restatement is still refused where the paths are not exclusive"
+lifeline c "Client"
+state c "INIT"
+state c "INIT"
+state c "REQUESTING"
+fragment f "which way?" type=alt
+operand one "first" in=f
+state c "BOUND" in=one
+state c "BOUND" in=one
+operand two "second" in=f
+state c "REQUESTING" in=two

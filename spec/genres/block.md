@@ -44,9 +44,39 @@ diagram language starts from.
 ## Purpose
 
 Expresses a system as **parts and the relations between them**: functional
-blocks, pipelines, datapaths, layered stacks, and the containment that
-groups them. The largest genre in the corpus and the default choice for a
-figure that is not a topology, a flowchart, or one of the typed blocks.
+blocks, pipelines, datapaths, layered stacks, and the containment that groups
+them. The largest genre in the corpus.
+
+**It is chosen for one of two reasons, and they are not the same reason
+(`GENRE-SELECTION-PRECEDENCE`).** The sentence that used to stand here — *"the default choice for a
+figure that is not a topology, a flowchart, or one of the typed blocks"* —
+was written before `statechart` and `sequence` existed and never named
+`timing`, and "default" was doing work that belongs to a decision:
+
+- **POSITIVELY.** The figure's own subject is **structural relations** between
+  parts, or **containment**, or it is the **host genre for a composed
+  region** (§4: a `bitfield` or `table` region living inside a scene). Here
+  `block` is not a fallback from anything — it is the genre that names the
+  figure, and every other genre would say less about it.
+- **AS THE RESIDUAL.** The figure's subject has **no genre that names it**:
+  an entity-relationship diagram, a dependency graph, a deployment map, a
+  taxonomy. `block` is the guaranteed-expressible baseline for exactly these,
+  and this reading is **CORRECT, not tolerated** — `GENRE-EARNING-THRESHOLD` §4 makes the general
+  construct a legitimate transitional position rather than a mistake. It
+  carries **one obligation**: state the loss. Say in a comment, a `class`
+  meaning or a `note=` what the figure's own vocabulary would have called
+  these boxes and lines — *entity*, *primary key*, *cardinality* — because the
+  syntax will not carry it and a later reader has no way to recover it.
+
+**What `block` is NOT is a way of avoiding a genre that fits.** A figure whose
+roles another genre names — a decision, a terminator, a state, a transition, a
+lifeline, a message — says **strictly less** under `block`, and it says less
+**silently**: core [§12.7](../core.md#127-the-reading-agent-contract) licenses no
+recovery of a role from a `shape=`, so a diamond asserts "decision" to nobody,
+a rounded box asserts "state" to nobody, and no tool reports the difference.
+That is a trade an author may still make — see guide/authoring.md Step 2's gate, where
+the two portability prices are separated and the trade has to be **declared** —
+but it is a trade, never the default.
 
 ## Defaults
 

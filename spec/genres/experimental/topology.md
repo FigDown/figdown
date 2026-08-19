@@ -414,6 +414,29 @@ slots are the ones its figures lean on hardest:
 A `note=` is for what none of those hold — the caveat, the measured number,
 the operational sentence the topology cannot express as structure.
 
+### Interface labels are drawn as PORT MARKERS (backlog 57)
+
+An `edge`'s `[tail]` and `[head]` labels name the INTERFACES the link is
+attached to, and in this genre the engine draws them by the network-diagram
+convention: **inside the device box, at the point the link crosses its
+border** — not as free-floating text near the line's end. That is not a
+cosmetic choice. A port belongs to a DEVICE, the box is the device, and a name
+written in the seam between two boxes leaves the reader to decide which one it
+belongs to by eye.
+
+This is a DRAWING rule and nothing else. The syntax is unchanged, the model is
+unchanged (`tail` and `head` are the same two strings §2 has always carried),
+and no option key asks for it or turns it off — `DOMAIN-CONVENTION-DIRECTIVES` keeps the drawing
+convention with the engine. Two ports crossing the same border spread along
+it. Where a device box is genuinely too small to hold the name, the marker
+hugs the border from just outside, and only if that also fails does it fall
+back to the ordinary label placement out along the line.
+
+It applies to `topology` and to no other genre, because the convention is this
+genre's: in `block` an `[tail]` label names a signal or a port on a functional
+block and is read against the line, and the corpus's `block` figures place it
+there deliberately.
+
 ### How this differs from the other genres
 
 **Until 0.3 this section said "today the only difference is a

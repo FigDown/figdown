@@ -1,10 +1,10 @@
 {
   "suite_version": "1.0.0",
   "run": {
-    "utc": "2026-08-16T06:20:03Z",
+    "utc": "2026-08-18T00:29:03Z",
     "model_alias": "sonnet",
     "model_used": "claude-sonnet-5",
-    "cli": "2.1.233 (Claude Code)",
+    "cli": "2.1.234 (Claude Code)",
     "condition": "syntax",
     "reader": 1
   },
@@ -12,7 +12,7 @@
     "id": "arp-resolution",
     "genre": "topology",
     "path": "examples/showcase/arp-resolution.fd",
-    "file_sha256": "46c8123b88838d5b17d5cccf91518f966ba83eadbb0787d36a00e5f734e45145",
+    "file_sha256": "ad44cf31f71c479899a9d34665f9033a4dc343ee1e15407a0c1f38a2531af9d9",
     "title_shown": null,
     "presented_sha256": "8455a226e188b589f3d41c3cc96c861a660dc595180f8dc29494bdf3cf4d075c",
     "presented_lines": 25,
@@ -39,21 +39,21 @@
     "is_error": false
   },
   "usage": {
-    "cost_usd": 0.015303000000000002,
+    "cost_usd": 0.017037000000000004,
     "input_tokens": 2,
-    "output_tokens": 995,
-    "cache_creation_input_tokens": 0,
-    "duration_ms": 10322
+    "output_tokens": 613,
+    "cache_creation_input_tokens": 1306,
+    "duration_ms": 6969
   },
-  "raw_answer_text": "A1: Broadcast — the request goes out to every host on the LAN (destination MAC ff:ff:ff:ff:ff:ff).\nA2: NOT STATED (the file only shows that A's cache has no entry for B's IP before the exchange, not why).\nA3: NOT STATED\nA4: No — other hosts on the LAN \"heard\" the broadcast but it is labeled \"ignored.\"\nA5: Unicast — sent directly only to the requesting host (Host A).\nA6: A caches the information; its table entry becomes B's IP → aa:bb:cc:..., learned from the reply.\nA7: The request is meant to obtain B's hardware address — A asks \"who-has B?\" and only after the reply does A learn and cache B's MAC.\nA8: NOT STATED",
+  "raw_answer_text": "A1: Every station on the segment — it is a broadcast (destination MAC ff:ff:ff:ff:ff:ff).\nA2: A's ARP cache has no entry for B's IP before the exchange.\nA3: NOT STATED\nA4: No — the diagram shows other hosts (lan) \"heard, ignored,\" indicating they do not reply.\nA5: It is sent directly (unicast) to just the requesting host (dst MAC = A's MAC).\nA6: A caches the information, resulting in an entry in A's table mapping B's IP → aa:bb:cc:... (learned from the reply).\nA7: The requesting host does not know it — obtaining B's MAC address is precisely the purpose of the request.\nA8: NOT STATED",
   "answers": {
-    "q1": "Broadcast — the request goes out to every host on the LAN (destination MAC ff:ff:ff:ff:ff:ff).",
-    "q2": "NOT STATED (the file only shows that A's cache has no entry for B's IP before the exchange, not why).",
+    "q1": "Every station on the segment — it is a broadcast (destination MAC ff:ff:ff:ff:ff:ff).",
+    "q2": "A's ARP cache has no entry for B's IP before the exchange.",
     "q3": "NOT STATED",
-    "q4": "No — other hosts on the LAN \"heard\" the broadcast but it is labeled \"ignored.\"",
-    "q5": "Unicast — sent directly only to the requesting host (Host A).",
-    "q6": "A caches the information; its table entry becomes B's IP → aa:bb:cc:..., learned from the reply.",
-    "q7": "The request is meant to obtain B's hardware address — A asks \"who-has B?\" and only after the reply does A learn and cache B's MAC.",
+    "q4": "No — the diagram shows other hosts (lan) \"heard, ignored,\" indicating they do not reply.",
+    "q5": "It is sent directly (unicast) to just the requesting host (dst MAC = A's MAC).",
+    "q6": "A caches the information, resulting in an entry in A's table mapping B's IP → aa:bb:cc:... (learned from the reply).",
+    "q7": "The requesting host does not know it — obtaining B's MAC address is precisely the purpose of the request.",
     "q8": "NOT STATED"
   }
 }

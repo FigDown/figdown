@@ -1,0 +1,57 @@
+{
+  "probe_version": "1.0.0",
+  "run": {
+    "utc": "2026-08-18T00:20:47Z",
+    "model_alias": "sonnet",
+    "model_used": "claude-sonnet-5",
+    "cli": "2.1.234 (Claude Code)",
+    "condition": "cold",
+    "reader": 2
+  },
+  "subject": {
+    "sid": "B01",
+    "bucket": "true-block",
+    "subjects_sha256": "00bb3a638935cee5ce265755d3e35aa3df0c48823030cb85cc6300f4fabfe0a3",
+    "brief_sha256": "d3baa0582e1413f163fb53ec7da044c63bd438c27f66881a38003da5777d4295"
+  },
+  "presented": {
+    "what": "the subject brief and skill/figdown/SKILL.md, pasted verbatim into the message",
+    "bundle_path": "skill/figdown/SKILL.md",
+    "bundle_sha256": "5c1e6d4a711089761d8d085552b46f14617f2e23c167ae21827d54218d6f6d4c",
+    "bundle_chars": 14990
+  },
+  "prompt": {
+    "system_sha256": "f0c9d216983b082a65bb1ba2a4c4224d7faf8950a8d5487f4fd85d9badfce1bd",
+    "user_sha256": "4e2983f8b07474870ce9cdb0c6b77ee12f900de86851b6805d4c37e7e72af8e1",
+    "user_chars": 15485
+  },
+  "cold_room": {
+    "cwd": "an isolated empty temporary directory outside the repository",
+    "tools_offered": "none — every tool denied by name",
+    "mcp_servers": "none",
+    "settings": "safe-mode: no project or user settings, no memory file, no skills, no plugins, no hooks",
+    "session_persistence": false,
+    "shown": "the system prompt, skill/figdown/SKILL.md verbatim, and the subject brief — nothing else",
+    "not_shown": "the specification, any genre document, any genre-selection guideline (none exists), guide/authoring.md, any .fd file, the repository, the answer key"
+  },
+  "integrity": {
+    "turns": 1,
+    "permission_denials": 0,
+    "tool_calls_observed": false,
+    "is_error": false
+  },
+  "usage": {
+    "cost_usd": 0.036261,
+    "input_tokens": 2,
+    "output_tokens": 77,
+    "duration_ms": 2731
+  },
+  "raw_answer_text": "# FigDown — figures as text. Spec: https://github.com/FigDown/figdown\nfigdown 0.1 block # page layout with regions growing toward each other + a slot->record pointer; block genre covers internal structure + relationship",
+  "answer": {
+    "version": "0.1",
+    "genre": "block",
+    "reason": "page layout with regions growing toward each other + a slot->record pointer; block genre covers internal structure + relationship",
+    "reason_source": "trailing comment on the header line",
+    "header_line": "figdown 0.1 block # page layout with regions growing toward each other + a slot->record pointer; block genre covers internal structure + relationship"
+  }
+}

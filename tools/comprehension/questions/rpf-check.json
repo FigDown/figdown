@@ -1,6 +1,6 @@
 {
   "id": "rpf-check",
-  "genre": "block",
+  "genre": "flowchart",
   "figure": "examples/rpf-check.fd",
   "subject": "reverse-path-forwarding check",
   "source": {
@@ -192,5 +192,6 @@
       }
     }
   ],
-  "score_rules_reviewed": "scoring rules reviewed by the suite maintainer BEFORE any reader ran: none_of lists that would have rejected a correct contrastive answer (e.g. 'dropped, not accepted') were relaxed or emptied. No question text and no canonical answer was changed, and no rule was touched after any reader answer was seen. A second review pass, driven by `--selftest` (a key must accept its own canonical answer) and still before any reader answer was consulted, repaired q8; every transcript taken against the earlier key was discarded and this figure was re-read from scratch."
+  "score_rules_reviewed": "scoring rules reviewed by the suite maintainer BEFORE any reader ran: none_of lists that would have rejected a correct contrastive answer (e.g. 'dropped, not accepted') were relaxed or emptied. No question text and no canonical answer was changed, and no rule was touched after any reader answer was seen. A second review pass, driven by `--selftest` (a key must accept its own canonical answer) and still before any reader answer was consulted, repaired q8; every transcript taken against the earlier key was discarded and this figure was re-read from scratch.",
+  "genre_note": "This figure was converted block -> flowchart (commit eb0724b). The QUESTIONS AND KEYS ARE UNCHANGED — they were authored from RFC 7761/3704 by an agent that never saw the .fd, and re-keying them would have destroyed the before/after comparison. Only this label moved. See decisions/registry.md and its dated note."
 }

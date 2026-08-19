@@ -809,7 +809,7 @@ exactly as rank assignment, obstacle detours and the derived legend are
 (§12.6). What the author writes is *this element has this aside*; where
 the aside sits is a drawing convention.
 
-**Four placement rules are NORMATIVE, and they are here rather than in the
+**Six placement rules are NORMATIVE, and they are here rather than in the
 engine because two engines must agree on them.** A note whose box lands
 somewhere else is not a cosmetic difference: it is a different figure, and
 `RENDERING-DETERMINISM`'s byte-reproducibility promise (§7) reaches the SVG, not only the model.
@@ -831,6 +831,28 @@ somewhere else is not a cosmetic difference: it is a different figure, and
    figure-level note: it draws with the caption, at the foot of the
    canvas, and it **never takes a leader** — there is nothing for a leader
    to point at.
+5. **A note placed by ADJACENCY names its target; a note with a LEADER does
+   not**. Adjacency carries the whole association in a gap,
+   and the reader has to work out which neighbour the box belongs to — so
+   an adjacency-placed note is drawn with its target's **label in bold,
+   then a colon, then the note's own text**: *"**MAC layer:** Runs on the
+   recovered RX clock, not the core clock."* The prefix is DERIVED from
+   the resolved target and is never authored — it is the same fact the
+   drawing already publishes as `data-note-for`. A note with a drawn
+   leader takes NO prefix: the leader *is* the association, and saying it
+   twice is ink for a fact already stated. Only a labelled `node` or
+   `group` is named this way; a connector has no name a reader can see,
+   and a `title` note names the figure, of which there is one.
+   The two decisions are circular — the prefix changes the box, the box
+   changes whether adjacency succeeds — so the ORDER is normative: the
+   note is placed **with** the prefix first, and if that placement takes a
+   leader it is placed again **without** it and that second placement
+   stands. There is no third pass.
+6. **A note's text wraps to a fixed CORRIDOR, measured in the note's own
+   type**. A line that fits the corridor stays on one line;
+   author newlines are honoured and never merged; a single word wider than
+   the corridor is not broken. The corridor is a width in the drawing, not
+   a character count — a count is blind to what the glyphs are.
 
 **Determinism**: one greedy pass, no iteration, registration order =
 **document order**. Two engines given the same source therefore reach the
@@ -2153,7 +2175,11 @@ alone. Recorded as an open question in §9.
   `statechart` has **no UML clause** to borrow for this: UML 2.5.1 §14 has
   no "same state drawn twice", so this gap is NOT covered by any claim that
   the genre's unexpressible items are §14 surface deliberately not
-  borrowed.
+  borrowed. **Trigger named (2026-08-17):** the dormant "targeted count of
+  dual-view/dual-context figures" trigger above is now stated operationally,
+  with an owner, in
+  element-identity-proposal.md §9
+  — measurement still owed, not yet taken.
 - `BITFIELD-UNION-VARIANTS`: **union/case bitfields** (`PRODUCTION-CORPUS-MEASUREMENT`, 2026-07-30) — CORRECTNESS trap:
   `break` rows currently read as one contiguous bit sequence, so a
   register whose bits have mutually exclusive encodings (e.g. eight
@@ -2732,6 +2758,68 @@ alone. Recorded as an open question in §9.
   flowchart genre design and had been miscited for the sequence genre across
   the corpus; those citations point here. v0.2.
   *(End of the question as filed.)*
+- `TIMING-NAMED-INSTANT`: **the `timing` genre cannot state that an INSTANT matters**
+  (2026-08-17, from the maintainer's review of
+  `examples/patterns/timing-b.fd`). That figure draws four labelled data
+  segments — A, B, C, D — on a `data` lane whose segment boundaries coincide
+  with the edges of `valid` on the lane above it. Reading the figure **is**
+  reading that coincidence, and the datasheet convention for showing it is a
+  vertical guide drawn through every lane at the boundary, so the eye reads
+  down a column instead of travelling along one row and back. FigDown's whole
+  timing surface is `signal` (a lane string), `gap` (a time break) and `data=`
+  (the labels for a lane's `=` cells). **None of the three names a point on the
+  time axis.** So the figure cannot say *this boundary is the one that
+  matters*, and a reader is left to infer the alignment from the fact that two
+  lanes happen to be drawn under one another — which is exactly the inference
+  `MEANING-RECOVERY-SOURCE` says a figure may not leave to a convention. The genre's vocabulary is
+  single-sourced from **WaveDrom**, which is a tool and not a standard;
+  WaveDrom's own spelling for this is `node`/`edge` — anchor characters placed
+  in the lane string, plus a relation drawn between two anchors — so prior art
+  exists for the SPELLING, and none of it is a source word under RULE 4.1.
+  **The `PRESENTATION-AS-MEANING-CARRIER` boundary is the whole of the design constraint.** A NAMED event —
+  *this instant is T1* — is meaning: it is a fact about the subject, it
+  survives a strip of the layout zone (`GUI-WRITEBACK-STRUCTURE`), and a reading agent can quote it.
+  A bare vertical rule is presentation: it draws the alignment without
+  asserting it, and under §5 and `PRESENTATION-AS-MEANING-CARRIER` a reader is entitled to discard
+  presentation entirely. Any landing must therefore put the NAME in the
+  language and let the ENGINE derive the rule. A construct that only draws a
+  line would spend a keyword and leave the figure saying precisely what it says
+  today, which is nothing.
+  **Nearest neighbour, and not the same question: `TIMING-MEASUREMENT-ANNOTATIONS`.** That entry is a
+  named timing PARAMETER spanning TWO signal events (setup, hold, cycle),
+  rendered with dimension arrows and edge-alignment guides. This one has arity
+  one: a single instant, named, referenced by every lane at once, with nothing
+  measured between two of anything. The two share one prerequisite — the
+  signal-event locator, designed and deliberately not built under the
+  **`ANNOTATION-LOCATOR-SPLIT`** disposition (the annotation family is two families: annotations,
+  *a body attached to a target*, and the locator grammar for naming a
+  sub-element AS a target). If that grammar lands, a named instant may fall out
+  of it as the degenerate one-endpoint case rather than earn a construct of its
+  own, and that is the likeliest disposition of this entry — filed here so the
+  case is counted when the locator session runs, not so it is designed twice.
+  **Measured demand, and it is honestly partial.** In-repo: 1 of 3 `timing`
+  documents (`timing-b`; `timing-a` is a clocked handshake that reads by cycle
+  count, and `examples/reference/experimental/timing.fd` is a vocabulary
+  demonstrator, not a subject figure), so 1 of 57 non-fixture `.fd` files. In
+  production, the census counts **142 of 2,177 classified images (6.5%; 7.2%
+  weighted)** as timing-waveform — but that is the GENRE's demand, and this
+  construct's has never been counted at all.
+  **What would close it:** (a) that count — over the corpus and over those 142
+  production figures, how many can only be READ by aligning two or more lanes
+  at one instant. `NEW-CONSTRUCT-EVIDENCE-GATE`'s WHETHER, measured rather than asserted, is what turns a
+  convention into a construct. And (b) a source word under RULE 4.1: a survey
+  of what the IEEE timing-diagram conventions, or the Z.120-family timing
+  notations, actually call such a marker. **No such source has been read for
+  this entry, and nothing here asserts what any of them contains.** They are
+  named as places to look. A claim about one of them owes
+  [standards-claims.tsv](standards-claims.tsv) a row before it is written, and
+  a source this repository cannot reach is recorded there as `unread` rather
+  than left unsaid.
+  **What would kill it:** the demand measuring as label prose being sufficient.
+  The figures that need an instant today carry the timestamp in a lane label or
+  in the host document's text, and if the count shows that no reading is lost
+  that way, the construct is convenience — and `GENRE-EARNING-THRESHOLD`'s WHEN then puts it behind
+  everything that was measured. v0.2.
 - **A presence condition cannot reference a field** — `present="C = 1"`
   names `C`, and the language cannot resolve that to the `field "C"` three
   lines up: a bitfield field name is a **label**, not an id, and `class=` /

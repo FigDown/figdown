@@ -1,0 +1,59 @@
+{
+  "suite_version": "1.0.0",
+  "run": {
+    "utc": "2026-08-16T06:20:49Z",
+    "model_alias": "sonnet",
+    "model_used": "claude-sonnet-5",
+    "cli": "2.1.233 (Claude Code)",
+    "condition": "title-only",
+    "reader": 1
+  },
+  "figure": {
+    "id": "arp-resolution",
+    "genre": "topology",
+    "path": "examples/showcase/arp-resolution.fd",
+    "file_sha256": "46c8123b88838d5b17d5cccf91518f966ba83eadbb0787d36a00e5f734e45145",
+    "title_shown": "ARP Resolution",
+    "presented_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "presented_lines": 0,
+    "presented_chars": 0
+  },
+  "prompt": {
+    "system_sha256": "42d79e37b78275f219f2b1b70497abf709362f5fa68aa5427fb1f42b12b60425",
+    "user_sha256": "f52d1ccf8863b47602d4cf9112f243faa0b6a387f351ab4ff521146817995fbd",
+    "question_set_sha256": "d9d8582ddf508c6d8e38fde7421a0b578072c3b00b22c75dbf8f1be1dfb16010"
+  },
+  "cold_room": {
+    "cwd": "an isolated empty temporary directory outside the repository",
+    "tools_offered": "none — every tool denied by name",
+    "mcp_servers": "none",
+    "settings": "safe-mode: no project or user settings, no memory file, no skills, no plugins, no hooks",
+    "session_persistence": false,
+    "shown": "the system prompt, the figure title, and the questions — nothing else",
+    "not_shown": "the specification, any genre document, any other .fd file, the file name, the name of the language, the repository"
+  },
+  "integrity": {
+    "turns": 1,
+    "permission_denials": 0,
+    "tool_calls_observed": false,
+    "is_error": false
+  },
+  "usage": {
+    "cost_usd": 0.007551,
+    "input_tokens": 762,
+    "output_tokens": 351,
+    "cache_creation_input_tokens": 0,
+    "duration_ms": 4064
+  },
+  "raw_answer_text": "A1: It is broadcast to every station on the Ethernet segment (broadcast address FF:FF:FF:FF:FF:FF).\nA2: It lacks the mapping of the target's IP (protocol) address to its hardware (MAC) address in its ARP cache/table.\nA3: It stores the requesting host's IP (protocol) address together with its hardware (MAC) address.\nA4: No, non-target hosts silently discard the request (though they may update their own cache with the sender's mapping) without sending a reply.\nA5: The reply is sent directly (unicast) to the requesting host, not broadcast.\nA6: It stores the target's IP-to-hardware address mapping in its ARP cache/table for future use.\nA7: No, obtaining the target's hardware address is precisely the purpose of the request; the host only knows the target's protocol (IP) address beforehand.\nA8: It merges the sender's address mapping into its table before checking whether the opcode is a request or a reply.",
+  "answers": {
+    "q1": "It is broadcast to every station on the Ethernet segment (broadcast address FF:FF:FF:FF:FF:FF).",
+    "q2": "It lacks the mapping of the target's IP (protocol) address to its hardware (MAC) address in its ARP cache/table.",
+    "q3": "It stores the requesting host's IP (protocol) address together with its hardware (MAC) address.",
+    "q4": "No, non-target hosts silently discard the request (though they may update their own cache with the sender's mapping) without sending a reply.",
+    "q5": "The reply is sent directly (unicast) to the requesting host, not broadcast.",
+    "q6": "It stores the target's IP-to-hardware address mapping in its ARP cache/table for future use.",
+    "q7": "No, obtaining the target's hardware address is precisely the purpose of the request; the host only knows the target's protocol (IP) address beforehand.",
+    "q8": "It merges the sender's address mapping into its table before checking whether the opcode is a request or a reply."
+  }
+}

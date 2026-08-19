@@ -65,6 +65,52 @@ Statuses referred to above are defined in [`spec/README.md`](spec/README.md).
 
 Nothing yet.
 
+## v0.4.1 — 2026-08-18
+
+**Release `v0.4.1`, language version `figdown 0.4`.** A patch release: the
+language does not move — no `.fd` gains or loses a spelling, every conformance
+golden passes unmodified, and `read/0.4/` is reused byte-for-byte. What ships
+is a **rendering repair line**, seven batches of layout and legibility work
+driven by a figure-by-figure review of the whole corpus, plus two behaviour
+corrections that act on documents without touching their headers.
+
+**Changed — the renderer asks better questions before it draws.** Seams
+between ranks and groups are sized to the ink that must live in them (labels,
+lassos, captions), so construct-dense figures stop piling into a few pixels.
+Endpoint labels anchor a fixed distance from their own port instead of a
+fraction of the span, so short edges keep their labels at their ends. A note
+must be *discriminably* adjacent to its target or it takes a drawn leader, and
+notes associated by adjacency alone open with their target's name in bold.
+Element labels join the set that edge routing avoids. A bundle's lasso orients
+by its members' direction — narrow along the links, long across them — and a
+one-link bundle draws its caption without a ring. Long edges pick the free
+side of the figure; parallel returns to one target take distinct lanes; three
+or more same-meaning returns may merge onto one labelled trunk. The `topology`
+genre adopts the port convention: interface names sit inside the device box at
+the border crossing. Reciprocal message pairs run antiparallel-adjacent.
+Crowded unclassed lines pair with their labels by muted tone — four hues a
+just-noticeable difference apart, deriving no legend entry and stating no
+meaning. Chart captions lean out of the bars' footprint; band captions clear
+their node's label; `state` derives its rounded geometry from the word.
+
+**Changed — two behaviours, neither version-gated.** A `pin` that makes one
+node's box cover another **completely** is refused at geometry time when the
+covered position was chosen by the engine — a cover both of whose boxes are
+pinned is the author's paint-order statement and still draws, and partial
+overlap never errors. And `sequence`'s no-restatement rule is now
+operand-scoped, which only legalises: two mutually exclusive branches may both
+end in the same state, because at most one of them occurs.
+
+**Corpus.** The bundled examples were reviewed figure by figure and repaired
+alongside the engine: the RPF check is now a fully automatic flowchart, a new
+`block-c` pattern demonstrates a right-to-left response path, and the
+reference topology's peer group joined its subject. The layout gate's floor
+residue fell from seven flagged labels to one across the whole corpus.
+
+**Upgrading.** Nothing to do. Figures re-render with the improvements on the
+next build; no source changes are required or implied. Full details:
+[`spec/migrations.md`](spec/migrations.md).
+
 ## v0.4.0 — 2026-08-17
 
 **Release `v0.4.0`, language version `figdown 0.4`.** The third `Y`: new

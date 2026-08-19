@@ -1,26 +1,26 @@
 {
   "suite_version": "1.0.0",
   "run": {
-    "utc": "2026-08-16T06:20:43Z",
+    "utc": "2026-08-18T00:24:18Z",
     "model_alias": "sonnet",
     "model_used": "claude-sonnet-5",
-    "cli": "2.1.233 (Claude Code)",
+    "cli": "2.1.234 (Claude Code)",
     "condition": "syntax",
     "reader": 3
   },
   "figure": {
     "id": "rpf-check",
-    "genre": "block",
+    "genre": "flowchart",
     "path": "examples/rpf-check.fd",
-    "file_sha256": "1500962db181dc5f6fd68653e24fcaa8f9153d1cffe0525c476075df57946ce6",
+    "file_sha256": "30c508b436fc6fbe51029d78b94a05bcf1d138fc7383ffe0b22efea15de14e57",
     "title_shown": null,
-    "presented_sha256": "47e4206e757fd19b6d6aaed76d97d24667005c8ce781df60585674949b86c61d",
+    "presented_sha256": "b977d4ff6a1a3f243c21443ce649e777a8f49b1bdc629c06186fb551ab34c5ba",
     "presented_lines": 26,
-    "presented_chars": 705
+    "presented_chars": 667
   },
   "prompt": {
     "system_sha256": "1a78658262dc29e7e24cbe3e1eb72659cf31990e85deddacf0b1625e40c5eac2",
-    "user_sha256": "fabd876e217bd4564b691265c1700bff2cfa69db716bc7e4eb97efdc9fe8bae2",
+    "user_sha256": "acc1144d0c3e2f403c860d5c353cbbbbf36c9c6cbbf2630e1d616ef5a17d7953",
     "question_set_sha256": "61aeae46aa0cc940551eea4a1d6d2e3ef9c67091350fd92995d2e5729e831406"
   },
   "cold_room": {
@@ -39,21 +39,21 @@
     "is_error": false
   },
   "usage": {
-    "cost_usd": 0.0086796,
+    "cost_usd": 0.0158784,
     "input_tokens": 2,
-    "output_tokens": 556,
+    "output_tokens": 1035,
     "cache_creation_input_tokens": 0,
-    "duration_ms": 6109
+    "duration_ms": 10949
   },
-  "raw_answer_text": "A1: The Unicast RIB (unicast routing table).\nA2: The packet's source address.\nA3: NOT STATED\nA4: The interface on which the packet actually arrived.\nA5: The router first looks up the route back toward the source, then compares it to the arrival interface.\nA6: If the packet arrived on the \"upstream\" interface (the one indicated by the RIB lookup), it is accepted and forwarded.\nA7: If the packet did not arrive on that upstream interface, it fails the check and is dropped (RPF fail).\nA8: NOT STATED",
+  "raw_answer_text": "A1: The unicast routing table (RIB).\nA2: The packet's source address.\nA3: NOT STATED\nA4: It compares that route's interface against the interface on which the packet actually arrived.\nA5: The lookup happens first, then the comparison (rx → lookup → verdict).\nA6: If the packet arrived on the \"upstream\" interface (the one routing would use to reach the source), it passes and the router accepts and forwards it.\nA7: If the packet did not arrive on that upstream interface, it fails the check (\"RPF fail\") and the router drops it.\nA8: The check uses the route back toward the source instead of toward the destination — verifying the packet arrived on \"an interface that is not the route back to the source\" is what makes it a reverse check, since normal forwarding decisions look toward the destination, not the source.",
   "answers": {
-    "q1": "The Unicast RIB (unicast routing table).",
+    "q1": "The unicast routing table (RIB).",
     "q2": "The packet's source address.",
     "q3": "NOT STATED",
-    "q4": "The interface on which the packet actually arrived.",
-    "q5": "The router first looks up the route back toward the source, then compares it to the arrival interface.",
-    "q6": "If the packet arrived on the \"upstream\" interface (the one indicated by the RIB lookup), it is accepted and forwarded.",
-    "q7": "If the packet did not arrive on that upstream interface, it fails the check and is dropped (RPF fail).",
-    "q8": "NOT STATED"
+    "q4": "It compares that route's interface against the interface on which the packet actually arrived.",
+    "q5": "The lookup happens first, then the comparison (rx → lookup → verdict).",
+    "q6": "If the packet arrived on the \"upstream\" interface (the one routing would use to reach the source), it passes and the router accepts and forwards it.",
+    "q7": "If the packet did not arrive on that upstream interface, it fails the check (\"RPF fail\") and the router drops it.",
+    "q8": "The check uses the route back toward the source instead of toward the destination — verifying the packet arrived on \"an interface that is not the route back to the source\" is what makes it a reverse check, since normal forwarding decisions look toward the destination, not the source."
   }
 }

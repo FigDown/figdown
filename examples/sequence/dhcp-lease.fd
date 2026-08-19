@@ -75,20 +75,26 @@ title "DHCP lease acquisition, renewal and release (RFC 2131 §3.1, §4.4)"
 # order gives it, so nothing is lost in THIS figure; a figure with two
 # interleaved concurrent exchanges would lose it.
 #
-# ── HONEST LIMIT — a lifeline's states are ONE sequence ─────────────
-# `state c "INIT"` appears in the `refused` operand, because RFC 2131
-# Figure 5 sends REQUESTING back to INIT on DHCPNAK. The DHCPDECLINE
-# path of §3.1 item 5 ALSO returns the client to INIT, and it cannot be
-# drawn as a state as well: a lifeline's state occurrences are read as
+# ── LIMIT LIFTED, and what is still true ─────────────
+# This block used to read: "a lifeline's state occurrences are read as
 # one sequence in document order, so a second INIT reads as restating a
-# state that has not changed and is refused as such. The two paths are
-# mutually exclusive in TIME — only one of them ever happens — and the
-# language has no way to say that two occurrences are alternatives
-# rather than neighbours. So the DHCPDECLINE restart travels in that
-# message's `description=` and the DHCPNAK restart is drawn.
-# The same shape has a second consequence a reader must carry: the
-# state drawn after a fragment follows whichever operand ran, and the
-# picture cannot mark which.
+# state that has not changed and is refused as such … the DHCPDECLINE
+# restart travels in that message's `description=` and the DHCPNAK
+# restart is drawn." That was accurate about the engine and wrong about
+# the figure. RFC 2131 Figure 5 sends REQUESTING back to INIT on
+# DHCPNAK (§4.4.5) and §3.1 item 5 restarts from INIT after a
+# DHCPDECLINE, and the two paths are mutually exclusive in TIME — the
+# address either checks out or it does not — so neither INIT restates
+# the other. The check is OPERAND-SCOPED now: occurrences in different
+# operands of one fragment do not restate each other, and an occurrence
+# is compared only with the most recent one in a scope that encloses
+# its own. Both restarts are therefore drawn as states, and neither
+# fact rides in a `description=` any more.
+# WHAT IS STILL TRUE, and a reader must carry it: the state drawn AFTER
+# a fragment follows whichever operand ran, and the picture cannot mark
+# which. That is the same shape one step further on, and it is why the
+# final `state c "INIT"` below is compared with `REQUESTING` rather than
+# with anything inside the alternatives.
 #
 # ── HONEST LIMIT — a meaning-only class puts no ink on the page ────
 # `class dropped "Sent, never delivered"` declares no paint, so the
@@ -225,7 +231,15 @@ message c <-> h "ARP: who-has 192.0.2.44 — and the reply" in=conflict class=pr
 # §3.1 item 5: the client "MUST send a DHCPDECLINE message to the
 # server and restarts the configuration process", waiting at least ten
 # seconds first.
-message c -> sb "DHCPDECLINE  requested-ip=192.0.2.44" in=conflict class=refuse description="the client waits at least 10s and then restarts the configuration process from INIT (§3.1 item 5); that INIT is carried here and not drawn, because a lifeline's state occurrences are read as one sequence and this path and the DHCPNAK path both end there"
+message c -> sb "DHCPDECLINE  requested-ip=192.0.2.44" in=conflict class=refuse description="the client waits at least ten seconds before restarting (§3.1 item 5)"
+# AND THE RESTART IS NOW DRAWN. Until this release this INIT could only
+# travel in the message's description=: the no-restatement check read a
+# lifeline's occurrences as one linear sequence, so this INIT and the
+# DHCPNAK branch's INIT read as one restating the other. They are on
+# exclusive paths — the address either checks out or it does not, and the
+# server either commits or NAKs — and the check is operand-scoped now, so
+# both restarts are on the drawing where a reader can see them.
+state c "INIT" in=conflict
 
 operand refused "no — the address is not available" in=commit
 message c <- sb "DHCPNAK" in=refused class=refuse description="the selected server cannot satisfy the request; Figure 5 sends REQUESTING back to INIT on DHCPNAK (§4.4.5)"

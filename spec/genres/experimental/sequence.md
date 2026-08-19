@@ -225,11 +225,32 @@ for the drawn thing and not a cross-reference into §14, which is where
 picture is UML's metaclass, the spelling is its notation's** — a partial
 borrow, declared.
 
-**Two CONSECUTIVE `state` lines naming the same lifeline and the same name
-are a line error.** A state that has not changed is never restated, and a
-transition is derived from the adjacent pair, so a restatement would assert a
-change that did not happen. It is also the reason a reader "tidying
-duplicates" must not silently delete one.
+**A `state` line that repeats the lifeline's current state is a line error.**
+A state that has not changed is never restated, and a transition is derived
+from the adjacent pair, so a restatement would assert a change that did not
+happen. It is also the reason a reader "tidying duplicates" must not silently
+delete one.
+
+**THE SCOPE IS THE CONTAINER (correction).** This rule read *"two
+CONSECUTIVE `state` lines naming the same lifeline and the same name are a
+line error"*, and consecutive meant *in declaration order*, which asked
+nothing about whether the two occurrences can happen together. An `alt` whose
+`granted` operand ends `state c "INIT"` and whose `refused` operand ends
+`state c "INIT"` was therefore refused — while **at most one operand of a
+fragment occurs**, so neither of those two is a restatement of the other. The
+comparison is now made against the most recent occurrence **in a scope that
+encloses or is the occurrence's own** — itself, its operand, its fragment, the
+document — and never against one in a SIBLING operand. A `StateInvariant` is
+an `InteractionFragment` and an `InteractionOperand` contains the fragments
+that occur when its branch is taken (UML 2.5.1 §17.12.13), which is where the
+scope comes from.
+
+Two consequences are deliberate. An occurrence inside an operand still
+restates one written OUTSIDE it, because the outer state is on every path into
+the branch. And an occurrence AFTER a fragment is compared with the last one
+outside it, not with whatever an operand left behind — **which branch ran is
+exactly what the figure does not say**. Outside operands nothing changed: a
+linear restatement is the same error it always was.
 
 ### `fragment` is a PARTIAL borrow, and the debt is larger than a head-noun reduction
 

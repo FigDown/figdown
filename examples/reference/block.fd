@@ -42,7 +42,13 @@ node dec "Decode" shape=rounded in=ingest class=tint
 # transcribed — never invent one.
 node dedup in=ingest
 
-node gate "Drop?" shape=diamond
+# `shape=diamond` needs a demonstrator under a scene genre and this is it — but
+# the LABEL is a selector role, not a question. A diamond asserts nothing a
+# reading agent can recover (shape is presentation), so under `block` a
+# question label makes the figure LOOK like a flowchart while stating none of
+# what that genre's words state. This is the sanctioned mux/selector interim:
+# keep the geometry, put the role in the label.
+node gate "Selector" shape=diamond
 # Written empty label: the model records "" and the renderer draws no text
 # (`EMPTY-LABEL-STATE`) — an unlabelled tap point, without inventing a word for it.
 node j "" shape=circle

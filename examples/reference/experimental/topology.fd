@@ -27,6 +27,11 @@ edge s2 [e0/2] -- [e0/2] l2
 edge l1 -> wan
 edge l1 -- l2
 
+# A SINGLE-MEMBER bundle (backlog 53). It is legal and it means
+# something real — a one-link LAG, an Ethernet Segment with one member — so the
+# declaration stands. What changed is the DRAWING: a ring exists to unite lines,
+# and around one line it unites nothing, so a one-member bundle now draws its
+# CAPTION beside the link and no ellipse.
 bundle mh "multi-home" l1--l2
 # The MULTI-MEMBER form: the member list is ONE comma-delimited token, and each
 # member must resolve to a unique edge, as written (`s1--l1` is not `l1--s1`).
@@ -37,10 +42,19 @@ bundle mh "multi-home" l1--l2
 # is what L1's two spine uplinks are.
 bundle ecmp "ECMP uplink set" s1--l1,s2--l1
 # The WRITTEN-EMPTY label (`EMPTY-LABEL-STATE`): absent is omitted, `""` is a written value —
-# a third state, and the ring draws with no caption rather than falling back to
+# a third state, and the ring drew with no caption rather than falling back to
 # the id. This form was demonstrated on a `block` bundle until 0.3; it
 # moved here with the keyword, because `topology` is the only genre that
 # declares it now.
+#
+# THIS DECLARATION IS NOW MODEL-ONLY, AND DELIBERATELY KEPT (
+# backlog 53). It is a SINGLE-member bundle, so it draws no ring, and its label
+# is written-empty, so it draws no caption: the figure shows nothing for it.
+# The line is not deleted, because it is the DEMONSTRATOR for the written-empty
+# label on `bundle` — the model still carries the trunk, `read` still reports
+# it, and a reader who asks the source what s2--l2 is gets an answer. Nothing a
+# ring around one unnamed line could draw is a fact the figure did not already
+# state, which is precisely why it now draws nothing.
 bundle unlabelled "" s2--l2
 
 # WITHDRAWN — `plane tunnels "VXLAN overlay" z-index=1` stood here. `plane`, its
@@ -53,9 +67,17 @@ bundle unlabelled "" s2--l2
 # `network` (RFC 8345 §4.1/§6.1). Today the one figure that wanted it is served
 # by `class` (`RESERVED-SPELLINGS`).
 
-group peer "Peers" gap=4
-node p1 "P1" in=peer style=dashed stroke=#64748b
-node p2 "P2" in=peer
+# The peer group earns its place in the subject (maintainer review,
+# 0.4): it is the spine's eBGP peering, reached by one real edge, so
+# the figure reads as one network rather than a catalogue with a loose corner.
+# It still carries its three demonstrators: `gap=` on the group, a node whose
+# dashed look is now a CLASSED meaning rather than bare presentation, and a
+# direct stroke= on the node showing the per-node override beside the class.
+class prov "Provisional peer — planned, not yet carrying traffic" style=dashed
+group peer "eBGP peers" gap=4
+node p1 "Peer 1" in=peer class=prov stroke=#64748b
+node p2 "Peer 2" in=peer
+edge s2 -[eBGP]- p1
 
 layout
 pin s1 at=(80,40) width=72 height=40

@@ -1,18 +1,18 @@
 {
   "suite_version": "1.0.0",
   "run": {
-    "utc": "2026-08-16T06:21:17Z",
+    "utc": "2026-08-18T00:24:48Z",
     "model_alias": "sonnet",
     "model_used": "claude-sonnet-5",
-    "cli": "2.1.233 (Claude Code)",
+    "cli": "2.1.234 (Claude Code)",
     "condition": "title-only",
     "reader": 3
   },
   "figure": {
     "id": "rpf-check",
-    "genre": "block",
+    "genre": "flowchart",
     "path": "examples/rpf-check.fd",
-    "file_sha256": "1500962db181dc5f6fd68653e24fcaa8f9153d1cffe0525c476075df57946ce6",
+    "file_sha256": "30c508b436fc6fbe51029d78b94a05bcf1d138fc7383ffe0b22efea15de14e57",
     "title_shown": "RPF check on a multicast join",
     "presented_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
     "presented_lines": 0,
@@ -39,21 +39,21 @@
     "is_error": false
   },
   "usage": {
-    "cost_usd": 0.007344,
-    "input_tokens": 703,
-    "output_tokens": 349,
+    "cost_usd": 0.008591999999999999,
+    "input_tokens": 769,
+    "output_tokens": 419,
     "cache_creation_input_tokens": 0,
-    "duration_ms": 4283
+    "duration_ms": 5350
   },
-  "raw_answer_text": "A1: The unicast routing table (RIB), which is also used to derive the router's understanding of reverse paths.\nA2: The packet's source address is used as the lookup key.\nA3: It also tells the router the next-hop (upstream) neighbor and the metric/preference associated with that path, along with the expected incoming interface.\nA4: It compares that interface against the interface on which the multicast packet actually arrived.\nA5: The router first looks up the route back toward the source, then compares it to the arrival interface.\nA6: The packet passes if the expected interface (from the source lookup) matches the interface on which it arrived; when it passes, the router forwards it out the appropriate outgoing interface(s) per the multicast forwarding state.\nA7: The packet fails if the arrival interface does not match the expected interface toward the source; when it fails, the router drops the packet.\nA8: It's called \"reverse\" because instead of checking the route toward the destination (as normal unicast forwarding does), it checks the route back toward the source of the traffic, verifying the packet arrived from the direction it should have come from.",
+  "raw_answer_text": "A1: The router consults its unicast routing table (or the multicast RPF table derived from it, e.g. from BGP/IGP or a static mroute).\nA2: The packet's source address is used as the lookup key.\nA3: It also tells the router the expected upstream (RPF) interface and next hop toward that source.\nA4: It compares that expected upstream interface against the interface on which the packet actually arrived.\nA5: The router first looks up the route back toward the source, then compares it to the arriving interface.\nA6: If the expected interface matches the interface the packet arrived on, the RPF check passes and the router accepts/forwards the packet (or processes the join) normally.\nA7: If the interface doesn't match, the RPF check fails and the router drops the packet (or rejects/ignores the join).\nA8: It's \"reverse\" because the check looks up the path back toward the source of the traffic rather than the normal forwarding lookup toward the destination, ensuring multicast traffic arrives on the interface that would be used to send unicast traffic back to that source.",
   "answers": {
-    "q1": "The unicast routing table (RIB), which is also used to derive the router's understanding of reverse paths.",
+    "q1": "The router consults its unicast routing table (or the multicast RPF table derived from it, e.g. from BGP/IGP or a static mroute).",
     "q2": "The packet's source address is used as the lookup key.",
-    "q3": "It also tells the router the next-hop (upstream) neighbor and the metric/preference associated with that path, along with the expected incoming interface.",
-    "q4": "It compares that interface against the interface on which the multicast packet actually arrived.",
-    "q5": "The router first looks up the route back toward the source, then compares it to the arrival interface.",
-    "q6": "The packet passes if the expected interface (from the source lookup) matches the interface on which it arrived; when it passes, the router forwards it out the appropriate outgoing interface(s) per the multicast forwarding state.",
-    "q7": "The packet fails if the arrival interface does not match the expected interface toward the source; when it fails, the router drops the packet.",
-    "q8": "It's called \"reverse\" because instead of checking the route toward the destination (as normal unicast forwarding does), it checks the route back toward the source of the traffic, verifying the packet arrived from the direction it should have come from."
+    "q3": "It also tells the router the expected upstream (RPF) interface and next hop toward that source.",
+    "q4": "It compares that expected upstream interface against the interface on which the packet actually arrived.",
+    "q5": "The router first looks up the route back toward the source, then compares it to the arriving interface.",
+    "q6": "If the expected interface matches the interface the packet arrived on, the RPF check passes and the router accepts/forwards the packet (or processes the join) normally.",
+    "q7": "If the interface doesn't match, the RPF check fails and the router drops the packet (or rejects/ignores the join).",
+    "q8": "It's \"reverse\" because the check looks up the path back toward the source of the traffic rather than the normal forwarding lookup toward the destination, ensuring multicast traffic arrives on the interface that would be used to send unicast traffic back to that source."
   }
 }

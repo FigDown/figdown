@@ -54,7 +54,21 @@ function renderOnce(engine, src) {
   const { doc, errs } = engine.parse(src);
   if (errs.length) return { ok: false, errs };
   const result = engine.render(doc);
-  return { ok: true, svg: result.svg };
+  // THE SCENE ORIGIN IS REPORTED, AND THIS GATE HAS TO SUBTRACT IT.
+  // Several passes move the WHOLE scene by one uniform offset so ink that
+  // belongs off the low side of the canvas has somewhere to be drawn — a
+  // left-pointing boundary label (`bShift`), a ring return row above the top
+  // rank (`chShift`), a long-edge corridor on the low margin (`lShift`/
+  // `tShift`). None of them reflows anything: relative geometry,
+  // pins included, is preserved exactly, and `meta.left`/`meta.top` exist so
+  // the editor's drag->pin round-trip stays stable. Measured in RAW svg
+  // coordinates a uniform shift reads as "every pinned node moved", which is
+  // the opposite of what this gate is asking. `patterns/block-b` hit it first:
+  // pinning one more node let a corridor be adopted, the scene shifted 25.5 px,
+  // and two pins that had not reflowed at all were reported as violations.
+  return { ok: true, svg: result.svg,
+           org: [ (result.sceneMeta && result.sceneMeta.left) || 0,
+                  (result.sceneMeta && result.sceneMeta.top)  || 0 ] };
 }
 
 function renderWithRetry(engine, src, label) {
@@ -583,6 +597,7 @@ function main() {
     }
 
     const basePositions = extractNodePositions(baseResult.svg);
+    const baseOrg = baseResult.org || [0, 0];
     if (!basePositions.length) { cov.skip(fdPath, 'no-positions'); continue; }
 
     const basePosMap = new Map(basePositions.map(p => [p.id, p]));
@@ -627,6 +642,11 @@ function main() {
       }
 
       const afterPositions = extractNodePositions(afterResult.svg);
+      // normalise both renders to their own reported scene origin, so a uniform
+      // shift is not read as movement
+      const afterOrg = afterResult.org || [0, 0];
+      const dOx = afterOrg[0] - baseOrg[0], dOy = afterOrg[1] - baseOrg[1];
+      if (dOx || dOy) for (const p of afterPositions) { p.x -= dOx; p.y -= dOy; }
       const disps = measureDisplacements(basePosMap, afterPositions);
 
       if (!disps.length) {

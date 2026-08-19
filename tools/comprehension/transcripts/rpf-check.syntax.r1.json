@@ -1,26 +1,26 @@
 {
   "suite_version": "1.0.0",
   "run": {
-    "utc": "2026-08-16T06:20:28Z",
+    "utc": "2026-08-18T00:23:54Z",
     "model_alias": "sonnet",
     "model_used": "claude-sonnet-5",
-    "cli": "2.1.233 (Claude Code)",
+    "cli": "2.1.234 (Claude Code)",
     "condition": "syntax",
     "reader": 1
   },
   "figure": {
     "id": "rpf-check",
-    "genre": "block",
+    "genre": "flowchart",
     "path": "examples/rpf-check.fd",
-    "file_sha256": "1500962db181dc5f6fd68653e24fcaa8f9153d1cffe0525c476075df57946ce6",
+    "file_sha256": "30c508b436fc6fbe51029d78b94a05bcf1d138fc7383ffe0b22efea15de14e57",
     "title_shown": null,
-    "presented_sha256": "47e4206e757fd19b6d6aaed76d97d24667005c8ce781df60585674949b86c61d",
+    "presented_sha256": "b977d4ff6a1a3f243c21443ce649e777a8f49b1bdc629c06186fb551ab34c5ba",
     "presented_lines": 26,
-    "presented_chars": 705
+    "presented_chars": 667
   },
   "prompt": {
     "system_sha256": "1a78658262dc29e7e24cbe3e1eb72659cf31990e85deddacf0b1625e40c5eac2",
-    "user_sha256": "fabd876e217bd4564b691265c1700bff2cfa69db716bc7e4eb97efdc9fe8bae2",
+    "user_sha256": "acc1144d0c3e2f403c860d5c353cbbbbf36c9c6cbbf2630e1d616ef5a17d7953",
     "question_set_sha256": "61aeae46aa0cc940551eea4a1d6d2e3ef9c67091350fd92995d2e5729e831406"
   },
   "cold_room": {
@@ -39,21 +39,21 @@
     "is_error": false
   },
   "usage": {
-    "cost_usd": 0.008469599999999999,
+    "cost_usd": 0.019254,
     "input_tokens": 2,
-    "output_tokens": 542,
-    "cache_creation_input_tokens": 0,
-    "duration_ms": 5853
+    "output_tokens": 820,
+    "cache_creation_input_tokens": 1158,
+    "duration_ms": 8289
   },
-  "raw_answer_text": "A1: The Unicast RIB (unicast routing table).\nA2: The packet's source address.\nA3: NOT STATED.\nA4: The interface on which the packet actually arrived.\nA5: The router first looks up the route back toward the packet's source, then compares it to the arrival interface.\nA6: It passes when the packet arrived on the \"upstream\" interface (the interface indicated by the source lookup); the router then accepts and forwards it.\nA7: It fails when the packet did not arrive on that upstream interface; the router then drops it as an RPF failure.\nA8: NOT STATED.",
+  "raw_answer_text": "A1: The router consults the Unicast RIB (the \"Unicast RIB lookup\" step shown in the flow).\nA2: The source address (the lookup is performed for the packet coming \"from 198.51.100.7\").\nA3: NOT STATED.\nA4: It compares that interface against the interface on which the packet actually arrived (Ingress ge-0/0/1).\nA5: The router looks up the route back toward the source first, then compares it to the arrival interface (rx → lookup → verdict).\nA6: It passes when the packet arrived on the \"upstream\" interface (yes branch), and the router accepts and forwards it.\nA7: It fails when the packet did not arrive on the upstream interface (no branch), and the router drops it as an RPF failure.\nA8: NOT STATED.",
   "answers": {
-    "q1": "The Unicast RIB (unicast routing table).",
-    "q2": "The packet's source address.",
+    "q1": "The router consults the Unicast RIB (the \"Unicast RIB lookup\" step shown in the flow).",
+    "q2": "The source address (the lookup is performed for the packet coming \"from 198.51.100.7\").",
     "q3": "NOT STATED.",
-    "q4": "The interface on which the packet actually arrived.",
-    "q5": "The router first looks up the route back toward the packet's source, then compares it to the arrival interface.",
-    "q6": "It passes when the packet arrived on the \"upstream\" interface (the interface indicated by the source lookup); the router then accepts and forwards it.",
-    "q7": "It fails when the packet did not arrive on that upstream interface; the router then drops it as an RPF failure.",
+    "q4": "It compares that interface against the interface on which the packet actually arrived (Ingress ge-0/0/1).",
+    "q5": "The router looks up the route back toward the source first, then compares it to the arrival interface (rx → lookup → verdict).",
+    "q6": "It passes when the packet arrived on the \"upstream\" interface (yes branch), and the router accepts and forwards it.",
+    "q7": "It fails when the packet did not arrive on the upstream interface (no branch), and the router drops it as an RPF failure.",
     "q8": "NOT STATED."
   }
 }

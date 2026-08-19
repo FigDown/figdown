@@ -1,0 +1,64 @@
+{
+  "header": {
+    "version": "0.1",
+    "genre": "block"
+  },
+  "title": "Two boxes that clip each other are drawn",
+  "flow": "right",
+  "classes": [],
+  "planes": [
+    {
+      "id": "base",
+      "z": 0
+    }
+  ],
+  "nodes": [
+    {
+      "id": "a",
+      "label": "A",
+      "shape": "box",
+      "plane": "base",
+      "line": 9
+    },
+    {
+      "id": "b",
+      "label": "B",
+      "shape": "box",
+      "plane": "base",
+      "line": 10
+    }
+  ],
+  "groups": [],
+  "edges": [
+    {
+      "a": "a",
+      "op": "->",
+      "b": "b",
+      "plane": "base",
+      "line": 13
+    }
+  ],
+  "ranks": [],
+  "pins": [
+    {
+      "id": "a",
+      "x": 0,
+      "y": 0,
+      "width": 120,
+      "height": 60,
+      "line": 11
+    },
+    {
+      "id": "b",
+      "x": 80,
+      "y": 40,
+      "width": 120,
+      "height": 60,
+      "line": 12
+    }
+  ],
+  "thresholds": [],
+  "bands": [],
+  "bundles": [],
+  "regions": []
+}

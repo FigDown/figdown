@@ -1,0 +1,57 @@
+{
+  "probe_version": "1.0.0",
+  "run": {
+    "utc": "2026-08-18T00:20:55Z",
+    "model_alias": "sonnet",
+    "model_used": "claude-sonnet-5",
+    "cli": "2.1.234 (Claude Code)",
+    "condition": "cold",
+    "reader": 1
+  },
+  "subject": {
+    "sid": "B04",
+    "bucket": "true-block",
+    "subjects_sha256": "00bb3a638935cee5ce265755d3e35aa3df0c48823030cb85cc6300f4fabfe0a3",
+    "brief_sha256": "971b282e2356d665b9ab584f456806c19e8120c469e2a50d0ccbd37938284378"
+  },
+  "presented": {
+    "what": "the subject brief and skill/figdown/SKILL.md, pasted verbatim into the message",
+    "bundle_path": "skill/figdown/SKILL.md",
+    "bundle_sha256": "5c1e6d4a711089761d8d085552b46f14617f2e23c167ae21827d54218d6f6d4c",
+    "bundle_chars": 14990
+  },
+  "prompt": {
+    "system_sha256": "f0c9d216983b082a65bb1ba2a4c4224d7faf8950a8d5487f4fd85d9badfce1bd",
+    "user_sha256": "5dfea64338be33fd2af90b922928ad64466884ed9802194a8dbaaca848244268",
+    "user_chars": 15516
+  },
+  "cold_room": {
+    "cwd": "an isolated empty temporary directory outside the repository",
+    "tools_offered": "none — every tool denied by name",
+    "mcp_servers": "none",
+    "settings": "safe-mode: no project or user settings, no memory file, no skills, no plugins, no hooks",
+    "session_persistence": false,
+    "shown": "the system prompt, skill/figdown/SKILL.md verbatim, and the subject brief — nothing else",
+    "not_shown": "the specification, any genre document, any genre-selection guideline (none exists), guide/authoring.md, any .fd file, the repository, the answer key"
+  },
+  "integrity": {
+    "turns": 1,
+    "permission_denials": 0,
+    "tool_calls_observed": false,
+    "is_error": false
+  },
+  "usage": {
+    "cost_usd": 0.036417,
+    "input_tokens": 2,
+    "output_tokens": 81,
+    "duration_ms": 2868
+  },
+  "raw_answer_text": "# FigDown — figures as text. Spec: https://github.com/FigDown/figdown\nfigdown 0.1 block # containers (auth, cache) with internal nodes and cross-boundary flow; not a graph traversal, so not flowchart",
+  "answer": {
+    "version": "0.1",
+    "genre": "block",
+    "reason": "containers (auth, cache) with internal nodes and cross-boundary flow; not a graph traversal, so not flowchart",
+    "reason_source": "trailing comment on the header line",
+    "header_line": "figdown 0.1 block # containers (auth, cache) with internal nodes and cross-boundary flow; not a graph traversal, so not flowchart"
+  }
+}

@@ -70,7 +70,26 @@ either.
 | Setting | Default | Notes |
 |---------|---------|-------|
 | `flow` | `right` | The core-model default. `statechart` does **not** take `flowchart`'s `down`: FSM figures are commonly wide, and most real ones are pinned anyway |
-| `shape` | `box` | The core-model default (§2.1). Do **not** encode state-ness in a shape (`SHAPE-ENUM-VOCABULARY`) — the genre already says it |
+| `shape` | `rounded` | **Derived from the directive**, since 0.4 (see the correction below). `shape=` on a `state` line remains legal and overrides the *drawing* only (§12.7) — the node is still a state in the model |
+
+**Correction.** This table read `` `shape` | `box` | The
+core-model default (§2.1). Do **not** encode state-ness in a shape (`SHAPE-ENUM-VOCABULARY`) — the
+genre already says it ``, and that rule was **unfollowable as written**. The
+engine's role→shape derivation covered `flowchart` only, so a `state` fell
+through to the core `box` default and drew the right-angle rectangle ISO 5807
+§9.2.1 gives to a *process* — the one form this genre exists to be
+distinguished from. An author who obeyed the rule therefore got a picture that
+said the wrong thing, and four of the six shipped statechart figures bought
+their way out with twenty-four hand-keyed `shape=rounded` lines: the exact
+per-node presentation encoding the rule forbids, written because the default
+left no alternative.
+
+The rule was right and the default was wrong. `state` now derives `rounded`
+the way `decision` derives `diamond` — the SOURCE says what the thing is, and
+the shape is only how that thing happens to be drawn. `SHAPE-ENUM-VOCABULARY` is unchanged and now
+costs nothing to follow: **do not write a shape to say a node is a state.**
+The twenty-four keys were dropped from the corpus in the same release with the
+drawings byte-identical, which is what made the derivation safe to take.
 
 ## Complete vocabulary (normative)
 

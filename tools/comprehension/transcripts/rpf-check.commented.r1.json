@@ -1,26 +1,26 @@
 {
   "suite_version": "1.0.0",
   "run": {
-    "utc": "2026-08-16T06:21:51Z",
+    "utc": "2026-08-18T00:25:00Z",
     "model_alias": "sonnet",
     "model_used": "claude-sonnet-5",
-    "cli": "2.1.233 (Claude Code)",
+    "cli": "2.1.234 (Claude Code)",
     "condition": "commented",
     "reader": 1
   },
   "figure": {
     "id": "rpf-check",
-    "genre": "block",
+    "genre": "flowchart",
     "path": "examples/rpf-check.fd",
-    "file_sha256": "1500962db181dc5f6fd68653e24fcaa8f9153d1cffe0525c476075df57946ce6",
+    "file_sha256": "30c508b436fc6fbe51029d78b94a05bcf1d138fc7383ffe0b22efea15de14e57",
     "title_shown": null,
-    "presented_sha256": "6695731f36535bcdb9574f2f39803a3df1f610ae65df7066f4ffb4d389fde7d1",
-    "presented_lines": 66,
-    "presented_chars": 3648
+    "presented_sha256": "c6090a0ce94145e638ed7f743209a39c7bb0b40f8ea976a1644e0929d3737291",
+    "presented_lines": 108,
+    "presented_chars": 6563
   },
   "prompt": {
     "system_sha256": "1a78658262dc29e7e24cbe3e1eb72659cf31990e85deddacf0b1625e40c5eac2",
-    "user_sha256": "26ce096fd35ef683c93b86075245326d5a6ff56c5307319d4a11ac623392cf7b",
+    "user_sha256": "bcdb8a89602c809b362d752b608876d8f59a022c2087d02ec1f5d66dab7dcdd2",
     "question_set_sha256": "61aeae46aa0cc940551eea4a1d6d2e3ef9c67091350fd92995d2e5729e831406"
   },
   "cold_room": {
@@ -39,21 +39,21 @@
     "is_error": false
   },
   "usage": {
-    "cost_usd": 0.0174219,
+    "cost_usd": 0.031866,
     "input_tokens": 2,
-    "output_tokens": 1118,
-    "cache_creation_input_tokens": 0,
-    "duration_ms": 12469
+    "output_tokens": 816,
+    "cache_creation_input_tokens": 3270,
+    "duration_ms": 9066
   },
-  "raw_answer_text": "A1: The router consults the Unicast RIB (unicast routing table), as shown by the \"Unicast RIB lookup\" node.\nA2: NOT STATED explicitly, though the check is described as verifying \"the route back to the source,\" implying the source address is the key.\nA3: NOT STATED.\nA4: It compares that interface (the \"next-hop\" / \"upstream\" interface from the lookup) against the interface on which the packet actually arrived.\nA5: The lookup happens first (\"Unicast RIB lookup\" → \"next-hop ge-0/0/1\" edge into the verdict), and the comparison happens second.\nA6: The packet passes when it \"Arrived on the 'upstream' interface\" (the yes branch), and the router then \"Accept[s] and forward[s]\" it.\nA7: The packet fails when it did not arrive on the upstream interface (the no branch), described as arriving \"on an interface that is not the route back to the source,\" and the router \"Drop[s] (RPF fail)\" it.\nA8: It is called \"reverse\" because the check runs backwards along the path the packet arrived on — it looks up the route back toward the source rather than the normal forward route toward the destination.",
+  "raw_answer_text": "A1: NOT STATED (the figure only names it \"Unicast RIB lookup\").\nA2: NOT STATED.\nA3: NOT STATED.\nA4: The interface the packet arrived on (labeled \"Ingress ge-0/0/1\" in the figure).\nA5: The lookup happens first — the edge order is `lookup -> verdict`, so the route lookup precedes the comparison.\nA6: It passes when the packet \"Arrived on the \\\"upstream\\\" interface\" (the \"yes\" branch), and the router's action is \"Accept and forward.\"\nA7: It fails when the packet did not arrive on the upstream interface (the \"no\" branch), and the router's action is \"Drop (RPF fail).\"\nA8: NOT STATED.",
   "answers": {
-    "q1": "The router consults the Unicast RIB (unicast routing table), as shown by the \"Unicast RIB lookup\" node.",
-    "q2": "NOT STATED explicitly, though the check is described as verifying \"the route back to the source,\" implying the source address is the key.",
+    "q1": "NOT STATED (the figure only names it \"Unicast RIB lookup\").",
+    "q2": "NOT STATED.",
     "q3": "NOT STATED.",
-    "q4": "It compares that interface (the \"next-hop\" / \"upstream\" interface from the lookup) against the interface on which the packet actually arrived.",
-    "q5": "The lookup happens first (\"Unicast RIB lookup\" → \"next-hop ge-0/0/1\" edge into the verdict), and the comparison happens second.",
-    "q6": "The packet passes when it \"Arrived on the 'upstream' interface\" (the yes branch), and the router then \"Accept[s] and forward[s]\" it.",
-    "q7": "The packet fails when it did not arrive on the upstream interface (the no branch), described as arriving \"on an interface that is not the route back to the source,\" and the router \"Drop[s] (RPF fail)\" it.",
-    "q8": "It is called \"reverse\" because the check runs backwards along the path the packet arrived on — it looks up the route back toward the source rather than the normal forward route toward the destination."
+    "q4": "The interface the packet arrived on (labeled \"Ingress ge-0/0/1\" in the figure).",
+    "q5": "The lookup happens first — the edge order is `lookup -> verdict`, so the route lookup precedes the comparison.",
+    "q6": "It passes when the packet \"Arrived on the \\\"upstream\\\" interface\" (the \"yes\" branch), and the router's action is \"Accept and forward.\"",
+    "q7": "It fails when the packet did not arrive on the upstream interface (the \"no\" branch), and the router's action is \"Drop (RPF fail).\"",
+    "q8": "NOT STATED."
   }
 }

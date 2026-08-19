@@ -12,13 +12,14 @@
 > See also the [structure pattern library](patterns/index.md) — generic
 > skeletons distilled from a real 774-document corpus.
 
-## Statechart-style trials (planned genre; portable `block` today)
+## Statecharts (`statechart` — EXPERIMENTAL genre, requires `figdown 0.2`)
 
-Classic FSMs written in the planned **`statechart` authoring style**
-(short labels, `#` multi-line notes, optional companion table). Header is
-still `block` until the experimental genre is registered — see
-[statechart/index.md](statechart/index.md) and
-decisions/registry.md.
+Classic FSMs in the **`statechart` genre**: `state`/`transition` spell the
+roles, short labels, `#` multi-line notes, optional companion table. This
+section's header once read "planned genre; portable `block` today" — the
+genre registered and every figure here declares it, so that
+sentence had been false for two releases and is corrected rather than
+kept. See [statechart/index.md](statechart/index.md).
 
 ## Block & architecture (census #1)
 
@@ -39,15 +40,6 @@ spec, and until 0.1 only `MULTI-FIGURE-DOCUMENTS` had ever been shown. Also the 
 `chart` on a scene document.
 
 ![Telemetry export path](telemetry-export.svg)
-
-### RPF check — a figure that reads right to left  — [source](rpf-check.fd)
-Four constructs that had no demonstrator anywhere before 0.1, gathered
-into one small figure: `flow left` (the corpus was `right` and `down` only),
-the `\"` escape inside a quoted label, a `#` inside a bracketed edge label
-(verbatim since `VERBATIM-REGION-SCOPE`), and a
-negative `at=` coordinate.
-
-![RPF check](rpf-check.svg)
 
 ### Partition map — pool with global thresholds  — [source](partition-map.fd)
 The same block constructs plus `threshold`/`band` markers cover buffer
@@ -186,6 +178,20 @@ under the old `node … shape=` spelling would have erased the fact that it is
 a branch point at all. Here the word carries it and the drawing is free.
 
 ![Packet ingress path](packet-ingress.svg)
+
+### RPF check — a procedure that reads right to left  — [source](rpf-check.fd)
+Four constructs that had no demonstrator anywhere before 0.1, gathered
+into one small figure: `flow left` (the corpus was `right` and `down` only),
+the `\"` escape inside a quoted label, a `#` inside a bracketed edge label
+(verbatim since `VERBATIM-REGION-SCOPE`), and a
+negative `at=` coordinate. It was a `block` figure until this release, with the
+stage roles carried by `shape=` and asserted by nothing; converting it to
+`flowchart` puts them in the words and lets the geometry derive — the same
+trade `packet-ingress` makes above, paid on a figure that already existed. It
+is also the corpus's only `figdown 0.1 flowchart` document, so it is where the
+version-gated connector spelling is visible: `edge` at 0.1, `flowline` at 0.2.
+
+![RPF check](rpf-check.svg)
 
 ## Interactions (sequence — EXPERIMENTAL genre)
 

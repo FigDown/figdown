@@ -334,18 +334,18 @@ class client  "Active-close path (typically the client) — calls CLOSE first: F
 class server  "Passive-close path (typically the server) — receives the peer's FIN first: CLOSE-WAIT → LAST-ACK → CLOSED" stroke=#16a34a
 class rare    "Rare / simultaneous transition — simultaneous open or close, or a reset/abort (RST, close from a half-open state)" stroke=#9333ea style=dashed
 
-state closed "CLOSED"        shape=rounded class=states
-state listen "LISTEN"        shape=rounded class=states
-state synsent "SYN-SENT"     shape=rounded class=states
-state synrcvd "SYN-RECEIVED" shape=rounded class=states
-state estab  "ESTABLISHED"   shape=rounded class=states
-state fw1    "FIN-WAIT-1"    shape=rounded class=states
-state fw2    "FIN-WAIT-2"    shape=rounded class=states
-state closing "CLOSING"      shape=rounded class=states
-state closewait "CLOSE-WAIT" shape=rounded class=states
-state lastack "LAST-ACK"     shape=rounded class=states
-state timewait "TIME-WAIT"   shape=rounded class=states
-state closed2 "CLOSED"       shape=rounded class=states
+state closed "CLOSED"        class=states
+state listen "LISTEN"        class=states
+state synsent "SYN-SENT"     class=states
+state synrcvd "SYN-RECEIVED" class=states
+state estab  "ESTABLISHED"   class=states
+state fw1    "FIN-WAIT-1"    class=states
+state fw2    "FIN-WAIT-2"    class=states
+state closing "CLOSING"      class=states
+state closewait "CLOSE-WAIT" class=states
+state lastack "LAST-ACK"     class=states
+state timewait "TIME-WAIT"   class=states
+state closed2 "CLOSED"       class=states
 
 flow down
 

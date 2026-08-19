@@ -195,12 +195,16 @@ function extractEdges(svgText, tx, ty) {
   const edges = [];
 
   // straight <line> edges
-  const lineRe = /<line(?: data-edge="[^"]*")? x1="([^"]*)" y1="([^"]*)" x2="([^"]*)" y2="([^"]*)"[^/]*stroke-width="1\.6"[^/]*\/>/g;
+  // `data-edge` is the drawn edge's identity — the SOURCE LINE it came from —
+  // and F6 needs it to ask whether an edge is incident to a label's owner. It
+  // is captured, never required: an edge without one simply has `line: null`
+  // and F6 treats it as foreign to everything, which is the safe direction.
+  const lineRe = /<line(?: data-edge="([^"]*)")? x1="([^"]*)" y1="([^"]*)" x2="([^"]*)" y2="([^"]*)"[^/]*stroke-width="1\.6"[^/]*\/>/g;
   let m;
   while ((m = lineRe.exec(svgText)) !== null) {
-    const x1 = parseFloat(m[1]) + tx, y1 = parseFloat(m[2]) + ty;
-    const x2 = parseFloat(m[3]) + tx, y2 = parseFloat(m[4]) + ty;
-    edges.push({ segs: [[[x1, y1], [x2, y2]]] });
+    const x1 = parseFloat(m[2]) + tx, y1 = parseFloat(m[3]) + ty;
+    const x2 = parseFloat(m[4]) + tx, y2 = parseFloat(m[5]) + ty;
+    edges.push({ segs: [[[x1, y1], [x2, y2]]], line: m[1] === undefined ? null : m[1] });
   }
 
   // polyline <path> edges: fill="none" + stroke-width="1.6"
@@ -210,7 +214,7 @@ function extractEdges(svgText, tx, ty) {
   // Use a conservative check: path must have fill="none" and not be inside <defs>.
   //
   // Strategy: find the <g transform="translate("> content block and scan it.
-  const pathRe = /<path(?: data-edge="[^"]*")? d="([^"]*)" fill="none" stroke="[^"]*" stroke-width="1\.6"([^/]*)\/>/g;
+  const pathRe = /<path(?: data-edge="([^"]*)")? d="([^"]*)" fill="none" stroke="[^"]*" stroke-width="1\.6"([^/]*)\/>/g;
   while ((m = pathRe.exec(svgText)) !== null) {
     // A merge bus (engine, item 26 stage 1) draws ONE trunk that several edges
     // share, and every member says so with data-bus="<target>". The shared ink
@@ -218,9 +222,9 @@ function extractEdges(svgText, tx, ty) {
     // lines the trunk carries — so `coincident` below does not charge two
     // members of the SAME bus for it. Coincidence between anything else,
     // including two members of two DIFFERENT buses, is scored as before.
-    const busM = /\bdata-bus="([^"]*)"/.exec(m[2] || '');
+    const busM = /\bdata-bus="([^"]*)"/.exec(m[3] || '');
     // skip the arrowhead path (M0,0 L10,5 L0,10 z — it lives in <defs>)
-    const d = m[1];
+    const d = m[2];
     if (d.includes('z') || d.includes('Z')) continue;
     const pts = parsePath(d);
     if (pts.length < 2) continue;
@@ -229,7 +233,7 @@ function extractEdges(svgText, tx, ty) {
     // decompose polyline into individual segments
     const segs = [];
     for (let i = 0; i + 1 < tpts.length; i++) segs.push([tpts[i], tpts[i + 1]]);
-    edges.push({ segs, bus: busM ? busM[1] : null });
+    edges.push({ segs, bus: busM ? busM[1] : null, line: m[1] === undefined ? null : m[1] });
   }
 
   return edges;
@@ -296,12 +300,29 @@ function extractLabels(svgText, tx, ty) {
     const fs   = parseFloat(tm[4]);
     const attrs = tm[3] + tm[5];
     const body  = tm[6];
-    // Body is either bare text (single line) or a run of <tspan>s (one per line).
+    // Body is bare text (single line), or <tspan>s. A tspan is one of TWO
+    // things and they must not be confused:
+    //   • a LINE of a multi-line label — the engine writes one tspan per line
+    //     with its own `y`, which is the case this reader was built for;
+    //   • a RUN inside one line — a note may open with its
+    //     target's label in bold (item 56b), and that line is two tspans at
+    //     the SAME `y`.
+    // Grouping by `y` tells them apart. Reading the runs as lines made a
+    // two-run single line look like a two-line label, which inflated the box
+    // and invented a collision with the line below it: the gate reporting a
+    // defect the drawing does not have.
     let lines;
     if (body.indexOf('<tspan') >= 0) {
-      lines = [];
-      const sp = /<tspan[^>]*>([\s\S]*?)<\/tspan>/g;
-      let sm; while ((sm = sp.exec(body)) !== null) lines.push(sm[1]);
+      const rows = new Map(), order = [];
+      const sp = /<tspan([^>]*)>([\s\S]*?)<\/tspan>/g;
+      let sm;
+      while ((sm = sp.exec(body)) !== null) {
+        const ym = /\by="([^"]*)"/.exec(sm[1]);
+        const key = ym ? ym[1] : String(order.length);
+        if (!rows.has(key)) { rows.set(key, []); order.push(key); }
+        rows.get(key).push(sm[2]);
+      }
+      lines = order.map(k => rows.get(k).join(' '));
     } else {
       lines = [body];
     }
@@ -598,7 +619,29 @@ function computeF5(svgText, tx, ty, edges, nodes, labels) {
     if (!isEdge) continue;
     const C = [L.x + L.w / 2, L.y + L.h / 2];
     // filter (1): per-EDGE min distance, so a bent edge is one edge.
-    const ds = edges.map(e => ({ e, d: f5EdgeMin(C, e) })).sort((a, b) => a.d - b.d);
+    // filter (5): per-BUS min distance, so a merge bus is one LINE. A bus draws
+    // its shared trunk once per member (that is the convention `data-bus`
+    // records, and the reason `coincident` already exempts it), so a label on
+    // the trunk sits at the same distance from every member and F5's
+    // nearest-versus-second-nearest margin is 0 by construction — it would
+    // charge the drawing convention rather than an ambiguity. The reader's
+    // question, "which line does this word name", has one answer here: the
+    // trunk. Members of DIFFERENT buses, and a bus against any other edge, are
+    // compared exactly as before.
+    const perEdge = edges.map(e => ({ e, d: f5EdgeMin(C, e) }));
+    const busMin = new Map();
+    for (const r of perEdge) if (r.e.bus) {
+      const cur = busMin.get(r.e.bus);
+      if (cur === undefined || r.d < cur) busMin.set(r.e.bus, r.d);
+    }
+    const seenBus = new Set();
+    const ds = perEdge.filter(r => {
+      if (!r.e.bus) return true;
+      if (seenBus.has(r.e.bus)) return false;
+      seenBus.add(r.e.bus);
+      r.d = busMin.get(r.e.bus);
+      return true;
+    }).sort((a, b) => a.d - b.d);
     if (ds.length < 2) continue;
     considered++;
     const margin = ds[1].d - ds[0].d;
@@ -606,6 +649,175 @@ function computeF5(svgText, tx, ty, edges, nodes, labels) {
     const anti = f5AntiParallel(ds[0].e, ds[1].e, 5);   // filter (4)
     const nodeBorderFP = nodeD < 18;                     // filter (2)
     if (margin < F5_M && !anti && !nodeBorderFP) flagged.push(L.text);
+  }
+  return { flagged, considered };
+}
+
+// ── F6: element-label / foreign-edge margin (§14.4's named frontier) ─────────
+// ADVISORY, RATCHETING — printed with its denominator, absent from score(),
+// from --max-score and from --strict, exactly like F5 and `align`.
+//
+// F5 charges EDGE labels only, by design: it asks which of two edges a label
+// names. §14.4 names the other half of the same question and leaves it open —
+// an ELEMENT's label (a node's, an external's, a group's band name) that a
+// FOREIGN edge touches. It is the fourth instance of one mechanism
+// (edge-label/edge = F5, note/element = engine-backlog item 40,
+// endpoint-label/endpoint = item 42, element-label/foreign-edge = this), and
+// the corpus case that filed it is the sharpest yet: `showcase/arp-resolution`
+// ran the green unicast shaft through `rest of the LAN (hosts C, D, ...)`,
+// inviting the reader to conclude the unicast reaches the rest of the LAN —
+// the exact claim the figure exists to deny.
+//
+// The rule. For an element label owned by element O:
+//   margin = distance from the label BOX to the nearest edge NOT incident to O
+//   flag when margin < M.
+//
+// WHY NOT F5's LITERAL nearest-versus-second-nearest. It was written that way
+// first (margin = d_foreign - d_own) and measured: it charges the DRAWING
+// CONVENTION rather than the defect. F5 compares two edges because an edge
+// label between two lines names one of them and the reader must choose; an
+// ELEMENT label already has an owner — the element — so the only open question
+// is clearance. Worse, the own-edge term is a constant of the convention: an
+// external's label sits a fixed 10 px beyond its anchor and its own edge
+// terminates AT that anchor, so d_own is pinned near 16 px for every external
+// in the corpus, and the axis then reported `arp-resolution` as defective at a
+// foreign clearance of 11.6 px — a figure whose shaft demonstrably clears the
+// label. What survives from F5 is everything else: the readers, the box
+// geometry, the halo-twin de-duplication, M, the printed denominator, and the
+// ratchet. Incidence is read from the DOCUMENT, so "foreign" is a fact about
+// the source and not a guess from the geometry.
+//
+// Distance is measured to the BOX, not to a centre, because the defect is
+// INTERSECTION: the arp shaft entered the box's right portion while the box
+// centre was 30 px away. This is the one place F6 departs from F5's
+// centre-based measure, and it departs for the reason F5 gives for choosing
+// the centre — measure the thing the eye is actually doing.
+//
+// M = 4 px, F5's own constant, and for F5's reason: a 1.6 px shaft with a 3 px
+// white halo under the glyph is separated from the text at about 4 px and not
+// before.
+const F6_M = +(process.env.F6_M || 4);
+
+function pointRectDist(px, py, r) {
+  const dx = Math.max(r.x - px, 0, px - (r.x + r.w));
+  const dy = Math.max(r.y - py, 0, py - (r.y + r.h));
+  return Math.hypot(dx, dy);
+}
+// Exact distance from a segment to an axis-aligned rect: 0 when they meet,
+// otherwise attained at a vertex of one against the other.
+function segRectDist(p, q, r) {
+  if (pointRectDist(p[0], p[1], r) === 0 || pointRectDist(q[0], q[1], r) === 0) return 0;
+  const x2 = r.x + r.w, y2 = r.y + r.h;
+  const sides = [[r.x, r.y, x2, r.y], [x2, r.y, x2, y2], [x2, y2, r.x, y2], [r.x, y2, r.x, r.y]];
+  for (const [sx1, sy1, sx2, sy2] of sides)
+    if (segsCross(p[0], p[1], q[0], q[1], sx1, sy1, sx2, sy2)) return 0;
+  let d = Infinity;
+  for (const c of [[r.x, r.y], [x2, r.y], [x2, y2], [r.x, y2]])
+    d = Math.min(d, pointToSegDist(c[0], c[1], p[0], p[1], q[0], q[1]));
+  d = Math.min(d, pointRectDist(p[0], p[1], r), pointRectDist(q[0], q[1], r));
+  return d;
+}
+function edgeRectDist(e, r) {
+  let d = Infinity;
+  for (const [p, q] of e.segs) d = Math.min(d, segRectDist(p, q, r));
+  return d;
+}
+
+// The three element-label classes, each read where the engine writes it.
+//   node label     — <text> inside <g data-node="ID">; owner = ID
+//   band name      — <text font-size="11.5"> inside <g data-group="ID">
+//   external label — font-size 10, outside both wrappers, its full text equal
+//                    to a `boundary` node's label in the DOCUMENT. An external
+//                    is never drawn as a shape (EXTERNAL-EDGE-ENDPOINTS), so the drawing carries no
+//                    wrapper to key on and the SOURCE is the only honest way to
+//                    tell its label from an endpoint label at the same size.
+//                    That is the same reason `computeAlign` reads the document.
+function extractElementLabels(svgText, tx, ty, doc) {
+  const out = [];
+  const textRe = /<text x="([^"]*)" y="([^"]*)"([^>]*)>([\s\S]*?)<\/text>/g;
+  const boxOf = (x, y, fs, attrs, body) => {
+    let lines;
+    if (body.indexOf('<tspan') >= 0) {
+      lines = []; const sp = /<tspan[^>]*>([\s\S]*?)<\/tspan>/g; let sm;
+      while ((sm = sp.exec(body)) !== null) lines.push(sm[1]);
+    } else lines = [body];
+    const text = lines.join('\n');
+    if (!text.trim()) return null;
+    const charW = 6.5 * fs / 11;
+    const w = Math.max(...lines.map(l => l.length)) * charW;
+    const h = (lines.length - 1) * fs * 1.3 + fs * 1.1;
+    const am = /text-anchor="([^"]*)"/.exec(attrs);
+    const anchor = am ? am[1] : 'start';
+    const left = anchor === 'middle' ? x - w / 2 : anchor === 'end' ? x - w : x;
+    return { x: left, y: y - fs * 0.85, w, h, text };
+  };
+  // wrapper ranges, so a <text> is attributed to the group that encloses it
+  const ranges = [];
+  for (const tag of ['data-node', 'data-group']) {
+    const re = new RegExp('<g ' + tag + '="([^"]*)"', 'g');
+    let m;
+    while ((m = re.exec(svgText)) !== null) {
+      let depth = 1, p = svgText.indexOf('>', m.index) + 1;
+      while (p < svgText.length && depth > 0) {
+        const o = svgText.indexOf('<g', p), c = svgText.indexOf('</g>', p);
+        if (c < 0) break;
+        if (o >= 0 && o < c) { depth++; p = o + 2; } else { depth--; p = c + 4; }
+      }
+      ranges.push({ kind: tag === 'data-node' ? 'node' : 'group', id: m[1], s: m.index, e: p });
+    }
+  }
+  // `external` declarations live in `doc.boundaries`, not in `doc.nodes`: an
+  // external is not a node and the parser says so. Reading `doc.nodes` for them
+  // — the obvious guess — finds nothing and the axis silently measures no
+  // external label at all, which is the blind spot this file's header is about.
+  const extLabels = new Map();
+  for (const n of ((doc && doc.boundaries) || []))
+    if (n.label) extLabels.set(String(n.label), n.id);
+  const seen = new Set();
+  let tm;
+  while ((tm = textRe.exec(svgText)) !== null) {
+    const attrs = tm[3];
+    const fm = /font-size="([^"]*)"/.exec(attrs);
+    if (!fm) continue;
+    const fs = parseFloat(fm[1]);
+    const b = boxOf(parseFloat(tm[1]) + tx, parseFloat(tm[2]) + ty, fs, attrs, tm[4]);
+    if (!b) continue;
+    // the halo twin is the same box at the same point — count it once
+    const key = b.x.toFixed(2) + ',' + b.y.toFixed(2) + ',' + b.text;
+    if (seen.has(key)) continue;
+    const owner = ranges.find(r => tm.index >= r.s && tm.index < r.e);
+    if (owner && owner.kind === 'node') { seen.add(key); out.push(Object.assign(b, { cls: 'node', owner: owner.id })); continue; }
+    if (owner && owner.kind === 'group' && Math.abs(fs - 11.5) < 1e-6) {
+      seen.add(key); out.push(Object.assign(b, { cls: 'band', owner: null })); continue;
+    }
+    if (!owner && Math.abs(fs - 10) < 1e-6 && extLabels.has(b.text)) {
+      seen.add(key); out.push(Object.assign(b, { cls: 'external', owner: extLabels.get(b.text) }));
+    }
+  }
+  return out;
+}
+
+function computeF6(svgText, tx, ty, edges, doc) {
+  const labels = extractElementLabels(svgText, tx, ty, doc);
+  if (!labels.length || !edges.length) return { flagged: [], considered: 0 };
+  // which drawn edge belongs to which source line, so "incident to O" is a
+  // question about the DOCUMENT and not a guess from the geometry
+  const inc = new Map();
+  for (const e of ((doc && doc.edges) || [])) inc.set(String(e.line), [e.a, e.b]);
+  const flagged = [];
+  let considered = 0;
+  for (const L of labels) {
+    considered++;
+    let foreign = Infinity, who = null;
+    for (const e of edges) {
+      const ends = e.line !== undefined && e.line !== null ? inc.get(String(e.line)) : null;
+      if (L.owner && ends && (ends[0] === L.owner || ends[1] === L.owner)) continue;   // its own
+      const d = edgeRectDist(e, L);
+      if (d < foreign) { foreign = d; who = e.line; }
+    }
+    if (!isFinite(foreign)) continue;
+    if (foreign < F6_M) flagged.push(L.cls + ' "' + L.text.replace(/\n/g, '|') + '"'
+      + ' (' + foreign.toFixed(1) + 'px' + (who !== null && who !== undefined ? ', line ' + who : '') + ')');
   }
   return { flagged, considered };
 }
@@ -891,6 +1103,10 @@ function analyzeSvg(svgText, doc) {
   m.f5 = f5.flagged.length;
   m.f5Flagged = f5.flagged;
   m.f5Considered = f5.considered;
+  const f6 = computeF6(svgText, tx, ty, edges, doc);
+  m.f6 = f6.flagged.length;
+  m.f6Flagged = f6.flagged;
+  m.f6Considered = f6.considered;
   const al = computeAlign(doc, nodes);
   m.align           = al.count;
   m.alignConsidered = al.considered;
@@ -919,7 +1135,7 @@ const NOT_JUDGED = [
 ];
 
 // ── F5 RATCHET BASELINE (spec/core.md §14) ────────────────────────────────────
-// F5 lands ADVISORY. The 8 labels below are REAL defects, not false positives —
+// F5 lands ADVISORY. The 7 labels below are REAL defects, not false positives —
 // the list is the honest state and no filter or M was weakened to shrink it.
 // They are TOLERATED here (a warning, never a failure) because every one sits in
 // a figure still under layout repair: the DEFECT is the placement, and only
@@ -947,12 +1163,62 @@ const NOT_JUDGED = [
 // again (engine-backlog item 32), it returns with F5 1 on `e1/12.24` —
 // restore the entry in the same commit, because the ratchet would otherwise
 // read a pre-existing defect as a regression against baseline 0.
+// AN ENTRY CLEARED BY A PIN CHANGE IS REMOVED IN THE SAME COMMIT, WITH ITS
+// NUMBER KEPT HERE. `examples/showcase/tcp-state-machine.fd` held `1`
+// (`rcv ACK of FIN / x`, the TIME-WAIT convergence, 0.5 px of margin) from the
+// ratchet's first day until this release, when three pins moved — CLOSED right,
+// LISTEN down, CLOSING up and right — and the figure measured F5 0 with lblcol
+// also 0 and a score of 0. This is the second removal and it is a DIFFERENT
+// kind from srl-evpn's below: that one left because nothing measures it any
+// more, this one because the defect is gone. Both keep their number here, for
+// the same reason — a removed entry with no note is how a later reader
+// re-discovers an old defect as if it were new. If those pins are ever
+// reverted, the label returns and the ratchet will read it as a REGRESSION
+// against baseline 0, which is the correct reading: the placement, not the
+// figure, is what cleared it.
+// ── F6 RATCHET BASELINE (§14.4's frontier) ────────────────────────────────────
+// Same contract as F5_BASELINE below, and populated the same way: the honest
+// residue after the renderer half of engine-backlog item 45 landed. An entry is
+// a TOLERATED count, never a target; a figure that exceeds its entry — or a
+// clean figure that gains its first — is reported as a regression. F6 is
+// ADVISORY: it is absent from score(), from --max-score and from --strict, so
+// the regression is printed and does not fail the gate while the axis soaks.
+const F6_BASELINE = {
+  // A shaft grazing the band name at 2.8 px, not a strike. The edge is drawn
+  // as a plain <line> because `routeAround` reports "boxed in" for it — the
+  // detour the padded name obstacle asks for is blocked by the neighbouring
+  // group rects — so the router cannot clear this one and the residue is
+  // honest rather than papered over. It clears when the router can leave a
+  // corridor for it (engine-backlog items 26/41/44's territory).
+  'examples/pvlan-flows.fd': 1, // band `Promiscuous — VID_P` — 2.8px from edge line 77
+};
+
 const F5_BASELINE = {
-  'examples/statechart/dhcp-client.fd':           3, // saturated top band; label-aware placement only
-  'examples/statechart/bfd-session.fd':           2, // `rx Down`,`admin disable` — DOWN/INIT/UP column (item 26/27)
-  'examples/showcase/tcp-state-machine.fd':       1, // `rcv ACK of FIN / x` — TIME-WAIT convergence (0.5px margin)
-  'examples/patterns/state-b.fd':                 1, // `cond3` — IDLE fan, item-26 stranded-label figure
-  'examples/patterns/topology-a.fd':              1, // `p3` — port labels at a link crossing
+  // LOWERED (engine-backlog items 41/46). The long-edge corridor
+  // router gives parallel returns to one target DISTINCT LANES, so the two top
+  // returns that had 3 px of y between them are now 36 px apart and each names
+  // one line. `need address|snd DISCOVER` and `no lease left|NAK / expiry`
+  // cleared with them; 3 -> 1, and the residue is
+  // `REQUEST failed|NAK/timeout → INIT` against the INIT-bound arrival fan.
+  'examples/statechart/dhcp-client.fd':           1, // was 3 (saturated top band)
+  // LOWERED. `rx Down` cleared: `DOWN -> UP` left the crowded
+  // centre column for the free LEFT margin (item 41's occupancy rule), which is
+  // the ambiguity that label was caught in. `admin disable` is the residue and
+  // it is the self-loop column — item 27's.
+  // CLEARED (engine-backlog items 60/61), entries DELETED per
+  // the ratchet's own rule — lower it, then remove it:
+  //   bfd-session's `admin disable` was the self-loop column, and its three
+  //   transitions are now one merge-bus trunk with a label at each origin, so
+  //   the column is gone rather than tidied;
+  //   state-b's `cond3` cleared with the scorer's new F5 term — a candidate
+  //   whose two NEAREST edges are within M of each other is charged, which is
+  //   the gate's own question asked before the fact instead of after it.
+  // Both figures now measure F5 0. A regression at either is a floor
+  // violation from here, which is what deleting the entry means.
+  // topology-a's `p3` cleared: engine-backlog item 42 anchors
+  // endpoint labels at a fixed DISTANCE from their own port instead of a
+  // fraction of the run, so the three-label cluster mid-span dissolved.
+  // Entry deleted per the ratchet's own rule (lower it, then remove it).
 };
 
 // collectFd RECURSES. See the file header for what the non-recursive version
@@ -1193,6 +1459,7 @@ function main() {
     offcv:       5,
     coinc:       5,
     f5:          4,
+    f6:          4,
     align:       6,
     ink:         7,
     score:       5,
@@ -1209,6 +1476,7 @@ function main() {
     lpad('offcv',  COL.offcv),
     lpad('coinc',  COL.coinc),
     lpad('f5',     COL.f5),
+    lpad('f6',     COL.f6),
     lpad('align',  COL.align),
     lpad('ink/e',  COL.ink),
     lpad('score',  COL.score),
@@ -1233,6 +1501,7 @@ function main() {
       lpad(r.offcv || 0,              COL.offcv),
       lpad(r.coincident,              COL.coinc),
       lpad(r.f5 || 0,                 COL.f5),
+      lpad(r.f6 || 0,                 COL.f6),
       lpad(r.align || 0,              COL.align),
       lpad(r.inkPerEdge.toFixed(0),   COL.ink),
       lpad(r.score,                   COL.score),
@@ -1342,6 +1611,40 @@ function main() {
       console.log('  placement; do not raise the baseline to silence it.');
       anyFail = true;
     }
+  }
+
+  // ── F6 — element-label / foreign-edge margin, ADVISORY, §14.4's frontier ───
+  // Printed with its denominator on every run, for F5's reason: `F6 0` must
+  // never be able to mean "the axis looked at nothing".
+  {
+    let flagged = 0, considered = 0;
+    const residue = [], regressed = [], cleared = [];
+    for (const r of rows) {
+      considered += (r.f6Considered || 0);
+      flagged    += (r.f6 || 0);
+      const base = F6_BASELINE[r.relRoot] || 0;
+      if (r.f6 > base) regressed.push({ file: r.relRoot, base, now: r.f6, labels: r.f6Flagged || [] });
+      else if (r.f6 > 0) residue.push({ file: r.relRoot, now: r.f6, base, labels: r.f6Flagged || [] });
+      else if (base > 0) cleared.push({ file: r.relRoot, base });
+    }
+    console.log('');
+    console.log('F6 — element-label / foreign-edge margin (§14.4 frontier; ADVISORY ratchet, M='
+                + F6_M + 'px, measured to the label BOX):');
+    console.log('  ' + flagged + ' flagged / ' + considered
+                + ' element labels considered   (node, external and band names; a foreign');
+    console.log('  shaft within ' + F6_M + 'px of a label the element did not draw invites the'
+                + ' wrong reading)');
+    for (const x of residue)
+      console.log('  baseline  ' + pad(x.file, 46) + 'F6 ' + x.now + '/' + x.base
+                  + '  ' + x.labels.join(', '));
+    for (const x of cleared)
+      console.log('  cleared   ' + pad(x.file, 46) + 'F6 0/' + x.base + '  — baseline may be lowered');
+    for (const x of regressed)
+      console.log('  REGRESSED ' + pad(x.file, 46) + 'F6 ' + x.now + ' > baseline ' + x.base
+                  + '  ' + x.labels.join(', '));
+    console.log('  This axis DOES NOT GATE while it soaks: not in score(), not in');
+    console.log('  --max-score, not in --strict. It becomes a floor rule when it reaches 0,');
+    console.log('  by the route F5 is taking.');
   }
 
   // ── align — axis-free orthogonality, ADVISORY, WIRED INTO NOTHING ──────────

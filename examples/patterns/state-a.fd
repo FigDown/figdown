@@ -3,9 +3,9 @@
 figdown 0.2 statechart
 title "3-State Cycle with Conditional Transitions"
 
-state idle   "IDLE"    shape=rounded fill=#dbeafe
-state active "ACTIVE"  shape=rounded
-state wait   "WAIT"    shape=rounded
+state idle   "IDLE"    fill=#dbeafe
+state active "ACTIVE"
+state wait   "WAIT"
 
 flow down
 

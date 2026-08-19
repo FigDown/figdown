@@ -1,0 +1,59 @@
+{
+  "suite_version": "1.0.0",
+  "run": {
+    "utc": "2026-08-16T06:20:20Z",
+    "model_alias": "sonnet",
+    "model_used": "claude-sonnet-5",
+    "cli": "2.1.233 (Claude Code)",
+    "condition": "syntax",
+    "reader": 3
+  },
+  "figure": {
+    "id": "arp-resolution",
+    "genre": "topology",
+    "path": "examples/showcase/arp-resolution.fd",
+    "file_sha256": "46c8123b88838d5b17d5cccf91518f966ba83eadbb0787d36a00e5f734e45145",
+    "title_shown": null,
+    "presented_sha256": "8455a226e188b589f3d41c3cc96c861a660dc595180f8dc29494bdf3cf4d075c",
+    "presented_lines": 25,
+    "presented_chars": 907
+  },
+  "prompt": {
+    "system_sha256": "1a78658262dc29e7e24cbe3e1eb72659cf31990e85deddacf0b1625e40c5eac2",
+    "user_sha256": "f563a1dfa607ac74ca44e55c272578ffd994666478ae0c88e29109b6a5268537",
+    "question_set_sha256": "d9d8582ddf508c6d8e38fde7421a0b578072c3b00b22c75dbf8f1be1dfb16010"
+  },
+  "cold_room": {
+    "cwd": "an isolated empty temporary directory outside the repository",
+    "tools_offered": "none — every tool denied by name",
+    "mcp_servers": "none",
+    "settings": "safe-mode: no project or user settings, no memory file, no skills, no plugins, no hooks",
+    "session_persistence": false,
+    "shown": "the system prompt, the presented file text, and the questions — nothing else",
+    "not_shown": "the specification, any genre document, any other .fd file, the file name, the name of the language, the repository"
+  },
+  "integrity": {
+    "turns": 1,
+    "permission_denials": 0,
+    "tool_calls_observed": false,
+    "is_error": false
+  },
+  "usage": {
+    "cost_usd": 0.010068,
+    "input_tokens": 2,
+    "output_tokens": 646,
+    "cache_creation_input_tokens": 0,
+    "duration_ms": 7230
+  },
+  "raw_answer_text": "A1: Broadcast — sent to every host on the LAN (dst MAC ff:ff:ff:ff:ff:ff).\nA2: It has no entry for B's IP in its ARP cache before the exchange.\nA3: NOT STATED\nA4: NOT STATED (the file shows other hosts on the LAN as having \"heard, ignored\" the broadcast, but does not explicitly say whether they send a reply).\nA5: Sent directly to just the requesting host (unicast).\nA6: It caches the information, resulting in an entry mapping B's IP → aa:bb:cc:... in its table.\nA7: It does not know it; that is precisely the information the request is meant to obtain (\"who-has B?\").\nA8: NOT STATED",
+  "answers": {
+    "q1": "Broadcast — sent to every host on the LAN (dst MAC ff:ff:ff:ff:ff:ff).",
+    "q2": "It has no entry for B's IP in its ARP cache before the exchange.",
+    "q3": "NOT STATED",
+    "q4": "NOT STATED (the file shows other hosts on the LAN as having \"heard, ignored\" the broadcast, but does not explicitly say whether they send a reply).",
+    "q5": "Sent directly to just the requesting host (unicast).",
+    "q6": "It caches the information, resulting in an entry mapping B's IP → aa:bb:cc:... in its table.",
+    "q7": "It does not know it; that is precisely the information the request is meant to obtain (\"who-has B?\").",
+    "q8": "NOT STATED"
+  }
+}

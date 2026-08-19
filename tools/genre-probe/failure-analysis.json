@@ -1,0 +1,25 @@
+{
+  "about": "Why every missed answer in the genre-selection baseline was missed. One entry per (subject/condition) or (subject/condition/reader). A miss with no entry here fails --strict, on the comprehension suite's rule: a score alone is not actionable.",
+  "classes": {
+    "prior-override": "the model's untutored prior won; the bundle did not move it",
+    "subject-misread": "the chosen genre is wrong about what the brief describes, and would be wrong under any guideline",
+    "portability-override": "a portable genre was chosen DELIBERATELY, with the reason stated in the header comment. Arguably correct on the project's own standing instruction, and therefore counted separately and never silently credited",
+    "key-disputed": "the three labelers split three ways; the subject carries no key and is excluded from every rate",
+    "unreasoned-either": "an ambiguous subject answered inside the accepted pair but with no stated reason",
+    "version-error": "the genre matched and the version did not; scored separately from the genre rate, never against it"
+  },
+  "ladder_not_consulted_is_na": "The comprehension suite's failure taxonomy has no analogue here, and neither does the class a genre-selection gate would need most — `ladder-not-consulted`. There is no ladder to consult. This baseline is the measurement of what happens without one.",
+  "measured_against": "tools/genre-probe/transcripts/ at probe_set_version 1.0.0; every classification was made by reading the reader's own stated reason, verbatim, in the transcript named.",
+  "failures": {
+    "P01/cold": {
+      "class": "portability-override",
+      "per_reader": { "1": "portability-override", "2": "portability-override", "3": "portability-override" },
+      "note": "All three cold readers named `flowchart` as the genre the figure IS, and then chose `block` anyway because the brief said the figure must render on any released version. Reader 2 wrote it most plainly: `step sequence with two failure exits; flowchart genre is EXPERIMENTAL, block is normative/portable and expresses nodes+edges fine here`. Reader 1 and reader 3 say the same thing in more words. This is not a misread and it is not a prior: the bundle's own instruction (`Prefer the first three — they are the portable ones`) was followed exactly, and it moved a correct answer to a wrong one. All three naive readers, with no bundle, answered `flowchart`."
+    },
+    "P02/cold": {
+      "class": "portability-override",
+      "per_reader": { "1": "portability-override", "2": "portability-override", "3": "portability-override" },
+      "note": "Readers 1 and 2 chose `table`, reader 3 chose `block`; all three cited the brief's v0.1 constraint in the header comment. Readers 1 and 2 reached `table` through a SECOND bundle rule — `Conditions with one outcome per combination is a table, not a flowchart` (SKILL.md §2 of 'When the figure comes from a source') — and then confirmed the choice with portability. Classified `portability-override` rather than `subject-misread` because every one of the three states the portability ground in its own words; the decision-table rule is recorded as a contributing cause in decisions/registry.md and is the reason the two trap subjects diverge in WHICH portable genre they land on."
+    }
+  }
+}

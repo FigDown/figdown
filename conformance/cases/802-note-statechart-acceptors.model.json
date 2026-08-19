@@ -15,7 +15,7 @@
     {
       "id": "idle",
       "label": "Idle",
-      "shape": "box",
+      "shape": "rounded",
       "plane": "base",
       "note": "on a state",
       "line": 24
@@ -23,7 +23,7 @@
     {
       "id": "active",
       "label": "Active",
-      "shape": "box",
+      "shape": "rounded",
       "plane": "base",
       "note": "a second one, on a sibling state, resolved independently",
       "line": 25
@@ -31,7 +31,7 @@
     {
       "id": "failed",
       "label": "Failed",
-      "shape": "box",
+      "shape": "rounded",
       "plane": "base",
       "line": 26
     }
