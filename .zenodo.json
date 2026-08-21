@@ -4,7 +4,8 @@
   "license": "mit",
   "creators": [
     {
-      "name": "FigDown"
+      "name": "FigDown",
+      "type": "organizational"
     }
   ]
 }
