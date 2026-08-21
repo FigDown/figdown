@@ -1,0 +1,52 @@
+{
+  "probe_version": "1.0.0",
+  "run": {
+    "utc": "2026-08-19T12:07:21Z",
+    "cli": "2.1.234 (Claude Code)",
+    "condition": "A",
+    "task": "T1",
+    "kind": "trap",
+    "seat": 1,
+    "model_alias": "sonnet",
+    "round": 2,
+    "model_used": "claude-sonnet-5"
+  },
+  "saw": {
+    "skill_path": "skill/figdown/SKILL.md",
+    "skill_sha256": "718f935282ce7a93f4b7e36b83983ac1112e49818384d8eaf35869830d34d6a2",
+    "skill_chars": 16497,
+    "system_sha256": "39117af0175e7d927c8f9c715c9555f91e3357a146f2d6d311d4a3bb889ecaae",
+    "user_sha256": "ada97514a3a9cdf0a7d55d60dc8a2dfb5a0d8e869314347243accc0cf38ca0eb"
+  },
+  "integrity": {
+    "turns": 1,
+    "permission_denials": 0,
+    "is_error": false
+  },
+  "usage": {
+    "cost_usd": 0.07389899999999999,
+    "duration_ms": 22985
+  },
+  "scrub": {
+    "ran": true,
+    "pattern": "email-regex",
+    "replacements": 0
+  },
+  "raw_answer_text": "Looking at the previous attempt, I output the Markdown *embed* instead of the actual `.fd` source — the validator correctly rejected that, since a `.fd` file must start with the spec provenance comment and `figdown 0.1 <genre>` line, not a Markdown image/embed. Here is the corrected `.fd` source itself.\n\n```figdown\n# FigDown — figures as text. Spec: https://github.com/FigDown/figdown\nfigdown 0.1 block\ntitle \"Alert-forwarding chain\"\n\nblock probe \"Probe\" \"emits raw samples\"\nblock normalizer \"Normalizer\" \"reshapes samples\"\nblock sink \"Sink\" \"writes to storage\"\n\nedge probe -> normalizer via=(60,20),(90,40)\nedge normalizer -> sink\n```\n\nTo embed this in the host Markdown document (after building `alert-forwarding-chain.svg` from this source), use:\n\n```markdown\n![Alert-forwarding chain: probe feeds normalizer, which feeds sink](figures/alert-forwarding-chain.svg)\n\n<sub>source: [figures/alert-forwarding-chain.fd](figures/alert-forwarding-chain.fd)</sub>\n```\n\nNotes:\n- The `via=(60,20),(90,40)` waypoint list on the `probe -> normalizer` edge is the explicit routing you asked for, so that connector jogs through those two points instead of drawing straight — leaving room for the future element between probe and normalizer.\n- `normalizer -> sink` is left unrouted (straight), since nothing was asked to route it around.\n- Labels are kept short per the block genre's guidance — the surrounding prose (probe = raw samples, normalizer = reshaping, sink = storage) carries the detail, the figure just carries structure.\n\nRun `node <skill-dir>/build-svg.js alert-forwarding-chain.fd` to render and confirm `OK`, then look at the render before calling this done.",
+  "extracted_document": "![Alert-forwarding chain: probe feeds normalizer, which feeds sink](figures/alert-forwarding-chain.svg)\n\n<sub>source: [figures/alert-forwarding-chain.fd](figures/alert-forwarding-chain.fd)</sub>\n",
+  "validation": {
+    "errors": [
+      "Line 1: first line must be \"figdown 0.1 <genre>\"",
+      "Line 1: unrecognized line (unknown keyword \"![Alert-forwarding\")",
+      "Line 3: unrecognized line (unknown keyword \"<sub>source:\")"
+    ],
+    "invariants_pass": false,
+    "missing_nodes": [
+      "probe",
+      "normalizer",
+      "sink"
+    ],
+    "edge_count": 0,
+    "success": false
+  }
+}

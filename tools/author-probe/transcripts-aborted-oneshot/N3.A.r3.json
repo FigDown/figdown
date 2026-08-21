@@ -1,0 +1,59 @@
+{
+  "probe_version": "1.0.0",
+  "run": {
+    "utc": "2026-08-19T11:49:12Z",
+    "cli": "2.1.234 (Claude Code)",
+    "condition": "A",
+    "task": "N3",
+    "kind": "normal",
+    "seat": 3,
+    "model_alias": "haiku",
+    "model_used": "claude-haiku-4-5-20251001"
+  },
+  "saw": {
+    "skill_path": "skill/figdown/SKILL.md",
+    "skill_sha256": "718f935282ce7a93f4b7e36b83983ac1112e49818384d8eaf35869830d34d6a2",
+    "skill_chars": 16497,
+    "system_sha256": "39117af0175e7d927c8f9c715c9555f91e3357a146f2d6d311d4a3bb889ecaae",
+    "user_sha256": "a132efb7518ea63eed35484c99da41bec5d49fe3ee312de5025e2aa134b912f2"
+  },
+  "integrity": {
+    "turns": 1,
+    "permission_denials": 0,
+    "is_error": false
+  },
+  "usage": {
+    "cost_usd": 0.034210000000000004,
+    "duration_ms": 34544
+  },
+  "scrub": {
+    "ran": true,
+    "pattern": "email-regex",
+    "replacements": 0
+  },
+  "raw_answer_text": "Looking at the FigDown documentation and your flowchart requirements, I need to create a flowchart that documents the BGP session reset troubleshooting procedure. Since this is an experimental genre (flowchart), I'll use `figdown 0.1 flowchart`.\n\nThe flow you've described is:\n1. Check interface error counters (process step)\n2. Make a decision based on findings\n3. Two branches: clear counters → monitor (if errors found) OR escalate to operator (if no errors)\n\nHere's the finished FigDown document:\n\n```figdown\n# FigDown — figures as text. Spec: https://github.com/FigDown/figdown\nfigdown 0.1 flowchart\ntitle \"BGP session reset procedure\"\n\nnode checkcounters type=process \"Check interface error counters\"\nnode errorsfound type=decision \"Errors found?\"\nnode clearcounters type=process \"Clear interface counters\"\nnode monitor type=terminator \"Monitor session\"\nnode escalate type=terminator \"Escalate to operator\"\n\ncheckcounters -> errorsfound\nerrorsfound -> clearcounters label=\"yes\"\nclearcounters -> monitor\nerrorsfound -> escalate label=\"no\"\n```\n\nThis document follows FigDown's structure with:\n- The spec provenance line (required first comment)\n- Genre declaration: `figdown 0.1 flowchart` (experimental genre)\n- The title: \"BGP session reset procedure\"\n- Five nodes with their types (process, decision, terminator) and meaningful labels\n- Four edges connecting them in the sequence you specified, with \"yes\"/\"no\" labels on the decision branches\n\nThe flowchart clearly shows the operator's troubleshooting path: check counters → decide → either clear and monitor or escalate.",
+  "extracted_document": "# FigDown — figures as text. Spec: https://github.com/FigDown/figdown\nfigdown 0.1 flowchart\ntitle \"BGP session reset procedure\"\n\nnode checkcounters type=process \"Check interface error counters\"\nnode errorsfound type=decision \"Errors found?\"\nnode clearcounters type=process \"Clear interface counters\"\nnode monitor type=terminator \"Monitor session\"\nnode escalate type=terminator \"Escalate to operator\"\n\ncheckcounters -> errorsfound\nerrorsfound -> clearcounters label=\"yes\"\nclearcounters -> monitor\nerrorsfound -> escalate label=\"no\"\n",
+  "validation": {
+    "errors": [
+      "Line 5: node does not take type=",
+      "Line 6: node does not take type=",
+      "Line 7: node does not take type=",
+      "Line 8: node does not take type=",
+      "Line 9: node does not take type=",
+      "Line 11: \"checkcounters\" is not allowed in genre flowchart",
+      "Line 12: \"errorsfound\" is not allowed in genre flowchart",
+      "Line 13: \"clearcounters\" is not allowed in genre flowchart",
+      "Line 14: \"errorsfound\" is not allowed in genre flowchart"
+    ],
+    "invariants_pass": false,
+    "missing_nodes": [
+      "checkcounters",
+      "errorsfound",
+      "clearcounters",
+      "monitor",
+      "escalate"
+    ],
+    "edge_count": 0,
+    "success": false
+  }
+}

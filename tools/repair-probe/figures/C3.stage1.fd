@@ -1,0 +1,15 @@
+figdown 0.1 block
+title "Firmware update verdict pair"
+
+node fetch "Fetch firmware image"
+node verify "Verify checksum"
+node accept "Apply update"
+node reject "Reject and roll back"
+node notify "Notify operator"
+
+edge fetch -> verify
+edge verify -> accept
+edge verify -> reject
+edge reject -> notify
+
+pin reject at=(0,40) width=60 height=20

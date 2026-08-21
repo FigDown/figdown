@@ -1,0 +1,63 @@
+{
+  "probe_version": "1.0.0",
+  "run": {
+    "utc": "2026-08-19T12:16:20Z",
+    "cli": "2.1.234 (Claude Code)",
+    "condition": "B",
+    "task": "N4",
+    "kind": "normal",
+    "seat": 4,
+    "model_alias": "haiku",
+    "round": 2,
+    "model_used": "claude-haiku-4-5-20251001"
+  },
+  "saw": {
+    "skill_path": "tools/author-probe/skill-candidate.md",
+    "skill_sha256": "2abdaf0d9211d5ee1464c5f5c3a200b1ae6f7bd71cfd6344e7da94d669e6ed31",
+    "skill_chars": 17591,
+    "system_sha256": "39117af0175e7d927c8f9c715c9555f91e3357a146f2d6d311d4a3bb889ecaae",
+    "user_sha256": "5f110ff9e7d6535cf25d8d7fc67d9bfe41e4701aa1c67a60442b1bfa710e58bf"
+  },
+  "integrity": {
+    "turns": 1,
+    "permission_denials": 0,
+    "is_error": false
+  },
+  "usage": {
+    "cost_usd": 0.0067287,
+    "duration_ms": 13392
+  },
+  "scrub": {
+    "ran": true,
+    "pattern": "email-regex",
+    "replacements": 0
+  },
+  "raw_answer_text": "Looking at the validation errors, I can see two main issues:\n\n1. **\"block\" keyword is not allowed** — In FigDown's block genre, nodes should be declared without the `block` keyword; just the id and label\n2. **Edge operators are missing** — Each edge needs a directional operator like `->`, `<-`, `--`, or `<->`\n\nSince this describes a workflow where the scheduler triggers the job, the job orchestrates to CA and Deploy Agent, etc., the direction should flow from trigger/caller to recipient. I'll use `->` to show this flow.\n\n```figdown\n# FigDown — figures as text. Spec: https://github.com/FigDown/figdown\nfigdown 0.1 block\ntitle \"Certificate renewal automation\"\n\nscheduler \"Scheduler\"\nrenewaljob \"Renewal Job\"\ncaclient \"CA Client\"\nca \"Certificate Authority\"\ndeployagent \"Deploy Agent\"\nservice \"Service\"\n\nscheduler -> renewaljob\nrenewaljob -> caclient\ncaclient -> ca\nrenewaljob -> deployagent\ndeployagent -> service\n```\n\nThe corrected document removes the `block` keyword from node declarations and adds the `->` operator to each edge, showing the direction of control/data flow through the certificate renewal automation workflow.",
+  "extracted_document": "# FigDown — figures as text. Spec: https://github.com/FigDown/figdown\nfigdown 0.1 block\ntitle \"Certificate renewal automation\"\n\nscheduler \"Scheduler\"\nrenewaljob \"Renewal Job\"\ncaclient \"CA Client\"\nca \"Certificate Authority\"\ndeployagent \"Deploy Agent\"\nservice \"Service\"\n\nscheduler -> renewaljob\nrenewaljob -> caclient\ncaclient -> ca\nrenewaljob -> deployagent\ndeployagent -> service\n",
+  "validation": {
+    "errors": [
+      "Line 5: \"scheduler\" is not allowed in genre block",
+      "Line 6: \"renewaljob\" is not allowed in genre block",
+      "Line 7: \"caclient\" is not allowed in genre block",
+      "Line 8: \"ca\" is not allowed in genre block",
+      "Line 9: \"deployagent\" is not allowed in genre block",
+      "Line 10: \"service\" is not allowed in genre block",
+      "Line 12: \"scheduler\" is not allowed in genre block",
+      "Line 13: \"renewaljob\" is not allowed in genre block",
+      "Line 14: \"caclient\" is not allowed in genre block",
+      "Line 15: \"renewaljob\" is not allowed in genre block",
+      "Line 16: \"deployagent\" is not allowed in genre block"
+    ],
+    "invariants_pass": false,
+    "missing_nodes": [
+      "scheduler",
+      "renewaljob",
+      "caclient",
+      "ca",
+      "deployagent",
+      "service"
+    ],
+    "edge_count": 0,
+    "success": false
+  }
+}

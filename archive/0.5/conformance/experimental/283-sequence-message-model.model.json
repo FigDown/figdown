@@ -1,0 +1,95 @@
+{
+  "header": {
+    "version": "0.4",
+    "genre": "sequence"
+  },
+  "title": "Message forms",
+  "flow": "right",
+  "classes": [
+    {
+      "id": "secure",
+      "meaning": "Carried over TLS",
+      "line": 12
+    }
+  ],
+  "planes": [
+    {
+      "id": "base",
+      "z": 0
+    }
+  ],
+  "nodes": [],
+  "groups": [],
+  "edges": [],
+  "ranks": [],
+  "pins": [],
+  "thresholds": [],
+  "bands": [],
+  "bundles": [],
+  "regions": [],
+  "lifelines": [
+    {
+      "id": "c",
+      "label": "Client",
+      "line": 13
+    },
+    {
+      "id": "s",
+      "label": "Server",
+      "line": 14
+    }
+  ],
+  "messages": [
+    {
+      "a": "c",
+      "op": "->",
+      "b": "s",
+      "label": "plain forward",
+      "line": 15
+    },
+    {
+      "a": "c",
+      "op": "<-",
+      "b": "s",
+      "label": "plain reverse",
+      "line": 16
+    },
+    {
+      "a": "c",
+      "op": "<->",
+      "b": "s",
+      "label": "sustained two-way exchange, individual messages not enumerated",
+      "line": 17
+    },
+    {
+      "a": "c",
+      "op": "->",
+      "b": "s",
+      "label": "labels at both ends",
+      "tail": "from",
+      "head": "to",
+      "line": 18
+    },
+    {
+      "a": "c",
+      "op": "->",
+      "b": "s",
+      "label": "inline mid label",
+      "line": 19
+    },
+    {
+      "a": "c",
+      "op": "->",
+      "b": "s",
+      "label": "everything at once",
+      "stroke": "#1d4ed8",
+      "style": "dashed",
+      "class": [
+        "secure"
+      ],
+      "note": "drawn aside",
+      "description": "never drawn, authored documentation",
+      "line": 20
+    }
+  ]
+}

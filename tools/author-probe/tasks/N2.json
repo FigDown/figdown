@@ -1,0 +1,9 @@
+{
+  "id": "N2",
+  "kind": "normal",
+  "genre": "topology",
+  "version": "0.1",
+  "brief": "Draw a topology figure titled \"Branch office WAN uplinks\". A branch site has two access switches, each connected to a single branch router. The branch router carries a primary WAN link to a regional hub router and a separate backup WAN link to a second, diverse-path regional hub router. Use these ids: access1, access2, branch, hubprimary, hubbackup. Show the four links the description implies: access1 to branch, access2 to branch, branch to hubprimary, and branch to hubbackup.",
+  "must_have_nodes": ["access1", "access2", "branch", "hubprimary", "hubbackup"],
+  "min_edges": 4
+}

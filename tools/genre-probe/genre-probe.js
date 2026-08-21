@@ -373,7 +373,7 @@ function deriveKeys() {
     rule_amendment: {
       what: 'The rule as first written derived the key from the PRIMARY votes alone and ignored the `also defensible` column.',
       why: 'Three subjects came back with a unanimous primary AND the same second genre named `also defensible` by two or three labelers — A03 by all three. A key that scores `block` on A03 as a miss would contradict the very labelers who wrote it, on a column they were explicitly told to fill in only when the second answer is as good as the first.',
-      when: 'Applied after the labels were read and BEFORE any reader was run. No reader answer had been taken against any key. This is the comprehension suite\'s own discipline (decisions/registry.md: two key-review passes, both before any reader answer was consulted).',
+      when: 'Applied after the labels were read and BEFORE any reader was run. No reader answer had been taken against any key. This is the comprehension suite\'s own discipline (design/comprehension-suite.md §7: two key-review passes, both before any reader answer was consulted).',
       effect: 'A02, A03, A04 and B03 became `either-with-reason`. B03 is the one the designer did not expect: two of three labelers hold that a four-stage pipeline whose middle stages decompose is as defensible as a procedure. That is data, and it is recorded rather than overridden.',
     },
     provenance: {

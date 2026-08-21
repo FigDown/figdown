@@ -1,0 +1,3 @@
+figdown 0.1 block
+node a "A"
+pin a width=wide height=20

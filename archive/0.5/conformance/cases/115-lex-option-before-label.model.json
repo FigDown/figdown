@@ -1,0 +1,138 @@
+{
+  "sections": [
+    {
+      "header": {
+        "version": "0.1",
+        "genre": "block"
+      },
+      "flow": "right",
+      "classes": [
+        {
+          "id": "c1",
+          "meaning": "Fabric",
+          "fill": "#e0f2fe",
+          "line": 28
+        }
+      ],
+      "planes": [
+        {
+          "id": "base",
+          "z": 0
+        }
+      ],
+      "nodes": [
+        {
+          "id": "a",
+          "label": "A",
+          "shape": "box",
+          "plane": "base",
+          "fill": "#fef9c3",
+          "line": 29
+        },
+        {
+          "id": "b",
+          "label": "B",
+          "shape": "box",
+          "plane": "base",
+          "line": 30
+        }
+      ],
+      "groups": [
+        {
+          "id": "g",
+          "label": "Pod",
+          "fill": "#f1f5f9",
+          "line": 31
+        }
+      ],
+      "edges": [
+        {
+          "a": "a",
+          "op": "--",
+          "b": "b",
+          "plane": "base",
+          "line": 32
+        }
+      ],
+      "ranks": [],
+      "pins": [],
+      "thresholds": [
+        {
+          "label": "Threshold",
+          "in": "g",
+          "offset": 50,
+          "line": 33
+        }
+      ],
+      "bands": [
+        {
+          "label": "Shared",
+          "in": "g",
+          "from": 15,
+          "to": 35,
+          "extend": "up",
+          "fill": "#dcfce7",
+          "line": 34
+        }
+      ],
+      "bundles": [],
+      "regions": []
+    },
+    {
+      "header": {
+        "version": "0.1",
+        "genre": "topology"
+      },
+      "flow": "right",
+      "classes": [],
+      "planes": [
+        {
+          "id": "base",
+          "z": 0
+        }
+      ],
+      "nodes": [
+        {
+          "id": "a",
+          "label": "A",
+          "shape": "box",
+          "plane": "base",
+          "line": 7
+        },
+        {
+          "id": "b",
+          "label": "B",
+          "shape": "box",
+          "plane": "base",
+          "line": 8
+        }
+      ],
+      "groups": [],
+      "edges": [
+        {
+          "a": "a",
+          "op": "--",
+          "b": "b",
+          "plane": "base",
+          "line": 9
+        }
+      ],
+      "ranks": [],
+      "pins": [],
+      "thresholds": [],
+      "bands": [],
+      "bundles": [
+        {
+          "id": "t1",
+          "label": "LAG",
+          "members": [
+            "a--b"
+          ],
+          "stroke": "#0ea5e9",
+          "line": 10
+        }
+      ],
+      "regions": []
+    }
+  ]
+}

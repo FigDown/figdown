@@ -1,0 +1,54 @@
+{
+  "probe_version": "1.0.0",
+  "run": {
+    "utc": "2026-08-19T12:18:46Z",
+    "cli": "2.1.234 (Claude Code)",
+    "condition": "B",
+    "task": "T2",
+    "kind": "trap",
+    "seat": 2,
+    "model_alias": "sonnet",
+    "round": 1,
+    "model_used": "claude-sonnet-5"
+  },
+  "saw": {
+    "skill_path": "tools/author-probe/skill-candidate.md",
+    "skill_sha256": "2abdaf0d9211d5ee1464c5f5c3a200b1ae6f7bd71cfd6344e7da94d669e6ed31",
+    "skill_chars": 17591,
+    "system_sha256": "39117af0175e7d927c8f9c715c9555f91e3357a146f2d6d311d4a3bb889ecaae",
+    "user_sha256": "2a10341578c85534d6165fced406df82bebf308a40bf03ab68636f3dfe388e97"
+  },
+  "integrity": {
+    "turns": 1,
+    "permission_denials": 0,
+    "is_error": false
+  },
+  "usage": {
+    "cost_usd": 0.0421137,
+    "duration_ms": 28134
+  },
+  "scrub": {
+    "ran": true,
+    "pattern": "email-regex",
+    "replacements": 0
+  },
+  "raw_answer_text": "FigDown's genre reference for `flowchart` (`reference/experimental/flowchart.md`) isn't part of the documentation I was given verbatim — only the router entry pointing to it. I've composed the flowchart below using the domain vocabulary the router implies (`process`, `decision`, `terminator` node kinds) and the general-language rules that *are* fully specified here (quoted labels, `class` for meaning, arrow edges, branch labels on the decision's two outgoing edges). The \"change window\" enclosure is authored as a labeled group containing `validate` and `apply`, per the request.\n\n```figdown\n# FigDown — figures as text. Spec: https://github.com/FigDown/figdown\nfigdown 0.1 flowchart\ntitle \"Change request procedure\"\n\nprocess receive \"Receive change request\"\nprocess validate \"Validate against policy\"\ndecision isvalid \"Valid?\"\nprocess apply \"Apply change to device\"\nterminator confirm \"Confirm success\"\nterminator rollback \"Roll back\"\n\ngroup changewindow \"Change window\" {\n  validate\n  apply\n}\n\nreceive -> validate\nvalidate -> isvalid\nisvalid -> apply \"yes\"\nisvalid -> rollback \"no\"\napply -> confirm\n```\n\nNotes on how I built this:\n\n- Six nodes, exactly as specified: `receive`, `validate` (processes), `isvalid` (decision), `apply` (process), `confirm`, `rollback` (terminators).\n- Five edges, exactly as specified, with the decision's two branches carrying short `\"yes\"` / `\"no\"` labels rather than any longer prose — the branching logic itself lives in the labels, not restated elsewhere.\n- `validate` and `apply` are enclosed together in a `group` named `\"Change window\"`, giving the reader the at-a-glance boundary requested, without folding that meaning into either node's own label.\n- I did not add a `class` for the change-window semantics since the group's own label already states the meaning in text, per the \"class is how meaning survives\" rule — a class would be redundant here rather than additive.\n\nSince I couldn't load `reference/experimental/flowchart.md` to confirm exact keyword spellings (`process`/`decision`/`terminator`/`group`) or the arrow-edge syntax, this document is a best-effort composition from the genre-independent rules plus the router's naming — run `node build-svg.js` against it before treating it as final; if the real genre file spells any of these differently, the build's line-numbered errors will say so and the fix is mechanical.",
+  "extracted_document": "# FigDown — figures as text. Spec: https://github.com/FigDown/figdown\nfigdown 0.1 flowchart\ntitle \"Change request procedure\"\n\nprocess receive \"Receive change request\"\nprocess validate \"Validate against policy\"\ndecision isvalid \"Valid?\"\nprocess apply \"Apply change to device\"\nterminator confirm \"Confirm success\"\nterminator rollback \"Roll back\"\n\ngroup changewindow \"Change window\" {\n  validate\n  apply\n}\n\nreceive -> validate\nvalidate -> isvalid\nisvalid -> apply \"yes\"\nisvalid -> rollback \"no\"\napply -> confirm\n",
+  "validation": {
+    "errors": [
+      "Line 12: \"group\" is not allowed in genre flowchart — it was WITHDRAWN from this genre, not misspelled: `flowchart` no longer declares `group`. Its one occurrence in the corpus was this genre's own reference figure, which exists to demonstrate every form of every keyword — so citing it as evidence of need is circular. There were no authored uses. Subject vocabulary is per genre (core §3, G2): a spelling accepted by several genres is several independent declarations, and this genre's was withdrawn without touching any other's. (withdrawn, R160; MIGRATIONS 0.3)",
+      "Line 13: \"validate\" is not allowed in genre flowchart",
+      "Line 14: \"apply\" is not allowed in genre flowchart",
+      "Line 15: \"}\" is not allowed in genre flowchart",
+      "Line 17: \"receive\" is not allowed in genre flowchart",
+      "Line 18: \"validate\" is not allowed in genre flowchart",
+      "Line 19: \"isvalid\" is not allowed in genre flowchart",
+      "Line 20: \"isvalid\" is not allowed in genre flowchart",
+      "Line 21: \"apply\" is not allowed in genre flowchart"
+    ],
+    "invariants_pass": false,
+    "missing_nodes": [],
+    "edge_count": 0,
+    "success": false
+  }
+}

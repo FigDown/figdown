@@ -1,0 +1,45 @@
+figdown 0.1 block
+# `OPTION-POSITION-PARSING`: an option may appear ANYWHERE on a directive line —
+# `splitOpts` extracts `key=` tokens by shape and the positional arguments
+# close up behind them. Two directives contradicted that: `bundle` and
+# `threshold` (spelled `guide` until 0.1) tested quotedness on the RAW
+# token stream while reading the value from the option-stripped one, so an
+# option BEFORE the label shifted the indices apart and rejected a legal line
+# ("bad member ..." / "threshold needs a quoted label"). `band` joined the
+# label-bearing set (`BAND-LABEL-STATUS`) and obeys the same rule.
+# Quotedness is now carried `pos`-aligned, so the two behave like everyone
+# else. This case pins option-before-label on the SIX directives that still
+# carry an option AND a label: `class`, `node`, `group`, `threshold` and
+# `band` in section 1, and `bundle` — the directive `OPTION-POSITION-PARSING` was written for — in
+# the `topology` section below, which is where `bundle` is now declared. Its
+# subject is the generic option/positional rule, not the demoted constructs
+# it uses to prove it (STATUS.txt criterion).
+#
+# It exercised EIGHT until 0.3, when the ruling on per-genre subject
+# vocabulary took two of them out (`SCENE-KEYWORD-MEMBERSHIP`/`PAINT-ORDER-CONSTRUCT`):
+#   - `plane z-index=2 L1 "Overlay"` stood after the `class` line until
+#     0.3 — the whole directive left the language, and both of its
+#     option keys with it (`PAINT-ORDER-CONSTRUCT`), so that position went with it.
+#   - `external plane=L1 e "Uplink"` stood after the `group` line. `external`
+#     survives, but `plane=` was its ONLY option key, so with `plane=`
+#     withdrawn `external` takes no option key at all and can no longer put
+#     one before a label. The rule still holds for it vacuously; there is
+#     nothing left to write.
+class fill=#e0f2fe c1 "Fabric"
+node fill=#fef9c3 a "A"
+node b "B"
+group fill=#f1f5f9 g "Pod"
+edge a -- b
+threshold in=g "Threshold" offset=50%
+band in=g "Shared" fill=#dcfce7 15..35%
+
+figdown 0.1 topology
+# Section 2: `bundle` was WITHDRAWN from `block` and is declared
+# by `topology` only (`SCENE-KEYWORD-MEMBERSHIP`), so the line that proves `OPTION-POSITION-PARSING`'s original defect
+# moved here rather than being deleted — the generic rule is still pinned on
+# the directive that motivated it. `GENRE-NAMESPACE` gives each section its own genre and
+# its own id space, so `a`/`b` are fresh names here, not the ones above.
+node a "A"
+node b "B"
+edge a -- b
+bundle stroke=#0ea5e9 t1 "LAG" a--b

@@ -1,0 +1,60 @@
+{
+  "probe_version": "1.0.0",
+  "run": {
+    "utc": "2026-08-19T12:17:27Z",
+    "cli": "2.1.234 (Claude Code)",
+    "condition": "B",
+    "task": "N3",
+    "kind": "normal",
+    "seat": 3,
+    "model_alias": "haiku",
+    "round": 3,
+    "model_used": "claude-haiku-4-5-20251001"
+  },
+  "saw": {
+    "skill_path": "tools/author-probe/skill-candidate.md",
+    "skill_sha256": "2abdaf0d9211d5ee1464c5f5c3a200b1ae6f7bd71cfd6344e7da94d669e6ed31",
+    "skill_chars": 17591,
+    "system_sha256": "39117af0175e7d927c8f9c715c9555f91e3357a146f2d6d311d4a3bb889ecaae",
+    "user_sha256": "af4c1a6e0cd604014f62e4678f2c407f4160a07682c2caec2e57f3269ec4878b"
+  },
+  "integrity": {
+    "turns": 1,
+    "permission_denials": 0,
+    "is_error": false
+  },
+  "usage": {
+    "cost_usd": 0.050797999999999996,
+    "duration_ms": 68478
+  },
+  "scrub": {
+    "ran": true,
+    "pattern": "email-regex",
+    "replacements": 0
+  },
+  "raw_answer_text": "Looking at the validation errors, the issue is with how elements are declared in the flowchart genre. The current syntax `process checkcounters \"label\"` is being rejected. \n\nSince I don't have access to the `reference/experimental/flowchart.md` file that documents the flowchart genre specifically, but the error indicates the ID placement is the problem, I'll try inverting the order to place the ID before the type keyword. This is consistent with how many similar languages work.\n\n```figdown\n# FigDown — figures as text. Spec: https://github.com/FigDown/figdown\nfigdown 0.1 flowchart\ntitle \"BGP session reset procedure\"\n\ncheckcounters process \"Check interface error counters\"\nerrorsfound decision \"Errors found?\"\nclearcounters process \"Clear interface counters\"\nmonitor terminator \"Monitor session\"\nescalate terminator \"Escalate to operator\"\n\ncheckcounters -> errorsfound\nerrorsfound yes -> clearcounters\nclearcounters -> monitor\nerrorsfound no -> escalate\n```\n\nThe key change from the prior attempt: element declarations now follow the pattern `id type \"label\"` instead of `type id \"label\"`. This moves the identifier before the type keyword, which should resolve the \"not allowed\" validation errors on the element declarations.",
+  "extracted_document": "# FigDown — figures as text. Spec: https://github.com/FigDown/figdown\nfigdown 0.1 flowchart\ntitle \"BGP session reset procedure\"\n\ncheckcounters process \"Check interface error counters\"\nerrorsfound decision \"Errors found?\"\nclearcounters process \"Clear interface counters\"\nmonitor terminator \"Monitor session\"\nescalate terminator \"Escalate to operator\"\n\ncheckcounters -> errorsfound\nerrorsfound yes -> clearcounters\nclearcounters -> monitor\nerrorsfound no -> escalate\n",
+  "validation": {
+    "errors": [
+      "Line 5: \"checkcounters\" is not allowed in genre flowchart",
+      "Line 6: \"errorsfound\" is not allowed in genre flowchart",
+      "Line 7: \"clearcounters\" is not allowed in genre flowchart",
+      "Line 8: \"monitor\" is not allowed in genre flowchart",
+      "Line 9: \"escalate\" is not allowed in genre flowchart",
+      "Line 11: \"checkcounters\" is not allowed in genre flowchart",
+      "Line 12: \"errorsfound\" is not allowed in genre flowchart",
+      "Line 13: \"clearcounters\" is not allowed in genre flowchart",
+      "Line 14: \"errorsfound\" is not allowed in genre flowchart"
+    ],
+    "invariants_pass": false,
+    "missing_nodes": [
+      "checkcounters",
+      "errorsfound",
+      "clearcounters",
+      "monitor",
+      "escalate"
+    ],
+    "edge_count": 0,
+    "success": false
+  }
+}

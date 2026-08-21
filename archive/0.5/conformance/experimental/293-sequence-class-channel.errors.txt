@@ -1,0 +1,3 @@
+Line 15: class "ghost" sets fill= but no stroke=, and a fragment has no interior — add stroke= to the class (it paints the fragment; fill= keeps painting members that have an interior) (MIGRATIONS 0.1)
+Line 16: class "ghost" sets fill= but no stroke=, and an operand has no interior — add stroke= to the class (it paints the operand; fill= keeps painting members that have an interior) (MIGRATIONS 0.1)
+Line 17: class "ghost" sets fill= but no stroke=, and a message has no interior — add stroke= to the class (it paints the message; fill= keeps painting members that have an interior) (MIGRATIONS 0.1)

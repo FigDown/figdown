@@ -1,0 +1,50 @@
+{
+  "probe_version": "1.0.0",
+  "run": {
+    "utc": "2026-08-19T12:19:51Z",
+    "cli": "2.1.234 (Claude Code)",
+    "condition": "B",
+    "task": "T1",
+    "kind": "trap",
+    "seat": 4,
+    "model_alias": "haiku",
+    "round": 2,
+    "model_used": "claude-haiku-4-5-20251001"
+  },
+  "saw": {
+    "skill_path": "tools/author-probe/skill-candidate.md",
+    "skill_sha256": "2abdaf0d9211d5ee1464c5f5c3a200b1ae6f7bd71cfd6344e7da94d669e6ed31",
+    "skill_chars": 17591,
+    "system_sha256": "39117af0175e7d927c8f9c715c9555f91e3357a146f2d6d311d4a3bb889ecaae",
+    "user_sha256": "1cd4b4068abf2edacff1b02b9e2d8a499d751b641b7e96630baf5a2baa9efccf"
+  },
+  "integrity": {
+    "turns": 1,
+    "permission_denials": 0,
+    "is_error": false
+  },
+  "usage": {
+    "cost_usd": 0.061897999999999995,
+    "duration_ms": 93931
+  },
+  "scrub": {
+    "ran": true,
+    "pattern": "email-regex",
+    "replacements": 0
+  },
+  "raw_answer_text": "Looking at the error messages, I can see that the keyword `block` is not valid in the `block` genre. The errors indicate:\n\n1. `\"block\"` is not allowed as a keyword for declaring nodes\n2. References to `probe` and `normalizer` as bare identifiers fail in edges\n3. The `pin` syntax for waypoints is incorrect\n\nThe issue is that I don't have access to the `reference/scene.md` file that documents the specific syntax for the `block` genre. However, based on common patterns in diagram languages and the structure of FigDown, the most likely keyword for declaring nodes in a block diagram is `node`.\n\nHere's my corrected attempt:\n\n```figdown\n# FigDown — figures as text. Spec: https://github.com/FigDown/figdown\nfigdown 0.1 block\ntitle \"Alert-forwarding chain\"\n\nnode probe \"Probe\"\nnode normalizer \"Normalizer\"\nnode sink \"Sink\"\n\nprobe -> normalizer waypoints (60,20) (90,40)\nnormalizer -> sink\n\nlayout\npin probe\npin normalizer\npin sink\n```\n\nThe key changes:\n- Replaced `block` keyword with `node` for declaring the three services\n- Moved waypoint specification directly onto the edge declaration: `probe -> normalizer waypoints (60,20) (90,40)`\n- Simplified the layout section to just pin the three nodes without trying to attach waypoints to the pin directive\n\nIf `node` is not the correct keyword, the reference files `reference/scene.md` and `reference/layout.md` would clarify the exact syntax required for the block genre. The structure of the document should otherwise be correct.",
+  "extracted_document": "# FigDown — figures as text. Spec: https://github.com/FigDown/figdown\nfigdown 0.1 block\ntitle \"Alert-forwarding chain\"\n\nnode probe \"Probe\"\nnode normalizer \"Normalizer\"\nnode sink \"Sink\"\n\nprobe -> normalizer waypoints (60,20) (90,40)\nnormalizer -> sink\n\nlayout\npin probe\npin normalizer\npin sink\n",
+  "validation": {
+    "errors": [
+      "Line 9: \"probe\" is not allowed in genre block",
+      "Line 10: \"normalizer\" is not allowed in genre block",
+      "Line 13: pin needs <id> and at=(<x>,<y>) and/or width=<px> and/or height=<px>",
+      "Line 14: pin needs <id> and at=(<x>,<y>) and/or width=<px> and/or height=<px>",
+      "Line 15: pin needs <id> and at=(<x>,<y>) and/or width=<px> and/or height=<px>"
+    ],
+    "invariants_pass": false,
+    "missing_nodes": [],
+    "edge_count": 0,
+    "success": false
+  }
+}

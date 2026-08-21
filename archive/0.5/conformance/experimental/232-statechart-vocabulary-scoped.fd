@@ -1,0 +1,16 @@
+# `STATECHART-GENRE-SCOPE` / `GENRE-NAMESPACE` `GENRE-VOCABULARY-OBLIGATION`: `statechart`'s allowlist is the scene host set and no more.
+# It does NOT inherit `flowchart`'s three role keywords: a `decision` in a
+# statechart is a category error (a state is not a test), and the allowlist
+# rejects it with no per-keyword code — the same device 224 pins for the
+# other direction. The scene keywords themselves are all in, so the same
+# figure written with `node`/`edge`/`group`/`class`/`rank`/`flow` parses.
+figdown 0.2 statechart
+decision q "Valid?"
+process p "Step"
+terminator t "Done"
+class mode "A mode of the machine" fill=#e0e7ff
+state idle "IDLE" class=mode
+state busy "BUSY" class=mode
+transition idle -[start]-> busy
+rank idle,busy
+flow right

@@ -1,0 +1,13 @@
+# Static err() coverage: edge operator / form
+# Named `907-errors-edge-and-path-form` until 0.1: it carried three
+# `path` form errors alongside these, and `EDGE-GEOMETRY-CONSTRUCTS` withdrew the directive. The
+# edge half is the subject and is untouched.
+figdown 0.1 block
+node a "A"
+node b "B"
+edge
+edge a b
+edge a
+edge a -[mid b
+edge a -[mid] b
+edge a ->

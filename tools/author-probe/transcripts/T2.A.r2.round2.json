@@ -1,0 +1,55 @@
+{
+  "probe_version": "1.0.0",
+  "run": {
+    "utc": "2026-08-19T12:09:03Z",
+    "cli": "2.1.234 (Claude Code)",
+    "condition": "A",
+    "task": "T2",
+    "kind": "trap",
+    "seat": 2,
+    "model_alias": "sonnet",
+    "round": 2,
+    "model_used": "claude-sonnet-5"
+  },
+  "saw": {
+    "skill_path": "skill/figdown/SKILL.md",
+    "skill_sha256": "718f935282ce7a93f4b7e36b83983ac1112e49818384d8eaf35869830d34d6a2",
+    "skill_chars": 16497,
+    "system_sha256": "39117af0175e7d927c8f9c715c9555f91e3357a146f2d6d311d4a3bb889ecaae",
+    "user_sha256": "23b722b1c50cce8369e45c9bdd2c8d521565748f3b813db8ccaa563b73078ea8"
+  },
+  "integrity": {
+    "turns": 1,
+    "permission_denials": 0,
+    "is_error": false
+  },
+  "usage": {
+    "cost_usd": 0.065535,
+    "duration_ms": 18492
+  },
+  "scrub": {
+    "ran": true,
+    "pattern": "email-regex",
+    "replacements": 0
+  },
+  "raw_answer_text": "I don't have `reference/experimental/flowchart.md` loaded in this conversation (only the router file above), so I can't guarantee every keyword spelling below is exact — I'm composing it from the router's stated pattern (node-type keywords, quoted labels, `->` edges, and the general `class`/`title`/`figdown` rules that hold across genres). Please run `node <skill-dir>/build-svg.js changerequest.fd` and fix any line-numbered errors it reports; I flag this because per the doc's own rule, an unverified construct should be stated rather than presented as certain.\n\n```figdown\n# FigDown — figures as text. Spec: https://github.com/FigDown/figdown\nfigdown 0.1 flowchart\ntitle \"Change request procedure\"\n\nprocess receive \"Receive change request\"\nprocess validate \"Validate against policy\"\ndecision isvalid \"Valid?\"\nprocess apply \"Apply change to device\"\nterminator confirm \"Confirm success\"\nterminator rollback \"Roll back\"\n\ngroup changewindow \"Change window\" {\n  validate\n  apply\n}\n\nreceive -> validate\nvalidate -> isvalid\nisvalid -> apply \"yes\"\nisvalid -> rollback \"no\"\napply -> confirm\n```\n\nThe host Markdown embed (once the SVG is built) should be:\n\n```markdown\n![Change request procedure flowchart](figures/changerequest.svg)\n\n<sub>source: [figures/changerequest.fd](figures/changerequest.fd)</sub>\n```\n\nNote: the `.fd` source itself must never contain that Markdown wrapper — that was the bug in the previous attempt (the embed snippet was saved as `changerequest.fd` instead of the actual FigDown source), which is exactly what the validator's three errors point at. This reply fixes that by putting real FigDown content in the code block above.",
+  "extracted_document": "![Change request procedure flowchart](figures/changerequest.svg)\n\n<sub>source: [figures/changerequest.fd](figures/changerequest.fd)</sub>\n",
+  "validation": {
+    "errors": [
+      "Line 1: first line must be \"figdown 0.1 <genre>\"",
+      "Line 1: unrecognized line (unknown keyword \"![Change\")",
+      "Line 3: unrecognized line (unknown keyword \"<sub>source:\")"
+    ],
+    "invariants_pass": false,
+    "missing_nodes": [
+      "receive",
+      "validate",
+      "isvalid",
+      "apply",
+      "confirm",
+      "rollback"
+    ],
+    "edge_count": 0,
+    "success": false
+  }
+}

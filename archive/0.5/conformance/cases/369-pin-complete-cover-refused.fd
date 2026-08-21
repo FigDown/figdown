@@ -1,0 +1,19 @@
+# 0.4 (backlog 47b): a pin that puts one node's box COMPLETELY over
+# another's is a geometry-time error, not a lint number. `b`'s pin below is
+# 400x300 at the origin and `a` is placed by the engine, so `a` ends up
+# entirely inside `b` and is not drawn at all — the figure states that `a` is
+# not there. The diagnostic comes from render(), never from parse(): the
+# source is impeccable and the defect exists only in the final coordinates,
+# exactly like the group-band enclosure error it is modelled on.
+#
+# It fires here because ONE of the two coordinates is the engine's. When BOTH
+# boxes are pinned the cover is the author's own statement in the one paint
+# order this language has — document order, `PAINT-ORDER-CONSTRUCT` — and it is drawn; that is
+# `examples/rainbow.fd`, seven concentric pinned ellipses, and it is why this
+# check asks who chose the position rather than only what the geometry is.
+figdown 0.1 block
+title "A pin that covers a node the engine placed"
+node a "A"
+node b "B"
+pin b at=(0,0) width=400 height=300
+edge a -> b

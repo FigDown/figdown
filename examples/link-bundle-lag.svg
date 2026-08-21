@@ -1,0 +1,34 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 458 184" width="458" height="184" font-family="system-ui,sans-serif"><defs><marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#555"/></marker><pattern id="hatch" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><line x1="0" y1="0" x2="0" y2="6" stroke="#bbb" stroke-width="2"/></pattern></defs><g transform="translate(18,6)"><line data-edge="m1" x1="84.60866265390884" y1="64.94751904667407" x2="278.6086626539089" y2="37.19358485497164" stroke="#555" stroke-width="1.6"/><line data-edge="m2" x1="85.6" y1="71.87696709585121" x2="279.6" y2="44.123032904148786" stroke="#555" stroke-width="1.6"/><line data-edge="m3" x1="86.59133734609115" y1="78.80641514502835" x2="280.59133734609117" y2="51.05248095332593" stroke="#555" stroke-width="1.6"/><line data-edge="31" x1="85.6" y1="83.48717948717949" x2="279.6" y2="108.35897435897436" stroke="#555" stroke-width="1.6"/><g data-node="sw1" data-x="0" data-y="60" data-lasso="ae0" style="cursor:move"><rect x="0" y="60" width="85.6" height="36" fill="#fff" stroke="#8a8880"/><text x="42.8" y="82.55" font-size="13" text-anchor="middle" fill="#1d1d1b">Switch-1</text></g><g data-node="sw2" data-x="279.6" data-y="20" data-lasso="ae0" style="cursor:move"><rect x="279.6" y="20" width="85.6" height="36" fill="#fff" stroke="#8a8880"/><text x="322.40000000000003" y="42.55" font-size="13" text-anchor="middle" fill="#1d1d1b">Switch-2</text></g><g data-node="mgmt" data-x="279.6" data-y="100" style="cursor:move"><rect x="279.6" y="100" width="150.4" height="36" fill="#fff" stroke="#8a8880"/><text x="354.8" y="122.55" font-size="13" text-anchor="middle" fill="#1d1d1b">Management switch</text></g><ellipse cx="182.6" cy="58" rx="34" ry="20" data-lasso="ae0" fill="transparent" stroke="#64748b" stroke-dasharray="6 4" stroke-width="1.6" transform="rotate(-8.142 182.6 58)"/><text x="175.981" y="15.187" font-size="11.5" text-anchor="middle" fill="#fff" stroke="#fff" stroke-width="3" stroke-linejoin="round">ae0 — link aggregation group</text><text x="175.981" y="15.187" font-size="11.5" text-anchor="middle" fill="#64748b">ae0 — link aggregation group</text><rect x="82.10" y="61.45" width="7" height="7" fill="#fff" stroke="#8a8880" data-port-sq="85.60,64.95"/><rect x="276.10" y="33.69" width="7" height="7" fill="#fff" stroke="#8a8880" data-port-sq="279.60,37.19"/><rect x="82.10" y="68.38" width="7" height="7" fill="#fff" stroke="#8a8880" data-port-sq="85.60,71.88"/><rect x="276.10" y="40.62" width="7" height="7" fill="#fff" stroke="#8a8880" data-port-sq="279.60,44.12"/><rect x="82.10" y="75.31" width="7" height="7" fill="#fff" stroke="#8a8880" data-port-sq="85.60,78.81"/><rect x="276.10" y="47.55" width="7" height="7" fill="#fff" stroke="#8a8880" data-port-sq="279.60,51.05"/><text x="111.23636363636363" y="48.876967095851214" font-size="10" text-anchor="middle" fill="#fff" data-port-sq="85.60,64.95" stroke="#fff" stroke-width="3" stroke-linejoin="round">ge-0/0/0</text><text x="111.23636363636363" y="48.876967095851214" font-size="10" text-anchor="middle" fill="#555" data-port-sq="85.60,64.95">ge-0/0/0</text><text x="249.46363636363637" y="33.123032904148786" font-size="10" text-anchor="middle" fill="#fff" data-port-sq="279.60,37.19" stroke="#fff" stroke-width="3" stroke-linejoin="round">ge-0/0/0</text><text x="249.46363636363637" y="33.123032904148786" font-size="10" text-anchor="middle" fill="#555" data-port-sq="279.60,37.19">ge-0/0/0</text><text x="131.73636363636362" y="74.87696709585121" font-size="10" text-anchor="middle" fill="#fff" data-port-sq="85.60,71.88" stroke="#fff" stroke-width="3" stroke-linejoin="round">ge-0/0/1</text><text x="131.73636363636362" y="74.87696709585121" font-size="10" text-anchor="middle" fill="#555" data-port-sq="85.60,71.88">ge-0/0/1</text><text x="263.76126160188085" y="66.88894683807142" font-size="10" text-anchor="middle" fill="#fff" data-port-sq="279.60,44.12" stroke="#fff" stroke-width="3" stroke-linejoin="round">ge-0/0/1</text><text x="263.76126160188085" y="66.88894683807142" font-size="10" text-anchor="middle" fill="#555" data-port-sq="279.60,44.12">ge-0/0/1</text><text x="111.23636363636363" y="100.87696709585121" font-size="10" text-anchor="middle" fill="#fff" data-port-sq="85.60,78.81" stroke="#fff" stroke-width="3" stroke-linejoin="round">ge-0/0/2</text><text x="111.23636363636363" y="100.87696709585121" font-size="10" text-anchor="middle" fill="#555" data-port-sq="85.60,78.81">ge-0/0/2</text><text x="253.96363636363637" y="88.1230329041488" font-size="10" text-anchor="middle" fill="#fff" data-port-sq="279.60,51.05" stroke="#fff" stroke-width="3" stroke-linejoin="round">ge-0/0/2</text><text x="253.96363636363637" y="88.1230329041488" font-size="10" text-anchor="middle" fill="#555" data-port-sq="279.60,51.05">ge-0/0/2</text><line x1="106.09999999999998" y1="71.87696709585121" x2="85.6" y2="71.87696709585121" stroke="#555" stroke-width="1" opacity="0.6"/><line x1="259.60700626120223" y1="77.6230329041488" x2="279.6" y2="51.05248095332593" stroke="#555" stroke-width="1" opacity="0.6"/><text x="0" y="166.5" font-size="11" fill="#1d1d1b">A physical link that is a member of the aggregation</text></g><metadata id="figdown-source" data-sha256="48c619e7ab23e22b3f9ebc9a8fb7f1d638ba068e819459ad31cb07bb899582b1" data-engine-version="0.5.0"><![CDATA[
+# FigDown — figures as text. Spec: https://github.com/FigDown/figdown
+
+figdown 0.5 topology
+title "Three-link aggregation between two switches"
+
+# A link bundle's DEFINING case: several parallel links between one pair of
+# devices, operated as one logical link. Until `figdown 0.5` this figure could
+# not be written — a bundle named its members by endpoint pair, and between
+# these two switches the pair "sw1--sw2" names three links at once.
+#
+# Each member link carries its own `id=`, and the bundle names the ids. The
+# ids are HANDLES and nothing else: `m1` does not say the link is first, or
+# primary, or related to `m2`. The membership claim is made by the `bundle`
+# line, and the interface names are made by the end labels.
+
+class member "A physical link that is a member of the aggregation"
+
+node sw1 "Switch-1"
+node sw2 "Switch-2"
+
+edge sw1 [ge-0/0/0] -- [ge-0/0/0] sw2 id=m1 class=member
+edge sw1 [ge-0/0/1] -- [ge-0/0/1] sw2 id=m2 class=member
+edge sw1 [ge-0/0/2] -- [ge-0/0/2] sw2 id=m3 class=member
+
+bundle ae0 "ae0 — link aggregation group" m1,m2,m3
+
+# The management link is deliberately NOT a member, and it is anonymous: a
+# connector nobody needs to name does not need an id, and its absence asserts
+# nothing at all.
+node mgmt "Management switch"
+edge sw1 -- mgmt
+
+]]></metadata></svg>

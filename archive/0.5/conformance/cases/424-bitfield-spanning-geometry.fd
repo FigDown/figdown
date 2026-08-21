@@ -1,0 +1,42 @@
+figdown 0.1 bitfield
+# `FIELD-WIDER-THAN-WORD`: ONE FIELD IS ONE BOX, and where the drawing cannot make
+# it one box the second box says so. The three geometries a field wider than
+# `word=` can take, one per declaration, in the order they appear below.
+#
+#   1. WHOLE ROWS. Starts at column 0, width a multiple of `word`. Every row
+#      it covers is full, so the rows form a rectangle: one shape, the
+#      internal horizontal rules absent, exactly RFC 8200 §3's `+   +`.
+#   2. THE L. Starts at column 0, width NOT a multiple of `word`. The last
+#      row is short, so the two rows share columns 0…r−1 but not the rest:
+#      one shape, and the boundary is unstroked only over the shared part.
+#   3. THE STAIRCASE. Starts mid-row and ends at or before that column on
+#      the next row, so the two pieces share NO column and meet at a single
+#      corner. There is no edge to leave unstroked and the drawing is two
+#      boxes. The NAME is written once, on the first box in reading order;
+#      the second carries the continuation mark. `field "Staircase" 32`
+#      below was `examples/arp.fd`'s SPA — cut; this is now it.
+#   4. THE NARROW STAIRCASE. The same, one column per piece, which is the
+#      narrowest a box can be. Both the name and the continuation mark
+#      shrink to the 7px floor and then overflow their box rather than
+#      vanish — an illegible box is worse than a crowded one.
+#
+# THE MODEL RECORDS NONE OF THIS. A field is a name and a width (core
+# §12.7); which shape it draws is the renderer reading the widths in order,
+# so the golden below pins the widths and the ORDER, and the geometry is
+# pinned by the runner's determinism self-check (`examples/arp.svg` was cut).
+# A second implementation owes the model, and SHOULD draw one field as one
+# box wherever the geometry permits it.
+title "Spanning geometry"
+bitfield span "Spanning geometry (word=32)" word=32 numbering=msb0
+
+# 1 — rows 0…3, all full.
+field "Whole rows" 128
+# 2 — row 4 full, then columns 0…15 of row 5. The L.
+field "L shape" 48
+# 3 — columns 16…31 of row 5, then columns 0…15 of row 6. Disjoint.
+field "Staircase" 32
+# columns 16…31 of row 6, closing it.
+field "Tail" 16
+# 4 — row 7 columns 0…30, then column 31 of row 7 and column 0 of row 8.
+field "Narrow head" 31
+field "Two column staircase" 2

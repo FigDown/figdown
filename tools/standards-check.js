@@ -138,7 +138,7 @@ const EXCLUSIONS = [
   [/^archive\//,                    'frozen release trees — same rule'],
   [/^CHANGELOG\.md$/,               'the release narrative — written in this repository, which the register is not, and every standards claim it summarises is registered at the spec site that makes it'],
   [/^dist\//,                       'GENERATED from editor/figdown.html by tools/make-lib.js'],
-  [/^skill\//,                      'GENERATED from read/0.4/ and the engine by tools/make-skill.js — the engine claim is registered once, at editor/figdown.html'],
+  [/^skill\//,                      'GENERATED from read/0.5/ and the engine by tools/make-skill.js — the engine claim is registered once, at editor/figdown.html'],
   [/^tools\/comprehension\//,       'model transcripts and question fixtures — other agents\' words, not this project\'s assertions'],
   [/^tools\/migrate-fixtures\//,    'migration inputs, pre-migration by design'],
   [/^spec\/standards-claims\.tsv$/, 'THE REGISTER ITSELF'],
@@ -207,6 +207,26 @@ const PATTERNS = [
   [/(?:ITU-T\s+)?\bZ\.120\b/g,                        () => 'ITU-T Z.120'],
   [/(?:ITU-T\s+)?\bX\.680\b/g,                        () => 'ITU-T X.680'],
   [/\bASN\.1\b/g,                                     () => 'ITU-T X.680'],
+  // ITU-T G-series — the transport-network architecture recommendations.
+  // ADDED 2026-08-20, and this is the line the header above anticipates: the
+  // topology-domain standards survey quotes ITU-T G.8080 clause by clause, and
+  // before this line the gate could not see one of those claims — the survey
+  // said so itself, in the document, because the gate could not say it.
+  // (Deliberately no clause number and no obtainability word here: a regex
+  // comment should not accumulate citations of its own. The clauses, the
+  // sibling recommendations G.8080 defers to, and the retrieval record all sit
+  // in the register, where a reader can check them.)
+  // A G-series recommendation is routinely written with its Y-series twin
+  // (`G.8080/Y.1304`) and often with the `Rec.` honorific; both are the SAME
+  // document and must normalise to one key, or the register would owe a second
+  // row for a spelling difference. Three digits minimum, so an ordinary
+  // sentence-initial `G.` cannot match.
+  [/(?:ITU-T\s+)?(?:Rec\.\s+)?\bG\.(\d{3,4})(?:\/Y\.\d{3,4})?\b/g, m => 'ITU-T G.' + m[1]],
+  // ONF TAPI — the Transport API topology model, whose normative artefact is a
+  // YANG module rather than a numbered clause document, so it has no number to
+  // key on and the acronym IS the token. Its `clause` column carries the YANG
+  // grouping name instead.
+  [/\b(?:ONF\s+|LF\s+ONMI\s+)?TAPI\b/g,               () => 'ONF TAPI'],
   [/\bRFC\s*(\d{3,4})/g,                              m => 'RFC ' + m[1]],
   [/\bUML\b/g,                                        () => 'UML'],
   [/\bBPMN\b/g,                                       () => 'OMG BPMN'],

@@ -1,0 +1,47 @@
+{
+  "header": {
+    "version": "0.1",
+    "genre": "bitfield"
+  },
+  "title": "a \" b # c",
+  "flow": "right",
+  "classes": [],
+  "planes": [
+    {
+      "id": "base",
+      "z": 0
+    }
+  ],
+  "nodes": [],
+  "groups": [],
+  "edges": [],
+  "ranks": [],
+  "pins": [],
+  "thresholds": [],
+  "bands": [],
+  "bundles": [],
+  "regions": [
+    {
+      "genre": "bitfield",
+      "id": "x",
+      "label": "X",
+      "word": 32,
+      "numbering": "msb0",
+      "fields": [
+        {
+          "name": "one",
+          "width": 8,
+          "description": "a \" # b",
+          "line": 8
+        },
+        {
+          "name": "two",
+          "width": 8,
+          "description": "ends with a backslash \\",
+          "line": 9
+        }
+      ],
+      "line": 7
+    }
+  ]
+}

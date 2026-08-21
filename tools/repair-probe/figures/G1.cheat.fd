@@ -1,0 +1,13 @@
+figdown 0.1 block
+title "Cluster monitoring tap placement"
+
+group cluster "Switch cluster"
+node sw1 "Switch 1" in=cluster
+node sw2 "Switch 2" in=cluster
+node collector "Flow collector"
+
+edge sw1 -> sw2
+
+pin cluster at=(0,0)
+pin sw1 at=(0,0) width=120 height=50
+pin sw2 at=(140,0) width=120 height=50

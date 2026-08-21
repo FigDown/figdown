@@ -1,0 +1,60 @@
+{
+  "probe_version": "1.0.0",
+  "run": {
+    "utc": "2026-08-19T12:03:41Z",
+    "cli": "2.1.234 (Claude Code)",
+    "condition": "A",
+    "task": "N1",
+    "kind": "normal",
+    "seat": 4,
+    "model_alias": "haiku",
+    "round": 3,
+    "model_used": "claude-haiku-4-5-20251001"
+  },
+  "saw": {
+    "skill_path": "skill/figdown/SKILL.md",
+    "skill_sha256": "718f935282ce7a93f4b7e36b83983ac1112e49818384d8eaf35869830d34d6a2",
+    "skill_chars": 16497,
+    "system_sha256": "39117af0175e7d927c8f9c715c9555f91e3357a146f2d6d311d4a3bb889ecaae",
+    "user_sha256": "b7b714afe5fbc141d0fbb024ada2bded19707257cbb6f1de68c5f5768b6bd3b7"
+  },
+  "integrity": {
+    "turns": 1,
+    "permission_denials": 0,
+    "is_error": false
+  },
+  "usage": {
+    "cost_usd": 0.022866,
+    "duration_ms": 16930
+  },
+  "scrub": {
+    "ran": true,
+    "pattern": "email-regex",
+    "replacements": 0
+  },
+  "raw_answer_text": "Looking at the validation errors, the issue is clear: I'm missing the `block` keyword that should precede each component declaration. The `block` genre requires an explicit keyword to declare each block/component.\n\nThe corrected syntax follows this pattern: `block <id> \"<label>\"`\n\nHere's the corrected document:\n\n```figdown\n# FigDown — figures as text. Spec: https://github.com/FigDown/figdown\nfigdown 0.1 block\ntitle \"Telemetry export pipeline\"\n\nblock poller \"Poller\"\nblock normalizer \"Normalizer\"\nblock healthprobe \"Health Probe\"\nblock buffer \"Ring Buffer\"\nblock exporter \"Exporter\"\n\npoller -> normalizer\nhealthprobe -> normalizer\nnormalizer -> buffer\nbuffer -> exporter\n```\n\nThe key changes:\n- Added `block` keyword before each component id (lines 5-9)\n- Kept the labels in quotes as required\n- Left the edges/connections unchanged—they correctly reference the block ids\n- Title and figdown declaration remain the same\n\nThe edges now correctly connect the five components: poller and healthprobe feed into the normalizer, which feeds into the buffer, which feeds into the exporter.",
+  "extracted_document": "# FigDown — figures as text. Spec: https://github.com/FigDown/figdown\nfigdown 0.1 block\ntitle \"Telemetry export pipeline\"\n\nblock poller \"Poller\"\nblock normalizer \"Normalizer\"\nblock healthprobe \"Health Probe\"\nblock buffer \"Ring Buffer\"\nblock exporter \"Exporter\"\n\npoller -> normalizer\nhealthprobe -> normalizer\nnormalizer -> buffer\nbuffer -> exporter\n",
+  "validation": {
+    "errors": [
+      "Line 5: \"block\" is not allowed in genre block",
+      "Line 6: \"block\" is not allowed in genre block",
+      "Line 7: \"block\" is not allowed in genre block",
+      "Line 8: \"block\" is not allowed in genre block",
+      "Line 9: \"block\" is not allowed in genre block",
+      "Line 11: \"poller\" is not allowed in genre block",
+      "Line 12: \"healthprobe\" is not allowed in genre block",
+      "Line 13: \"normalizer\" is not allowed in genre block",
+      "Line 14: \"buffer\" is not allowed in genre block"
+    ],
+    "invariants_pass": false,
+    "missing_nodes": [
+      "poller",
+      "normalizer",
+      "healthprobe",
+      "buffer",
+      "exporter"
+    ],
+    "edge_count": 0,
+    "success": false
+  }
+}

@@ -1,0 +1,97 @@
+{
+  "header": {
+    "version": "0.5",
+    "genre": "topology"
+  },
+  "flow": "right",
+  "classes": [],
+  "planes": [
+    {
+      "id": "base",
+      "z": 0
+    }
+  ],
+  "nodes": [
+    {
+      "id": "sw1",
+      "label": "Switch-1",
+      "shape": "box",
+      "plane": "base",
+      "line": 13
+    },
+    {
+      "id": "sw2",
+      "label": "Switch-2",
+      "shape": "box",
+      "plane": "base",
+      "line": 14
+    },
+    {
+      "id": "sw3",
+      "label": "Switch-3",
+      "shape": "box",
+      "plane": "base",
+      "line": 15
+    }
+  ],
+  "groups": [],
+  "edges": [
+    {
+      "id": "lag1a",
+      "a": "sw1",
+      "op": "--",
+      "b": "sw2",
+      "plane": "base",
+      "line": 16
+    },
+    {
+      "id": "lag1b",
+      "a": "sw1",
+      "op": "--",
+      "b": "sw2",
+      "plane": "base",
+      "line": 17
+    },
+    {
+      "id": "lag1c",
+      "a": "sw1",
+      "op": "--",
+      "b": "sw2",
+      "plane": "base",
+      "line": 18
+    },
+    {
+      "a": "sw1",
+      "op": "--",
+      "b": "sw3",
+      "plane": "base",
+      "line": 19
+    }
+  ],
+  "ranks": [],
+  "pins": [],
+  "thresholds": [],
+  "bands": [],
+  "bundles": [
+    {
+      "id": "lag1",
+      "label": "LAG-1 (802.1AX)",
+      "members": [
+        "lag1a",
+        "lag1b",
+        "lag1c"
+      ],
+      "line": 20
+    },
+    {
+      "id": "other",
+      "label": "Mixed",
+      "members": [
+        "lag1a",
+        "sw1--sw3"
+      ],
+      "line": 21
+    }
+  ],
+  "regions": []
+}

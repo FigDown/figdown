@@ -193,6 +193,58 @@ function testDiagnostics() {
   ok('check reports the same diagnostics and states its file count');
 }
 
+// The OTHER error channel (spec core §8, and the 0.4 dist defect). A
+// source that parses clean can still describe a drawing that states something
+// it does not; the engine reports that from `render`, and until 0.4
+// the `dist/` wrapper this server requires threw the channel away and handed
+// back `errors: []` beside an SVG of the refused figure. So the case is not
+// "does the message read well" — it is that a picture the engine refused must
+// never reach a caller or a file.
+function testGeometryRefusal() {
+  // `b` is pinned 400x300 at the origin and `a` is placed by the engine, so
+  // `a` ends up entirely inside `b` and is not drawn at all.
+  const COVERED = [
+    'figdown 0.1 block',
+    'title "A pin that covers a node the engine placed"',
+    'node a "A"',
+    'node b "B"',
+    'pin b at=(0,0) width=400 height=300',
+    'edge a -> b',
+  ].join('\n') + '\n';
+
+  const r = call('figdown_build', { source: COVERED });
+  const t = joined(r);
+  assert.notStrictEqual(r.isError, true, 'a refused figure is a RESULT, not isError');
+  assert.ok(t.startsWith('FIGURE REFUSED'), 'a geometry-time refusal says so, and does NOT claim a parse failure:\n' + t.slice(0, 200));
+  assert.ok(!t.startsWith('PARSE FAILED'), 'the source parses clean — naming it a parse failure sends the author to the wrong line');
+  assert.ok(/completely over/.test(t), 'the diagnostic text arrives verbatim');
+  assert.ok(/Line 5:/.test(t), 'it names the line the author can act on — the pin');
+  assert.ok(!t.includes('<svg'), 'NO SVG: the picture the engine refused must not reach the caller');
+  ok('a figure refused at geometry time -> FIGURE REFUSED result, no SVG, the pin line named');
+
+  // The sidecar must not be written either.
+  const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'figdown-mcp-geo-'));
+  try {
+    const fd = path.join(tmp, 'covered.fd');
+    fs.writeFileSync(fd, COVERED);
+    const w = joined(call('figdown_build', { path: fd, write: true }));
+    assert.ok(w.startsWith('FIGURE REFUSED'), 'write:true does not change the verdict');
+    assert.ok(!fs.existsSync(path.join(tmp, 'covered.svg')),
+      'NO ARTIFACT ON DISK: core §8 costs a geometry error exactly what a parse error costs');
+    ok('build write:true on a refused figure -> nothing written to disk');
+  } finally {
+    fs.rmSync(tmp, { recursive: true, force: true });
+  }
+
+  // And the checker must agree with the builder: a check that clears a
+  // document `figdown_build` then refuses is a check that lies.
+  const c = joined(call('figdown_check', { source: COVERED }));
+  assert.ok(c.includes('ok: false') && c.includes('1 with diagnostics'),
+    'figdown_check must see the geometry channel too:\n' + c);
+  assert.ok(c.includes('completely over'), 'and report the same diagnostic');
+  ok('check agrees with build on a geometry-time refusal — one verdict, two tools');
+}
+
 function testCheck() {
   const r = call('figdown_check', { path: path.join(ROOT, 'examples', 'showcase') });
   const t = joined(r);
@@ -308,7 +360,7 @@ function testReference() {
   assert.ok(skill.includes('SKILL.md') && skill.includes('CLOSED'));
   ok('reference name:"skill" -> SKILL.md, which states the grammar is closed');
 
-  // The unknown-name probe was `sequence` until this release, when the genre
+  // The unknown-name probe was `sequence` until 0.4, when the genre
   // landed its vocabulary and its router row and the probe started asking for
   // a file that exists. That is the hazard of naming a PLAUSIBLE absent genre:
   // it becomes present. `swimlane` is chosen instead because it is a construct
@@ -337,6 +389,7 @@ function testHygiene() {
   await testWire();
   testBuild();
   testDiagnostics();
+  testGeometryRefusal();
   testCheck();
   testRead();
   testReference();

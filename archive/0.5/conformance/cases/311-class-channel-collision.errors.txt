@@ -1,0 +1,3 @@
+Line 10: classes "a1" and "a2" both set fill= on this element — one channel, one class: move one class's paint to a different channel (stroke=/style=), or carry only one of them
+Line 11: classes "b1" and "b2" both set stroke= on this element — one channel, one class: move one class's paint to a different channel (fill=/style=), or carry only one of them
+Line 12: classes "c1" and "c2" both set style= on this element — one channel, one class: move one class's paint to a different channel (fill=/stroke=), or carry only one of them

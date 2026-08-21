@@ -15,7 +15,7 @@ node integrations/kroki-service/server.js   # listens on :8006 (PORT env to chan
 Or with Docker (build from the repository root):
 
 ```sh
-docker build -f integrations/kroki-service/Dockerfile -t figdown-kroki.
+docker build -f integrations/kroki-service/Dockerfile -t figdown-kroki .
 docker run -p 8006:8006 figdown-kroki
 ```
 

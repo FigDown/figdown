@@ -1,0 +1,96 @@
+{
+  "header": {
+    "version": "0.1",
+    "genre": "bitfield"
+  },
+  "title": "Repetition occurrences",
+  "flow": "right",
+  "classes": [],
+  "planes": [
+    {
+      "id": "base",
+      "z": 0
+    }
+  ],
+  "nodes": [],
+  "groups": [],
+  "edges": [],
+  "ranks": [],
+  "pins": [],
+  "thresholds": [],
+  "bands": [],
+  "bundles": [],
+  "regions": [
+    {
+      "genre": "bitfield",
+      "id": "rec",
+      "label": "Repeated elements (word=32)",
+      "word": 32,
+      "numbering": "msb0",
+      "fields": [
+        {
+          "name": "Head",
+          "width": 16,
+          "line": 33
+        },
+        {
+          "name": "Determinate run",
+          "width": 16,
+          "index": {
+            "first": 0,
+            "last": 7
+          },
+          "line": 37
+        },
+        {
+          "name": "Adjacent pair",
+          "width": 32,
+          "index": {
+            "first": 0,
+            "last": 1
+          },
+          "line": 40
+        },
+        {
+          "name": "Descending",
+          "width": 32,
+          "index": {
+            "first": 53,
+            "last": 0
+          },
+          "line": 43
+        },
+        {
+          "name": "Prose run",
+          "width": 32,
+          "index": {
+            "first": 0,
+            "last": "Entry Count"
+          },
+          "line": 46
+        },
+        {
+          "name": "Unstated",
+          "width": 32,
+          "index": {},
+          "line": 50
+        },
+        {
+          "name": "Spanning run",
+          "width": 64,
+          "index": {
+            "first": 0,
+            "last": 3
+          },
+          "line": 53
+        },
+        {
+          "name": "Tail",
+          "width": 16,
+          "line": 54
+        }
+      ],
+      "line": 32
+    }
+  ]
+}

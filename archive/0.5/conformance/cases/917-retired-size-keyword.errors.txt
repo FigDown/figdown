@@ -1,0 +1,2 @@
+Line 10: size has been retired: its keys moved onto pin — write pin <id> width=<px> height=<px> (one directive carries an element's whole declared geometry: at= places it, width=/height= extend it; all three keys are optional and a pin with none of them declares nothing) (MIGRATIONS 0.1)
+Line 15: size has been retired: its keys moved onto pin — write pin <id> width=<px> height=<px> (one directive carries an element's whole declared geometry: at= places it, width=/height= extend it; all three keys are optional and a pin with none of them declares nothing) (MIGRATIONS 0.1)

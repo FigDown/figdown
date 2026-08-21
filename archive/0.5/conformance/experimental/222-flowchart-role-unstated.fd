@@ -1,0 +1,13 @@
+# `FLOWCHART-ROLE-KEYWORDS` / `UNSAFE-DEFAULT-ELIMINATION` §3: a bare `node` under `flowchart` is ROLE-UNSTATED. It does NOT
+# default to `process` — a flowchart node may be a datastore, an annotation or
+# a state, so a default here could assert a falsehood that no inspection of the
+# figure would catch. The model therefore OMITS `role` on `store` and `hint`,
+# and a reading agent can tell "the author said nothing" from "the author said
+# process" — which is the distinction the whole vocabulary buys.
+figdown 0.2 flowchart
+process step "Write the record"
+node    store "Journal" shape=cylinder
+node    hint
+flow down
+flowline step -> store
+flowline store -> hint

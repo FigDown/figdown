@@ -1,0 +1,42 @@
+# ADVERSARIAL FIXTURE — a source that tries to break OUT of the artifact's
+# own metadata block.
+#
+# Core §7 makes every artifact self-carrying: the renderer embeds the FULL
+# SOURCE TEXT in `<metadata id="figdown-source">`, inside a CDATA section,
+# beside a SHA-256 of that source. Embedding a document inside a document is
+# exactly the shape that injection attacks are made of, and CDATA has one
+# terminator — `]]>` — so a source containing `]]>` is the attack.
+#
+# THIS FILE CONTAINS THAT TERMINATOR, in a comment and in a string, together
+# with the pre-spliced form an attacker would reach for next
+# (`]]]]><![CDATA[>`), a closing `</metadata>` tag, and a `<script>` element
+# positioned to run if any of them landed. Here is the terminator, in this
+# comment, unquoted: ]]>
+# And the pre-spliced form, which must not be un-spliced back into one: ]]]]><![CDATA[>
+# And a closing tag with a script behind it: </metadata><script>alert(1)</script>
+#
+# WHAT THIS FIXTURE PINS. The `.model.json` golden pins only the ordinary
+# part: the document parses, and comments are not model content. The real
+# assertion is `gate:safesvg`'s, and it is a ROUNDTRIP one — render this file
+# to an artifact, read the artifact as XML, and require that
+#
+#   1. the text recovered from `<metadata id="figdown-source">` equals these
+#      bytes exactly, so the splice is reversible and the embedded source is
+#      still the source; and
+#   2. `data-sha256` equals the SHA-256 of these bytes, so the escaping did
+#      not change what the hash covers; and
+#   3. no `<script>` element exists anywhere in the parsed tree, so nothing
+#      above escaped the CDATA section.
+#
+# A NOTE FOR CONSUMERS, because this fixture is what proves the point: an
+# extractor that finds the source with a non-greedy regex up to the first
+# `</metadata>` gets the WRONG ANSWER on this file — it stops inside the
+# CDATA, at the closing tag written in the comment three lines up. Recovering
+# the embedded source requires an extractor that knows where CDATA sections
+# begin and end. The engine's escaping is correct; a careless reader of it
+# need not be.
+figdown 0.3 block
+title "]]> </metadata> <![CDATA[ <script>alert(1)</script>"
+node a "]]]]><![CDATA[>" note="]]>"
+node b "<![CDATA[ unterminated"
+edge a -> b

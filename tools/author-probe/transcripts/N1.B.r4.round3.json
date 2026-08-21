@@ -1,0 +1,49 @@
+{
+  "probe_version": "1.0.0",
+  "run": {
+    "utc": "2026-08-19T12:13:29Z",
+    "cli": "2.1.234 (Claude Code)",
+    "condition": "B",
+    "task": "N1",
+    "kind": "normal",
+    "seat": 4,
+    "model_alias": "haiku",
+    "round": 3,
+    "model_used": "claude-haiku-4-5-20251001"
+  },
+  "saw": {
+    "skill_path": "tools/author-probe/skill-candidate.md",
+    "skill_sha256": "2abdaf0d9211d5ee1464c5f5c3a200b1ae6f7bd71cfd6344e7da94d669e6ed31",
+    "skill_chars": 17591,
+    "system_sha256": "39117af0175e7d927c8f9c715c9555f91e3357a146f2d6d311d4a3bb889ecaae",
+    "user_sha256": "8b6d5031625923a2abe880b60ca94de8474f252e4061b5be2dbcc95757c93328"
+  },
+  "integrity": {
+    "turns": 1,
+    "permission_denials": 0,
+    "is_error": false
+  },
+  "usage": {
+    "cost_usd": 0.021730000000000003,
+    "duration_ms": 11518
+  },
+  "scrub": {
+    "ran": true,
+    "pattern": "email-regex",
+    "replacements": 0
+  },
+  "raw_answer_text": "Looking at the validator errors, the issue is with the edge syntax. The bare arrow notation (`->`) is not the correct syntax for the `block` genre. In block diagrams, edges need to be explicitly declared using the `edge` keyword.\n\nLet me produce the corrected document:\n\n```figdown\n# FigDown — figures as text. Spec: https://github.com/FigDown/figdown\nfigdown 0.1 block\ntitle \"Telemetry export pipeline\"\n\nnode poller \"Poller\"\nnode normalizer \"Normalizer\"\nnode healthprobe \"Health Probe\"\nnode buffer \"Ring Buffer\"\nnode exporter \"Exporter\"\n\nedge poller normalizer\nedge healthprobe normalizer\nedge normalizer buffer\nedge buffer exporter\n```\n\nThe key fix: **edge declarations must use the `edge` keyword** followed by the source and target node IDs, not the arrow syntax (`->`). The nodes themselves are correctly defined, but edges in the block genre require the `edge` keyword to be properly recognized.",
+  "extracted_document": "# FigDown — figures as text. Spec: https://github.com/FigDown/figdown\nfigdown 0.1 block\ntitle \"Telemetry export pipeline\"\n\nnode poller \"Poller\"\nnode normalizer \"Normalizer\"\nnode healthprobe \"Health Probe\"\nnode buffer \"Ring Buffer\"\nnode exporter \"Exporter\"\n\nedge poller normalizer\nedge healthprobe normalizer\nedge normalizer buffer\nedge buffer exporter\n",
+  "validation": {
+    "errors": [
+      "Line 11: edge needs an operator: -> <- -- <-> (a [mid] label splits it: -[x]->)",
+      "Line 12: edge needs an operator: -> <- -- <-> (a [mid] label splits it: -[x]->)",
+      "Line 13: edge needs an operator: -> <- -- <-> (a [mid] label splits it: -[x]->)",
+      "Line 14: edge needs an operator: -> <- -- <-> (a [mid] label splits it: -[x]->)"
+    ],
+    "invariants_pass": false,
+    "missing_nodes": [],
+    "edge_count": 0,
+    "success": false
+  }
+}

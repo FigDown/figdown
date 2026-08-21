@@ -130,6 +130,14 @@ repointed from `read/0.3/` to `read/0.4/` in the same increment, so
 `skill/figdown/reference/reading.md` carries the corrected wording too and
 `skill/figdown/SKILL.md` no longer has to print the correction beside it.
 
+**Carried forward (`CONNECTOR-IDENTITY-KEY`).** `read/0.5/` is written from
+`read/0.4/`, so it inherits the corrected wording, and the two tools were
+repointed again in that increment. The correction does not have to be
+re-applied per release — what §13.7.3 requires is that it lands in the next
+read tree WRITTEN, and every tree written after it copies from a corrected
+ancestor. `read/0.1/`–`read/0.3/` keep the wording they shipped, which is the
+freeze working.
+
 **What is NOT discharged, and never will be.** `read/0.1/`, `read/0.2/` and
 `read/0.3/` still carry the position-based wording, byte for byte, and that is
 the freeze working rather than a residual defect. A consumer who reads one of

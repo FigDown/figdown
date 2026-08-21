@@ -1,0 +1,8 @@
+figdown 0.1 table
+# `CHART-BLOCK-NAMING`: `plot` → `chart`, `kind=` → `type=`, `bars3d` → `bar3d`.
+table t "T"
+| X | V |
+|---|---|
+| r1 | 1 |
+plot t
+chart t kind=bars3d

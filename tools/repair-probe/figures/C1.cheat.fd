@@ -1,0 +1,13 @@
+figdown 0.1 block
+title "Load balancer traffic mirror path"
+
+node lb "Load balancer"
+node poolA "Pool A member"
+node poolB "Pool B member"
+node mirror "Mirror port"
+node collector "Capture collector"
+node health "Health checker"
+
+edge lb -> poolA
+edge lb -> poolB
+edge mirror -> collector

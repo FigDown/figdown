@@ -1,0 +1,5 @@
+Line 5: external needs an id
+Line 6: unexpected argument "extra"
+Line 7: external does not take fill=
+Line 8: external does not take shape=
+Line 9: unknown option "nonsense="

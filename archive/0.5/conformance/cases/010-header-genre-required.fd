@@ -1,0 +1,5 @@
+# 0.1: the genre token is REQUIRED. `block`, `topology` and
+# `flowchart` share one vocabulary and differ only in default flow, so the
+# header is the only place such a document states which figure it is.
+figdown 0.1
+node a "A"

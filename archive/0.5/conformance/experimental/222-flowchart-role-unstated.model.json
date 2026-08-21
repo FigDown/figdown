@@ -1,0 +1,60 @@
+{
+  "header": {
+    "version": "0.2",
+    "genre": "flowchart"
+  },
+  "flow": "down",
+  "classes": [],
+  "planes": [
+    {
+      "id": "base",
+      "z": 0
+    }
+  ],
+  "nodes": [
+    {
+      "id": "step",
+      "label": "Write the record",
+      "role": "process",
+      "shape": "box",
+      "plane": "base",
+      "line": 8
+    },
+    {
+      "id": "store",
+      "label": "Journal",
+      "shape": "cylinder",
+      "plane": "base",
+      "line": 9
+    },
+    {
+      "id": "hint",
+      "shape": "box",
+      "plane": "base",
+      "line": 10
+    }
+  ],
+  "groups": [],
+  "edges": [
+    {
+      "a": "step",
+      "op": "->",
+      "b": "store",
+      "plane": "base",
+      "line": 12
+    },
+    {
+      "a": "store",
+      "op": "->",
+      "b": "hint",
+      "plane": "base",
+      "line": 13
+    }
+  ],
+  "ranks": [],
+  "pins": [],
+  "thresholds": [],
+  "bands": [],
+  "bundles": [],
+  "regions": []
+}

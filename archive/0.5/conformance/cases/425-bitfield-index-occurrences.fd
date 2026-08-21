@@ -1,0 +1,54 @@
+figdown 0.1 bitfield
+# `REPEATED-RUN-DRAWING`: a repeated run is DRAWN as its first element, the
+# elision, and its last — RFC 8754 §2's own drawing, which 0.1 already
+# took as the authority for a spanning field in the same figure. Before this
+# release the engine drew ONE occurrence and hung `[first] … [last]` on the
+# elision strip; that strip text is gone, and the index is APPENDED to the
+# author's label instead (`Queue Depth [0]`), never inserted into it — the
+# label is opaque text and the engine may not parse it to find where the RFC
+# would put a bracket.
+#
+# THE ELISION MARK IS DERIVED FROM ARITHMETIC, not from a special case. The
+# elements not drawn number |last − first| − 1, and the mark is drawn when
+# that is not zero. The two lines below are the two sides of that:
+#   `Determinate run` — index=0..7, 6 undrawn, so the mark IS drawn;
+#   `Adjacent pair`   — index=0..1, 0 undrawn, so the mark is NOT drawn.
+# The mark means "there are more, not drawn"; over a pair it would be a false
+# statement. `index=0..0` never reaches the renderer at all — it is a line
+# error (case 421), because a range of one element is not repetition.
+#
+# WHAT THIS CASE PINS AND WHAT IT DOES NOT. The model here is the same model
+# 0.1 recorded: `index` is a key on a field, and the number of drawn
+# occurrences is a RENDERING decision the model neither carries nor implies —
+# exactly the division case 424 states for spanning geometry. So the golden
+# pins the index OBJECT (`last` a number = determinate, a string = prose) and
+# the field widths and order; it does NOT pin that two boxes are drawn, that
+# the elision mark appears over one line and not the other, or any geometry
+# whatever. `run.js` has no SVG goldens by design. What the fixture buys is
+# that the renderer is EXERCISED over both arms — a change that throws on
+# either one fails the run — and that a second implementation reading this
+# file is told, in prose, which drawing the reference produces and why.
+title "Repetition occurrences"
+bitfield rec "Repeated elements (word=32)" word=32 numbering=msb0
+field "Head" 16
+# Determinate, 8 elements, 6 of them undrawn. Starts mid-row, so the two drawn
+# occurrences stand in the same columns one band apart and the cells beside
+# them are blank DRAWING, not bits.
+field "Determinate run" 16 index=0..7
+# Determinate, 2 elements, NONE undrawn: both are drawn and nothing separates
+# them but the ordinary boundary between two boxes.
+field "Adjacent pair" 32 index=0..1
+# Descending: 54 elements, 52 undrawn. The absolute value is what makes this
+# a run rather than a negative count.
+field "Descending" 32 index=53..0
+# Prose last index: the count is not in the document, so the number undrawn is
+# indeterminate and the mark is drawn.
+field "Prose run" 32 index="0..Entry Count"
+# `index=""` claims repetition and states NO index, so there is no [first] and
+# no [last] to write on an occurrence — one occurrence and a bare elision
+# mark, the same ruling `present=""` gets for its caption.
+field "Unstated" 32 index=""
+# Wider than `word=` AND repeated — the interaction examples/srh.fd carries.
+# Each occurrence spans two rows and is still one field: one box, name once.
+field "Spanning run" 64 index=0..3
+field "Tail" 16

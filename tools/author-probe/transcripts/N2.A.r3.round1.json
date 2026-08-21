@@ -1,0 +1,49 @@
+{
+  "probe_version": "1.0.0",
+  "run": {
+    "utc": "2026-08-19T12:04:14Z",
+    "cli": "2.1.234 (Claude Code)",
+    "condition": "A",
+    "task": "N2",
+    "kind": "normal",
+    "seat": 3,
+    "model_alias": "haiku",
+    "round": 1,
+    "model_used": "claude-haiku-4-5-20251001"
+  },
+  "saw": {
+    "skill_path": "skill/figdown/SKILL.md",
+    "skill_sha256": "718f935282ce7a93f4b7e36b83983ac1112e49818384d8eaf35869830d34d6a2",
+    "skill_chars": 16497,
+    "system_sha256": "39117af0175e7d927c8f9c715c9555f91e3357a146f2d6d311d4a3bb889ecaae",
+    "user_sha256": "e8bbb8bb800d7d108223fb06e522a5d73fa95892c46d272c5b2f495b633cbe4c"
+  },
+  "integrity": {
+    "turns": 1,
+    "permission_denials": 0,
+    "is_error": false
+  },
+  "usage": {
+    "cost_usd": 0.0173346,
+    "duration_ms": 32465
+  },
+  "scrub": {
+    "ran": true,
+    "pattern": "email-regex",
+    "replacements": 0
+  },
+  "raw_answer_text": "Looking at the documentation and the figure requirements, I need to create a `topology` figure (which is an experimental genre according to the router table). Let me structure this as a network topology showing the branch office WAN configuration.\n\nThe figure needs:\n- 5 nodes: two access switches, one branch router, and two regional hub routers\n- 4 edges: access switches to branch router, and branch router to each hub\n- Semantic distinction between primary and backup WAN links using classes\n\nHere's the finished FigDown document:\n\n```figdown\n# FigDown — figures as text. Spec: https://github.com/FigDown/figdown\nfigdown 0.1 topology\ntitle \"Branch office WAN uplinks\"\n\nclass primary \"Primary WAN\"\nclass backup \"Backup WAN\"\n\nnode access1 \"Access 1\"\nnode access2 \"Access 2\"\nnode branch \"Branch Router\"\nnode hubprimary \"Hub (Primary)\"\nnode hubbackup \"Hub (Backup)\"\n\nedge access1 branch\nedge access2 branch\nedge branch hubprimary class=primary\nedge branch hubbackup class=backup\n```\n\nThis topology diagram conveys:\n- **Structure**: Two access switches provide redundancy at the branch, converging on a single branch router\n- **Semantics**: The two outbound links from the branch router are explicitly classified—one as primary and one as backup—capturing the redundancy strategy at the WAN layer\n- **Clarity**: Node labels are concise; the meaningful distinction (primary vs. backup) is encoded as classes, not as label prose, so the `.fd` source carries the structure readers need to understand the design",
+  "extracted_document": "# FigDown — figures as text. Spec: https://github.com/FigDown/figdown\nfigdown 0.1 topology\ntitle \"Branch office WAN uplinks\"\n\nclass primary \"Primary WAN\"\nclass backup \"Backup WAN\"\n\nnode access1 \"Access 1\"\nnode access2 \"Access 2\"\nnode branch \"Branch Router\"\nnode hubprimary \"Hub (Primary)\"\nnode hubbackup \"Hub (Backup)\"\n\nedge access1 branch\nedge access2 branch\nedge branch hubprimary class=primary\nedge branch hubbackup class=backup\n",
+  "validation": {
+    "errors": [
+      "Line 14: edge needs an operator: -> <- -- <-> (a [mid] label splits it: -[x]->)",
+      "Line 15: edge needs an operator: -> <- -- <-> (a [mid] label splits it: -[x]->)",
+      "Line 16: edge needs an operator: -> <- -- <-> (a [mid] label splits it: -[x]->)",
+      "Line 17: edge needs an operator: -> <- -- <-> (a [mid] label splits it: -[x]->)"
+    ],
+    "invariants_pass": false,
+    "missing_nodes": [],
+    "edge_count": 0,
+    "success": false
+  }
+}

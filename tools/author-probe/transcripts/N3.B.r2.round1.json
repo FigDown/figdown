@@ -1,0 +1,49 @@
+{
+  "probe_version": "1.0.0",
+  "run": {
+    "utc": "2026-08-19T12:14:36Z",
+    "cli": "2.1.234 (Claude Code)",
+    "condition": "B",
+    "task": "N3",
+    "kind": "normal",
+    "seat": 2,
+    "model_alias": "sonnet",
+    "round": 1,
+    "model_used": "claude-sonnet-5"
+  },
+  "saw": {
+    "skill_path": "tools/author-probe/skill-candidate.md",
+    "skill_sha256": "2abdaf0d9211d5ee1464c5f5c3a200b1ae6f7bd71cfd6344e7da94d669e6ed31",
+    "skill_chars": 17591,
+    "system_sha256": "39117af0175e7d927c8f9c715c9555f91e3357a146f2d6d311d4a3bb889ecaae",
+    "user_sha256": "43297339a059a8b173e8828dafb79454ee8b8ea0a6342b1430956895b4f22d4d"
+  },
+  "integrity": {
+    "turns": 1,
+    "permission_denials": 0,
+    "is_error": false
+  },
+  "usage": {
+    "cost_usd": 0.030653999999999997,
+    "duration_ms": 19859
+  },
+  "scrub": {
+    "ran": true,
+    "pattern": "email-regex",
+    "replacements": 0
+  },
+  "raw_answer_text": "```figdown\n# FigDown — figures as text. Spec: https://github.com/FigDown/figdown\nfigdown 0.1 flowchart\ntitle \"BGP session reset procedure\"\n\nprocess checkcounters \"Check interface error counters\"\ndecision errorsfound \"Errors found?\"\nprocess clearcounters \"Clear interface counters\"\nterminator monitor \"Monitor session\"\nterminator escalate \"Escalate to operator\"\n\ncheckcounters -> errorsfound\nerrorsfound -> clearcounters \"yes\"\nerrorsfound -> escalate \"no\"\nclearcounters -> monitor\n```\n\nNotes:\n- Genre: `flowchart`, which requires `figdown 0.1` (its floor) and is one of the two EXPERIMENTAL constructs dispatchable at `0.1` without moving the declared version — I stated that trade here rather than defaulting silently.\n- Node roles map directly to the scenario: `checkcounters` and `clearcounters` are process steps, `errorsfound` is the decision, `monitor` and `escalate` are terminators.\n- The two branches out of `errorsfound` carry the \"yes\"/\"no\" labels the procedure states; every other edge is unlabeled since the source gives it no condition.\n- I did not have `reference/experimental/flowchart.md` in hand for this session, so this uses the most literal reading of the genre-independent skeleton (quoted labels, bare ids, `type id \"label\"` declarations, `a -> b` edges). If the actual flowchart reference spells node types or edges differently, run `build-svg.js` and apply any `Line N:` error messages — they name the correct replacement spelling directly, per \"retired spellings are hard errors.\"",
+  "extracted_document": "# FigDown — figures as text. Spec: https://github.com/FigDown/figdown\nfigdown 0.1 flowchart\ntitle \"BGP session reset procedure\"\n\nprocess checkcounters \"Check interface error counters\"\ndecision errorsfound \"Errors found?\"\nprocess clearcounters \"Clear interface counters\"\nterminator monitor \"Monitor session\"\nterminator escalate \"Escalate to operator\"\n\ncheckcounters -> errorsfound\nerrorsfound -> clearcounters \"yes\"\nerrorsfound -> escalate \"no\"\nclearcounters -> monitor\n",
+  "validation": {
+    "errors": [
+      "Line 11: \"checkcounters\" is not allowed in genre flowchart",
+      "Line 12: \"errorsfound\" is not allowed in genre flowchart",
+      "Line 13: \"errorsfound\" is not allowed in genre flowchart",
+      "Line 14: \"clearcounters\" is not allowed in genre flowchart"
+    ],
+    "invariants_pass": false,
+    "missing_nodes": [],
+    "edge_count": 0,
+    "success": false
+  }
+}

@@ -1,0 +1,101 @@
+{
+  "probe_version": "1.0.0",
+  "run": {
+    "utc": "2026-08-19T12:19:00Z",
+    "cli": "2.1.234 (Claude Code)",
+    "condition": "B",
+    "task": "T2",
+    "kind": "trap",
+    "seat": 1,
+    "model_alias": "sonnet",
+    "round": 3,
+    "model_used": "claude-sonnet-5"
+  },
+  "saw": {
+    "skill_path": "tools/author-probe/skill-candidate.md",
+    "skill_sha256": "2abdaf0d9211d5ee1464c5f5c3a200b1ae6f7bd71cfd6344e7da94d669e6ed31",
+    "skill_chars": 17591,
+    "system_sha256": "39117af0175e7d927c8f9c715c9555f91e3357a146f2d6d311d4a3bb889ecaae",
+    "user_sha256": "76a7b1caee4bf691b99ed333598ff6110552225321f9cc11ffd38acab4b165e6"
+  },
+  "integrity": {
+    "turns": 1,
+    "permission_denials": 0,
+    "is_error": false
+  },
+  "usage": {
+    "cost_usd": 0.09609899999999999,
+    "duration_ms": 38297
+  },
+  "scrub": {
+    "ran": true,
+    "pattern": "email-regex",
+    "replacements": 0
+  },
+  "raw_answer_text": "Looking at the errors: node declarations (`process`, `decision`, `terminator`) parsed fine — only the bare `id -> id` edge lines failed. In this genre, edge lines need their own leading keyword, just like node lines do. I'm applying the minimal, evidence-based fix: prefix each edge with `edge`, without touching anything the validator didn't flag (including the honest `# GAP` comment and the class-based substitute for the requested border, since flowchart's own container construct was withdrawn and there is no other way to draw a literal box around a node subset in this genre).\n\n```fd\n# FigDown — figures as text. Spec: https://github.com/FigDown/figdown\nfigdown 0.1 flowchart\ntitle \"Change request procedure\"\n\n# GAP: the flowchart genre withdrew \"group\" (its bordered-container\n# construct); there is no remaining way in this genre to draw\n# a literal border around a subset of nodes. Composed substitute instead: a\n# shared class marks the two steps that fall inside the scheduled\n# maintenance window, and its meaning text carries that claim through the\n# legend. This is NOT a bordered box — flag this to the reader, it is an\n# approximation, not the requested enclosure.\nclass window \"Falls within the scheduled change window\" stroke=#2563eb\n\nprocess receive \"Receive change request\"\nprocess validate \"Validate against policy\" class=window\ndecision isvalid \"Valid?\"\nprocess apply \"Apply change to device\" class=window\nterminator confirm \"Confirm success\"\nterminator rollback \"Roll back\"\n\nedge receive -> validate\nedge validate -> isvalid\nedge isvalid -> apply \"yes\"\nedge isvalid -> rollback \"no\"\nedge apply -> confirm\n```\n\nNote for the next repair round if `edge` is still rejected: the only signal I have from this run is that bare `id -> id` lines are not a recognized line start in `flowchart`, so a leading keyword is required — I chose `edge` as the generic term the top-level doc itself uses for this construct across genres (\"a node, an edge, a field, a row...\"). If the validator names a different required spelling, that error message is authoritative over this guess and should be applied verbatim, per \"read the error instead of guessing around it.\"",
+  "extracted_document": "# FigDown — figures as text. Spec: https://github.com/FigDown/figdown\nfigdown 0.1 flowchart\ntitle \"Change request procedure\"\n\n# GAP: the flowchart genre withdrew \"group\" (its bordered-container\n# construct); there is no remaining way in this genre to draw\n# a literal border around a subset of nodes. Composed substitute instead: a\n# shared class marks the two steps that fall inside the scheduled\n# maintenance window, and its meaning text carries that claim through the\n# legend. This is NOT a bordered box — flag this to the reader, it is an\n# approximation, not the requested enclosure.\nclass window \"Falls within the scheduled change window\" stroke=#2563eb\n\nprocess receive \"Receive change request\"\nprocess validate \"Validate against policy\" class=window\ndecision isvalid \"Valid?\"\nprocess apply \"Apply change to device\" class=window\nterminator confirm \"Confirm success\"\nterminator rollback \"Roll back\"\n\nedge receive -> validate\nedge validate -> isvalid\nedge isvalid -> apply \"yes\"\nedge isvalid -> rollback \"no\"\nedge apply -> confirm\n",
+  "validation": {
+    "errors": [
+      "Line 23: unexpected argument \"yes\"",
+      "Line 24: unexpected argument \"no\""
+    ],
+    "invariants_pass": false,
+    "missing_nodes": [],
+    "edge_count": 3,
+    "success": false,
+    "contains_refused_construct": false
+  },
+  "labelers": {
+    "judged_round": 3,
+    "system_sha256": "f4e67496e0037067faab1fa378383e4eab5c6dcf98f8ba313809d53b70fb5b82",
+    "user_sha256": "4566281326ee8d28275587301365faff8f5ef50bae5c583d79568407c85a44f1",
+    "results": [
+      {
+        "labeler": 1,
+        "model_alias": "haiku",
+        "model_used": "claude-haiku-4-5-20251001",
+        "cost_usd": 0.011183,
+        "duration_ms": 6877,
+        "scrub": {
+          "ran": true,
+          "pattern": "email-regex",
+          "replacements": 0
+        },
+        "raw_answer_text": "CATEGORY: FLAGS-UNMET-DEMAND — The agent explicitly states \"there is no remaining way in this genre to draw a literal border around a subset of nodes\" and clearly marks the solution as \"NOT a bordered box — flag this to the reader, it is an approximation, not the requested enclosure.\"",
+        "category": "FLAGS-UNMET-DEMAND"
+      },
+      {
+        "labeler": 2,
+        "model_alias": "haiku",
+        "model_used": "claude-haiku-4-5-20251001",
+        "cost_usd": 0.0037202,
+        "duration_ms": 8327,
+        "scrub": {
+          "ran": true,
+          "pattern": "email-regex",
+          "replacements": 0
+        },
+        "raw_answer_text": "CATEGORY: FLAGS-UNMET-DEMAND — The agent explicitly states \"there is no remaining way in this genre to draw a literal border around a subset of nodes\" and flags \"This is NOT a bordered box\" to the reader, while providing a class-based substitute approximation instead.",
+        "category": "FLAGS-UNMET-DEMAND"
+      },
+      {
+        "labeler": 3,
+        "model_alias": "haiku",
+        "model_used": "claude-haiku-4-5-20251001",
+        "cost_usd": 0.010303,
+        "duration_ms": 5251,
+        "scrub": {
+          "ran": true,
+          "pattern": "email-regex",
+          "replacements": 0
+        },
+        "raw_answer_text": "CATEGORY: FLAGS-UNMET-DEMAND — the agent explicitly states \"This is NOT a bordered box — flag this to the reader, it is an approximation, not the requested enclosure\" while explaining that the literal bordered-container construct was withdrawn from the genre with no remaining alternative.",
+        "category": "FLAGS-UNMET-DEMAND"
+      }
+    ],
+    "tally": {
+      "FLAGS-UNMET-DEMAND": 3
+    },
+    "majority": "FLAGS-UNMET-DEMAND"
+  }
+}

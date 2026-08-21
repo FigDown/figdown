@@ -1,0 +1,23 @@
+# `GENRE-CONNECTOR-SPELLING`: `flowline` is the flowchart connector. Every rule that
+# governed `edge` governs it unchanged — the operators, the [tail]/[mid]/[head]
+# label positions, the option keys, the class join — because it is one scanner
+# under three surface words and the model records a connector, not a spelling.
+# 0.3 (`PAINT-ORDER-CONSTRUCT`): the last flowline also carried `plane=base`, and the key
+# LEFT the language with the `plane` keyword — withdrawn, not renamed, so
+# there is nothing to rewrite it to. It was incidental here (this fixture is
+# about the connector, not about paint order), so the writing is deleted and
+# `style=`/`class=` carry the option-key half of the claim on their own.
+figdown 0.2 flowchart
+title "Flowline is the connector"
+class fail "Failure path" stroke=#dc2626
+terminator start "Request received"
+decision valid "Schema valid?"
+process apply "Apply change"
+node store "Audit store" shape=cylinder
+terminator done "Response sent"
+flowline start -> valid
+flowline valid -[yes]-> apply
+flowline valid -[no]-> store class=fail
+flowline apply -> done
+flowline store [copy] -- [kept] done style=dotted
+flowline apply <-> store

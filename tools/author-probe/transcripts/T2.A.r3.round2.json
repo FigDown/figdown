@@ -1,0 +1,57 @@
+{
+  "probe_version": "1.0.0",
+  "run": {
+    "utc": "2026-08-19T12:11:05Z",
+    "cli": "2.1.234 (Claude Code)",
+    "condition": "A",
+    "task": "T2",
+    "kind": "trap",
+    "seat": 3,
+    "model_alias": "haiku",
+    "round": 2,
+    "model_used": "claude-haiku-4-5-20251001"
+  },
+  "saw": {
+    "skill_path": "skill/figdown/SKILL.md",
+    "skill_sha256": "718f935282ce7a93f4b7e36b83983ac1112e49818384d8eaf35869830d34d6a2",
+    "skill_chars": 16497,
+    "system_sha256": "39117af0175e7d927c8f9c715c9555f91e3357a146f2d6d311d4a3bb889ecaae",
+    "user_sha256": "5a1b2abd538d727a146b7f6f027d8456c1b97c92cdb2ea21f02fc1815322623c"
+  },
+  "integrity": {
+    "turns": 1,
+    "permission_denials": 0,
+    "is_error": false
+  },
+  "usage": {
+    "cost_usd": 0.045161999999999994,
+    "duration_ms": 60442
+  },
+  "scrub": {
+    "ran": true,
+    "pattern": "email-regex",
+    "replacements": 0
+  },
+  "raw_answer_text": "Looking at the validator errors, I can see that the syntax I used for declaring flowchart nodes (`process`, `decision`, `terminator` keywords) is not valid for the flowchart genre, and the `box` construct is also not allowed.\n\nThe problem is that **the FigDown documentation you provided, while marked as \"complete\", does not include the `reference/experimental/flowchart.md` file** that is essential for understanding flowchart syntax. The router table tells me I need to load that file, but it isn't included in your documentation excerpt.\n\nWithout that reference file, I cannot know the exact correct syntax for flowchart. However, let me provide my best educated guess based on common flowchart DSL patterns and FigDown principles:\n\n```figdown\n# FigDown — figures as text. Spec: https://github.com/FigDown/figdown\nfigdown 0.1 flowchart\ntitle \"Change request procedure\"\n\naction receive \"Receive change request\"\naction validate \"Validate against policy\"\ndecision isvalid \"Valid?\"\naction apply \"Apply change\"\nterminator confirm \"Confirm success\"\nterminator rollback \"Rollback\"\n\nreceive -> validate\nvalidate -> isvalid\nisvalid -> apply \"yes\"\nisvalid -> rollback \"no\"\napply -> confirm\n```\n\n**However, this is an educated guess.** To provide the accurate, validated solution, I would need you to supply the actual `reference/experimental/flowchart.md` file content, which documents:\n- The correct keywords for node types (is it `action`, `step`, `node`, or something else?)\n- Whether there's a syntax for grouping/boxing nodes (since the original `box` construct doesn't work)\n- The correct edge syntax and label placement\n\nCould you provide the flowchart.md reference file so I can produce the correct document?",
+  "extracted_document": "# FigDown — figures as text. Spec: https://github.com/FigDown/figdown\nfigdown 0.1 flowchart\ntitle \"Change request procedure\"\n\naction receive \"Receive change request\"\naction validate \"Validate against policy\"\ndecision isvalid \"Valid?\"\naction apply \"Apply change\"\nterminator confirm \"Confirm success\"\nterminator rollback \"Rollback\"\n\nreceive -> validate\nvalidate -> isvalid\nisvalid -> apply \"yes\"\nisvalid -> rollback \"no\"\napply -> confirm\n",
+  "validation": {
+    "errors": [
+      "Line 5: \"action\" is not allowed in genre flowchart",
+      "Line 6: \"action\" is not allowed in genre flowchart",
+      "Line 8: \"action\" is not allowed in genre flowchart",
+      "Line 12: \"receive\" is not allowed in genre flowchart",
+      "Line 13: \"validate\" is not allowed in genre flowchart",
+      "Line 14: \"isvalid\" is not allowed in genre flowchart",
+      "Line 15: \"isvalid\" is not allowed in genre flowchart",
+      "Line 16: \"apply\" is not allowed in genre flowchart"
+    ],
+    "invariants_pass": false,
+    "missing_nodes": [
+      "receive",
+      "validate",
+      "apply"
+    ],
+    "edge_count": 0,
+    "success": false
+  }
+}

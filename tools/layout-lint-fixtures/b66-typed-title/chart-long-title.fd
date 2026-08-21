@@ -1,0 +1,20 @@
+# FigDown — figures as text. Spec: https://github.com/FigDown/figdown
+#
+# Regression fixture for backlog item 66 (`TYPED-BLOCK-TITLE-CANVAS`). `chart`'s
+# row/column axis-label overhang was fixed (`LABEL-PLACEMENT-METRIC`), but its OWN
+# top caption — drawn at the section's fixed x=0 corner as the attached
+# table's label + " — bar3d", never shifted by the axis-label gutter `ox` —
+# still ran off the canvas before `TYPED-BLOCK-TITLE-CANVAS`, same as bitfield/timing. `chart` is
+# EXPERIMENTAL (spec/core.md §4.4, outside the v0.1 conformance surface) but
+# the engine still renders it, so it still owes this invariant. One row, one
+# column: the smallest bar3d floor a long caption can outrun. See
+# bitfield-long-title.fd in this directory for why this file lives here
+# rather than under examples/.
+
+figdown 0.1 table
+
+table tb "Per-region cache-miss rate under the new eviction policy"
+| Region | Misses/s |
+|--------|:--------:|
+| us-east|    42    |
+chart tb type=bar3d

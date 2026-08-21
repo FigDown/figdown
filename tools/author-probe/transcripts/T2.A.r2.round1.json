@@ -1,0 +1,55 @@
+{
+  "probe_version": "1.0.0",
+  "run": {
+    "utc": "2026-08-19T12:08:44Z",
+    "cli": "2.1.234 (Claude Code)",
+    "condition": "A",
+    "task": "T2",
+    "kind": "trap",
+    "seat": 2,
+    "model_alias": "sonnet",
+    "round": 1,
+    "model_used": "claude-sonnet-5"
+  },
+  "saw": {
+    "skill_path": "skill/figdown/SKILL.md",
+    "skill_sha256": "718f935282ce7a93f4b7e36b83983ac1112e49818384d8eaf35869830d34d6a2",
+    "skill_chars": 16497,
+    "system_sha256": "39117af0175e7d927c8f9c715c9555f91e3357a146f2d6d311d4a3bb889ecaae",
+    "user_sha256": "2e041b85e561a0752afcaa8ccb2b3e9c72a323d84236dae7be8ca7b9a7b77532"
+  },
+  "integrity": {
+    "turns": 1,
+    "permission_denials": 0,
+    "is_error": false
+  },
+  "usage": {
+    "cost_usd": 0.0415434,
+    "duration_ms": 28716
+  },
+  "scrub": {
+    "ran": true,
+    "pattern": "email-regex",
+    "replacements": 0
+  },
+  "raw_answer_text": "Here is the authored FigDown document. Note: I don't have the literal contents of `reference/experimental/flowchart.md` in front of me (only the top-level skill doc that routes to it), so I've composed the flowchart body from the vocabulary the task itself specifies (`process`, `decision`, `terminator`) and the enclosure (\"change window\" box) using the most natural container spelling. Per the documented workflow, run `node <skill-dir>/build-svg.js changerequest.fd` before treating this as final — if the grouping keyword differs from what the real `flowchart.md` defines, the build will report a line error naming the correct spelling, and that's a one-line fix, not a redesign.\n\n```figdown\n# FigDown — figures as text. Spec: https://github.com/FigDown/figdown\nfigdown 0.1 flowchart\ntitle \"Change request procedure\"\n\nprocess receive \"Receive change request\"\nprocess validate \"Validate against policy\"\ndecision isvalid \"Valid?\"\nprocess apply \"Apply change to device\"\nterminator confirm \"Confirm success\"\nterminator rollback \"Roll back\"\n\nreceive -> validate\nvalidate -> isvalid\nisvalid -> apply \"yes\"\nisvalid -> rollback \"no\"\napply -> confirm\n\n# Enclosure: validate and apply happen inside the scheduled maintenance\n# window; group syntax follows the flowchart genre's container construct.\ngroup changewindow \"Change window\"\n  validate\n  apply\nend\n```\n\nEmbed once built:\n\n```markdown\n![Change request procedure flowchart](figures/changerequest.svg)\n\n<sub>source: [figures/changerequest.fd](figures/changerequest.fd)</sub>\n```",
+  "extracted_document": "![Change request procedure flowchart](figures/changerequest.svg)\n\n<sub>source: [figures/changerequest.fd](figures/changerequest.fd)</sub>\n",
+  "validation": {
+    "errors": [
+      "Line 1: first line must be \"figdown 0.1 <genre>\"",
+      "Line 1: unrecognized line (unknown keyword \"![Change\")",
+      "Line 3: unrecognized line (unknown keyword \"<sub>source:\")"
+    ],
+    "invariants_pass": false,
+    "missing_nodes": [
+      "receive",
+      "validate",
+      "isvalid",
+      "apply",
+      "confirm",
+      "rollback"
+    ],
+    "edge_count": 0,
+    "success": false
+  }
+}

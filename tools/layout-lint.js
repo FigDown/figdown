@@ -116,7 +116,11 @@ function parsePath(d) {
 function extractNodes(svgText, tx, ty) {
   // Extract all <g data-node="..." data-x="..." data-y="..."> blocks
   const nodes = [];
-  const gRe = /<g data-node="([^"]*)" data-x="([^"]*)" data-y="([^"]*)"/g;
+  // `data-lasso` is OPTIONAL and follows `data-y`: a node carries
+  // it when a drawn bundle lasso was derived from it, listing every bundle it
+  // is a member of. Read here rather than guessed, so the lasso axis below can
+  // tell a member from a bystander by identity instead of by position.
+  const gRe = /<g data-node="([^"]*)" data-x="([^"]*)" data-y="([^"]*)"(?: data-lasso="([^"]*)")?/g;
   let m;
   while ((m = gRe.exec(svgText)) !== null) {
     const id = m[1];
@@ -161,9 +165,46 @@ function extractNodes(svgText, tx, ty) {
       x = Math.min(...xs); y = Math.min(...ys);
       w = Math.max(...xs) - x; h = Math.max(...ys) - y;
     }
-    nodes.push({ id, x, y, w, h });
+    nodes.push({ id, x, y, w, h, lassos: m[4] ? m[4].split(' ').filter(Boolean) : [] });
   }
   return nodes;
+}
+
+// ── BUNDLE LASSOS ARE INK (axis added 0.5, backlog item 69) ──────────
+// A `bundle` draws a lasso: an ellipse round the member links, which STATES
+// that what it encloses is one aggregation. A non-member drawn inside it is
+// therefore not an ugly figure but a false one — the reader is told a device
+// belongs to a LAG it is not part of, and the source never said so. The
+// measured instance is fig 06 of the UNH-IOL validation exercise (a three-link
+// LACP setup): the lasso enclosed two test stations at normalised radius 0.70,
+// the engine said nothing, and THIS TOOL SCORED THE FIGURE 0.
+//
+// The engine now refuses such a figure at geometry time, so this axis exists to
+// be a SECOND, INDEPENDENT reader of the same claim: the engine judges its own
+// ring object, this reads the ellipse actually drawn. A defect in one is not a
+// defect in the other, and the number is the residue that would otherwise be
+// invisible — which is the shape of every axis in this file.
+//
+// Keyed on `data-lasso`, never on "an ellipse that looks like a ring": a
+// topology figure is full of ellipses (node shapes, the `cloud` in half the
+// corpus), and a reader that guessed would be measuring node bodies.
+function extractLassos(svgText, tx, ty) {
+  const out = [];
+  const re = /<ellipse ([^>]*?)data-lasso="([^"]*)"([^>]*?)\/>/g;
+  let m;
+  while ((m = re.exec(svgText)) !== null) {
+    const el = m[0];
+    const cx = numAttr(el, 'cx'), cy = numAttr(el, 'cy');
+    const rx = numAttr(el, 'rx'), ry = numAttr(el, 'ry');
+    if (cx === null || cy === null || rx === null || ry === null) continue;
+    // The ring's own axes: `rx` lies ALONG the members and `ry` ACROSS them,
+    // rotated onto the canvas by the element's `rotate(deg cx cy)`.
+    const rot = /rotate\(\s*([-\d.]+)/.exec(el);
+    const th = (rot ? parseFloat(rot[1]) : 0) * Math.PI / 180;
+    out.push({ id: m[2], cx: cx + tx, cy: cy + ty, rx, ry,
+               ux: Math.cos(th), uy: Math.sin(th), vx: -Math.sin(th), vy: Math.cos(th) });
+  }
+  return out;
 }
 
 // Extract group (container) rectangles.
@@ -331,6 +372,16 @@ function extractLabels(svgText, tx, ty) {
     const key = x.toFixed(2) + ',' + y.toFixed(2) + ',' + text;
     if (seen.has(key)) continue;
     seen.add(key);
+    // WHICH PORT SQUARE IS THIS LABEL'S OWN. A port name is
+    // drawn with `data-port-sq="<key>"` naming the fitting it labels, and the
+    // square carries the same key. The association is therefore READ, never
+    // inferred from proximity — which matters precisely where the new axes
+    // bite: two ports 10 px apart on one border is the case where "nearest
+    // square" and "own square" disagree, and it is the only case worth
+    // measuring. A label with no attribute (every mid label, every non-port
+    // endpoint label, every figure in every other genre) has `sq === null`
+    // and is foreign to every square, which is the correct reading.
+    const sqm = /data-port-sq="([^"]*)"/.exec(attrs);
     // Same geometry the engine's own placement pass uses (cand() in
     // editor/figdown.html): width = widest line, line height 1.3*fs, ink box
     // 1.1*fs, baseline of the first line sits 0.85*fs below the box top.
@@ -341,9 +392,39 @@ function extractLabels(svgText, tx, ty) {
     const am = /text-anchor="([^"]*)"/.exec(attrs);
     const anchor = am ? am[1] : 'start';
     const left = anchor === 'middle' ? x - w / 2 : anchor === 'end' ? x - w : x;
-    labels.push({ x: left, y: y - fs * 0.85, w, h, text });
+    labels.push({ x: left, y: y - fs * 0.85, w, h, text, sq: sqm ? sqm[1] : null });
   }
   return labels;
+}
+
+// ── PORT SQUARES ARE INK (axis added 0.4) ────────────────────────────
+// The topology genre draws a port as a small square straddling the device
+// border at the crossing (UML 2.5.1 §11.4's notation, adapted). That square is
+// DRAWN INK with a MEANING — "this link attaches to this device here" — and
+// until this release nothing in this gate could see it: every axis above reads
+// text and lines, so a foreign name written across a fitting, or a foreign
+// shaft run through one, scored exactly zero. The defect the notation exists to
+// end (which device does this interface belong to) would have been reintroduced
+// by the notation itself, silently.
+//
+// The reader keys on `data-port-sq`, written at draw time, rather than
+// pattern-matching 7x7 rects: a topology figure is full of small rects (node
+// bodies, group bands, legend swatches) and a reader that guesses would be
+// measuring whatever else happened to be that size. The attribute's VALUE is
+// the square's identity, and the port name that belongs to it carries the same
+// string — so "foreign" is read, not inferred.
+function extractPortSquares(svgText, tx, ty) {
+  const out = [];
+  const re = /<rect ([^>]*?)data-port-sq="([^"]*)"([^>]*?)\/>/g;
+  let m;
+  while ((m = re.exec(svgText)) !== null) {
+    const el = m[0];
+    const x = numAttr(el, 'x'), y = numAttr(el, 'y');
+    const w = numAttr(el, 'width'), h = numAttr(el, 'height');
+    if (x === null || y === null || w === null || h === null) continue;
+    out.push({ x: x + tx, y: y + ty, w, h, key: m[2] });
+  }
+  return out;
 }
 
 // ── Off-canvas text (axis: is the ink ON THE PAGE at all?) ────────────────────
@@ -800,10 +881,15 @@ function extractElementLabels(svgText, tx, ty, doc) {
 function computeF6(svgText, tx, ty, edges, doc) {
   const labels = extractElementLabels(svgText, tx, ty, doc);
   if (!labels.length || !edges.length) return { flagged: [], considered: 0 };
-  // which drawn edge belongs to which source line, so "incident to O" is a
-  // question about the DOCUMENT and not a guess from the geometry
+  // which drawn edge belongs to which source connector, so "incident to O" is a
+  // question about the DOCUMENT and not a guess from the geometry.
+  // CONNECTOR-IDENTITY-KEY: the key is what `data-edge` carries — the connector's
+  // authored id when it has one, its source line when it does not — so the map
+  // is built the same way the attribute is written, and F6 keeps seeing every
+  // edge rather than quietly treating a named one as foreign to everything.
   const inc = new Map();
-  for (const e of ((doc && doc.edges) || [])) inc.set(String(e.line), [e.a, e.b]);
+  for (const e of ((doc && doc.edges) || []))
+    inc.set(e.id !== undefined && e.id !== null ? String(e.id) : String(e.line), [e.a, e.b]);
   const flagged = [];
   let considered = 0;
   for (const L of labels) {
@@ -817,7 +903,13 @@ function computeF6(svgText, tx, ty, edges, doc) {
     }
     if (!isFinite(foreign)) continue;
     if (foreign < F6_M) flagged.push(L.cls + ' "' + L.text.replace(/\n/g, '|') + '"'
-      + ' (' + foreign.toFixed(1) + 'px' + (who !== null && who !== undefined ? ', line ' + who : '') + ')');
+      // The nearest foreign edge is named by what the drawing keys it by, and
+      // the word in front of it has to match: `line 12` for an anonymous
+      // connector, `edge lag1a` for a named one (CONNECTOR-IDENTITY-KEY). One wording for both
+      // would be false for half the cases.
+      + ' (' + foreign.toFixed(1) + 'px'
+      + (who !== null && who !== undefined
+         ? (/^\d+$/.test(String(who)) ? ', line ' + who : ', edge ' + who) : '') + ')');
   }
   return { flagged, considered };
 }
@@ -883,7 +975,9 @@ function computeAlign(doc, nodes) {
 
 // ── Metrics ──────────────────────────────────────────────────────────────────
 
-function computeMetrics(edges, nodes, groups, labels) {
+function computeMetrics(edges, nodes, groups, labels, squares, lassos) {
+  squares = squares || [];
+  lassos = lassos || [];
   // 1. crossings — true edge-edge segment crossings
   let crossings = 0;
   for (let i = 0; i < edges.length; i++) {
@@ -1000,6 +1094,98 @@ function computeMetrics(edges, nodes, groups, labels) {
     if (struck) lblcol++;
   }
 
+  // 4b. sqlbl / sqedge — THE SAME TWO QUESTIONS, ASKED OF A PORT SQUARE.
+  //     `lblcol` above asks them of a name: is another mark written over it
+  //     (a), and does a line run through it (b). A port square is drawn ink
+  //     that says "this link attaches to this device here", and both questions
+  //     apply to it unchanged — so they are asked on the same two shapes, at
+  //     the same weights, and NOT invented as a third kind of axis.
+  //
+  //       sqlbl  — a FOREIGN name overlapping a square. Own names are exempt
+  //                and only own names: `data-port-sq` pairs each name with its
+  //                own fitting, so the exemption is an identity and not a
+  //                radius. A pair count, exactly like the label-label half of
+  //                `lblcol` — two names over one square is two defects,
+  //                because each one of them is a wrong statement about which
+  //                link that fitting belongs to.
+  //       sqedge — a FOREIGN shaft passing through a square. Charged AT MOST
+  //                ONCE per square, exactly like the strikethrough half of
+  //                `lblcol`, for its reason: what the eye reports is "that
+  //                fitting has a line through it", not a count of lines.
+  //
+  //     WHICH EDGE OWNS A SQUARE IS READ FROM THE GEOMETRY, and it is the one
+  //     place here that is not read from an attribute. The square IS the
+  //     crossing point: the connector that attaches to it terminates inside
+  //     it by construction, so "an endpoint of this edge lies in this square"
+  //     is an exact test rather than a proximity guess. Co-located links share
+  //     one drawn square (the engine draws it once) and every one of them owns
+  //     it, which is the correct reading of a shared fitting.
+  let sqlbl = 0, sqedge = 0;
+  if (squares.length) {
+    const EPS = 1;   // 1 px touching is not an overlap, as in lblcol
+    for (const S of squares) {
+      for (const L of labels) {
+        if (L.sq && L.sq === S.key) continue;                 // its own name
+        if (L.x + L.w > S.x + EPS && S.x + S.w > L.x + EPS &&
+            L.y + L.h > S.y + EPS && S.y + S.h > L.y + EPS) sqlbl++;
+      }
+      let struck = false;
+      for (const e of edges) {
+        // own edge: some vertex of it lies in (or on) this square
+        let owns = false;
+        for (const [p, q] of e.segs) {
+          for (const v of [p, q])
+            if (v[0] >= S.x - EPS && v[0] <= S.x + S.w + EPS &&
+                v[1] >= S.y - EPS && v[1] <= S.y + S.h + EPS) { owns = true; break; }
+          if (owns) break;
+        }
+        if (owns) continue;
+        for (const [p, q] of e.segs)
+          if (segPassesThroughRect(p[0], p[1], q[0], q[1], S.x, S.y, S.w, S.h)) { struck = true; break; }
+        if (struck) break;
+      }
+      if (struck) sqedge++;
+    }
+  }
+
+  // 4c. lassoin — A BUNDLE'S LASSO WITH A NON-MEMBER INSIDE IT (item 69).
+  //     Not a readability defect: a FALSE STATEMENT. Every other axis in this
+  //     file measures ink that is hard to read; this one measures ink that
+  //     says something the source did not. A lasso is the drawn extent of the
+  //     bundle's members, so a device wholly inside it is drawn as one of them.
+  //
+  //     MEMBERSHIP IS READ, NEVER INFERRED: `data-lasso` on the ellipse names
+  //     the bundle, and the same string on a node's group says that node is
+  //     one of the links' endpoints. A node with no attribute, or with other
+  //     bundles' ids only, is a bystander — which is exactly the reading the
+  //     genre's own rule demands (membership is DECLARED, never inferred from
+  //     rendered geometry).
+  //
+  //     FULLY INSIDE, not centre-inside. The band check in the engine tests a
+  //     BOX against a region rather than a point, and this keeps that
+  //     discipline; it takes the stricter half of it because a lasso has no
+  //     interior to sit on — the engine has already shrunk every ring clear of
+  //     every node box, so a box is wholly in or wholly out and the ambiguous
+  //     middle does not exist. A pair count: one charge per (lasso,
+  //     non-member), because each enclosed device is its own wrong claim.
+  let lassoin = 0;
+  const lassoHits = [];
+  for (const R of lassos) {
+    for (const n of nodes) {
+      if (n.lassos && n.lassos.indexOf(R.id) >= 0) continue;      // a member
+      let inside = true, worst = 0;
+      for (const p of [[n.x, n.y], [n.x + n.w, n.y], [n.x, n.y + n.h], [n.x + n.w, n.y + n.h]]) {
+        const dx = p[0] - R.cx, dy = p[1] - R.cy;
+        const r = Math.hypot((R.ux * dx + R.uy * dy) / R.rx, (R.vx * dx + R.vy * dy) / R.ry);
+        worst = Math.max(worst, r);
+        if (r > 1) { inside = false; break; }
+      }
+      if (!inside) continue;
+      lassoin++;
+      lassoHits.push({ bundle: R.id, node: n.id, r: worst });
+    }
+  }
+
   // 5. coincident — HOW MANY EDGES are drawn on top of another edge: an edge
   //    is charged once if any of its segments shares more than 10 px of line
   //    with a segment of any OTHER edge. Once per edge, like the `lblcol`
@@ -1040,6 +1226,8 @@ function computeMetrics(edges, nodes, groups, labels) {
   const inkPerEdge = edges.length ? totalLen / edges.length : 0;
 
   return { crossings, thru, novlp, lblcol, coincident, inkPerEdge,
+           sqlbl, sqedge, sqCount: squares.length,
+           lassoin, lassoHits, lassoCount: lassos.length,
            nodeCount: nodes.length, edgeCount: edges.length };
 }
 
@@ -1088,7 +1276,7 @@ function renderWithRetry(engine, src, fdPath) {
 // ── SVG coordinate extraction (handle the translate wrapper) ──────────────────
 
 function parseTranslate(svgText) {
-  const m = svgText.match(/<g transform="translate\(([^)]+),([^)]+)\)"/);
+  const m = svgText.match(/<g transform="translate\(([^,)]+),([^)]+)\)"/);
   return m ? [parseFloat(m[1]), parseFloat(m[2])] : [0, 0];
 }
 
@@ -1098,7 +1286,9 @@ function analyzeSvg(svgText, doc) {
   const groups  = extractGroups(svgText, tx, ty);
   const edges   = extractEdges(svgText, tx, ty);
   const labels  = extractLabels(svgText, tx, ty);
-  const m = computeMetrics(edges, nodes, groups, labels);
+  const squares = extractPortSquares(svgText, tx, ty);
+  const lassos  = extractLassos(svgText, tx, ty);
+  const m = computeMetrics(edges, nodes, groups, labels, squares, lassos);
   const f5 = computeF5(svgText, tx, ty, edges, nodes, labels);
   m.f5 = f5.flagged.length;
   m.f5Flagged = f5.flagged;
@@ -1166,7 +1356,7 @@ const NOT_JUDGED = [
 // AN ENTRY CLEARED BY A PIN CHANGE IS REMOVED IN THE SAME COMMIT, WITH ITS
 // NUMBER KEPT HERE. `examples/showcase/tcp-state-machine.fd` held `1`
 // (`rcv ACK of FIN / x`, the TIME-WAIT convergence, 0.5 px of margin) from the
-// ratchet's first day until this release, when three pins moved — CLOSED right,
+// ratchet's first day until 0.4, when three pins moved — CLOSED right,
 // LISTEN down, CLOSING up and right — and the figure measured F5 0 with lblcol
 // also 0 and a score of 0. This is the second removal and it is a DIFFERENT
 // kind from srl-evpn's below: that one left because nothing measures it any
@@ -1308,9 +1498,33 @@ const SCENE_GENRES = new Set(['block', 'topology', 'flowchart', 'statechart', 's
 // whose own measured contribution to a placement objective was small and needed
 // two guards to stop it making figures worse. Neither may move a figure's rank,
 // and neither may fail the gate. They are columns, not terms.
+// `sqlbl` and `sqedge` ARE IN THE SUM, at `lblcol`'s own weight, and that is
+// the whole point of adding them. A port square is drawn ink
+// whose meaning is an association — this link, this device, here — and the two
+// ways that association is destroyed are the two `lblcol` already charges for
+// text: something written over it, or a line drawn through it. An advisory
+// column would have let the port notation land while making a figure worse by
+// a measure the gate prints and does not rank. They are also ZERO BY
+// CONSTRUCTION on every figure that draws no squares — every genre but
+// topology, and every topology figure rendered by an engine before this one —
+// so no historical score moves by their arrival.
+// `lassoin` IS IN THE SUM AT `offcv`'S WEIGHT — 4, the heaviest this function
+// has — and not at `lblcol`'s 2, which is where the port-square axes went. The
+// distinction is what the axis measures. `sqlbl`/`sqedge` sit at `lblcol`'s
+// weight because they ask `lblcol`'s question of a different mark: is this ink
+// hard to read. `lassoin` asks nothing of the kind — the enclosed device is
+// drawn perfectly legibly, and that is the defect: the figure states a
+// membership its source never declared. `offcv` already carries 4 for being
+// the one axis about MEANING LOST rather than legibility ("text that is NOT
+// THERE"); a false statement is the same class one step worse, and it takes
+// the same weight rather than inventing a tier above the scale. It is ZERO BY
+// CONSTRUCTION on every figure that draws no lasso, and — —
+// on every figure the current engine agrees to draw at all, so no historical
+// score moves by its arrival either.
 function score(m) {
   return m.crossings * 2 + m.thru * 3 + m.novlp * 3 + m.lblcol * 2 + m.coincident * 2
-       + (m.offcv || 0) * 4;
+       + (m.offcv || 0) * 4 + (m.sqlbl || 0) * 2 + (m.sqedge || 0) * 2
+       + (m.lassoin || 0) * 4;
 }
 
 function pad(s, n) {
@@ -1458,6 +1672,9 @@ function main() {
     lblcol:      6,
     offcv:       5,
     coinc:       5,
+    sqlbl:       6,
+    sqedge:      7,
+    lasso:       6,
     f5:          4,
     f6:          4,
     align:       6,
@@ -1475,6 +1692,9 @@ function main() {
     lpad('lblcol', COL.lblcol),
     lpad('offcv',  COL.offcv),
     lpad('coinc',  COL.coinc),
+    lpad('sqlbl',  COL.sqlbl),
+    lpad('sqedge', COL.sqedge),
+    lpad('lasso',  COL.lasso),
     lpad('f5',     COL.f5),
     lpad('f6',     COL.f6),
     lpad('align',  COL.align),
@@ -1500,6 +1720,9 @@ function main() {
       lpad(r.lblcol,                  COL.lblcol),
       lpad(r.offcv || 0,              COL.offcv),
       lpad(r.coincident,              COL.coinc),
+      lpad(r.sqlbl || 0,              COL.sqlbl),
+      lpad(r.sqedge || 0,             COL.sqedge),
+      lpad(r.lassoin || 0,            COL.lasso),
       lpad(r.f5 || 0,                 COL.f5),
       lpad(r.f6 || 0,                 COL.f6),
       lpad(r.align || 0,              COL.align),
@@ -1585,6 +1808,58 @@ function main() {
         residue.push({ file: r.relRoot, now: r.f5, base, labels: r.f5Flagged || [] });
       else if (base > 0)
         cleared.push({ file: r.relRoot, base });
+    }
+    // ── PORT SQUARES: the axis states its own denominator ────────────────
+    // This file's rule is that a measurement without its denominator is a
+    // measurement nobody can read: "sqlbl 0" means one thing over 219 drawn
+    // fittings and nothing at all over none. Printed on EVERY run, zero or
+    // not, like the coverage line — a topology corpus that suddenly draws no
+    // squares would otherwise look exactly like one whose squares are clean.
+    {
+      let sq = 0, figs = 0, l = 0, e = 0;
+      for (const r of rows) {
+        sq += (r.sqCount || 0); l += (r.sqlbl || 0); e += (r.sqedge || 0);
+        if (r.sqCount) figs++;
+      }
+      console.log('');
+      console.log('PORT SQUARES (topology port notation, 0.4; SCORED at lblcol\'s weight):');
+      console.log('  ' + sq + ' fitting(s) drawn over ' + figs + ' figure(s)'
+                  + '   sqlbl ' + l + ' (a foreign name over a fitting)'
+                  + '   sqedge ' + e + ' (a foreign shaft through one)');
+      console.log('  Ownership is READ from `data-port-sq`, never inferred from distance:');
+      console.log('  the rect and the name that belongs to it carry the same key.');
+    }
+    // ── BUNDLE LASSOS: the same, for the axis that measures a false claim ──
+    // Its denominator is printed on every run for the same reason, and each
+    // firing is NAMED rather than counted: an enclosed non-member is not a
+    // defect of degree — the reader cannot see that the figure is lying by
+    // looking at it, which is precisely how fig 06 shipped. Same discipline as
+    // the off-canvas findings above, and it FAILS --strict for the same reason:
+    // this is not a figure that could be better, it is a figure that says
+    // something its source does not.
+    {
+      let rings = 0, figs = 0, hits = [];
+      for (const r of rows) {
+        rings += (r.lassoCount || 0);
+        if (r.lassoCount) figs++;
+        for (const h of (r.lassoHits || [])) hits.push({ file: r.file, ...h });
+      }
+      console.log('');
+      console.log('BUNDLE LASSOS (item 69, 0.5; SCORED at offcv\'s weight, FAILS --strict):');
+      console.log('  ' + rings + ' lasso(s) drawn over ' + figs + ' figure(s)'
+                  + '   lasso ' + hits.length + ' (a non-member drawn inside one)');
+      console.log('  Membership is READ from `data-lasso`, never inferred from geometry:');
+      console.log('  the ellipse and every node it was derived from carry the same id.');
+      for (const h of hits)
+        console.log('      ' + h.file + ' — bundle "' + h.bundle + '" encloses non-member "'
+                    + h.node + '" (normalised radius ' + h.r.toFixed(2) + ')');
+      if (hits.length) {
+        console.log('  A lasso is the drawn extent of the bundle\'s members, so this figure');
+        console.log('  states a membership its source never declared. The engine refuses such');
+        console.log('  a figure at geometry time — a firing here means one');
+        console.log('  got past it, and the artifact must not ship.');
+        anyFail = true;
+      }
     }
     console.log('');
     console.log('F5 — label-association margin (legibility floor §14; ADVISORY ratchet, M='

@@ -1,0 +1,6 @@
+Line 3: table has no |---| delimiter row
+Line 4: pipe row must end with |
+Line 5: delimiter row before any header row
+Line 7: width needs one value per column (auto | <px> | <n>%)
+Line 8: cell needs [h]<row>[,<col>] with fill=…/class=… or highlight
+Line 9: cell needs [h]<row>,<col> fill=…/class=… or <row> highlight

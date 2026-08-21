@@ -1,0 +1,18 @@
+# 0.4 (backlog 52): `state` DERIVES its geometry — rounded — the way
+# `decision` derives diamond, because a statechart node has exactly one kind
+# and the directive is therefore the whole model (`GENRE-NODE-SPELLING`). Before this release
+# `state` fell through to the core `box` default, which made the genre's own
+# `SHAPE-ENUM-VOCABULARY` rule ("do not encode state-ness in a shape — the genre already says it")
+# unfollowable: obeying it drew the right-angle rectangle ISO 5807 gives to a
+# process, so every shipped figure wrote `shape=rounded` on every line.
+#
+# The second half is the flowchart precedent (fixture 221) held for this
+# genre: an explicit `shape=` still overrides the DRAWING ONLY (core §12.7).
+# `boxy` below is a state drawn as a box; it is not a process, and the model
+# records no role for it — because `state` never records one.
+figdown 0.2 statechart
+state derived "DERIVED"
+state boxy    "OVERRIDDEN" shape=box
+state elly    "ELLIPSE"    shape=ellipse
+transition derived -[e1]-> boxy
+transition boxy -[e2]-> elly

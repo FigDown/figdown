@@ -1,0 +1,138 @@
+{
+  "header": {
+    "version": "0.1",
+    "genre": "block"
+  },
+  "flow": "right",
+  "classes": [],
+  "planes": [
+    {
+      "id": "base",
+      "z": 0
+    }
+  ],
+  "nodes": [
+    {
+      "id": "q0",
+      "label": "Q0",
+      "shape": "box",
+      "group": "pool",
+      "plane": "base",
+      "line": 23
+    }
+  ],
+  "groups": [
+    {
+      "id": "pool",
+      "label": "Resource pool",
+      "line": 22
+    }
+  ],
+  "edges": [],
+  "ranks": [],
+  "pins": [],
+  "thresholds": [
+    {
+      "label": "Max",
+      "in": "q",
+      "offset": 50,
+      "line": 29
+    },
+    {
+      "label": "Split",
+      "in": "hdr",
+      "offset": 25,
+      "line": 34
+    },
+    {
+      "label": "Group target, unchanged",
+      "in": "pool",
+      "offset": 80,
+      "line": 35
+    },
+    {
+      "label": "Node target, unchanged",
+      "in": "q0",
+      "offset": 35,
+      "line": 36
+    }
+  ],
+  "bands": [
+    {
+      "label": "Reserved",
+      "in": "q",
+      "from": 15,
+      "to": 35,
+      "extend": "up",
+      "fill": "#e5e7eb",
+      "line": 30
+    }
+  ],
+  "bundles": [],
+  "regions": [
+    {
+      "genre": "table",
+      "id": "q",
+      "label": "Queue depth",
+      "heads": [
+        [
+          {
+            "v": "Slot"
+          },
+          {
+            "v": "Depth"
+          }
+        ]
+      ],
+      "aligns": [
+        "none",
+        "none"
+      ],
+      "rows": [
+        {
+          "cells": [
+            {
+              "v": "s0"
+            },
+            {
+              "v": "12"
+            }
+          ],
+          "line": 27
+        },
+        {
+          "cells": [
+            {
+              "v": "s1"
+            },
+            {
+              "v": "30"
+            }
+          ],
+          "line": 28
+        }
+      ],
+      "line": 24
+    },
+    {
+      "genre": "bitfield",
+      "id": "hdr",
+      "label": "Header",
+      "word": 32,
+      "numbering": "msb0",
+      "fields": [
+        {
+          "name": "Type",
+          "width": 8,
+          "line": 32
+        },
+        {
+          "name": "Rest",
+          "width": 24,
+          "line": 33
+        }
+      ],
+      "line": 31
+    }
+  ]
+}

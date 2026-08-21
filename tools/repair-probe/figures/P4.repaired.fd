@@ -1,0 +1,12 @@
+figdown 0.1 block
+title "Fan controller feedback loop"
+
+node sensor "Temperature sensor"
+node ctrl "Fan controller"
+node pwm "PWM driver"
+node fan "Fan"
+
+edge sensor -> ctrl
+edge ctrl -> pwm
+edge pwm -> fan
+edge fan -> sensor

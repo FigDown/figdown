@@ -1,0 +1,49 @@
+{
+  "probe_version": "1.0.0",
+  "run": {
+    "utc": "2026-08-19T12:13:42Z",
+    "cli": "2.1.234 (Claude Code)",
+    "condition": "B",
+    "task": "N2",
+    "kind": "normal",
+    "seat": 1,
+    "model_alias": "sonnet",
+    "round": 3,
+    "model_used": "claude-sonnet-5"
+  },
+  "saw": {
+    "skill_path": "tools/author-probe/skill-candidate.md",
+    "skill_sha256": "2abdaf0d9211d5ee1464c5f5c3a200b1ae6f7bd71cfd6344e7da94d669e6ed31",
+    "skill_chars": 17591,
+    "system_sha256": "39117af0175e7d927c8f9c715c9555f91e3357a146f2d6d311d4a3bb889ecaae",
+    "user_sha256": "988738d92eaaa165fb02e2db882a4f4a77bca3b334361297e2f107f4adf5b600"
+  },
+  "integrity": {
+    "turns": 1,
+    "permission_denials": 0,
+    "is_error": false
+  },
+  "usage": {
+    "cost_usd": 0.065796,
+    "duration_ms": 17504
+  },
+  "scrub": {
+    "ran": true,
+    "pattern": "email-regex",
+    "replacements": 0
+  },
+  "raw_answer_text": "```figdown\n# FigDown — figures as text. Spec: https://github.com/FigDown/figdown\nfigdown 0.1 topology\ntitle \"Branch office WAN uplinks\"\n\nclass backup \"Diverse-path backup WAN link\" style=dashed\n\nnode access1 \"Access Switch 1\"\nnode access2 \"Access Switch 2\"\nnode branch \"Branch Router\"\nnode hubprimary \"Regional Hub Router (Primary)\"\nnode hubbackup \"Regional Hub Router (Backup)\"\n\nlink access1 -- branch\nlink access2 -- branch\nlink branch -[primary WAN]-- hubprimary\nlink branch -[backup WAN]-- hubbackup class=backup\n```\n\nNote: the previous attempt's four errors were all on the edge lines — `topology` rejects a bare `a -- b` edge statement (the form that works in `block`). I could not load `reference/experimental/topology.md` in this session to confirm the genre's own edge keyword, so I've made the smallest structural change consistent with the error message: prefixing each edge with `link`, keeping the bracketed inline-label form and the trailing `class=` from the working `block`-style syntax, since those were not flagged as errors. If `link` is not in fact the topology genre's correct keyword, rerun `build-svg.js` and treat any new error as authoritative over this guess — I have not been able to validate this revision myself.",
+  "extracted_document": "# FigDown — figures as text. Spec: https://github.com/FigDown/figdown\nfigdown 0.1 topology\ntitle \"Branch office WAN uplinks\"\n\nclass backup \"Diverse-path backup WAN link\" style=dashed\n\nnode access1 \"Access Switch 1\"\nnode access2 \"Access Switch 2\"\nnode branch \"Branch Router\"\nnode hubprimary \"Regional Hub Router (Primary)\"\nnode hubbackup \"Regional Hub Router (Backup)\"\n\nlink access1 -- branch\nlink access2 -- branch\nlink branch -[primary WAN]-- hubprimary\nlink branch -[backup WAN]-- hubbackup class=backup\n",
+  "validation": {
+    "errors": [
+      "Line 13: \"link\" is not allowed in genre topology",
+      "Line 14: \"link\" is not allowed in genre topology",
+      "Line 15: \"link\" is not allowed in genre topology",
+      "Line 16: \"link\" is not allowed in genre topology"
+    ],
+    "invariants_pass": false,
+    "missing_nodes": [],
+    "edge_count": 0,
+    "success": false
+  }
+}

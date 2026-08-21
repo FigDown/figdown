@@ -1,0 +1,149 @@
+{
+  "header": {
+    "version": "0.4",
+    "genre": "topology"
+  },
+  "title": "A pin that puts a bystander inside a bundle's lasso",
+  "flow": "right",
+  "classes": [],
+  "planes": [
+    {
+      "id": "base",
+      "z": 0
+    }
+  ],
+  "nodes": [
+    {
+      "id": "dut",
+      "label": "DUT",
+      "shape": "box",
+      "plane": "base",
+      "line": 15
+    },
+    {
+      "id": "lp",
+      "label": "LP",
+      "shape": "box",
+      "plane": "base",
+      "line": 16
+    },
+    {
+      "id": "lt1",
+      "label": "Tap 1",
+      "shape": "box",
+      "plane": "base",
+      "line": 17
+    },
+    {
+      "id": "lt2",
+      "label": "Tap 2",
+      "shape": "box",
+      "plane": "base",
+      "line": 18
+    },
+    {
+      "id": "ts",
+      "label": "LT.TS9",
+      "shape": "box",
+      "plane": "base",
+      "line": 19
+    }
+  ],
+  "groups": [],
+  "edges": [
+    {
+      "a": "dut",
+      "op": "--",
+      "b": "lt1",
+      "plane": "base",
+      "line": 20
+    },
+    {
+      "a": "lt1",
+      "op": "--",
+      "b": "lp",
+      "plane": "base",
+      "line": 21
+    },
+    {
+      "a": "dut",
+      "op": "--",
+      "b": "lt2",
+      "plane": "base",
+      "line": 22
+    },
+    {
+      "a": "lt2",
+      "op": "--",
+      "b": "lp",
+      "plane": "base",
+      "line": 23
+    },
+    {
+      "a": "lt2",
+      "op": "--",
+      "b": "ts",
+      "plane": "base",
+      "line": 25
+    }
+  ],
+  "ranks": [],
+  "pins": [
+    {
+      "id": "dut",
+      "x": 0,
+      "y": 140,
+      "width": 100,
+      "height": 70,
+      "line": 27
+    },
+    {
+      "id": "lt1",
+      "x": 220,
+      "y": 40,
+      "width": 110,
+      "height": 40,
+      "line": 28
+    },
+    {
+      "id": "ts",
+      "x": 220,
+      "y": 150,
+      "width": 110,
+      "height": 40,
+      "line": 29
+    },
+    {
+      "id": "lt2",
+      "x": 220,
+      "y": 260,
+      "width": 110,
+      "height": 40,
+      "line": 30
+    },
+    {
+      "id": "lp",
+      "x": 440,
+      "y": 140,
+      "width": 100,
+      "height": 70,
+      "line": 31
+    }
+  ],
+  "thresholds": [],
+  "bands": [],
+  "bundles": [
+    {
+      "id": "lag",
+      "label": "Aggregated link (2 links)",
+      "members": [
+        "dut--lt1",
+        "lt1--lp",
+        "dut--lt2",
+        "lt2--lp"
+      ],
+      "line": 24
+    }
+  ],
+  "regions": []
+}

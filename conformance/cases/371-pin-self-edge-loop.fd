@@ -1,0 +1,21 @@
+# Backlog 64 (fixed 0.4): a `pin` must not delete a drawing. Until
+# 0.4 the self-edge route was gated on "neither endpoint is pinned" —
+# a guard that belongs to the CHANNEL route, whose lane plan is an auto-layout
+# artefact — so a pinned node's self-edge fell through to the straight route
+# and drew a ZERO-LENGTH line at the node's own centre, with the edge label
+# printed across the node's name. No error, no warning, a silently missing
+# arc. The rule the fix keeps: a self-edge draws the same way whether its
+# node's coordinate came from a pin or from the layout pass.
+#
+# The MODEL is unchanged by any of that — this fixture's golden pins the
+# parse, and the DRAWING is asserted by tools/shape-check.js, which measures
+# every self-loop's path length and its label's clearance off the rendered SVG.
+figdown 0.1 block
+title "A pinned node still draws its self-edge as a side loop"
+node a "A"
+node b "B"
+pin a at=(0,0) width=120 height=60
+pin b at=(240,0) width=120 height=60
+edge a -[to b]-> b
+edge a -[stay in A]-> a
+edge b -[stay in B]-> b

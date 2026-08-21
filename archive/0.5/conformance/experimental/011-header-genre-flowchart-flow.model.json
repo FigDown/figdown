@@ -1,0 +1,46 @@
+{
+  "header": {
+    "version": "0.2",
+    "genre": "flowchart"
+  },
+  "flow": "down",
+  "classes": [],
+  "planes": [
+    {
+      "id": "base",
+      "z": 0
+    }
+  ],
+  "nodes": [
+    {
+      "id": "a",
+      "label": "Start",
+      "shape": "box",
+      "plane": "base",
+      "line": 2
+    },
+    {
+      "id": "b",
+      "label": "End",
+      "shape": "box",
+      "plane": "base",
+      "line": 3
+    }
+  ],
+  "groups": [],
+  "edges": [
+    {
+      "a": "a",
+      "op": "->",
+      "b": "b",
+      "plane": "base",
+      "line": 4
+    }
+  ],
+  "ranks": [],
+  "pins": [],
+  "thresholds": [],
+  "bands": [],
+  "bundles": [],
+  "regions": []
+}

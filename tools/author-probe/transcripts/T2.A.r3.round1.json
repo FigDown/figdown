@@ -1,0 +1,54 @@
+{
+  "probe_version": "1.0.0",
+  "run": {
+    "utc": "2026-08-19T12:10:04Z",
+    "cli": "2.1.234 (Claude Code)",
+    "condition": "A",
+    "task": "T2",
+    "kind": "trap",
+    "seat": 3,
+    "model_alias": "haiku",
+    "round": 1,
+    "model_used": "claude-haiku-4-5-20251001"
+  },
+  "saw": {
+    "skill_path": "skill/figdown/SKILL.md",
+    "skill_sha256": "718f935282ce7a93f4b7e36b83983ac1112e49818384d8eaf35869830d34d6a2",
+    "skill_chars": 16497,
+    "system_sha256": "39117af0175e7d927c8f9c715c9555f91e3357a146f2d6d311d4a3bb889ecaae",
+    "user_sha256": "2e041b85e561a0752afcaa8ccb2b3e9c72a323d84236dae7be8ca7b9a7b77532"
+  },
+  "integrity": {
+    "turns": 1,
+    "permission_denials": 0,
+    "is_error": false
+  },
+  "usage": {
+    "cost_usd": 0.032109,
+    "duration_ms": 32739
+  },
+  "scrub": {
+    "ran": true,
+    "pattern": "email-regex",
+    "replacements": 0
+  },
+  "raw_answer_text": "Looking at the requirements, I need to create a FigDown flowchart document. The flowchart is experimental, so I'll use `figdown 0.1 flowchart`. \n\nBased on the FigDown language structure shown in the documentation and standard flowchart conventions, I'll create nodes for each step (process, decision, and terminator types), connect them with edges, and use a `box` construct to group the validate and apply steps into the \"change window\" container.\n\n```figdown\n# FigDown — figures as text. Spec: https://github.com/FigDown/figdown\nfigdown 0.1 flowchart\ntitle \"Change request procedure\"\n\nprocess receive \"Receive change request\"\nprocess validate \"Validate against policy\"\ndecision isvalid \"Valid?\"\nprocess apply \"Apply change\"\nterminator confirm \"Confirm success\"\nterminator rollback \"Rollback\"\n\nreceive -> validate\nvalidate -> isvalid\nisvalid -> apply \"yes\"\nisvalid -> rollback \"no\"\napply -> confirm\n\nbox \"change window\" {\n  validate\n  apply\n}\n```\n\nThis flowchart:\n1. **Receives** a change request\n2. **Validates** it against policy (within the change window)\n3. **Decides** whether it's valid with two branches:\n   - **Yes path**: Apply the change (within the change window) then Confirm success\n   - **No path**: Rollback directly\n4. The **change window box** visually groups validate and apply to show that both occur during the scheduled maintenance window",
+  "extracted_document": "# FigDown — figures as text. Spec: https://github.com/FigDown/figdown\nfigdown 0.1 flowchart\ntitle \"Change request procedure\"\n\nprocess receive \"Receive change request\"\nprocess validate \"Validate against policy\"\ndecision isvalid \"Valid?\"\nprocess apply \"Apply change\"\nterminator confirm \"Confirm success\"\nterminator rollback \"Rollback\"\n\nreceive -> validate\nvalidate -> isvalid\nisvalid -> apply \"yes\"\nisvalid -> rollback \"no\"\napply -> confirm\n\nbox \"change window\" {\n  validate\n  apply\n}\n",
+  "validation": {
+    "errors": [
+      "Line 12: \"receive\" is not allowed in genre flowchart",
+      "Line 13: \"validate\" is not allowed in genre flowchart",
+      "Line 14: \"isvalid\" is not allowed in genre flowchart",
+      "Line 15: \"isvalid\" is not allowed in genre flowchart",
+      "Line 16: \"apply\" is not allowed in genre flowchart",
+      "Line 18: \"box\" is not allowed in genre flowchart",
+      "Line 19: \"validate\" is not allowed in genre flowchart",
+      "Line 20: \"apply\" is not allowed in genre flowchart",
+      "Line 21: \"}\" is not allowed in genre flowchart"
+    ],
+    "invariants_pass": false,
+    "missing_nodes": [],
+    "edge_count": 0,
+    "success": false
+  }
+}

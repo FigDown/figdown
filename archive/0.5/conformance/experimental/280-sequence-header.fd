@@ -1,0 +1,9 @@
+# `SEQUENCE-GENRE-VOCABULARY`: the `sequence` genre header itself, and NOTHING
+# else. The genre lands as a dispatch point exactly the way `statechart` did at
+# `STATECHART-GENRE-SCOPE` (fixture 230) — one token in the header, no keyword of its own, no
+# layout rule, no renderer path. What the model records is `header.genre`, and
+# that is the whole of the increment: the document below is a header and a
+# blank body, which is the only `sequence` document this version means to
+# land. Its vocabulary arrives in a later increment; until then a reader of
+# this model learns the KIND of figure the author declared and nothing more.
+figdown 0.4 sequence

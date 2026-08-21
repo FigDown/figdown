@@ -1,0 +1,4 @@
+Line 17: duplicate pin for "a"
+Line 18: pin width=/height= do not apply to group "g" — groups size to their members
+Line 19: pin width=/height= do not apply to external endpoint "w" — its geometry derives from its content
+Line 20: pin width=/height= do not apply to the bitfield block "hdr" — its geometry derives from its content

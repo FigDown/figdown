@@ -1,0 +1,11 @@
+# The option keys an `edge` takes, authored as topology.
+# 0.3 (`PAINT-ORDER-CONSTRUCT`): this fixture used to open with
+# `plane overlay "LSP paths" z-index=2` and to write ` plane=overlay` on the
+# edge. Both LEFT the language with the `plane` keyword — withdrawn, not
+# renamed, so there is no spelling to migrate them to — and both were
+# incidental: the subject here is the edge option set, and `stroke=`/`style=`
+# are the keys that carry it. Paint order is document order.
+figdown 0.1 topology
+node r1 "R1"
+node r2 "R2"
+edge r1 -> r2 stroke=#dc2626 style=dashed

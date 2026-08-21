@@ -1,0 +1,12 @@
+figdown 0.1 table
+# `CHART-LEVEL-KEY`: `chart level=` is DELETED, not renamed. Zero uses
+# corpus-wide, zero 3-D bar charts, zero requests; it was the only construct
+# whose caption the ENGINE wrote rather than the author, and its `parseFloat`
+# grammar uniquely accepted `1e3`, breaking the otherwise-uniform numeric
+# grammar. The key stays REGISTERED as retired so the deletion gets a named
+# message instead of the generic `unknown option "level="`.
+table t "T"
+| X | V |
+|---|---|
+| r1 | 1 |
+chart t level=40

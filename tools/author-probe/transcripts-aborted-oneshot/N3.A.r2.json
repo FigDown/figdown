@@ -1,0 +1,48 @@
+{
+  "probe_version": "1.0.0",
+  "run": {
+    "utc": "2026-08-19T11:48:52Z",
+    "cli": "2.1.234 (Claude Code)",
+    "condition": "A",
+    "task": "N3",
+    "kind": "normal",
+    "seat": 2,
+    "model_alias": "sonnet",
+    "model_used": "claude-sonnet-5"
+  },
+  "saw": {
+    "skill_path": "skill/figdown/SKILL.md",
+    "skill_sha256": "718f935282ce7a93f4b7e36b83983ac1112e49818384d8eaf35869830d34d6a2",
+    "skill_chars": 16497,
+    "system_sha256": "39117af0175e7d927c8f9c715c9555f91e3357a146f2d6d311d4a3bb889ecaae",
+    "user_sha256": "a132efb7518ea63eed35484c99da41bec5d49fe3ee312de5025e2aa134b912f2"
+  },
+  "integrity": {
+    "turns": 1,
+    "permission_denials": 0,
+    "is_error": false
+  },
+  "usage": {
+    "cost_usd": 0.0250137,
+    "duration_ms": 16473
+  },
+  "scrub": {
+    "ran": true,
+    "pattern": "email-regex",
+    "replacements": 0
+  },
+  "raw_answer_text": "# BGP Session Reset Procedure — FigDown Figure\n\nI don't have direct access to `reference/experimental/flowchart.md` in this session, so I'm composing the flowchart from the vocabulary the task itself names — `process`, `decision`, `terminator` — combined with the genre-independent skeleton rules (quoted labels, `->` edges, `figdown 0.2` — wait, flowchart's floor is `0.1`, so I stay there). If the genre file specifies different keyword spellings, treat this as a first draft to reconcile against it before shipping.\n\n```figdown\n# FigDown — figures as text. Spec: https://github.com/FigDown/figdown\nfigdown 0.1 flowchart\ntitle \"BGP session reset procedure\"\n\nprocess checkcounters \"Check interface error counters\"\ndecision errorsfound \"Errors found?\"\nprocess clearcounters \"Clear interface counters\"\nterminator monitor \"Monitor session\"\nterminator escalate \"Escalate to human operator\"\n\ncheckcounters -> errorsfound\nerrorsfound -> clearcounters \"yes\"\nerrorsfound -> escalate \"no\"\nclearcounters -> monitor\n```\n\nNotes for the record:\n\n- Node ids and roles follow exactly what was specified: `checkcounters` and `clearcounters` are `process` steps, `errorsfound` is the `decision`, and `monitor` / `escalate` are `terminator`s ending the flow.\n- The two branches out of `errorsfound` carry the `\"yes\"` / `\"no\"` edge labels per the described logic; all other edges are unlabeled sequence steps.\n- Before rendering, run `node <skill-dir>/build-svg.js` on this file — if `process`/`decision`/`terminator`/edge-label spellings differ from what `reference/experimental/flowchart.md` actually defines, the build will surface it as a line error naming the correct keyword, and the fix is mechanical.",
+  "extracted_document": "# FigDown — figures as text. Spec: https://github.com/FigDown/figdown\nfigdown 0.1 flowchart\ntitle \"BGP session reset procedure\"\n\nprocess checkcounters \"Check interface error counters\"\ndecision errorsfound \"Errors found?\"\nprocess clearcounters \"Clear interface counters\"\nterminator monitor \"Monitor session\"\nterminator escalate \"Escalate to human operator\"\n\ncheckcounters -> errorsfound\nerrorsfound -> clearcounters \"yes\"\nerrorsfound -> escalate \"no\"\nclearcounters -> monitor\n",
+  "validation": {
+    "errors": [
+      "Line 11: \"checkcounters\" is not allowed in genre flowchart",
+      "Line 12: \"errorsfound\" is not allowed in genre flowchart",
+      "Line 13: \"errorsfound\" is not allowed in genre flowchart",
+      "Line 14: \"clearcounters\" is not allowed in genre flowchart"
+    ],
+    "invariants_pass": false,
+    "missing_nodes": [],
+    "edge_count": 0,
+    "success": false
+  }
+}

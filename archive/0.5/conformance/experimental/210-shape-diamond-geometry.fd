@@ -1,0 +1,13 @@
+# Shape geometry, diamond (engine backlog 14/16; DISCREPANCIES `SHAPE-AWARE-GEOMETRY`).
+# A rhombus offers only its INSCRIBED rectangle to its label, and an edge
+# meeting it must stop on the drawn outline, not on the bounding box whose
+# corners are empty space. The parse model is unaffected by either; this
+# case pins down the parse of the scenario tools/shape-check.js asserts the
+# geometry for (long label + two diagonally incident edges).
+figdown 0.2 flowchart
+node q "Retry limit reached?" shape=diamond
+node a "Alert the operator"
+node b "Continue"
+flow down
+flowline q -[yes]-> a
+flowline q -[no]-> b

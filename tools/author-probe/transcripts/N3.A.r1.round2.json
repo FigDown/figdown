@@ -1,0 +1,53 @@
+{
+  "probe_version": "1.0.0",
+  "run": {
+    "utc": "2026-08-19T12:05:13Z",
+    "cli": "2.1.234 (Claude Code)",
+    "condition": "A",
+    "task": "N3",
+    "kind": "normal",
+    "seat": 1,
+    "model_alias": "sonnet",
+    "round": 2,
+    "model_used": "claude-sonnet-5"
+  },
+  "saw": {
+    "skill_path": "skill/figdown/SKILL.md",
+    "skill_sha256": "718f935282ce7a93f4b7e36b83983ac1112e49818384d8eaf35869830d34d6a2",
+    "skill_chars": 16497,
+    "system_sha256": "39117af0175e7d927c8f9c715c9555f91e3357a146f2d6d311d4a3bb889ecaae",
+    "user_sha256": "bffaf03eb27149070f6bcfacaa45eb4fc779f81599f6c2400ef4558cbd7f9a1f"
+  },
+  "integrity": {
+    "turns": 1,
+    "permission_denials": 0,
+    "is_error": false
+  },
+  "usage": {
+    "cost_usd": 0.094779,
+    "duration_ms": 40301
+  },
+  "scrub": {
+    "ran": true,
+    "pattern": "email-regex",
+    "replacements": 0
+  },
+  "raw_answer_text": "I don't have the contents of `reference/experimental/flowchart.md` in what I was given — only the router entry that names it. My first attempt guessed at edge syntax (`bare_id -> bare_id`) by analogy with other diagram tools, and the validator confirms that guess was wrong: it's not that the *node ids* are bad, it's that a **bare line isn't a recognized statement shape in this genre** (the parser calls the leading token itself disallowed).\n\nThe one syntax pattern this genre file's silence still lets me reuse safely is the language's own convention, stated in the core skeleton, of expressing connections/config as `key=value` pairs attached to a declaration (seen in `class ... stroke=#dc2626`, `fill=`, `style=`) rather than as a separate freestanding line. So my corrected attempt attaches flow via `next=` on simple steps and `yes=`/`no=` on the decision, instead of standalone edge lines:\n\n```figdown\n# FigDown — figures as text. Spec: https://github.com/FigDown/figdown\nfigdown 0.1 flowchart\ntitle \"BGP session reset procedure\"\n\n# NOTE: reference/experimental/flowchart.md was not available to me when\n# authoring this file. The previous attempt used standalone `id -> id`\n# edge lines and every one of them errored (\"not allowed in genre\n# flowchart\"), which is the parser rejecting a bare-line edge shape, not\n# the node ids themselves. This revision instead attaches successor(s) to\n# each node's own declaration with key=value references (yes=/no=/next=),\n# by analogy with this genre's documented key=value option style\n# (stroke=, fill=, class=). THIS IS UNVERIFIED SYNTAX — please run\n# `node <skill-dir>/build-svg.js` on this file and fix per the actual\n# error output; if it still fails, the flowchart genre file needs to be\n# consulted directly rather than guessed at again.\n\nprocess checkcounters \"Check interface error counters\" next=errorsfound\ndecision errorsfound \"Errors found?\" yes=clearcounters no=escalate\nprocess clearcounters \"Clear interface counters\" next=monitor\nterminator monitor \"Monitor session\"\nterminator escalate \"Escalate to operator\"\n```\n\n**Please validate this before trusting it.** I flagged the uncertainty in-line per the \"do not invent syntax silently\" rule rather than presenting a second guess as settled fact. If `next=`/`yes=`/`no=` also errors, the reliable next step is to open `reference/experimental/flowchart.md` directly (I don't have it in this session) rather than for me to guess a third time — two failures on this step is the documented signal to halve the step and stop guessing at edge spellings.",
+  "extracted_document": "# FigDown — figures as text. Spec: https://github.com/FigDown/figdown\nfigdown 0.1 flowchart\ntitle \"BGP session reset procedure\"\n\n# NOTE: reference/experimental/flowchart.md was not available to me when\n# authoring this file. The previous attempt used standalone `id -> id`\n# edge lines and every one of them errored (\"not allowed in genre\n# flowchart\"), which is the parser rejecting a bare-line edge shape, not\n# the node ids themselves. This revision instead attaches successor(s) to\n# each node's own declaration with key=value references (yes=/no=/next=),\n# by analogy with this genre's documented key=value option style\n# (stroke=, fill=, class=). THIS IS UNVERIFIED SYNTAX — please run\n# `node <skill-dir>/build-svg.js` on this file and fix per the actual\n# error output; if it still fails, the flowchart genre file needs to be\n# consulted directly rather than guessed at again.\n\nprocess checkcounters \"Check interface error counters\" next=errorsfound\ndecision errorsfound \"Errors found?\" yes=clearcounters no=escalate\nprocess clearcounters \"Clear interface counters\" next=monitor\nterminator monitor \"Monitor session\"\nterminator escalate \"Escalate to operator\"\n",
+  "validation": {
+    "errors": [
+      "Line 17: unknown option \"next=\"",
+      "Line 18: unknown option \"yes=\"",
+      "Line 18: unknown option \"no=\"",
+      "Line 19: unknown option \"next=\""
+    ],
+    "invariants_pass": false,
+    "missing_nodes": [
+      "checkcounters",
+      "errorsfound",
+      "clearcounters"
+    ],
+    "edge_count": 0,
+    "success": false
+  }
+}

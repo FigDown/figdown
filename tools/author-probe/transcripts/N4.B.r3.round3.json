@@ -1,0 +1,63 @@
+{
+  "probe_version": "1.0.0",
+  "run": {
+    "utc": "2026-08-19T12:16:38Z",
+    "cli": "2.1.234 (Claude Code)",
+    "condition": "B",
+    "task": "N4",
+    "kind": "normal",
+    "seat": 3,
+    "model_alias": "haiku",
+    "round": 3,
+    "model_used": "claude-haiku-4-5-20251001"
+  },
+  "saw": {
+    "skill_path": "tools/author-probe/skill-candidate.md",
+    "skill_sha256": "2abdaf0d9211d5ee1464c5f5c3a200b1ae6f7bd71cfd6344e7da94d669e6ed31",
+    "skill_chars": 17591,
+    "system_sha256": "39117af0175e7d927c8f9c715c9555f91e3357a146f2d6d311d4a3bb889ecaae",
+    "user_sha256": "1d3c8f6ef95e654279006e5adbf04257c0e8d6e7ca4d531808ba09875770bfb4"
+  },
+  "integrity": {
+    "turns": 1,
+    "permission_denials": 0,
+    "is_error": false
+  },
+  "usage": {
+    "cost_usd": 0.026257,
+    "duration_ms": 20164
+  },
+  "scrub": {
+    "ran": true,
+    "pattern": "email-regex",
+    "replacements": 0
+  },
+  "raw_answer_text": "Looking at the validator errors, the issue is clear: the keyword `node` is not valid for the `block` genre. The errors indicate that the IDs on the edge lines (scheduler, renewaljob, caclient, etc.) are not recognized because they were never properly declared.\n\nFor FigDown's `block` genre, the correct keyword for declaring diagram elements is `block`, not `node`. The edges are trying to reference IDs that don't exist in the block grammar because they were declared with the wrong keyword.\n\nHere's the corrected document:\n\n```figdown\n# FigDown — figures as text. Spec: https://github.com/FigDown/figdown\nfigdown 0.1 block\ntitle \"Certificate renewal automation\"\n\nblock scheduler \"Scheduler\"\nblock renewaljob \"Renewal Job\"\nblock caclient \"CA Client\"\nblock ca \"Certificate Authority\"\nblock deployagent \"Deploy Agent\"\nblock service \"Service\"\n\nscheduler -> renewaljob\nrenewaljob -> caclient\ncaclient -> ca\nrenewaljob -> deployagent\ndeployagent -> service\n```\n\nThe change is simple: replace each `node` keyword with `block`. This uses the correct syntax for the block genre in FigDown, which allows the edge declarations to properly reference the declared block IDs. The structure and all five connections remain unchanged.",
+  "extracted_document": "# FigDown — figures as text. Spec: https://github.com/FigDown/figdown\nfigdown 0.1 block\ntitle \"Certificate renewal automation\"\n\nblock scheduler \"Scheduler\"\nblock renewaljob \"Renewal Job\"\nblock caclient \"CA Client\"\nblock ca \"Certificate Authority\"\nblock deployagent \"Deploy Agent\"\nblock service \"Service\"\n\nscheduler -> renewaljob\nrenewaljob -> caclient\ncaclient -> ca\nrenewaljob -> deployagent\ndeployagent -> service\n",
+  "validation": {
+    "errors": [
+      "Line 5: \"block\" is not allowed in genre block",
+      "Line 6: \"block\" is not allowed in genre block",
+      "Line 7: \"block\" is not allowed in genre block",
+      "Line 8: \"block\" is not allowed in genre block",
+      "Line 9: \"block\" is not allowed in genre block",
+      "Line 10: \"block\" is not allowed in genre block",
+      "Line 12: \"scheduler\" is not allowed in genre block",
+      "Line 13: \"renewaljob\" is not allowed in genre block",
+      "Line 14: \"caclient\" is not allowed in genre block",
+      "Line 15: \"renewaljob\" is not allowed in genre block",
+      "Line 16: \"deployagent\" is not allowed in genre block"
+    ],
+    "invariants_pass": false,
+    "missing_nodes": [
+      "scheduler",
+      "renewaljob",
+      "caclient",
+      "ca",
+      "deployagent",
+      "service"
+    ],
+    "edge_count": 0,
+    "success": false
+  }
+}

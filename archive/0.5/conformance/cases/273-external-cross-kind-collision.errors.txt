@@ -1,0 +1,3 @@
+Line 10: duplicate id "b"
+Line 5: duplicate id "x"
+Line 7: duplicate id "g"

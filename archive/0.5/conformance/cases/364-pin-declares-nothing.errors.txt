@@ -1,0 +1,2 @@
+Line 8: pin needs <id> and at=(<x>,<y>) and/or width=<px> and/or height=<px>
+Line 9: pin of unknown id "ghost"

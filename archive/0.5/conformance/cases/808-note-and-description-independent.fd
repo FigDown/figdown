@@ -1,0 +1,43 @@
+figdown 0.3 bitfield
+# `DRAWN-ANNOTATION-FORM`: `note=` AND `description=` ARE INDEPENDENT KEYS. Neither
+# is a fallback for the other, neither shadows the other, and this document
+# holds both at once so that a later reader cannot merge them by mistake.
+#
+# THE DIVISION IS AUDIENCE, NOT LENGTH AND NOT FORMALITY:
+#
+#   key            audience        draws?  acceptor
+#   description=   the MACHINE     no — an SVG <title> tooltip only    field
+#   note=          the HUMAN       YES — a folded-corner box on the page
+#                                  node/process/decision/terminator/state/
+#                                  group/edge/flowline/transition/title
+#
+# THE OBVIOUS FIXTURE IS NOT WRITABLE, and saying why is the point. "Both
+# keys on one element" cannot be written today: the two acceptor sets are
+# DISJOINT — `field` is the only directive that takes `description=`, and
+# `field` is the one directive that REFUSES `note=` (case 803). So what this
+# file pins is the next thing down, and the thing that actually protects the
+# distinction: the two keys live in one document, side by side, each on its
+# own carrier, and NEITHER interferes with the other.
+#
+# WHAT THE GOLDEN CAN AND CANNOT SEE, said plainly. `description` IS projected
+# into the model (per field); `note` is NOT — normalize.js has no row for it
+# yet (case 800 states the gap in full). So the golden below shows the
+# `description=` half in place and shows that the `note=` half disturbs
+# nothing around it, and the day normalize.js gains a `note` row this golden
+# regenerates into the stronger assertion the fixture is aimed at: the two
+# keys in different places in the tree, with no shared slot for one to
+# overwrite the other. An engine that implemented `note=` as an ALIAS for
+# `description=` — the reading the 0.1 retirement diagnostic used to
+# teach — would collapse them into one slot, and that is what this file
+# exists to catch.
+bitfield hdr "Frame header" word=32 numbering=msb0
+field "Version" 4 description="prose for the reading agent: it becomes an SVG <title> and puts no ink on the page"
+field "Flags" 12 description="a second one, so the golden shows them per-field"
+field "Length" 16
+
+figdown 0.3 block
+# Section 2: the DRAWN key, on carriers that take it, in the same file.
+group fabric "Fabric" note="drawn: the human reader must see this one"
+node spine "Spine" in=fabric note="drawn"
+node leaf "Leaf" in=fabric
+edge spine -> leaf note="drawn, on the carrier that has no id to address"

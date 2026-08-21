@@ -1,0 +1,48 @@
+{
+  "header": {
+    "version": "0.3",
+    "genre": "block"
+  },
+  "title": "]]> </metadata> <![CDATA[ <script>alert(1)</script>",
+  "flow": "right",
+  "classes": [],
+  "planes": [
+    {
+      "id": "base",
+      "z": 0
+    }
+  ],
+  "nodes": [
+    {
+      "id": "a",
+      "label": "]]]]><![CDATA[>",
+      "shape": "box",
+      "plane": "base",
+      "note": "]]>",
+      "line": 40
+    },
+    {
+      "id": "b",
+      "label": "<![CDATA[ unterminated",
+      "shape": "box",
+      "plane": "base",
+      "line": 41
+    }
+  ],
+  "groups": [],
+  "edges": [
+    {
+      "a": "a",
+      "op": "->",
+      "b": "b",
+      "plane": "base",
+      "line": 42
+    }
+  ],
+  "ranks": [],
+  "pins": [],
+  "thresholds": [],
+  "bands": [],
+  "bundles": [],
+  "regions": []
+}

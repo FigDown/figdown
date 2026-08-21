@@ -1,0 +1,66 @@
+{
+  "probe_version": "1.0.0",
+  "run": {
+    "utc": "2026-08-19T10:42:30Z",
+    "model_alias": "sonnet",
+    "model_used": "claude-sonnet-5",
+    "cli": "2.1.234 (Claude Code)",
+    "seat": 3,
+    "condition": "B",
+    "fixture": "P1",
+    "klass": "parse/unrecognized-line",
+    "round": 1
+  },
+  "engine_channel": "dist-public-api",
+  "saw": {
+    "original_fixture_sha256": "ff603d6fe385a2c7679ef54de847665b5fd5e1361249d54aedc485fc87c625c8",
+    "document_shown_sha256": "ff603d6fe385a2c7679ef54de847665b5fd5e1361249d54aedc485fc87c625c8",
+    "system_sha256": "ef2a3cd623ce06b05aa4652d8ace761c4f70f24298bcef0552f22e2e46e277fc",
+    "user_sha256": "17dfce84029df637e892dcf3bc728d81ce11cd77321d4cb270cebec404a040f5"
+  },
+  "integrity": {
+    "turns": 1,
+    "permission_denials": 0,
+    "is_error": false
+  },
+  "usage": {
+    "cost_usd": 0.004275,
+    "duration_ms": 2144
+  },
+  "scrub": {
+    "ran": true,
+    "pattern": "email-regex",
+    "replacements": 0
+  },
+  "raw_answer_text": "```\nfigdown 0.1 block\ntitle \"Top-of-rack telemetry export path\"\n\nnode poller \"Metrics poller\"\nnode buffer \"Ring buffer\"\nnode exporter \"Exporter agent\"\nnode collector \"Collector endpoint\"\n\nedge poller -> buffer\nedge buffer -> exporter\nedge exporter -> collector\n```",
+  "presented": {
+    "document_shown": "figdown 0.1 block\ntitle \"Top-of-rack telemetry export path\"\n\nnode poller \"Metrics poller\"\nnode buffer \"Ring buffer\"\nnode exporter \"Exporter agent\"\nnode collector \"Collector endpoint\"\n\nedge poller -> buffer\negde buffer -> exporter\nedge exporter -> collector\n",
+    "validator_shown": {
+      "errors": [
+        "Line 10: \"egde\" is not allowed in genre block"
+      ],
+      "diagnostics": [
+        {
+          "code": "parse/word-not-in-genre",
+          "line": 10,
+          "message": "\"egde\" is not allowed in genre block",
+          "subject": {
+            "kind": "keyword",
+            "id": "egde"
+          },
+          "evidence": null,
+          "supportedFixes": []
+        }
+      ]
+    }
+  },
+  "extracted_document": "figdown 0.1 block\ntitle \"Top-of-rack telemetry export path\"\n\nnode poller \"Metrics poller\"\nnode buffer \"Ring buffer\"\nnode exporter \"Exporter agent\"\nnode collector \"Collector endpoint\"\n\nedge poller -> buffer\nedge buffer -> exporter\nedge exporter -> collector\n",
+  "validation": {
+    "errors_after": [],
+    "diagnostics_after": [],
+    "invariants_pass": true,
+    "missing_nodes": [],
+    "edge_count": 3,
+    "success": true
+  }
+}

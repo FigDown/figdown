@@ -1,0 +1,14 @@
+figdown 0.1 table
+# 0.1 (`POSITIONAL-LIST-SPELLING`): the table `width` space form is retired, exactly as
+# `rank`'s is — same rule, same diagnostic shape. `COMMA-LIST-WHITESPACE`: whitespace after a
+# comma is not a spelling either.
+table t "T"
+| A | B | C |
+|---|---|---|
+| 1 | 2 | 3 |
+width auto 90 25%
+table u "U"
+| A | B | C |
+|---|---|---|
+| 1 | 2 | 3 |
+width auto,90 25%

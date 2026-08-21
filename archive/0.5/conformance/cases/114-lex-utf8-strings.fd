@@ -1,0 +1,5 @@
+figdown 0.1 block
+title "中文標題 CJK"
+node a "路徑與標籤"
+node b "line1\nline2"
+node c "quote \" and \\ backslash"

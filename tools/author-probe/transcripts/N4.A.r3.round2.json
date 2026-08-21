@@ -1,0 +1,50 @@
+{
+  "probe_version": "1.0.0",
+  "run": {
+    "utc": "2026-08-19T12:06:44Z",
+    "cli": "2.1.234 (Claude Code)",
+    "condition": "A",
+    "task": "N4",
+    "kind": "normal",
+    "seat": 3,
+    "model_alias": "haiku",
+    "round": 2,
+    "model_used": "claude-haiku-4-5-20251001"
+  },
+  "saw": {
+    "skill_path": "skill/figdown/SKILL.md",
+    "skill_sha256": "718f935282ce7a93f4b7e36b83983ac1112e49818384d8eaf35869830d34d6a2",
+    "skill_chars": 16497,
+    "system_sha256": "39117af0175e7d927c8f9c715c9555f91e3357a146f2d6d311d4a3bb889ecaae",
+    "user_sha256": "f4ef9c0bbe831546b2330cdb4479c852dc39d8a349b49bade535af4499b8e933"
+  },
+  "integrity": {
+    "turns": 1,
+    "permission_denials": 0,
+    "is_error": false
+  },
+  "usage": {
+    "cost_usd": 0.036268,
+    "duration_ms": 43911
+  },
+  "scrub": {
+    "ran": true,
+    "pattern": "email-regex",
+    "replacements": 0
+  },
+  "raw_answer_text": "Looking at the validation errors, I can see that the keyword `block` is not allowed in the `block` genre (which is confusing but makes sense—using \"block\" to define blocks in a block genre would be redundant).\n\nThe errors indicate that the keyword for defining individual elements in a `block` diagram genre must be something else. Based on the documentation structure and common conventions for architecture/dataflow diagrams, the correct keyword is likely `node`.\n\nLet me also analyze the error pattern:\n- Lines 6-11 fail because `block` is the wrong keyword\n- Lines 13-17 fail as cascading errors from undefined nodes\n\nHere's the corrected document:\n\n```figdown\n# FigDown — figures as text. Spec: https://github.com/FigDown/figdown\n\nfigdown 0.1 block\ntitle \"Certificate renewal automation\"\n\nnode scheduler \"Scheduler\"\nnode renewaljob \"Renewal Job\"\nnode caclient \"CA Client\"\nnode ca \"Certificate Authority\"\nnode deployagent \"Deploy Agent\"\nnode service \"Service\"\n\nscheduler -> renewaljob\nrenewaljob -> caclient\ncaclient -> ca\nrenewaljob -> deployagent\ndeployagent -> service\n```\n\nThe key changes:\n- Replaced `block` keyword with `node` for each element declaration\n- Kept all six nodes with their IDs and labels\n- Preserved all five directed edges showing the workflow: scheduler → renewal job → CA client → CA, and renewal job → deploy agent → service",
+  "extracted_document": "# FigDown — figures as text. Spec: https://github.com/FigDown/figdown\n\nfigdown 0.1 block\ntitle \"Certificate renewal automation\"\n\nnode scheduler \"Scheduler\"\nnode renewaljob \"Renewal Job\"\nnode caclient \"CA Client\"\nnode ca \"Certificate Authority\"\nnode deployagent \"Deploy Agent\"\nnode service \"Service\"\n\nscheduler -> renewaljob\nrenewaljob -> caclient\ncaclient -> ca\nrenewaljob -> deployagent\ndeployagent -> service\n",
+  "validation": {
+    "errors": [
+      "Line 13: \"scheduler\" is not allowed in genre block",
+      "Line 14: \"renewaljob\" is not allowed in genre block",
+      "Line 15: \"caclient\" is not allowed in genre block",
+      "Line 16: \"renewaljob\" is not allowed in genre block",
+      "Line 17: \"deployagent\" is not allowed in genre block"
+    ],
+    "invariants_pass": false,
+    "missing_nodes": [],
+    "edge_count": 0,
+    "success": false
+  }
+}

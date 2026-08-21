@@ -1,0 +1,128 @@
+{
+  "header": {
+    "version": "0.1",
+    "genre": "table"
+  },
+  "flow": "right",
+  "classes": [],
+  "planes": [
+    {
+      "id": "base",
+      "z": 0
+    }
+  ],
+  "nodes": [],
+  "groups": [],
+  "edges": [],
+  "ranks": [],
+  "pins": [],
+  "thresholds": [],
+  "bands": [],
+  "bundles": [],
+  "regions": [
+    {
+      "genre": "table",
+      "id": "t",
+      "label": "T",
+      "heads": [
+        [
+          {
+            "v": "A"
+          },
+          {
+            "v": "B"
+          },
+          {
+            "v": "C"
+          }
+        ]
+      ],
+      "aligns": [
+        "none",
+        "none",
+        "none"
+      ],
+      "rows": [
+        {
+          "cells": [
+            {
+              "v": "1"
+            },
+            {
+              "v": "2"
+            },
+            {
+              "v": "3"
+            }
+          ],
+          "line": 7
+        }
+      ],
+      "width": {
+        "widths": [
+          "auto",
+          {
+            "px": 90
+          },
+          {
+            "pct": 25
+          }
+        ],
+        "line": 8
+      },
+      "line": 4
+    },
+    {
+      "genre": "table",
+      "id": "u",
+      "label": "U",
+      "heads": [
+        [
+          {
+            "v": "A"
+          },
+          {
+            "v": "B"
+          },
+          {
+            "v": "C"
+          }
+        ]
+      ],
+      "aligns": [
+        "none",
+        "none",
+        "none"
+      ],
+      "rows": [
+        {
+          "cells": [
+            {
+              "v": "1"
+            },
+            {
+              "v": "2"
+            },
+            {
+              "v": "3"
+            }
+          ],
+          "line": 12
+        }
+      ],
+      "width": {
+        "widths": [
+          "auto",
+          {
+            "px": 90
+          },
+          {
+            "pct": 25
+          }
+        ],
+        "line": 13
+      },
+      "line": 9
+    }
+  ]
+}

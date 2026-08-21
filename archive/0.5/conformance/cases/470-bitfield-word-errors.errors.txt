@@ -1,0 +1,4 @@
+Line 2: word must be a positive integer
+Line 4: word must be a positive integer
+Line 6: word must be a positive integer
+Line 8: word must be a positive integer

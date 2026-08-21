@@ -1,0 +1,63 @@
+{
+  "header": {
+    "version": "0.1",
+    "genre": "block"
+  },
+  "flow": "right",
+  "classes": [],
+  "planes": [
+    {
+      "id": "base",
+      "z": 0
+    }
+  ],
+  "nodes": [
+    {
+      "id": "a",
+      "label": "A",
+      "shape": "box",
+      "plane": "base",
+      "line": 2
+    },
+    {
+      "id": "b",
+      "label": "B",
+      "shape": "box",
+      "plane": "base",
+      "line": 3
+    }
+  ],
+  "groups": [],
+  "edges": [
+    {
+      "a": "a",
+      "op": "->",
+      "b": "b",
+      "mid": "flags[3:0]",
+      "plane": "base",
+      "line": 4
+    },
+    {
+      "a": "a",
+      "op": "->",
+      "b": "b",
+      "mid": "two\nlines ] ok",
+      "plane": "base",
+      "line": 5
+    },
+    {
+      "a": "a",
+      "op": "->",
+      "b": "b",
+      "mid": "has # hash",
+      "plane": "base",
+      "line": 6
+    }
+  ],
+  "ranks": [],
+  "pins": [],
+  "thresholds": [],
+  "bands": [],
+  "bundles": [],
+  "regions": []
+}

@@ -1,0 +1,107 @@
+{
+  "header": {
+    "version": "0.4",
+    "genre": "sequence"
+  },
+  "title": "Exclusive branches may end in the same state",
+  "flow": "right",
+  "classes": [],
+  "planes": [
+    {
+      "id": "base",
+      "z": 0
+    }
+  ],
+  "nodes": [],
+  "groups": [],
+  "edges": [],
+  "ranks": [],
+  "pins": [],
+  "thresholds": [],
+  "bands": [],
+  "bundles": [],
+  "regions": [],
+  "lifelines": [
+    {
+      "id": "c",
+      "label": "Client",
+      "line": 13
+    },
+    {
+      "id": "s",
+      "label": "Server",
+      "line": 14
+    }
+  ],
+  "messages": [
+    {
+      "a": "c",
+      "op": "->",
+      "b": "s",
+      "label": "REQUEST",
+      "line": 16
+    },
+    {
+      "a": "c",
+      "op": "<-",
+      "b": "s",
+      "label": "ACK",
+      "in": "granted",
+      "line": 20
+    },
+    {
+      "a": "c",
+      "op": "<-",
+      "b": "s",
+      "label": "NAK",
+      "in": "refused",
+      "line": 23
+    }
+  ],
+  "states": [
+    {
+      "lifeline": "c",
+      "name": "INIT",
+      "line": 15
+    },
+    {
+      "lifeline": "c",
+      "name": "REQUESTING",
+      "line": 17
+    },
+    {
+      "lifeline": "c",
+      "name": "BOUND",
+      "in": "granted",
+      "line": 21
+    },
+    {
+      "lifeline": "c",
+      "name": "INIT",
+      "in": "refused",
+      "line": 24
+    }
+  ],
+  "fragments": [
+    {
+      "id": "commit",
+      "label": "can the server satisfy it?",
+      "type": "alt",
+      "line": 18
+    }
+  ],
+  "operands": [
+    {
+      "id": "granted",
+      "label": "yes",
+      "in": "commit",
+      "line": 19
+    },
+    {
+      "id": "refused",
+      "label": "no",
+      "in": "commit",
+      "line": 22
+    }
+  ]
+}

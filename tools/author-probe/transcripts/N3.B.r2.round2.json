@@ -1,0 +1,47 @@
+{
+  "probe_version": "1.0.0",
+  "run": {
+    "utc": "2026-08-19T12:14:48Z",
+    "cli": "2.1.234 (Claude Code)",
+    "condition": "B",
+    "task": "N3",
+    "kind": "normal",
+    "seat": 2,
+    "model_alias": "sonnet",
+    "round": 2,
+    "model_used": "claude-sonnet-5"
+  },
+  "saw": {
+    "skill_path": "tools/author-probe/skill-candidate.md",
+    "skill_sha256": "2abdaf0d9211d5ee1464c5f5c3a200b1ae6f7bd71cfd6344e7da94d669e6ed31",
+    "skill_chars": 17591,
+    "system_sha256": "39117af0175e7d927c8f9c715c9555f91e3357a146f2d6d311d4a3bb889ecaae",
+    "user_sha256": "d450e1d60b56994d30b57240170325abb96c2e916beadf5e532b1cd32e679aaf"
+  },
+  "integrity": {
+    "turns": 1,
+    "permission_denials": 0,
+    "is_error": false
+  },
+  "usage": {
+    "cost_usd": 0.018218099999999997,
+    "duration_ms": 11578
+  },
+  "scrub": {
+    "ran": true,
+    "pattern": "email-regex",
+    "replacements": 0
+  },
+  "raw_answer_text": "```figdown\n# FigDown — figures as text. Spec: https://github.com/FigDown/figdown\nfigdown 0.1 flowchart\ntitle \"BGP session reset procedure\"\n\nprocess checkcounters \"Check interface error counters\"\ndecision errorsfound \"Errors found?\"\nprocess clearcounters \"Clear interface counters\"\nterminator monitor \"Monitor session\"\nterminator escalate \"Escalate to operator\"\n\nedge checkcounters -> errorsfound\nedge errorsfound -> clearcounters \"yes\"\nedge errorsfound -> escalate \"no\"\nedge clearcounters -> monitor\n```\n\nNotes on this fix: the prior attempt wrote edges as bare `id -> id` lines, which the validator rejected as not-allowed statements in the `flowchart` genre — the grammar is closed, so every statement needs an explicit keyword. I changed each connection line to start with `edge`, matching the pattern used for node statements (`process`, `decision`, `terminator`). I don't have `reference/experimental/flowchart.md` loaded in this session to confirm `edge` is the exact required keyword rather than some other spelling; if `node <this-skill-dir>/build-svg.js` still reports a line error on these edge lines, the error message should name the correct keyword/replacement per the \"retired spellings are hard errors\" rule, and that should be used instead of guessing further.",
+  "extracted_document": "# FigDown — figures as text. Spec: https://github.com/FigDown/figdown\nfigdown 0.1 flowchart\ntitle \"BGP session reset procedure\"\n\nprocess checkcounters \"Check interface error counters\"\ndecision errorsfound \"Errors found?\"\nprocess clearcounters \"Clear interface counters\"\nterminator monitor \"Monitor session\"\nterminator escalate \"Escalate to operator\"\n\nedge checkcounters -> errorsfound\nedge errorsfound -> clearcounters \"yes\"\nedge errorsfound -> escalate \"no\"\nedge clearcounters -> monitor\n",
+  "validation": {
+    "errors": [
+      "Line 12: unexpected argument \"yes\"",
+      "Line 13: unexpected argument \"no\""
+    ],
+    "invariants_pass": false,
+    "missing_nodes": [],
+    "edge_count": 2,
+    "success": false
+  }
+}

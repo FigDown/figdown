@@ -1,0 +1,10 @@
+figdown 0.1 block
+# 0.1 (`QUOTING-RULES`), scene half: labels and the class meaning.
+class hot Hot
+node a Cache
+node b "B"
+group g Store
+external e External
+# `plane l1 Overlay` stood between the `class` and `node` lines until
+# 0.3 — the directive left the language (`PAINT-ORDER-CONSTRUCT`), and its label
+# position, which reported `plane label must be quoted`, left with it.

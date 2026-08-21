@@ -1,0 +1,48 @@
+{
+  "probe_version": "1.0.0",
+  "run": {
+    "utc": "2026-08-19T11:48:37Z",
+    "cli": "2.1.234 (Claude Code)",
+    "condition": "A",
+    "task": "N2",
+    "kind": "normal",
+    "seat": 4,
+    "model_alias": "haiku",
+    "model_used": "claude-haiku-4-5-20251001"
+  },
+  "saw": {
+    "skill_path": "skill/figdown/SKILL.md",
+    "skill_sha256": "718f935282ce7a93f4b7e36b83983ac1112e49818384d8eaf35869830d34d6a2",
+    "skill_chars": 16497,
+    "system_sha256": "39117af0175e7d927c8f9c715c9555f91e3357a146f2d6d311d4a3bb889ecaae",
+    "user_sha256": "e8bbb8bb800d7d108223fb06e522a5d73fa95892c46d272c5b2f495b633cbe4c"
+  },
+  "integrity": {
+    "turns": 1,
+    "permission_denials": 0,
+    "is_error": false
+  },
+  "usage": {
+    "cost_usd": 0.0086146,
+    "duration_ms": 11945
+  },
+  "scrub": {
+    "ran": true,
+    "pattern": "email-regex",
+    "replacements": 0
+  },
+  "raw_answer_text": "Looking at the requirements, I need to create a topology figure showing a branch office network with:\n- 2 access switches connected to a branch router\n- Branch router connected to 2 regional hub routers (primary and backup)\n\nThe documentation indicates that **topology** is an experimental genre, so I'll use `figdown 0.1 topology`. I'll keep the node labels clear and concise, letting the structure and relationships carry the meaning.\n\nHere's the finished FigDown document:\n\n```figdown\n# FigDown — figures as text. Spec: https://github.com/FigDown/figdown\n\nfigdown 0.1 topology\ntitle \"Branch office WAN uplinks\"\n\nnode access1 \"Access Switch 1\"\nnode access2 \"Access Switch 2\"\nnode branch \"Branch Router\"\nnode hubprimary \"Hub (Primary)\"\nnode hubbackup \"Hub (Backup)\"\n\nedge access1 branch\nedge access2 branch\nedge branch hubprimary\nedge branch hubbackup\n```\n\nThis topology shows:\n- The two access switches connecting LAN traffic to the branch router\n- The branch router as the focal point, terminating both the access network and the WAN uplinks\n- Separate paths to both regional hub routers, with the primary link for normal operation and the backup link for redundancy across a diverse path",
+  "extracted_document": "# FigDown — figures as text. Spec: https://github.com/FigDown/figdown\n\nfigdown 0.1 topology\ntitle \"Branch office WAN uplinks\"\n\nnode access1 \"Access Switch 1\"\nnode access2 \"Access Switch 2\"\nnode branch \"Branch Router\"\nnode hubprimary \"Hub (Primary)\"\nnode hubbackup \"Hub (Backup)\"\n\nedge access1 branch\nedge access2 branch\nedge branch hubprimary\nedge branch hubbackup\n",
+  "validation": {
+    "errors": [
+      "Line 12: edge needs an operator: -> <- -- <-> (a [mid] label splits it: -[x]->)",
+      "Line 13: edge needs an operator: -> <- -- <-> (a [mid] label splits it: -[x]->)",
+      "Line 14: edge needs an operator: -> <- -- <-> (a [mid] label splits it: -[x]->)",
+      "Line 15: edge needs an operator: -> <- -- <-> (a [mid] label splits it: -[x]->)"
+    ],
+    "invariants_pass": false,
+    "missing_nodes": [],
+    "edge_count": 0,
+    "success": false
+  }
+}

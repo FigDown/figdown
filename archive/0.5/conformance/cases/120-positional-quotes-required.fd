@@ -1,0 +1,10 @@
+figdown 0.1 bitfield
+# 0.1 (`QUOTING-RULES`): where the delimiter is WHITESPACE, a string-typed value
+# is quoted — a bare token cannot grow into a phrase, and the old failure
+# named the wrong thing (`unexpected argument "miss"` for a missing quote).
+# Covers the positional labels, the `class` meaning, the classic `field`
+# name, and the one string-typed OPTION value, `description=`.
+bitfield x "X" numbering=msb0
+field "Payload" 8
+field "Payload2" 8 description=unquoted
+field "Payload3" 8 description="quoted is fine"

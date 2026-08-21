@@ -1,0 +1,9 @@
+figdown 0.1 bitfield
+# 0.1: the comment scanner honours the string escapes the tokenizer
+# honours (\n \" \\). Before the fix it toggled its in-quote state on the
+# ESCAPED quote below, read the following `#` as a comment introducer, cut
+# the line there and reported `unterminated string` for a legal document.
+title "a \" b # c"
+bitfield x "X" numbering=msb0
+field "one" 8 description="a \" # b"
+field "two" 8 description="ends with a backslash \\"

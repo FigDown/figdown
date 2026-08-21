@@ -1,0 +1,29 @@
+figdown 0.1 block
+# The ABSENT half of the label tri-state (spec §12.3); 215-label-empty-string
+# freezes the empty-string half and the rule is the contrast between the two
+# goldens. `plane over` stood on the first line of the document until
+# 0.3 — the directive left the language (`PAINT-ORDER-CONSTRUCT`), so its absent-label
+# row left with it; `bundle bl a--c` stood after the `edge` line and moved to
+# section 2, because `bundle` is now declared by `topology` only (`SCENE-KEYWORD-MEMBERSHIP`) and
+# an absent label on a `bundle` is still a state worth freezing.
+node a
+node b "b"
+group g
+group h "h"
+node c "C" in=g
+external x
+edge a -> c
+bitfield hdr numbering=lsb0
+field "ver" 4
+table t
+| A | B |
+|---|---|
+| 1 | 2 |
+timing w
+signal clk 0101
+
+figdown 0.1 topology
+node a
+node c
+edge a -> c
+bundle bl a--c

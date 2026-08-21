@@ -1,0 +1,63 @@
+{
+  "probe_version": "1.0.0",
+  "run": {
+    "utc": "2026-08-19T12:06:23Z",
+    "cli": "2.1.234 (Claude Code)",
+    "condition": "A",
+    "task": "N4",
+    "kind": "normal",
+    "seat": 4,
+    "model_alias": "haiku",
+    "round": 2,
+    "model_used": "claude-haiku-4-5-20251001"
+  },
+  "saw": {
+    "skill_path": "skill/figdown/SKILL.md",
+    "skill_sha256": "718f935282ce7a93f4b7e36b83983ac1112e49818384d8eaf35869830d34d6a2",
+    "skill_chars": 16497,
+    "system_sha256": "39117af0175e7d927c8f9c715c9555f91e3357a146f2d6d311d4a3bb889ecaae",
+    "user_sha256": "a9a168a4c6a53bf26aa2d1c9c80661266824e2c27a5562d855dcda4dfa0d7d40"
+  },
+  "integrity": {
+    "turns": 1,
+    "permission_denials": 0,
+    "is_error": false
+  },
+  "usage": {
+    "cost_usd": 0.021729000000000002,
+    "duration_ms": 11287
+  },
+  "scrub": {
+    "ran": true,
+    "pattern": "email-regex",
+    "replacements": 0
+  },
+  "raw_answer_text": "Looking at the validator errors, I can see two main issues:\n\n1. **\"block\" is not allowed in genre block** — The keyword `block` should not be used to declare nodes in a block diagram. Nodes should be declared with just the id and label.\n\n2. **edge needs an operator** — Edges require directional operators like `->`, `<-`, `--`, or `<->`. Since this is a directed flow of work, `->` is appropriate.\n\nHere's the corrected document:\n\n```figdown\n# FigDown — figures as text. Spec: https://github.com/FigDown/figdown\nfigdown 0.1 block\ntitle \"Certificate renewal automation\"\n\nscheduler \"Scheduler\"\nrenewaljob \"Renewal Job\"\ncaclient \"CA Client\"\nca \"Certificate Authority\"\ndeployagent \"Deploy Agent\"\nservice \"Service\"\n\nscheduler -> renewaljob\nrenewaljob -> caclient\ncaclient -> ca\nrenewaljob -> deployagent\ndeployagent -> service\n```\n\nThe changes:\n- Removed `block` keyword from node declarations (lines 5–10)\n- Added `->` directional operator to all edges (lines 12–16)\n- Kept all required ids, labels, and connections as specified",
+  "extracted_document": "# FigDown — figures as text. Spec: https://github.com/FigDown/figdown\nfigdown 0.1 block\ntitle \"Certificate renewal automation\"\n\nscheduler \"Scheduler\"\nrenewaljob \"Renewal Job\"\ncaclient \"CA Client\"\nca \"Certificate Authority\"\ndeployagent \"Deploy Agent\"\nservice \"Service\"\n\nscheduler -> renewaljob\nrenewaljob -> caclient\ncaclient -> ca\nrenewaljob -> deployagent\ndeployagent -> service\n",
+  "validation": {
+    "errors": [
+      "Line 5: \"scheduler\" is not allowed in genre block",
+      "Line 6: \"renewaljob\" is not allowed in genre block",
+      "Line 7: \"caclient\" is not allowed in genre block",
+      "Line 8: \"ca\" is not allowed in genre block",
+      "Line 9: \"deployagent\" is not allowed in genre block",
+      "Line 10: \"service\" is not allowed in genre block",
+      "Line 12: \"scheduler\" is not allowed in genre block",
+      "Line 13: \"renewaljob\" is not allowed in genre block",
+      "Line 14: \"caclient\" is not allowed in genre block",
+      "Line 15: \"renewaljob\" is not allowed in genre block",
+      "Line 16: \"deployagent\" is not allowed in genre block"
+    ],
+    "invariants_pass": false,
+    "missing_nodes": [
+      "scheduler",
+      "renewaljob",
+      "caclient",
+      "ca",
+      "deployagent",
+      "service"
+    ],
+    "edge_count": 0,
+    "success": false
+  }
+}

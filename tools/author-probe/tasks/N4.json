@@ -1,0 +1,9 @@
+{
+  "id": "N4",
+  "kind": "normal",
+  "genre": "block",
+  "version": "0.1",
+  "brief": "Draw a block figure titled \"Certificate renewal automation\". A scheduler triggers a renewal job on a timer. The renewal job asks a CA client to obtain a new certificate. The CA client talks to the certificate authority itself to get the new certificate. Once the renewal job has the new certificate, it hands off to a deploy agent, which restarts the affected service to pick up the new certificate. Use these ids: scheduler, renewaljob, caclient, ca, deployagent, service. Show the five connections the description implies: scheduler into renewaljob, renewaljob into caclient, caclient into ca, renewaljob into deployagent, and deployagent into service.",
+  "must_have_nodes": ["scheduler", "renewaljob", "caclient", "ca", "deployagent", "service"],
+  "min_edges": 5
+}

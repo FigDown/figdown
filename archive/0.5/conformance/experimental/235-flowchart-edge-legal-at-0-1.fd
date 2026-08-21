@@ -1,0 +1,9 @@
+# `KEYWORD-RENAME-SCOPE`: the flowchart connector rename is GATED BY THE DECLARED
+# LANGUAGE VERSION. `GENRE-CONNECTOR-SPELLING` applied it to `figdown 0.1` and that BROKE documents
+# that were legal at v0.1.8 — this exact file stopped parsing. Under core §13.0
+# only a MAJOR version removes, so `edge` stays legal here until v1.0.
+figdown 0.1 flowchart
+process a "Step"
+decision q "Ok?"
+edge a -> q
+edge q -[yes]-> a

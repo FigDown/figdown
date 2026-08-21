@@ -149,6 +149,36 @@ function parseFailed(label, errors) {
   );
 }
 
+// GEOMETRY-TIME REFUSAL (spec core §8, §8.4). A document whose source is
+// impeccable line by line can still describe a drawing that states something
+// it does not — a `group` band enclosing a non-member, a `pin` covering a node
+// completely. Those come from `render`, not from `parse`, and core §8 makes
+// them cost exactly what a parse error costs: nothing is drawn and no artifact
+// is written. Reporting them under the PARSE FAILED banner would send the
+// author to look for a typo on a line that has none, so they get their own
+// heading and their own remedy sentence.
+function figureRefused(label, errors) {
+  return text(
+    'FIGURE REFUSED — ' + errors.length + ' geometry-time diagnostic(s)' + (label ? ' in ' + label : '') + '.\n' +
+    'The source parses clean; the DRAWING would state something the source does not,\n' +
+    'so nothing was rendered and no artifact was written (spec core §8). Each line names\n' +
+    'the line you can act on — usually the `pin` that fixed the position.',
+    errors.join('\n')
+  );
+}
+
+// WHICH CHANNEL REFUSED. `render()` reports parse errors when there are any and
+// geometry-time diagnostics ONLY when there are none — the two are mutually
+// exclusive by construction, because nothing is rendered for a document that
+// does not parse. So asking the parser is enough to name the channel, and it
+// is asked directly rather than inferred from the message text: a banner keyed
+// on wording would go wrong the first time a message is reworded.
+function refused(label, src, errors) {
+  return figdown.parse(src).errors.length
+    ? parseFailed(label, errors)
+    : figureRefused(label, errors);
+}
+
 // `source` or `path`, never both, never neither. Returns {src, label, file} or
 // throws a message string.
 function takeSource(args, exts) {
@@ -172,8 +202,12 @@ function toolBuild(args) {
   try { s = takeSource(args, ['.fd']); } catch (m) { return toolError(m); }
 
   const opts = args.with_title === true ? { title: true } : undefined;
+  // `artifact` refuses on EITHER channel (dist 0.4): a parse error, or
+  // a geometry-time diagnostic that only `render` can see. Both give svg=null
+  // and a non-empty `errors`, so nothing below can write a picture the engine
+  // has already said is wrong.
   const { svg, errors } = figdown.artifact(s.src, opts);
-  if (errors.length) return parseFailed(s.label, errors);
+  if (errors.length) return refused(s.label, s.src, errors);
 
   const wrote = args.write === true && s.file
     ? s.file.replace(/\.fd$/, '') + '.svg'
@@ -247,9 +281,13 @@ function toolCheck(args) {
 
   if (!units.length) return text('ok: true  0 .fd file(s) found under ' + args.path + ' — nothing to check.');
 
+  // BOTH CHANNELS, because a checker that clears a document `figdown_build`
+  // then refuses is a checker that lies. `render` reports parse errors when
+  // there are any and geometry-time diagnostics (core §8) otherwise, which is
+  // exactly the set that decides whether an artifact can be written.
   const bad = [];
   for (const u of units) {
-    const errs = figdown.parse(u.src).errors;
+    const errs = figdown.render(u.src).errors;
     if (errs.length) bad.push(u.label + ':\n' + errs.map(e => '  ' + e).join('\n'));
   }
 
@@ -291,9 +329,17 @@ function toolRead(args) {
     }
     const sidecar = s.file ? s.file.replace(/\.svg$/, '.fd') : null;
     if (sidecar && fs.existsSync(sidecar) && recordedSha) {
-      const live = figdown.artifact(fs.readFileSync(sidecar, 'utf8')).svg;
+      const rebuilt = figdown.artifact(fs.readFileSync(sidecar, 'utf8'));
+      const live = rebuilt.svg;
       const liveSha = live && (live.match(/data-sha256="([0-9a-f]{64})"/) || [])[1];
-      notes.push(liveSha === recordedSha
+      // A sidecar the engine now REFUSES cannot be compared, and calling that
+      // "stale" would name the wrong defect: the .fd did not drift, it stopped
+      // being drawable. Say which it is.
+      notes.push(rebuilt.errors.length
+        ? 'SIDECAR REFUSED: ' + path.basename(sidecar) + ' no longer builds — '
+          + rebuilt.errors.length + ' diagnostic(s), so the recorded hash could not be checked:\n  '
+          + rebuilt.errors.join('\n  ')
+        : liveSha === recordedSha
         ? 'sidecar ' + path.basename(sidecar) + ' matches the artifact\'s recorded hash'
         : 'STALE ARTIFACT: ' + path.basename(sidecar) + ' has changed since this .svg was built. '
           + 'The .fd is truth — rebuild.');

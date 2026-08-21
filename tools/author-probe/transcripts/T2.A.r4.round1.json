@@ -1,0 +1,54 @@
+{
+  "probe_version": "1.0.0",
+  "run": {
+    "utc": "2026-08-19T12:10:24Z",
+    "cli": "2.1.234 (Claude Code)",
+    "condition": "A",
+    "task": "T2",
+    "kind": "trap",
+    "seat": 4,
+    "model_alias": "haiku",
+    "round": 1,
+    "model_used": "claude-haiku-4-5-20251001"
+  },
+  "saw": {
+    "skill_path": "skill/figdown/SKILL.md",
+    "skill_sha256": "718f935282ce7a93f4b7e36b83983ac1112e49818384d8eaf35869830d34d6a2",
+    "skill_chars": 16497,
+    "system_sha256": "39117af0175e7d927c8f9c715c9555f91e3357a146f2d6d311d4a3bb889ecaae",
+    "user_sha256": "2e041b85e561a0752afcaa8ccb2b3e9c72a323d84236dae7be8ca7b9a7b77532"
+  },
+  "integrity": {
+    "turns": 1,
+    "permission_denials": 0,
+    "is_error": false
+  },
+  "usage": {
+    "cost_usd": 0.022844,
+    "duration_ms": 43519
+  },
+  "scrub": {
+    "ran": true,
+    "pattern": "email-regex",
+    "replacements": 0
+  },
+  "raw_answer_text": "Looking at the documentation and the requirements, I need to create a flowchart with specific node types and connections, plus a container grouping two of the nodes.\n\nThe documentation indicates that flowchart is an **experimental** (EXPERIMENTAL) genre requiring `figdown 0.1 flowchart`. While I don't have access to the complete flowchart reference file (which would be `reference/experimental/flowchart.md`), I can construct this based on standard flowchart conventions and the general FigDown syntax principles outlined in the main documentation.\n\nHere's the finished FigDown document:\n\n```figdown\n# FigDown — figures as text. Spec: https://github.com/FigDown/figdown\nfigdown 0.1 flowchart\ntitle \"Change request procedure\"\n\nprocess receive \"Receive change request\"\nprocess validate \"Validate against policy\"\ndecision isvalid \"Valid?\"\nprocess apply \"Apply change to device\"\nterminator confirm \"Confirm success\"\nterminator rollback \"Rollback\"\n\ncontainer changewindow \"change window\" {\n  validate\n  apply\n}\n\nreceive -> validate\nvalidate -> isvalid\nisvalid -> apply \"yes\"\nisvalid -> rollback \"no\"\napply -> confirm\n```\n\n**Structure explained:**\n- **Nodes**: Six flowchart elements declared with their types (`process`, `decision`, `terminator`), ids, and labels\n- **Connections**: Five edges connecting the flow—receive→validate→isvalid, with the decision branching to either apply (yes) or rollback (no), then apply→confirm\n- **Container**: A bordered box labeled \"change window\" groups `validate` and `apply`, visually highlighting the scheduled maintenance window where policy validation and actual device changes occur",
+  "extracted_document": "# FigDown — figures as text. Spec: https://github.com/FigDown/figdown\nfigdown 0.1 flowchart\ntitle \"Change request procedure\"\n\nprocess receive \"Receive change request\"\nprocess validate \"Validate against policy\"\ndecision isvalid \"Valid?\"\nprocess apply \"Apply change to device\"\nterminator confirm \"Confirm success\"\nterminator rollback \"Rollback\"\n\ncontainer changewindow \"change window\" {\n  validate\n  apply\n}\n\nreceive -> validate\nvalidate -> isvalid\nisvalid -> apply \"yes\"\nisvalid -> rollback \"no\"\napply -> confirm\n",
+  "validation": {
+    "errors": [
+      "Line 12: \"container\" is not allowed in genre flowchart",
+      "Line 13: \"validate\" is not allowed in genre flowchart",
+      "Line 14: \"apply\" is not allowed in genre flowchart",
+      "Line 15: \"}\" is not allowed in genre flowchart",
+      "Line 17: \"receive\" is not allowed in genre flowchart",
+      "Line 18: \"validate\" is not allowed in genre flowchart",
+      "Line 19: \"isvalid\" is not allowed in genre flowchart",
+      "Line 20: \"isvalid\" is not allowed in genre flowchart",
+      "Line 21: \"apply\" is not allowed in genre flowchart"
+    ],
+    "invariants_pass": false,
+    "missing_nodes": [],
+    "edge_count": 0,
+    "success": false
+  }
+}

@@ -1,0 +1,10 @@
+# `STATECHART-GENRE-SCOPE`: the language number moved for the first time, and this
+# fixture pins the half of core §13.0 that the move is CONSTRAINED by: `Y`
+# adds and never removes, so every genre and every construct legal under
+# `figdown 0.1` is legal under `figdown 0.2`, unchanged and with the same
+# model. The only field that differs is `header.version`, which the model now
+# carries as DECLARED rather than as a constant of the projection.
+figdown 0.2 block
+node a "A"
+node b "B"
+edge a -> b

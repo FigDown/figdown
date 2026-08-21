@@ -1,0 +1,60 @@
+{
+  "probe_version": "1.0.0",
+  "run": {
+    "utc": "2026-08-19T12:15:04Z",
+    "cli": "2.1.234 (Claude Code)",
+    "condition": "B",
+    "task": "N3",
+    "kind": "normal",
+    "seat": 3,
+    "model_alias": "haiku",
+    "round": 1,
+    "model_used": "claude-haiku-4-5-20251001"
+  },
+  "saw": {
+    "skill_path": "tools/author-probe/skill-candidate.md",
+    "skill_sha256": "2abdaf0d9211d5ee1464c5f5c3a200b1ae6f7bd71cfd6344e7da94d669e6ed31",
+    "skill_chars": 17591,
+    "system_sha256": "39117af0175e7d927c8f9c715c9555f91e3357a146f2d6d311d4a3bb889ecaae",
+    "user_sha256": "43297339a059a8b173e8828dafb79454ee8b8ea0a6342b1430956895b4f22d4d"
+  },
+  "integrity": {
+    "turns": 1,
+    "permission_denials": 0,
+    "is_error": false
+  },
+  "usage": {
+    "cost_usd": 0.034924,
+    "duration_ms": 37780
+  },
+  "scrub": {
+    "ran": true,
+    "pattern": "email-regex",
+    "replacements": 0
+  },
+  "raw_answer_text": "I'll create the flowchart figure for the BGP session reset procedure. Since I don't have the experimental flowchart reference documentation loaded, I'll compose this from the FigDown patterns established in the main documentation, using reasonable conventions for flowchart elements (process steps, decisions, and terminators with their interconnections).\n\n```figdown\n# FigDown — figures as text. Spec: https://github.com/FigDown/figdown\nfigdown 0.1 flowchart\ntitle \"BGP session reset procedure\"\n\nprocess id=checkcounters \"Check interface error counters\"\ndecision id=errorsfound \"Errors found?\"\nprocess id=clearcounters \"Clear interface counters\"\nterminator id=monitor \"Monitor session\"\nterminator id=escalate \"Escalate to operator\"\n\ncheckcounters -> errorsfound\nerrorsfound yes -> clearcounters\nclearcounters -> monitor\nerrorsfound no -> escalate\n```\n\n**What the figure contains:**\n\nThe flowchart implements the troubleshooting decision tree you described:\n\n1. **checkcounters** — A process step that checks the interface's error counters\n2. **errorsfound** — A decision point asking whether errors were detected\n3. **clearcounters** — A process step executed when errors are found; clears the counters\n4. **monitor** — An end state for the \"errors found\" path, continuing to monitor the session\n5. **escalate** — An end state for the \"no errors\" path, escalating to a human operator\n\nThe flow follows your specification exactly: check → decide → branch to either (clear and monitor) or (escalate), with no cross-connections or loops.",
+  "extracted_document": "# FigDown — figures as text. Spec: https://github.com/FigDown/figdown\nfigdown 0.1 flowchart\ntitle \"BGP session reset procedure\"\n\nprocess id=checkcounters \"Check interface error counters\"\ndecision id=errorsfound \"Errors found?\"\nprocess id=clearcounters \"Clear interface counters\"\nterminator id=monitor \"Monitor session\"\nterminator id=escalate \"Escalate to operator\"\n\ncheckcounters -> errorsfound\nerrorsfound yes -> clearcounters\nclearcounters -> monitor\nerrorsfound no -> escalate\n",
+  "validation": {
+    "errors": [
+      "Line 5: unknown option \"id=\"",
+      "Line 6: unknown option \"id=\"",
+      "Line 7: unknown option \"id=\"",
+      "Line 8: unknown option \"id=\"",
+      "Line 9: unknown option \"id=\"",
+      "Line 11: \"checkcounters\" is not allowed in genre flowchart",
+      "Line 12: \"errorsfound\" is not allowed in genre flowchart",
+      "Line 13: \"clearcounters\" is not allowed in genre flowchart",
+      "Line 14: \"errorsfound\" is not allowed in genre flowchart"
+    ],
+    "invariants_pass": false,
+    "missing_nodes": [
+      "checkcounters",
+      "errorsfound",
+      "clearcounters",
+      "monitor",
+      "escalate"
+    ],
+    "edge_count": 0,
+    "success": false
+  }
+}

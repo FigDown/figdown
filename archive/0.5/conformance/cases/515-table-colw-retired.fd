@@ -1,0 +1,10 @@
+# Retired spelling: `colw` was renamed `width`. The migration
+# error fires wherever the old keyword appears — outside a block as well as
+# inside one — so an old document never fails with a vague "unknown keyword".
+figdown 0.1 table
+colw auto 90
+table t "T"
+| A | B |
+|---|---|
+| 1 | 2 |
+colw auto 90

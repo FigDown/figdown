@@ -1,0 +1,3 @@
+Line 11: duplicate pin for "a"
+Line 3: duplicate title line
+Line 7: duplicate flow directive

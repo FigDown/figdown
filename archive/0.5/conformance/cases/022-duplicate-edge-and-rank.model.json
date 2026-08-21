@@ -1,0 +1,90 @@
+{
+  "header": {
+    "version": "0.1",
+    "genre": "block"
+  },
+  "flow": "right",
+  "classes": [],
+  "planes": [
+    {
+      "id": "base",
+      "z": 0
+    }
+  ],
+  "nodes": [
+    {
+      "id": "a",
+      "label": "A",
+      "shape": "box",
+      "plane": "base",
+      "line": 2
+    },
+    {
+      "id": "b",
+      "label": "B",
+      "shape": "box",
+      "plane": "base",
+      "line": 3
+    },
+    {
+      "id": "c",
+      "label": "C",
+      "shape": "box",
+      "plane": "base",
+      "line": 4
+    }
+  ],
+  "groups": [],
+  "edges": [
+    {
+      "a": "a",
+      "op": "->",
+      "b": "b",
+      "plane": "base",
+      "line": 5
+    },
+    {
+      "a": "a",
+      "op": "->",
+      "b": "b",
+      "plane": "base",
+      "line": 6
+    },
+    {
+      "a": "a",
+      "op": "->",
+      "b": "b",
+      "mid": "differs only by a label",
+      "plane": "base",
+      "line": 7
+    }
+  ],
+  "ranks": [
+    {
+      "ids": [
+        "a",
+        "b"
+      ],
+      "line": 8
+    },
+    {
+      "ids": [
+        "b",
+        "c"
+      ],
+      "line": 9
+    },
+    {
+      "ids": [
+        "a",
+        "b"
+      ],
+      "line": 10
+    }
+  ],
+  "pins": [],
+  "thresholds": [],
+  "bands": [],
+  "bundles": [],
+  "regions": []
+}

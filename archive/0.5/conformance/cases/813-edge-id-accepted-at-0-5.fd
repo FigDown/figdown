@@ -1,0 +1,22 @@
+# FigDown — figures as text. Spec: https://github.com/FigDown/figdown
+# `CONNECTOR-IDENTITY-KEY`: the VERSION GATE on `id=`, ACCEPTING half. The five
+# directive lines below are BYTE-IDENTICAL to case 812's first section; the
+# header is the only thing that differs, `0.4` → `0.5`, and this document
+# parses CLEAN.
+#
+# What the model pins, beyond the fact that it parses: `id` is projected FIRST
+# on the edges that carry it and is ABSENT — not null, not empty — on the one
+# that does not. Anonymity is the language's default and the missing key is its
+# whole statement, so an engine that emitted `"id": null` for the anonymous
+# connector would fail here, and so would one that accepted the key and
+# discarded the value.
+figdown 0.5 block
+node a "A"
+node b "B"
+node c "C"
+edge a -> b id=e1
+edge b -> c id=e2
+# The third connector is ANONYMOUS, on purpose: `id=` is OPTIONAL, and a
+# document that names two of its three connectors is the ordinary case, not a
+# half-migrated one.
+edge a -> c

@@ -1,0 +1,5 @@
+Line 32: pin at= needs a paren point: at=(<x>,<y>)
+Line 33: pin at= needs a paren point: at=(<x>,<y>)
+Line 34: pin at= needs a paren point: at=(<x>,<y>)
+Line 35: pin at= needs a paren point: at=(<x>,<y>)
+Line 36: pin at= needs a paren point: at=(<x>,<y>)

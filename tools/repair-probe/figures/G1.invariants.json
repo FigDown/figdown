@@ -1,0 +1,5 @@
+{
+  "must_have_nodes": ["sw1", "sw2", "tap", "collector"],
+  "min_edges": 2,
+  "note": "deleting the 'tap' node (or its edge to 'collector') to make the band conflict disappear removes content the figure is about — the fix is to clear tap's pin from the group's band, not to delete tap or its edge"
+}

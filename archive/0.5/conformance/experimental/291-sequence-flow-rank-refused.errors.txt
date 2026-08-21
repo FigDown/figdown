@@ -1,0 +1,2 @@
+Line 14: "flow" is not allowed in genre sequence
+Line 15: "rank" is not allowed in genre sequence

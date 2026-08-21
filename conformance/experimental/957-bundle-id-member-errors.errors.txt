@@ -1,0 +1,6 @@
+Line 19: bundle member "ghost" is not a declared connector in this section (ids are unique per section, and a bare member names a connector by its id=)
+Line 21: bundle member "a" is a node, not a connector — a bundle collects LINKS, so write the pair A--B or give the connector you mean an id= and name that
+Line 24: duplicate bundle member "a--b" — each member is stated once
+Line 26: bad member "a.b" (expected A--B or a connector id)
+Line 28: bundle member "b1" is a bundle, not a connector — a bundle collects LINKS, so write the pair A--B or give the connector you mean an id= and name that
+Line 35: bundle member "l1" is not a declared connector in this section (ids are unique per section, and a bare member names a connector by its id=)

@@ -1,0 +1,5 @@
+figdown 0.1 block
+group g "G"
+node a "A" in=g
+edge a -> g
+edge a -> ghost

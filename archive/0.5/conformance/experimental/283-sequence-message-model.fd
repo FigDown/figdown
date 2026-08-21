@@ -1,0 +1,20 @@
+# `SEQUENCE-GENRE-VOCABULARY`: the `message` model golden. All THREE operators, the
+# trailing quoted label, the `[tail]`/`[head]` positions the shared connector
+# scanner gives it, `in=` membership, and the presentation keys — everything
+# that reaches the `messages` collection.
+#
+# What the golden is really pinning is that a message is NOT an edge. `edges`
+# stays empty; the message lands in its own collection with its source `line`,
+# because a message has a place in the figure's total order and an edge has
+# no position at all (`SEQUENCE-ORDER-MODEL`).
+figdown 0.4 sequence
+title "Message forms"
+class secure "Carried over TLS"
+lifeline c "Client"
+lifeline s "Server"
+message c -> s "plain forward"
+message c <- s "plain reverse"
+message c <-> s "sustained two-way exchange, individual messages not enumerated"
+message c [from] -> [to] s "labels at both ends"
+message c -[inline mid label]-> s
+message c -> s "everything at once" class=secure stroke=#1d4ed8 style=dashed note="drawn aside" description="never drawn, authored documentation"

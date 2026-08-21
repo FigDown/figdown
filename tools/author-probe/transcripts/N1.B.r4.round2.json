@@ -1,0 +1,49 @@
+{
+  "probe_version": "1.0.0",
+  "run": {
+    "utc": "2026-08-19T12:13:17Z",
+    "cli": "2.1.234 (Claude Code)",
+    "condition": "B",
+    "task": "N1",
+    "kind": "normal",
+    "seat": 4,
+    "model_alias": "haiku",
+    "round": 2,
+    "model_used": "claude-haiku-4-5-20251001"
+  },
+  "saw": {
+    "skill_path": "tools/author-probe/skill-candidate.md",
+    "skill_sha256": "2abdaf0d9211d5ee1464c5f5c3a200b1ae6f7bd71cfd6344e7da94d669e6ed31",
+    "skill_chars": 17591,
+    "system_sha256": "39117af0175e7d927c8f9c715c9555f91e3357a146f2d6d311d4a3bb889ecaae",
+    "user_sha256": "4ab728bf52a980124c881e2245605f21ba703eed35c857729d86594ec242accb"
+  },
+  "integrity": {
+    "turns": 1,
+    "permission_denials": 0,
+    "is_error": false
+  },
+  "usage": {
+    "cost_usd": 0.028194999999999998,
+    "duration_ms": 25206
+  },
+  "scrub": {
+    "ran": true,
+    "pattern": "email-regex",
+    "replacements": 0
+  },
+  "raw_answer_text": "Looking at the validator errors, I can see two issues in the previous attempt:\n\n1. **\"block\" keyword is not valid** — The genre-specific syntax doesn't use `block` as the keyword to declare components. The common pattern in block/scene diagrams is `node`.\n\n2. **Edge operators are missing** — Edges require a directional operator like `->`, `<-`, `--`, or `<->` to show the connection type. For a data pipeline, `->` (directed edge) is appropriate.\n\nHere's the corrected document:\n\n```figdown\n# FigDown — figures as text. Spec: https://github.com/FigDown/figdown\nfigdown 0.1 block\ntitle \"Telemetry export pipeline\"\n\nnode poller \"Poller\"\nnode normalizer \"Normalizer\"\nnode healthprobe \"Health Probe\"\nnode buffer \"Ring Buffer\"\nnode exporter \"Exporter\"\n\npoller -> normalizer\nhealthprobe -> normalizer\nnormalizer -> buffer\nbuffer -> exporter\n```\n\nThe changes:\n- Replaced `block` declarations with `node` declarations\n- Added `->` operators to all edges to indicate directed data flow\n- Preserved the component IDs and labels as specified\n- The pipeline now clearly shows data flowing from two independent sources (poller and health probe) into the normalizer, then through the buffer, and finally to the exporter",
+  "extracted_document": "# FigDown — figures as text. Spec: https://github.com/FigDown/figdown\nfigdown 0.1 block\ntitle \"Telemetry export pipeline\"\n\nnode poller \"Poller\"\nnode normalizer \"Normalizer\"\nnode healthprobe \"Health Probe\"\nnode buffer \"Ring Buffer\"\nnode exporter \"Exporter\"\n\npoller -> normalizer\nhealthprobe -> normalizer\nnormalizer -> buffer\nbuffer -> exporter\n",
+  "validation": {
+    "errors": [
+      "Line 11: \"poller\" is not allowed in genre block",
+      "Line 12: \"healthprobe\" is not allowed in genre block",
+      "Line 13: \"normalizer\" is not allowed in genre block",
+      "Line 14: \"buffer\" is not allowed in genre block"
+    ],
+    "invariants_pass": false,
+    "missing_nodes": [],
+    "edge_count": 0,
+    "success": false
+  }
+}

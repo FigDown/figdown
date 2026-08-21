@@ -1,0 +1,60 @@
+{
+  "probe_version": "1.0.0",
+  "run": {
+    "utc": "2026-08-19T12:13:39Z",
+    "cli": "2.1.234 (Claude Code)",
+    "condition": "B",
+    "task": "N2",
+    "kind": "normal",
+    "seat": 2,
+    "model_alias": "sonnet",
+    "round": 1,
+    "model_used": "claude-sonnet-5"
+  },
+  "saw": {
+    "skill_path": "tools/author-probe/skill-candidate.md",
+    "skill_sha256": "2abdaf0d9211d5ee1464c5f5c3a200b1ae6f7bd71cfd6344e7da94d669e6ed31",
+    "skill_chars": 17591,
+    "system_sha256": "39117af0175e7d927c8f9c715c9555f91e3357a146f2d6d311d4a3bb889ecaae",
+    "user_sha256": "5cb75a0dcbc2a731f18bde3a976bd9c2f3dade7d39ca3addd99bdea9111443ab"
+  },
+  "integrity": {
+    "turns": 1,
+    "permission_denials": 0,
+    "is_error": false
+  },
+  "usage": {
+    "cost_usd": 0.0394374,
+    "duration_ms": 28308
+  },
+  "scrub": {
+    "ran": true,
+    "pattern": "email-regex",
+    "replacements": 0
+  },
+  "raw_answer_text": "Topology genre needs `reference/experimental/topology.md` and `reference/layout.md`, per the router table — neither was included in the documentation I was given, so the exact node/edge keyword spellings below are my best-faith composition from the core grammar (quoted labels, bare ids, `class` for meaning) rather than a verified lookup. Per \"Do not invent syntax,\" please run `node build-svg.js branch-office-wan.fd` before treating this as final — if the genre file spells devices/links differently, the build will name the correct replacement and I'll fix it in one pass.\n\n```figdown\n# FigDown — figures as text. Spec: https://github.com/FigDown/figdown\nfigdown 0.1 topology\ntitle \"Branch office WAN uplinks\"\n\nclass wan \"WAN uplink\" stroke=#2563eb\nclass backup \"Backup path\" stroke=#dc2626 style=dashed\n\nswitch access1 \"Access Switch 1\"\nswitch access2 \"Access Switch 2\"\nrouter branch \"Branch Router\"\nrouter hubprimary \"Primary Hub Router\"\nrouter hubbackup \"Backup Hub Router\"\n\nlink access1 branch\nlink access2 branch\nlink branch hubprimary class=wan\nlink branch hubbackup class=wan,backup\n```\n\nNotes on the source, kept out of the figure itself:\n- The description gives no bandwidth, carrier, or interface detail for any link — nothing was invented to fill that gap; the figure states only what was given (endpoints, and primary vs. backup role).\n- `wan`/`backup` classes exist so the primary-vs-backup distinction reads from the render itself, not just the label text — per the \"class is how meaning survives\" rule, since color/dash alone would assert nothing a reader could recover otherwise.\n- access1–branch and access2–branch are plain access links (no class), since the source didn't characterize them beyond \"connected.\"",
+  "extracted_document": "# FigDown — figures as text. Spec: https://github.com/FigDown/figdown\nfigdown 0.1 topology\ntitle \"Branch office WAN uplinks\"\n\nclass wan \"WAN uplink\" stroke=#2563eb\nclass backup \"Backup path\" stroke=#dc2626 style=dashed\n\nswitch access1 \"Access Switch 1\"\nswitch access2 \"Access Switch 2\"\nrouter branch \"Branch Router\"\nrouter hubprimary \"Primary Hub Router\"\nrouter hubbackup \"Backup Hub Router\"\n\nlink access1 branch\nlink access2 branch\nlink branch hubprimary class=wan\nlink branch hubbackup class=wan,backup\n",
+  "validation": {
+    "errors": [
+      "Line 8: \"switch\" is not allowed in genre topology",
+      "Line 9: \"switch\" is not allowed in genre topology",
+      "Line 10: \"router\" is not allowed in genre topology",
+      "Line 11: \"router\" is not allowed in genre topology",
+      "Line 12: \"router\" is not allowed in genre topology",
+      "Line 14: \"link\" is not allowed in genre topology",
+      "Line 15: \"link\" is not allowed in genre topology",
+      "Line 16: \"link\" is not allowed in genre topology",
+      "Line 17: \"link\" is not allowed in genre topology"
+    ],
+    "invariants_pass": false,
+    "missing_nodes": [
+      "access1",
+      "access2",
+      "branch",
+      "hubprimary",
+      "hubbackup"
+    ],
+    "edge_count": 0,
+    "success": false
+  }
+}

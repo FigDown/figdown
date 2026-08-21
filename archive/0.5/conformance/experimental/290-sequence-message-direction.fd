@@ -1,0 +1,24 @@
+# `SEQUENCE-GENRE-VOCABULARY`: `--` is a LINE ERROR on `message` and legal on every
+# other connector spelling in the language. The operator set is per genre for
+# the same reason the keywords are: a Message carries a sending AND a
+# receiving event occurrence (UML 2.5.1 §17.4.3.1 defines the LOST case as the
+# one where the receiving occurrence is absent), so a message with unstated
+# direction is not a thing this domain has.
+#
+# The second section is the KEEP half, and it is what makes the claim a
+# per-genre one rather than a language-wide retirement: the same operator on
+# the same shared scanner still parses under `block`.
+#
+# The endpoint resolution error is here too, because it is the other thing a
+# message line can get wrong: both endpoints must be declared `lifeline` ids.
+figdown 0.4 sequence
+lifeline c "C"
+lifeline s "S"
+message c -- s "no direction"
+message c -[mid]- s
+message c -> nobody "unknown endpoint"
+
+figdown 0.1 block
+node a "A"
+node b "B"
+edge a -- b

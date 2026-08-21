@@ -1,0 +1,13 @@
+figdown 0.1 block
+title "Telemetry export pipeline"
+
+node poller "Sample poller"
+node normalizer "Normalizer"
+node buffer "Ring buffer"
+node exporter "Exporter"
+node healthprobe "Health probe"
+
+edge poller -> normalizer
+edge healthprobe -> normalizer
+edge normalizer -> buffer
+edge buffer -> exporter

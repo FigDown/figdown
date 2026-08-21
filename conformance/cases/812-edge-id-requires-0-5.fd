@@ -1,0 +1,35 @@
+# FigDown — figures as text. Spec: https://github.com/FigDown/figdown
+# `CONNECTOR-IDENTITY-KEY`: the VERSION GATE on `id=`, REFUSING half. Case 813 is
+# the accepting half and its directive lines are BYTE-IDENTICAL to this
+# section's; the header is the only thing that differs. A gate is only a gate
+# if both directions are pinned — this case alone would be satisfied by an
+# engine that rejected `id=` everywhere, and 813 alone by one that accepted it
+# everywhere. Keep them edited together.
+#
+# WHY THE KEY IS GATED, and the reason is NOT the one case 805 gives for
+# `note=`. `note=` has a prior meaning on the record, so accepting it under an
+# older header would repaint one figure as another. `id=` has no prior meaning
+# of any kind: it was never a spelling of anything. It is gated because it is a
+# NEW SPELLING ON THE ACCEPTED SURFACE, and a header that stops determining
+# what the language accepts has stopped being a declaration. The frozen reading
+# contract for a version, and the archived engine for it, both describe a
+# language with no `id=`; an engine that accepted the key anyway would put a
+# document outside every reader that holds it to the version it declares.
+#
+# ONE ERROR PER LINE. Each line below reports the gate and stops; the id-lexis
+# check and the uniqueness check do not also fire.
+figdown 0.4 block
+node a "A"
+node b "B"
+node c "C"
+edge a -> b id=e1
+edge b -> c id=e2
+
+# The version is interpolated TWICE in the message — once to report what the
+# document declares and once to name what the spelling means there — so a
+# second section at a different version pins both spellings the gate can
+# produce. An engine that hard-coded "0.4" into the string fails here.
+figdown 0.1 block
+node p "P"
+node q "Q"
+edge p -- q id=e1

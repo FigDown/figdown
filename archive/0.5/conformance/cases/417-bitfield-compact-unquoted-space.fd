@@ -1,0 +1,11 @@
+figdown 0.1 bitfield
+# The compact list is ONE whitespace-free comma-delimited token (`COMMA-LIST-WHITESPACE`), so an
+# item name containing spaces MUST be quoted (`QUOTING-RULES`: a comma-delimited element
+# is bare unless it contains whitespace, a comma, a quote, a paren or `#`).
+# Unquoted, the name breaks the token and the line reports the one-token rule
+# with the cure named. An element with no `:` at all keeps its own message.
+bitfield x "X" numbering=msb0
+field Total Length:16
+field a:8,Fragment
+# quoted, the same names are fine — that is what the migration writes
+field "Total Length":16,"Fragment Offset":13

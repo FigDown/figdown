@@ -1,0 +1,47 @@
+{
+  "probe_version": "1.0.0",
+  "run": {
+    "utc": "2026-08-19T12:05:43Z",
+    "cli": "2.1.234 (Claude Code)",
+    "condition": "A",
+    "task": "N3",
+    "kind": "normal",
+    "seat": 1,
+    "model_alias": "sonnet",
+    "round": 3,
+    "model_used": "claude-sonnet-5"
+  },
+  "saw": {
+    "skill_path": "skill/figdown/SKILL.md",
+    "skill_sha256": "718f935282ce7a93f4b7e36b83983ac1112e49818384d8eaf35869830d34d6a2",
+    "skill_chars": 16497,
+    "system_sha256": "39117af0175e7d927c8f9c715c9555f91e3357a146f2d6d311d4a3bb889ecaae",
+    "user_sha256": "2f30316e8afd035e76b9e4937d8f35c8a750a08b7fda1d89b5553813008cfa27"
+  },
+  "integrity": {
+    "turns": 1,
+    "permission_denials": 0,
+    "is_error": false
+  },
+  "usage": {
+    "cost_usd": 0.083067,
+    "duration_ms": 28845
+  },
+  "scrub": {
+    "ran": true,
+    "pattern": "email-regex",
+    "replacements": 0
+  },
+  "raw_answer_text": "Based on the validator output, the node lines themselves (`process`, `decision`, `terminator` with `id \"label\"`) parsed fine — only the inline `next=`/`yes=`/`no=` options were rejected. So edges in this genre are not node-attached options; they must be their own construct. I don't have `reference/experimental/flowchart.md` loaded in this session, so I'm inferring the edge syntax from the general FigDown pattern (a keyword line, not a bare arrow, per the note left in the prior attempt) rather than guessing options on node lines again.\n\n```figdown\n# FigDown — figures as text. Spec: https://github.com/FigDown/figdown\nfigdown 0.1 flowchart\ntitle \"BGP session reset procedure\"\n\n# NOTE: reference/experimental/flowchart.md still not consulted directly.\n# Prior attempt's inline yes=/no=/next= options on node lines were\n# rejected (\"unknown option\"), so this revision moves edges to their own\n# `edge` lines instead, per the general FigDown pattern of separating\n# node declarations from connections. UNVERIFIED against the actual\n# flowchart genre file — run `node <skill-dir>/build-svg.js` on this file;\n# if `edge` is not the right keyword or `->`/label placement differs, the\n# error output will name the correct spelling and this comment should be\n# removed once confirmed.\n\nprocess checkcounters \"Check interface error counters\"\ndecision errorsfound \"Errors found?\"\nprocess clearcounters \"Clear interface counters\"\nterminator monitor \"Monitor session\"\nterminator escalate \"Escalate to operator\"\n\nedge checkcounters -> errorsfound\nedge errorsfound -> clearcounters \"Yes\"\nedge errorsfound -> escalate \"No\"\nedge clearcounters -> monitor\n```\n\nPlease run the validator on this and paste back the exact error text if it still fails — I'd rather correct against the real message than guess a third time.",
+  "extracted_document": "# FigDown — figures as text. Spec: https://github.com/FigDown/figdown\nfigdown 0.1 flowchart\ntitle \"BGP session reset procedure\"\n\n# NOTE: reference/experimental/flowchart.md still not consulted directly.\n# Prior attempt's inline yes=/no=/next= options on node lines were\n# rejected (\"unknown option\"), so this revision moves edges to their own\n# `edge` lines instead, per the general FigDown pattern of separating\n# node declarations from connections. UNVERIFIED against the actual\n# flowchart genre file — run `node <skill-dir>/build-svg.js` on this file;\n# if `edge` is not the right keyword or `->`/label placement differs, the\n# error output will name the correct spelling and this comment should be\n# removed once confirmed.\n\nprocess checkcounters \"Check interface error counters\"\ndecision errorsfound \"Errors found?\"\nprocess clearcounters \"Clear interface counters\"\nterminator monitor \"Monitor session\"\nterminator escalate \"Escalate to operator\"\n\nedge checkcounters -> errorsfound\nedge errorsfound -> clearcounters \"Yes\"\nedge errorsfound -> escalate \"No\"\nedge clearcounters -> monitor\n",
+  "validation": {
+    "errors": [
+      "Line 22: unexpected argument \"Yes\"",
+      "Line 23: unexpected argument \"No\""
+    ],
+    "invariants_pass": false,
+    "missing_nodes": [],
+    "edge_count": 2,
+    "success": false
+  }
+}

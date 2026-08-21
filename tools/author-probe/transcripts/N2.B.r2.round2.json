@@ -1,0 +1,49 @@
+{
+  "probe_version": "1.0.0",
+  "run": {
+    "utc": "2026-08-19T12:14:19Z",
+    "cli": "2.1.234 (Claude Code)",
+    "condition": "B",
+    "task": "N2",
+    "kind": "normal",
+    "seat": 2,
+    "model_alias": "sonnet",
+    "round": 2,
+    "model_used": "claude-sonnet-5"
+  },
+  "saw": {
+    "skill_path": "tools/author-probe/skill-candidate.md",
+    "skill_sha256": "2abdaf0d9211d5ee1464c5f5c3a200b1ae6f7bd71cfd6344e7da94d669e6ed31",
+    "skill_chars": 17591,
+    "system_sha256": "39117af0175e7d927c8f9c715c9555f91e3357a146f2d6d311d4a3bb889ecaae",
+    "user_sha256": "851a1f65b14fc1374efaa11e9aa123e8ba777abadb9070a8dc991e08969c60ef"
+  },
+  "integrity": {
+    "turns": 1,
+    "permission_denials": 0,
+    "is_error": false
+  },
+  "usage": {
+    "cost_usd": 0.09495600000000001,
+    "duration_ms": 39241
+  },
+  "scrub": {
+    "ran": true,
+    "pattern": "email-regex",
+    "replacements": 0
+  },
+  "raw_answer_text": "Note: the earlier attempt used `switch`, `router`, and `link` — none of which exist as openers in the `topology` genre (all nine errors are \"not allowed in genre topology\", i.e., unrecognized keywords, not malformed arguments). Topology's vocabulary is generic: nodes and edges, with role/meaning carried by the label text and `class`, not by a per-device-type keyword. I don't have a live validator in this session, so I can't confirm this renders clean — I'm applying the documented pattern (closed grammar, `class` for meaning, quoted labels, bare ids) as best I can without the genre file in hand. Treat this as a best-effort repair, not a confirmed pass.\n\n```figdown\n# FigDown — figures as text. Spec: https://github.com/FigDown/figdown\nfigdown 0.1 topology\ntitle \"Branch office WAN uplinks\"\n\nclass wan \"WAN uplink\" stroke=#2563eb\nclass backup \"Backup path\" stroke=#dc2626 style=dashed\n\nnode access1 \"Access Switch 1\"\nnode access2 \"Access Switch 2\"\nnode branch \"Branch Router\"\nnode hubprimary \"Primary Hub Router\"\nnode hubbackup \"Backup Hub Router\"\n\nedge access1 branch\nedge access2 branch\nedge branch hubprimary class=wan\nedge branch hubbackup class=wan,backup\n```\n\nWhat changed and why:\n- `switch id \"label\"` / `router id \"label\"` → `node id \"label\"`: node-type keywords aren't part of the topology genre; the device role (access switch, branch router, hub router) is carried entirely in the quoted label, which is the honest place for it since no per-type opener exists.\n- `link a b` → `edge a b`: same reasoning — `link` isn't a recognized opener; `edge` is the generic connector.\n- Kept the two `class` declarations and their application to the two WAN edges (`hubprimary`, `hubbackup`) unchanged, including the dashed/red `backup` class stacked with `wan` on the backup link, since that meaning was correct and unaffected by the keyword errors.\n\nPlease run `node <skill-dir>/build-svg.js branch-wan-uplinks.fd` (or whatever you name it) to confirm — if `node`/`edge` aren't the actual topology keywords either, the error output will name the real ones and I'll do another bounded repair pass from that.",
+  "extracted_document": "# FigDown — figures as text. Spec: https://github.com/FigDown/figdown\nfigdown 0.1 topology\ntitle \"Branch office WAN uplinks\"\n\nclass wan \"WAN uplink\" stroke=#2563eb\nclass backup \"Backup path\" stroke=#dc2626 style=dashed\n\nnode access1 \"Access Switch 1\"\nnode access2 \"Access Switch 2\"\nnode branch \"Branch Router\"\nnode hubprimary \"Primary Hub Router\"\nnode hubbackup \"Backup Hub Router\"\n\nedge access1 branch\nedge access2 branch\nedge branch hubprimary class=wan\nedge branch hubbackup class=wan,backup\n",
+  "validation": {
+    "errors": [
+      "Line 14: edge needs an operator: -> <- -- <-> (a [mid] label splits it: -[x]->)",
+      "Line 15: edge needs an operator: -> <- -- <-> (a [mid] label splits it: -[x]->)",
+      "Line 16: edge needs an operator: -> <- -- <-> (a [mid] label splits it: -[x]->)",
+      "Line 17: edge needs an operator: -> <- -- <-> (a [mid] label splits it: -[x]->)"
+    ],
+    "invariants_pass": false,
+    "missing_nodes": [],
+    "edge_count": 0,
+    "success": false
+  }
+}

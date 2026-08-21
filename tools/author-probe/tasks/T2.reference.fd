@@ -1,0 +1,15 @@
+figdown 0.1 flowchart
+title "Change request procedure"
+
+process receive "Receive change request"
+process validate "Validate against policy"
+decision isvalid "Valid?"
+process apply "Apply to device"
+terminator confirm "Confirm success"
+terminator rollback "Roll back"
+
+edge receive -> validate
+edge validate -> isvalid
+edge isvalid -[yes]-> apply
+edge apply -> confirm
+edge isvalid -[no]-> rollback

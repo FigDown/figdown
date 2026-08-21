@@ -1,0 +1,64 @@
+{
+  "probe_version": "1.0.0",
+  "run": {
+    "utc": "2026-08-19T12:03:04Z",
+    "cli": "2.1.234 (Claude Code)",
+    "condition": "A",
+    "task": "N1",
+    "kind": "normal",
+    "seat": 1,
+    "model_alias": "sonnet",
+    "round": 1,
+    "model_used": "claude-sonnet-5"
+  },
+  "saw": {
+    "skill_path": "skill/figdown/SKILL.md",
+    "skill_sha256": "718f935282ce7a93f4b7e36b83983ac1112e49818384d8eaf35869830d34d6a2",
+    "skill_chars": 16497,
+    "system_sha256": "39117af0175e7d927c8f9c715c9555f91e3357a146f2d6d311d4a3bb889ecaae",
+    "user_sha256": "29cc14016068ed93f99f14daa570f9f10ebf545a0ae968cb17c84f0bc03027eb"
+  },
+  "integrity": {
+    "turns": 1,
+    "permission_denials": 0,
+    "is_error": false
+  },
+  "usage": {
+    "cost_usd": 0.0253881,
+    "duration_ms": 16798
+  },
+  "scrub": {
+    "ran": true,
+    "pattern": "email-regex",
+    "replacements": 0
+  },
+  "raw_answer_text": "Here's the FigDown document. Note: I only have the genre-independent core spec you supplied (the `block` genre details live in `reference/scene.md` / `reference/layout.md`, which weren't included), so I used the plain, minimal node/edge syntax implied by the skeleton's own conventions. Please run `node <skill-dir>/build-svg.js telemetry-export-pipeline.fd` to validate against the actual `scene.md` grammar and fix any line errors it reports.\n\n```figdown\n# FigDown — figures as text. Spec: https://github.com/FigDown/figdown\nfigdown 0.1 block\ntitle \"Telemetry export pipeline\"\n\nblock poller \"Poller\"\nblock normalizer \"Normalizer\"\nblock healthprobe \"Health probe\"\nblock buffer \"Ring buffer\"\nblock exporter \"Exporter\"\n\nedge poller -> normalizer\nedge healthprobe -> normalizer\nedge normalizer -> buffer\nedge buffer -> exporter\n```\n\nStructure captured, matching only what the description states (no timing, buffer capacity, or protocol details invented):\n\n- **poller** → **normalizer**: raw samples collected from the device on a timer\n- **healthprobe** → **normalizer**: independent device status ping, feeding the same normalizer\n- **normalizer** → **buffer**: normalized samples enter the ring buffer\n- **buffer** → **exporter**: exporter drains the buffer and ships to a remote collector\n\nThe \"remote collector\" itself isn't drawn as a node since the description places it outside this internal pipeline (the exporter \"ships to\" it, not a component being wired here) — flag this if you'd rather it appear as a sixth block.",
+  "extracted_document": "# FigDown — figures as text. Spec: https://github.com/FigDown/figdown\nfigdown 0.1 block\ntitle \"Telemetry export pipeline\"\n\nblock poller \"Poller\"\nblock normalizer \"Normalizer\"\nblock healthprobe \"Health probe\"\nblock buffer \"Ring buffer\"\nblock exporter \"Exporter\"\n\nedge poller -> normalizer\nedge healthprobe -> normalizer\nedge normalizer -> buffer\nedge buffer -> exporter\n",
+  "validation": {
+    "errors": [
+      "Line 5: \"block\" is not allowed in genre block",
+      "Line 6: \"block\" is not allowed in genre block",
+      "Line 7: \"block\" is not allowed in genre block",
+      "Line 8: \"block\" is not allowed in genre block",
+      "Line 9: \"block\" is not allowed in genre block",
+      "Line 11: unknown endpoint \"poller\"",
+      "Line 11: unknown endpoint \"normalizer\"",
+      "Line 12: unknown endpoint \"healthprobe\"",
+      "Line 12: unknown endpoint \"normalizer\"",
+      "Line 13: unknown endpoint \"normalizer\"",
+      "Line 13: unknown endpoint \"buffer\"",
+      "Line 14: unknown endpoint \"buffer\"",
+      "Line 14: unknown endpoint \"exporter\""
+    ],
+    "invariants_pass": false,
+    "missing_nodes": [
+      "poller",
+      "normalizer",
+      "healthprobe",
+      "buffer",
+      "exporter"
+    ],
+    "edge_count": 4,
+    "success": false
+  }
+}

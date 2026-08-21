@@ -1,0 +1,17 @@
+figdown 0.1 block
+# `CLASS-EMPTY-MEANING`: the meaning FIELD is mandatory and its VALUE may be
+# empty. This is the language's own absent / "" / "text" tri-state (`EMPTY-LABEL-STATE`),
+# which the `class` parser had been collapsing: it tested truthiness, so an
+# explicitly empty meaning was rejected as if the field were missing.
+#   class x            -> line error   (pinned by 302-class-decl-errors)
+#   class x ""         -> legal; NO meaning claimed, NO legend entry
+#   class x "Hot path" -> legal; entry drawn
+# The model records "" as "", never as an omitted key: normalizing it away
+# would destroy the distinction `EMPTY-LABEL-STATE` exists to preserve. A reading agent
+# concludes NO category from an empty meaning (core §12.7).
+class grouped "" fill=#dbeafe stroke=#1d4ed8
+class hot "Hot path" fill=#fee2e2 stroke=#dc2626
+node a "A" class=grouped
+node b "B" class=grouped
+node c "C" class=hot
+edge a -> c class=hot

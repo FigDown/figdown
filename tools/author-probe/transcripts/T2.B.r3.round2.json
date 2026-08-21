@@ -1,0 +1,53 @@
+{
+  "probe_version": "1.0.0",
+  "run": {
+    "utc": "2026-08-19T12:20:40Z",
+    "cli": "2.1.234 (Claude Code)",
+    "condition": "B",
+    "task": "T2",
+    "kind": "trap",
+    "seat": 3,
+    "model_alias": "haiku",
+    "round": 2,
+    "model_used": "claude-haiku-4-5-20251001"
+  },
+  "saw": {
+    "skill_path": "tools/author-probe/skill-candidate.md",
+    "skill_sha256": "2abdaf0d9211d5ee1464c5f5c3a200b1ae6f7bd71cfd6344e7da94d669e6ed31",
+    "skill_chars": 17591,
+    "system_sha256": "39117af0175e7d927c8f9c715c9555f91e3357a146f2d6d311d4a3bb889ecaae",
+    "user_sha256": "e8cb22e929d3db805bb30557299bb65ad21da00e2b9120150a2bddb70270e793"
+  },
+  "integrity": {
+    "turns": 1,
+    "permission_denials": 0,
+    "is_error": false
+  },
+  "usage": {
+    "cost_usd": 0.047852000000000006,
+    "duration_ms": 61137
+  },
+  "scrub": {
+    "ran": true,
+    "pattern": "email-regex",
+    "replacements": 0
+  },
+  "raw_answer_text": "Looking at the errors, I can see the fundamental problem: the syntax I used (`process`, `decision`, `terminator`, and `group`) is not valid for the `flowchart` genre. The error about `group` being WITHDRAWN suggests the syntax is no longer compatible with the current version.\n\nTo fix this properly, **I need the flowchart reference documentation** (`reference/experimental/flowchart.md` listed in the router table) to know the correct keywords and syntax for declaring nodes and edges in this genre.\n\nThe core FigDown specification I was given explicitly states:\n\n> **Load the genre file BEFORE you write line 2, not only when something fails.** A scene genre may spell the thing and the line with its own domain's words, and it may rank its keywords...\n\nThe router table directs me to load `reference/experimental/flowchart.md` for flowchart syntax, but that file was not provided. Without it, I cannot know:\n\n- What keywords replace `process`, `decision`, and `terminator`\n- How to declare node types in this genre\n- Whether there's an alternative grouping construct now that `group` is withdrawn\n- The correct node declaration syntax overall\n\n**I cannot complete this task truthfully without that reference document.** The specification emphasizes that I must not invent syntax, and guessing at the correct keywords would violate that principle.\n\nCould you provide the flowchart reference documentation (`reference/experimental/flowchart.md`), or would you like me to try representing this as a different genre (such as `block`, which is in the v0.1 portable subset)?",
+  "extracted_document": null,
+  "validation": {
+    "errors": [
+      "no fenced code block found"
+    ],
+    "invariants_pass": false,
+    "missing_nodes": [
+      "receive",
+      "validate",
+      "isvalid",
+      "apply",
+      "confirm",
+      "rollback"
+    ],
+    "edge_count": null,
+    "success": false
+  }
+}

@@ -1,0 +1,54 @@
+{
+  "probe_version": "1.0.0",
+  "run": {
+    "utc": "2026-08-19T10:41:51Z",
+    "model_alias": "sonnet",
+    "model_used": "claude-sonnet-5",
+    "cli": "2.1.234 (Claude Code)",
+    "seat": 2,
+    "condition": "A",
+    "fixture": "P2",
+    "klass": "parse/unrecognized-line",
+    "round": 1
+  },
+  "engine_channel": "dist-public-api",
+  "saw": {
+    "original_fixture_sha256": "538b1d09dcaaea345f6724bb313e55424abbbd1350f893befffc01237779cbf9",
+    "document_shown_sha256": "538b1d09dcaaea345f6724bb313e55424abbbd1350f893befffc01237779cbf9",
+    "system_sha256": "ef2a3cd623ce06b05aa4652d8ace761c4f70f24298bcef0552f22e2e46e277fc",
+    "user_sha256": "04ca952fff86395d285aa25eeeb13d41123e95d35c9182c82b39f7d6c456e18c"
+  },
+  "integrity": {
+    "turns": 1,
+    "permission_denials": 0,
+    "is_error": false
+  },
+  "usage": {
+    "cost_usd": 0.004041,
+    "duration_ms": 2440
+  },
+  "scrub": {
+    "ran": true,
+    "pattern": "email-regex",
+    "replacements": 0
+  },
+  "raw_answer_text": "```\nfigdown 0.1 flowchart\ntitle \"Configuration rollback procedure\"\n\nprocess apply \"Apply candidate config\"\ndecision verify \"Config verifies clean?\"\nprocess commit \"Commit config\"\nterminator rollback \"Roll back to last-known-good\"\n\nedge apply -> verify\nedge verify -[yes]-> commit\nedge verify -[no]-> rollback\n```",
+  "presented": {
+    "document_shown": "figdown 0.1 flowchart\ntitle \"Configuration rollback procedure\"\n\nprocess apply \"Apply candidate config\"\ndecision verify \"Config verifies clean?\"\nprocess commit \"Commit config\"\nterminator rollback \"Roll back to last-known-good\"\n\nedge apply -> verify\nedge verify -[yes]-> commit\negde verify -[no]-> rollback\n",
+    "validator_shown": {
+      "errors": [
+        "Line 11: \"egde\" is not allowed in genre flowchart"
+      ],
+      "diagnostics": []
+    }
+  },
+  "extracted_document": "figdown 0.1 flowchart\ntitle \"Configuration rollback procedure\"\n\nprocess apply \"Apply candidate config\"\ndecision verify \"Config verifies clean?\"\nprocess commit \"Commit config\"\nterminator rollback \"Roll back to last-known-good\"\n\nedge apply -> verify\nedge verify -[yes]-> commit\nedge verify -[no]-> rollback\n",
+  "validation": {
+    "errors_after": [],
+    "diagnostics_after": [],
+    "invariants_pass": true,
+    "missing_nodes": [],
+    "edge_count": 3,
+    "success": true
+  }
+}

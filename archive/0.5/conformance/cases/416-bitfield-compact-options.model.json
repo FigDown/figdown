@@ -1,0 +1,82 @@
+{
+  "header": {
+    "version": "0.1",
+    "genre": "bitfield"
+  },
+  "flow": "right",
+  "classes": [
+    {
+      "id": "hdr",
+      "meaning": "Header word",
+      "line": 8
+    }
+  ],
+  "planes": [
+    {
+      "id": "base",
+      "z": 0
+    }
+  ],
+  "nodes": [],
+  "groups": [],
+  "edges": [],
+  "ranks": [],
+  "pins": [],
+  "thresholds": [],
+  "bands": [],
+  "bundles": [],
+  "regions": [
+    {
+      "genre": "bitfield",
+      "id": "ip",
+      "label": "IPv4 word 1",
+      "word": 32,
+      "numbering": "msb0",
+      "fields": [
+        {
+          "name": "Version",
+          "width": 4,
+          "fill": "#dbeafe",
+          "line": 10
+        },
+        {
+          "name": "IHL",
+          "width": 4,
+          "fill": "#dbeafe",
+          "line": 10
+        },
+        {
+          "name": "DSCP",
+          "width": 6,
+          "class": [
+            "hdr"
+          ],
+          "description": "RFC 3168 renamed the TOS byte",
+          "line": 11
+        },
+        {
+          "name": "ECN",
+          "width": 2,
+          "class": [
+            "hdr"
+          ],
+          "description": "RFC 3168 renamed the TOS byte",
+          "line": 11
+        },
+        {
+          "name": "Total Length",
+          "width": 16,
+          "fill": "#fef9c3",
+          "line": 13
+        },
+        {
+          "name": "Identification",
+          "width": 16,
+          "stroke": "#0f172a",
+          "line": 15
+        }
+      ],
+      "line": 9
+    }
+  ]
+}

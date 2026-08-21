@@ -1,0 +1,8 @@
+figdown 0.1 bitfield
+# `break` ends the row after the fields declared since the block opened
+# (or since the previous break); with none there is nothing to break.
+bitfield b "Wrap" numbering=lsb0
+break
+field "one" 8
+break
+break

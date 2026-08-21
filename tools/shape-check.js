@@ -1,11 +1,11 @@
 #!/usr/bin/env node
 // shape-check.js — render-side geometry check for non-rectangular shapes.
 // Loads the FigDown engine the same way build-svg.js / boundary-check.js do,
-// renders each .fd in memory and asserts the two properties that make a shape
-// mean what it looks like. Both are read off the RENDERED SVG — the drawn
-// outline (polygon/ellipse/rect attributes) and the drawn label — never off
-// engine internals, so the check is independent of how the engine computes
-// its geometry:
+// renders each .fd in memory and asserts the three properties that make a
+// shape mean what it looks like. All are read off the RENDERED SVG — the drawn
+// outline (polygon/ellipse/rect attributes), the drawn label and the drawn
+// edge path — never off engine internals, so the check is independent of how
+// the engine computes its geometry:
 //
 //   1. containment — every corner of a node label's text box lies inside the
 //      node's own drawn outline (not merely inside its bounding box). A
@@ -14,7 +14,19 @@
 //      visible outline;
 //   2. endpoints   — an edge that meets a node ends ON that node's drawn
 //      outline: not short of it (the arrowhead hides under the fill) and not
-//      beyond it (the line floats in empty space next to the shape).
+//      beyond it (the line floats in empty space next to the shape);
+//   3. self-loops  — an edge that returns to its own node draws a loop with
+//      LENGTH, outside the box, and its label clears the node's own label.
+//      Added 0.4 for backlog 64, where the failure was exactly this
+//      and nothing measured it: a pinned node's self-edge fell out of the
+//      loop branch and drew a ZERO-LENGTH line at the node's centre, with
+//      the edge label printed across the node's name. The model goldens
+//      cannot see it (geometry is not modelled) and the endpoint check
+//      skipped self-loops by name, so the defect shipped unpriced from
+//      0.2 until it was filed. The property is stated for EVERY self-loop,
+//      pinned or auto, because that is the rule the fix has to keep: a
+//      self-transition draws the same way whether its node's coordinate
+//      came from a pin or from the layout pass.
 //
 // Outline model, matching the shapes the engine draws:
 //   rectangle (box/rounded/cylinder)  max(|dx|/a, |dy|/b) = 1
@@ -72,6 +84,12 @@ let ENG = null;                                   // set by loadEngine; carries 
 // ── tolerances ────────────────────────────────────────────────────────────────
 const TEXT_TOL = 1.0;    // norm ceiling for a label corner (1.0 = the outline)
 const END_TOL  = 0.02;   // endpoint norm must be 1 +/- this (2% of the radius)
+// A self-loop's drawn run is 20 + 16 + 20 = 56 px on every side the engine
+// offers, so the floor is a FLOOR — it separates "a loop" from "no loop at
+// all", not one loop shape from another, and a future loop half that size
+// still clears it. The defect it exists to catch measured 0.0.
+const LOOP_MIN = 24;     // px of drawn run below which a self-loop is not drawn
+const OVL_TOL  = 0.5;    // px of box overlap tolerated before it is a collision
 const CH       = 7.2;    // engine's advance per LATIN unit at font-size 13
 const FONT     = 13;
 
@@ -152,6 +170,40 @@ function pointsOfEdge(tag, d) {
   return [[num(tag, 'x1'), num(tag, 'y1')], [num(tag, 'x2'), num(tag, 'y2')]];
 }
 
+const runLen = pts => {
+  let L = 0;
+  for (let i = 1; i < pts.length; i++) L += Math.hypot(pts[i][0] - pts[i - 1][0], pts[i][1] - pts[i - 1][1]);
+  return L;
+};
+const flat = s => s.replace(/&[a-z]+;/g, 'x').replace(/\s+/g, ' ').trim();
+
+// Every <text> the figure draws OUTSIDE a node group — edge labels, port
+// labels, notes — as boxes, in the same units labelBoxOf uses. A label is
+// emitted twice (halo pass then fill pass) at identical coordinates, so the
+// duplicates are folded by position+text rather than counted twice.
+function looseLabels(svg) {
+  const loose = svg.replace(/<g data-node="[^"]+"[^>]*>[\s\S]*?<\/g>/g, '');
+  const box = {};
+  for (const m of loose.matchAll(/<text[^>]*>[\s\S]*?<\/text>/g)) {
+    const open = m[0].match(/<text[^>]*>/)[0];
+    const fsz = num(open, 'font-size');
+    const x = num(open, 'x'), y = num(open, 'y');
+    if (isNaN(fsz) || isNaN(x) || isNaN(y)) continue;
+    const body = m[0].replace(/<text[^>]*>/, '').replace(/<\/text>/, '');
+    const lines = body.includes('<tspan')
+      ? [...body.matchAll(/<tspan[^>]*>([\s\S]*?)<\/tspan>/g)].map(t => t[1])
+      : [body];
+    const w = Math.max(...lines.map(l => ENG.cw(l.replace(/&[a-z]+;/g, 'x')))) * CH * (fsz / FONT);
+    const h = (lines.length - 1) * fsz * 1.3 + 0.93 * fsz;
+    const anc = attr(open, 'text-anchor') || 'start';
+    const x0 = anc === 'middle' ? x - w / 2 : anc === 'end' ? x - w : x;
+    const text = flat(lines.join(' '));
+    box[x0.toFixed(2) + '|' + y.toFixed(2) + '|' + text] =
+      { x: x0, y: y - 0.72 * fsz, w, h, text };
+  }
+  return Object.values(box);
+}
+
 // ── per-figure check ──────────────────────────────────────────────────────────
 function checkOne(engine, fdPath) {
   const src = fs.readFileSync(fdPath, 'utf8');
@@ -172,7 +224,7 @@ function checkOne(engine, fdPath) {
   const shapeOf = {};
   for (const n of doc.nodes) shapeOf[n.id] = n.shape;
 
-  const textFails = [], endFails = [], seen = {}, rows = [];
+  const textFails = [], endFails = [], loopFails = [], seen = {}, rows = [];
 
   // 1. label containment
   for (const id in nodes) {
@@ -194,11 +246,19 @@ function checkOne(engine, fdPath) {
   }
 
   // 2. edge endpoints
-  const edgeByLine = {}, pairN = {};
+  // CONNECTOR-IDENTITY-KEY: `data-edge` carries the connector's AUTHORED id where
+  // it has one and its source line where it does not, so the index is keyed by
+  // whichever of the two the drawing wrote and the attribute is read as an
+  // opaque string. It could not stay `(\d+)`: that pattern silently stops
+  // matching a named connector, and an assertion that quietly covers fewer
+  // edges than it did is worse than one that fails. The two key spaces cannot
+  // collide — an id starts with a letter or `_`, a line number does not.
+  const edgeByRef = {}, pairN = {};
   const pk = e => (e.a < e.b ? e.a + '\t' + e.b : e.b + '\t' + e.a);
-  for (const e of doc.edges) { edgeByLine[e.line] = e; pairN[pk(e)] = (pairN[pk(e)] || 0) + 1; }
-  for (const m of svg.matchAll(/<(line|path) data-edge="(\d+)"[^>]*\/>/g)) {
-    const tag = m[0], e = edgeByLine[+m[2]];
+  const refOf = e => (e.id !== undefined && e.id !== null ? String(e.id) : String(e.line));
+  for (const e of doc.edges) { edgeByRef[refOf(e)] = e; pairN[pk(e)] = (pairN[pk(e)] || 0) + 1; }
+  for (const m of svg.matchAll(/<(line|path) data-edge="([^"]*)"[^>]*\/>/g)) {
+    const tag = m[0], e = edgeByRef[m[2]];
     if (!e || e.a === e.b) continue;                 // self-loops draw their own arc
     // co-located edges on the same node pair are deliberately fanned out
     // sideways (+/- 7 px per lane) so they stay legible; their endpoints are
@@ -222,7 +282,47 @@ function checkOne(engine, fdPath) {
           v.toFixed(3) + ' — ' + (v < 1 ? 'short of' : 'beyond') + ' the drawn outline');
     }
   }
-  return { fd: fdPath, nodes: Object.keys(nodes).length, textFails, endFails, seen, rows };
+
+  // 3. self-loops (backlog 64)
+  // Read off the drawing like everything else here: the arc's own run length,
+  // and whether the text that names it sits on top of the node's name. Both
+  // failures were what a pinned self-transition looked like — a zero-length
+  // `<line>` at the node's centre and a trigger label across the state's own
+  // label — so the two assertions together are the regression, and they are
+  // asserted for auto-placed loops as well, which is the invariant.
+  const loose = looseLabels(svg);
+  let loops = 0;
+  for (const m of svg.matchAll(/<(line|path) data-edge="([^"]*)"[^>]*\/>/g)) {
+    const tag = m[0], e = edgeByRef[m[2]];
+    if (!e || e.a !== e.b) continue;
+    const n = nodes[e.a];
+    if (!n) continue;                                // boundary anchor: not drawn
+    const pts = pointsOfEdge(tag, attr(tag, 'd'));
+    if (pts.length < 2 || pts.some(p => p.some(isNaN))) continue;
+    loops++;
+    const L = runLen(pts);
+    if (L < LOOP_MIN)
+      loopFails.push('self-loop line ' + e.line + ' on node "' + e.a + '": drawn run is ' +
+        L.toFixed(1) + ' px (floor ' + LOOP_MIN + ') — the loop is not drawn' +
+        (L < 0.05 ? ', it is a zero-length mark at the node centre' : ''));
+    // the loop's own outer run must leave the box, or there is nothing to read
+    if (!pts.some(p => norm(n.o, p[0] - n.o.cx, p[1] - n.o.cy) > 1 + END_TOL))
+      loopFails.push('self-loop line ' + e.line + ' on node "' + e.a +
+        '": every drawn point lies inside the node outline');
+    if (!e.mid || !n.lbl) continue;
+    const want = flat(String(e.mid).replace(/\\n/g, ' '));
+    for (const t of loose) {
+      if (t.text !== want) continue;
+      const ox = Math.min(t.x + t.w, n.lbl.x + n.lbl.w) - Math.max(t.x, n.lbl.x);
+      const oy = Math.min(t.y + t.h, n.lbl.y + n.lbl.h) - Math.max(t.y, n.lbl.y);
+      if (ox > OVL_TOL && oy > OVL_TOL)
+        loopFails.push('self-loop line ' + e.line + ' on node "' + e.a + '": its label "' +
+          t.text + '" overlaps the node\'s own label by ' + ox.toFixed(1) + 'x' +
+          oy.toFixed(1) + ' px');
+    }
+  }
+  return { fd: fdPath, nodes: Object.keys(nodes).length, loops,
+           textFails, endFails, loopFails, seen, rows };
 }
 
 // ── file collection ───────────────────────────────────────────────────────────
@@ -261,10 +361,10 @@ function main() {
   cov.header();
 
   const perShape = {};
-  let anyFail = false, checkedText = 0, checkedEnd = 0;
+  let anyFail = false, checkedText = 0, checkedEnd = 0, checkedLoop = 0;
   const bad = [];
   console.log(pad('figure', 52) + lpad('nodes', 6) + lpad('labels', 7) +
-              lpad('ends', 6) + '  result');
+              lpad('ends', 6) + lpad('loops', 7) + '  result');
   for (const f of files) {
     let r;
     try { r = checkOne(engine, f); }
@@ -283,14 +383,14 @@ function main() {
     }
     const nt = r.rows.filter(x => x.kind === 'text').length;
     const ne = r.rows.filter(x => x.kind === 'end' || x.kind === 'fan').length;
-    if (!nt && !ne) {
+    if (!nt && !ne && !r.loops) {
       // These two used to share one bare `continue`, so "renders no shapes at
       // all" and "draws shapes with nothing to assert" were both invisible.
       cov.skip(f, r.nodes ? 'nothing-to-assert' : 'no-drawn-shapes');
       continue;
     }
     cov.score();
-    checkedText += nt; checkedEnd += ne;
+    checkedText += nt; checkedEnd += ne; checkedLoop += r.loops;
     for (const row of r.rows) {
       const s = perShape[row.shape] = perShape[row.shape] ||
         { text: 0, ends: 0, fan: 0, tfail: 0, efail: 0, worstText: 0, worstEnd: 0 };
@@ -304,10 +404,10 @@ function main() {
         if (Math.abs(row.norm - 1) > END_TOL) s.efail++;
       }
     }
-    const fails = r.textFails.concat(r.endFails);
+    const fails = r.textFails.concat(r.endFails, r.loopFails);
     if (fails.length) { anyFail = true; bad.push([f, fails]); }
     console.log(pad(corpus.rel(f), 52) + lpad(r.nodes, 6) + lpad(nt, 7) +
-                lpad(ne, 6) + '  ' + (fails.length ? 'FAIL (' + fails.length + ')' : 'ok'));
+                lpad(ne, 6) + lpad(r.loops, 7) + '  ' + (fails.length ? 'FAIL (' + fails.length + ')' : 'ok'));
     if (verbose)
       for (const row of r.rows)
         console.log('    ' + pad(row.kind, 5) + pad(row.shape, 9) + pad(row.id, 16) +
@@ -326,6 +426,7 @@ function main() {
       lpad(s.worstEnd.toFixed(4), 10) + lpad(s.fan, 8));
   }
   console.log('total: ' + checkedText + ' labels, ' + checkedEnd + ' endpoints, ' +
+    checkedLoop + ' self-loops, ' +
     bad.reduce((n, b) => n + b[1].length, 0) + ' failures');
 
   // ── COVERAGE. Printed on EVERY run, every reason, zero or not. ────────────

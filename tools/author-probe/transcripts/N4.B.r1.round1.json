@@ -1,0 +1,63 @@
+{
+  "probe_version": "1.0.0",
+  "run": {
+    "utc": "2026-08-19T12:14:57Z",
+    "cli": "2.1.234 (Claude Code)",
+    "condition": "B",
+    "task": "N4",
+    "kind": "normal",
+    "seat": 1,
+    "model_alias": "sonnet",
+    "round": 1,
+    "model_used": "claude-sonnet-5"
+  },
+  "saw": {
+    "skill_path": "tools/author-probe/skill-candidate.md",
+    "skill_sha256": "2abdaf0d9211d5ee1464c5f5c3a200b1ae6f7bd71cfd6344e7da94d669e6ed31",
+    "skill_chars": 17591,
+    "system_sha256": "39117af0175e7d927c8f9c715c9555f91e3357a146f2d6d311d4a3bb889ecaae",
+    "user_sha256": "400e267431c35a9ff5c29d5b40548fb62f5e91f55022c2d60bdfd1ccfc1e2838"
+  },
+  "integrity": {
+    "turns": 1,
+    "permission_denials": 0,
+    "is_error": false
+  },
+  "usage": {
+    "cost_usd": 0.057696,
+    "duration_ms": 12469
+  },
+  "scrub": {
+    "ran": true,
+    "pattern": "email-regex",
+    "replacements": 0
+  },
+  "raw_answer_text": "```figdown\n# FigDown — figures as text. Spec: https://github.com/FigDown/figdown\nfigdown 0.1 block\ntitle \"Certificate renewal automation\"\n\nblock scheduler \"Scheduler\"\nblock renewaljob \"Renewal Job\"\nblock caclient \"CA Client\"\nblock ca \"Certificate Authority\"\nblock deployagent \"Deploy Agent\"\nblock service \"Service\"\n\nedge scheduler -> renewaljob \"timer\"\nedge renewaljob -> caclient \"obtain cert\"\nedge caclient -> ca \"request/issue\"\nedge renewaljob -> deployagent \"new cert\"\nedge deployagent -> service \"restart\"\n```\n\nNotes:\n- Six blocks, one per id given, with short human-readable labels.\n- Five edges exactly as described: scheduler→renewaljob (timer trigger), renewaljob→caclient (ask to obtain), caclient→ca (talk to the CA), renewaljob→deployagent (hand off once cert is obtained), deployagent→service (restart to pick up new cert).\n- Edge labels are kept short per the \"labels carry structure, not prose\" guidance — the surrounding write-up can carry the fuller narrative if needed.",
+  "extracted_document": "# FigDown — figures as text. Spec: https://github.com/FigDown/figdown\nfigdown 0.1 block\ntitle \"Certificate renewal automation\"\n\nblock scheduler \"Scheduler\"\nblock renewaljob \"Renewal Job\"\nblock caclient \"CA Client\"\nblock ca \"Certificate Authority\"\nblock deployagent \"Deploy Agent\"\nblock service \"Service\"\n\nedge scheduler -> renewaljob \"timer\"\nedge renewaljob -> caclient \"obtain cert\"\nedge caclient -> ca \"request/issue\"\nedge renewaljob -> deployagent \"new cert\"\nedge deployagent -> service \"restart\"\n",
+  "validation": {
+    "errors": [
+      "Line 5: \"block\" is not allowed in genre block",
+      "Line 6: \"block\" is not allowed in genre block",
+      "Line 7: \"block\" is not allowed in genre block",
+      "Line 8: \"block\" is not allowed in genre block",
+      "Line 9: \"block\" is not allowed in genre block",
+      "Line 10: \"block\" is not allowed in genre block",
+      "Line 12: unexpected argument \"timer\"",
+      "Line 13: unexpected argument \"obtain cert\"",
+      "Line 14: unexpected argument \"request/issue\"",
+      "Line 15: unexpected argument \"new cert\"",
+      "Line 16: unexpected argument \"restart\""
+    ],
+    "invariants_pass": false,
+    "missing_nodes": [
+      "scheduler",
+      "renewaljob",
+      "caclient",
+      "ca",
+      "deployagent",
+      "service"
+    ],
+    "edge_count": 0,
+    "success": false
+  }
+}

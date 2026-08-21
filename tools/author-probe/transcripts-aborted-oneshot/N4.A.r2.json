@@ -1,0 +1,62 @@
+{
+  "probe_version": "1.0.0",
+  "run": {
+    "utc": "2026-08-19T11:49:14Z",
+    "cli": "2.1.234 (Claude Code)",
+    "condition": "A",
+    "task": "N4",
+    "kind": "normal",
+    "seat": 2,
+    "model_alias": "sonnet",
+    "model_used": "claude-sonnet-5"
+  },
+  "saw": {
+    "skill_path": "skill/figdown/SKILL.md",
+    "skill_sha256": "718f935282ce7a93f4b7e36b83983ac1112e49818384d8eaf35869830d34d6a2",
+    "skill_chars": 16497,
+    "system_sha256": "39117af0175e7d927c8f9c715c9555f91e3357a146f2d6d311d4a3bb889ecaae",
+    "user_sha256": "ad114943f092c2efcb7b7e4a66f3068d3be38aff65a94ebe7fb06fbe28c4e1e7"
+  },
+  "integrity": {
+    "turns": 1,
+    "permission_denials": 0,
+    "is_error": false
+  },
+  "usage": {
+    "cost_usd": 0.0230292,
+    "duration_ms": 15563
+  },
+  "scrub": {
+    "ran": true,
+    "pattern": "email-regex",
+    "replacements": 0
+  },
+  "raw_answer_text": "Notes before the figure:\n\n- The router says a `block` figure needs `reference/scene.md` and `reference/layout.md` loaded before writing line 2. Those files weren't included in the documentation given to me, so I've written this using only the genre-independent skeleton (header line, `title`, node/edge declarations with quoted labels per the \"every label is quoted\" rule). If the actual scene/layout syntax differs from what I've guessed for node and edge declarations, that's the seam to check first when validating with `build-svg.js`.\n- All five ids are used exactly as specified, and all five connections are drawn as plain edges — no class/styling was added since the description gives no meaning (like \"hot path\" or \"failure\") that would need one.\n\n```figdown\n# FigDown — figures as text. Spec: https://github.com/FigDown/figdown\nfigdown 0.1 block\ntitle \"Certificate renewal automation\"\n\nblock scheduler \"Scheduler\"\nblock renewaljob \"Renewal job\"\nblock caclient \"CA client\"\nblock ca \"Certificate authority\"\nblock deployagent \"Deploy agent\"\nblock service \"Service\"\n\nedge scheduler -> renewaljob \"timer\"\nedge renewaljob -> caclient \"obtain certificate\"\nedge caclient -> ca \"request certificate\"\nedge renewaljob -> deployagent \"hand off\"\nedge deployagent -> service \"restart\"\n```\n\nRun `node <skill-dir>/build-svg.js certificate-renewal.fd` to validate and produce the SVG; if the node/edge keywords above don't match what `reference/scene.md` actually specifies, the build errors will name the correct spelling and I can fix it from there.",
+  "extracted_document": "# FigDown — figures as text. Spec: https://github.com/FigDown/figdown\nfigdown 0.1 block\ntitle \"Certificate renewal automation\"\n\nblock scheduler \"Scheduler\"\nblock renewaljob \"Renewal job\"\nblock caclient \"CA client\"\nblock ca \"Certificate authority\"\nblock deployagent \"Deploy agent\"\nblock service \"Service\"\n\nedge scheduler -> renewaljob \"timer\"\nedge renewaljob -> caclient \"obtain certificate\"\nedge caclient -> ca \"request certificate\"\nedge renewaljob -> deployagent \"hand off\"\nedge deployagent -> service \"restart\"\n",
+  "validation": {
+    "errors": [
+      "Line 5: \"block\" is not allowed in genre block",
+      "Line 6: \"block\" is not allowed in genre block",
+      "Line 7: \"block\" is not allowed in genre block",
+      "Line 8: \"block\" is not allowed in genre block",
+      "Line 9: \"block\" is not allowed in genre block",
+      "Line 10: \"block\" is not allowed in genre block",
+      "Line 12: unexpected argument \"timer\"",
+      "Line 13: unexpected argument \"obtain certificate\"",
+      "Line 14: unexpected argument \"request certificate\"",
+      "Line 15: unexpected argument \"hand off\"",
+      "Line 16: unexpected argument \"restart\""
+    ],
+    "invariants_pass": false,
+    "missing_nodes": [
+      "scheduler",
+      "renewaljob",
+      "caclient",
+      "ca",
+      "deployagent",
+      "service"
+    ],
+    "edge_count": 0,
+    "success": false
+  }
+}

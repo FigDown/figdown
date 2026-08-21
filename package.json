@@ -1,6 +1,6 @@
 {
   "name": "figdown",
-  "version": "0.4.1",
+  "version": "0.5.0",
   "description": "A missing edge still looks fine. Text doesn't. A closed, deterministic figure language for Markdown whose source states the meaning, so the next reader can check the figure instead of only looking at it.",
   "license": "MIT",
   "author": "FigDown <hello@figdown.org>",
@@ -32,7 +32,7 @@
     "gate:page": "node tools/page-check.js",
     "gate:shape": "node tools/shape-check.js --strict",
     "gate:strip": "node tools/strip-check.js --strict",
-    "gate:layout": "node tools/layout-lint.js --strict",
+    "gate:layout": "node tools/layout-lint.js --strict examples figures tools/layout-lint-fixtures/b66-typed-title",
     "gate:namespace": "node tools/namespace-check.js --strict",
     "gate:artifact": "node tools/artifact-check.js --strict",
     "gate:dist": "node tools/dist-check.js --strict",
@@ -48,6 +48,8 @@
     "gate:standards": "node tools/standards-check.js --strict",
     "gate:plugin": "node tools/plugin-check.js --strict",
     "gate:mcp": "node integrations/mcp-server/test.js",
+    "gate:proof": "node tools/make-proof.js --check",
+    "gate:safesvg": "node tools/safe-svg-check.js --strict",
     "gates:list": "node -e \"const s=require(process.cwd()+'/package.json').scripts||{};const g=Object.keys(s).filter(k=>k.startsWith('gate:'));if(!g.length){console.error('gates:list — no gate:* scripts found');process.exit(2);}if(process.env.GATES_JSON)console.log(JSON.stringify(g));else g.forEach(k=>console.log(k+'  ->  '+s[k]));\"",
     "test": "node -e \"const s=require(process.cwd()+'/package.json').scripts||{};const sp=require('child_process').spawnSync;const g=Object.keys(s).filter(k=>k.startsWith('gate:'));if(!g.length){console.error('npm test — no gate:* scripts found; refusing to report success');process.exit(2);}const bad=[];g.forEach(k=>{const a=s[k].split(' ');const bin=a[0]==='node'?process.execPath:a[0];console.log('');console.log('=== GATE '+k+'  ['+s[k]+'] ===');const r=sp(bin,a.slice(1),{stdio:'inherit'});if(r.error)console.error('    spawn error: '+r.error.message);const c=(r.status===null||r.status===undefined)?1:r.status;console.log('--- '+k+': '+(c===0?'PASS':'FAIL (exit '+c+')')+' ---');if(c!==0)bad.push(k+'  ['+s[k]+']  exit '+c);});console.log('');console.log('=== GATE SUMMARY: '+(g.length-bad.length)+'/'+g.length+' passed ===');if(bad.length){console.log('FAILED GATES:');bad.forEach(b=>console.log('  '+b));process.exit(1);}console.log('ALL GATES GREEN');\"",
     "gate:reference": "node tools/reference-gate.js"

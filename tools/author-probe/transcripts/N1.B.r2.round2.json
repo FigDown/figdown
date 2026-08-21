@@ -1,0 +1,44 @@
+{
+  "probe_version": "1.0.0",
+  "run": {
+    "utc": "2026-08-19T12:13:10Z",
+    "cli": "2.1.234 (Claude Code)",
+    "condition": "B",
+    "task": "N1",
+    "kind": "normal",
+    "seat": 2,
+    "model_alias": "sonnet",
+    "round": 2,
+    "model_used": "claude-sonnet-5"
+  },
+  "saw": {
+    "skill_path": "tools/author-probe/skill-candidate.md",
+    "skill_sha256": "2abdaf0d9211d5ee1464c5f5c3a200b1ae6f7bd71cfd6344e7da94d669e6ed31",
+    "skill_chars": 17591,
+    "system_sha256": "39117af0175e7d927c8f9c715c9555f91e3357a146f2d6d311d4a3bb889ecaae",
+    "user_sha256": "77028887cd1e6364bac03f071d82c0ec026f2f5f43d9bad28f457053bd8f1594"
+  },
+  "integrity": {
+    "turns": 1,
+    "permission_denials": 0,
+    "is_error": false
+  },
+  "usage": {
+    "cost_usd": 0.066891,
+    "duration_ms": 16602
+  },
+  "scrub": {
+    "ran": true,
+    "pattern": "email-regex",
+    "replacements": 0
+  },
+  "raw_answer_text": "```figdown\n# FigDown — figures as text. Spec: https://github.com/FigDown/figdown\nfigdown 0.1 block\ntitle \"Telemetry export pipeline\"\n\nnode poller \"Poller\"\nnode normalizer \"Normalizer\"\nnode healthprobe \"Health probe\"\nnode buffer \"Ring buffer\"\nnode exporter \"Exporter\"\n\nedge poller -> normalizer\nedge healthprobe -> normalizer\nedge normalizer -> buffer\nedge buffer -> exporter\n```\n\nChange from the previous attempt: the `block` genre does not use `block` as its own element keyword — that word is reserved for the genre name on line 1. The generic element keyword the spec uses throughout (nodes/edges) is `node`, so each component is now declared with `node <id> \"<label>\"`. That also resolves the four \"unknown endpoint\" errors on the `edge` lines, since they were only unknown because the declarations above them had failed to parse. The four edges (poller→normalizer, healthprobe→normalizer, normalizer→buffer, buffer→exporter) are unchanged, matching the description exactly.\n\nI have not been able to run `build-svg.js` in this environment, so I can't confirm a clean `OK` — please rerun the validator on this corrected file; if `node` is still not the right keyword for genre `block`, the error message should now name the correct one directly.",
+  "extracted_document": "# FigDown — figures as text. Spec: https://github.com/FigDown/figdown\nfigdown 0.1 block\ntitle \"Telemetry export pipeline\"\n\nnode poller \"Poller\"\nnode normalizer \"Normalizer\"\nnode healthprobe \"Health probe\"\nnode buffer \"Ring buffer\"\nnode exporter \"Exporter\"\n\nedge poller -> normalizer\nedge healthprobe -> normalizer\nedge normalizer -> buffer\nedge buffer -> exporter\n",
+  "validation": {
+    "errors": [],
+    "invariants_pass": true,
+    "missing_nodes": [],
+    "edge_count": 4,
+    "success": true
+  }
+}

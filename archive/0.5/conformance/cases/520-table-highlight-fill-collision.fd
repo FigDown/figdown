@@ -1,0 +1,29 @@
+figdown 0.1 table
+# `ROW-HIGHLIGHT-CELL-FILL-COLLISION`: the row tint (`highlight`) and a cell `fill=` paint the
+# SAME channel, and both ways of writing them for one cell used to resolve
+# silently and in opposite directions. Two keys for one channel with an
+# undocumented precedence is the `color=` and the §8.4 fill=/stroke= defect;
+# the answer here is the same as there — a named line error, never a
+# precedence rule (a precedence rule is exactly what `STYLE-KEY-SCOPE` had just removed
+# from `field`).
+class tinted "vendor extension" fill=#fecaca
+table t "T"
+| A | B | C |
+|---|---|---|
+| 1 | 2 | 3 |
+| 4 | 5 | 6 |
+| 7 | 8 | 9 |
+# (1) one line, both marks: `highlight` was SILENTLY DISCARDED and never
+#     reached the model, while the cell fill drew.
+cell (1,1) fill=#eeeeee highlight
+# (2) two lines, same cell: both parsed, and the per-cell fill won at paint
+#     time — the model said "row 2 is highlighted" while the drawing tinted
+#     only part of the row.
+cell 2 highlight
+cell (2,2) fill=#ffffff
+# a class that RESOLVES to a fill collides the same way
+cell (2,3) class=tinted
+# stroke= and class= without a fill paint a DIFFERENT channel and stay legal
+cell (2,1) stroke=#dc2626
+# row 3 carries no highlight, so its cell fill is untouched
+cell (3,1) fill=#d1fae5

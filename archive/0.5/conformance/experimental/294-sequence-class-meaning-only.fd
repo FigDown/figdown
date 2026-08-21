@@ -1,0 +1,22 @@
+# `CLASS-CHANNEL-REACH`, the KEEP half of the same ruling as 293: a class that
+# claims a MEANING and declares NO paint is legal on every member, and this
+# genre is the one built on it. `class` here carries what two refused
+# constructs would have carried — `group` (`SEQUENCE-PARTICIPANT-GROUPING`, a set of participants with
+# something in common) and `lost=` (`UNDELIVERED-MESSAGE-MARKING`, a message sent and never delivered)
+# — and both refusals were taken BECAUSE `class` plus its meaning already
+# expresses the fact. So a meaning with no paint is the designed idiom.
+#
+# The same form was a LINE ERROR on an `edge` from 0.1 to 0.4
+# (`CLASS-PAINT-REQUIREMENT`'s second half, retired by `CLASS-CHANNEL-REACH` on the ground that the same release
+# had already made the derived legend draw such a class's meaning with no
+# swatch). The golden here is the model: `cls` records the join, and no
+# paint key is recorded anywhere, because none was written.
+figdown 0.4 sequence
+title "Address lease"
+class dropped "Sent, never delivered"
+class party "Runs on the client host"
+lifeline c "DHCP client" class=party
+lifeline s "DHCP server"
+message c -> s "DHCPDISCOVER"
+message c -> s "DHCPREQUEST (unicast, renewing)" class=dropped
+state c "BOUND" class=party

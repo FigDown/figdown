@@ -1,0 +1,11 @@
+figdown 0.1 block
+# 0.1: `rank a,b,c` — ONE comma-delimited token — is the canonical
+# spelling. It terminates at the first whitespace, so the rest of the line
+# stays free for future `key=` options. 0.1 then RETIRED the space
+# form; `353-rank-space-form-retired` pins the diagnostic, this file the model.
+node a "A"
+node b "B"
+node c "C"
+node d "D"
+rank a,b,c
+rank b,d

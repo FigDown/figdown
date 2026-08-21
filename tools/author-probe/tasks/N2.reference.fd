@@ -1,0 +1,13 @@
+figdown 0.1 topology
+title "Branch office WAN uplinks"
+
+node access1 "Access switch 1"
+node access2 "Access switch 2"
+node branch "Branch router"
+node hubprimary "Primary hub router"
+node hubbackup "Backup hub router"
+
+edge access1 -> branch
+edge access2 -> branch
+edge branch -> hubprimary
+edge branch -> hubbackup

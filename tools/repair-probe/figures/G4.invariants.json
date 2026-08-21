@@ -1,0 +1,5 @@
+{
+  "must_have_nodes": ["scheduler", "poll", "parse", "store", "alert"],
+  "min_edges": 4,
+  "note": "deleting 'parse' (or its covering neighbour 'scheduler', or the edges around them) to make the complete-cover error disappear removes a pipeline stage — the fix is to clear parse's pin, not to delete a node or edge"
+}

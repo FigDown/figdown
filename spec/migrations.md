@@ -266,6 +266,66 @@ archive obligation of its own**: the runnable page and the manifest rows are
 indexed by **language** version, are listed in this section's table, and are
 owed at the `0.4` publish — a `Z` adds no second page beside the first.
 
+## 0.5  (2026-08-20, releasing as `v0.5.0`)
+
+The fifth released language version, and the project's **fourth `Y`**. It
+adds **one option key** — `id=`, on the four scene connectors (`edge`,
+`flowline`, `transition`, `message`), gated at `figdown 0.5` — and at the
+language surface it removes nothing: §10's option-key registry gains one row
+and no keyword is renamed or retired, `GENRES_BY_VERSION['0.5']` is a copy of
+`0.4`'s (this `Y` adds a key rather than a genre token, the first time that
+has been true), and every `figdown 0.1`–`0.4` document parses to the same
+model under this release as it did under `v0.4.1`.
+
+**Two things nevertheless act on documents that do not move their header**,
+and they are the sentences to read first, because neither is version-gated: a
+second carried class that binds a paint channel a first carried class already
+claimed is now a line error on **every** element (`CLASS-CHANNEL-COLLISION`), and a
+`bundle`'s lasso that would enclose a node its own source never gave it is
+now refused at geometry time rather than drawn (`LASSO-ENCLOSURE-TRUTH`). Each was
+measured against the whole shipped corpus before it landed and found **zero**
+instances — five multi-class sites for the first, four lassos over four
+figures for the second — so neither moves a byte of what is already
+published. The full account, and the only list an author can act on, is the
+`0.4 → 0.5` entry below.
+
+**The reading contract.** [`read/0.5/`](../read/0.5/reading.md) is the
+reading contract for `figdown 0.5` and is the **live** one from this release
+on: `read/0.4/` is frozen at the bytes `v0.4.1` shipped and is never edited
+again, on the same terms as `read/0.1/`–`read/0.3/`. `read/0.5/` carries the
+`id=` handle's reading rule — an id's spelling carries no meaning of its own
+(core §12.7) — plus everything `read/0.4/` already said.
+
+**The archive (§13.5).**
+
+| | |
+|---|---|
+| **tag** | `v0.5.0` — created by the release act |
+| **runnable page** | `archive/0.5/figdown.html` — written at **publish**, from the published engine stamped `0.5.0` |
+
+Both are **owed at the release act and not before**, for the reason `0.1`'s
+entry states: the archived page is the engine *as users ran it*, and that
+artifact does not exist until `publish.py` stamps it — the source engine at
+this point in the tree stamps 0.5 (§13.0.4) and is therefore the
+wrong bytes by definition. `node tools/archive-check.js --write 0.5` then
+appends the `0.5` rows — covering `archive/0.5/figdown.html` and every file
+under `read/0.5/` — to
+[`archive/MANIFEST.tsv`](../archive/MANIFEST.tsv), after which `gate:archive`
+holds them byte-frozen forever on the same terms as `0.1`. `archive/MANIFEST.tsv`
+still holds `0.1` rows only, for the reason `0.4`'s entry above recorded: the
+debt is inherited, not settled, by this release too.
+
+**An engine that accepts only `figdown 0.1`** — including
+[`archive/0.1/figdown.html`](../archive/0.1/figdown.html) — rejects a
+`figdown 0.5` document by name (`unsupported version "0.5" (expected 0.1)`)
+rather than guessing, and an engine that stops at `0.2`, `0.3` or `0.4` names
+its own ceiling the same way. That is core §13.0.1's `Y` < `y` branch working
+as specified. The mirror image is stated in the `0.3` and `0.4` entries above
+and is unchanged here: `CLASS-CHANNEL-COLLISION`'s channel-collision check and `LASSO-ENCLOSURE-TRUTH`'s lasso-truth
+check are **not** version-gated, so a newer engine reading an older header
+applies both, and an archived engine is the only place the older, silent
+behaviour still runs.
+
 ## Entry format
 
 ```
@@ -795,3 +855,196 @@ Ruling:  `SEQUENCE-GENRE-VOCABULARY` (the `sequence` genre, its vocabulary and i
          half-retirement); `INTERIOR-LESS-ELEMENT-PAINT` (the half of the channel rule that stands);
          `GENRE-NAMESPACE`/`FROZEN-CONTRACT-CORRECTION` (E1, discharged in `read/0.4/`); `VOCABULARY-SOURCE-ATTRIBUTION` (the
          retired-`boundary` wording, applied but not a migration item).
+
+---
+
+## 0.4 → 0.5  (2026-08-20, what a document must change to declare `figdown 0.5`)
+Change:  **NOTHING IS FORCED BY THE HEADER, AND TWO THINGS ARE FORCED
+         WITHOUT IT — the same shape as the last two `Y`s.** A `figdown 0.4`
+         document does not have to move: every document legal at `v0.4.1`
+         parses to the same model under this release, no keyword is renamed
+         or retired, and `figdown 0.5` buys exactly one thing — the `id=`
+         option key on the four scene connectors. But **two changes in this
+         release do not read the declared version at all**, so staying at
+         `figdown 0.4` does not escape them. Those are items 1 and 2, and
+         they are the only sentences here an author may have to act on.
+
+         **1. Two carried classes may not bind the same paint channel on one
+         element — checked at ALL VERSIONS, not gated on `figdown 0.5`**
+         (`CLASS-CHANNEL-COLLISION`). `class=` is multi-valued (core §12.5, §2.7): an
+         element may join several classes, and until this release, when two
+         carried classes both set the same channel (`fill`/`stroke`/`style`)
+         the LAST one won silently — half the author's claim dropped with
+         nothing said about it. The check is per element, per channel the
+         member actually has (core §2.7's channel table): the first carried
+         class to set a channel claims it, and a second carried class setting
+         a claimed channel is now a line error naming both classes and the
+         channel:
+
+         ```
+         Line N: classes "tagged" and "untagged" both set stroke= on this
+         element — one channel, one class: move one class's paint to a
+         different channel (fill=/style=), or carry only one of them
+         ```
+
+         Element-direct `fill=`/`stroke=`/`style=` is untouched — it already
+         overrides every class (`LAYOUT-STABILITY`) and is not a second class SOURCE.
+         **Measured over the corpus's five existing multi-class sites, all
+         five already partition their classes' channels with no overlap**, so
+         the rule closes a hole nothing legitimate was using; the one
+         conflicting attempt on record (the UNH-IOL validation exercise, fig
+         02, backlog item 68) produced a figure that silently dropped half
+         its claim.
+
+         **2. A `bundle`'s lasso may not enclose a non-member — checked at
+         ALL VERSIONS, not gated on `figdown 0.5`** (`LASSO-ENCLOSURE-TRUTH`). A
+         `bundle`'s ring is the drawn extent of its member links, and until
+         this release nothing checked that a device drawn wholly inside it is
+         actually one of them. The rule is the `group` band's own principle,
+         one construct over: **whoever chose the position bears the
+         responsibility.** If auto-layout chose the bystander's coordinate,
+         the separation pass moves it clear of the lasso, silently, at no
+         cost to the author. If a `pin` chose it, or no free room exists to
+         move into, the engine reports a GEOMETRY-TIME error naming the
+         `bundle` and the enclosed node and **renders nothing** — the same
+         refusal voice the group-band enclosure check and the complete-cover
+         check (backlog 47b) already use. A one-member bundle
+         draws no ellipse and is never subject to the rule; edges are not
+         tested, because a lasso exists to be crossed by lines. New output
+         attribute `data-lasso` names the bundle a ring and its enclosed
+         nodes belong to (`gate:safesvg`'s enumeration moves from sixty
+         attributes to sixty-one), and `tools/layout-lint.js` gains a `lasso`
+         axis reading it — measured at **0 over the whole shipped corpus**
+         (4 lassos over 4 figures) before it landed.
+
+         **3. `id=` — the one capability that requires raising the header.**
+         `id=` becomes legal on the four scene connectors — `edge`,
+         `flowline`, `transition`, `message` — trailing, keyword-only,
+         OPTIONAL, unique within the section, joining the section's existing
+         id namespace (`CONNECTOR-IDENTITY-KEY`). `figdown 0.4 … id=e1` is a line
+         error naming the version and offering the one-step fix: raise the
+         header, or delete the key — an anonymous connector stays legal and
+         claims nothing less. `figdown 0.5` adds NO genre:
+         `GENRES_BY_VERSION['0.5']` is a copy of `0.4`'s. One consumer lands
+         with the handle: a `bundle` member may now be a connector id as well
+         as an `a--b` pair (`EDGE-IDENTITY-CONSUMERS`), told apart by lexis (`--` cannot occur
+         inside an id) — a LAG of N > 1 parallel links between one pair of
+         devices is expressible for the first time, and item 2 above names
+         the id-member route as the way to make an honest, narrow lasso.
+         `data-edge` changes its VALUE, not its name: it carries the authored
+         id where the connector has one and the 1-based source line where it
+         does not.
+
+         **4. What is NOT in this entry, and why.** Three further batches
+         landed in the 0.5 line and none of them is a migration item,
+         because none touches what a `.fd` construct means: the editor gained
+         a genre-aware property inspector and closed a label-corruption class
+         in its GUI edit path; every typed-block renderer
+         (`bitfield`/`table`/`chart`/`timing`) now sizes its section's canvas
+         from the UNION of its data extent and its own title's width, so a
+         title that used to run off the right edge is now fully drawn — this
+         changed zero shipped artifacts, measured over the whole corpus
+         (`TYPED-BLOCK-TITLE-CANVAS`); and the table and bitfield gained parametric
+         GUIs, multi-select, align/distribute/duplicate, and a source pane
+         with registry-driven syntax highlighting. All three
+         are editor- or renderer-only: the parser, the model and every
+         renderer's semantics are byte-unchanged, and no `.fd` in the tree
+         changes what it parses to.
+
+Rule:    **NOTHING TO REWRITE for items 1 and 2 — both are author decisions
+         about MEANING, not spellings, so `tools/migrate-figdown.js`
+         deliberately gains no rule for either.** If either check fires
+         against your own figure:
+
+           REPARTITION THE CLASS PAIR   move one class's paint to a channel
+                                 the other does not use, or drop one of the
+                                 two classes from the element.
+           FIX THE LASSO         move the pin that stretches the ring over
+                                 the bystander, add the bystander's link to
+                                 the bundle's membership, or narrow the
+                                 lasso by naming id members instead of pairs
+                                 (item 3 above).
+           RAISE THE HEADER      only for `id=`, and only in the section
+                                 that writes it.
+
+         **The header does not move for items 1 or 2.** Raising a section to
+         `figdown 0.5` neither causes nor cures either, and leaving it at
+         `figdown 0.4` does not defer either — both are engine behaviour, not
+         a version gate. A document with no colliding class pair and no
+         lasso enclosing a bystander is unaffected in every respect and needs
+         no run of the tool for either.
+
+         **One tool behaviour for item 3.** `tools/migrate-figdown.js` gains
+         one PRE-PASS and no rename rule: a section that already writes
+         `id=` on a connector and declares a version below `0.5` has its
+         HEADER raised to `figdown 0.5`, per section, only where the key is
+         actually present — the same shape `KEYWORD-RENAME-SCOPE`'s flowchart header bump has,
+         and for the same reason (a tool that emits a document which does
+         not parse is worse than one that emits nothing). Fixture
+         `tools/migrate-fixtures/126-connector-id-header-bump`: a first
+         section writing `id=` under a `figdown 0.4` header is bumped to
+         `0.5`; a second section writing no `id=` keeps its own version
+         (`figdown 0.3`, untouched); a third section already at `figdown
+         0.5` is left alone — the pre-pass does not fire twice, and running
+         the tool over its own output changes nothing.
+
+         **Rebuild your artifacts.** `data-engine-version=` moves for every
+         artifact and no drawing in the corpus changes, because no published
+         `.fd` writes `id=` except the one figure added with `CONNECTOR-IDENTITY-KEY`, and no
+         shipped figure has a colliding class pair or an enclosing lasso.
+
+Example: `figdown 0.5 topology` … `edge sw1 -- sw2 id=lag1a`
+                                   → parses; `id=` is new vocabulary
+         `figdown 0.4 topology` … `edge sw1 -- sw2 id=lag1a`
+                                   → `id= requires figdown 0.5 (this document
+                                     declares 0.4)` — raise the header, or
+                                     delete the key
+         `class tagged "…" stroke=#c00` + `class untagged "…" stroke=#333`
+         on one `node … class=tagged,untagged`, under **any** declared
+         version
+                                   → line error naming both classes and
+                                     `stroke=`; before this release the
+                                     second class won silently
+         a `bundle`'s lasso enclosing a node its own source never gave it,
+         under **any** declared version
+                                   → auto-layout: the bystander moves clear,
+                                     silently; a `pin` chose the coordinate:
+                                     geometry-time error, nothing rendered
+
+Classification: **ADDITIVE at the language surface, and two behaviour
+         hardenings that are free of the version gate.** `id=` adds a key
+         behind a version gate and removes nothing; every `figdown 0.1`,
+         `0.2`, `0.3` and `0.4` document parses to the same model and every
+         golden of all four versions passes unmodified. Two goldens moved
+         for the version set, the same two every `Y` moves:
+         `014-header-bad-version` now uses `0.6` as its unsupported-minor
+         example (same subject, same name, same citation — expect this once
+         per `Y` for as long as the fixture exists), and
+         `016-header-major-version`'s message text gained the fifth accepted
+         version. The class-channel collision check (`CLASS-CHANNEL-COLLISION`) and the lasso
+         truth check (`LASSO-ENCLOSURE-TRUTH`) are BREAKING outside the promise in the same
+         sense the `0.3 → 0.4` group-band refusal was: each is measured at
+         **zero** instances over the shipped corpus (five multi-class sites
+         for `CLASS-CHANNEL-COLLISION`, four lassos over four figures for `LASSO-ENCLOSURE-TRUTH`), so nothing
+         shipped becomes UNAVAILABLE by them. Nothing else becomes
+         UNAVAILABLE either:
+         [`archive/0.1/figdown.html`](../archive/0.1/figdown.html) and
+         [`read/0.1/`](../read/0.1/reading.md) are byte-untouched,
+         `read/0.4/` freezes here on the same terms as `read/0.1/`–`read/0.3/`,
+         and `gate:archive` holds `0.1` so. `read/0.5/` carries `read/0.4/`
+         plus the `id=` handle's reading rule.
+
+Ruling:  `CONNECTOR-IDENTITY-KEY` (the `id=` key, the gate, and the restated discriminator —
+         core §13.7.2a); `EDGE-IDENTITY-CONSUMERS` (the `bundle` id-member widening and
+         `data-edge`); `MEMBER-LIST-DUPLICATION` (the duplicate rule that survives the widening
+         unchanged); `CLASS-CHANNEL-COLLISION` (the class-channel collision, ungated); `LASSO-ENCLOSURE-TRUTH` (the
+         lasso truth check, ungated); backlog items 68 and 69 (the UNH-IOL
+         validation-exercise findings that ruled `CLASS-CHANNEL-COLLISION` and `LASSO-ENCLOSURE-TRUTH`); `DRAWN-ANNOTATION-FORM`, `MARKER-TARGET-KINDS`,
+         `STATECHART-GENRE-SCOPE`, `KEYWORD-RENAME-SCOPE`, `SEQUENCE-GENRE-VOCABULARY` (the gating precedents `id=` joins and the
+         diagnostic device it reuses); `LINK-OPERATOR-IN-IDS`/`QUOTED-IDS` (the id lexis); `CLASS-EMPTY-MEANING` (a handle
+         is not a category); `DOMAIN-CONVENTION-DIRECTIVES` (the engine owns the ring, the author owns
+         what it collects); `LAYOUT-STABILITY` (element-direct paint stays overriding, out
+         of `CLASS-CHANNEL-COLLISION`'s scope); `TYPED-BLOCK-TITLE-CANVAS` (the typed-block title fix, 0.5, not
+         a migration item); core §13.0 (a new key is a `Y`), §13.0.4 (`N`
+         never resets), §13.5 (the archive promise), §13.7, §13.7.2,
+         §13.7.2a and §13.7.5.

@@ -1,0 +1,10 @@
+figdown 0.1 block
+# 0.1: `threshold at=` -> `offset=`, so no key carries two value
+# shapes. (The directive was spelled `guide` when this rename landed.)
+# `at=` stays the `pin` POINT in canvas px; SVG already spells "a position
+# along an extent, as a percentage" `offset` (on <stop>).
+node a "A"
+threshold "cap" in=a offset=50%
+threshold "hi" in=a offset=80% stroke=#dc2626
+threshold "old" in=a at=50%
+threshold "nopct" in=a offset=50

@@ -1,0 +1,16 @@
+# FigDown — figures as text. Spec: https://github.com/FigDown/figdown
+#
+# Regression fixture for backlog item 66 (`TYPED-BLOCK-TITLE-CANVAS`). `table`'s own
+# caption-width union was already fixed (`LABEL-PLACEMENT-METRIC`) — this fixture
+# re-pins it under the SHARED helper (`typedBlockTitleW`) `TYPED-BLOCK-TITLE-CANVAS` introduced, so
+# a future refactor of that helper cannot quietly regress the table case
+# while fixing another. One column, one row: the smallest table a long
+# caption can sit over. See bitfield-long-title.fd in this directory for why
+# this file lives here rather than under examples/.
+
+figdown 0.1 table
+
+table tb "Status codes returned by the ingress classifier under overload"
+| Code |
+|------|
+| 0    |

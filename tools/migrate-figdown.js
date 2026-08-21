@@ -952,6 +952,37 @@ function migrateText(text, colorMeans) {
     });
     close();
   }
+  // 0.5 (`CONNECTOR-IDENTITY-KEY`): the same device, one language version up. `id=` on a
+  // connector is `figdown 0.5` vocabulary, so a section that WRITES it must
+  // declare 0.5 or the document this tool hands back does not parse. It is a
+  // PRE-PASS for the reason the one above is: the header is written before the
+  // connector lines that decide it.
+  //
+  // Two differences from `KEYWORD-RENAME-SCOPE`'s bump, and both are deliberate. It applies to
+  // EVERY genre, because `id=` is genre-independent and all four connector
+  // spellings take it. And it raises whatever version the section declares,
+  // `0.1` through `0.4`, rather than only `0.1`, because the key is newer than
+  // every one of them. A section already at 0.5, or one that writes no `id=`,
+  // is left exactly as it is: the lowest version that carries the figure is
+  // the correct one (core §13.0 — `Y` adds).
+  const bumpIdHeader = new Set();
+  {
+    let hdrLine = -1, hdrVer = null, needs = false;
+    const close = () => {
+      if (needs && hdrLine > 0 && hdrVer && hdrVer < '0.5') bumpIdHeader.add(hdrLine);
+    };
+    lines.forEach((line, i) => {
+      const bare = stripComment(line).trim();
+      const hm2 = /^figdown\s+(0\.\d+)(?:\s+(\S+))?/.exec(bare);
+      if (hm2) { close(); hdrLine = i + 1; hdrVer = hm2[1]; needs = false; return; }
+      // Only a CONNECTOR line carries the key. `id=` is not legal anywhere
+      // else, so a `node … id=x` line is a line error this tool must not
+      // paper over by moving the header under it.
+      if (/^(edge|flowline|transition|message)(\s|$)/.test(bare) &&
+          /(^|\s)id=/.test(bare)) needs = true;
+    });
+    close();
+  }
   let genre = null;
   let inBitfield = false;
   let starCount = 0;
@@ -1027,7 +1058,7 @@ function migrateText(text, colorMeans) {
           'corpus was already carrying it. The freeze contract promises ' +
           'mechanical migration for FROZEN constructs; `plane` was ' +
           'EXPERIMENTAL, so none was owed. ' +
-          'See spec/migrations.md 0.3 and decisions/registry.md.  ' +
+          'See spec/migrations.md 0.3 and design/scene-keyword-audit.md §4.2.  ' +
           'line: ' + trim,
       });
       return line;
@@ -1130,6 +1161,23 @@ function migrateText(text, colorMeans) {
             line: n,
             rule: 'flowchart header 0.1→0.2 (flowline is 0.2 vocabulary)',
             before: trim,
+            after: stripComment(after).trim(),
+          });
+          headerLine = after;
+        }
+      }
+      // `CONNECTOR-IDENTITY-KEY`: raise the header to `figdown 0.5` on a section that
+      // writes `id=` on a connector. Runs after `KEYWORD-RENAME-SCOPE`'s bump so that a
+      // `figdown 0.1 flowchart` section which writes both a connector and an
+      // `id=` ends at 0.5 rather than at 0.2 — the higher requirement wins,
+      // and it wins by being applied second to the line `KEYWORD-RENAME-SCOPE` already moved.
+      if (bumpIdHeader.has(n)) {
+        const after = headerLine.replace(/^(\s*figdown\s+)0\.[1-4](\s)/, '$10.5$2');
+        if (after !== headerLine) {
+          changes.push({
+            line: n,
+            rule: 'connector header 0.x→0.5 (id= is 0.5 vocabulary)',
+            before: stripComment(headerLine).trim(),
             after: stripComment(after).trim(),
           });
           headerLine = after;

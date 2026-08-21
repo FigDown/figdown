@@ -1,0 +1,21 @@
+# FigDown — figures as text. Spec: https://github.com/FigDown/figdown
+# `CONNECTOR-IDENTITY-KEY`: a `bundle` names its members by CONNECTOR ID, which is
+# the construct's own defining case — a LAG is a set of PARALLEL links between
+# one pair of devices, and until now the endpoint pair could not address them
+# (case 392 pins the refusal).
+#
+# The two member forms live in ONE comma list and are told apart by LEXIS, not
+# by a flag: `--` cannot occur inside an id, so a member either contains it and
+# is a pair or does not and is an id. `lag1` is the parallel case that only the
+# id form reaches; `other` is the mixed list, which needs no rule of its own
+# because every member resolves independently.
+figdown 0.5 topology
+node sw1 "Switch-1"
+node sw2 "Switch-2"
+node sw3 "Switch-3"
+edge sw1 -- sw2 id=lag1a
+edge sw1 -- sw2 id=lag1b
+edge sw1 -- sw2 id=lag1c
+edge sw1 -- sw3
+bundle lag1 "LAG-1 (802.1AX)" lag1a,lag1b,lag1c
+bundle other "Mixed" lag1a,sw1--sw3

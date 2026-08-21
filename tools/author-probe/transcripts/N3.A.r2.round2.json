@@ -1,0 +1,47 @@
+{
+  "probe_version": "1.0.0",
+  "run": {
+    "utc": "2026-08-19T12:04:54Z",
+    "cli": "2.1.234 (Claude Code)",
+    "condition": "A",
+    "task": "N3",
+    "kind": "normal",
+    "seat": 2,
+    "model_alias": "sonnet",
+    "round": 2,
+    "model_used": "claude-sonnet-5"
+  },
+  "saw": {
+    "skill_path": "skill/figdown/SKILL.md",
+    "skill_sha256": "718f935282ce7a93f4b7e36b83983ac1112e49818384d8eaf35869830d34d6a2",
+    "skill_chars": 16497,
+    "system_sha256": "39117af0175e7d927c8f9c715c9555f91e3357a146f2d6d311d4a3bb889ecaae",
+    "user_sha256": "798c15bfdd5bb394b51a4b5b062574d082462331d3aa7a737735b52c1c7fe47f"
+  },
+  "integrity": {
+    "turns": 1,
+    "permission_denials": 0,
+    "is_error": false
+  },
+  "usage": {
+    "cost_usd": 0.06208799999999999,
+    "duration_ms": 14166
+  },
+  "scrub": {
+    "ran": true,
+    "pattern": "email-regex",
+    "replacements": 0
+  },
+  "raw_answer_text": "Given the validator flags the connection lines specifically (not the node declarations), the flowchart genre evidently requires an explicit keyword to introduce a connection line — a bare `id -> id` is being parsed as an attempt to declare a node named `checkcounters`, which collides with genre rules. I've composed the corrected file using an explicit `edge` keyword for each connection, keeping every id, label and branch exactly as specified.\n\n```figdown\n# FigDown — figures as text. Spec: https://github.com/FigDown/figdown\nfigdown 0.1 flowchart\ntitle \"BGP session reset procedure\"\n\nprocess checkcounters \"Check interface error counters\"\ndecision errorsfound \"Errors found?\"\nprocess clearcounters \"Clear interface counters\"\nterminator monitor \"Monitor session\"\nterminator escalate \"Escalate to human operator\"\n\nedge checkcounters -> errorsfound\nedge errorsfound -> clearcounters \"yes\"\nedge errorsfound -> escalate \"no\"\nedge clearcounters -> monitor\n```\n\nPlease run `node <skill-dir>/build-svg.js X.fd` on this — if `edge` is not the correct keyword either, the error message will name the actual required spelling (per the docs: \"Retired spellings are hard errors whose message names the replacement\"), and I'll correct it from that message rather than guessing again.",
+  "extracted_document": "# FigDown — figures as text. Spec: https://github.com/FigDown/figdown\nfigdown 0.1 flowchart\ntitle \"BGP session reset procedure\"\n\nprocess checkcounters \"Check interface error counters\"\ndecision errorsfound \"Errors found?\"\nprocess clearcounters \"Clear interface counters\"\nterminator monitor \"Monitor session\"\nterminator escalate \"Escalate to human operator\"\n\nedge checkcounters -> errorsfound\nedge errorsfound -> clearcounters \"yes\"\nedge errorsfound -> escalate \"no\"\nedge clearcounters -> monitor\n",
+  "validation": {
+    "errors": [
+      "Line 12: unexpected argument \"yes\"",
+      "Line 13: unexpected argument \"no\""
+    ],
+    "invariants_pass": false,
+    "missing_nodes": [],
+    "edge_count": 2,
+    "success": false
+  }
+}

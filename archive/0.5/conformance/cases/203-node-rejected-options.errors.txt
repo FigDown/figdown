@@ -1,0 +1,5 @@
+Line 12: w= has been renamed: use width= (SVG, CSS, DOT, mxGraph and D2 all spell it in full — no standard abbreviates it) (MIGRATIONS 0.1)
+Line 13: h= has been renamed: use height= (SVG, CSS, DOT, mxGraph and D2 all spell it in full — no standard abbreviates it) (MIGRATIONS 0.1)
+Line 6: node does not take width=/height= — use a pin line
+Line 7: node does not take width=/height= — use a pin line
+Line 8: kind= has been renamed: on a node use shape= (geometric; the label text carries the device semantics — MIGRATIONS 0.1), on a chart use type= (Vega, Chart.js and ECharts all spell the chart-type key "type" — MIGRATIONS 0.1). One spelling was retired on node and live on plot at the same time, inside one namespace; 0.1 closed that.

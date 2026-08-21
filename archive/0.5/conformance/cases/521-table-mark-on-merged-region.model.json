@@ -1,0 +1,199 @@
+{
+  "header": {
+    "version": "0.1",
+    "genre": "table"
+  },
+  "flow": "right",
+  "classes": [
+    {
+      "id": "mk",
+      "meaning": "marked",
+      "stroke": "#e07b00",
+      "line": 28
+    },
+    {
+      "id": "mk2",
+      "meaning": "marked, second meaning",
+      "stroke": "#2f8132",
+      "line": 29
+    }
+  ],
+  "planes": [
+    {
+      "id": "base",
+      "z": 0
+    }
+  ],
+  "nodes": [],
+  "groups": [],
+  "edges": [],
+  "ranks": [],
+  "pins": [],
+  "thresholds": [],
+  "bands": [],
+  "bundles": [],
+  "regions": [
+    {
+      "genre": "table",
+      "id": "t",
+      "label": "Marks on merged regions",
+      "heads": [
+        [
+          {
+            "v": "A"
+          },
+          {
+            "v": "B"
+          },
+          {
+            "v": "C"
+          },
+          {
+            "v": "D"
+          }
+        ]
+      ],
+      "aligns": [
+        "none",
+        "none",
+        "none",
+        "none"
+      ],
+      "rows": [
+        {
+          "cells": [
+            {
+              "v": "a1"
+            },
+            {
+              "v": "b1"
+            },
+            {
+              "v": "",
+              "merge": "left"
+            },
+            {
+              "v": "d1"
+            }
+          ],
+          "line": 33
+        },
+        {
+          "cells": [
+            {
+              "v": "a2"
+            },
+            {
+              "v": "b2"
+            },
+            {
+              "v": "c2"
+            },
+            {
+              "v": "d2"
+            }
+          ],
+          "line": 34
+        },
+        {
+          "cells": [
+            {
+              "v": "a3"
+            },
+            {
+              "v": "",
+              "merge": "up"
+            },
+            {
+              "v": "c3"
+            },
+            {
+              "v": "d3"
+            }
+          ],
+          "line": 35
+        },
+        {
+          "cells": [
+            {
+              "v": "a4"
+            },
+            {
+              "v": "b4"
+            },
+            {
+              "v": "",
+              "merge": "left"
+            },
+            {
+              "v": "d4"
+            }
+          ],
+          "line": 36
+        },
+        {
+          "cells": [
+            {
+              "v": "a5"
+            },
+            {
+              "v": "",
+              "merge": "up"
+            },
+            {
+              "v": "",
+              "merge": "up"
+            },
+            {
+              "v": "d5"
+            }
+          ],
+          "line": 37
+        }
+      ],
+      "marks": [
+        {
+          "row": 1,
+          "col": 2,
+          "class": [
+            "mk"
+          ],
+          "line": 38
+        },
+        {
+          "row": 2,
+          "col": 2,
+          "class": [
+            "mk"
+          ],
+          "line": 39
+        },
+        {
+          "row": 4,
+          "col": 2,
+          "class": [
+            "mk"
+          ],
+          "line": 40
+        },
+        {
+          "row": 4,
+          "col": 4,
+          "class": [
+            "mk2"
+          ],
+          "line": 41
+        },
+        {
+          "row": 5,
+          "col": 4,
+          "class": [
+            "mk2"
+          ],
+          "line": 42
+        }
+      ],
+      "line": 30
+    }
+  ]
+}

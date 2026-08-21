@@ -1,0 +1,112 @@
+{
+  "sections": [
+    {
+      "header": {
+        "version": "0.3",
+        "genre": "bitfield"
+      },
+      "flow": "right",
+      "classes": [],
+      "planes": [
+        {
+          "id": "base",
+          "z": 0
+        }
+      ],
+      "nodes": [],
+      "groups": [],
+      "edges": [],
+      "ranks": [],
+      "pins": [],
+      "thresholds": [],
+      "bands": [],
+      "bundles": [],
+      "regions": [
+        {
+          "genre": "bitfield",
+          "id": "hdr",
+          "label": "Frame header",
+          "word": 32,
+          "numbering": "msb0",
+          "fields": [
+            {
+              "name": "Version",
+              "width": 4,
+              "description": "prose for the reading agent: it becomes an SVG <title> and puts no ink on the page",
+              "line": 34
+            },
+            {
+              "name": "Flags",
+              "width": 12,
+              "description": "a second one, so the golden shows them per-field",
+              "line": 35
+            },
+            {
+              "name": "Length",
+              "width": 16,
+              "line": 36
+            }
+          ],
+          "line": 33
+        }
+      ]
+    },
+    {
+      "header": {
+        "version": "0.3",
+        "genre": "block"
+      },
+      "flow": "right",
+      "classes": [],
+      "planes": [
+        {
+          "id": "base",
+          "z": 0
+        }
+      ],
+      "nodes": [
+        {
+          "id": "spine",
+          "label": "Spine",
+          "shape": "box",
+          "group": "fabric",
+          "plane": "base",
+          "note": "drawn",
+          "line": 4
+        },
+        {
+          "id": "leaf",
+          "label": "Leaf",
+          "shape": "box",
+          "group": "fabric",
+          "plane": "base",
+          "line": 5
+        }
+      ],
+      "groups": [
+        {
+          "id": "fabric",
+          "label": "Fabric",
+          "note": "drawn: the human reader must see this one",
+          "line": 3
+        }
+      ],
+      "edges": [
+        {
+          "a": "spine",
+          "op": "->",
+          "b": "leaf",
+          "plane": "base",
+          "note": "drawn, on the carrier that has no id to address",
+          "line": 6
+        }
+      ],
+      "ranks": [],
+      "pins": [],
+      "thresholds": [],
+      "bands": [],
+      "bundles": [],
+      "regions": []
+    }
+  ]
+}

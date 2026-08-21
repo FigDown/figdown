@@ -1,0 +1,8 @@
+figdown 0.1 block
+node a "A"
+node b "B"
+edge a -> b
+
+layout
+pin a at=(0,0)
+pin b at=(200,0)

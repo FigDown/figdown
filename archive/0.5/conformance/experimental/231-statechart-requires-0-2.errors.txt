@@ -1,0 +1,1 @@
+Line 7: genre "statechart" requires figdown 0.2 (this document declares 0.1) — write: figdown 0.2 statechart

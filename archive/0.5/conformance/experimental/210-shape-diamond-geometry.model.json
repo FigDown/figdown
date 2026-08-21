@@ -1,0 +1,62 @@
+{
+  "header": {
+    "version": "0.2",
+    "genre": "flowchart"
+  },
+  "flow": "down",
+  "classes": [],
+  "planes": [
+    {
+      "id": "base",
+      "z": 0
+    }
+  ],
+  "nodes": [
+    {
+      "id": "q",
+      "label": "Retry limit reached?",
+      "shape": "diamond",
+      "plane": "base",
+      "line": 8
+    },
+    {
+      "id": "a",
+      "label": "Alert the operator",
+      "shape": "box",
+      "plane": "base",
+      "line": 9
+    },
+    {
+      "id": "b",
+      "label": "Continue",
+      "shape": "box",
+      "plane": "base",
+      "line": 10
+    }
+  ],
+  "groups": [],
+  "edges": [
+    {
+      "a": "q",
+      "op": "->",
+      "b": "a",
+      "mid": "yes",
+      "plane": "base",
+      "line": 12
+    },
+    {
+      "a": "q",
+      "op": "->",
+      "b": "b",
+      "mid": "no",
+      "plane": "base",
+      "line": 13
+    }
+  ],
+  "ranks": [],
+  "pins": [],
+  "thresholds": [],
+  "bands": [],
+  "bundles": [],
+  "regions": []
+}

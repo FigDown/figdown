@@ -1,0 +1,88 @@
+{
+  "sections": [
+    {
+      "header": {
+        "version": "0.1",
+        "genre": "block"
+      },
+      "flow": "right",
+      "classes": [],
+      "planes": [
+        {
+          "id": "base",
+          "z": 0
+        }
+      ],
+      "nodes": [
+        {
+          "id": "a",
+          "label": "A",
+          "shape": "box",
+          "plane": "base",
+          "line": 2
+        },
+        {
+          "id": "b",
+          "label": "B",
+          "shape": "box",
+          "plane": "base",
+          "line": 3
+        }
+      ],
+      "groups": [],
+      "edges": [
+        {
+          "a": "a",
+          "op": "->",
+          "b": "b",
+          "plane": "base",
+          "line": 4
+        }
+      ],
+      "ranks": [],
+      "pins": [],
+      "thresholds": [],
+      "bands": [],
+      "bundles": [],
+      "regions": []
+    },
+    {
+      "header": {
+        "version": "0.1",
+        "genre": "bitfield"
+      },
+      "flow": "right",
+      "classes": [],
+      "planes": [
+        {
+          "id": "base",
+          "z": 0
+        }
+      ],
+      "nodes": [],
+      "groups": [],
+      "edges": [],
+      "ranks": [],
+      "pins": [],
+      "thresholds": [],
+      "bands": [],
+      "bundles": [],
+      "regions": [
+        {
+          "genre": "bitfield",
+          "id": "hdr",
+          "word": 32,
+          "numbering": "msb0",
+          "fields": [
+            {
+              "name": "Payload",
+              "width": "*",
+              "line": 3
+            }
+          ],
+          "line": 2
+        }
+      ]
+    }
+  ]
+}

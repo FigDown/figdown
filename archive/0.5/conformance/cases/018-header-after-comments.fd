@@ -1,0 +1,9 @@
+# 0.1 (`HEADER-GENRE-REQUIREMENT`): the header must be the FIRST SIGNIFICANT line —
+# comments and blank lines MAY precede it. A provenance block above the
+# header is common in production corpora, and the grammar admits it.
+# source: hand-written
+# method: transcribed from an ASCII figure
+
+figdown 0.1 block
+title "Provenance block above the header"
+node a "A"

@@ -1,0 +1,9 @@
+{
+  "id": "N3",
+  "kind": "normal",
+  "genre": "flowchart",
+  "version": "0.1",
+  "brief": "Draw a flowchart figure titled \"BGP session reset procedure\" for an operator whose BGP session keeps flapping. First, check the interface's error counters. That check is a decision: if errors are found, clear the interface counters and then monitor the session. If no errors are found, escalate to a human operator instead. Use these ids: checkcounters (a process step for checking the counters), errorsfound (the decision), clearcounters (a process step), monitor (a terminator ending in monitoring), escalate (a terminator ending in escalation). Show the branches: checkcounters into errorsfound, errorsfound's yes branch into clearcounters, clearcounters into monitor, and errorsfound's no branch into escalate.",
+  "must_have_nodes": ["checkcounters", "errorsfound", "clearcounters", "monitor", "escalate"],
+  "min_edges": 4
+}

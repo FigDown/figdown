@@ -1,0 +1,5 @@
+Line 10: highlight applies to data rows only
+Line 11: row 3 out of range
+Line 7: row 0 is retired — address header tiers as h1..hN (top-down)
+Line 8: cell 9,1 out of range
+Line 9: cell 1,2 is merged away — annotate the anchor cell

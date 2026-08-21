@@ -1,0 +1,54 @@
+{
+  "probe_version": "1.0.0",
+  "run": {
+    "utc": "2026-08-19T12:17:01Z",
+    "cli": "2.1.234 (Claude Code)",
+    "condition": "B",
+    "task": "T1",
+    "kind": "trap",
+    "seat": 3,
+    "model_alias": "haiku",
+    "round": 1,
+    "model_used": "claude-haiku-4-5-20251001"
+  },
+  "saw": {
+    "skill_path": "tools/author-probe/skill-candidate.md",
+    "skill_sha256": "2abdaf0d9211d5ee1464c5f5c3a200b1ae6f7bd71cfd6344e7da94d669e6ed31",
+    "skill_chars": 17591,
+    "system_sha256": "39117af0175e7d927c8f9c715c9555f91e3357a146f2d6d311d4a3bb889ecaae",
+    "user_sha256": "fa7943573757aa3a08a2cc869cae97d2f4cae7c5fb931fcd72852abab3a602c2"
+  },
+  "integrity": {
+    "turns": 1,
+    "permission_denials": 0,
+    "is_error": false
+  },
+  "usage": {
+    "cost_usd": 0.026747,
+    "duration_ms": 22561
+  },
+  "scrub": {
+    "ran": true,
+    "pattern": "email-regex",
+    "replacements": 0
+  },
+  "raw_answer_text": "Looking at the documentation and your requirements, I need to create a block diagram with three services connected in sequence, with the probe-to-normalizer edge explicitly routed through waypoints to create a visible jog.\n\nHere's the finished FigDown document:\n\n```figdown\n# FigDown — figures as text. Spec: https://github.com/FigDown/figdown\nfigdown 0.1 block\ntitle \"Alert-forwarding chain\"\n\nblock probe \"Probe\"\nblock normalizer \"Normalizer\"\nblock sink \"Sink\"\n\nedge probe normalizer via=(60,20),(90,40)\nedge normalizer sink\n```\n\n**Commentary:**\n\n- **Line 1** is the spec provenance line, required and verbatim.\n- **Line 2** declares this as a `block` genre diagram at version `0.1`.\n- **Line 3** supplies the title that will appear above the figure.\n- **Lines 5–7** declare three block nodes with their ids and labels.\n- **Lines 9–10** declare the edges:\n  - The first edge from `probe` to `normalizer` includes explicit waypoints at `(60,20)` and `(90,40)` via the `via=` parameter, which forces the connector to jog around intermediate space rather than routing directly.\n  - The second edge from `normalizer` to `sink` routes normally.\n\nThe waypoints create the visible routing jog you requested, preparing the layout for a third element that may occupy the direct path in the final rendered figure.",
+  "extracted_document": "# FigDown — figures as text. Spec: https://github.com/FigDown/figdown\nfigdown 0.1 block\ntitle \"Alert-forwarding chain\"\n\nblock probe \"Probe\"\nblock normalizer \"Normalizer\"\nblock sink \"Sink\"\n\nedge probe normalizer via=(60,20),(90,40)\nedge normalizer sink\n",
+  "validation": {
+    "errors": [
+      "Line 5: \"block\" is not allowed in genre block",
+      "Line 6: \"block\" is not allowed in genre block",
+      "Line 7: \"block\" is not allowed in genre block",
+      "Line 9: edge needs an operator: -> <- -- <-> (a [mid] label splits it: -[x]->)",
+      "Line 10: edge needs an operator: -> <- -- <-> (a [mid] label splits it: -[x]->)"
+    ],
+    "invariants_pass": false,
+    "missing_nodes": [
+      "probe",
+      "normalizer",
+      "sink"
+    ],
+    "edge_count": 0,
+    "success": false
+  }
+}

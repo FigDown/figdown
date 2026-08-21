@@ -1,0 +1,47 @@
+{
+  "probe_version": "1.0.0",
+  "run": {
+    "utc": "2026-08-19T12:04:11Z",
+    "cli": "2.1.234 (Claude Code)",
+    "condition": "A",
+    "task": "N2",
+    "kind": "normal",
+    "seat": 4,
+    "model_alias": "haiku",
+    "round": 2,
+    "model_used": "claude-haiku-4-5-20251001"
+  },
+  "saw": {
+    "skill_path": "skill/figdown/SKILL.md",
+    "skill_sha256": "718f935282ce7a93f4b7e36b83983ac1112e49818384d8eaf35869830d34d6a2",
+    "skill_chars": 16497,
+    "system_sha256": "39117af0175e7d927c8f9c715c9555f91e3357a146f2d6d311d4a3bb889ecaae",
+    "user_sha256": "2102ec4a240de5fa8d8d2cbd733f6dc86cd5be58511e1654f59eb0e5b18e0998"
+  },
+  "integrity": {
+    "turns": 1,
+    "permission_denials": 0,
+    "is_error": false
+  },
+  "usage": {
+    "cost_usd": 0.02059,
+    "duration_ms": 8827
+  },
+  "scrub": {
+    "ran": true,
+    "pattern": "email-regex",
+    "replacements": 0
+  },
+  "raw_answer_text": "Looking at the validator errors, the issue is that each `edge` line needs an **operator** specifying the connection type. The error message tells us the options are `->`, `<-`, `--`, or `<->`.\n\nFor a network topology diagram, `--` (undirected connection) is appropriate for these links since they represent bidirectional network paths. For edges with labels, the syntax shown in the error message is `-[label]->`, so for undirected edges with labels, it would be `-[label]--`.\n\nHere's the corrected document:\n\n```figdown\n# FigDown — figures as text. Spec: https://github.com/FigDown/figdown\nfigdown 0.1 topology\ntitle \"Branch office WAN uplinks\"\n\nnode access1 \"Access Switch 1\"\nnode access2 \"Access Switch 2\"\nnode branch \"Branch Router\"\nnode hubprimary \"Regional Hub (Primary)\"\nnode hubbackup \"Regional Hub (Backup)\"\n\nedge access1 -- branch\nedge access2 -- branch\nedge branch -[Primary WAN]-- hubprimary\nedge branch -[Backup WAN]-- hubbackup\n```\n\nThe changes:\n- Added `--` operator to all four edge lines for undirected connections\n- Used the `-[label]--` syntax for the labeled edges to the hub routers",
+  "extracted_document": "# FigDown — figures as text. Spec: https://github.com/FigDown/figdown\nfigdown 0.1 topology\ntitle \"Branch office WAN uplinks\"\n\nnode access1 \"Access Switch 1\"\nnode access2 \"Access Switch 2\"\nnode branch \"Branch Router\"\nnode hubprimary \"Regional Hub (Primary)\"\nnode hubbackup \"Regional Hub (Backup)\"\n\nedge access1 -- branch\nedge access2 -- branch\nedge branch -[Primary WAN]-- hubprimary\nedge branch -[Backup WAN]-- hubbackup\n",
+  "validation": {
+    "errors": [
+      "Line 13: edge needs a target id after the operator",
+      "Line 14: edge needs a target id after the operator"
+    ],
+    "invariants_pass": false,
+    "missing_nodes": [],
+    "edge_count": 2,
+    "success": false
+  }
+}

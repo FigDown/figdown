@@ -1,0 +1,11 @@
+figdown 0.1 flowchart
+title "Configuration rollback procedure"
+
+process apply "Apply candidate config"
+decision verify "Config verifies clean?"
+process commit "Commit config"
+terminator rollback "Roll back to last-known-good"
+
+edge apply -> verify
+edge verify -[yes]-> commit
+egde verify -[no]-> rollback

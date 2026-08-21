@@ -1,0 +1,22 @@
+# `UNDELIVERED-MESSAGE-MARKING`/`SEQUENCE-TIME-GAP`/`SEQUENCE-PARTICIPANT-GROUPING`: the three constructs this genre REFUSED. None
+# of them is a withdrawal — the genre never declared any of the three — so
+# each gets its own diagnostic shape: the ground the ruling gave, and the
+# spelling that works instead.
+#
+# `gap` is the interesting one mechanically. It is BOTH `timing`'s child
+# keyword and the word this genre refused, so the refusal has to be consulted
+# BEFORE the typed-block-child exemption or the author is told "gap is a
+# typed-block child", which is true of the language and says nothing about the
+# ruling they have run into.
+#
+# `lost=` is the other interesting one: it is NOT in the language's option
+# registry at all, because refusing it means adding no key. So its named
+# diagnostic fires on the UNKNOWN-OPTION path rather than on the
+# inapplicable-key path — which is how a refusal can be named without the
+# spelling being registered.
+figdown 0.4 sequence
+lifeline c "C"
+lifeline s "S"
+group participants "Both ends"
+gap "T1 fires"
+message c -> s "never arrives" lost="the issuing server does not answer"

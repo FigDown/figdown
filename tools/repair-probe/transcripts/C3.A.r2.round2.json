@@ -1,0 +1,54 @@
+{
+  "probe_version": "1.0.0",
+  "run": {
+    "utc": "2026-08-19T11:08:37Z",
+    "model_alias": "haiku",
+    "model_used": "claude-haiku-4-5-20251001",
+    "cli": "2.1.234 (Claude Code)",
+    "seat": 2,
+    "condition": "A",
+    "fixture": "C3",
+    "klass": "compound/word-not-in-genre+complete-cover (staged)",
+    "round": 2
+  },
+  "engine_channel": "dist-public-api",
+  "saw": {
+    "original_fixture_sha256": "12f5ba35e048162320e8efb89270945a30b6320c67ae9b29d5dca860fbc8f329",
+    "document_shown_sha256": "f4775034e50873c707bd6c137eda98c39c0038103d094da28314caa1148ac960",
+    "system_sha256": "ef2a3cd623ce06b05aa4652d8ace761c4f70f24298bcef0552f22e2e46e277fc",
+    "user_sha256": "ccd3210f86fdf67c20e53a865a8aedf25923adc84c670f8b84bcbd07b8d438b0"
+  },
+  "integrity": {
+    "turns": 1,
+    "permission_denials": 0,
+    "is_error": false
+  },
+  "usage": {
+    "cost_usd": 0.038661999999999995,
+    "duration_ms": 68215
+  },
+  "scrub": {
+    "ran": true,
+    "pattern": "email-regex",
+    "replacements": 0
+  },
+  "raw_answer_text": "```\nfigdown 0.1 block\ntitle \"Firmware update verdict pair\"\n\nnode fetch \"Fetch firmware image\"\nnode verify \"Verify checksum\"\nnode accept \"Apply update\"\nnode reject \"Reject and roll back\"\nnode notify \"Notify operator\"\n\nedge fetch -> verify\nedge verify -> accept\nedge verify -> reject\nedge reject -> notify\n\npin reject at=(0,100) width=60 height=20\n```",
+  "presented": {
+    "document_shown": "figdown 0.1 block\ntitle \"Firmware update verdict pair\"\n\nnode fetch \"Fetch firmware image\"\nnode verify \"Verify checksum\"\nnode accept \"Apply update\"\nnode reject \"Reject and roll back\"\nnode notify \"Notify operator\"\n\nedge fetch -> verify\nedge verify -> accept\nedge verify -> reject\nedge reject -> notify\n\npin reject at=(0,40) width=60 height=20\n",
+    "validator_shown": {
+      "errors": [
+        "Line 15: pin puts \"fetch\" completely over \"reject\" — a node drawn entirely inside another is invisible, so the figure states that \"reject\" is not there. Move the pin off \"reject\", or pin \"reject\" too if the cover is deliberate — document order is paint order (R161), so two author-placed boxes may overlap however the author says. Partial overlap is not this error; only a complete cover is."
+      ],
+      "diagnostics": []
+    }
+  },
+  "extracted_document": "figdown 0.1 block\ntitle \"Firmware update verdict pair\"\n\nnode fetch \"Fetch firmware image\"\nnode verify \"Verify checksum\"\nnode accept \"Apply update\"\nnode reject \"Reject and roll back\"\nnode notify \"Notify operator\"\n\nedge fetch -> verify\nedge verify -> accept\nedge verify -> reject\nedge reject -> notify\n\npin reject at=(0,100) width=60 height=20\n",
+  "validation": {
+    "errors_after": [],
+    "diagnostics_after": [],
+    "invariants_pass": true,
+    "missing_nodes": [],
+    "edge_count": 4,
+    "success": true
+  }
+}

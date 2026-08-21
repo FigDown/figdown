@@ -1,0 +1,12 @@
+figdown 0.1 block
+# §1: ids are unique per document — typed blocks share the node/group/
+# external namespace (206 is the same rule between node and group).
+node a "Node A"
+bitfield a "Block A" numbering=lsb0
+field "one" 4
+table t "T"
+| h |
+|---|
+| 1 |
+timing t "W"
+signal clk p...

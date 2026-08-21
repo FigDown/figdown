@@ -1,0 +1,62 @@
+figdown 0.3 block
+# `DRAWN-ANNOTATION-FORM`: the directives that refuse `note=` with the GENERIC
+# message — `cell`, `external`, `threshold`, `band`, `bundle` and `class`.
+# There were SEVEN until 0.3; `plane` was the seventh and it left the
+# language (`PAINT-ORDER-CONSTRUCT`), so `plane over "Overlay" note="…"` is gone from section 1
+# and the set is six. The six sit in three sections because they no longer
+# sit in one genre: `block` declares `threshold`, `band`, `external` and
+# `class`; `topology` is the only genre that still declares `bundle` (`SCENE-KEYWORD-MEMBERSHIP`);
+# and the `table` genre owns `cell`.
+#
+# WHAT IS BEING PINNED, AND WHY IT IS NOT NOTHING. `note` is in `OPT_KEYS` —
+# the language HAS the spelling — so none of these lines can answer
+# `unknown option "note="`. They answer `<directive> does not take note=`,
+# which is the ordinary allowlist message every unlisted key gets on every
+# directive. That is the CORRECT answer here: there is no reasoned refusal to
+# make, because the key simply is not in these rows. `field` is the one
+# exception and has its own message (case 803); this fixture is the boundary
+# of that exception.
+#
+# WHY EACH ONE IS OUT. `class` is a DECLARATION, not a drawn element — a note
+# on a declaration has no carrier to attach to, and the same was true of
+# `plane` while it existed. `cell` is a grid square inside a region and
+# `threshold`/`band` are marks laid ON a region, so all three would need the
+# locator grammar that `MARKER-TARGET-KINDS` deliberately left unbuilt. `external` and
+# `bundle` were not argued for and were not measured; nothing asked for them,
+# and RULE 4.7 makes that a reason not to grant them yet.
+#
+# NORMATIVE BY SUBJECT, per STATUS.txt's third criterion: `threshold`,
+# `band` and `bundle` are demoted constructs that this fixture merely USES as
+# hosts. What it TESTS is a language-wide allowlist message for a NORMATIVE
+# option key. Case 115 sits in exactly this position — it runs `bundle`,
+# `threshold` and `band` through the generic option-before-label rule and
+# stays in cases/ — and this file follows it.
+class hot "Hot path" stroke=#e07b00 note="a class is a declaration and has no carrier"
+group pool "Resource pool"
+node q0 "Q0" in=pool
+node q1 "Q1" in=pool
+external wan "WAN"
+external mgmt "Mgmt" note="not argued for, not measured"
+edge q0 -- wan
+edge q1 -- wan
+threshold "Max" in=pool offset=80% note="a mark on a region needs the locator grammar MARKER-TARGET-KINDS left unbuilt"
+band "Reserved" 15..35% in=pool note="the same, for the region form"
+
+figdown 0.3 topology
+# Section 2: `bundle`, which only `topology` declares since `SCENE-KEYWORD-MEMBERSHIP`. The hosts
+# are rebuilt here because `GENRE-NAMESPACE` gives every section its own id space.
+node q0 "Q0"
+node q1 "Q1"
+external wan "WAN"
+edge q0 -- wan
+edge q1 -- wan
+bundle lag "LAG-1" q0--wan,q1--wan note="not argued for, not measured"
+
+figdown 0.3 table
+# Section 3: `cell`, which only exists inside a `table` block.
+table t "Cells refuse it too"
+| Slot | Depth |
+|------|-------|
+| s0 | 12 |
+| s1 | 30 |
+cell (1,1) note="a grid square is addressed by coordinate, not annotated by one"

@@ -1,0 +1,55 @@
+{
+  "probe_version": "1.0.0",
+  "run": {
+    "utc": "2026-08-19T12:05:21Z",
+    "cli": "2.1.234 (Claude Code)",
+    "condition": "A",
+    "task": "N4",
+    "kind": "normal",
+    "seat": 1,
+    "model_alias": "sonnet",
+    "round": 1,
+    "model_used": "claude-sonnet-5"
+  },
+  "saw": {
+    "skill_path": "skill/figdown/SKILL.md",
+    "skill_sha256": "718f935282ce7a93f4b7e36b83983ac1112e49818384d8eaf35869830d34d6a2",
+    "skill_chars": 16497,
+    "system_sha256": "39117af0175e7d927c8f9c715c9555f91e3357a146f2d6d311d4a3bb889ecaae",
+    "user_sha256": "ad114943f092c2efcb7b7e4a66f3068d3be38aff65a94ebe7fb06fbe28c4e1e7"
+  },
+  "integrity": {
+    "turns": 1,
+    "permission_denials": 0,
+    "is_error": false
+  },
+  "usage": {
+    "cost_usd": 0.0205542,
+    "duration_ms": 14203
+  },
+  "scrub": {
+    "ran": true,
+    "pattern": "email-regex",
+    "replacements": 0
+  },
+  "raw_answer_text": "Here's the FigDown source for this figure. It's a straightforward `block` diagram — six components, five directed connections, no branching or state — so no other genre fits better.\n\n```figdown\n# FigDown — figures as text. Spec: https://github.com/FigDown/figdown\nfigdown 0.1 block\ntitle \"Certificate renewal automation\"\n\nblock scheduler \"Scheduler\"\nblock renewaljob \"Renewal Job\"\nblock caclient \"CA Client\"\nblock ca \"Certificate Authority\"\nblock deployagent \"Deploy Agent\"\nblock service \"Service\"\n\nscheduler -> renewaljob \"trigger\"\nrenewaljob -> caclient \"obtain certificate\"\ncaclient -> ca \"request certificate\"\nrenewaljob -> deployagent \"hand off\"\ndeployagent -> service \"restart\"\n```\n\nNotes on the choices made:\n\n- **Genre**: `block` — this is a small set of labeled components with directed relationships, which is exactly what `block` is for (per the router: \"architecture, dataflow, hierarchy\").\n- **Labels kept short**: each edge label names the action in a couple of words (`trigger`, `obtain certificate`, `request certificate`, `hand off`, `restart`), leaving the surrounding prose to carry any further detail — per the mode-3 authoring rule against overstuffed labels.\n- **No classes/colour** were introduced because the description gives no categorical distinction (e.g., \"critical path\" vs \"normal\") worth asserting — adding color without stated meaning would violate the \"class is how meaning survives\" rule.\n- **All five connections** from the description are present, one-to-one, with none invented.\n\nNext step per the normal workflow: run `node <skill-dir>/build-svg.js X.fd` to validate and produce the `.svg`, then embed both side by side in the host document with the standard source footer:\n\n```markdown\n![Certificate renewal automation: a scheduler triggers a renewal job, which obtains a new certificate via a CA client from the certificate authority, then hands off to a deploy agent that restarts the service.](figures/cert-renewal.svg)\n\n<sub>source: [figures/cert-renewal.fd](figures/cert-renewal.fd)</sub>\n```",
+  "extracted_document": "![Certificate renewal automation: a scheduler triggers a renewal job, which obtains a new certificate via a CA client from the certificate authority, then hands off to a deploy agent that restarts the service.](figures/cert-renewal.svg)\n\n<sub>source: [figures/cert-renewal.fd](figures/cert-renewal.fd)</sub>\n",
+  "validation": {
+    "errors": [
+      "Line 1: first line must be \"figdown 0.1 <genre>\"",
+      "Line 1: unrecognized line (unknown keyword \"![Certificate\")",
+      "Line 3: unrecognized line (unknown keyword \"<sub>source:\")"
+    ],
+    "invariants_pass": false,
+    "missing_nodes": [
+      "scheduler",
+      "renewaljob",
+      "caclient",
+      "ca",
+      "deployagent",
+      "service"
+    ],
+    "edge_count": 0,
+    "success": false
+  }
+}

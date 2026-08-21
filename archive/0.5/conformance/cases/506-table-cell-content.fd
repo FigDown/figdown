@@ -1,0 +1,5 @@
+figdown 0.1 table
+table t "T"
+| A | B | C | D |
+|---|---|---|---|
+| a \| pipe | \^^ | | \x raw |

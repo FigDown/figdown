@@ -1,0 +1,54 @@
+{
+  "probe_version": "1.0.0",
+  "run": {
+    "utc": "2026-08-19T12:17:55Z",
+    "cli": "2.1.234 (Claude Code)",
+    "condition": "B",
+    "task": "T1",
+    "kind": "trap",
+    "seat": 3,
+    "model_alias": "haiku",
+    "round": 2,
+    "model_used": "claude-haiku-4-5-20251001"
+  },
+  "saw": {
+    "skill_path": "tools/author-probe/skill-candidate.md",
+    "skill_sha256": "2abdaf0d9211d5ee1464c5f5c3a200b1ae6f7bd71cfd6344e7da94d669e6ed31",
+    "skill_chars": 17591,
+    "system_sha256": "39117af0175e7d927c8f9c715c9555f91e3357a146f2d6d311d4a3bb889ecaae",
+    "user_sha256": "adeae917f3a3a6a3b5e1f369b25e15094b24ef7f61e4b24c01a9562521965841"
+  },
+  "integrity": {
+    "turns": 1,
+    "permission_denials": 0,
+    "is_error": false
+  },
+  "usage": {
+    "cost_usd": 0.041913,
+    "duration_ms": 52894
+  },
+  "scrub": {
+    "ran": true,
+    "pattern": "email-regex",
+    "replacements": 0
+  },
+  "raw_answer_text": "Looking at the validation errors, I can see two issues to fix:\n\n1. **Lines 5-7**: The keyword `block` is not allowed within the `block` genre. Based on common block diagram terminology, the correct keyword should be `box` for defining rectangular elements/containers.\n\n2. **Lines 9-10**: The edges are missing directional operators. The validator shows four options (`->`, `<-`, `--`, `<->`). For a directed chain, I need to use `->`.\n\nHere's the corrected document:\n\n```figdown\n# FigDown — figures as text. Spec: https://github.com/FigDown/figdown\nfigdown 0.1 block\ntitle \"Alert-forwarding chain\"\n\nbox probe \"Probe\"\nbox normalizer \"Normalizer\"\nbox sink \"Sink\"\n\nedge probe normalizer -> via=(60,20),(90,40)\nedge normalizer sink ->\n```\n\nThe changes made:\n- Replaced `block` with `box` on lines 5, 6, and 7\n- Added `->` operator to both edge declarations (lines 9 and 10)\n- Preserved the `via=(60,20),(90,40)` waypoint specification on the first edge so it will route around the element that sits between probe and normalizer",
+  "extracted_document": "# FigDown — figures as text. Spec: https://github.com/FigDown/figdown\nfigdown 0.1 block\ntitle \"Alert-forwarding chain\"\n\nbox probe \"Probe\"\nbox normalizer \"Normalizer\"\nbox sink \"Sink\"\n\nedge probe normalizer -> via=(60,20),(90,40)\nedge normalizer sink ->\n",
+  "validation": {
+    "errors": [
+      "Line 5: \"box\" is not allowed in genre block",
+      "Line 6: \"box\" is not allowed in genre block",
+      "Line 7: \"box\" is not allowed in genre block",
+      "Line 9: edge needs an operator: -> <- -- <-> (a [mid] label splits it: -[x]->)",
+      "Line 10: edge needs an operator: -> <- -- <-> (a [mid] label splits it: -[x]->)"
+    ],
+    "invariants_pass": false,
+    "missing_nodes": [
+      "probe",
+      "normalizer",
+      "sink"
+    ],
+    "edge_count": 0,
+    "success": false
+  }
+}

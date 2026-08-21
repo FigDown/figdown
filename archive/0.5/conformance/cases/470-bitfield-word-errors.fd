@@ -1,0 +1,9 @@
+figdown 0.1 bitfield
+bitfield a numbering=msb0 word=
+field "X" 8
+bitfield b numbering=msb0 word=8.5
+field "Y" 8
+bitfield c numbering=msb0 word=0
+field "Z" 8
+bitfield d numbering=msb0 word=abc
+field "W" 8

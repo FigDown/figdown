@@ -1,0 +1,79 @@
+{
+  "header": {
+    "version": "0.2",
+    "genre": "flowchart"
+  },
+  "flow": "down",
+  "classes": [],
+  "planes": [
+    {
+      "id": "base",
+      "z": 0
+    }
+  ],
+  "nodes": [
+    {
+      "id": "wide",
+      "label": "Which case?",
+      "role": "decision",
+      "shape": "ellipse",
+      "plane": "base",
+      "line": 7
+    },
+    {
+      "id": "round",
+      "label": "Normalize",
+      "role": "process",
+      "shape": "rounded",
+      "plane": "base",
+      "line": 8
+    },
+    {
+      "id": "boxy",
+      "label": "Halt",
+      "role": "terminator",
+      "shape": "box",
+      "plane": "base",
+      "line": 9
+    },
+    {
+      "id": "plain",
+      "label": "Look-alike",
+      "shape": "diamond",
+      "plane": "base",
+      "line": 10
+    }
+  ],
+  "groups": [],
+  "edges": [
+    {
+      "a": "wide",
+      "op": "->",
+      "b": "round",
+      "mid": "a",
+      "plane": "base",
+      "line": 12
+    },
+    {
+      "a": "wide",
+      "op": "->",
+      "b": "boxy",
+      "mid": "b",
+      "plane": "base",
+      "line": 13
+    },
+    {
+      "a": "round",
+      "op": "->",
+      "b": "plain",
+      "plane": "base",
+      "line": 14
+    }
+  ],
+  "ranks": [],
+  "pins": [],
+  "thresholds": [],
+  "bands": [],
+  "bundles": [],
+  "regions": []
+}

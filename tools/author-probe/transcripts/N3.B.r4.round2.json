@@ -1,0 +1,44 @@
+{
+  "probe_version": "1.0.0",
+  "run": {
+    "utc": "2026-08-19T12:15:29Z",
+    "cli": "2.1.234 (Claude Code)",
+    "condition": "B",
+    "task": "N3",
+    "kind": "normal",
+    "seat": 4,
+    "model_alias": "haiku",
+    "round": 2,
+    "model_used": "claude-haiku-4-5-20251001"
+  },
+  "saw": {
+    "skill_path": "tools/author-probe/skill-candidate.md",
+    "skill_sha256": "2abdaf0d9211d5ee1464c5f5c3a200b1ae6f7bd71cfd6344e7da94d669e6ed31",
+    "skill_chars": 17591,
+    "system_sha256": "39117af0175e7d927c8f9c715c9555f91e3357a146f2d6d311d4a3bb889ecaae",
+    "user_sha256": "d21561291d0358656377b21f778198c969bf46040cee61334edd9d5447f2ab2c"
+  },
+  "integrity": {
+    "turns": 1,
+    "permission_denials": 0,
+    "is_error": false
+  },
+  "usage": {
+    "cost_usd": 0.021295,
+    "duration_ms": 8370
+  },
+  "scrub": {
+    "ran": true,
+    "pattern": "email-regex",
+    "replacements": 0
+  },
+  "raw_answer_text": "Looking at the validator output, the issue is that the `edge` syntax is missing the directional operator. According to the error message, edges need an operator like `->`, `<-`, `--`, or `<->`. For a flowchart, `->` is the appropriate directional operator, and labels in the middle use the syntax `-[label]->`.\n\nHere's the corrected document:\n\n```figdown\n# FigDown — figures as text. Spec: https://github.com/FigDown/figdown\nfigdown 0.1 flowchart\ntitle \"BGP session reset procedure\"\n\nprocess checkcounters \"Check interface error counters\"\ndecision errorsfound \"Errors found?\"\nprocess clearcounters \"Clear counters\"\nterminator monitor \"Monitor session\"\nterminator escalate \"Escalate to operator\"\n\nedge checkcounters -> errorsfound\nedge errorsfound -[yes]-> clearcounters\nedge errorsfound -[no]-> escalate\nedge clearcounters -> monitor\n```\n\nThe key changes:\n- Line 11: `edge checkcounters -> errorsfound` (added `->` operator)\n- Line 12: `edge errorsfound -[yes]-> clearcounters` (added `->` operator and moved label into the middle with `-[yes]->` syntax)\n- Line 13: `edge errorsfound -[no]-> escalate` (added `->` operator and moved label into the middle with `-[no]->` syntax)\n- Line 14: `edge clearcounters -> monitor` (added `->` operator)\n\nThis fixes all four syntax errors by providing the required directional operators and using the correct label placement syntax for mid-edge labels.",
+  "extracted_document": "# FigDown — figures as text. Spec: https://github.com/FigDown/figdown\nfigdown 0.1 flowchart\ntitle \"BGP session reset procedure\"\n\nprocess checkcounters \"Check interface error counters\"\ndecision errorsfound \"Errors found?\"\nprocess clearcounters \"Clear counters\"\nterminator monitor \"Monitor session\"\nterminator escalate \"Escalate to operator\"\n\nedge checkcounters -> errorsfound\nedge errorsfound -[yes]-> clearcounters\nedge errorsfound -[no]-> escalate\nedge clearcounters -> monitor\n",
+  "validation": {
+    "errors": [],
+    "invariants_pass": true,
+    "missing_nodes": [],
+    "edge_count": 4,
+    "success": true
+  }
+}

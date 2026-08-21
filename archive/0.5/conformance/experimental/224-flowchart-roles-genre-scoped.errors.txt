@@ -1,0 +1,3 @@
+Line 11: "terminator" is not allowed in genre bitfield
+Line 7: "decision" is not allowed in genre block
+Line 9: "process" is not allowed in genre topology

@@ -1,0 +1,17 @@
+# `MEMBERSHIP-KEY-ACCEPTANCE`: the KEEP half. `in=` is withdrawn from TWO genres and
+# from nothing else — a per-genre withdrawal is one genre's declaration
+# lapsing, never the key leaving the language (core §3, `GENRE-VOCABULARY-OBLIGATION`), and the only way
+# to say that in a fixture is to write the key where it is still legal.
+#
+# Two sections, because the two surviving genres are two independent
+# declarations and a fixture that pinned only one would leave the other free
+# to drift. Both still resolve `in=` against a declared `group` id, unchanged.
+figdown 0.2 block
+title "in= under block is untouched"
+group g "Chassis"
+node a "A" in=g
+
+figdown 0.2 topology
+title "in= under topology is untouched"
+group site "Site 1"
+node r1 "R1" in=site

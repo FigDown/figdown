@@ -1,0 +1,32 @@
+figdown 0.1 block
+# 0.1 retires THREE option keys language-wide. Unlike `color=` — which
+# stayed registered on the thirteen directives that accepted it, so its
+# message could be per-directive — these spellings left the language
+# altogether: no directive accepts them, so the diagnostic fires WHEREVER the
+# key appears (the `colw` → `width` precedent). A retired spelling must name
+# its migration entry (PROCESS §5(d)); this case pins all three messages, and
+# pins that the named diagnostic beats both the generic `unknown option` and
+# the host directive's own "does not take" message.
+#
+#   w=   → width=    SVG, CSS, Graphviz DOT, mxGraph and D2 all spell the box
+#   h=   → height=   attributes in full. `fill=`/`stroke=` were borrowed whole
+#                    from SVG; abbreviating only the extent pair breaks the
+#                    single-source vocabulary rule (`UNSAFE-DEFAULT-ELIMINATION`).
+#   dir= → extend=   HTML's `dir` is TEXT WRITING DIRECTION. FigDown's meant
+#                    "which way the band extends from its anchor" — the same
+#                    spelling for a different meaning, an `UNSAFE-DEFAULT-ELIMINATION` defect.
+#
+# The INPUT below MUST be written in the RETIRED spellings — that is the whole
+# point of the fixture. A bulk rename to the current spellings makes every
+# line legal (or fail for an unrelated reason) and silently deletes the
+# coverage; if you are running a migration over this directory, this file is
+# the one to skip.
+group g "G"
+node a "A"
+pin a w=120
+pin a h=60
+band "z" 15% in=g dir=up
+# on a directive that never accepted the key, the retirement message is still
+# the right answer — the OLD spelling is what does not belong there
+node b "B" w=10
+edge a -> b dir=down

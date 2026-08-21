@@ -1,0 +1,84 @@
+{
+  "header": {
+    "version": "0.1",
+    "genre": "table"
+  },
+  "flow": "right",
+  "classes": [],
+  "planes": [
+    {
+      "id": "base",
+      "z": 0
+    }
+  ],
+  "nodes": [],
+  "groups": [],
+  "edges": [],
+  "ranks": [],
+  "pins": [],
+  "thresholds": [],
+  "bands": [],
+  "bundles": [],
+  "regions": [
+    {
+      "genre": "table",
+      "id": "hm",
+      "label": "Heatmap",
+      "heads": [
+        [
+          {
+            "v": "X"
+          },
+          {
+            "v": "c1"
+          },
+          {
+            "v": "c2"
+          }
+        ]
+      ],
+      "aligns": [
+        "none",
+        "none",
+        "none"
+      ],
+      "rows": [
+        {
+          "cells": [
+            {
+              "v": "r1"
+            },
+            {
+              "v": "10"
+            },
+            {
+              "v": "20"
+            }
+          ],
+          "line": 5
+        },
+        {
+          "cells": [
+            {
+              "v": "r2"
+            },
+            {
+              "v": "30.5"
+            },
+            {
+              "v": "-4"
+            }
+          ],
+          "line": 6
+        }
+      ],
+      "line": 2
+    },
+    {
+      "genre": "chart",
+      "table": "hm",
+      "type": "bar3d",
+      "line": 7
+    }
+  ]
+}

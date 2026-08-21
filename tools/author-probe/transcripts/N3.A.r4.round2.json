@@ -1,0 +1,49 @@
+{
+  "probe_version": "1.0.0",
+  "run": {
+    "utc": "2026-08-19T12:06:17Z",
+    "cli": "2.1.234 (Claude Code)",
+    "condition": "A",
+    "task": "N3",
+    "kind": "normal",
+    "seat": 4,
+    "model_alias": "haiku",
+    "round": 2,
+    "model_used": "claude-haiku-4-5-20251001"
+  },
+  "saw": {
+    "skill_path": "skill/figdown/SKILL.md",
+    "skill_sha256": "718f935282ce7a93f4b7e36b83983ac1112e49818384d8eaf35869830d34d6a2",
+    "skill_chars": 16497,
+    "system_sha256": "39117af0175e7d927c8f9c715c9555f91e3357a146f2d6d311d4a3bb889ecaae",
+    "user_sha256": "7ba430e07262ba6534cbbeab48fb58413b6af01f10aaa5ff65e3e1d3e27e64b7"
+  },
+  "integrity": {
+    "turns": 1,
+    "permission_denials": 0,
+    "is_error": false
+  },
+  "usage": {
+    "cost_usd": 0.05477900000000001,
+    "duration_ms": 78988
+  },
+  "scrub": {
+    "ran": true,
+    "pattern": "email-regex",
+    "replacements": 0
+  },
+  "raw_answer_text": "Looking at these validator errors, I can see the issue: the connection syntax using bare identifiers with `->` is not allowed in the flowchart genre. The error message tells me that tokens like `\"checkcounters\"` are not valid in that context.\n\nWithout access to the full `reference/experimental/flowchart.md` documentation (which the router table indicates I should load for flowchart), I need to infer the correct syntax. Based on FigDown's philosophy of explicit, declarative syntax and the error pattern, my best educated guess is that flowchart connections use an explicit `edge` keyword rather than the `->` arrow operator.\n\nHere's the corrected document:\n\n```figdown\n# FigDown — figures as text. Spec: https://github.com/FigDown/figdown\nfigdown 0.1 flowchart\ntitle \"BGP session reset procedure\"\n\nprocess checkcounters \"Check interface error counters\"\ndecision errorsfound \"Errors found?\"\nprocess clearcounters \"Clear interface counters\"\nterminator monitor \"Monitor session\"\nterminator escalate \"Escalate to operator\"\n\nedge checkcounters errorsfound\nedge errorsfound clearcounters yes\nedge clearcounters monitor\nedge errorsfound escalate no\n```\n\n**Changes made:**\n- Replaced `->` arrows with explicit `edge` keyword declarations for connections\n- Simplified the branch conditions (just `yes` and `no` instead of `errorsfound yes ->`)\n\n**Note:** This is my best inference without the actual flowchart reference documentation. If this still produces errors, I would need access to `reference/experimental/flowchart.md` to understand the genre's exact syntax requirements.",
+  "extracted_document": "# FigDown — figures as text. Spec: https://github.com/FigDown/figdown\nfigdown 0.1 flowchart\ntitle \"BGP session reset procedure\"\n\nprocess checkcounters \"Check interface error counters\"\ndecision errorsfound \"Errors found?\"\nprocess clearcounters \"Clear interface counters\"\nterminator monitor \"Monitor session\"\nterminator escalate \"Escalate to operator\"\n\nedge checkcounters errorsfound\nedge errorsfound clearcounters yes\nedge clearcounters monitor\nedge errorsfound escalate no\n",
+  "validation": {
+    "errors": [
+      "Line 11: edge needs an operator: -> <- -- <-> (a [mid] label splits it: -[x]->)",
+      "Line 12: edge needs an operator: -> <- -- <-> (a [mid] label splits it: -[x]->)",
+      "Line 13: edge needs an operator: -> <- -- <-> (a [mid] label splits it: -[x]->)",
+      "Line 14: edge needs an operator: -> <- -- <-> (a [mid] label splits it: -[x]->)"
+    ],
+    "invariants_pass": false,
+    "missing_nodes": [],
+    "edge_count": 0,
+    "success": false
+  }
+}

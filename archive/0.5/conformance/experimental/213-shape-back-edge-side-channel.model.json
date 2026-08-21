@@ -1,0 +1,67 @@
+{
+  "header": {
+    "version": "0.2",
+    "genre": "flowchart"
+  },
+  "flow": "down",
+  "classes": [],
+  "planes": [
+    {
+      "id": "base",
+      "z": 0
+    }
+  ],
+  "nodes": [
+    {
+      "id": "ce",
+      "label": "CE router",
+      "shape": "box",
+      "plane": "base",
+      "line": 16
+    },
+    {
+      "id": "net",
+      "label": "Transit provider\nbackbone",
+      "shape": "ellipse",
+      "plane": "base",
+      "line": 17
+    },
+    {
+      "id": "pe",
+      "label": "PE router",
+      "shape": "box",
+      "plane": "base",
+      "line": 18
+    }
+  ],
+  "groups": [],
+  "edges": [
+    {
+      "a": "ce",
+      "op": "->",
+      "b": "net",
+      "plane": "base",
+      "line": 20
+    },
+    {
+      "a": "net",
+      "op": "->",
+      "b": "pe",
+      "plane": "base",
+      "line": 21
+    },
+    {
+      "a": "pe",
+      "op": "->",
+      "b": "net",
+      "plane": "base",
+      "line": 22
+    }
+  ],
+  "ranks": [],
+  "pins": [],
+  "thresholds": [],
+  "bands": [],
+  "bundles": [],
+  "regions": []
+}

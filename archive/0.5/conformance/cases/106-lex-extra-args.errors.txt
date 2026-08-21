@@ -1,0 +1,2 @@
+Line 2: unexpected argument "extra"
+Line 3: ";" is reserved for a future statement separator and has no meaning in v0.1 — write one directive per line; a literal ";" belongs inside a quoted string, an [edge label] or a comment (MIGRATIONS 0.1)

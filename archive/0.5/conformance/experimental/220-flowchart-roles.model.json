@@ -1,0 +1,109 @@
+{
+  "header": {
+    "version": "0.2",
+    "genre": "flowchart"
+  },
+  "title": "Roles",
+  "flow": "down",
+  "classes": [],
+  "planes": [
+    {
+      "id": "base",
+      "z": 0
+    }
+  ],
+  "nodes": [
+    {
+      "id": "start",
+      "label": "Begin",
+      "role": "terminator",
+      "shape": "rounded",
+      "plane": "base",
+      "line": 9
+    },
+    {
+      "id": "step",
+      "label": "Do the work",
+      "role": "process",
+      "shape": "box",
+      "plane": "base",
+      "line": 10
+    },
+    {
+      "id": "gate",
+      "label": "Continue?",
+      "role": "decision",
+      "shape": "diamond",
+      "plane": "base",
+      "line": 11
+    },
+    {
+      "id": "stop",
+      "label": "End",
+      "role": "terminator",
+      "shape": "rounded",
+      "plane": "base",
+      "line": 12
+    }
+  ],
+  "groups": [],
+  "edges": [
+    {
+      "a": "start",
+      "op": "->",
+      "b": "step",
+      "plane": "base",
+      "line": 15
+    },
+    {
+      "a": "step",
+      "op": "->",
+      "b": "gate",
+      "plane": "base",
+      "line": 16
+    },
+    {
+      "a": "gate",
+      "op": "->",
+      "b": "stop",
+      "mid": "yes",
+      "plane": "base",
+      "line": 17
+    },
+    {
+      "a": "gate",
+      "op": "->",
+      "b": "step",
+      "mid": "no",
+      "plane": "base",
+      "line": 18
+    }
+  ],
+  "ranks": [
+    {
+      "ids": [
+        "step",
+        "gate"
+      ],
+      "line": 14
+    }
+  ],
+  "pins": [
+    {
+      "id": "start",
+      "x": 10,
+      "y": 10,
+      "line": 20
+    },
+    {
+      "id": "step",
+      "width": 90,
+      "height": 30,
+      "line": 21
+    }
+  ],
+  "thresholds": [],
+  "bands": [],
+  "bundles": [],
+  "regions": []
+}

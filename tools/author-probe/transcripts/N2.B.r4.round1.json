@@ -1,0 +1,49 @@
+{
+  "probe_version": "1.0.0",
+  "run": {
+    "utc": "2026-08-19T12:14:34Z",
+    "cli": "2.1.234 (Claude Code)",
+    "condition": "B",
+    "task": "N2",
+    "kind": "normal",
+    "seat": 4,
+    "model_alias": "haiku",
+    "round": 1,
+    "model_used": "claude-haiku-4-5-20251001"
+  },
+  "saw": {
+    "skill_path": "tools/author-probe/skill-candidate.md",
+    "skill_sha256": "2abdaf0d9211d5ee1464c5f5c3a200b1ae6f7bd71cfd6344e7da94d669e6ed31",
+    "skill_chars": 17591,
+    "system_sha256": "39117af0175e7d927c8f9c715c9555f91e3357a146f2d6d311d4a3bb889ecaae",
+    "user_sha256": "5cb75a0dcbc2a731f18bde3a976bd9c2f3dade7d39ca3addd99bdea9111443ab"
+  },
+  "integrity": {
+    "turns": 1,
+    "permission_denials": 0,
+    "is_error": false
+  },
+  "usage": {
+    "cost_usd": 0.0237848,
+    "duration_ms": 50525
+  },
+  "scrub": {
+    "ran": true,
+    "pattern": "email-regex",
+    "replacements": 0
+  },
+  "raw_answer_text": "I'll create a FigDown topology figure showing the branch office WAN uplinks structure with the nodes and connections you specified.\n\n```figdown\n# FigDown — figures as text. Spec: https://github.com/FigDown/figdown\nfigdown 0.1 topology\ntitle \"Branch office WAN uplinks\"\n\nnode access1 \"Access Switch 1\"\nnode access2 \"Access Switch 2\"\nnode branch \"Branch Router\"\nnode hubprimary \"Regional Hub\"\nnode hubbackup \"Regional Hub\"\n\nedge access1 branch\nedge access2 branch\nedge branch hubprimary class=primary\nedge branch hubbackup class=backup\n\nclass primary \"Primary WAN Link\"\nclass backup \"Backup WAN Link\"\n```\n\nThis topology document declares:\n\n- **Five nodes** representing the network equipment: two access switches, a branch router, and two regional hub routers\n- **Four edges** showing the connections: both access switches connect to the branch router, and the branch router connects to both regional hubs\n- **Two classes** that give semantic meaning to the two WAN links—distinguishing the primary path from the redundant backup path\n\nThe rendering will show these nodes positioned logically with the access switches on the left, the branch router in the center, and the two regional hubs on the right, with edges between them clearly showing the uplink topology.",
+  "extracted_document": "# FigDown — figures as text. Spec: https://github.com/FigDown/figdown\nfigdown 0.1 topology\ntitle \"Branch office WAN uplinks\"\n\nnode access1 \"Access Switch 1\"\nnode access2 \"Access Switch 2\"\nnode branch \"Branch Router\"\nnode hubprimary \"Regional Hub\"\nnode hubbackup \"Regional Hub\"\n\nedge access1 branch\nedge access2 branch\nedge branch hubprimary class=primary\nedge branch hubbackup class=backup\n\nclass primary \"Primary WAN Link\"\nclass backup \"Backup WAN Link\"\n",
+  "validation": {
+    "errors": [
+      "Line 11: edge needs an operator: -> <- -- <-> (a [mid] label splits it: -[x]->)",
+      "Line 12: edge needs an operator: -> <- -- <-> (a [mid] label splits it: -[x]->)",
+      "Line 13: edge needs an operator: -> <- -- <-> (a [mid] label splits it: -[x]->)",
+      "Line 14: edge needs an operator: -> <- -- <-> (a [mid] label splits it: -[x]->)"
+    ],
+    "invariants_pass": false,
+    "missing_nodes": [],
+    "edge_count": 0,
+    "success": false
+  }
+}

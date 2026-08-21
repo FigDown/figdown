@@ -1,0 +1,31 @@
+# FigDown — figures as text. Spec: https://github.com/FigDown/figdown
+
+figdown 0.5 topology
+title "Three-link aggregation between two switches"
+
+# A link bundle's DEFINING case: several parallel links between one pair of
+# devices, operated as one logical link. Until `figdown 0.5` this figure could
+# not be written — a bundle named its members by endpoint pair, and between
+# these two switches the pair "sw1--sw2" names three links at once.
+#
+# Each member link carries its own `id=`, and the bundle names the ids. The
+# ids are HANDLES and nothing else: `m1` does not say the link is first, or
+# primary, or related to `m2`. The membership claim is made by the `bundle`
+# line, and the interface names are made by the end labels.
+
+class member "A physical link that is a member of the aggregation"
+
+node sw1 "Switch-1"
+node sw2 "Switch-2"
+
+edge sw1 [ge-0/0/0] -- [ge-0/0/0] sw2 id=m1 class=member
+edge sw1 [ge-0/0/1] -- [ge-0/0/1] sw2 id=m2 class=member
+edge sw1 [ge-0/0/2] -- [ge-0/0/2] sw2 id=m3 class=member
+
+bundle ae0 "ae0 — link aggregation group" m1,m2,m3
+
+# The management link is deliberately NOT a member, and it is anonymous: a
+# connector nobody needs to name does not need an id, and its absence asserts
+# nothing at all.
+node mgmt "Management switch"
+edge sw1 -- mgmt

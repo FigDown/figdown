@@ -1,0 +1,120 @@
+{
+  "header": {
+    "version": "0.2",
+    "genre": "statechart"
+  },
+  "title": "Pinned states still draw their self-transitions",
+  "flow": "right",
+  "classes": [],
+  "planes": [
+    {
+      "id": "base",
+      "z": 0
+    }
+  ],
+  "nodes": [
+    {
+      "id": "down",
+      "label": "DOWN",
+      "shape": "rounded",
+      "plane": "base",
+      "line": 16
+    },
+    {
+      "id": "init",
+      "label": "INIT",
+      "shape": "rounded",
+      "plane": "base",
+      "line": 17
+    },
+    {
+      "id": "up",
+      "label": "UP",
+      "shape": "rounded",
+      "plane": "base",
+      "line": 18
+    }
+  ],
+  "groups": [],
+  "edges": [
+    {
+      "a": "down",
+      "op": "->",
+      "b": "init",
+      "mid": "rx Down",
+      "plane": "base",
+      "line": 19
+    },
+    {
+      "a": "init",
+      "op": "->",
+      "b": "up",
+      "mid": "rx Init, rx Up",
+      "plane": "base",
+      "line": 20
+    },
+    {
+      "a": "up",
+      "op": "->",
+      "b": "down",
+      "mid": "Detect expired",
+      "plane": "base",
+      "line": 21
+    },
+    {
+      "a": "down",
+      "op": "->",
+      "b": "down",
+      "mid": "rx Up",
+      "plane": "base",
+      "line": 22
+    },
+    {
+      "a": "init",
+      "op": "->",
+      "b": "init",
+      "mid": "rx Down",
+      "plane": "base",
+      "line": 23
+    },
+    {
+      "a": "up",
+      "op": "->",
+      "b": "up",
+      "mid": "rx Init",
+      "plane": "base",
+      "line": 24
+    }
+  ],
+  "ranks": [],
+  "pins": [
+    {
+      "id": "down",
+      "x": 220,
+      "y": 40,
+      "width": 110,
+      "height": 56,
+      "line": 26
+    },
+    {
+      "id": "init",
+      "x": 60,
+      "y": 200,
+      "width": 110,
+      "height": 56,
+      "line": 27
+    },
+    {
+      "id": "up",
+      "x": 380,
+      "y": 200,
+      "width": 110,
+      "height": 56,
+      "line": 28
+    }
+  ],
+  "thresholds": [],
+  "bands": [],
+  "bundles": [],
+  "regions": []
+}

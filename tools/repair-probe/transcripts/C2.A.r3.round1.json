@@ -1,0 +1,56 @@
+{
+  "probe_version": "1.0.0",
+  "run": {
+    "utc": "2026-08-19T11:07:34Z",
+    "model_alias": "haiku",
+    "model_used": "claude-haiku-4-5-20251001",
+    "cli": "2.1.234 (Claude Code)",
+    "seat": 3,
+    "condition": "A",
+    "fixture": "C2",
+    "klass": "compound/duplicate+unknown-reference×2",
+    "round": 1
+  },
+  "engine_channel": "dist-public-api",
+  "saw": {
+    "original_fixture_sha256": "91c85859be9a92c9be58c8cc88601c88b09b61e406f677fcac2c5ce6f3875c52",
+    "document_shown_sha256": "91c85859be9a92c9be58c8cc88601c88b09b61e406f677fcac2c5ce6f3875c52",
+    "system_sha256": "ef2a3cd623ce06b05aa4652d8ace761c4f70f24298bcef0552f22e2e46e277fc",
+    "user_sha256": "460bb5339ce79cee5af27e21bce192158ff4243e15d69a9bf0913657803d62c8"
+  },
+  "integrity": {
+    "turns": 1,
+    "permission_denials": 0,
+    "is_error": false
+  },
+  "usage": {
+    "cost_usd": 0.011084,
+    "duration_ms": 14116
+  },
+  "scrub": {
+    "ran": true,
+    "pattern": "email-regex",
+    "replacements": 0
+  },
+  "raw_answer_text": "```\nfigdown 0.1 topology\ntitle \"DNS resolver cache refresh path\"\n\nnode client \"Stub resolver\"\nnode cache \"Local cache\"\nnode fwd \"Forwarder\"\nnode auth \"Authoritative server\"\nnode auth_backup \"Authoritative server backup\"\nnode stats \"Query stats\"\n\nedge client -> cache\nedge cache -> fwd\nedge fwd -> auth\nedge stats -> cache\n```",
+  "presented": {
+    "document_shown": "figdown 0.1 topology\ntitle \"DNS resolver cache refresh path\"\n\nnode client \"Stub resolver\"\nnode cache \"Local cache\"\nnode fwd \"Forwarder\"\nnode auth \"Authoritative server\"\nnode auth \"Authoritative server backup\"\nnode stats \"Query stats\"\n\nedge client -> cache\nedge cache -> fwd\nedge fwd -> athu\nedge stats -> cach\n",
+    "validator_shown": {
+      "errors": [
+        "Line 8: duplicate id \"auth\"",
+        "Line 13: unknown endpoint \"athu\"",
+        "Line 14: unknown endpoint \"cach\""
+      ],
+      "diagnostics": []
+    }
+  },
+  "extracted_document": "figdown 0.1 topology\ntitle \"DNS resolver cache refresh path\"\n\nnode client \"Stub resolver\"\nnode cache \"Local cache\"\nnode fwd \"Forwarder\"\nnode auth \"Authoritative server\"\nnode auth_backup \"Authoritative server backup\"\nnode stats \"Query stats\"\n\nedge client -> cache\nedge cache -> fwd\nedge fwd -> auth\nedge stats -> cache\n",
+  "validation": {
+    "errors_after": [],
+    "diagnostics_after": [],
+    "invariants_pass": true,
+    "missing_nodes": [],
+    "edge_count": 4,
+    "success": true
+  }
+}

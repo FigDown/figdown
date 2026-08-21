@@ -1,0 +1,9 @@
+figdown 0.1 block
+title "Alert-forwarding chain"
+
+node probe "Sample probe"
+node normalizer "Normalizer"
+node sink "Storage sink"
+
+edge probe -> normalizer
+edge normalizer -> sink

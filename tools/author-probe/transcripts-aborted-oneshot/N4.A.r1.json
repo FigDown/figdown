@@ -1,0 +1,62 @@
+{
+  "probe_version": "1.0.0",
+  "run": {
+    "utc": "2026-08-19T11:49:03Z",
+    "cli": "2.1.234 (Claude Code)",
+    "condition": "A",
+    "task": "N4",
+    "kind": "normal",
+    "seat": 1,
+    "model_alias": "sonnet",
+    "model_used": "claude-sonnet-5"
+  },
+  "saw": {
+    "skill_path": "skill/figdown/SKILL.md",
+    "skill_sha256": "718f935282ce7a93f4b7e36b83983ac1112e49818384d8eaf35869830d34d6a2",
+    "skill_chars": 16497,
+    "system_sha256": "39117af0175e7d927c8f9c715c9555f91e3357a146f2d6d311d4a3bb889ecaae",
+    "user_sha256": "ad114943f092c2efcb7b7e4a66f3068d3be38aff65a94ebe7fb06fbe28c4e1e7"
+  },
+  "integrity": {
+    "turns": 1,
+    "permission_denials": 0,
+    "is_error": false
+  },
+  "usage": {
+    "cost_usd": 0.053535,
+    "duration_ms": 10897
+  },
+  "scrub": {
+    "ran": true,
+    "pattern": "email-regex",
+    "replacements": 0
+  },
+  "raw_answer_text": "Since the router points `block` figures at `reference/scene.md` and `reference/layout.md`, which I don't have loaded, I've stuck to only the genre-independent syntax explicitly documented in the core spec (block openers take a quoted label; edges connect declared ids) and avoided any layout/pin tuning or experimental extensions.\n\n```figdown\n# FigDown — figures as text. Spec: https://github.com/FigDown/figdown\nfigdown 0.1 block\ntitle \"Certificate renewal automation\"\n\nblock scheduler \"Scheduler\"\nblock renewaljob \"Renewal job\"\nblock caclient \"CA client\"\nblock ca \"Certificate authority\"\nblock deployagent \"Deploy agent\"\nblock service \"Service\"\n\nscheduler -> renewaljob\nrenewaljob -> caclient\ncaclient -> ca\nrenewaljob -> deployagent\ndeployagent -> service\n```\n\nBefore treating this as final, run it through `build-svg.js` — I have not loaded `reference/scene.md` or `reference/layout.md`, so the exact block/edge spellings above are my best inference from the core spec's rules (\"every block opener\" has a quoted label, ids are bare tokens) rather than confirmed genre syntax. If the build reports a line error, the message will name the correct spelling to use instead.",
+  "extracted_document": "# FigDown — figures as text. Spec: https://github.com/FigDown/figdown\nfigdown 0.1 block\ntitle \"Certificate renewal automation\"\n\nblock scheduler \"Scheduler\"\nblock renewaljob \"Renewal job\"\nblock caclient \"CA client\"\nblock ca \"Certificate authority\"\nblock deployagent \"Deploy agent\"\nblock service \"Service\"\n\nscheduler -> renewaljob\nrenewaljob -> caclient\ncaclient -> ca\nrenewaljob -> deployagent\ndeployagent -> service\n",
+  "validation": {
+    "errors": [
+      "Line 5: \"block\" is not allowed in genre block",
+      "Line 6: \"block\" is not allowed in genre block",
+      "Line 7: \"block\" is not allowed in genre block",
+      "Line 8: \"block\" is not allowed in genre block",
+      "Line 9: \"block\" is not allowed in genre block",
+      "Line 10: \"block\" is not allowed in genre block",
+      "Line 12: \"scheduler\" is not allowed in genre block",
+      "Line 13: \"renewaljob\" is not allowed in genre block",
+      "Line 14: \"caclient\" is not allowed in genre block",
+      "Line 15: \"renewaljob\" is not allowed in genre block",
+      "Line 16: \"deployagent\" is not allowed in genre block"
+    ],
+    "invariants_pass": false,
+    "missing_nodes": [
+      "scheduler",
+      "renewaljob",
+      "caclient",
+      "ca",
+      "deployagent",
+      "service"
+    ],
+    "edge_count": 0,
+    "success": false
+  }
+}

@@ -1,0 +1,1 @@
+Line 27: note= draws and is not accepted on field; use description= for prose a machine reads. The two keys divide by AUDIENCE, not by length: description= reaches the reading agent as an SVG <title> and puts no ink on the page, while note= is an explanation the human must see. A field's presence condition is present=, not either of them (MIGRATIONS 0.3)

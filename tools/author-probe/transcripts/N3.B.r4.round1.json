@@ -1,0 +1,49 @@
+{
+  "probe_version": "1.0.0",
+  "run": {
+    "utc": "2026-08-19T12:15:20Z",
+    "cli": "2.1.234 (Claude Code)",
+    "condition": "B",
+    "task": "N3",
+    "kind": "normal",
+    "seat": 4,
+    "model_alias": "haiku",
+    "round": 1,
+    "model_used": "claude-haiku-4-5-20251001"
+  },
+  "saw": {
+    "skill_path": "tools/author-probe/skill-candidate.md",
+    "skill_sha256": "2abdaf0d9211d5ee1464c5f5c3a200b1ae6f7bd71cfd6344e7da94d669e6ed31",
+    "skill_chars": 17591,
+    "system_sha256": "39117af0175e7d927c8f9c715c9555f91e3357a146f2d6d311d4a3bb889ecaae",
+    "user_sha256": "43297339a059a8b173e8828dafb79454ee8b8ea0a6342b1430956895b4f22d4d"
+  },
+  "integrity": {
+    "turns": 1,
+    "permission_denials": 0,
+    "is_error": false
+  },
+  "usage": {
+    "cost_usd": 0.019934999999999998,
+    "duration_ms": 38350
+  },
+  "scrub": {
+    "ran": true,
+    "pattern": "email-regex",
+    "replacements": 0
+  },
+  "raw_answer_text": "Looking at the requirements, I need to create a flowchart with five elements and specific connections. The user has given me the structure directly, so I'll translate it into FigDown syntax.\n\nSince this is a flowchart (an experimental genre available at v0.1), I'll use flowchart-specific shape keywords: `process` for action steps, `decision` for branching points, and `terminator` for endpoints. Decision edges will be labeled with \"yes\" and \"no\" to show the branches.\n\n```figdown\n# FigDown — figures as text. Spec: https://github.com/FigDown/figdown\nfigdown 0.1 flowchart\ntitle \"BGP session reset procedure\"\n\nprocess checkcounters \"Check interface error counters\"\ndecision errorsfound \"Errors found?\"\nprocess clearcounters \"Clear counters\"\nterminator monitor \"Monitor session\"\nterminator escalate \"Escalate to operator\"\n\nedge checkcounters errorsfound\nedge errorsfound clearcounters label=\"yes\"\nedge errorsfound escalate label=\"no\"\nedge clearcounters monitor\n```\n\n**Structure:** The flowchart implements the procedure you described:\n1. Start by checking interface error counters\n2. Branch on whether errors are found\n3. If yes: clear the counters and proceed to monitoring\n4. If no: escalate to the operator\n\nThe decision node (`errorsfound`) routes to two different termination points based on the outcome, with labeled edges showing the yes/no branches clearly.",
+  "extracted_document": "# FigDown — figures as text. Spec: https://github.com/FigDown/figdown\nfigdown 0.1 flowchart\ntitle \"BGP session reset procedure\"\n\nprocess checkcounters \"Check interface error counters\"\ndecision errorsfound \"Errors found?\"\nprocess clearcounters \"Clear counters\"\nterminator monitor \"Monitor session\"\nterminator escalate \"Escalate to operator\"\n\nedge checkcounters errorsfound\nedge errorsfound clearcounters label=\"yes\"\nedge errorsfound escalate label=\"no\"\nedge clearcounters monitor\n",
+  "validation": {
+    "errors": [
+      "Line 11: edge needs an operator: -> <- -- <-> (a [mid] label splits it: -[x]->)",
+      "Line 12: edge needs an operator: -> <- -- <-> (a [mid] label splits it: -[x]->)",
+      "Line 13: edge needs an operator: -> <- -- <-> (a [mid] label splits it: -[x]->)",
+      "Line 14: edge needs an operator: -> <- -- <-> (a [mid] label splits it: -[x]->)"
+    ],
+    "invariants_pass": false,
+    "missing_nodes": [],
+    "edge_count": 0,
+    "success": false
+  }
+}

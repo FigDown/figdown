@@ -1,0 +1,5 @@
+figdown 0.1 block
+group ingress "Ingress Pipeline" gap=0
+node parser "Parser" in=ingress
+node l2 "L2 Lookup" in=ingress
+node ext "External"

@@ -1,0 +1,63 @@
+{
+  "probe_version": "1.0.0",
+  "run": {
+    "utc": "2026-08-19T12:05:59Z",
+    "cli": "2.1.234 (Claude Code)",
+    "condition": "A",
+    "task": "N4",
+    "kind": "normal",
+    "seat": 3,
+    "model_alias": "haiku",
+    "round": 1,
+    "model_used": "claude-haiku-4-5-20251001"
+  },
+  "saw": {
+    "skill_path": "skill/figdown/SKILL.md",
+    "skill_sha256": "718f935282ce7a93f4b7e36b83983ac1112e49818384d8eaf35869830d34d6a2",
+    "skill_chars": 16497,
+    "system_sha256": "39117af0175e7d927c8f9c715c9555f91e3357a146f2d6d311d4a3bb889ecaae",
+    "user_sha256": "ad114943f092c2efcb7b7e4a66f3068d3be38aff65a94ebe7fb06fbe28c4e1e7"
+  },
+  "integrity": {
+    "turns": 1,
+    "permission_denials": 0,
+    "is_error": false
+  },
+  "usage": {
+    "cost_usd": 0.008652000000000002,
+    "duration_ms": 15752
+  },
+  "scrub": {
+    "ran": true,
+    "pattern": "email-regex",
+    "replacements": 0
+  },
+  "raw_answer_text": "Looking at the documentation and the requirements, I need to create a FigDown block diagram showing a certificate renewal workflow. The description indicates an architecture/dataflow diagram with 6 components and 5 directed connections between them.\n\nLet me compose the FigDown document:\n\n```figdown\n# FigDown — figures as text. Spec: https://github.com/FigDown/figdown\n\nfigdown 0.1 block\ntitle \"Certificate renewal automation\"\n\nblock scheduler \"Scheduler\"\nblock renewaljob \"Renewal Job\"\nblock caclient \"CA Client\"\nblock ca \"Certificate Authority\"\nblock deployagent \"Deploy Agent\"\nblock service \"Service\"\n\nscheduler -> renewaljob\nrenewaljob -> caclient\ncaclient -> ca\nrenewaljob -> deployagent\ndeployagent -> service\n```\n\n**What this shows:**\n\nThe diagram flows the certificate renewal process:\n1. **Scheduler** (timer-driven) triggers the **Renewal Job**\n2. **Renewal Job** requests the **CA Client** to obtain a new certificate\n3. **CA Client** communicates with the **Certificate Authority** to fetch the certificate\n4. Once the cert is obtained, **Renewal Job** hands off to the **Deploy Agent**\n5. **Deploy Agent** restarts the **Service** to load the new certificate\n\nThe structure captures both the acquisition path (scheduler → renewal job → CA client → CA) and the deployment path (renewal job → deploy agent → service), showing how they diverge after the renewal job has secured the certificate.",
+  "extracted_document": "# FigDown — figures as text. Spec: https://github.com/FigDown/figdown\n\nfigdown 0.1 block\ntitle \"Certificate renewal automation\"\n\nblock scheduler \"Scheduler\"\nblock renewaljob \"Renewal Job\"\nblock caclient \"CA Client\"\nblock ca \"Certificate Authority\"\nblock deployagent \"Deploy Agent\"\nblock service \"Service\"\n\nscheduler -> renewaljob\nrenewaljob -> caclient\ncaclient -> ca\nrenewaljob -> deployagent\ndeployagent -> service\n",
+  "validation": {
+    "errors": [
+      "Line 6: \"block\" is not allowed in genre block",
+      "Line 7: \"block\" is not allowed in genre block",
+      "Line 8: \"block\" is not allowed in genre block",
+      "Line 9: \"block\" is not allowed in genre block",
+      "Line 10: \"block\" is not allowed in genre block",
+      "Line 11: \"block\" is not allowed in genre block",
+      "Line 13: \"scheduler\" is not allowed in genre block",
+      "Line 14: \"renewaljob\" is not allowed in genre block",
+      "Line 15: \"caclient\" is not allowed in genre block",
+      "Line 16: \"renewaljob\" is not allowed in genre block",
+      "Line 17: \"deployagent\" is not allowed in genre block"
+    ],
+    "invariants_pass": false,
+    "missing_nodes": [
+      "scheduler",
+      "renewaljob",
+      "caclient",
+      "ca",
+      "deployagent",
+      "service"
+    ],
+    "edge_count": 0,
+    "success": false
+  }
+}

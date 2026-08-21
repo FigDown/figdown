@@ -1,0 +1,4 @@
+figdown 0.1 block
+node a "Named" fill=teal stroke=black
+node b "Spacer" fill=transparent
+node c "Hex3" fill=#0d9

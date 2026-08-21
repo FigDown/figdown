@@ -1,0 +1,11 @@
+# `FLOWCHART-ROLE-KEYWORDS`: the role keywords live in the `flowchart` namespace ONLY (`GENRE-NAMESPACE` `GENRE-NAMESPACE`/`GENRE-VOCABULARY-OBLIGATION`),
+# and every other rule that governs `node` governs them unchanged.
+figdown 0.1 flowchart
+process
+decision 9bad "Nope"
+terminator dup "One"
+process dup "Two"
+decision q unquoted
+process p "P" shape=hexagon
+terminator t "T" width=80
+process x "X" description="not a node option"

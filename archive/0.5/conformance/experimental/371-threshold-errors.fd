@@ -1,0 +1,13 @@
+figdown 0.1 block
+group g "G"
+node a "A"
+threshold Cap in=g offset=50%
+threshold "Cap" offset=50%
+threshold "Cap" in=g offset=120%
+# `fill=` left the option-key registry with the fill -> band keyword rename
+# and came back as the presentation key `color=`
+# was renamed to. It is live again, so a bad VALUE is what is reported now.
+threshold "Cap" in=g offset=50% stroke=below
+# the registry is still closed: an unregistered key is an unknown option
+threshold "Cap" in=g offset=50% below=1
+threshold "Cap" in=ghost offset=50%

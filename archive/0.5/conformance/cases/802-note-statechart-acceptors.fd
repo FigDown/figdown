@@ -1,0 +1,29 @@
+figdown 0.3 statechart
+# `DRAWN-ANNOTATION-FORM`: `note=` on the two acceptors the `statechart` genre owns
+# — `state` and `transition`.
+#
+# The same `CATEGORICAL-MEANING-MAPPING` point case 801 makes: `state` is `node` renamed and
+# `transition` is `edge` renamed (`GENRE-NODE-SPELLING`), and each declares `note` in its own
+# row rather than inheriting one. This is also the genre where the borrowed
+# visual convention is least surprising — the folded-corner box `note=` draws
+# is UML's own note symbol, and a UML state machine is where a reader has
+# most likely seen it (RULE 4.1: borrow the established symbol rather than
+# invent one).
+#
+# `transition` is the acceptor that earns the key here. A state machine's
+# hard-to-read part is usually the GUARD or the side effect on an arrow, and
+# a transition has no id — so, exactly as with `edge` in case 800, an
+# attribute is the only form that can reach it.
+#
+# See case 800 for the GOLDEN GAP that applies here too: normalize.js does not
+# project `note`, so this fixture pins acceptance, not the strings.
+#
+# The header is `figdown 0.3`. `statechart` itself already required
+# `figdown 0.2` (`STATECHART-GENRE-SCOPE`), so this document exercises TWO version gates at once
+# and satisfies both; nothing here would parse under `figdown 0.1`.
+state idle "Idle" note="on a state"
+state active "Active" note="a second one, on a sibling state, resolved independently"
+state failed "Failed"
+transition idle -> active note="on a transition — the carrier with no id"
+transition active -[timeout]-> failed note="a labelled transition takes both: [timeout] is the trigger, this is the aside"
+transition failed -> idle

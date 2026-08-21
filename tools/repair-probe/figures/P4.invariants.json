@@ -1,0 +1,5 @@
+{
+  "must_have_nodes": ["sensor", "ctrl", "pwm", "fan"],
+  "min_edges": 4,
+  "note": "deleting the 'edge fan -> sesnor' line instead of retargeting it to sensor drops the figure to 3 edges and breaks the closed feedback loop the figure is about"
+}

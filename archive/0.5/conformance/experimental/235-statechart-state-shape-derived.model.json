@@ -1,0 +1,62 @@
+{
+  "header": {
+    "version": "0.2",
+    "genre": "statechart"
+  },
+  "flow": "right",
+  "classes": [],
+  "planes": [
+    {
+      "id": "base",
+      "z": 0
+    }
+  ],
+  "nodes": [
+    {
+      "id": "derived",
+      "label": "DERIVED",
+      "shape": "rounded",
+      "plane": "base",
+      "line": 14
+    },
+    {
+      "id": "boxy",
+      "label": "OVERRIDDEN",
+      "shape": "box",
+      "plane": "base",
+      "line": 15
+    },
+    {
+      "id": "elly",
+      "label": "ELLIPSE",
+      "shape": "ellipse",
+      "plane": "base",
+      "line": 16
+    }
+  ],
+  "groups": [],
+  "edges": [
+    {
+      "a": "derived",
+      "op": "->",
+      "b": "boxy",
+      "mid": "e1",
+      "plane": "base",
+      "line": 17
+    },
+    {
+      "a": "boxy",
+      "op": "->",
+      "b": "elly",
+      "mid": "e2",
+      "plane": "base",
+      "line": 18
+    }
+  ],
+  "ranks": [],
+  "pins": [],
+  "thresholds": [],
+  "bands": [],
+  "bundles": [],
+  "regions": []
+}

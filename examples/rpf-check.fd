@@ -2,7 +2,7 @@
 
 # Reverse-path-forwarding check — a PROCEDURE that reads RIGHT TO LEFT.
 #
-# GENRE: `flowchart`, and it was `block` until this release. What the figure IS
+# GENRE: `flowchart`, and it was `block` until 0.4. What the figure IS
 # never changed — a chain of stages, one decision, two terminal outcomes — but
 # under `block` the roles were carried by `shape=`: a diamond MEANT "decision"
 # and a rounded box MEANT "outcome", to a reader who had learned that. Shape is

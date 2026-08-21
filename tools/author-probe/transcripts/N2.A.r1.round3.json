@@ -1,0 +1,54 @@
+{
+  "probe_version": "1.0.0",
+  "run": {
+    "utc": "2026-08-19T12:04:16Z",
+    "cli": "2.1.234 (Claude Code)",
+    "condition": "A",
+    "task": "N2",
+    "kind": "normal",
+    "seat": 1,
+    "model_alias": "sonnet",
+    "round": 3,
+    "model_used": "claude-sonnet-5"
+  },
+  "saw": {
+    "skill_path": "skill/figdown/SKILL.md",
+    "skill_sha256": "718f935282ce7a93f4b7e36b83983ac1112e49818384d8eaf35869830d34d6a2",
+    "skill_chars": 16497,
+    "system_sha256": "39117af0175e7d927c8f9c715c9555f91e3357a146f2d6d311d4a3bb889ecaae",
+    "user_sha256": "46febf288587e6a15ea0f17f3a18bcf839ce5edd6d96fdadc6240401bb294794"
+  },
+  "integrity": {
+    "turns": 1,
+    "permission_denials": 0,
+    "is_error": false
+  },
+  "usage": {
+    "cost_usd": 0.031169699999999998,
+    "duration_ms": 21212
+  },
+  "scrub": {
+    "ran": true,
+    "pattern": "email-regex",
+    "replacements": 0
+  },
+  "raw_answer_text": "I don't have the topology genre reference loaded in this conversation, so I'm composing this from the general skeleton syntax (node declarations, links, quoted labels) — flagging that as an assumption below rather than guessing silently.\n\n```figdown\n# FigDown — figures as text. Spec: https://github.com/FigDown/figdown\nfigdown 0.1 topology\ntitle \"Branch office WAN uplinks\"\n\nnode access1 \"Access Switch 1\"\nnode access2 \"Access Switch 2\"\nnode branch \"Branch Router\"\nnode hubprimary \"Regional Hub — Primary\"\nnode hubbackup \"Regional Hub — Backup\"\n\nlink access1 branch\nlink access2 branch\nlink branch hubprimary \"primary\"\nlink branch hubbackup \"backup\"\n```\n\nEmbed once built:\n\n```markdown\n![Branch office WAN uplinks: two access switches to one branch router, with primary and backup WAN links to two diverse regional hubs](figures/branch-wan-uplinks.svg)\n\n<sub>source: [figures/branch-wan-uplinks.fd](figures/branch-wan-uplinks.fd)</sub>\n```\n\nNote on the fix: the earlier attempt put the *Markdown embed* (an image tag + `<sub>` footer) into the `.fd` file itself — that's the host document's job, not the figure source's. Line 1 of a `.fd` must be the verbatim spec comment, line 2 the `figdown 0.1 <genre>` header; nothing Markdown belongs in that file. This version puts the actual FigDown source in the `.fd` and keeps the Markdown embed separate, as the workflow section describes.\n\nOne open item to flag before you run the validator: I wrote `node`/`link` as the topology genre's vocabulary by analogy with the general skeleton (`class`, quoted labels) since I don't have `reference/experimental/topology.md` loaded in this session — if the genre file uses different domain words (e.g. `site`/`edge`, or a precise-vs-general keyword pair for link roles), run `build-svg.js` and let the \"unrecognized line\" errors, if any, point at the actual required spelling.",
+  "extracted_document": "![Branch office WAN uplinks: two access switches to one branch router, with primary and backup WAN links to two diverse regional hubs](figures/branch-wan-uplinks.svg)\n\n<sub>source: [figures/branch-wan-uplinks.fd](figures/branch-wan-uplinks.fd)</sub>\n",
+  "validation": {
+    "errors": [
+      "Line 1: first line must be \"figdown 0.1 <genre>\"",
+      "Line 1: unrecognized line (unknown keyword \"![Branch\")",
+      "Line 3: unrecognized line (unknown keyword \"<sub>source:\")"
+    ],
+    "invariants_pass": false,
+    "missing_nodes": [
+      "access1",
+      "access2",
+      "branch",
+      "hubprimary",
+      "hubbackup"
+    ],
+    "edge_count": 0,
+    "success": false
+  }
+}

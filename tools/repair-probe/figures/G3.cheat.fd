@@ -1,0 +1,8 @@
+figdown 0.1 block
+title "RPF verdict outcome pair"
+node lookup "RIB lookup"
+node verdict "Interface matches route back?"
+node accept "Accept and forward"
+
+edge lookup -> verdict
+edge verdict -> accept

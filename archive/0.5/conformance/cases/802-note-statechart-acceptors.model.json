@@ -1,0 +1,72 @@
+{
+  "header": {
+    "version": "0.3",
+    "genre": "statechart"
+  },
+  "flow": "right",
+  "classes": [],
+  "planes": [
+    {
+      "id": "base",
+      "z": 0
+    }
+  ],
+  "nodes": [
+    {
+      "id": "idle",
+      "label": "Idle",
+      "shape": "rounded",
+      "plane": "base",
+      "note": "on a state",
+      "line": 24
+    },
+    {
+      "id": "active",
+      "label": "Active",
+      "shape": "rounded",
+      "plane": "base",
+      "note": "a second one, on a sibling state, resolved independently",
+      "line": 25
+    },
+    {
+      "id": "failed",
+      "label": "Failed",
+      "shape": "rounded",
+      "plane": "base",
+      "line": 26
+    }
+  ],
+  "groups": [],
+  "edges": [
+    {
+      "a": "idle",
+      "op": "->",
+      "b": "active",
+      "plane": "base",
+      "note": "on a transition — the carrier with no id",
+      "line": 27
+    },
+    {
+      "a": "active",
+      "op": "->",
+      "b": "failed",
+      "mid": "timeout",
+      "plane": "base",
+      "note": "a labelled transition takes both: [timeout] is the trigger, this is the aside",
+      "line": 28
+    },
+    {
+      "a": "failed",
+      "op": "->",
+      "b": "idle",
+      "plane": "base",
+      "line": 29
+    }
+  ],
+  "ranks": [],
+  "pins": [],
+  "thresholds": [],
+  "bands": [],
+  "bundles": [],
+  "regions": []
+}

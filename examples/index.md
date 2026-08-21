@@ -74,6 +74,19 @@ a `bundle` multi-homing ring, multi-line host captions.
 
 ![EVPN-VXLAN IRB](srl-evpn-irb.svg)
 
+### Three-link aggregation — naming one link of several  — [source](link-bundle-lag.fd)
+The figure the language could not write before `figdown 0.5`. A `bundle` is
+defined as *parallel links between one pair of devices operated as one logical
+link* — a LAG, an ECMP set, an Ethernet Segment — and its members used to be
+named by endpoint pair, which between these two switches names three links at
+once. Each member carries an `id=` and the bundle names the ids. The ids are
+handles and nothing else: `m1` does not say the link is first or primary, the
+interface names are in the end labels, and the membership claim is on the
+`bundle` line. The management link is deliberately anonymous — a connector
+nobody needs to name does not need an id, and its absence asserts nothing.
+
+![Three-link aggregation](link-bundle-lag.svg)
+
 ### Private VLAN — figure plus rule table  — [source](pvlan-flows.fd)
 A worked example of the figure-plus-prose mode
 (`COMPLETENESS-DEFINITION` mode 3): one `.fd`, two
@@ -184,7 +197,7 @@ Four constructs that had no demonstrator anywhere before 0.1, gathered
 into one small figure: `flow left` (the corpus was `right` and `down` only),
 the `\"` escape inside a quoted label, a `#` inside a bracketed edge label
 (verbatim since `VERBATIM-REGION-SCOPE`), and a
-negative `at=` coordinate. It was a `block` figure until this release, with the
+negative `at=` coordinate. It was a `block` figure until 0.4, with the
 stage roles carried by `shape=` and asserted by nothing; converting it to
 `flowchart` puts them in the words and lets the geometry derive — the same
 trade `packet-ingress` makes above, paid on a figure that already existed. It

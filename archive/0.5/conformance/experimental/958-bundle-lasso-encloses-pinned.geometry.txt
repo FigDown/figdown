@@ -1,0 +1,1 @@
+Line 24: the lasso for bundle "lag" would enclose non-member "ts" — a lasso is the drawn extent of the bundle's members, so this draws "ts" as one of them. Move the pin clear of the bundle's extent, or change what "lag" collects so the lasso is its members' own. The figure is not drawn rather than drawn wrongly.

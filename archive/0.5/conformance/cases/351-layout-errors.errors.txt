@@ -1,0 +1,4 @@
+Line 4: flow needs right|down|left|up
+Line 5: unexpected argument "extra"
+Line 6: rank needs two or more node ids
+Line 7: unknown node "ghost" in rank

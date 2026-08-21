@@ -196,6 +196,23 @@ const STRUCTURAL = [
   { id: 'verbatim `#` inside a quoted string',
     anchor: ['spec/core.md', '`#` starts a comment'],
     detect: hashInString },
+  // CONNECTOR-IDENTITY-KEY/EDGE-IDENTITY-CONSUMERS. Two SITES, not one: an option key on a connector
+  // line, and a member spelling inside `bundle`'s list argument. They can be
+  // demonstrated separately — a figure may name its connectors and own no
+  // bundle at all — so the granularity rule makes them two entries.
+  { id: '`id=` on a scene connector — the connector handle (CONNECTOR-IDENTITY-KEY)',
+    anchor: ['spec/core.md', "the connector's HANDLE"],
+    detect: t => /^\s*(edge|flowline|transition|message)\b.*(^|\s)id=[A-Za-z_]/m.test(t) },
+  { id: 'a `bundle` member written as a connector id rather than as a pair (EDGE-IDENTITY-CONSUMERS)',
+    anchor: ['spec/genres/experimental/topology.md', 'or a connector id'],
+    // A member list with at least one element that carries no `--`. The pair
+    // form is what the corpus has always written, so the test is for the
+    // element the id form ADDS, not for a bundle line at all.
+    detect: t => (t.match(/^\s*bundle\b.*$/mg) || []).some(l => {
+      const m = /^\s*bundle\s+\S+\s+(?:"[^"]*"\s+)?(\S+)/.exec(l);
+      if (!m) return false;
+      return m[1].split(',').some(x => x && !x.includes('--'));
+    }) },
   { id: 'verbatim `#` inside a bracketed edge label (VERBATIM-REGION-SCOPE)',
     anchor: ['spec/core.md', 'VERBATIM-REGION-SCOPE'],
     detect: t => /^\s*edge\b.*\[[^\]\n]*#[^\]\n]*\]/m.test(t) },

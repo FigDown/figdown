@@ -1,0 +1,15 @@
+figdown 0.1 block
+# `RULE-POSITION-ENUMERATION`: a typed-block opener's LABEL is a positional string, so
+# RULE 2.1's mandatory quotes govern it exactly as they govern node, group,
+# external, plane, class and bundle. Until now `bitfield b Hdr` and
+# `table t Caption` were ACCEPTED with the label "Hdr"/"Caption" — 3 of the
+# language's 15 labelled positions — while both genre documents already wrote
+# the form as `<keyword> <id> ["label"]`.
+# The last line is the failure SYNTAX-STYLE §2.1 says it retired: an unquoted
+# multi-word positional is not a spelling, it is a hole. It used to report
+# `unexpected argument "Caption"` — a surplus argument, when the defect was a
+# missing quote.
+bitfield b1 Hdr numbering=msb0
+table t1 Caption
+timing w1 Lane
+table t2 My Caption

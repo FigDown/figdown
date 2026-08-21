@@ -1,0 +1,35 @@
+# FigDown — figures as text. Spec: https://github.com/FigDown/figdown
+# `CONNECTOR-IDENTITY-KEY`: every way an id-form `bundle` member can fail, one per
+# line, each naming what the author wrote.
+#
+# Section 2 exists for the CROSS-SECTION case, and the answer it pins is that
+# there is no special diagnostic for it. Ids are unique per SECTION (core §1)
+# and a cross-section reference is a line error by design, so an id declared in
+# a neighbouring section arrives as an id this section never declared — which
+# is what the message says, in the words that are true for it. Inventing a
+# "declared in another section" message would be inventing a resolution model
+# the language does not have.
+figdown 0.5 topology
+node a "A"
+node b "B"
+node c "C"
+edge a -- b id=l1
+edge a -- c
+# an id that names nothing
+bundle b1 "B1" l1,ghost
+# an id that names a NODE — a bundle collects links, not endpoints
+bundle b2 "B2" a
+# the same connector twice, once by id and once by pair: `MEMBER-LIST-DUPLICATION`'s duplicate rule
+# binds to the RESOLVED edge, so it catches the mixture with no rule of its own
+bundle b3 "B3" l1,a--b
+# a bare member that is not a legal id at all
+bundle b4 "B4" l1,a.b
+# an id that names a BUNDLE
+bundle b5 "B5" b1
+
+figdown 0.5 topology
+node d "D"
+node e "E"
+edge d -- e id=far
+# `l1` is declared in section 1 and is not in scope here
+bundle b6 "B6" far,l1

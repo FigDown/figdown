@@ -1,0 +1,6 @@
+Line 26: external does not take fill=
+Line 26: external does not take stroke=
+Line 26: external does not take style=
+Line 29: bitfield does not take style=
+Line 30: timing does not take style=
+Line 36: table does not take style=

@@ -1,0 +1,44 @@
+{
+  "probe_version": "1.0.0",
+  "run": {
+    "utc": "2026-08-19T12:03:15Z",
+    "cli": "2.1.234 (Claude Code)",
+    "condition": "A",
+    "task": "N1",
+    "kind": "normal",
+    "seat": 1,
+    "model_alias": "sonnet",
+    "round": 2,
+    "model_used": "claude-sonnet-5"
+  },
+  "saw": {
+    "skill_path": "skill/figdown/SKILL.md",
+    "skill_sha256": "718f935282ce7a93f4b7e36b83983ac1112e49818384d8eaf35869830d34d6a2",
+    "skill_chars": 16497,
+    "system_sha256": "39117af0175e7d927c8f9c715c9555f91e3357a146f2d6d311d4a3bb889ecaae",
+    "user_sha256": "0398cdab604be2c3256849c2947594b90eb8de05ee79335f1229d8b2cf07a820"
+  },
+  "integrity": {
+    "turns": 1,
+    "permission_denials": 0,
+    "is_error": false
+  },
+  "usage": {
+    "cost_usd": 0.05502,
+    "duration_ms": 10189
+  },
+  "scrub": {
+    "ran": true,
+    "pattern": "email-regex",
+    "replacements": 0
+  },
+  "raw_answer_text": "Looking at the validator output, the issue is clear: in genre `block`, the keyword for declaring a component isn't `block` (that word is already spent naming the genre on line 1) — it's `node`. That also resolves the \"unknown endpoint\" errors, since those were only unknown because no node with that id had actually been declared (the `block ...` lines were rejected before they could register the ids).\n\n```fd\n# FigDown — figures as text. Spec: https://github.com/FigDown/figdown\nfigdown 0.1 block\ntitle \"Telemetry export pipeline\"\n\nnode poller \"Poller\"\nnode normalizer \"Normalizer\"\nnode healthprobe \"Health probe\"\nnode buffer \"Ring buffer\"\nnode exporter \"Exporter\"\n\nedge poller -> normalizer\nedge healthprobe -> normalizer\nedge normalizer -> buffer\nedge buffer -> exporter\n```\n\nThis captures exactly what the description states: two independent sources (`poller`, `healthprobe`) feeding `normalizer`, which feeds `buffer`, which feeds `exporter` — no more, no less. I didn't add labels to the edges since the prose already carries that detail (poller is timer-driven, health probe pings independently, buffer holds briefly) and the figure's job here is just the topology.",
+  "extracted_document": "# FigDown — figures as text. Spec: https://github.com/FigDown/figdown\nfigdown 0.1 block\ntitle \"Telemetry export pipeline\"\n\nnode poller \"Poller\"\nnode normalizer \"Normalizer\"\nnode healthprobe \"Health probe\"\nnode buffer \"Ring buffer\"\nnode exporter \"Exporter\"\n\nedge poller -> normalizer\nedge healthprobe -> normalizer\nedge normalizer -> buffer\nedge buffer -> exporter\n",
+  "validation": {
+    "errors": [],
+    "invariants_pass": true,
+    "missing_nodes": [],
+    "edge_count": 4,
+    "success": true
+  }
+}

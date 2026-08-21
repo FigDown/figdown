@@ -1,0 +1,2 @@
+Line 7: unknown endpoint "nothere"
+Line 8: unknown endpoint "ghost"

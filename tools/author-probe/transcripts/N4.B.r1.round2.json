@@ -1,0 +1,50 @@
+{
+  "probe_version": "1.0.0",
+  "run": {
+    "utc": "2026-08-19T12:15:26Z",
+    "cli": "2.1.234 (Claude Code)",
+    "condition": "B",
+    "task": "N4",
+    "kind": "normal",
+    "seat": 1,
+    "model_alias": "sonnet",
+    "round": 2,
+    "model_used": "claude-sonnet-5"
+  },
+  "saw": {
+    "skill_path": "tools/author-probe/skill-candidate.md",
+    "skill_sha256": "2abdaf0d9211d5ee1464c5f5c3a200b1ae6f7bd71cfd6344e7da94d669e6ed31",
+    "skill_chars": 17591,
+    "system_sha256": "39117af0175e7d927c8f9c715c9555f91e3357a146f2d6d311d4a3bb889ecaae",
+    "user_sha256": "3356049543b392e0d75af36f9b498fd8776775748110516e00eaed9415171d79"
+  },
+  "integrity": {
+    "turns": 1,
+    "permission_denials": 0,
+    "is_error": false
+  },
+  "usage": {
+    "cost_usd": 0.083745,
+    "duration_ms": 28428
+  },
+  "scrub": {
+    "ran": true,
+    "pattern": "email-regex",
+    "replacements": 0
+  },
+  "raw_answer_text": "Fixing based on the validator's error messages: the node-opening keyword collides with the genre name (`block` is rejected as a keyword *inside* the `block` genre), and edges take their label through a `label=` key rather than a trailing bare string — consistent with the general `key=value` styling shown for classes and paint channels elsewhere in the base spec. Applying `node ... \"Label\"` for openers and `label=\"…\"` for edges:\n\n```figdown\n# FigDown — figures as text. Spec: https://github.com/FigDown/figdown\nfigdown 0.1 block\ntitle \"Certificate renewal automation\"\n\nnode scheduler \"Scheduler\"\nnode renewaljob \"Renewal Job\"\nnode caclient \"CA Client\"\nnode ca \"Certificate Authority\"\nnode deployagent \"Deploy Agent\"\nnode service \"Service\"\n\nedge scheduler -> renewaljob label=\"timer\"\nedge renewaljob -> caclient label=\"obtain cert\"\nedge caclient -> ca label=\"request/issue\"\nedge renewaljob -> deployagent label=\"new cert\"\nedge deployagent -> service label=\"restart\"\n```\n\nNotes:\n\n- No `reference/scene.md` was available in this session, so the node keyword (`node`) and edge-label spelling (`label=\"…\"`) are inferred from the validator's own error messages plus the base spec's general `key=value` convention and its later reference to \"same node set, same edge set\" — not confirmed against the genre file itself.\n- If a rerun of `build-svg.js` still reports errors on these two points, that is the signal the inference was wrong, not a signal to weaken any of the five nodes or five edges the description requires — all five connections (scheduler→renewaljob, renewaljob→caclient, caclient→ca, renewaljob→deployagent, deployagent→service) are preserved as stated.",
+  "extracted_document": "# FigDown — figures as text. Spec: https://github.com/FigDown/figdown\nfigdown 0.1 block\ntitle \"Certificate renewal automation\"\n\nnode scheduler \"Scheduler\"\nnode renewaljob \"Renewal Job\"\nnode caclient \"CA Client\"\nnode ca \"Certificate Authority\"\nnode deployagent \"Deploy Agent\"\nnode service \"Service\"\n\nedge scheduler -> renewaljob label=\"timer\"\nedge renewaljob -> caclient label=\"obtain cert\"\nedge caclient -> ca label=\"request/issue\"\nedge renewaljob -> deployagent label=\"new cert\"\nedge deployagent -> service label=\"restart\"\n",
+  "validation": {
+    "errors": [
+      "Line 12: label= is retired — write the label inline: edge A [tail] -[mid]-> [head] B (MIGRATIONS 0.1)",
+      "Line 13: label= is retired — write the label inline: edge A [tail] -[mid]-> [head] B (MIGRATIONS 0.1)",
+      "Line 14: label= is retired — write the label inline: edge A [tail] -[mid]-> [head] B (MIGRATIONS 0.1)",
+      "Line 15: label= is retired — write the label inline: edge A [tail] -[mid]-> [head] B (MIGRATIONS 0.1)",
+      "Line 16: label= is retired — write the label inline: edge A [tail] -[mid]-> [head] B (MIGRATIONS 0.1)"
+    ],
+    "invariants_pass": false,
+    "missing_nodes": [],
+    "edge_count": 0,
+    "success": false
+  }
+}

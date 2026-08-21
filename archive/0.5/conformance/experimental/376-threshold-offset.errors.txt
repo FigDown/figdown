@@ -1,0 +1,2 @@
+Line 10: threshold needs offset=<0..100>% (with the % sign)
+Line 9: threshold at= has been renamed: use offset=<0..100>% (at= is the pin POINT in canvas px; SVG spells a position along an extent "offset") (MIGRATIONS 0.1)

@@ -1,0 +1,5 @@
+{
+  "must_have_nodes": ["poller", "buffer", "exporter", "collector"],
+  "min_edges": 3,
+  "note": "deleting the misspelled 'egde buffer -> exporter' line instead of fixing the keyword removes the buffer->exporter edge, dropping the figure to 2 edges — a repair that reaches zero errors by deletion must still fail min_edges"
+}

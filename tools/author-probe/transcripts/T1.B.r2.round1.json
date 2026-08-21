@@ -1,0 +1,55 @@
+{
+  "probe_version": "1.0.0",
+  "run": {
+    "utc": "2026-08-19T12:16:56Z",
+    "cli": "2.1.234 (Claude Code)",
+    "condition": "B",
+    "task": "T1",
+    "kind": "trap",
+    "seat": 2,
+    "model_alias": "sonnet",
+    "round": 1,
+    "model_used": "claude-sonnet-5"
+  },
+  "saw": {
+    "skill_path": "tools/author-probe/skill-candidate.md",
+    "skill_sha256": "2abdaf0d9211d5ee1464c5f5c3a200b1ae6f7bd71cfd6344e7da94d669e6ed31",
+    "skill_chars": 17591,
+    "system_sha256": "39117af0175e7d927c8f9c715c9555f91e3357a146f2d6d311d4a3bb889ecaae",
+    "user_sha256": "fa7943573757aa3a08a2cc869cae97d2f4cae7c5fb931fcd72852abab3a602c2"
+  },
+  "integrity": {
+    "turns": 1,
+    "permission_denials": 0,
+    "is_error": false
+  },
+  "usage": {
+    "cost_usd": 0.0349116,
+    "duration_ms": 23347
+  },
+  "scrub": {
+    "ran": true,
+    "pattern": "email-regex",
+    "replacements": 0
+  },
+  "raw_answer_text": "```fd\n# FigDown — figures as text. Spec: https://github.com/FigDown/figdown\nfigdown 0.1 block\ntitle \"Alert-forwarding chain\"\n\nblock probe \"Probe\"\nblock normalizer \"Normalizer\"\nblock sink \"Sink\"\n\nedge probe -> normalizer via=(60,20),(90,40)\nedge normalizer -> sink\n```\n\nNotes on this authoring:\n\n- Three blocks, ids `probe`, `normalizer`, `sink`, with short labels only — the \"raw samples / reshapes / writes to storage\" detail belongs in surrounding prose, not crammed into the figure.\n- Two edges: `probe -> normalizer` and `normalizer -> sink`.\n- The `probe -> normalizer` edge carries `via=(60,20),(90,40)`, the two explicit waypoints requested, so it visibly jogs rather than drawing straight — leaving room for the future third element to sit between them.\n- I did not have `reference/scene.md` or `reference/layout.md` in front of me (only the router that names them), so `block`/`edge` line shapes and the `via=` waypoint key are composed from the conventions the top-level spec does show (quoted labels, bare ids, `(x,y)` points as used in `at=\"(1,2)\"`) rather than confirmed against the genre file itself. I was not able to run `build-svg.js` in this session to validate the file, so per the truthfulness rule I'm not reporting this as a passing build — treat it as authored source to validate with the actual tool before committing, and adjust the waypoint key's spelling if the loaded `scene.md` names it differently.",
+  "extracted_document": "# FigDown — figures as text. Spec: https://github.com/FigDown/figdown\nfigdown 0.1 block\ntitle \"Alert-forwarding chain\"\n\nblock probe \"Probe\"\nblock normalizer \"Normalizer\"\nblock sink \"Sink\"\n\nedge probe -> normalizer via=(60,20),(90,40)\nedge normalizer -> sink\n",
+  "validation": {
+    "errors": [
+      "Line 5: \"block\" is not allowed in genre block",
+      "Line 6: \"block\" is not allowed in genre block",
+      "Line 7: \"block\" is not allowed in genre block",
+      "Line 9: via= has been WITHDRAWN: it was renamed points=, and points= was withdrawn with the whole `path` directive. There is no replacement spelling — author waypoints are outside the stable prior-art intersection (only 2 of 4 surveyed systems model them, and those 2 disagree on what happens when an endpoint moves). Delete the line; the edge draws under auto layout. The decision and its evidence: MIGRATIONS 0.1, core §9 OQ-S37, decisions/registry.md",
+      "Line 10: unknown endpoint \"normalizer\"",
+      "Line 10: unknown endpoint \"sink\""
+    ],
+    "invariants_pass": false,
+    "missing_nodes": [
+      "probe",
+      "normalizer",
+      "sink"
+    ],
+    "edge_count": 1,
+    "success": false
+  }
+}

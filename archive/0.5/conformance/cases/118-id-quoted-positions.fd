@@ -1,0 +1,39 @@
+figdown 0.1 block
+# 0.1 (`QUOTED-IDS`): an id is BARE at EVERY id position. One wording covers
+# both halves — a needlessly quoted legal id (silently accepted before) and a
+# quoted token that is not a legal id (which used to report `<kw> needs an
+# id`, naming the wrong thing).
+class c "meaning"
+node a "A"
+node b "B"
+node "q" "Quoted id"
+node "Router 1" "Spaces"
+node 交換器 "Not an ASCII id"
+group "g" "Quoted group"
+external "e" "Quoted boundary"
+bitfield "bf" "B" numbering=msb0
+table "tb" "T"
+timing "wv" "W"
+chart "tb"
+edge "a" -> b
+edge a -> "b"
+node z "Z" class="c"
+node y "Y" in="g"
+rank "a",b
+pin "a" at=(1,2)
+# a `size` id stood here until 0.1 — that position left with the directive (`ELEMENT-GEOMETRY-DIRECTIVE`),
+# and a `path` id position stood here until 0.1 — same, with `EDGE-GEOMETRY-CONSTRUCTS`.
+# TWO MORE left with the withdrawal of `plane` (`PAINT-ORDER-CONSTRUCT`):
+# `plane l1` was the declaration id position (fourth line of the document
+# until then), and `node x "X" plane="l1"` was the reference id position —
+# the key went with the keyword, so neither position exists to quote.
+
+figdown 0.1 topology
+# Section 2: the `bundle` id position. `bundle "t" "L" a--b`
+# stood in section 1 until `SCENE-KEYWORD-MEMBERSHIP` withdrew `bundle` from `block`; the position
+# is still a position, so it moved to the genre that still declares the
+# directive rather than being deleted. `GENRE-NAMESPACE` gives the section its own id space.
+node a "A"
+node b "B"
+edge a -- b
+bundle "t" "L" a--b

@@ -1,0 +1,11 @@
+figdown 0.1 topology
+title "DNS resolver cache refresh path"
+
+node client "Stub resolver"
+node cache "Local cache"
+node fwd "Forwarder"
+node auth "Authoritative server"
+node stats "Query stats"
+
+edge client -> cache
+edge cache -> fwd

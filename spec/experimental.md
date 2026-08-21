@@ -33,7 +33,7 @@ the one genre that has it, in that genre's own normative document:
 | `bundle` | [genres/experimental/topology.md](genres/experimental/topology.md) | `block`, `flowchart`, `statechart` (`SCENE-KEYWORD-MEMBERSHIP`) |
 | `plane` (+ `plane=`, `z-index=`) | — | **WITHDRAWN FROM THE LANGUAGE** (`PAINT-ORDER-CONSTRUCT`) |
 
-**`sequence` (this release, `SEQUENCE-GENRE-VOCABULARY`) appears in no cell of that
+**`sequence` (an earlier release, `SEQUENCE-GENRE-VOCABULARY`) appears in no cell of that
 table, and the absence is the point.** It declares none of `threshold`,
 `band` or `bundle` and never did, so there was nothing to withdraw: writing
 one of them under `sequence` gets the plain allowlist message
@@ -81,7 +81,7 @@ replacement**, because there is none; that is the `path`/`routing` shape
 from `EDGE-GEOMETRY-CONSTRUCTS`, and §E7 records what it costs. Evidence:
 [migrations.md](migrations.md) 0.1 and 0.3,
 [core.md](core.md) §9 **`EDGE-IDENTITY-AND-GEOMETRY`**, `decisions/registry.md`
-and `decisions/registry.md`/§4.6.
+and `decisions/registry.md`.
 **§E1 and §E4 are not reused.** §E4 defined `path` and `routing`; §E1
 defined `plane`. Both numbers are left vacant rather than closed up, so
 that every citation of §E2–§E3 and §E5–§E7 written before this release
@@ -545,7 +545,7 @@ declares none.
 |---|---|---|---|
 | `id` | string | always | unique in the bundle namespace |
 | `label` | string | when written | core §12.3 |
-| `members` | array of string | always | one `"a--b"` string per member, endpoints in the order the member was written |
+| `members` | array of string | always | one string per member, **in the order the member was written**, in one of TWO shapes (`CONNECTOR-IDENTITY-KEY`, `figdown 0.5`): an endpoint PAIR, `"a--b"`, with the endpoints in the order they were written; or a CONNECTOR ID, `"lag1a"`, naming a connector declared with `id=` in this section. The schema does not change — it was already "array of string" and the string DOMAIN widens — and the two shapes are told apart by lexis rather than by a flag: `--` cannot occur inside an id (`LINK-OPERATOR-IN-IDS`), so a member either contains it and is a pair or does not and is an id. A mixed list is legal; every member resolves independently |
 | `fill` `stroke` `style` | string | when written | core §5 |
 | `line` | number | always | 1-based source line |
 

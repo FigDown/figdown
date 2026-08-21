@@ -1,0 +1,22 @@
+# `SEQUENCE-CONTAINMENT-SCOPE`: `in=` on ALL FIVE acceptors — message, operand, lifeline,
+# state and fragment — in one valid document, so the acceptor list is pinned by
+# a model golden and not only by its error messages. Every one is sense 1, *the
+# element this one lives inside*, and every value is a fragment or an operand
+# id.
+#
+# The `lifeline in=` line is the rare one and it is here on purpose: it says a
+# participant exists only inside a fragment. It is also the acceptor with no
+# use in any authored figure, so this fixture is its only demonstrator.
+figdown 0.4 sequence
+title "Every acceptor of in="
+lifeline c "Client"
+lifeline s "Server"
+fragment outer "attempt" type=opt
+operand a1 "if reachable" in=outer
+lifeline probe "Probe" in=a1
+message c -> s "request" in=a1
+state c "WAITING" in=a1
+fragment inner "retry" type=loop in=a1
+operand b1 "while no reply" in=inner
+message c -> probe "poll" in=b1
+message c <- probe "still waiting" in=b1

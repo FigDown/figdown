@@ -1,0 +1,14 @@
+# Shape geometry, ellipse (engine backlog 14/16; DISCREPANCIES `SHAPE-AWARE-GEOMETRY`).
+# An ellipse's inscribed rectangle is about 1/sqrt(2) of its axes, so a
+# multi-line label sized as if the node were rectangular crosses the curve;
+# an incident edge must land on the curve, not on the bounding box. Parse
+# model unaffected; tools/shape-check.js asserts the geometry.
+figdown 0.1 block
+node agg "Aggregation and\nreplication service" shape=ellipse
+node src "Source"
+node snk "Sink"
+edge src -> agg
+edge agg -> snk
+pin src at=(20,20)
+pin agg at=(200,120)
+pin snk at=(380,20)

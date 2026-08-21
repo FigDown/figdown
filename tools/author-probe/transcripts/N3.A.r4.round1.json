@@ -1,0 +1,49 @@
+{
+  "probe_version": "1.0.0",
+  "run": {
+    "utc": "2026-08-19T12:04:57Z",
+    "cli": "2.1.234 (Claude Code)",
+    "condition": "A",
+    "task": "N3",
+    "kind": "normal",
+    "seat": 4,
+    "model_alias": "haiku",
+    "round": 1,
+    "model_used": "claude-haiku-4-5-20251001"
+  },
+  "saw": {
+    "skill_path": "skill/figdown/SKILL.md",
+    "skill_sha256": "718f935282ce7a93f4b7e36b83983ac1112e49818384d8eaf35869830d34d6a2",
+    "skill_chars": 16497,
+    "system_sha256": "39117af0175e7d927c8f9c715c9555f91e3357a146f2d6d311d4a3bb889ecaae",
+    "user_sha256": "a132efb7518ea63eed35484c99da41bec5d49fe3ee312de5025e2aa134b912f2"
+  },
+  "integrity": {
+    "turns": 1,
+    "permission_denials": 0,
+    "is_error": false
+  },
+  "usage": {
+    "cost_usd": 0.0102398,
+    "duration_ms": 18515
+  },
+  "scrub": {
+    "ran": true,
+    "pattern": "email-regex",
+    "replacements": 0
+  },
+  "raw_answer_text": "Looking at the documentation, I need to create a **flowchart** figure (which is experimental/EXPERIMENTAL). The structure requires:\n\n1. The spec provenance line (first line, verbatim)\n2. A `figdown 0.1 flowchart` header\n3. A title\n4. Element declarations (process, decision, terminator shapes)\n5. Flow connections between them\n\nHere's the completed FigDown document:\n\n```figdown\n# FigDown — figures as text. Spec: https://github.com/FigDown/figdown\nfigdown 0.1 flowchart\ntitle \"BGP session reset procedure\"\n\nprocess checkcounters \"Check interface error counters\"\ndecision errorsfound \"Errors found?\"\nprocess clearcounters \"Clear interface counters\"\nterminator monitor \"Monitor session\"\nterminator escalate \"Escalate to operator\"\n\ncheckcounters -> errorsfound\nerrorsfound yes -> clearcounters\nclearcounters -> monitor\nerrorsfound no -> escalate\n```\n\n**Structure summary:**\n\n- **checkcounters** (process): checks the interface's error counters\n- **errorsfound** (decision): branches based on whether errors are present\n  - **Yes path** → **clearcounters** (process) → **monitor** (terminator)\n  - **No path** → **escalate** (terminator) \n\nThis flowchart guides an operator through the BGP session reset procedure: collect diagnostics first, then either resolve locally (if errors exist) or escalate (if none found).",
+  "extracted_document": "# FigDown — figures as text. Spec: https://github.com/FigDown/figdown\nfigdown 0.1 flowchart\ntitle \"BGP session reset procedure\"\n\nprocess checkcounters \"Check interface error counters\"\ndecision errorsfound \"Errors found?\"\nprocess clearcounters \"Clear interface counters\"\nterminator monitor \"Monitor session\"\nterminator escalate \"Escalate to operator\"\n\ncheckcounters -> errorsfound\nerrorsfound yes -> clearcounters\nclearcounters -> monitor\nerrorsfound no -> escalate\n",
+  "validation": {
+    "errors": [
+      "Line 11: \"checkcounters\" is not allowed in genre flowchart",
+      "Line 12: \"errorsfound\" is not allowed in genre flowchart",
+      "Line 13: \"clearcounters\" is not allowed in genre flowchart",
+      "Line 14: \"errorsfound\" is not allowed in genre flowchart"
+    ],
+    "invariants_pass": false,
+    "missing_nodes": [],
+    "edge_count": 0,
+    "success": false
+  }
+}

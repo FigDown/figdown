@@ -1,0 +1,54 @@
+{
+  "probe_version": "1.0.0",
+  "run": {
+    "utc": "2026-08-19T12:03:31Z",
+    "cli": "2.1.234 (Claude Code)",
+    "condition": "A",
+    "task": "N2",
+    "kind": "normal",
+    "seat": 1,
+    "model_alias": "sonnet",
+    "round": 1,
+    "model_used": "claude-sonnet-5"
+  },
+  "saw": {
+    "skill_path": "skill/figdown/SKILL.md",
+    "skill_sha256": "718f935282ce7a93f4b7e36b83983ac1112e49818384d8eaf35869830d34d6a2",
+    "skill_chars": 16497,
+    "system_sha256": "39117af0175e7d927c8f9c715c9555f91e3357a146f2d6d311d4a3bb889ecaae",
+    "user_sha256": "e8bbb8bb800d7d108223fb06e522a5d73fa95892c46d272c5b2f495b633cbe4c"
+  },
+  "integrity": {
+    "turns": 1,
+    "permission_denials": 0,
+    "is_error": false
+  },
+  "usage": {
+    "cost_usd": 0.021857099999999997,
+    "duration_ms": 14898
+  },
+  "scrub": {
+    "ran": true,
+    "pattern": "email-regex",
+    "replacements": 0
+  },
+  "raw_answer_text": "# Branch office WAN uplinks — FigDown topology\n\nFollowing the router in the FigDown docs, a `topology` figure declares nodes and the links between them; I kept labels short (ids carry identity, `class` carries the primary/backup meaning) so the figure states structure, not prose.\n\n```figdown\n# FigDown — figures as text. Spec: https://github.com/FigDown/figdown\nfigdown 0.1 topology\ntitle \"Branch office WAN uplinks\"\n\nclass primary \"Primary WAN path\" stroke=#16a34a\nclass backup \"Backup WAN path (diverse route)\" stroke=#dc2626 style=dashed\n\nnode access1 \"Access Switch 1\"\nnode access2 \"Access Switch 2\"\nnode branch \"Branch Router\"\nnode hubprimary \"Regional Hub A\"\nnode hubbackup \"Regional Hub B\"\n\nedge access1 branch\nedge access2 branch\nedge branch hubprimary \"primary\" class=primary\nedge branch hubbackup \"backup\" class=backup\n```\n\nNotes:\n- `topology` is dispatchable at `figdown 0.1` but is still EXPERIMENTAL (experimental) — noted here rather than left silent, per the portability guidance.\n- The two hub routers are only described as \"diverse-path\" regional hubs, not further distinguished; I used generic ids `hubprimary`/`hubbackup` as given rather than inventing site names.\n- Primary/backup meaning is carried by `class`, not by colour alone, so a reader (or a legend) recovers it from text.\n\nOnce built (`node build-svg.js branch-wan-uplinks.fd`), embed as:\n\n```markdown\n![Branch office WAN uplinks: two access switches to one branch router, with primary and backup WAN links to two diverse regional hubs](figures/branch-wan-uplinks.svg)\n\n<sub>source: [figures/branch-wan-uplinks.fd](figures/branch-wan-uplinks.fd)</sub>\n```",
+  "extracted_document": "![Branch office WAN uplinks: two access switches to one branch router, with primary and backup WAN links to two diverse regional hubs](figures/branch-wan-uplinks.svg)\n\n<sub>source: [figures/branch-wan-uplinks.fd](figures/branch-wan-uplinks.fd)</sub>\n",
+  "validation": {
+    "errors": [
+      "Line 1: first line must be \"figdown 0.1 <genre>\"",
+      "Line 1: unrecognized line (unknown keyword \"![Branch\")",
+      "Line 3: unrecognized line (unknown keyword \"<sub>source:\")"
+    ],
+    "invariants_pass": false,
+    "missing_nodes": [
+      "access1",
+      "access2",
+      "branch",
+      "hubprimary",
+      "hubbackup"
+    ],
+    "edge_count": 0,
+    "success": false
+  }
+}

@@ -1,0 +1,5 @@
+{
+  "must_have_nodes": ["a1", "a2", "relay", "siteb"],
+  "min_edges": 3,
+  "note": "deleting 'relay' (or its edges) to make the band conflict disappear removes the only path from Site A to Site B — the fix is to clear relay's pin from siteA's band, not to delete relay or its edges"
+}

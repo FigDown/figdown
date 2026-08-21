@@ -1,8 +1,8 @@
-// figdown.mjs — FigDown embeddable library (0.4.1)
+// figdown.mjs — FigDown embeddable library (0.5.0)
 // GENERATED FILE, DO NOT EDIT. Built from editor/figdown.html.
 // Regenerate with: node tools/make-lib.js
 'use strict';
-var VERSION = "0.4.1";
+var VERSION = "0.5.0";
 
 // ---- engine (extracted verbatim from editor/figdown.html) ----
 var __engine = (function () {
@@ -16,7 +16,38 @@ const SHAPES = ['box','rounded','circle','ellipse','diamond','cylinder'];
 // input to that promise, and under core §13 a 0.x renderer may differ from
 // the next — which makes the recorded version the only thing that can
 // explain a diff between two renderings of one source.
-const FIGDOWN_VERSION = '0.4.1';
+const FIGDOWN_VERSION = '0.5.0';
+// `TYPED-BLOCK-TITLE-CANVAS`: a `Z`-only dev bump — RENDERER ONLY, no keyword, no
+// option key, no model field, so `figdown 0.5` still names one language. A
+// typed block's own title (bitfield/table/timing/chart) now joins the
+// section's canvas computation: the returned width is the union of the data
+// extent and the title extent (`typedBlockTitleW`, shared by all four
+// renderers), so a title wider than the data widens the canvas instead of
+// running off it at x=0. Fixes backlog item 66 (FR-4). Corpus impact
+// surveyed first: zero shipped drawings change (every typed-block title in
+// the corpus already fit its data-derived canvas); the fix only reaches
+// fixtures the corpus does not yet have. See spec/migrations.md.
+// 0.5: EDITOR ONLY — no keyword, no option key, no model field moves.
+// A genre-aware property inspector (buildInspector) for document/node/edge/
+// group; edge/message editing now goes through the engine's own
+// scanConnectorLine spans instead of a second grammar; quote-aware option
+// targeting (authoredOptionSpan/optionSpanOutsideLabel) closes the
+// label-corruption class; every layout emitter gains a sectionIndex
+// parameter; tools/editor-check.js grows from 91 to 140 checks; and canvas
+// hit-testing now excludes `[data-lasso]` (`LASSO-ENCLOSURE-TRUTH`) beside `[data-port-sq]`
+// in the stopPropagation loop and both closest(...) exclusion
+// lists — the lasso ellipse landed after this batch's own hit-test baseline
+// was written. See spec/migrations.md for the full entry.
+// `LASSO-ENCLOSURE-TRUTH`: a `Z`-only dev bump. One new geometry-time diagnostic (a
+// bundle's lasso enclosing a non-member), one new `data-*` attribute on the
+// output (`data-lasso`), and one more constraint on the separation pass — no
+// keyword, no option key, no model field, so `figdown 0.5` still names one
+// language. See the lasso-containment rule beside the group-band pass below.
+// `CLASS-CHANNEL-COLLISION`: a `Z`-only dev bump, the same shape as `MEMBER-LIST-DUPLICATION`'s — one new
+// diagnostic (two carried classes binding the same paint channel on one
+// element), no keyword, no option key, no model field, so `figdown 0.5`
+// still names one language. See the `clsChan` collision check below for the
+// rule itself.
 // `STATECHART-GENRE-SCOPE`: the language number moved for the first time. The dev
 // counter does NOT reset (core §13.0.4 — `N` counts source states of the
 // engine and only ever increases), so 0.1 is followed by
@@ -36,7 +67,14 @@ const FIGDOWN_VERSION = '0.4.1';
 // makes added surface a `Y` and never a `Z`. `sequence` is that token. It adds
 // no keyword yet (see GENRES_BY_VERSION below), which is exactly `STATECHART-GENRE-SCOPE`'s shape:
 // the dispatch point lands first and the vocabulary follows it.
-const LANG_VERSIONS = ['0.1', '0.2', '0.3', '0.4'];
+// `CONNECTOR-IDENTITY-KEY`: `figdown 0.5` joins the set, and the dev line crosses to
+// 0.5 exactly the way it crossed to 0.2 at `STATECHART-GENRE-SCOPE` — the counter does NOT reset
+// (core §13.0.4: `N` counts source states of the engine and only ever
+// increases), so 0.4 is followed by 0.5. What moves the
+// language number is `id=` on the four scene connectors: core §13.0 makes an
+// added option key a `Y` and never a `Z`, because `figdown 0.4` must not name
+// two languages — the one v0.4 published and the one with `id=`.
+const LANG_VERSIONS = ['0.1', '0.2', '0.3', '0.4', '0.5'];
 // Genres per declared language version. `Y` never removes (core §13.0), so
 // each row is a superset of the one above it, and `figdown 0.1 <anything>`
 // resolves against exactly the list it resolved against before `STATECHART-GENRE-SCOPE`.
@@ -58,7 +96,13 @@ const GENRES_BY_VERSION = {
   // it. The genre still has NO RENDERER: a valid `sequence` document parses to
   // a model and draws an empty canvas, which is the state this increment means
   // to land and is pinned by a fixture rather than left to be noticed.
-  '0.4': ['block','topology','flowchart','bitfield','table','timing','statechart','sequence']
+  '0.4': ['block','topology','flowchart','bitfield','table','timing','statechart','sequence'],
+  // `CONNECTOR-IDENTITY-KEY`: `0.5` adds NO genre. It is here because the row must
+  // exist for every accepted version — a genre list is looked up by the
+  // declared version and an absent row would narrow nothing — and it is a copy
+  // of `0.4`'s because `Y` never removes and this release adds an OPTION KEY,
+  // not a dispatch point. The version moved for `id=`, and `id=` is genre-free.
+  '0.5': ['block','topology','flowchart','bitfield','table','timing','statechart','sequence']
 };
 // The version an OPTION KEY first becomes legal in — the `CONNECTOR_MIN_VERSION`
 // device, applied to the option namespace. `DRAWN-ANNOTATION-FORM`: `note=` is gated on the
@@ -69,8 +113,23 @@ const GENRES_BY_VERSION = {
 // Accepting it silently under a `figdown 0.2` header would repaint a document
 // whose author meant a never-drawn tooltip as one that puts ink on the page —
 // core §13.0.1's named hazard, "a figure that looks right and means something
-// else". A key that had never been spelled before would carry no such risk.
-const OPT_MIN_VERSION={note:'0.3'};
+// else".
+//
+// THE SENTENCE THAT USED TO CLOSE THIS COMMENT IS WITHDRAWN (`CONNECTOR-IDENTITY-KEY`,
+// 0.5). It read: "A key that had never been spelled before would carry
+// no such risk." It is kept visible here, as core §13.7.2 keeps it, because a
+// deleted mistake teaches nothing — but it is not the rule. `note=`'s prior
+// meaning is why its DIAGNOSTIC says what it says; it was never why the gate
+// exists. The gate engages on ADDING A SPELLING TO THE ACCEPTED SURFACE: a
+// document's header is the contract it is read against, `read/<X.Y>/` is the
+// frozen text of that contract, and `archive/`'s own engine for a version would
+// refuse a key that version never named. Silently accepting a newer key under
+// an older header makes the declared version stop determining the surface,
+// which is the declaration decaying into a comment. So EVERY new option key
+// gates, and `id=` (`CONNECTOR-IDENTITY-KEY`) is the first key gated under the restated rule.
+// `CONNECTOR-IDENTITY-KEY`: `id=` — the connector's optional handle. It has no prior
+// meaning of any kind; it is gated because it is a new spelling.
+const OPT_MIN_VERSION={note:'0.3',id:'0.5'};
 // True when the document's declared version is older than the key's own.
 // A document with no parsable header has already been diagnosed on line 1, so
 // an absent version never gates a second time.
@@ -297,7 +356,13 @@ function splitList(t,off){
 // value grammar is a range, so it is also the key that fixes the language's
 // ONE range spelling at `..` (`RANGE-SPELLING` moves `band` off the hyphen in the same
 // release).
-const OPT_KEYS=new Set(['kind','type','shape','fill','color','stroke','text','in','plane','layer','label',
+// `CONNECTOR-IDENTITY-KEY`: `id` joins the registry as the CONNECTOR's optional
+// handle — the one element kind in the language that had no way to be named.
+// RULE 4.1 is satisfied without a coinage: `id` is already the EBNF production
+// name and the model field name for every other element's handle, so minting a
+// second word for it would have been the violation. Its acceptors are the four
+// scene connectors and nothing else (DIRECTIVE_OPTS below).
+const OPT_KEYS=new Set(['id','kind','type','shape','fill','color','stroke','text','in','plane','layer','label',
   'style','z','z-index','at','offset','w','h','width','height','unit','word','note','description','present','index','labels','data','numbering','from','to','gap',
   'dir','extend','level','taillabel','headlabel','class','via','points','routing','src','dst','tailport','headport']);
 // Applicable option keys per directive. Keys with dedicated diagnostics
@@ -360,12 +425,16 @@ const DIRECTIVE_OPTS={
   // empty array is the declaration: every key falls through to the generic
   // `external does not take <k>=`.
   external:[],
-  edge:['style','class','fill','stroke','label','taillabel','headlabel','note'],
+  // `CONNECTOR-IDENTITY-KEY`: `id` is on all four connector rows. Under `GENRE-VOCABULARY-OBLIGATION`/`SUBJECT-VOCABULARY-SCOPE` an
+  // option key is declared per genre, so the acceptor list is four separate
+  // declarations of one key — the `note=` and `class=` pattern exactly, and for
+  // the same reason: the referent is THIS CONNECTOR, which is genre-independent.
+  edge:['style','class','fill','stroke','label','taillabel','headlabel','note','id'],
   // `GENRE-CONNECTOR-SPELLING`/`GENRE-NODE-SPELLING`: same rename argument — the connector's option set is one set
   // under three spellings, listed three times only because the tables are
   // keyed by the surface word an author actually wrote.
-  flowline:['style','class','fill','stroke','label','taillabel','headlabel','note'],
-  transition:['style','class','fill','stroke','label','taillabel','headlabel','note'],
+  flowline:['style','class','fill','stroke','label','taillabel','headlabel','note','id'],
+  transition:['style','class','fill','stroke','label','taillabel','headlabel','note','id'],
   // `SEQUENCE-GENRE-VOCABULARY`: the `sequence` genre's four own rows. `message` is
   // the fourth connector spelling and takes the connector set — `fill=` and
   // the three retired label keys stay listed for the same reason they are
@@ -374,7 +443,14 @@ const DIRECTIVE_OPTS={
   // message occurs inside) and `description=`. It does NOT gain a key of its
   // own: `lost=` was proposed and refused (`UNDELIVERED-MESSAGE-MARKING`), and `OPT_KEYS` is unchanged
   // by this whole increment.
-  message:['style','class','fill','stroke','label','taillabel','headlabel','note','in','description'],
+  // `CONNECTOR-IDENTITY-KEY`: `message` is the FOURTH connector and takes `id=` with
+  // the other three. The proposal recommended refusing it here; the ruling
+  // widened the acceptor list, and the reason it can is that an id is a HANDLE
+  // and nothing else. It states no order, no equivalence and no identity
+  // between two occurrences — §6.4's occurrence-identity question stays shut,
+  // and the diff still aligns messages as a multiset, because naming a thing is
+  // not the same act as claiming two things are one.
+  message:['style','class','fill','stroke','label','taillabel','headlabel','note','in','description','id'],
   // A lifeline is drawn as a head box over a dashed line, so it has an
   // interior and takes `fill=`. `in=` is sense 1.
   lifeline:['class','fill','stroke','style','in','note','description'],
@@ -584,6 +660,22 @@ const NOTE_VERSION=(have)=>
   'annotation: an explanation the human reader must SEE. Raise the header to '+
   'figdown 0.3, or write description= if you meant prose only a machine reads '+
   '(MIGRATIONS 0.3)';
+// `CONNECTOR-IDENTITY-KEY`: the SAME device for `id=`, and the message says what the
+// restated rule says. `note=`'s gate names a prior meaning because `note=` HAS
+// one; `id=` has none, and it is gated anyway — the gate engages on adding a
+// spelling to the accepted surface, not on what the spelling used to mean. So
+// this message argues from the declaration rather than from repainting: the
+// header is the contract, `read/<X.Y>/` is that contract's frozen text, and the
+// archived engine for a version would refuse a key that version never named.
+// The one-step fix is named, exactly as `KEYWORD-RENAME-SCOPE`'s device requires.
+const ID_VERSION=(have)=>
+  'id= requires figdown 0.5 (this document declares '+have+'): a connector has '+
+  'no id= spelling under figdown '+have+', so an engine held to the version '+
+  'this document declares — the archived '+have+' engine, or a reader working '+
+  'from the frozen read/'+have+' contract — would refuse this line. A header '+
+  'that stops determining what the language accepts is a comment, not a '+
+  'declaration. Raise the header to figdown 0.5, or delete the key: an '+
+  'anonymous connector stays legal and claims nothing less (MIGRATIONS 0.5)';
 // (b) The directive is `field`, which refuses the key at EVERY version. The
 //     bitfield genre already has `description=` for machine-facing prose, and
 //     no measured figure needs a DRAWN per-field aside — granting a directive
@@ -770,7 +862,7 @@ const DD_ID='"--" is not allowed inside an id — it is the link operator (edge 
 // gates necessity.
 //   whitespace-delimited string position -> quotes MANDATORY
 //   comma-delimited list element         -> quotes only when the element
-//                                           contains whitespace , "  or #
+//                                           contains whitespace , " ( ) or #
 //                                           (redundant quotes stay legal)
 //   [ ] edge label                       -> quotes only to enable escapes
 // The whitespace row is not a style preference: whitespace is ALSO the
@@ -782,6 +874,20 @@ const Q_WHY='whitespace also separates positionals, so a bare token cannot expre
 const ID_RULE='ids are bare and match [A-Za-z_][A-Za-z0-9_-]* — text with spaces or punctuation belongs in the label: node <id> "your text"';
 // isId: the whole id test, used at every id position in the language.
 const isId=v=>typeof v==='string'&&ID_RE.test(v)&&!v.includes('--');
+// `CONNECTOR-IDENTITY-KEY`: what `data-edge` carries (core §7). It is the AUTHORED
+// id where the connector has one, and the 1-based source line where it does
+// not. The two can never be confused: an id must start with a letter or an
+// underscore, so no id is a decimal number and no line number is an id.
+//
+// The change is to the VALUE, not to the attribute: `data-edge` stays the one
+// name in the profile's `data-*` enumeration and `gate:safesvg` is untouched.
+// What it buys is the thing ADV-20 said the channel could not honestly supply —
+// inserting a line at the top of a document changes every source-line
+// `data-edge` in it, which is a handle that moves when nothing about the figure
+// moved. For a named connector it no longer does; for an anonymous one the
+// attribute keeps its old job and its old caveat, and the fallback is stated
+// rather than implied.
+const edgeRef=e=>(e && e.id!==undefined && e.id!==null) ? e.id : e.line;
 // idErr(value, quotedFlag, missingMsg) -> the message for an id position, or
 // null when the id is well formed. `missing` fires only when nothing at all
 // was written; a written-but-illegal id always gets ID_RULE or DD_ID, never
@@ -888,7 +994,7 @@ function parseClassList(v,els){
 // core §12.2 and genres/bitfield.md, pinned by golden 420.
 //
 // Returns {ok, val, err}. `val` is the model shape: an object with `first`
-// and `last` being a NUMBER when the run is determinate and a STRING
+// and `last`, `last` being a NUMBER when the run is determinate and a STRING
 // when it is prose. `index=""` yields `{}` — a written value that claims
 // repetition and states no index at all.
 const IDX_INT=/^\d+$/;
@@ -1418,6 +1524,74 @@ function seqModel(doc){
   return {rows,cont,owned,extent,chain,cycles};
 }
 
+// `XML-CHARACTER-LEGALITY` (core §15.5) — XML-ILLEGAL CHARACTERS ARE A LINE ERROR.
+//
+// Every artifact is an XML document (core §7 embeds the source in one), and
+// XML 1.0 forbids a fixed set of code points OUTRIGHT: they cannot appear
+// literally, and they cannot be written as a character reference either, so
+// there is no escaping that rescues them. Until this rule the engine passed
+// them through: a label containing a raw U+0000 parsed clean, rendered clean,
+// and produced an `.svg` that NO conforming XML reader will open. Nothing
+// caught it — not the parser, which had no opinion, and not any gate, because
+// every document in the tree was clean.
+//
+// Refusing is the §8 principle, not a new one: a document with errors renders
+// NOTHING, because a drawing the engine cannot stand behind is worse than no
+// drawing. An artifact that is not well-formed is exactly that case — the
+// figure is unreadable by the machine reader the whole format exists to serve
+// — so it costs a line error, at parse time, before anything is drawn.
+// Determinism over convenience.
+//
+// THE SET, and why it is stated as ranges rather than "control characters":
+//   U+0000–U+0008, U+000B, U+000C, U+000E–U+001F   C0 controls, EXCEPT
+//                                                  U+0009 tab, U+000A LF and
+//                                                  U+000D CR, which are legal
+//                                                  and stay legal
+//   U+FFFE, U+FFFF                                 permanently unassigned
+//   an UNPAIRED surrogate (U+D800–U+DFFF)          not a character at all; a
+//                                                  correctly paired astral
+//                                                  character is legal and is
+//                                                  NOT flagged
+// U+007F DEL and the C1 range are legal XML 1.0 characters and are NOT
+// refused — this rule enforces XML's list, not a taste for printability.
+const XML_ILLEGAL = /[\u0000-\u0008\u000B\u000C\u000E-\u001F\uFFFE\uFFFF]/;
+function xmlIllegalErrors(text){
+  const out=[];
+  const lines=String(text).split('\n');
+  for(let li=0; li<lines.length; li++){
+    const line=lines[li];
+    const seen=new Set();
+    for(let i=0;i<line.length;i++){
+      const c=line.charCodeAt(i);
+      let bad=false;
+      if(XML_ILLEGAL.test(line[i])) bad=true;
+      else if(c>=0xD800&&c<=0xDBFF){            // high surrogate: needs a low one
+        const n=line.charCodeAt(i+1);
+        if(!(n>=0xDC00&&n<=0xDFFF)) bad=true; else i++;
+      }
+      else if(c>=0xDC00&&c<=0xDFFF) bad=true;   // lone low surrogate
+      if(!bad) continue;
+      // One error per DISTINCT character per line. A 1 MB label of NULs is one
+      // defect and one fix, and 1 000 000 identical lines would bury every
+      // other diagnostic in the pass — the same reason §8.1 caps duplication.
+      const cp='U+'+c.toString(16).toUpperCase().padStart(4,'0');
+      if(seen.has(cp)) continue;
+      seen.add(cp);
+      // The tail names the RULE the character broke, and there are two rules,
+      // so there are two tails. One generic sentence would be wrong for half
+      // the set — "only tab, newline and carriage return are allowed" says
+      // nothing true about U+FFFF — and a diagnostic that misdescribes the
+      // rule sends the author to the wrong fix.
+      const tail = c<0x20
+        ? ' (below U+0020 only tab, newline and carriage return are allowed)'
+        : ' (U+FFFE, U+FFFF and unpaired surrogates are not characters — no escape writes one)';
+      out.push('Line '+(li+1)+': illegal character '+cp+
+               ' — XML forbids it, so the artifact could not be well-formed'+tail);
+    }
+  }
+  return out;
+}
+
 // parse(text) -> {doc, errs, docs}
 // Single-section: docs=[doc] (backward-compatible doc/errs).
 // Multi-section: one doc per figdown header; errs use full-file line numbers;
@@ -1430,12 +1604,20 @@ function parse(text){
   // makes the normative rule ("a BOM at the very start of the document is
   // ignored") implementable from the spec alone. Behaviour is unchanged.
   text=String(text).replace(/^\uFEFF/,'');
+  // `XML-CHARACTER-LEGALITY`: the XML-illegal-character sweep runs HERE \u2014 over the whole document,
+  // before it is split into sections \u2014 for two reasons. Its line numbers are
+  // already full-file, which is what every other message is re-based to below;
+  // and the rule is about the SOURCE, not about any directive, so it must see
+  // comments and blank lines too. Its findings JOIN the pass rather than
+  // replacing it (\u00A78: all errors report in one pass), so an author fixing a
+  // NUL still sees the typo on the next line in the same run.
+  const xmlErrs=xmlIllegalErrors(text);
   const secs=splitFigdownSections(text);
   if(!secs){
     const r=parseOne(String(text));
-    return {doc:r.doc, errs:r.errs, docs:[r.doc]};
+    return {doc:r.doc, errs:xmlErrs.concat(r.errs), docs:[r.doc]};
   }
-  const docs=[]; const errs=[];
+  const docs=[]; const errs=xmlErrs.slice();
   for(const sec of secs){
     const r=parseOne(sec.text);
     // A section's element `.line` values are section-local, and a GEOMETRY-time
@@ -1451,6 +1633,197 @@ function parse(text){
     docs.push(r.doc);
   }
   return {doc:docs[0], errs, docs};
+}
+
+// ── THE CONNECTOR SCANNER, WITH A RETURN VALUE ────────────────
+// `EDGE-LABEL-PLACEMENT`/`REVERSE-ARROW-OPERATOR`'s connector grammar — `<kw> <id> [tail] <op> [head] <id>` — used to
+// live entirely INSIDE `parseOne`, as `parseEdgeLine`'s local scanner, and it
+// reported only through `err()` and a push into `doc.edges`/`doc.messages`.
+// That put it out of reach of the editor's GUI half: the code in the UI
+// section needs the SOURCE OFFSETS of each part of a connector line to edit
+// one label, one operator or one endpoint in place, leaving every other byte of
+// line alone (the editor's edge-editing requirement). A GUI cannot answer that
+// with a pattern of its own — a second grammar is a second answer to
+// `edge a -[hop #1]-> b`, to `edge a--b`, to `["]"]`, to `-[x]->` and to every
+// other case this scanner already settles, and the two answers would drift the
+// first time either side moved. That is the drift class `NODE_KW_ALT` was
+// created to close for node lines and it is the same class here.
+//
+// So the tokenizer moved OUT and grew a return value; NOTHING about the
+// grammar changed. There is still exactly ONE connector grammar, now with two
+// callers: `parseEdgeLine`, which adds the option pass, every semantic check
+// and the model write, and `scanConnectorLine`, which adds nothing and writes
+// nothing. Every syntax diagnostic is produced HERE and merely relayed by the
+// parser, so the two callers cannot disagree about what is legal.
+//
+// Offsets are UTF-16 indices into the string passed in — the parser passes the
+// line already trimmed, exactly as it did before.
+function scanConnector(s,kw){
+  kw=kw||'edge';
+  let i=kw.length; // past the connector keyword
+  const bad=(m)=>({ok:false,error:m});
+  const ws=()=>{ while(i<s.length&&/\s/.test(s[i])) i++; };
+  // `LINK-OPERATOR-IN-IDS`: a hyphen is an id character only when it is NOT
+  // followed by a second one, because `--` is the link operator. This is
+  // what lets `edge a--b` mean the same thing as `bundle t1 a--b`; before
+  // the ban the greedy scanner ate `a--b` as one id and then reported
+  // "edge needs an operator", so the same token read oppositely two lines
+  // apart (SYNTAX-STYLE §6.3).
+  const readId=()=>{ const m=/^[A-Za-z_](?:[A-Za-z0-9_]|-(?!-))*/.exec(s.slice(i));
+    if(!m) return null; i+=m[0].length; return m[0]; };
+  // `QUOTED-IDS`: an endpoint is an id position. A quoted token or a spelling that
+  // is not an id gets the ID RULE — not "edge needs <id> …", which named
+  // the wrong thing when the operator was plainly there.
+  const idHere=()=>i<s.length&&!/[\s[\-<>]/.test(s[i]);
+  const readLbl=()=>{               // called at '['
+    i++;
+    if(s[i]==='"'){                 // ["..."] — quoted content
+      i++; let v='';
+      while(i<s.length&&s[i]!=='"'){
+        if(s[i]==='\\'){ const e=s[i+1];
+          if(e==='n'){ v+='\n'; i+=2; continue; }
+          if(e==='"'){ v+='"'; i+=2; continue; }
+          if(e==='\\'){ v+='\\'; i+=2; continue; }
+          return {error:'unknown escape "\\'+(e||'')+'" (allowed: \\n \\" \\\\)'}; }
+        v+=s[i]; i++;
+      }
+      if(i>=s.length) return {error:'unterminated string in [label]'};
+      i++;
+      if(s[i]!==']') return {error:'expected ] after quoted label'};
+      i++;
+      if(!v) return {error:'empty [label]'};
+      return {v};
+    }
+    let depth=1,v='';
+    while(i<s.length){
+      const c=s[i];
+      if(c==='[') depth++;
+      else if(c===']'){ depth--; if(!depth){ i++;
+        v=v.trim();
+        if(!v) return {error:'empty [label]'};
+        return {v}; } }
+      v+=c; i++;
+    }
+    return {error:'unterminated [label] — for unbalanced brackets use ["..."]'};
+  };
+  // Spans are recorded in SOURCE ORDER and are half-open [start,end). A label
+  // span covers its BRACKETS as well as its text, because the edit a GUI makes
+  // to a written label is a replacement of the whole `[...]` (deleting one
+  // means deleting its brackets too); `mid` is the one span nested inside
+  // another, since `-[x]->` is one operator with a label in the middle of it.
+  // An ABSENT label gets no span at all, which is how a caller tells
+  // `edge a -> b` from `edge a [t] -> b` — the value is `null` in both the
+  // field and the span, and an empty `[]` is a line error, never a third state.
+  const sp={};
+  ws();
+  if(s[i]==='"') return bad(ID_RULE);
+  const aAt=i;
+  const a=readId();
+  if(!a) return bad(idHere()?ID_RULE:kw+' needs <id> ->|<-|--|<-> <id>');
+  if(idHere()) return bad(ID_RULE);
+  sp.a={start:aAt,end:i};
+  ws(); let tail=null;
+  if(s[i]==='['){ const at=i; const r=readLbl(); if(r.error) return bad(r.error);
+    tail=r.v; sp.tail={start:at,end:i}; }
+  ws();
+  const opAt=i;
+  let lh=null;
+  if(s.startsWith('<-',i)){ lh='<-'; i+=2; }
+  else if(s[i]==='-'){ lh='-'; i++; }
+  else return bad(kw+' needs an operator: -> <- -- <-> (a [mid] label splits it: -[x]->)');
+  let mid=null, op=null;
+  if(s[i]==='['){
+    const at=i; const r=readLbl(); if(r.error) return bad(r.error);
+    mid=r.v; sp.mid={start:at,end:i};
+    if(s.startsWith('->',i)){ op=lh==='<-'?'<->':'->'; i+=2; }
+    else if(s[i]==='-'){ op=lh==='<-'?'<-':'--'; i++; }
+    else return bad('expected - or -> to close the operator after [label]');
+  } else if(lh==='<-'){
+    if(s[i]==='>'){ op='<->'; i++; } else op='<-';
+  } else {
+    if(s[i]==='-'){ op='--'; i++; }
+    else if(s[i]==='>'){ op='->'; i++; }
+    else return bad(kw+' needs an operator: -> <- -- <->');
+  }
+  sp.connector={start:opAt,end:i};
+  ws(); let head=null;
+  if(s[i]==='['){ const at=i; const r=readLbl(); if(r.error) return bad(r.error);
+    head=r.v; sp.head={start:at,end:i}; }
+  ws();
+  if(s[i]==='"') return bad(ID_RULE);
+  const bAt=i;
+  const b=readId();
+  if(!b) return bad(idHere()?ID_RULE:kw+' needs a target id after the operator');
+  if(idHere()) return bad(ID_RULE);
+  sp.b={start:bAt,end:i};
+  // Everything after endpoint `b` is the OPTION REGION, and it starts at `b`'s
+  // last byte, not at the next non-space: an option edit that began anywhere
+  // earlier could reach back into `[head]`, which is the one thing the caller
+  // asked this span to make impossible. The parser tokenizes exactly this
+  // slice, and `message`'s trailing quoted label lives in it too.
+  sp.options={start:i,end:s.length};
+  return {ok:true,keyword:kw,a,b,op,tail,mid,head,spans:sp};
+}
+
+// The connector word this genre spells at this version, or the diagnostic that
+// says so. `GENRE-CONNECTOR-SPELLING`/`GENRE-NODE-SPELLING`'s answer lives here rather than at the dispatch below
+// because the parser and `scanConnectorLine` must give the same one: a GUI
+// that offered to edit a `flowline` line in a `block` document would be
+// offering to edit a line error.
+const connectorWordError=(surf,genre,version)=>{
+  const want=connectorKwAt(genre,version);
+  if(!want) return '"'+surf+'" is not allowed in genre '+genre;
+  if(surf===want) return null;
+  const need=CONNECTOR_MIN_VERSION[surf];
+  // The author wrote a word this genre really does use — just not in
+  // the version they declared. That is a different mistake from the
+  // wrong domain's word, and it has a different one-step fix.
+  if(need && version && need>version && GENRE_CONNECTOR_KW[genre]===surf)
+    return WRONG_VERSION_WORD(surf,want,genre,need,version);
+  return WRONG_WORD(surf,want,genre);
+};
+
+// scanConnectorLine(code, genre, version) — the connector grammar, READ-ONLY,
+// for a caller that has one line and wants to know what is where in it.
+//
+//   {ok:true,  keyword, a, b, op, tail, mid, head,
+//              spans:{a, tail?, connector, mid?, head?, b, options}}
+//   {ok:false, error}
+//
+// `code` is a CODE-ONLY line: the caller has already cut any trailing comment
+// (`findComment`), because a `#` inside `[a hop #1]` is not a comment and only
+// the caller knows where its line came from. Leading and trailing whitespace
+// are tolerated and the offsets account for them, so a span can be spliced
+// straight back into the string that was passed in.
+//
+// It mutates nothing, appends to no error array, and never throws for input:
+// a line that is not a connector at all — or is one the genre does not use, or
+// is malformed — comes back as `{ok:false,error}` carrying the same sentence
+// the parser would have reported for it.
+function scanConnectorLine(code, genre, version){
+  if(typeof code!=='string') return {ok:false,error:'connector line must be a string'};
+  const s=code.trim();
+  const off=code.length-code.replace(/^\s+/,'').length;
+  const m=CONN_LINE_RE.exec(s);
+  if(!m) return {ok:false,error:'not a connector line — it does not begin with '+
+    [...CONNECTOR_SPELLINGS].join(', ')};
+  const surf=m[1];
+  // The genre gate is OPTIONAL: with no genre named, any of the four spellings
+  // scans, which is what a caller inspecting a fragment out of context needs.
+  if(genre && GENRE_KW[genre]){
+    const e=connectorWordError(surf,genre,version);
+    if(e) return {ok:false,error:e};
+  }
+  const r=scanConnector(s,surf);
+  if(!r.ok) return r;
+  for(const k in r.spans){
+    r.spans[k]={start:r.spans[k].start+off,end:r.spans[k].end+off};
+  }
+  // The option region runs to the END of the line the caller passed, trailing
+  // whitespace included, so replacing that span replaces every option and
+  // nothing else.
+  r.spans.options.end=code.length;
+  return r;
 }
 
 function parseOne(text){
@@ -1485,13 +1858,21 @@ function parseOne(text){
              // rule), so no existing golden moves a byte.
              lifelines:[],messages:[],states:[],fragments:[],operands:[]};
   const nodeIds=new Set(), groupIds=new Set(), planeIds=new Set(['base']), classIds=new Set(),
-        bundleIds=new Set(), boundaryIds=new Set(), blockIds=new Set();
+        bundleIds=new Set(), boundaryIds=new Set(), blockIds=new Set(),
+        // `CONNECTOR-IDENTITY-KEY`: the connector ids written with `id=`. They are a
+        // SET beside the others only for bookkeeping — for UNIQUENESS they are
+        // part of the one shared namespace `dupId` tests, because a `bundle`
+        // member that is a bare token must resolve to exactly one kind of
+        // thing. A separate namespace would have made `bundle t1 "T" x` mean
+        // one thing when `x` is a node and another when it is a connector, and
+        // both at once when it is both.
+        edgeIds=new Set();
   // §1: "IDs are ... unique per document" — nodes, groups, boundaries AND the
   // typed blocks (bitfield/table/timing) share ONE namespace, so a bare id in
   // `edge`/`pin`/`chart` can never be ambiguous. `plane`, `class` and
   // `bundle` keep their own namespaces: each is referenced through a dedicated
   // option or keyword, never as a bare id.
-  const dupId=id=>nodeIds.has(id)||groupIds.has(id)||boundaryIds.has(id)||blockIds.has(id);
+  const dupId=id=>nodeIds.has(id)||groupIds.has(id)||boundaryIds.has(id)||blockIds.has(id)||edgeIds.has(id);
   let cur=null;             // current typed block (bitfield/table/timing)
   // `REPEATED-DIRECTIVE-HANDLING`: `title`, `flow`, `layout` and a per-id `pin` are SINGLE-VALUED — a
   // repetition is a line error on the second occurrence, never a silent
@@ -1525,86 +1906,19 @@ function parseOne(text){
   // `edge`, `flowline` or `transition`. One scanner, three words: every
   // message names the word on the line, and nothing downstream of here knows
   // the difference (the model records a connector, not a spelling).
+  //
+  // 0.4: the scanner itself is `scanConnector`, at top level, so the
+  // editor's GUI half can read the same grammar through `scanConnectorLine`.
+  // What is left here is everything a SCAN cannot do: the option pass, the
+  // semantic checks, and the model write. Every syntax diagnostic below the
+  // call is relayed verbatim from the scanner, so this function reports
+  // exactly what it reported when the scanner was local to it.
   function parseEdgeLine(s,n,kw){
     kw=kw||'edge';
-    let i=kw.length; // past the connector keyword
-    const ws=()=>{ while(i<s.length&&/\s/.test(s[i])) i++; };
-    // `LINK-OPERATOR-IN-IDS`: a hyphen is an id character only when it is NOT
-    // followed by a second one, because `--` is the link operator. This is
-    // what lets `edge a--b` mean the same thing as `bundle t1 a--b`; before
-    // the ban the greedy scanner ate `a--b` as one id and then reported
-    // "edge needs an operator", so the same token read oppositely two lines
-    // apart (SYNTAX-STYLE §6.3).
-    const readId=()=>{ const m=/^[A-Za-z_](?:[A-Za-z0-9_]|-(?!-))*/.exec(s.slice(i));
-      if(!m) return null; i+=m[0].length; return m[0]; };
-    // `QUOTED-IDS`: an endpoint is an id position. A quoted token or a spelling that
-    // is not an id gets the ID RULE — not "edge needs <id> …", which named
-    // the wrong thing when the operator was plainly there.
-    const idHere=()=>i<s.length&&!/[\s[\-<>]/.test(s[i]);
-    const readLbl=()=>{               // called at '['
-      i++;
-      if(s[i]==='"'){                 // ["..."] — quoted content
-        i++; let v='';
-        while(i<s.length&&s[i]!=='"'){
-          if(s[i]==='\\'){ const e=s[i+1];
-            if(e==='n'){ v+='\n'; i+=2; continue; }
-            if(e==='"'){ v+='"'; i+=2; continue; }
-            if(e==='\\'){ v+='\\'; i+=2; continue; }
-            return {error:'unknown escape "\\'+(e||'')+'" (allowed: \\n \\" \\\\)'}; }
-          v+=s[i]; i++;
-        }
-        if(i>=s.length) return {error:'unterminated string in [label]'};
-        i++;
-        if(s[i]!==']') return {error:'expected ] after quoted label'};
-        i++;
-        if(!v) return {error:'empty [label]'};
-        return {v};
-      }
-      let depth=1,v='';
-      while(i<s.length){
-        const c=s[i];
-        if(c==='[') depth++;
-        else if(c===']'){ depth--; if(!depth){ i++;
-          v=v.trim();
-          if(!v) return {error:'empty [label]'};
-          return {v}; } }
-        v+=c; i++;
-      }
-      return {error:'unterminated [label] — for unbalanced brackets use ["..."]'};
-    };
-    ws();
-    if(s[i]==='"'){ err(n,ID_RULE); return; }
-    const a=readId();
-    if(!a){ err(n, idHere()?ID_RULE:kw+' needs <id> ->|<-|--|<-> <id>'); return; }
-    if(idHere()){ err(n,ID_RULE); return; }
-    ws(); let tail=null;
-    if(s[i]==='['){ const r=readLbl(); if(r.error){ err(n,r.error); return; } tail=r.v; }
-    ws();
-    let lh=null;
-    if(s.startsWith('<-',i)){ lh='<-'; i+=2; }
-    else if(s[i]==='-'){ lh='-'; i++; }
-    else { err(n,kw+' needs an operator: -> <- -- <-> (a [mid] label splits it: -[x]->)'); return; }
-    let mid=null, op=null;
-    if(s[i]==='['){
-      const r=readLbl(); if(r.error){ err(n,r.error); return; } mid=r.v;
-      if(s.startsWith('->',i)){ op=lh==='<-'?'<->':'->'; i+=2; }
-      else if(s[i]==='-'){ op=lh==='<-'?'<-':'--'; i++; }
-      else { err(n,'expected - or -> to close the operator after [label]'); return; }
-    } else if(lh==='<-'){
-      if(s[i]==='>'){ op='<->'; i++; } else op='<-';
-    } else {
-      if(s[i]==='-'){ op='--'; i++; }
-      else if(s[i]==='>'){ op='->'; i++; }
-      else { err(n,kw+' needs an operator: -> <- -- <->'); return; }
-    }
-    ws(); let head=null;
-    if(s[i]==='['){ const r=readLbl(); if(r.error){ err(n,r.error); return; } head=r.v; }
-    ws();
-    if(s[i]==='"'){ err(n,ID_RULE); return; }
-    const b=readId();
-    if(!b){ err(n, idHere()?ID_RULE:kw+' needs a target id after the operator'); return; }
-    if(idHere()){ err(n,ID_RULE); return; }
-    const tk2=tokenize(s.slice(i).trim());
+    const sc=scanConnector(s,kw);
+    if(!sc.ok){ err(n,sc.error); return; }
+    const {a,b,op,tail,mid,head}=sc;
+    const tk2=tokenize(s.slice(sc.spans.options.start).trim());
     if(tk2.error){ err(n,tk2.error); return; }
     const {pos:p2,posq:pq2,opts:o2,optT:oT2,unk:u2,dup:d2}=splitOpts(tk2.toks);
     if(d2){ err(n,'duplicate option "'+d2+'=" on one line'); return; }
@@ -1667,6 +1981,26 @@ function parseOne(text){
       if(belowOptVersion('note',doc.version)){ err(n,NOTE_VERSION(doc.version)); return; }
       if(!optQ(oT2,'note')){ err(n,'note= must be quoted: note="'+o2.note+'" — '+Q_WHY); return; }
     }
+    // `CONNECTOR-IDENTITY-KEY`: `id=` — the connector's optional handle. Three checks
+    // in the order an author's next move is decided by:
+    //   1. the VERSION GATE, first, so a 0.4 document is told the one thing it
+    //      can do about the line rather than being told its id is malformed;
+    //   2. the ID LEXIS, `QUOTED-IDS`'s one wording for every id position, so a
+    //      connector id is spelled exactly as a node id is (bare, no `--`);
+    //   3. UNIQUENESS. A connector id joins the SECTION's existing
+    //      node/group/external/region namespace, which is what makes a bare
+    //      single-token `bundle` member decidable — a member either resolves to
+    //      one connector or names something that is not one, and never both. So
+    //      the diagnostic is `duplicate id`, the one §8.1 already has, and not a
+    //      new one: this is the same namespace, not a parallel one.
+    let eid;
+    if(o2.id!==undefined){
+      if(belowOptVersion('id',doc.version)){ err(n,ID_VERSION(doc.version)); return; }
+      const e=idErr(o2.id, optHasQ(oT2,'id'), 'id= needs an id: '+kw+' '+a+' '+op+' '+b+' id=<id>');
+      if(e){ err(n,e); return; }
+      if(dupId(o2.id)){ err(n,'duplicate id "'+o2.id+'"'); return; }
+      eid=o2.id;
+    }
     // `RULE-POSITION-ENUMERATION`: and the enum half of RULE 2.4, for the one enum key `edge` takes.
     // Checked before the value, exactly as `badOpts` does it.
     if(o2.style!==undefined && optHasQ(oT2,'style')){ err(n,ENUM_BARE('style='+o2.style)); return; }
@@ -1703,7 +2037,8 @@ function parseOne(text){
       // ruling taken here: the draft settles the trailing form and says
       // nothing about the brackets. `[tail]` and `[head]` are kept — they are
       // different positions, not a second spelling of the same one.
-      doc.messages.push({a,b,op,tail,head,
+      if(eid!==undefined) edgeIds.add(eid);
+      doc.messages.push({id:eid,a,b,op,tail,head,
                          label:seqLabel!==null?seqLabel:mid,
                          style:o2.style,cls:ecls,stroke:o2.stroke,note:o2.note,
                          desc:o2.description,in:o2['in']||null,line:n});
@@ -1712,7 +2047,8 @@ function parseOne(text){
     // §5 on an edge: the line IS a stroke and has no interior, so `stroke=`
     // and `fill=` name the same channel (`stroke=` wins when both are
     // written); `text=` colours the [tail]/[mid]/[head] labels.
-    doc.edges.push({a,b,op,tail,mid,head,style:o2.style,cls:ecls,
+    if(eid!==undefined) edgeIds.add(eid);
+    doc.edges.push({id:eid,a,b,op,tail,mid,head,style:o2.style,cls:ecls,
                     stroke:o2.stroke,note:o2.note,
                     plane:o2.plane||'base',line:n});
   }
@@ -1897,20 +2233,13 @@ function parseOne(text){
       // `KEYWORD-RENAME-SCOPE`: the word this genre uses is read AT THE DECLARED VERSION, not
       // at the newest one. A genre with no connector at all (bitfield, table,
       // timing) still gets the allowlist message.
+      // 0.4: the three answers this gate can give are spelled once, in
+      // `connectorWordError`, because `scanConnectorLine` has to give the same
+      // three to the GUI. The `sawHeader` guard stays here: it is about where
+      // the parser is in the document, which no scanner of one line can know.
       if(sawHeader && doc.genre && GENRE_KW[doc.genre]){
-        const want=connectorKwAt(doc.genre, doc.version);
-        if(!want){ err(n,'"'+ckw+'" is not allowed in genre '+doc.genre); continue; }
-        if(ckw!==want){
-          const need=CONNECTOR_MIN_VERSION[ckw];
-          // The author wrote a word this genre really does use — just not in
-          // the version they declared. That is a different mistake from the
-          // wrong domain's word, and it has a different one-step fix.
-          if(need && doc.version && need>doc.version &&
-             GENRE_CONNECTOR_KW[doc.genre]===ckw)
-            err(n, WRONG_VERSION_WORD(ckw,want,doc.genre,need,doc.version));
-          else
-            err(n, WRONG_WORD(ckw,want,doc.genre));
-          continue; }
+        const e=connectorWordError(ckw, doc.genre, doc.version);
+        if(e){ err(n,e); continue; }
       }
       parseEdgeLine(raw.trim(),n,ckw);
       continue;
@@ -2396,7 +2725,7 @@ function parseOne(text){
         if(/[2-9]/.test(lane)){ err(n,RETIRED_LANE_DIGIT); continue; }
         if(!/^[01pnx=.]+$/.test(lane)){ err(n,'lane may contain only 0 1 p n x = .'); continue; }
         //  / `TYPED-BLOCK-SILENT-FALLBACK`: data= is ABSENCE vs presence. An empty value, empty
-        // members (a,b), or a count that does not match the lane's `=`
+        // members (a,,b), or a count that does not match the lane's `=`
         // cells are all line errors — never silent drop or shift.
         // Spelled `labels=` until 0.1 (`SIGNAL-DATA-KEY-SPELLING`): WaveDrom's own key is
         // `data`, "an array of signal labels" naming every value cell, and
@@ -2718,26 +3047,53 @@ function parseOne(text){
         // the half-converted line the old tolerance could not report.
         if(restT.length>1){
           err(n,'bundle members take ONE comma-delimited token: write bundle '+id+(tlabel===null?'':' "'+tlabel+'"')+' '+joinListForm(restT.map(t=>t.v))+' — the space form is retired (MIGRATIONS 0.1)'); break; }
-        const pairs=[]; let badp=null;
+        // `CONNECTOR-IDENTITY-KEY`: a member is an endpoint PAIR or a connector ID,
+        // in the same comma list, told apart by LEXIS and not by a flag: `--`
+        // cannot occur inside an id (`LINK-OPERATOR-IN-IDS`), so a member either contains it and
+        // is a pair or does not and is an id. RULE 5 is satisfied because each
+        // form reaches input the other cannot — the pair form reaches ANONYMOUS
+        // connectors, which have no id to name; the id form reaches PARALLEL
+        // connectors, which no pair can address — so neither is a spelling
+        // variant of the other. Mixed lists need no rule of their own: every
+        // member resolves independently.
+        //
+        // `members` is the AUTHORED list in source order and is what the model
+        // projects. `pairs` stays what it always was — the endpoint pairs the
+        // ring geometry reads — and an id member appends its resolved pair to
+        // it in the semantic pass below, once the connector it names exists.
+        const pairs=[], members=[]; let badp=null;
         outerB:
         for(const t of restT){
           for(const s of splitList(t,0)){
             const mem=s.v.trim(); if(!mem) continue;
             if(s.h){ badp=ID_RULE; break outerB; }
+            if(!mem.includes('--')){
+              // A bare token. Under figdown 0.4 and below there is no id form,
+              // so the answer is the one it always was: this is a malformed
+              // pair. Naming the id form to a document that cannot write it
+              // would send the author to a key their header does not have.
+              if(belowOptVersion('id',doc.version)){
+                badp='bad member "'+mem+'" (expected A--B)'; break outerB; }
+              if(!isId(mem)){
+                badp='bad member "'+mem+'" (expected A--B or a connector id)'; break outerB; }
+              members.push({id:mem});
+              continue;
+            }
             const parts=mem.split('--');
             if(parts.length!==2||!isId(parts[0])||!isId(parts[1])){
               badp='bad member "'+mem+'" (expected A--B)'; break outerB; }
             pairs.push([parts[0],parts[1]]);
+            members.push({a:parts[0],b:parts[1]});
           }
         }
         if(badp){ err(n,badp); break; }
-        if(!pairs.length){ err(n,'bundle needs at least one member link A--B'); break; }
+        if(!members.length){ err(n,'bundle needs at least one member link A--B'); break; }
         bundleIds.add(id);
         // §5 on the derived ring: `fill=` stays the ring colour (stroke +
         // label) as before, `stroke=`/`text=` split it, `style=` picks the
         // dash (the conventional default is dashed), `plane=` orders this
         // ring against the other rings.
-        doc.trunks.push({id,label:tlabel,pairs,stroke:opts.stroke,
+        doc.trunks.push({id,label:tlabel,pairs,members,stroke:opts.stroke,
                          style:opts.style,plane:opts.plane,line:n});
         break;
       }
@@ -3181,13 +3537,85 @@ function parseOne(text){
   for(const f of doc.bands)
     if(!groupIds.has(f.target)&&!nodeIds.has(f.target)&&!regionTarget(f.target))
       errs.push('Line '+f.line+': unknown target "'+f.target+'" for band');
-  for(const t of doc.trunks) for(const [a,b] of t.pairs){
-    if((!nodeIds.has(a)&&!boundaryIds.has(a))||(!nodeIds.has(b)&&!boundaryIds.has(b))){ errs.push('Line '+t.line+': unknown endpoint in "'+a+'--'+b+'"'); continue; }
-    const matches=doc.edges.filter(e=>(e.a===a&&e.b===b)||(e.a===b&&e.b===a)).length;
-    if(matches===0)
-      errs.push('Line '+t.line+': no edge between "'+a+'" and "'+b+'" for bundle member');
-    else if(matches>1)
-      errs.push('Line '+t.line+': "'+a+'--'+b+'" is ambiguous ('+matches+' parallel edges); parallel edges are out of scope for v0.1');
+  // `MEMBER-LIST-DUPLICATION`: a bundle member repeated in ONE member list is a
+  // line error — the identity-model-proposal's probe 5, a live defect
+  // independent of edge identity. `bundle t1 "T" a--b,a--b` used to parse
+  // silently into a two-member bundle over one link. The duplicate test is
+  // on the RESOLVED edge (the same *Edge* object each pair member resolves
+  // to), not on the spelling, so `a--b,b--a` is caught too — two spellings
+  // of an undirected pair that resolve to one edge are one member named
+  // twice, not two. Stating the rule this way, rather than as "the same
+  // string written twice", is deliberate: it is the form that survives the
+  // future id-form member (§4.1 of the proposal) without a rewrite, because
+  // an id and a pair spelling can resolve to the same edge too. `seen` is
+  // per BUNDLE — each trunk's member list is checked against itself, not
+  // against any other bundle's.
+  //
+  // `CONNECTOR-IDENTITY-KEY`: the loop walks the AUTHORED member list, so a member is
+  // resolved by the form it was written in and the diagnostic names what the
+  // author wrote. The duplicate test does not change and did not need to: it
+  // was already bound to the resolved *Edge* object, which is exactly why an id
+  // member and a pair member naming ONE connector are caught by it without a
+  // second rule — the whole reason `MEMBER-LIST-DUPLICATION` was written that way.
+  for(const t of doc.trunks){
+    const seen=new Set();
+    for(const m of (t.members||t.pairs.map(p=>({a:p[0],b:p[1]})))){
+      // The written spelling, for every message this loop can produce.
+      const spelled=m.id!==undefined?m.id:m.a+'--'+m.b;
+      let hit=null;
+      if(m.id!==undefined){
+        // The id form. It resolves against the connectors of THIS SECTION and
+        // nothing else: ids are unique per section (core §1) and a
+        // cross-section reference is a line error by design, so an id from a
+        // neighbouring section arrives here as an id this section never
+        // declared — which is what the second message says, in the words that
+        // are true for it.
+        const named=doc.edges.filter(e=>e.id===m.id);
+        // What the id DOES name, when it does not name a connector. The kind is
+        // in the message because it is the whole of the author's next move: a
+        // node id in a member list is a `bundle b "B" a--b` written short, and
+        // a class id there is a different mistake entirely.
+        const kind=nodeIds.has(m.id)&&!edgeIds.has(m.id)?'a node':
+                   groupIds.has(m.id)?'a group':
+                   boundaryIds.has(m.id)?'an external endpoint':
+                   blockIds.has(m.id)?'a region':
+                   classIds.has(m.id)?'a class':
+                   bundleIds.has(m.id)?'a bundle':null;
+        if(named.length===1) hit=named[0];
+        else if(kind){
+          errs.push('Line '+t.line+': bundle member "'+m.id+'" is '+kind+', not a connector — a bundle collects LINKS, so write the pair A--B or give the connector you mean an id= and name that');
+          continue;
+        } else {
+          errs.push('Line '+t.line+': bundle member "'+m.id+'" is not a declared connector in this section (ids are unique per section, and a bare member names a connector by its id=)');
+          continue;
+        }
+        // The ring reads endpoint pairs, so a resolved id member contributes
+        // the pair its connector runs between. Nothing about the drawing is
+        // authored here (`DOMAIN-CONVENTION-DIRECTIVES`) — which links the ring encloses is.
+        t.pairs.push([hit.a,hit.b]);
+      } else {
+        const a=m.a, b=m.b;
+        if((!nodeIds.has(a)&&!boundaryIds.has(a))||(!nodeIds.has(b)&&!boundaryIds.has(b))){ errs.push('Line '+t.line+': unknown endpoint in "'+a+'--'+b+'"'); continue; }
+        const matches=doc.edges.filter(e=>(e.a===a&&e.b===b)||(e.a===b&&e.b===a));
+        if(matches.length===0){
+          errs.push('Line '+t.line+': no edge between "'+a+'" and "'+b+'" for bundle member'); continue; }
+        if(matches.length>1){
+          // `CONNECTOR-IDENTITY-KEY` REPLACES probe 6's message. The old one cited `v0.1` in a 0.4
+          // engine, stated a SCOPE EXCLUSION where the truth is "say which one
+          // you mean", and named no remedy. Parallel links are the defining
+          // case of a LAG, so a bundle that cannot name one member of three is
+          // a construct whose definition and whose grammar disagree; now there
+          // is a way out and the message is the place the author meets it.
+          errs.push('Line '+t.line+': "'+a+'--'+b+'" matches '+matches.length+
+            ' edges — the pair form addresses a connector only where ONE runs between the two nodes. Give the connector you mean an id= and write that id as the member (figdown 0.5)');
+          continue; }
+        hit=matches[0];
+      }
+      if(seen.has(hit))
+        errs.push('Line '+t.line+': duplicate bundle member "'+spelled+'" — each member is stated once');
+      else
+        seen.add(hit);
+    }
   }
   // `ELEMENT-GEOMETRY-DIRECTIVE`: `pin` has a SPLIT DOMAIN, and both halves are checked
   // here because both need the finished id sets.
@@ -3252,7 +3680,7 @@ function parseOne(text){
     // is that genre's designed idiom, not an oversight.
     //
     // `INTERIOR-LESS-ELEMENT-PAINT`'s half stands and now reaches EVERY collection that accepts
-    // `class=` (`CLASS-CHANNEL-REACH`). Until this release the loop below ran over `doc.edges`
+    // `class=` (`CLASS-CHANNEL-REACH`). Until 0.4 the loop below ran over `doc.edges`
     // alone, so `class k "K" fill=#eee` plus `message c -> s "m" class=k` was
     // accepted, painted nothing, and put the class in the legend — a message
     // has its own collection because it has a position in time (`SEQUENCE-ORDER-MODEL`), and
@@ -3303,6 +3731,7 @@ function parseOne(text){
     };
     const clsChan=(x,kind)=>{
       const K=CLASS_CHANNELS[kind];
+      const claimed={};             // channel -> class id that already set it on THIS element (`CLASS-CHANNEL-COLLISION`)
       for(const cid of (x.cls===undefined||x.cls===null?[]:(Array.isArray(x.cls)?x.cls:[x.cls]))){
         const c=doc.classes.find(y=>y.id===cid);
         if(!c) continue;                                   // unknown id: its own error
@@ -3311,8 +3740,29 @@ function parseOne(text){
         if(!K.has.includes('fill')&&c.fill!==undefined&&c.stroke===undefined){
           errs.push('Line '+x.line+': class "'+cid+'" sets fill= but no stroke=, and '+K.a+' has no interior — add stroke= to the class (it paints '+K.a.replace(/^an? /,'the ')+'; fill= keeps painting members that have an interior) (MIGRATIONS 0.1)');
           continue; }
-        if(!decl.some(k=>K.has.includes(k)))
+        if(!decl.some(k=>K.has.includes(k))){
           errs.push('Line '+x.line+': class "'+cid+'" declares only '+decl.map(k=>k+'=').join(' and ')+', and '+K.a+' has no such channel — add '+K.has.map(k=>k+'=').join(' or ')+' to the class (they paint '+K.a.replace(/^an? /,'the ')+'; the key it declares keeps painting members that have that channel) (MIGRATIONS 0.4)');
+          continue; }
+        // `CLASS-CHANNEL-COLLISION`: two CARRIED CLASSES binding the SAME paint
+        // channel on one element is a line error — §8's own rule ("a repeated
+        // option key on ONE line is a line error, never last-wins") one level
+        // up, closing the hole a class boundary opened in it. The check is
+        // per element, per channel the member actually has (K.has): the
+        // first carried class to set a channel CLAIMS it, and a later class
+        // repeating a claimed channel is refused by name. Element-direct
+        // `fill=`/`stroke=`/`style=` is untouched — it already overrides
+        // every class (rigidity, `LAYOUT-STABILITY`) and is not a second class SOURCE.
+        // `class=hot,deprecated` in conformance case 308 is the shape this
+        // must keep legal: each channel comes from exactly one class.
+        for(const k of K.has){
+          if(c[k]===undefined) continue;
+          if(claimed[k]!==undefined){
+            const other=K.has.filter(o=>o!==k).map(o=>o+'=').join('/');
+            errs.push('Line '+x.line+': classes "'+claimed[k]+'" and "'+cid+'" both set '+k+'= on this element — one channel, one class: move one class\'s paint to a different channel ('+other+'), or carry only one of them');
+          } else {
+            claimed[k]=cid;
+          }
+        }
       }
     };
     for(const x of doc.nodes) clsChan(x,'node');
@@ -3730,8 +4180,9 @@ function noteSvg(x,y,box,carrier){
   // about "a group" and no more — so the association the source states was
   // lost on the way to the page even when the placement was perfect. The pair
   // (kind, ref) is unambiguous: `ref` is the element's identity in this very
-  // drawing — a `data-node` id, a `data-group` id, or the `data-edge` line
-  // number a connector is keyed by, since a connector has no id to carry.
+  // drawing — a `data-node` id, a `data-group` id, or whatever `data-edge`
+  // keys a connector by, which from `CONNECTOR-IDENTITY-KEY` is the connector's
+  // AUTHORED id where it has one and its source line where it does not.
   // `title` is the one kind with no ref and needs none: it names the FIGURE,
   // and there is exactly one. The attribute changes no pixel.
   const ref=carrier&&carrier.ref!==undefined&&carrier.ref!==null?' data-note-for="'+esc(String(carrier.ref))+'"':'';
@@ -4860,6 +5311,190 @@ function renderScene(doc,y0){
       }
     }
   }
+  // ── THE RING GEOMETRY IS DEFINED HERE BECAUSE TWO PASSES NEED IT ───────
+  // (item 69.) `ringOf` used to sit with the ring DRAWING, a
+  // thousand lines below, because the ring is derived from final coordinates
+  // and nothing before the draw had a use for it. The lasso-containment rule
+  // gives it a second caller ABOVE: the separation pass immediately below has
+  // to know where each bundle's lasso will fall so it can keep a non-member
+  // out of it, exactly as it already keeps one out of a group band. The
+  // definition moved; not one character of the derivation changed, and the
+  // ring is still COMPUTED (`rings`, below the label pass) at the geometry it
+  // is drawn from, so what the separation pass sees is a PROJECTION and what
+  // the truth check sees is the ring itself.
+  // ── A BUNDLE RING IS ORIENTED BY ITS MEMBERS (item 43) ───────────────────
+  // Until now the ring was derived from the member links' MIDPOINTS and
+  // nothing else: `rx = max(46, x-spread + 38)`, `ry = max(26, y-spread + 22)`.
+  // Two facts about that formula are the defect. It is DIRECTION-BLIND — the
+  // axes are the canvas's, never the links' — and its floors are large enough
+  // that a bundle of two short legs draws a near-circle whatever the legs do.
+  // Measured on `patterns/topology-b`: rx 46 / ry 42.7, aspect
+  // 1.07, sitting on two legs that fan VERTICALLY, with the caption lying
+  // across the waist and on top of the `p3` endpoint label.
+  //
+  // The drawing convention for a link bundle is a loop THROUGH which the
+  // links run: narrow along the links, long across them. So the ring is now
+  // derived from the members' own frame.
+  //
+  //  1. DIRECTION. The mean UNDIRECTED direction of the members, by the
+  //     doubled-angle circular mean — doubling is what makes `a--b` and
+  //     `b--a` the same direction, so a bundle does not change shape when an
+  //     author writes a member the other way round (conformance 394).
+  //  2. THE BAND. The ring sits at the MIDPOINT OF THE MEMBERS' SHARED RUN
+  //     along that direction — the stretch of the corridor every member is
+  //     actually in. That is the placement rule because it is the only band
+  //     at which "the spread of the members" is a fact about all of them: a
+  //     fanning set (the reference topology's ECMP pair, which leaves two
+  //     different spines and arrives at one leaf) has a different spread at
+  //     every station, and the shared run is the interval over which the
+  //     question is even well posed. Members with no shared run at all fall
+  //     back to the mean of their midpoints, which is the old centre.
+  //  3. THE AXES. MINOR along the mean direction, sized to clear the strokes;
+  //     MAJOR across it, the members' spread at the band plus padding. A ring
+  //     needs a long axis to read as a ring, and it takes it from the spread
+  //     when the members fan (`rA >= rL`) and from its own RUN when they do
+  //     not — a single-member bundle (`reference/topology`'s multi-home link)
+  //     has zero spread, and the shape that hugs one link is an ellipse lying
+  //     ALONG it, never a circle straddling it.
+  //  4. NO NODE CONTACT. The ring is shrunk along its minor axis until it
+  //     clears every node box, and if it cannot it reverts to the pre-0.4
+  //     geometry rather than inventing a shape (no corpus figure does).
+  //
+  // The caption is NOT placed here — it is registered with the label pass
+  // below, so it can see the endpoint labels and the edges it has to avoid.
+  const rnd3=v=>Math.round(v*1000)/1000;   // ring coordinates, printed short
+  const RING_ALONG=15,      // semi-minor: the ring's body along the links
+        RING_ACROSS=20,     // clearance beyond the outermost member
+        RING_LONG=34,       // the long axis a ring needs to read as a ring
+        RING_FAN=2,         // below this spread the members are one line
+        RING_FLOOR=7,       // how thin the minor axis may be squeezed
+        RING_SOLO=4;        // a ONE-member bundle: the caption's stand-off
+  // ── A ONE-MEMBER BUNDLE IS ITS CAPTION (item 53) ─────────────────────────
+  // `bundle mh "multi-home" l1--l2` is legal and means something real (a
+  // one-link LAG, an Ethernet Segment with a single member), so the
+  // declaration is not an error and is not dropped. But a ring exists to
+  // UNITE lines, and around ONE line it unites nothing: it is ink that adds
+  // no fact, and on the reference topology it also bought the seam a 104 px
+  // corridor demand (2*RX_MIN + clearance) for a shape nobody had to see.
+  //
+  // So a single-member bundle DRAWS NO ELLIPSE. What it draws is its
+  // CAPTION, bundle-styled (the trunk's own stroke, the ring caption's type)
+  // and placed BY THE LINK — which is exactly the statement the construct
+  // makes: this link is the bundle, and here is its name. The frame below is
+  // therefore kept as a PLACEMENT frame and not as a drawing: the caption
+  // pass already sites a caption around a ring's rim, so a ring squeezed to
+  // `RING_SOLO` across gives the same pass a candidate family hugging the
+  // link. Nothing else in the pass changes.
+  //
+  // AN EMPTY CAPTION ON A ONE-MEMBER BUNDLE THEREFORE DRAWS NOTHING AT ALL.
+  // That is a real consequence and it is not hidden: the reference figure
+  // keeps `bundle unlabelled "" s2--l2` — it is the form demonstrator for
+  // the empty label — and states in a comment that this form is now
+  // MODEL-ONLY. The model still carries the trunk, `read` still reports it,
+  // and the drawing says nothing because there is nothing a ring around one
+  // unnamed line could say.
+  // Does the ring's disc meet an axis-aligned rect? Both are mapped into the
+  // frame where the ring is the unit circle; the rect becomes a convex quad,
+  // and the test is "is the quad within 1 of the origin".
+  const ringHitsRect=(R,RL,RA,b)=>{
+    const q=[[b.x,b.y],[b.x+b.w,b.y],[b.x+b.w,b.y+b.h],[b.x,b.y+b.h]].map(p=>{
+      const dx=p[0]-R.cx, dy=p[1]-R.cy;
+      return [(R.ux*dx+R.uy*dy)/RL, (R.vx*dx+R.vy*dy)/RA];
+    });
+    let inside=false;
+    for(let i=0,j=3;i<4;j=i++)
+      if((q[i][1]>0)!==(q[j][1]>0) &&
+         0 < (q[j][0]-q[i][0])*(0-q[i][1])/(q[j][1]-q[i][1])+q[i][0]) inside=!inside;
+    if(inside) return true;
+    for(let i=0,j=3;i<4;j=i++){
+      const vx=q[j][0]-q[i][0], vy=q[j][1]-q[i][1], L2=vx*vx+vy*vy;
+      const t=L2?Math.max(0,Math.min(1,-(q[i][0]*vx+q[i][1]*vy)/L2)):0;
+      if(Math.hypot(q[i][0]+t*vx, q[i][1]+t*vy)<1) return true;
+    }
+    return false;
+  };
+  const ringOf=t=>{
+    const segs=[];
+    for(const [a,b] of t.pairs){
+      const A=byId[a], B=byId[b]; if(!A||!B) continue;
+      const p=borderPoint(A,B.x+B.w/2,B.y+B.h/2), q=borderPoint(B,A.x+A.w/2,A.y+A.h/2);
+      if(Math.hypot(q[0]-p[0],q[1]-p[1])>1e-9) segs.push([p,q]);
+    }
+    if(!segs.length) return null;
+    // (1) mean undirected direction
+    let c2=0,s2=0;
+    for(const [p,q] of segs){
+      const L=Math.hypot(q[0]-p[0],q[1]-p[1]);
+      const c=(q[0]-p[0])/L, s=(q[1]-p[1])/L;
+      c2+=c*c-s*s; s2+=2*c*s;
+    }
+    const th=Math.hypot(c2,s2)<1e-9
+      ? Math.atan2(segs[0][1][1]-segs[0][0][1], segs[0][1][0]-segs[0][0][0])
+      : 0.5*Math.atan2(s2,c2);
+    const ux=Math.cos(th), uy=Math.sin(th), vx=-uy, vy=ux;
+    // (2) the band: the midpoint of the shared run
+    const iv=segs.map(([p,q])=>{
+      const a=ux*p[0]+uy*p[1], b=ux*q[0]+uy*q[1];
+      return a<=b?[a,b,p,q]:[b,a,q,p];
+    });
+    const lo=Math.max(...iv.map(z=>z[0])), hi=Math.min(...iv.map(z=>z[1]));
+    const s=lo<hi ? (lo+hi)/2 : iv.reduce((x,z)=>x+(z[0]+z[1])/2,0)/iv.length;
+    const P=iv.map(z=>{
+      const f=Math.min(1,Math.max(0,(s-z[0])/((z[1]-z[0])||1)));
+      return [z[2][0]+(z[3][0]-z[2][0])*f, z[2][1]+(z[3][1]-z[2][1])*f];
+    });
+    const cx=P.reduce((a,p)=>a+p[0],0)/P.length, cy=P.reduce((a,p)=>a+p[1],0)/P.length;
+    const spread=Math.max(...P.map(p=>Math.abs(vx*(p[0]-cx)+vy*(p[1]-cy))));
+    const runHalf=Math.min(...iv.map(z=>Math.min(s-z[0],z[1]-s)));
+    // (3) axes. Two shapes, and which one is drawn is decided by whether the
+    // members FAN at all. A set that fans is CROSSED by the ring: thin along
+    // the links, long enough across them to take the whole spread with room
+    // to spare, so each member passes through a part of the rim where the
+    // ring is still visibly open. A set that does not fan — one link, or
+    // members lying on top of each other — has no spread to take, and the
+    // shape that says "this link is the bundle" is an ellipse lying ALONG it.
+    let rA, rL;
+    if(spread<RING_FAN){ rL=Math.max(RING_ALONG,Math.min(RING_LONG,Math.max(0,runHalf))); rA=RING_ACROSS; }
+    else { rL=RING_ALONG; rA=Math.max(spread+RING_ACROSS,RING_LONG); }
+    const R={cx,cy,ux,uy,vx,vy,th};
+    // (0) ONE MEMBER (item 53): no ellipse is drawn, so this is a caption
+    // frame and not a shape. It is squeezed across to `RING_SOLO` so the
+    // caption pass's rim stations sit beside the link rather than a ring's
+    // radius away from it, and the node-clearance step below is skipped —
+    // there is no ink to keep out of a box.
+    if(segs.length===1){
+      R.solo=true; R.rL=rL; R.rA=RING_SOLO;
+      R.hw=Math.hypot(rL*ux, RING_SOLO*vx); R.hh=Math.hypot(rL*uy, RING_SOLO*vy);
+      return R;
+    }
+    // (4) out of every node box
+    const boxes=nodes.filter(n=>!n.boundary).map(n=>({x:n.x,y:n.y,w:n.w,h:n.h}));
+    if(boxes.some(b=>ringHitsRect(R,rL,rA,b))){
+      let ok=false;
+      for(let k=1;k<=24&&!ok;k++){
+        const RL=rL-(rL-RING_FLOOR)*k/24;
+        if(!boxes.some(b=>ringHitsRect(R,RL,rA,b))){ rL=RL; ok=true; }
+      }
+      // No orientation of this ring clears the drawing. Rather than publish a
+      // ring lying over a node, revert to the pre-0.4 derivation, which is at
+      // least the shape every earlier artifact recorded. No corpus figure
+      // takes this branch; it exists so that a hostile geometry degrades to
+      // the old defect instead of a new one.
+      if(!ok){
+        const M=segs.map(([p,q])=>[(p[0]+q[0])/2,(p[1]+q[1])/2]);
+        const mx=M.reduce((a,m)=>a+m[0],0)/M.length, my=M.reduce((a,m)=>a+m[1],0)/M.length;
+        const lx=Math.max(46,Math.max(...M.map(m=>Math.abs(m[0]-mx)))+38);
+        const ly=Math.max(26,Math.max(...M.map(m=>Math.abs(m[1]-my)))+22);
+        return {cx:mx, cy:my, ux:1, uy:0, vx:0, vy:1, th:0, legacy:true,
+                rL:lx, rA:ly, hw:lx, hh:ly};
+      }
+    }
+    R.rL=rL; R.rA=rA;
+    // the axis-aligned box the caption is placed beside and the canvas grows to
+    R.hw=Math.hypot(rL*ux, rA*vx); R.hh=Math.hypot(rL*uy, rA*vy);
+    return R;
+  };
+
   // ── GROUP BAND CONTIGUITY ────────────────────────────────────────────────
   // A group's band is the BOUNDING BOX of its members (see gBox below), and
   // until this pass nothing checked that the box contained only members. A
@@ -4914,6 +5549,44 @@ function renderScene(doc,y0){
     const canMove=u=>u.every(n=>!pinned(n.id))
                   && !(u[0].group&&doc.pins[u[0].group]&&doc.pins[u[0].group].fx!==null);
     const said=new Set();
+    // ── THE SAME REGION RULE FOR A BUNDLE'S LASSO (item 69) ────
+    // A band and a lasso are the same statement drawn two ways: each is a
+    // shape DERIVED from a declared membership, so whatever the shape contains
+    // reads as a member. This pass already keeps a non-member out of a band;
+    // the lasso is added to the same convergence rather than given a pass of
+    // its own, because the two constraints interact — a node pushed out of a
+    // lasso can land in a band, and one pushed out of a band can land in a
+    // lasso — and only a shared loop can settle both.
+    //
+    // CONTAINMENT IS THE WHOLE BOX, NOT ITS CENTRE, which is the band's own
+    // discipline (`inBand` tests the box's extent against the band's, never a
+    // point). The two differ in STRICTNESS, and the difference is forced by
+    // the shapes: a band is FILLED, so a box that merely overlaps it is
+    // already sitting on painted group territory; a lasso is a RING with no
+    // interior (§8.4), and `ringOf` step (4) has already shrunk it clear of
+    // every node box, so a box can only be wholly inside or wholly outside.
+    // Full containment is therefore not a weaker rule here, it is the only
+    // reachable one — and it is the same rule the complete-cover check uses
+    // one construct over (`inside`).
+    //
+    // A ONE-MEMBER BUNDLE DRAWS NO ELLIPSE (item 53) and therefore makes no
+    // containment claim: there is no shape, so there is nothing to be inside,
+    // and `lassoOf` returns null for it. Its caption is a label like any other.
+    // PORT SQUARES need no separate test: a square straddles the border of the
+    // node it belongs to, so a node clear of the ring carries its fittings out
+    // with it. EDGES are not tested at all — a lasso exists to be crossed by
+    // lines, and every member link runs through it by construction.
+    const trunks=(doc.trunks||[]).filter(t=>t.pairs&&t.pairs.length);
+    const lMem=t=>{ const s=new Set(); for(const [a,b] of t.pairs){ s.add(a); s.add(b); } return s; };
+    const lassoOf=t=>{ const R=ringOf(t); return (R&&!R.solo)?R:null; };
+    const inLasso=(n,R)=>{
+      for(const p of [[n.x,n.y],[n.x+n.w,n.y],[n.x,n.y+n.h],[n.x+n.w,n.y+n.h]]){
+        const dx=p[0]-R.cx, dy=p[1]-R.cy;
+        if(Math.hypot((R.ux*dx+R.uy*dy)/R.rL,(R.vx*dx+R.vy*dy)/R.rA)>1) return false;
+      }
+      return true;
+    };
+    const lKey=(t,n)=>'bundle '+t.id+' '+n.id;
     const collect=()=>{
       const out=[];
       for(const g of groups){
@@ -4923,7 +5596,49 @@ function renderScene(doc,y0){
           if(inBand(n,B)) out.push({g,n});
         }
       }
+      for(const t of trunks){
+        const R=lassoOf(t); if(!R) continue;
+        const mem=lMem(t);
+        for(const n of real){
+          if(mem.has(n.id)||said.has(lKey(t,n))) continue;
+          if(inLasso(n,R)) out.push({t,n,mem});
+        }
+      }
       return out;
+    };
+    // The MOVE, shared by both regions. `unit` travels; `obst` is the cross-axis
+    // interval it must end up clear of; `keep` is everything that must NOT be
+    // dragged along with it.
+    const push=(unit,obst,keep)=>{
+      const uLo=Math.min(...unit.map(cLo)), uHi=Math.max(...unit.map(n=>cLo(n)+cSz(n)));
+      const dNeg=(obst.lo-SEP)-uHi, dPos=(obst.hi+SEP)-uLo;
+      // NEARER SIDE, BUT NEVER OFF THE CANVAS. The obvious rule — move
+      // whichever way is shorter — sends the unit past the layout's own
+      // starting edge often enough to matter (`reference/topology` put L1 at
+      // x=-90 and the viewBox clipped it away). Growing the canvas the other
+      // way is not available either: the only uniform-shift machinery this
+      // renderer has moves PINNED nodes with everything else, and a pinned
+      // node that drifts because an unrelated node was added is the `RENDERING-DETERMINISM`
+      // stability violation this engine has already paid for once. So the
+      // constraint is applied HERE, to the choice: the negative direction is
+      // taken only when the unit still lands inside the envelope the layout
+      // had before this pass ran. Nothing outside the mover ever moves.
+      const dNegOK=uLo+dNeg>=cross0;
+      const d=(Math.abs(dNeg)<=Math.abs(dPos)&&dNegOK)?dNeg:dPos;
+      const ranks=new Set(unit.map(n=>n.rank));
+      // Everything the mover would be pushed ONTO travels with it: same rank,
+      // same side, clear of the obstacle. Relative order and spacing inside a
+      // lane are preserved, so the fix cannot manufacture an overlap.
+      // A node that BELONGS to a group never travels this way — a group moves
+      // whole or not at all, and dragging half of one along would reshape its
+      // band, which is the same defect one group further on.
+      for(const m of lay){
+        if(keep.has(m)||!ranks.has(m.rank)) continue;
+        if(!m.virtual&&m.group) continue;
+        const mLo=cLo(m), mHi=mLo+cSz(m);
+        if(d<0 ? (mHi<=uHi&&mHi<=obst.lo) : (mLo>=uLo&&mLo>=obst.hi)) mv(m,d);
+      }
+      for(const n of unit) mv(n,d);
     };
     let left=[];
     // EVERY conflict gets attention on every pass, and the band is recomputed
@@ -4935,6 +5650,49 @@ function renderScene(doc,y0){
       left=collect();
       if(!left.length) break;
       for(const c of left){
+        if(c.t){
+          // A LASSO CONFLICT. Only the intruder ever yields. The band's second
+          // option — move the GROUP instead — has no honest analogue here: a
+          // bundle's members are links between devices that other links also
+          // touch, so "move the members" relocates half the figure and reshapes
+          // the very ring it is trying to fix. When the intruder cannot move,
+          // an author coordinate is what fixed it, and the rule below (at the
+          // final geometry) says so rather than the engine overriding a pin.
+          const R=lassoOf(c.t);
+          if(!R||!inLasso(c.n,R)) continue;   // an earlier resolution cleared it
+          const unit=unitOf(c.n);
+          if(!canMove(unit)){ said.add(lKey(c.t,c.n)); continue; }
+          // Clear of the ring's AXIS-ALIGNED extent, not of the ellipse: a box
+          // outside the bounding box is outside the ring for certain, whatever
+          // the ring's rotation, and the pass stays monotone (always outward).
+          const obst=horiz?{lo:R.cy-R.hh, hi:R.cy+R.hh}:{lo:R.cx-R.hw, hi:R.cx+R.hw};
+          // AND IT MOVES NOTHING BUT THE INTRUDER. The band's push takes what
+          // it would land on along with it; a lasso's cannot, and the reason is
+          // the shape. A band's extent stops at its members' boxes, so a mover
+          // pushed clear of it lands in free space. A lasso's extent, when the
+          // ring falls back to the pre-0.4 derivation — which is what a bundle
+          // whose links pass THROUGH intermediate devices always does, since
+          // the ring cannot clear their boxes — spans the whole fan, so "clear
+          // of the ring" is exactly where the outermost members already are.
+          // Dragging them along was measured: it walks the top member off the
+          // canvas (y=-26 on the three-tap stress figure) and the ring grows
+          // with them, so the intruder is enclosed again on the next pass. So
+          // the move is taken ONLY into room that is already free, and when
+          // there is none the pass declines and the rule below refuses the
+          // figure. A separation that has to damage the drawing to succeed is
+          // not a separation; not drawn beats drawn wrongly, here as well.
+          const uLo=Math.min(...unit.map(cLo)), uHi=Math.max(...unit.map(n=>cLo(n)+cSz(n)));
+          const ranks=new Set(unit.map(n=>n.rank)), inUnit=new Set(unit);
+          const others=lay.filter(m=>!inUnit.has(m)&&ranks.has(m.rank));
+          const roomFor=d=>uLo+d>=cross0 &&
+            others.every(m=>{ const mLo=cLo(m), mHi=mLo+cSz(m);
+                              return mHi<=uLo+d-SEP||mLo>=uHi+d+SEP; });
+          const go=[(obst.lo-SEP)-uHi,(obst.hi+SEP)-uLo]
+                     .filter(roomFor).sort((p,q)=>Math.abs(p)-Math.abs(q));
+          if(!go.length){ said.add(lKey(c.t,c.n)); continue; }
+          for(const n of unit) mv(n,go[0]);
+          continue;
+        }
         const B=bandOf(c.g);
         if(!inBand(c.n,B)) continue;          // an earlier resolution cleared it
         const gMem=memOf(c.g.id);
@@ -4958,36 +5716,7 @@ function renderScene(doc,y0){
             said.add(c.g.id+' '+c.n.id); continue;
           }
         }
-        const uLo=Math.min(...unit.map(cLo)), uHi=Math.max(...unit.map(n=>cLo(n)+cSz(n)));
-        const dNeg=(obst.lo-SEP)-uHi, dPos=(obst.hi+SEP)-uLo;
-        // NEARER SIDE, BUT NEVER OFF THE CANVAS. The obvious rule — move
-        // whichever way is shorter — sends the unit past the layout's own
-        // starting edge often enough to matter (`reference/topology` put L1 at
-        // x=-90 and the viewBox clipped it away). Growing the canvas the other
-        // way is not available either: the only uniform-shift machinery this
-        // renderer has moves PINNED nodes with everything else, and a pinned
-        // node that drifts because an unrelated node was added is the `RENDERING-DETERMINISM`
-        // stability violation this engine has already paid for once. So the
-        // constraint is applied HERE, to the choice: the negative direction is
-        // taken only when the unit still lands inside the envelope the layout
-        // had before this pass ran. Nothing outside the mover ever moves.
-        const dNegOK=uLo+dNeg>=cross0;
-        const d=(Math.abs(dNeg)<=Math.abs(dPos)&&dNegOK)?dNeg:dPos;
-        const ranks=new Set(unit.map(n=>n.rank));
-        const keep=new Set(unit.concat(unit===gMem?[]:gMem));
-        // Everything the mover would be pushed ONTO travels with it: same rank,
-        // same side, clear of the obstacle. Relative order and spacing inside a
-        // lane are preserved, so the fix cannot manufacture an overlap.
-        // A node that BELONGS to a group never travels this way — a group moves
-        // whole or not at all, and dragging half of one along would reshape its
-        // band, which is the same defect one group further on.
-        for(const m of lay){
-          if(keep.has(m)||!ranks.has(m.rank)) continue;
-          if(!m.virtual&&m.group) continue;
-          const mLo=cLo(m), mHi=mLo+cSz(m);
-          if(d<0 ? (mHi<=uHi&&mHi<=obst.lo) : (mLo>=uLo&&mLo>=obst.hi)) mv(m,d);
-        }
-        for(const n of unit) mv(n,d);
+        push(unit,obst,new Set(unit.concat(unit===gMem?[]:gMem)));
       }
     }
     left=collect();
@@ -4995,6 +5724,13 @@ function renderScene(doc,y0){
     // is named. A figure that reaches this line with a hit is a defect in this
     // pass, and saying so beats drawing the false statement quietly.
     for(const c of left){
+      // A LASSO residue is NOT reported here. This pass sees a PROJECTION of
+      // the ring, taken before the boundary anchors are seated and before the
+      // uniform canvas shifts; the ring the reader sees is the one computed at
+      // the final geometry, and that is where its truth is judged (item 69,
+      // below the label pass). Reporting twice from two geometries is how a
+      // figure gets refused for a ring that was never drawn.
+      if(c.t) continue;
       if(said.has(c.g.id+' '+c.n.id)) continue;
       gErrs.push('Line '+srcLine(c.g.line)+': group "'+c.g.id+'" would enclose non-member "'
         +c.n.id+'" and the layout pass could not separate them; the figure is not drawn rather '
@@ -5797,185 +6533,98 @@ function renderScene(doc,y0){
   const padded=o=>({x:o.x-LBL_PAD,y:o.y-LBL_PAD,w:o.w+2*LBL_PAD,h:o.h+2*LBL_PAD});
   const lblObs=e=>extObs.filter(o=>o.id!==e.a&&o.id!==e.b).map(padded)
                         .concat(nameObs.map(padded));
-  // ── A BUNDLE RING IS ORIENTED BY ITS MEMBERS (item 43) ───────────────────
-  // Until now the ring was derived from the member links' MIDPOINTS and
-  // nothing else: `rx = max(46, x-spread + 38)`, `ry = max(26, y-spread + 22)`.
-  // Two facts about that formula are the defect. It is DIRECTION-BLIND — the
-  // axes are the canvas's, never the links' — and its floors are large enough
-  // that a bundle of two short legs draws a near-circle whatever the legs do.
-  // Measured on `patterns/topology-b`: rx 46 / ry 42.7, aspect
-  // 1.07, sitting on two legs that fan VERTICALLY, with the caption lying
-  // across the waist and on top of the `p3` endpoint label.
-  //
-  // The drawing convention for a link bundle is a loop THROUGH which the
-  // links run: narrow along the links, long across them. So the ring is now
-  // derived from the members' own frame.
-  //
-  //  1. DIRECTION. The mean UNDIRECTED direction of the members, by the
-  //     doubled-angle circular mean — doubling is what makes `a--b` and
-  //     `b--a` the same direction, so a bundle does not change shape when an
-  //     author writes a member the other way round (conformance 394).
-  //  2. THE BAND. The ring sits at the MIDPOINT OF THE MEMBERS' SHARED RUN
-  //     along that direction — the stretch of the corridor every member is
-  //     actually in. That is the placement rule because it is the only band
-  //     at which "the spread of the members" is a fact about all of them: a
-  //     fanning set (the reference topology's ECMP pair, which leaves two
-  //     different spines and arrives at one leaf) has a different spread at
-  //     every station, and the shared run is the interval over which the
-  //     question is even well posed. Members with no shared run at all fall
-  //     back to the mean of their midpoints, which is the old centre.
-  //  3. THE AXES. MINOR along the mean direction, sized to clear the strokes;
-  //     MAJOR across it, the members' spread at the band plus padding. A ring
-  //     needs a long axis to read as a ring, and it takes it from the spread
-  //     when the members fan (`rA >= rL`) and from its own RUN when they do
-  //     not — a single-member bundle (`reference/topology`'s multi-home link)
-  //     has zero spread, and the shape that hugs one link is an ellipse lying
-  //     ALONG it, never a circle straddling it.
-  //  4. NO NODE CONTACT. The ring is shrunk along its minor axis until it
-  //     clears every node box, and if it cannot it reverts to the pre-0.4
-  //     geometry rather than inventing a shape (no corpus figure does).
-  //
-  // The caption is NOT placed here — it is registered with the label pass
-  // below, so it can see the endpoint labels and the edges it has to avoid.
-  const rnd3=v=>Math.round(v*1000)/1000;   // ring coordinates, printed short
-  const RING_ALONG=15,      // semi-minor: the ring's body along the links
-        RING_ACROSS=20,     // clearance beyond the outermost member
-        RING_LONG=34,       // the long axis a ring needs to read as a ring
-        RING_FAN=2,         // below this spread the members are one line
-        RING_FLOOR=7,       // how thin the minor axis may be squeezed
-        RING_SOLO=4;        // a ONE-member bundle: the caption's stand-off
-  // ── A ONE-MEMBER BUNDLE IS ITS CAPTION (item 53) ─────────────────────────
-  // `bundle mh "multi-home" l1--l2` is legal and means something real (a
-  // one-link LAG, an Ethernet Segment with a single member), so the
-  // declaration is not an error and is not dropped. But a ring exists to
-  // UNITE lines, and around ONE line it unites nothing: it is ink that adds
-  // no fact, and on the reference topology it also bought the seam a 104 px
-  // corridor demand (2*RX_MIN + clearance) for a shape nobody had to see.
-  //
-  // So a single-member bundle DRAWS NO ELLIPSE. What it draws is its
-  // CAPTION, bundle-styled (the trunk's own stroke, the ring caption's type)
-  // and placed BY THE LINK — which is exactly the statement the construct
-  // makes: this link is the bundle, and here is its name. The frame below is
-  // therefore kept as a PLACEMENT frame and not as a drawing: the caption
-  // pass already sites a caption around a ring's rim, so a ring squeezed to
-  // `RING_SOLO` across gives the same pass a candidate family hugging the
-  // link. Nothing else in the pass changes.
-  //
-  // AN EMPTY CAPTION ON A ONE-MEMBER BUNDLE THEREFORE DRAWS NOTHING AT ALL.
-  // That is a real consequence and it is not hidden: the reference figure
-  // keeps `bundle unlabelled "" s2--l2` — it is the form demonstrator for
-  // the empty label — and states in a comment that this form is now
-  // MODEL-ONLY. The model still carries the trunk, `read` still reports it,
-  // and the drawing says nothing because there is nothing a ring around one
-  // unnamed line could say.
-  // Does the ring's disc meet an axis-aligned rect? Both are mapped into the
-  // frame where the ring is the unit circle; the rect becomes a convex quad,
-  // and the test is "is the quad within 1 of the origin".
-  const ringHitsRect=(R,RL,RA,b)=>{
-    const q=[[b.x,b.y],[b.x+b.w,b.y],[b.x+b.w,b.y+b.h],[b.x,b.y+b.h]].map(p=>{
-      const dx=p[0]-R.cx, dy=p[1]-R.cy;
-      return [(R.ux*dx+R.uy*dy)/RL, (R.vx*dx+R.vy*dy)/RA];
-    });
-    let inside=false;
-    for(let i=0,j=3;i<4;j=i++)
-      if((q[i][1]>0)!==(q[j][1]>0) &&
-         0 < (q[j][0]-q[i][0])*(0-q[i][1])/(q[j][1]-q[i][1])+q[i][0]) inside=!inside;
-    if(inside) return true;
-    for(let i=0,j=3;i<4;j=i++){
-      const vx=q[j][0]-q[i][0], vy=q[j][1]-q[i][1], L2=vx*vx+vy*vy;
-      const t=L2?Math.max(0,Math.min(1,-(q[i][0]*vx+q[i][1]*vy)/L2)):0;
-      if(Math.hypot(q[i][0]+t*vx, q[i][1]+t*vy)<1) return true;
-    }
-    return false;
-  };
-  const ringOf=t=>{
-    const segs=[];
-    for(const [a,b] of t.pairs){
-      const A=byId[a], B=byId[b]; if(!A||!B) continue;
-      const p=borderPoint(A,B.x+B.w/2,B.y+B.h/2), q=borderPoint(B,A.x+A.w/2,A.y+A.h/2);
-      if(Math.hypot(q[0]-p[0],q[1]-p[1])>1e-9) segs.push([p,q]);
-    }
-    if(!segs.length) return null;
-    // (1) mean undirected direction
-    let c2=0,s2=0;
-    for(const [p,q] of segs){
-      const L=Math.hypot(q[0]-p[0],q[1]-p[1]);
-      const c=(q[0]-p[0])/L, s=(q[1]-p[1])/L;
-      c2+=c*c-s*s; s2+=2*c*s;
-    }
-    const th=Math.hypot(c2,s2)<1e-9
-      ? Math.atan2(segs[0][1][1]-segs[0][0][1], segs[0][1][0]-segs[0][0][0])
-      : 0.5*Math.atan2(s2,c2);
-    const ux=Math.cos(th), uy=Math.sin(th), vx=-uy, vy=ux;
-    // (2) the band: the midpoint of the shared run
-    const iv=segs.map(([p,q])=>{
-      const a=ux*p[0]+uy*p[1], b=ux*q[0]+uy*q[1];
-      return a<=b?[a,b,p,q]:[b,a,q,p];
-    });
-    const lo=Math.max(...iv.map(z=>z[0])), hi=Math.min(...iv.map(z=>z[1]));
-    const s=lo<hi ? (lo+hi)/2 : iv.reduce((x,z)=>x+(z[0]+z[1])/2,0)/iv.length;
-    const P=iv.map(z=>{
-      const f=Math.min(1,Math.max(0,(s-z[0])/((z[1]-z[0])||1)));
-      return [z[2][0]+(z[3][0]-z[2][0])*f, z[2][1]+(z[3][1]-z[2][1])*f];
-    });
-    const cx=P.reduce((a,p)=>a+p[0],0)/P.length, cy=P.reduce((a,p)=>a+p[1],0)/P.length;
-    const spread=Math.max(...P.map(p=>Math.abs(vx*(p[0]-cx)+vy*(p[1]-cy))));
-    const runHalf=Math.min(...iv.map(z=>Math.min(s-z[0],z[1]-s)));
-    // (3) axes. Two shapes, and which one is drawn is decided by whether the
-    // members FAN at all. A set that fans is CROSSED by the ring: thin along
-    // the links, long enough across them to take the whole spread with room
-    // to spare, so each member passes through a part of the rim where the
-    // ring is still visibly open. A set that does not fan — one link, or
-    // members lying on top of each other — has no spread to take, and the
-    // shape that says "this link is the bundle" is an ellipse lying ALONG it.
-    let rA, rL;
-    if(spread<RING_FAN){ rL=Math.max(RING_ALONG,Math.min(RING_LONG,Math.max(0,runHalf))); rA=RING_ACROSS; }
-    else { rL=RING_ALONG; rA=Math.max(spread+RING_ACROSS,RING_LONG); }
-    const R={cx,cy,ux,uy,vx,vy,th};
-    // (0) ONE MEMBER (item 53): no ellipse is drawn, so this is a caption
-    // frame and not a shape. It is squeezed across to `RING_SOLO` so the
-    // caption pass's rim stations sit beside the link rather than a ring's
-    // radius away from it, and the node-clearance step below is skipped —
-    // there is no ink to keep out of a box.
-    if(segs.length===1){
-      R.solo=true; R.rL=rL; R.rA=RING_SOLO;
-      R.hw=Math.hypot(rL*ux, RING_SOLO*vx); R.hh=Math.hypot(rL*uy, RING_SOLO*vy);
-      return R;
-    }
-    // (4) out of every node box
-    const boxes=nodes.filter(n=>!n.boundary).map(n=>({x:n.x,y:n.y,w:n.w,h:n.h}));
-    if(boxes.some(b=>ringHitsRect(R,rL,rA,b))){
-      let ok=false;
-      for(let k=1;k<=24&&!ok;k++){
-        const RL=rL-(rL-RING_FLOOR)*k/24;
-        if(!boxes.some(b=>ringHitsRect(R,RL,rA,b))){ rL=RL; ok=true; }
-      }
-      // No orientation of this ring clears the drawing. Rather than publish a
-      // ring lying over a node, revert to the pre-0.4 derivation, which is at
-      // least the shape every earlier artifact recorded. No corpus figure
-      // takes this branch; it exists so that a hostile geometry degrades to
-      // the old defect instead of a new one.
-      if(!ok){
-        const M=segs.map(([p,q])=>[(p[0]+q[0])/2,(p[1]+q[1])/2]);
-        const mx=M.reduce((a,m)=>a+m[0],0)/M.length, my=M.reduce((a,m)=>a+m[1],0)/M.length;
-        const lx=Math.max(46,Math.max(...M.map(m=>Math.abs(m[0]-mx)))+38);
-        const ly=Math.max(26,Math.max(...M.map(m=>Math.abs(m[1]-my)))+22);
-        return {cx:mx, cy:my, ux:1, uy:0, vx:0, vy:1, th:0, legacy:true,
-                rL:lx, rA:ly, hw:lx, hh:ly};
-      }
-    }
-    R.rL=rL; R.rA=rA;
-    // the axis-aligned box the caption is placed beside and the canvas grows to
-    R.hw=Math.hypot(rL*ux, rA*vx); R.hh=Math.hypot(rL*uy, rA*vy);
-    return R;
-  };
   const rings=new Map();
   for(const t of doc.trunks||[]){ const R=ringOf(t); if(R) rings.set(t,R); }
+  // ── A LASSO THAT ENCLOSES A NON-MEMBER IS A FALSE DRAWING (item 69) ──────
+  // The group-band rule, one construct over, and the reason it is owed is a
+  // measurement: a three-link aggregation drawn from the UNH-IOL LACP test
+  // suite (Test Setup 2, fig 06 of that validation exercise) put a lasso at
+  // cx 592 cy 455, rx 231 ry 162 around six member links — and fully inside
+  // it, at normalised radius 0.70, sat two test stations that are not in the
+  // aggregation at all. The figure told the reader they were. The engine said
+  // nothing and `layout-lint` scored it 0, while the IDENTICAL claim written
+  // as a `group` band was refused four times by the pass above. Backlog 43 and
+  // 53 were about lasso SHAPE; this is lasso TRUTH.
+  //
+  // WHOEVER CHOSE THE POSITION BEARS THE RESPONSIBILITY — the band's principle,
+  // inherited whole, and its boundary inherited with it. The complete-cover
+  // check (backlog 47b) fires only when at least one of the two
+  // boxes is at a coordinate the author never wrote; this rule is that same
+  // question asked the other way round. Where NO author coordinate is involved
+  // the engine had the freedom and MUST use it, so the separation pass above
+  // has already moved the intruder out and nothing reaches here. What reaches
+  // here is a figure whose geometry an author fixed: the intruder is pinned,
+  // or a member endpoint is, or the separation pass ran out of room. Then the
+  // engine reports and the artifact is not written, because it will not draw a
+  // membership the source did not declare.
+  //
+  // The test is at the FINAL geometry — the same ring, from the same `ringOf`,
+  // that is drawn a thousand lines below — because the ring the reader reads is
+  // the only one whose truth is at stake.
+  {
+    const real=nodes.filter(n=>!n.boundary&&n.w>0&&n.h>0);
+    for(const t of doc.trunks||[]){
+      const R=rings.get(t);
+      if(!R||R.solo) continue;               // one member draws no ellipse (item 53)
+      const mem=new Set(); for(const [a,b] of t.pairs){ mem.add(a); mem.add(b); }
+      const memPinned=[...mem].some(id=>pinned(id));
+      for(const n of real){
+        if(mem.has(n.id)) continue;
+        let inside=true;
+        for(const p of [[n.x,n.y],[n.x+n.w,n.y],[n.x,n.y+n.h],[n.x+n.w,n.y+n.h]]){
+          const dx=p[0]-R.cx, dy=p[1]-R.cy;
+          if(Math.hypot((R.ux*dx+R.uy*dy)/R.rL,(R.vx*dx+R.vy*dy)/R.rA)>1){ inside=false; break; }
+        }
+        if(!inside) continue;
+        const ln=srcLine(t.line);
+        // Two voices, chosen by who chose the coordinate — the band's own
+        // split. A pin is named as a pin so the author knows which line to
+        // edit; a figure the engine could not separate says so, and admits it.
+        gErrs.push(pinned(n.id)||memPinned
+          ? 'Line '+ln+': the lasso for bundle "'+t.id+'" would enclose non-member "'+n.id
+            +'" — a lasso is the drawn extent of the bundle\'s members, so this draws "'+n.id
+            +'" as one of them. Move the pin clear of the bundle\'s extent, or change what "'
+            +t.id+'" collects so the lasso is its members\' own. The figure is not drawn '
+            +'rather than drawn wrongly.'
+          : 'Line '+ln+': the lasso for bundle "'+t.id+'" would enclose non-member "'+n.id
+            +'" and the layout pass could not separate them; the figure is not drawn rather '
+            +'than drawn wrongly. Give "'+n.id+'" a pin outside the bundle\'s extent, or add '
+            +'its link to "'+t.id+'".');
+      }
+    }
+  }
+  // WHOSE EXTENT THE LASSO IS, WRITTEN INTO THE DRAWING (item 69).
+  // `data-lasso` follows the `data-port-sq` pattern exactly: ONE
+  // attribute name, carried by the INK and by the thing the ink is about, with
+  // the same string on both, so a reader — `tools/layout-lint.js` first — reads
+  // the association instead of inferring it. The ellipse carries the bundle's
+  // id; every node the ellipse was derived from carries the ids of the lassos
+  // it is a member of (a node may be in more than one, space-separated). The
+  // geometry itself is NOT duplicated into the attribute: `cx/cy/rx/ry` and the
+  // `rotate()` are already the drawn truth, and a second copy could disagree
+  // with the first. Only bundles that DRAW an ellipse appear — a one-member
+  // bundle draws none (item 53) and claims no extent, so it stamps nothing.
+  const lassoMem=new Map();
+  for(const [t,R] of rings){
+    if(R.solo) continue;
+    for(const [a,b] of t.pairs) for(const id of [a,b]){
+      if(!lassoMem.has(id)) lassoMem.set(id,[]);
+      if(!lassoMem.get(id).includes(t.id)) lassoMem.get(id).push(t.id);
+    }
+  }
   // filled by the label pass below, consumed by the ring drawing further down
   const ringLbl=new Map(), ringLeads=[];
   // edges (sorted by plane z, then doc order)
   const edges=zsort(doc.edges);
   const esvg=[], lblsvg=[];  // labels paint last = closest to the viewer
+  // THE PORT SQUARES GET THEIR OWN LAYER (item 57b), between the
+  // node bodies and the labels. Over the nodes, because half of each square is
+  // meant to be seen INSIDE the box and the whole point of the notation is
+  // that the fitting sits ON the boundary; over the edges, because the
+  // connector ATTACHES to the square rather than passing through it; under
+  // everything in `lblsvg`, because a port name — and an arrowhead, which
+  // lives in that layer too — must never be occluded by the fitting it names.
+  const sqsvg=[];
   // ── deferred edge-label placement ───────────────────────────────────────
   // An edge label is not written where it is emitted.  Each emission reserves
   // its slot in lblsvg (so the paint order is unchanged) and registers the
@@ -6032,8 +6681,9 @@ function renderScene(doc,y0){
   // box and repeating one label three times is what this removes.
   //
   // Each member still emits its OWN full path from its source outline to the
-  // target outline — shape-check asserts exactly that, and `data-edge` carries
-  // one source line — so the shared trunk is stroked once per member. That
+  // target outline — shape-check asserts exactly that, and `data-edge` keys
+  // each one (its id, or its source line when anonymous; `CONNECTOR-IDENTITY-KEY`) — so the shared
+  // trunk is stroked once per member. That
   // coincidence is the convention and not a defect, and the members say so:
   // every bus path carries `data-bus="<target>"`, which is what lets a reader
   // (and layout-lint) tell a deliberate trunk from two edges hidden under each
@@ -6393,7 +7043,7 @@ function renderScene(doc,y0){
       // pattern to a period boundary at the path's end.
       const per=e.style==='dashed'?10:(e.style==='dotted'?6:0);
       const doff=per?' stroke-dashoffset="'+(((per-(runLen(pts)%per))%per).toFixed(2))+'"':'';
-      esvg.push('<path data-edge="'+e.line+'" d="'+roundPath(pts)+'" fill="none" stroke="'+col+'" stroke-width="1.6"'+dash+doff+' data-bus="'+esc(bus.bus)+'"/>');
+      esvg.push('<path data-edge="'+edgeRef(e)+'" d="'+roundPath(pts)+'" fill="none" stroke="'+col+'" stroke-width="1.6"'+dash+doff+' data-bus="'+esc(bus.bus)+'"/>');
       noteSegs(e,pts);
       for(const p of pts){ W=Math.max(W,p[0]+4); Hh=Math.max(Hh,p[1]+4-y0-20); }
       if(bus.dots) for(const d of bus.dots)
@@ -6426,7 +7076,26 @@ function renderScene(doc,y0){
       if(bus.arrow&&wantsEnd) arrowTri(pts[pts.length-1],pts[pts.length-2],col);
       continue;
     }
-    if(chBack(e)&&!pinned(e.a)&&!pinned(e.b)){
+    // A SELF-TRANSITION IS EXEMPT FROM THE PINNED-ENDPOINT EXCLUSION
+    // (item 64). The `!pinned` guard belongs to the CHANNEL
+    // route below it: a channel back edge is planned in `chPlan`, which is
+    // built over auto-layout lanes and has nothing to say about a box the
+    // author placed, so a pinned back edge correctly falls through to the
+    // straight route. A SELF-loop has no such dependency — its geometry is a
+    // function of ONE box and a free side, both of which a pinned box has —
+    // and sweeping it into the same exclusion made `pin` silently delete the
+    // drawing: `borderPoint(A, A's own centre)` twice is the same point, so
+    // the straight route emitted a zero-length `<line>` at the state's centre
+    // with the trigger label printed across the state's name. Measured on
+    // 0.4 over a pinned three-state triangle and a pinned two-state
+    // pair: every self-transition length 0.0. The rule the exemption keeps is
+    // one line — a self-transition draws the same way whether its state's
+    // coordinate came from a pin or from the layout pass — so the side
+    // selection below is REUSED as-is rather than duplicated for pins; a
+    // second selection rule would be a second convention, and `DOMAIN-CONVENTION-DIRECTIVES` gives the
+    // engine one. (`chBack` is always true here: `isBack` takes every
+    // self-edge, and the `recip` pair test skips `e.a===e.b`.)
+    if(chBack(e)&&(A===B||(!pinned(e.a)&&!pinned(e.b)))){
       // ── ROUTING-CHANGE ARCHITECTURE NOTE (`SELF-EDGE-DRAWING`/`EDGE-BEND-RETENTION`) ──────────
       // Edge labels are DEFERRED: every label is registered against its
       // FINAL segment geometry (reqLabel/lblReq above) and placed by ONE
@@ -6483,7 +7152,7 @@ function renderScene(doc,y0){
         for(const sd of ['r','l','b','t']){ const pp=mkLoop(sd); if(!loopHit(pp)){ sp=pp; break; } }
         if(!sp) sp=mkLoop('r');
         for(const p of sp){ W=Math.max(W,p[0]+4); Hh=Math.max(Hh,p[1]+16-y0-20); }
-        esvg.push('<path data-edge="'+e.line+'" d="'+roundPath(sp)+'" fill="none" stroke="'+col+'" stroke-width="1.6"'+dash+'/>');
+        esvg.push('<path data-edge="'+edgeRef(e)+'" d="'+roundPath(sp)+'" fill="none" stroke="'+col+'" stroke-width="1.6"'+dash+'/>');
         noteSegs(e,sp);
         // A self-loop's outer run is 16 px long, so sliding the label ALONG it
         // buys ~15 px and no escape at all from a line crossing it — and a
@@ -6623,7 +7292,7 @@ function renderScene(doc,y0){
       // it is what lets a reader (and `layout-lint`'s coincident term) tell a
       // deliberate shared trunk from two lines hidden under each other. Written
       // LAST, after stroke-width, so no existing reader breaks.
-      esvg.push('<path data-edge="'+e.line+'" d="'+roundPath(pts)+'" fill="none" stroke="'+col+'" stroke-width="1.6"'+dash
+      esvg.push('<path data-edge="'+edgeRef(e)+'" d="'+roundPath(pts)+'" fill="none" stroke="'+col+'" stroke-width="1.6"'+dash
         +(P.bus?' data-bus="'+esc(P.bus)+'"':'')+'/>');
       noteSegs(e,pts);
       if(P.busTail){
@@ -6662,7 +7331,7 @@ function renderScene(doc,y0){
     const lrPts=longRoute(e);
     if(lrPts){
       for(const p of lrPts){ W=Math.max(W,p[0]+4); Hh=Math.max(Hh,p[1]+16-y0-20); }
-      esvg.push('<path data-edge="'+e.line+'" d="'+roundPath(lrPts)+'" fill="none" stroke="'+col+'" stroke-width="1.6"'+dash+'/>');
+      esvg.push('<path data-edge="'+edgeRef(e)+'" d="'+roundPath(lrPts)+'" fill="none" stroke="'+col+'" stroke-width="1.6"'+dash+'/>');
       noteSegs(e,lrPts);
       if(e.mid){
         // WHICH LEG CARRIES THE LABEL, and it is the OPPOSITE of the channel
@@ -6791,7 +7460,7 @@ function renderScene(doc,y0){
         }
         }
       }
-      esvg.push('<path data-edge="'+e.line+'" d="'+roundPath(pts)+'" fill="none" stroke="'+col+'" stroke-width="1.6"'+dash+'/>');
+      esvg.push('<path data-edge="'+edgeRef(e)+'" d="'+roundPath(pts)+'" fill="none" stroke="'+col+'" stroke-width="1.6"'+dash+'/>');
       noteSegs(e,pts);
       if(midSeg) reqLabel({p:midSeg[0],q:midSeg[1],text:e.mid,fs:11,col:lcol,halo,e,A,B,kind:'mid',first:false});
       if(e.tail) seg(p0,pts[1],e.tail,10,p1,runLen(pts));
@@ -6825,7 +7494,7 @@ function renderScene(doc,y0){
       }
     }
     if(route){
-      esvg.push('<path data-edge="'+e.line+'" d="'+roundPath(route)+'" fill="none" stroke="'+col+'" stroke-width="1.6"'+dash+'/>');
+      esvg.push('<path data-edge="'+edgeRef(e)+'" d="'+roundPath(route)+'" fill="none" stroke="'+col+'" stroke-width="1.6"'+dash+'/>');
       noteSegs(e,route);
       if(e.mid){             // the longest segment carries the mid label
         let bi=0,bl=-1;
@@ -6842,7 +7511,7 @@ function renderScene(doc,y0){
       for(const pP of route){ W=Math.max(W,pP[0]+4); Hh=Math.max(Hh,pP[1]+4-y0-20); }
       continue;
     }
-    esvg.push('<line data-edge="'+e.line+'" x1="'+x1+'" y1="'+yy1+'" x2="'+x2+'" y2="'+yy2+'" stroke="'+col+'" stroke-width="1.6"'+dash+'/>');
+    esvg.push('<line data-edge="'+edgeRef(e)+'" x1="'+x1+'" y1="'+yy1+'" x2="'+x2+'" y2="'+yy2+'" stroke="'+col+'" stroke-width="1.6"'+dash+'/>');
     noteSegs(e,[[x1,yy1],[x2,yy2]]);
     if(e.mid)
       reqLabel({p:[x1,yy1],q:[x2,yy2],text:e.mid,fs:11,col:lcol,halo,e,A,B,kind:'mid',first:true});
@@ -7010,6 +7679,68 @@ function renderScene(doc,y0){
     // how near a corner a marker may be written; the offsets are one marker
     // width apart, which is exactly the pitch two ports need to be two.
     const PORT_IN=2, PORT_END=4, PORT_HUG=25, PORT_OUT=60;
+    // ── THE STRADDLING PORT SQUARE (item 57b) ─────────────────
+    // OMG UML 2.5.1 §11.4's composite-structure port notation: a small square
+    // drawn ON the classifier's boundary, half inside and half outside, with
+    // the connector attaching to it and the port name labelling it. Here the
+    // classifier is the device box, the connector is the link, and the name is
+    // the interface. Item 57 put the NAME at the crossing; this puts a MARK
+    // there, so the crossing is stated by the drawing rather than inferred
+    // from where a word happens to sit.
+    //
+    // `PORT_SQ` is 7 px — the CAP-HEIGHT OF THE PORT NAME ITSELF (the endpoint
+    // font is 10-11 px, so its capitals are about 7), which is what makes the
+    // fitting read as the name's own mark rather than a second little box: it
+    // is a fifth of an ordinary 36 px topology node's height and it never
+    // competes with the device outline. The size was MEASURED, not chosen:
+    // swept 7/8/9/10 px against layout-lint over this corpus, and 7 is the
+    // only value that regresses no figure — `reference/topology` scores 6 at
+    // 9 px, 4 at 8 px and 2 at 7 px against the pre-square 4, because every
+    // extra pixel of fitting is a pixel of along-border room the name no
+    // longer has on a small device.
+    //
+    // It is stroked in the OWNING NODE's own stroke at the node's own 1 px
+    // weight and filled with the node's own fill, so it belongs to the device
+    // that owns the port and to nothing else. `PORT_SQ_GAP` is the engine's
+    // own 3 px label standoff, reused rather than reinvented; it is also the
+    // width of the FORBIDDEN BAND around a foreign square (see `portCands`).
+    const PORT_SQ=7, PORT_SQ_GAP=3;
+    // Where the square goes: the crossing point snapped onto the nearest side
+    // of the owner's box, clamped so a square can never hang off a corner.
+    // The side comes back with it — the placement family needs it.
+    const portSq=(N,p)=>{
+      const dl=Math.abs(p[0]-N.x), dr=Math.abs(p[0]-(N.x+N.w)),
+            dt=Math.abs(p[1]-N.y), db=Math.abs(p[1]-(N.y+N.h));
+      const m=Math.min(dl,dr,dt,db);
+      const side=m===dt?'top':m===db?'bottom':m===dl?'left':'right';
+      const vert=(side==='top'||side==='bottom');
+      const h2=PORT_SQ/2;
+      let cx,cy;
+      // A CURVED OR ANGLED OUTLINE IS STILL THE OUTLINE. Snapping to the
+      // bounding box is right for the rectangle family and WRONG for
+      // everything else: `showcase/srl-evpn-irb`'s EVPN-VXLAN cloud is an
+      // ellipse 620 x 110, and its `irb0.24` port snapped to the box bottom
+      // came out 8 px BELOW the drawn curve — a fitting floating in space
+      // beside the thing it is fitted to. The edge already ends on the true
+      // outline (`borderPoint` put it there), so for a non-rectangular shape
+      // the crossing point IS the answer and the square is simply centred on
+      // it, axis-aligned. It straddles a slanted or curved border at a slight
+      // angle to it, which is how every hand-drawn figure does it too.
+      const boxy=!N.shape||N.shape==='box'||N.shape==='rounded'||N.shape==='cylinder';
+      if(!boxy){ cx=Math.max(N.x+h2,Math.min(N.x+N.w-h2,p[0]));
+                 cy=Math.max(N.y+h2,Math.min(N.y+N.h-h2,p[1])); }
+      else if(vert){ cx=Math.max(N.x+h2,Math.min(N.x+N.w-h2,p[0]));
+                     cy=side==='top'?N.y:N.y+N.h; }
+      else         { cy=Math.max(N.y+h2,Math.min(N.y+N.h-h2,p[1]));
+                     cx=side==='left'?N.x:N.x+N.w; }
+      return {cx,cy,side,vert,key:cx.toFixed(2)+','+cy.toFixed(2),
+              box:{x:cx-h2,y:cy-h2,w:PORT_SQ,h:PORT_SQ}};
+    };
+    // gap between two boxes, 0 when they meet — the same quantity `segBoxGap`
+    // measures between a segment and a box, and it is what the standoff rule
+    // below is written in.
+    const boxSep=(a,b)=>Math.hypot(Math.max(b.x-(a.x+a.w),0,a.x-(b.x+b.w)),
+                                   Math.max(b.y-(a.y+a.h),0,a.y-(b.y+b.h)));
     // The node's own drawn label, computed by the SAME formulas the node pass
     // emits it with (shrink-to-fit included), so the obstacle and the drawing
     // cannot disagree about where a name is.
@@ -7026,12 +7757,19 @@ function renderScene(doc,y0){
     // the glyph band inside that, and the two questions are different (see the
     // own-name term in the scorer).
     const inkBox=(b,fs)=>({x:b.x, y:b.y+fs*0.14, w:b.w, h:Math.max(1,b.h-fs*0.28)});
+    // A label request's own text box, in the one place both the slot pass and
+    // the candidate family can read it — they must agree about how wide a name
+    // is or the fan below spaces names by a width nobody draws.
+    const lblDims=r=>{
+      const lines=String(r.text).split('\n'), nL=lines.length;
+      const w=Math.max(...lines.map(cw))*6.5*r.fs/11;
+      const lh=r.fs*1.3;
+      return {w, h:(nL-1)*lh+r.fs*1.1, up:(nL-1)*lh/2+r.fs*0.85};
+    };
     const portCands=r=>{
       const N=r.port, P=r.p, out=[];
       if(!N) return out;
-      const lines=String(r.text).split('\n'), nL=lines.length;
-      const w=Math.max(...lines.map(cw))*6.5*r.fs/11;
-      const lh=r.fs*1.3, h=(nL-1)*lh+r.fs*1.1, up=(nL-1)*lh/2+r.fs*0.85;
+      const D=lblDims(r), w=D.w, h=D.h, up=D.up;
       // Which border did the link cross? The nearest side of the box.
       const dl=Math.abs(P[0]-N.x), dr=Math.abs(P[0]-(N.x+N.w)),
             dt=Math.abs(P[1]-N.y), db=Math.abs(P[1]-(N.y+N.h));
@@ -7039,13 +7777,28 @@ function renderScene(doc,y0){
       const side=m===dt?'top':m===db?'bottom':m===dl?'left':'right';
       const vert=(side==='top'||side==='bottom');
       // ROOM. A marker that cannot be written between the two corners of the
-      // side it crosses has no inside form at all; the ordinary outside
-      // family is then the only one offered, which is the stated fallback.
+      // side it crosses has no INSIDE form at all — but it still has an
+      // outside one, hugging the border it could not get into, and that is a
+      // far better answer than the along-the-shaft family it used to fall
+      // through to (an unclamped `roomIn` return sent every name on a narrow
+      // device out into the seam between its links, which is the defect the
+      // port convention exists to end). So the shortage is now a filter on
+      // the INSIDE ring only.
       const span=vert?N.w:N.h, need=(vert?w:h)+2*PORT_END;
-      if(span<need) return out;
+      const roomIn=span>=need;
       const lo=(vert?N.x:N.y)+PORT_END, hi=(vert?N.x+N.w:N.y+N.h)-PORT_END;
       const pitch=(vert?w:h)+4;
-      const u0=vert?P[0]:P[1];
+      // THE NAME IS ANCHORED TO ITS OWN SQUARE, not to the raw
+      // crossing: `u0` is the square's centreline along the border, so the
+      // corner clamp inside `portSq` can never leave a name off the mark it
+      // names. `base` is the smallest along-border offset at which the two
+      // marks are two — half the square, the 3 px standoff, half the text —
+      // and `deep` is the same clearance taken PERPENDICULARLY, past the
+      // square's far face.
+      const SQ=portSq(N,P);
+      const u0=vert?SQ.cx:SQ.cy;
+      const base=PORT_SQ/2+PORT_SQ_GAP+(vert?w:h)/2;
+      const deep=PORT_SQ/2+PORT_SQ_GAP;
       // TWO RINGS OF CANDIDATES, AND BOTH ARE AT THE CROSSING.
       //   in = inside the border, the convention proper;
       //   out = the mirror image, just OUTSIDE the same border.
@@ -7058,19 +7811,162 @@ function renderScene(doc,y0){
       // could not get inside keeps it on its own port, which is the fact it
       // exists to state. It is surcharged, so it is taken only after inside
       // has failed.
-      for(const inside of [true,false]) for(const k of [0,1,-1,2,-2]){
-        const u=Math.max(lo+(vert?w:h)/2, Math.min(hi-(vert?w:h)/2, u0+k*pitch));
+      //
+      // WITH A SQUARE AT THE CROSSING THE ANCHOR CHANGES, which is the
+      // placement half of the maintainer's ruling ("A/B 皆有埠名文字定位不夠
+      // 理想" — in both styles the port name is not sited well enough):
+      //
+      //   1. THE NAME IS ANCHORED TO ITS OWN SQUARE, on the square's
+      //      centreline along the border. When the port is alone on that side
+      //      the anchor IS `u0` and the name sits squarely on its fitting's
+      //      line — which is the whole reading the notation buys.
+      //   2. WHEN THE SIDE CARRIES SEVERAL PORTS the anchor is the SLOT the
+      //      side pass assigned (`r.portU`): the same ideal, projected so that
+      //      consecutive names clear each other IN SQUARE ORDER. Order is the
+      //      property that matters and it is why the slot is computed for the
+      //      whole side at once instead of being negotiated one label at a
+      //      time by a greedy scorer — a greedy pass produced `p1 p3 p2` over
+      //      squares in the order p1 p2 p3 on `patterns/topology-a`, and every
+      //      one of those three labels is legible while two of them are wrong.
+      //
+      // The perpendicular offset follows from the anchor: a name still over
+      // its own square's along-border extent must clear the square's face
+      // (`deep`), and one that has stepped clear of it along the border only
+      // needs the ordinary 2 px (`PORT_IN`).
+      //
+      // The ladder (±one text pitch at a time, from the slot) stays behind
+      // that as relief for a name whose slot is occupied by something else —
+      // the node's own name, a neighbour's label. Each of these exists inside
+      // the border and outside it. INSIDE IS THE CONVENTION PROPER; the
+      // outside ring is the mirror image, hugging the same border, and it is
+      // surcharged (`hug`, PORT_HUG) so it is taken only after inside has
+      // failed — but it is far cheaper than the ordinary along-the-shaft
+      // family (PORT_OUT), which is the ruling's second clause: a crowded
+      // interior sends the name to the OUTSIDE FLANK of its own port before it
+      // ever sends it out onto the shaft.
+      const uS=(r.portU===undefined?u0:r.portU);
+      const dpFor=u=>(Math.abs(u-u0)<base-1e-9?deep:PORT_IN);
+      const fam=[];
+      for(const inside of [true,false]) fam.push({inside,u:uS,dp:dpFor(uS),ex:0});
+      // OUTSIDE, THE NAME MAY ALSO STAND OFF THE BORDER. Inside, the far wall
+      // of the box ends the argument; outside there is open paper, and one
+      // step of it is often the whole difference. `05-lacp`'s DUT is 49.6 px
+      // wide, carries three ports on its left face and their names are 41.4 px
+      // — every name has to hug the outside, and every shaft converging on
+      // those three fittings runs through the hug ring on its way in. Two
+      // 8 px steps outward (priced like any other displacement, and past the
+      // second one the standoff rule below draws the association as a leader)
+      // let the fan open out to where the shafts have separated.
+      for(const d of [8,16]) fam.push({inside:false,u:uS,dp:dpFor(uS)+d,ex:d});
+      for(const inside of [true,false]) for(const sg of [1,-1]) for(const k of [0,1,2])
+        fam.push({inside,u:uS+sg*(base+k*pitch),dp:PORT_IN,ex:base+k*pitch});
+      for(const F of fam){
+        const inside=F.inside, IN=F.dp;
+        if(inside&&!roomIn) continue;
+        // THE CORNERS BIND INSIDE AND DO NOT BIND OUTSIDE. Inside, a name is
+        // written between the two corners of the face it belongs to or it is
+        // written on another face; outside there is no face to run out of, so
+        // clamping the outside ring to the node's own extent was simply
+        // collapsing a fanned side back into a stack. A node 36 px tall with
+        // three links arriving 8 px apart has no inside answer at all, and
+        // its outside answer is the fan — which needs to reach past the
+        // corner to exist.
+        const half=(vert?w:h)/2;
+        const u=inside?Math.max(lo+half, Math.min(hi-half, F.u)):F.u;
         let bx,by;
-        if(side==='bottom'){ bx=u-w/2; by=inside?N.y+N.h-PORT_IN-h:N.y+N.h+PORT_IN; }
-        else if(side==='top'){ bx=u-w/2; by=inside?N.y+PORT_IN:N.y-PORT_IN-h; }
-        else if(side==='left'){ bx=inside?N.x+PORT_IN:N.x-PORT_IN-w; by=u-h/2; }
-        else { bx=inside?N.x+N.w-PORT_IN-w:N.x+N.w+PORT_IN; by=u-h/2; }
+        if(side==='bottom'){ bx=u-w/2; by=inside?N.y+N.h-IN-h:N.y+N.h+IN; }
+        else if(side==='top'){ bx=u-w/2; by=inside?N.y+IN:N.y-IN-h; }
+        else if(side==='left'){ bx=inside?N.x+IN:N.x-IN-w; by=u-h/2; }
+        else { bx=inside?N.x+N.w-IN-w:N.x+N.w+IN; by=u-h/2; }
         out.push({x:bx+w/2, y:by+up, anchor:'middle', t:undefined, side,
-                  ex:Math.abs(k)*pitch, inPort:inside, hug:!inside,
+                  sq:SQ.box, sqk:SQ.key, atBorder:true,
+                  ex:F.ex, inPort:inside, hug:!inside,
                   box:{x:bx,y:by,w,h}});
       }
       return out;
     };
+    // ── DRAW EVERY PORT SQUARE BEFORE ANY NAME IS PLACED ──────────────────
+    // The squares are a function of geometry alone (owner box + crossing
+    // point), so they are all known before the greedy placement pass starts.
+    // Computing them here rather than inside that loop buys the property that
+    // matters: EVERY name is scored against EVERY square, including squares
+    // belonging to names that have not been placed yet. A name written across
+    // a later port's fitting would say the wrong thing about which link it
+    // belongs to, and a one-pass greedy loop that emitted squares as it went
+    // could only ever avoid the ones already drawn.
+    //
+    // Two crossings can coincide (co-located links on one border, a bundle's
+    // members leaving through one face): the square is keyed on its snapped
+    // centre so one fitting is drawn once, not stroked n times. That key is
+    // also the square's IDENTITY in the drawing — it is written on the rect
+    // as `data-port-sq` and on the name that belongs to it, so a reader (and
+    // `tools/layout-lint.js`) can tell a name's own fitting from a foreign one
+    // by reading rather than by guessing at distances.
+    const sqBox=[], sqSeen=new Set();
+    for(const r of lblReq){
+      if(!r.port) continue;
+      const S=portSq(r.port,r.p);
+      if(sqSeen.has(S.key)) continue;
+      sqSeen.add(S.key);
+      sqBox.push(Object.assign({key:S.key},S.box));
+      const N=r.port;
+      sqsvg.push('<rect x="'+S.box.x.toFixed(2)+'" y="'+S.box.y.toFixed(2)+
+                 '" width="'+PORT_SQ+'" height="'+PORT_SQ+'" fill="'+(N.fill||'#fff')+
+                 '" stroke="'+(N.stroke||'#8a8880')+'" data-port-sq="'+S.key+'"/>');
+      W=Math.max(W, S.box.x+S.box.w+4);
+      Hh=Math.max(Hh, S.box.y+S.box.h+4-y0-20);
+    }
+    // ── ONE SIDE'S NAMES ARE ORDERED TOGETHER, NOT ONE AT A TIME ──────────
+    // "Same side, several ports: the names serialize along the border in
+    // SQUARE ORDER" is a property of the SIDE, and a greedy scorer cannot hold
+    // it — it places one label at a time against what is already on the paper,
+    // so the second name takes the cheapest gap rather than its own place in
+    // the row. Measured: `patterns/topology-a`'s aggregation node came out
+    // `p1 p3 p2` over squares in the order p1 p2 p3. Every one of those labels
+    // is legible and two of them are wrong, which is worse than a collision:
+    // a collision announces itself and a swapped pair does not.
+    //
+    // So each (node, side) group is projected ONCE, here, before any placement
+    // is scored. The projection is the smallest order-preserving spreading of
+    // the ideal positions: walk the group in square order, push each name just
+    // far enough to clear the previous one, then slide the whole run back so
+    // it stays centred on where the squares actually are. A side with one port
+    // is unmoved by construction — its slot IS its square's centreline — so
+    // this pass costs the ordinary figure nothing.
+    //
+    // Separation is measured in TEXT, not in squares: half of each of the two
+    // names plus the 3 px standoff. Two fittings 8 px apart on a 36 px device
+    // (three links into one small node, which is `05-lacp`'s DUT) cannot give
+    // their names 8 px and be read as two names; the names take the room the
+    // TEXT needs and the reader maps name to square by ORDER, which is exactly
+    // what the order-preserving projection guarantees.
+    {
+      const sides=new Map();
+      for(const r of lblReq){
+        if(!r.port) continue;
+        const S=portSq(r.port,r.p);
+        const k=(r.port.id===undefined?'?':r.port.id)+'|'+S.side;
+        if(!sides.has(k)) sides.set(k,[]);
+        const D=lblDims(r);
+        sides.get(k).push({r, u0:S.vert?S.cx:S.cy, ext:S.vert?D.w:D.h});
+      }
+      for(const g of sides.values()){
+        if(g.length<2) continue;
+        // stable: equal crossings keep registration (edge) order
+        g.forEach((e,i)=>{e.i=i;});
+        g.sort((a,b)=>a.u0-b.u0||a.i-b.i);
+        let u=g[0].u0, sum=0;
+        g[0].u=u;
+        for(let i=1;i<g.length;i++){
+          const sep=(g[i-1].ext+g[i].ext)/2+PORT_SQ_GAP;
+          u=Math.max(g[i].u0, u+sep);
+          g[i].u=u;
+        }
+        for(const e of g) sum+=e.u-e.u0;
+        const shift=sum/g.length;                 // re-centre on the squares
+        for(const e of g) e.r.portU=e.u-shift;
+      }
+    }
     const placed=[];
     // A request may name a SECOND carrying segment (`alt`). Back edges do: the
     // stub leaving the source is the preferred carrier because it says which
@@ -7167,8 +8063,19 @@ function renderScene(doc,y0){
       // already there) and never merely because outside happens to be tidy.
       const cs=[];
       if(r.port) for(const c of portCands(r)) cs.push({c,si:0});
-      for(let si=0;si<sides.length;si++) for(const t of ts) for(const cl of [0,1]) for(const ep of eps)
-        cs.push({c:cand(r,t,sides[si],cl,ep),si,out:!!r.port});
+      // THE OWN SQUARE TRAVELS WITH THE REQUEST, NOT WITH THE FAMILY
+      // A port name driven all the way out to the along-shaft
+      // family still names its fitting and must still be told apart from the
+      // next one, so those candidates carry the same square the border family
+      // does — the forbidden band, the affinity filter and the standoff rule
+      // below then apply to every position this label can take, instead of
+      // stopping at the border.
+      const RSQ=r.port?portSq(r.port,r.p):null;
+      for(let si=0;si<sides.length;si++) for(const t of ts) for(const cl of [0,1]) for(const ep of eps){
+        const c=cand(r,t,sides[si],cl,ep);
+        if(RSQ){ c.sq=RSQ.box; c.sqk=RSQ.key; }
+        cs.push({c,si,out:!!r.port});
+      }
       for(const CS of cs){
         const c=CS.c, si=CS.si, t=(c.t===undefined?tPref:c.t);
         c.car=[r.p,r.q];          // the carrier this candidate rides (item 59)
@@ -7177,13 +8084,82 @@ function renderScene(doc,y0){
         // one fact it exists to state, and no amount of collision relief buys
         // that back. Candidates that fail are dropped; `bestAny` keeps the
         // least-bad one so a figure with no legal position still draws.
+        // A DRAWN ASSOCIATION REPLACES AN INFERRED ONE. Every
+        // filter in this pass is a proxy for one question — can the reader
+        // tell what this word belongs to — and each answers it by PROXIMITY,
+        // because proximity is all an unadorned label has. A port name past
+        // the standoff cap is not unadorned: it takes a leader (below), and a
+        // line from the word to the fitting states the association outright.
+        // So `lead` is computed first and the proximity proxies stand down
+        // for it. The BAND does not: a name written across a foreign fitting
+        // is a wrong statement no leader can correct.
+        const lead=!!(c.sq&&boxSep(c.box,c.sq)>STANDOFF_CAP);
         let owns=true;
-        if(r.kind==='end'&&r.other){
+        if(r.kind==='end'&&r.other&&!lead){
           const ccx=c.box.x+c.box.w/2, ccy=c.box.y+c.box.h/2;
           owns=Math.hypot(ccx-r.p[0],ccy-r.p[1])<Math.hypot(ccx-r.other[0],ccy-r.other[1]);
         }
+        // A FOREIGN SQUARE'S BAND IS FORBIDDEN SPACE, NOT A PRICE
+        // Once a fitting is drawn, a port name no longer names
+        // "this end of this link" — it names THAT SQUARE, and the only thing
+        // that says which square is proximity. On the first squared render of
+        // `patterns/topology-a` the aggregation node's three names came out
+        // `p1 p3 p2` over squares in the order p1 p2 p3, because the
+        // free-space terms priced the second name into the gap past its own
+        // fitting: every one of those labels is legible and two of the three
+        // are wrong. No collision relief buys that back, so this is a filter,
+        // exactly as endpoint affinity above is, and it has two halves that
+        // apply to DIFFERENT candidates:
+        //   • the BAND — the foreign square grown by the 3 px standoff — is
+        //     space NO port name may enter, wherever it was going to be
+        //     written. A name across a neighbour's fitting is the wrong
+        //     statement whether it got there from the border ring or from the
+        //     shaft, so this half is unconditional.
+        //   • the AFFINITY — nearer a foreign square's centre than its own —
+        //     applies only AT THE BORDER, where proximity is the only thing
+        //     saying which square a name belongs to. Out on the shaft the
+        //     name is associated by the LINE it rides (and, past the standoff
+        //     cap, by a drawn leader), and item 42's own-endpoint filter
+        //     already governs that ring. Applying it there was built and
+        //     measured: on `05-lacp`, three names whose squares sit 14.5 px
+        //     apart have their own shaft running through the middle of the
+        //     7 px window the affinity test leaves them, so every clean
+        //     position was disqualified and the figure took the strikes
+        //     instead (lblcol 3 -> 5).
+        if(c.sq){
+          const ccx=c.box.x+c.box.w/2, ccy=c.box.y+c.box.h/2;
+          const d0=Math.hypot(ccx-(c.sq.x+c.sq.w/2), ccy-(c.sq.y+c.sq.h/2));
+          const G=PORT_SQ_GAP;
+          for(const b of sqBox){
+            if(b.key===c.sqk) continue;
+            if(c.box.x<b.x+b.w+G&&b.x-G<c.box.x+c.box.w&&
+               c.box.y<b.y+b.h+G&&b.y-G<c.box.y+c.box.h){ owns=false; break; }
+            if(c.atBorder&&
+               Math.hypot(ccx-(b.x+b.w/2),ccy-(b.y+b.h/2))<d0-1e-9){ owns=false; break; }
+          }
+        }
         let s=0;
         for(const b of placed)   s+=3*ovl(c.box,b);
+        // A NAME WRITTEN ACROSS ITS OWN FITTING is the one arrangement the
+        // notation cannot survive, and unlike a foreign square this one is
+        // PRICED rather than forbidden: the offset family already starts the
+        // name clear of its own square, so the only way back onto it is the
+        // corner clamp on a device too small to hold the name anywhere else —
+        // and on that device the least-bad answer still has to exist. Charged
+        // at the `placed` weight, because a drawn square is drawn ink of the
+        // same order, and measured on the LINE box, because a 7 px square and
+        // a 12 px line box brushing at all is already too close to read as
+        // two marks.
+        if(c.sq) s+=3*ovl(c.box,c.sq);
+        // THE LEADER'S OWN PRICE, AND THE BAND IT HAS TO SIT IN. A leader is
+        // extra ink and a second thing to follow, so it must be dearer than
+        // every adjacency that needs none — and it must be CHEAPER THAN A
+        // STRIKETHROUGH, which costs 26 here, or the pass would keep choosing
+        // a name lying across a line over the same name standing clear with
+        // its association drawn. 15 is the middle of that band and it is the
+        // whole of the tuning: below 26 by construction, above the 0-12 px
+        // displacement prices that separate one clean position from another.
+        if(lead) s+=15;
         // A PORT MARKER IS SUPPOSED TO BE INSIDE ITS OWN BOX (item 57), so
         // that one node is not charged for it. Every other box still is, at
         // the usual weights — a marker that has slid out of its own device
@@ -7325,31 +8301,64 @@ function renderScene(doc,y0){
         // the 16 px anchor and the affinity filter, both of item 42's.
         if(r.kind!=='end'&&segBoxGap(c.car[0],c.car[1],c.box)>STANDOFF_CAP){
           if(s<farS-1e-9){ farS=s; farBest=c; } continue; }
+        // A PORT NAME OWES ITS SQUARE THE SAME STANDOFF, AND IT
+        // PAYS FOR IT WITH A LEADER RATHER THAN WITH A FILTER. Item 59 makes
+        // the cap a filter for mid-labels because their displacement is
+        // unbounded — a mid-label can wander anywhere along a 900 px channel.
+        // A port name's family is bounded by construction (the border rings
+        // are at the border; the shaft ring is 16-24 px along its own edge),
+        // and the tier prices above — PORT_HUG then PORT_OUT — already order
+        // it. Making the cap a filter HERE was built and measured, and the
+        // corpus refused it: on `05-lacp` it disqualified the whole shaft ring
+        // for six names whose only near positions lie across their own shaft,
+        // and the figure took six strikethroughs rather than six clean names
+        // 20 px out (lblcol 5 -> 7). So the cap does not decide WHERE the name
+        // goes; it decides whether the association is drawn, below.
         if(s<anyS-1e-9){ anyS=s; anyBest=c; }
         if(owns&&s<bestS-1e-9){ bestS=s; best=c; }
       }
     }
       if(!best) best=anyBest||farBest||offBest;  // no legal position — least bad
       r0.win=best;                     // kept for item 55's recolour pass
-      lblsvg[r0.idx]=textEl(best.x,best.y,r0.fs,best.anchor,r0.col,r0.text,r0.halo);
-      // THE LEADER (item 59). A mid-label that had to be placed past the cap
-      // states its line explicitly: a hairline from the nearest point of its
-      // box to the nearest point of its own carrying segment, in the label's
-      // own colour. It is drawn UNDER nothing and over nothing — it is 1 px,
-      // it starts at the box and it stops at the shaft — so it adds no ink
-      // anywhere the reader is not already looking for the association.
-      if(r0.kind!=='end'&&best.car&&segBoxGap(best.car[0],best.car[1],best.box)>STANDOFF_CAP){
+      // A PORT NAME CARRIES ITS SQUARE'S KEY. The name and the
+      // fitting it names are one statement drawn as two marks, and nothing in
+      // the finished SVG said they were a pair — a reader (and the layout
+      // gate, which now scores a foreign name written across a fitting) had
+      // only proximity to go on, which is the very thing the notation exists
+      // to stop relying on. The key is the square's snapped centre, so the two
+      // elements carry the same string and the association is READ.
+      lblsvg[r0.idx]=textEl(best.x,best.y,r0.fs,best.anchor,r0.col,r0.text,
+                            r0.halo+(best.sqk?' data-port-sq="'+best.sqk+'"':''));
+      // THE LEADER (item 59), AND ITS SECOND CALLER. A label that
+      // had to be placed past the cap states its referent explicitly: a
+      // hairline from the nearest point of its box to that referent, in the
+      // label's own colour. It is drawn UNDER nothing and over nothing — it is
+      // 1 px, it starts at the box and it stops at the thing — so it adds no
+      // ink anywhere the reader is not already looking for the association.
+      //
+      // TWO REFERENTS, ONE LEADER. A mid-label's is the nearest point of its
+      // own carrying segment; a port name's is the CENTRE OF ITS OWN SQUARE,
+      // because that is the mark it names. The drawing is otherwise identical
+      // and is therefore drawn by one closure rather than copied — a second
+      // leader mechanism is a second set of rules about when a leader appears,
+      // and this figure only ever needs one.
+      const leadTo=(fx,fy)=>{
         const b=best.box, cx=b.x+b.w/2, cy=b.y+b.h/2;
-        const P0=best.car[0], Q0=best.car[1];
-        const vx=Q0[0]-P0[0], vy=Q0[1]-P0[1], L2=vx*vx+vy*vy;
-        const t=L2?Math.max(0,Math.min(1,((cx-P0[0])*vx+(cy-P0[1])*vy)/L2)):0;
-        const fx=P0[0]+t*vx, fy=P0[1]+t*vy;
-        // the box's own boundary point on the ray toward that foot
+        // the box's own boundary point on the ray toward the referent
         const dx=fx-cx, dy=fy-cy, ax=Math.abs(dx)||1e-9, ay=Math.abs(dy)||1e-9;
         const k=Math.min((b.w/2+2)/ax,(b.h/2+2)/ay);
         r0.leadIdx=lblsvg.length;
         lblsvg.push('<line x1="'+(cx+dx*k)+'" y1="'+(cy+dy*k)+'" x2="'+fx+'" y2="'+fy+
                     '" stroke="'+r0.col+'" stroke-width="1" opacity="0.6"/>');
+      };
+      if(r0.kind!=='end'&&best.car&&segBoxGap(best.car[0],best.car[1],best.box)>STANDOFF_CAP){
+        const b=best.box, cx=b.x+b.w/2, cy=b.y+b.h/2;
+        const P0=best.car[0], Q0=best.car[1];
+        const vx=Q0[0]-P0[0], vy=Q0[1]-P0[1], L2=vx*vx+vy*vy;
+        const t=L2?Math.max(0,Math.min(1,((cx-P0[0])*vx+(cy-P0[1])*vy)/L2)):0;
+        leadTo(P0[0]+t*vx, P0[1]+t*vy);
+      } else if(best.sq&&boxSep(best.box,best.sq)>STANDOFF_CAP){
+        leadTo(best.sq.x+best.sq.w/2, best.sq.y+best.sq.h/2);
       }
       placed.push(Object.assign({text:r0.text},best.box));
       W=Math.max(W, best.box.x+best.box.w+4);
@@ -7866,7 +8875,7 @@ function renderScene(doc,y0){
         used[pick]++;
       }
       if(tone.size>1) for(const [e2,col2] of tone){
-        const key='data-edge="'+e2.line+'"';
+        const key='data-edge="'+edgeRef(e2)+'"';
         for(let i=0;i<esvg.length;i++)
           if(esvg[i].indexOf(key)>=0) esvg[i]=esvg[i].replace('stroke="#555"','stroke="'+col2+'"');
         for(const i of (arrowIdx.get(e2)||[]))
@@ -7907,7 +8916,8 @@ function renderScene(doc,y0){
       } else lblsvg.push(textEl(cx,cy-10,10,'middle',bcol,n.label,bhalo));
       continue;
     }
-    nsvg.push('<g data-node="'+n.id+'" data-x="'+n.x+'" data-y="'+n.y+'" style="cursor:move">');
+    nsvg.push('<g data-node="'+n.id+'" data-x="'+n.x+'" data-y="'+n.y+'"'
+      +(lassoMem.has(n.id)?' data-lasso="'+lassoMem.get(n.id).join(' ')+'"':'')+' style="cursor:move">');
     const fill=n.fill||'#fff', stroke=n.stroke||'#8a8880', txt=labelInk(fill,'#1d1d1b');
     const ndash=n.style==='dashed'?' stroke-dasharray="6 4"':(n.style==='dotted'?' stroke-dasharray="2 4"':'');
     if(n.shape==='diamond'){
@@ -7969,7 +8979,7 @@ function renderScene(doc,y0){
     // ONE MEMBER = NO ELLIPSE (item 53). The caption below is the whole
     // drawing, and an unlabelled one-member bundle draws nothing.
     if(!R.solo){
-      tsvg.push('<ellipse cx="'+rnd3(R.cx)+'" cy="'+rnd3(R.cy)+'" rx="'+rnd3(R.rL)+'" ry="'+rnd3(R.rA)+'" fill="transparent" stroke="'+(t.stroke||col)+'"'+dashOf(t.style,'6 4')+' stroke-width="1.6"'+rot+'/>');
+      tsvg.push('<ellipse cx="'+rnd3(R.cx)+'" cy="'+rnd3(R.cy)+'" rx="'+rnd3(R.rL)+'" ry="'+rnd3(R.rA)+'" data-lasso="'+t.id+'" fill="transparent" stroke="'+(t.stroke||col)+'"'+dashOf(t.style,'6 4')+' stroke-width="1.6"'+rot+'/>');
       W=Math.max(W,R.cx+R.hw); Hh=Math.max(Hh,R.cy+R.hh-y0-20);
     }
     const L=ringLbl.get(t);
@@ -8079,7 +9089,7 @@ function renderScene(doc,y0){
                      ' paint-order="stroke" stroke="#fff" stroke-width="3"'));
   }
   const yEnd=y0+20+Hh+10;
-  return {svg:gsvg.join('')+esvg.join('')+nsvg.join('')+tsvg.join('')+lblsvg.join(''), y:yEnd, w:W+2,
+  return {svg:gsvg.join('')+esvg.join('')+nsvg.join('')+tsvg.join('')+sqsvg.join('')+lblsvg.join(''), y:yEnd, w:W+2,
           meta:{W:W, top:y0+20+chShift+tShift, Hh:Hh, left:bShift+lShift}, errs:gErrs};
 }
 // borderPoint: where the ray from n's centre toward (tx,ty) leaves the shape.
@@ -8631,6 +9641,26 @@ function renderSequence(doc,y0){
 // would put a 17-digit tail in the artifact for no reader's benefit.
 function r2(v){ return Math.round(v*100)/100; }
 
+// `TYPED-BLOCK-TITLE-CANVAS` (backlog 66): A TYPED BLOCK'S TITLE JOINS ITS OWN CANVAS.
+//
+// Each of the four typed-block renderers (bitfield/table/timing/chart) sizes
+// its section from its DATA — cells, ruler, lanes, floor — and draws its own
+// caption over that canvas afterwards, at x=0, without ever measuring the
+// caption into the width it returns. A caption wider than the data therefore
+// ran past the right edge of the section's own `<svg>` box, and a section
+// canvas grows right and down only, so text at a negative coordinate is
+// CLIPPED, never merely misplaced (`LABEL-PLACEMENT-METRIC`, which fixed exactly this
+// for a `table` caption and a `chart` row/column label gutter but not for a
+// bitfield/timing title or a chart's own top caption — production field
+// report FR-4, decisions/registry.md).
+//
+// ONE MEASUREMENT, used by all four renderers below, so the calibration lives
+// in one place rather than four. Bold text at this size is measured ~8%
+// wider than the plain per-character estimate `cwMax(...)*CH` gives at
+// regular weight — verified against the raster, not assumed, the same
+// allowance `renderTable`'s caption fix already established.
+function typedBlockTitleW(label){ return cwMax(label)*CH*1.08+2; }
+
 // ---- bitfield ----
 function renderBitfield(b,y0){
   const cell=Math.max(18,Math.min(28,Math.floor(760/b.word))), rh=30, ruler=16;
@@ -9061,7 +10091,12 @@ function renderBitfield(b,y0){
     }
     yb+=2;
   }
-  return {svg:svg.join(''), y:yb, w:wb,
+  // THE SECTION IS AS WIDE AS ITS WIDEST INK, AND THE CAPTION IS INK (`TYPED-BLOCK-TITLE-CANVAS`).
+  // `wb` is the DATA extent alone (cells, ruler, `present=` captions) — the
+  // BOX below stays measured against it, because a region-scope
+  // `threshold`/`band` is a statement about the data, not about the title
+  // that names it. Only the returned canvas width grows for the caption.
+  return {svg:svg.join(''), y:yb, w:Math.max(wb, typedBlockTitleW(b.label)),
           box:{x0:0, x1:wb, yA:y0+18, yB:yb}};
 }
 
@@ -9178,9 +10213,10 @@ function renderTable(t,y0){
   // grid is not the figure; the caption is not decoration.
   // Bold at 13 px is wider than `CH` (a regular-weight advance), so the caption
   // is measured with the same 8% allowance the raster needed — verified by
-  // rendering, not assumed.
-  const capW=cwMax(t.label)*CH*1.08+2;
-  return {svg:svg.join(''), y:yEnd+6, w:Math.max(totalW+2,capW),
+  // rendering, not assumed. `typedBlockTitleW` (`TYPED-BLOCK-TITLE-CANVAS`) is that
+  // same measurement, now shared by all four typed-block renderers rather
+  // than kept as this one's own private copy.
+  return {svg:svg.join(''), y:yEnd+6, w:Math.max(totalW+2,typedBlockTitleW(t.label)),
           box:{x0:0, x1:totalW, yA:yTop+yAt[H], yB:yEnd}};
 }
 
@@ -9339,7 +10375,14 @@ function renderChart(b,y0,doc){
     svg.push(textEl(zr[0]+21, zr[1]-z*ZS+3.5, 9.5, 'start', '#6f6e69', String(z)));
   }
   const near=[PR(R,C,0)[0]+ox, PR(R,C,0)[1]];
-  const w=Math.max(near[0]+70, farRight+ox+4);
+  // THE TOP CAPTION IS THE SECTION'S OWN INK TOO (`TYPED-BLOCK-TITLE-CANVAS`). The
+  // row/column axis-label gutter (`ox`, above) was widened for exactly this
+  // reason, but that pass measured the LEANED-OUT axis labels
+  // and never the caption drawn at the section's fixed x=0 top-left corner —
+  // a `chart` whose table name is long enough still ran the caption off the
+  // right edge under its own data floor. The caption is never shifted (it is
+  // already the section's leftmost, topmost ink); only the canvas grows.
+  const w=Math.max(near[0]+70, farRight+ox+4, typedBlockTitleW(t.label+' — bar3d'));
   const hgt=Math.max(near[1]+24, farDown+6)-y0;
   return {svg:svg.join('')+lsvg.join(''), y:y0+hgt, w:w};
 }
@@ -9396,7 +10439,12 @@ function renderTiming(w,y0){
     svg.push('<path d="M'+x+','+(y+4)+' q4,'+(hTotal/4)+' 0,'+(hTotal/2)+' q-4,'+(hTotal/4)+' 0,'+(hTotal/2)+'" fill="none" stroke="#999" stroke-width="2"/>');
   }
   const H=y+8+w.signals.length*(laneH+laneGap);
-  return {svg:svg.join(''), y:H, w:nameW+cycles*cycleW+2,
+  // THE SECTION IS AS WIDE AS ITS WIDEST INK, AND THE TITLE IS INK (`TYPED-BLOCK-TITLE-CANVAS`,
+  // 0.5). `nameW+cycles*cycleW+2` is the DATA extent alone (the
+  // signal-name gutter plus the lane grid); the BOX below stays measured
+  // against it, unchanged, for the same reason a table's region box stays
+  // measured against the grid and not the caption.
+  return {svg:svg.join(''), y:H, w:Math.max(nameW+cycles*cycleW+2, typedBlockTitleW(w.label)),
           box:{x0:nameW, x1:nameW+cycles*cycleW, yA:y0+18, yB:H}};
 }
 
@@ -9474,14 +10522,27 @@ function __stackSectionSvgs(results) {
 // the default does NOT (embedded figures almost always sit under the
 // host document's caption — the majority case).
 // Multi-section sources are stacked vertically into a single SVG (MULTI-FIGURE-DOCUMENTS).
+//
+// TWO ERROR CHANNELS REACH ONE errors ARRAY. parse cannot see a
+// coordinate, so a document whose SOURCE is impeccable can still draw a false
+// statement — a group band enclosing a non-member, a pin covering a node
+// completely. The engine reports those from render (as .errs on its render
+// result), and core §8 requires a caller to treat a non-empty render
+// diagnostic list EXACTLY as it treats a parse error list. Until 0.4
+// this wrapper discarded that channel and returned errors: [] with an SVG of
+// the picture the engine had just said was wrong — the one copy of the engine
+// a require('figdown') user actually gets. Both channels now land here, and
+// either withholds the SVG.
 function render(text, opts) {
   var p = parse(text);
   if (p.errors.length) return { svg: null, errors: p.errors };
-  if (p.docs.length > 1) {
-    var rs = p.docs.map(function (d) { return __engine.render(d, opts); });
-    return { svg: __engine.stackSectionSvgs(rs), errors: [] };
-  }
-  return { svg: __engine.render(p.doc, opts).svg, errors: [] };
+  if (!p.docs.length) return { svg: null, errors: [] };
+  var rs = p.docs.map(function (d) { return __engine.render(d, opts); });
+  var errs = [];
+  for (var i = 0; i < rs.length; i++) errs = errs.concat(rs[i].errs || []);
+  if (errs.length) return { svg: null, errors: errs };
+  var svg = rs.length > 1 ? __engine.stackSectionSvgs(rs) : rs[0].svg;
+  return { svg: svg, errors: [] };
 }
 // renderDoc(doc, opts) -> svg string, for an already-validated doc from parse().
 // For multi-section, pass parse().docs to renderDocs instead.
@@ -9494,10 +10555,13 @@ function renderDocs(docs, opts) {
   return __engine.stackSectionSvgs(docs.map(function (d) { return __engine.render(d, opts); }));
 }
 // artifact(text) -> { svg, errors }  svg is the full self-carrying SVG:
-// the render plus a <metadata id="figdown-source"> block embedding the
-// source text, the SHA-256 OF THAT SOURCE, and the engine version that
-// rendered it (same convention as tools/build-svg.js; spec core §7).
-// svg is null when there are errors.
+// the render plus a <metadata id="figdown-source"> block
+// embedding the source text, the SHA-256 OF THAT SOURCE, and the engine
+// version that rendered it (same convention as tools/build-svg.js; spec §7).
+// svg is null when there are errors — parse-time OR geometry-time, on
+// tools/build-svg.js's contract (core §8): a non-empty render diagnostic list
+// refuses the artifact exactly as a parse error does, because writing it
+// anyway publishes the picture the engine has just said is wrong.
 function artifact(text, opts) {
   var src = String(text);
   var p = render(src, opts);

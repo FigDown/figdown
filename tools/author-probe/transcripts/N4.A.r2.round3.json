@@ -1,0 +1,55 @@
+{
+  "probe_version": "1.0.0",
+  "run": {
+    "utc": "2026-08-19T12:05:58Z",
+    "cli": "2.1.234 (Claude Code)",
+    "condition": "A",
+    "task": "N4",
+    "kind": "normal",
+    "seat": 2,
+    "model_alias": "sonnet",
+    "round": 3,
+    "model_used": "claude-sonnet-5"
+  },
+  "saw": {
+    "skill_path": "skill/figdown/SKILL.md",
+    "skill_sha256": "718f935282ce7a93f4b7e36b83983ac1112e49818384d8eaf35869830d34d6a2",
+    "skill_chars": 16497,
+    "system_sha256": "39117af0175e7d927c8f9c715c9555f91e3357a146f2d6d311d4a3bb889ecaae",
+    "user_sha256": "e339eec368457fdcb07060d6556c53715a1629118c9fc7161d76b563b829e767"
+  },
+  "integrity": {
+    "turns": 1,
+    "permission_denials": 0,
+    "is_error": false
+  },
+  "usage": {
+    "cost_usd": 0.0296289,
+    "duration_ms": 19459
+  },
+  "scrub": {
+    "ran": true,
+    "pattern": "email-regex",
+    "replacements": 0
+  },
+  "raw_answer_text": "The earlier attempt embedded a Markdown wrapper *as if it were* the `.fd` source — that's why the validator choked on `![...]` and `<sub>`. Here is the actual `X.fd` content:\n\n```figdown\n# FigDown — figures as text. Spec: https://github.com/FigDown/figdown\nfigdown 0.1 block\ntitle \"Certificate renewal automation\"\n\nblock scheduler \"Scheduler\"\nblock renewaljob \"Renewal job\"\nblock caclient \"CA client\"\nblock ca \"Certificate authority\"\nblock deployagent \"Deploy agent\"\nblock service \"Service\"\n\nscheduler -> renewaljob\nrenewaljob -> caclient\ncaclient -> ca\nrenewaljob -> deployagent\ndeployagent -> service\n```\n\nSave that as `figures/cert-renewal.fd`, run it through `build-svg.js` to produce `figures/cert-renewal.svg`, and embed the two side by side in the host Markdown like this:\n\n```markdown\n![Certificate renewal automation: scheduler triggers a renewal job, which asks a CA client to obtain a certificate from the CA, then hands off to a deploy agent that restarts the service](figures/cert-renewal.svg)\n\n<sub>source: [figures/cert-renewal.fd](figures/cert-renewal.fd)</sub>\n```\n\nThe `.fd` file (fenced above) is what goes through the validator; the Markdown snippet is only the embed that references the built SVG — the two must not be conflated, which is exactly what tripped the first attempt.",
+  "extracted_document": "![Certificate renewal automation: scheduler triggers a renewal job, which asks a CA client to obtain a certificate from the CA, then hands off to a deploy agent that restarts the service](figures/cert-renewal.svg)\n\n<sub>source: [figures/cert-renewal.fd](figures/cert-renewal.fd)</sub>\n",
+  "validation": {
+    "errors": [
+      "Line 1: first line must be \"figdown 0.1 <genre>\"",
+      "Line 1: unrecognized line (unknown keyword \"![Certificate\")",
+      "Line 3: unrecognized line (unknown keyword \"<sub>source:\")"
+    ],
+    "invariants_pass": false,
+    "missing_nodes": [
+      "scheduler",
+      "renewaljob",
+      "caclient",
+      "ca",
+      "deployagent",
+      "service"
+    ],
+    "edge_count": 0,
+    "success": false
+  }
+}

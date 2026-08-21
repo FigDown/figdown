@@ -1,0 +1,1 @@
+Line 6: "node" is a semantic directive — it must appear before the layout zone (`CONTENT-LAYOUT-ZONE-SPLIT`)

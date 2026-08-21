@@ -1,0 +1,26 @@
+figdown 0.1 bitfield
+# `PRESENCE-CONDITION-EXPRESSION`: the positional PRESENCE FLAG is retired in both of its
+# spellings. `optional` (…0.1, and again 0.1 after `PRESENCE-FLAG-SPELLING` reverted
+# `PRESENCE-FLAG-SPELLING`) and `conditional` (0.1…0.1) are each a line error naming
+# their migration; the live construct is the option key `present=`, whose
+# VALUE is the presence condition. A bare flag could say only THAT a field
+# was conditional — never why — so the condition had to live in the THEN-`note=`
+# key, where neither the human nor the model could use it.
+#
+# READ THAT SENTENCE AS HISTORY, and read it that way in the golden too. When
+# `PRESENCE-CONDITION-EXPRESSION` was written, `note=` on a `field` was the machine-facing tooltip key;
+# `DESCRIPTION-KEY-SPELLING` renamed it `description=` in the same release, and `DRAWN-ANNOTATION-FORM`
+# revived the spelling `note=` for something else entirely — the DRAWN
+# annotation, which `field` refuses (case 479). So a reader arriving today
+# meets "the condition had to live in note=" in the 0.1 diagnostic and
+# has to translate twice: the key that sentence names is the one now spelled
+# `description=`, and the `note=` that exists in the language today is not it.
+# The .errors.txt golden still carries the original wording BYTE FOR BYTE
+# because a golden is what the engine emits, not what a fixture wishes it
+# said; re-wording it is an ENGINE edit (the `PRESENCE-CONDITION-EXPRESSION` literal in
+# editor/figdown.html) and is not made here.
+bitfield a "A" numbering=msb0 word=32
+field "W" 16 present="C = 1"
+field "X" 16 optional
+field "Y" 16 conditional
+field "Z" 16 present=""

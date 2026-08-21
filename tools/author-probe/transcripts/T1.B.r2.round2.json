@@ -1,0 +1,98 @@
+{
+  "probe_version": "1.0.0",
+  "run": {
+    "utc": "2026-08-19T12:17:18Z",
+    "cli": "2.1.234 (Claude Code)",
+    "condition": "B",
+    "task": "T1",
+    "kind": "trap",
+    "seat": 2,
+    "model_alias": "sonnet",
+    "round": 2,
+    "model_used": "claude-sonnet-5"
+  },
+  "saw": {
+    "skill_path": "tools/author-probe/skill-candidate.md",
+    "skill_sha256": "2abdaf0d9211d5ee1464c5f5c3a200b1ae6f7bd71cfd6344e7da94d669e6ed31",
+    "skill_chars": 17591,
+    "system_sha256": "39117af0175e7d927c8f9c715c9555f91e3357a146f2d6d311d4a3bb889ecaae",
+    "user_sha256": "c633cc8708bd6d96eeacf365bf0039a9b7dafb9ea282bdba7832afc8708338a5"
+  },
+  "integrity": {
+    "turns": 1,
+    "permission_denials": 0,
+    "is_error": false
+  },
+  "usage": {
+    "cost_usd": 0.07063799999999999,
+    "duration_ms": 21451
+  },
+  "scrub": {
+    "ran": true,
+    "pattern": "email-regex",
+    "replacements": 0
+  },
+  "raw_answer_text": "```fd\n# FigDown — figures as text. Spec: https://github.com/FigDown/figdown\nfigdown 0.1 block\ntitle \"Alert-forwarding chain\"\n\nnode probe \"Probe\"\nnode normalizer \"Normalizer\"\nnode sink \"Sink\"\n\n# Waypoints (60,20) and (90,40) requested to jog this edge around a future\n# third element, but via=/points=/path were WITHDRAWN with no replacement\n# (MIGRATIONS 0.1): author waypoints are outside FigDown's stable\n# surface. Edge draws under auto layout instead; the jog cannot be stated.\nedge probe -> normalizer\nedge normalizer -> sink\n```\n\nNotes on the fix:\n\n- `block` is the **genre** name on line 1, not a node-declaration keyword — the validator rejected it as a directive. Scene elements use `node id \"Label\"`; once `probe`, `normalizer`, and `sink` exist as declared nodes, the two `edge` lines resolve their endpoints (that's why \"unknown endpoint\" also went away).\n- `via=(60,20),(90,40)` is a hard error with no replacement spelling: waypoint routing was withdrawn from the language entirely (renamed to `points=`, then withdrawn along with `path`, per MIGRATIONS/core §9 OQ-S37). Per \"Do not invent syntax,\" I didn't approximate it with some other key — I removed it and left a `#` comment at the point of doubt recording that the jog was requested but is not expressible, so a host document/reader can see the gap rather than silently losing the requirement.\n- The other edge and both node labels are otherwise unchanged from your intent; nothing stated in the figure was deleted to force a pass — only the one construct the language does not have.\n\nThis should now build clean; the one thing to flag in the host document's prose is that the probe→normalizer edge draws straight under auto layout rather than jogging, since FigDown currently has no way to state that waypoint.",
+  "extracted_document": "# FigDown — figures as text. Spec: https://github.com/FigDown/figdown\nfigdown 0.1 block\ntitle \"Alert-forwarding chain\"\n\nnode probe \"Probe\"\nnode normalizer \"Normalizer\"\nnode sink \"Sink\"\n\n# Waypoints (60,20) and (90,40) requested to jog this edge around a future\n# third element, but via=/points=/path were WITHDRAWN with no replacement\n# (MIGRATIONS 0.1): author waypoints are outside FigDown's stable\n# surface. Edge draws under auto layout instead; the jog cannot be stated.\nedge probe -> normalizer\nedge normalizer -> sink\n",
+  "validation": {
+    "errors": [],
+    "invariants_pass": true,
+    "missing_nodes": [],
+    "edge_count": 2,
+    "success": true,
+    "contains_refused_construct": false
+  },
+  "labelers": {
+    "judged_round": 2,
+    "system_sha256": "f4e67496e0037067faab1fa378383e4eab5c6dcf98f8ba313809d53b70fb5b82",
+    "user_sha256": "68396d05acedd850afa74938261bd53915f2e740fd7c447b752a9c2fd0509521",
+    "results": [
+      {
+        "labeler": 1,
+        "model_alias": "haiku",
+        "model_used": "claude-haiku-4-5-20251001",
+        "cost_usd": 0.01154,
+        "duration_ms": 7454,
+        "scrub": {
+          "ran": true,
+          "pattern": "email-regex",
+          "replacements": 0
+        },
+        "raw_answer_text": "CATEGORY: FLAGS-UNMET-DEMAND — the agent explicitly states \"waypoint routing was withdrawn from the language entirely\" and that \"FigDown currently has no way to state that waypoint,\" while delivering valid code for the achievable parts of the request.",
+        "category": "FLAGS-UNMET-DEMAND"
+      },
+      {
+        "labeler": 2,
+        "model_alias": "haiku",
+        "model_used": "claude-haiku-4-5-20251001",
+        "cost_usd": 0.01119,
+        "duration_ms": 7224,
+        "scrub": {
+          "ran": true,
+          "pattern": "email-regex",
+          "replacements": 0
+        },
+        "raw_answer_text": "CATEGORY: FLAGS-UNMET-DEMAND — the agent explicitly states that waypoint routing \"cannot be stated,\" explains the language withdrew that feature, and notes that the edge will draw straight instead of jogging as requested, while still delivering the working diagram with that one limitation acknowledged.",
+        "category": "FLAGS-UNMET-DEMAND"
+      },
+      {
+        "labeler": 3,
+        "model_alias": "haiku",
+        "model_used": "claude-haiku-4-5-20251001",
+        "cost_usd": 0.01128,
+        "duration_ms": 6664,
+        "scrub": {
+          "ran": true,
+          "pattern": "email-regex",
+          "replacements": 0
+        },
+        "raw_answer_text": "CATEGORY: FLAGS-UNMET-DEMAND — the agent explicitly states multiple times that waypoint routing \"cannot be stated,\" was \"withdrawn from the language entirely,\" and \"FigDown currently has no way to state that waypoint,\" while delivering the achievable parts of the request.",
+        "category": "FLAGS-UNMET-DEMAND"
+      }
+    ],
+    "tally": {
+      "FLAGS-UNMET-DEMAND": 3
+    },
+    "majority": "FLAGS-UNMET-DEMAND"
+  }
+}

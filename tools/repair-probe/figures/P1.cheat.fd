@@ -1,0 +1,10 @@
+figdown 0.1 block
+title "Top-of-rack telemetry export path"
+
+node poller "Metrics poller"
+node buffer "Ring buffer"
+node exporter "Exporter agent"
+node collector "Collector endpoint"
+
+edge poller -> buffer
+edge exporter -> collector

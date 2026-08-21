@@ -1,0 +1,10 @@
+# `GENRE-CONNECTOR-SPELLING`: `edge` under `flowchart` is a LINE ERROR with a NAMED diagnostic —
+# not `unrecognized line`, and not the bare allowlist message. The author has
+# written a real construct under the wrong spelling, so the message names the
+# word this genre uses and why, which the generic "not allowed in genre" does
+# not. `state` is rejected here too: flowchart keeps `node`.
+figdown 0.2 flowchart
+process a "Step"
+process b "Step 2"
+edge a -> b
+state c "C"

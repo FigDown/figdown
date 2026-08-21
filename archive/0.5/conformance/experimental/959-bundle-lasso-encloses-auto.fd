@@ -1,0 +1,27 @@
+# 0.5 (backlog item 69), the OTHER half of 958: the same false drawing
+# with NO author coordinate anywhere — no `layout`, no `pin`. Auto-layout puts
+# "x" in the corridor between the two aggregated links, the lasso closes round
+# it, and the figure states that the console is part of the LAG.
+#
+# The separation pass moves a non-member out of a lasso whenever there is free
+# room to move it into, exactly as it already does for a group band. Here there
+# is none: this lasso's ring falls back to the pre-0.4 derivation (the ring
+# cannot clear the tap boxes its own members run through), and that shape's
+# extent IS the members' fan — so "clear of the lasso" is precisely where t1
+# and t2 already are, on both sides. The pass declines rather than shove the
+# figure into an overlap or off the canvas, and the rule reports in the band's
+# own "could not separate" voice.
+figdown 0.4 topology
+title "A lasso the layout closed round a bystander"
+node a "Switch A"
+node t1 "Tap 1"
+node x "Console"
+node t2 "Tap 2"
+node b "Switch B"
+edge a -- t1
+edge t1 -- b
+edge a -- x
+edge x -- b
+edge a -- t2
+edge t2 -- b
+bundle lag "LAG" a--t1,t1--b,a--t2,t2--b

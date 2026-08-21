@@ -1,0 +1,44 @@
+{
+  "probe_version": "1.0.0",
+  "run": {
+    "utc": "2026-08-19T12:13:56Z",
+    "cli": "2.1.234 (Claude Code)",
+    "condition": "B",
+    "task": "N1",
+    "kind": "normal",
+    "seat": 3,
+    "model_alias": "haiku",
+    "round": 2,
+    "model_used": "claude-haiku-4-5-20251001"
+  },
+  "saw": {
+    "skill_path": "tools/author-probe/skill-candidate.md",
+    "skill_sha256": "2abdaf0d9211d5ee1464c5f5c3a200b1ae6f7bd71cfd6344e7da94d669e6ed31",
+    "skill_chars": 17591,
+    "system_sha256": "39117af0175e7d927c8f9c715c9555f91e3357a146f2d6d311d4a3bb889ecaae",
+    "user_sha256": "49c7ca407c9bebf4b5466db6029f37ed8269e549816d63eed102f3d4bf828fa8"
+  },
+  "integrity": {
+    "turns": 1,
+    "permission_denials": 0,
+    "is_error": false
+  },
+  "usage": {
+    "cost_usd": 0.036525,
+    "duration_ms": 39702
+  },
+  "scrub": {
+    "ran": true,
+    "pattern": "email-regex",
+    "replacements": 0
+  },
+  "raw_answer_text": "Looking at the validator errors, I can see the problem: the keyword `block` is not allowed in the block genre. The nodes must be declared using a different keyword.\n\nBased on the FigDown documentation structure, which references `reference/scene.md` for the block genre, and the pattern of errors showing \"unknown endpoint\" (the node IDs aren't being recognized), the nodes need to be declared with a genre-appropriate keyword before the edges reference them.\n\nThe most consistent approach with FigDown's explicit, keyword-based style is to use `node` instead of `block` for individual node declarations:\n\n```figdown\n# FigDown — figures as text. Spec: https://github.com/FigDown/figdown\nfigdown 0.1 block\ntitle \"Telemetry export pipeline\"\n\nnode poller \"Poller\"\nnode normalizer \"Normalizer\"\nnode healthprobe \"Health Probe\"\nnode buffer \"Ring Buffer\"\nnode exporter \"Exporter\"\n\nedge poller -> normalizer\nedge healthprobe -> normalizer\nedge normalizer -> buffer\nedge buffer -> exporter\n```\n\n**What changed:** Replaced `block` with `node` for each component declaration. This allows the FigDown parser to recognize the node IDs (poller, normalizer, etc.) as valid endpoints when they appear in the edge declarations, resolving all 13 validation errors.",
+  "extracted_document": "# FigDown — figures as text. Spec: https://github.com/FigDown/figdown\nfigdown 0.1 block\ntitle \"Telemetry export pipeline\"\n\nnode poller \"Poller\"\nnode normalizer \"Normalizer\"\nnode healthprobe \"Health Probe\"\nnode buffer \"Ring Buffer\"\nnode exporter \"Exporter\"\n\nedge poller -> normalizer\nedge healthprobe -> normalizer\nedge normalizer -> buffer\nedge buffer -> exporter\n",
+  "validation": {
+    "errors": [],
+    "invariants_pass": true,
+    "missing_nodes": [],
+    "edge_count": 4,
+    "success": true
+  }
+}

@@ -1,0 +1,60 @@
+{
+  "probe_version": "1.0.0",
+  "run": {
+    "utc": "2026-08-19T12:03:10Z",
+    "cli": "2.1.234 (Claude Code)",
+    "condition": "A",
+    "task": "N1",
+    "kind": "normal",
+    "seat": 4,
+    "model_alias": "haiku",
+    "round": 1,
+    "model_used": "claude-haiku-4-5-20251001"
+  },
+  "saw": {
+    "skill_path": "skill/figdown/SKILL.md",
+    "skill_sha256": "718f935282ce7a93f4b7e36b83983ac1112e49818384d8eaf35869830d34d6a2",
+    "skill_chars": 16497,
+    "system_sha256": "39117af0175e7d927c8f9c715c9555f91e3357a146f2d6d311d4a3bb889ecaae",
+    "user_sha256": "29cc14016068ed93f99f14daa570f9f10ebf545a0ae968cb17c84f0bc03027eb"
+  },
+  "integrity": {
+    "turns": 1,
+    "permission_denials": 0,
+    "is_error": false
+  },
+  "usage": {
+    "cost_usd": 0.0115736,
+    "duration_ms": 22590
+  },
+  "scrub": {
+    "ran": true,
+    "pattern": "email-regex",
+    "replacements": 0
+  },
+  "raw_answer_text": "Looking at the FigDown documentation provided, I need to create a block figure (appropriate for architecture and dataflow diagrams) with the specified components and connections.\n\nBased on the documentation structure and the block genre requirements, here is the FigDown document:\n\n```figdown\n# FigDown — figures as text. Spec: https://github.com/FigDown/figdown\nfigdown 0.1 block\ntitle \"Telemetry export pipeline\"\n\nblock poller \"Poller\"\nblock normalizer \"Normalizer\"\nblock healthprobe \"Health Probe\"\nblock buffer \"Ring Buffer\"\nblock exporter \"Exporter\"\n\nedge poller normalizer\nedge healthprobe normalizer\nedge normalizer buffer\nedge buffer exporter\n```\n\nThis document captures the structure as described:\n\n- **Poller**: collects raw samples from the device on a timer\n- **Health Probe**: independently monitors device health\n- **Normalizer**: receives data from both the poller and health probe, reshapes into common schema\n- **Ring Buffer**: holds normalized samples briefly\n- **Exporter**: drains the buffer and ships to remote collector\n\nThe four edges establish the data flow: two sources (poller and health probe) feed the normalizer, which outputs to the buffer, which feeds the exporter. The component IDs match your specification, and each label is concise as recommended by FigDown's philosophy that figures should carry structure while prose carries detail.",
+  "extracted_document": "# FigDown — figures as text. Spec: https://github.com/FigDown/figdown\nfigdown 0.1 block\ntitle \"Telemetry export pipeline\"\n\nblock poller \"Poller\"\nblock normalizer \"Normalizer\"\nblock healthprobe \"Health Probe\"\nblock buffer \"Ring Buffer\"\nblock exporter \"Exporter\"\n\nedge poller normalizer\nedge healthprobe normalizer\nedge normalizer buffer\nedge buffer exporter\n",
+  "validation": {
+    "errors": [
+      "Line 5: \"block\" is not allowed in genre block",
+      "Line 6: \"block\" is not allowed in genre block",
+      "Line 7: \"block\" is not allowed in genre block",
+      "Line 8: \"block\" is not allowed in genre block",
+      "Line 9: \"block\" is not allowed in genre block",
+      "Line 11: edge needs an operator: -> <- -- <-> (a [mid] label splits it: -[x]->)",
+      "Line 12: edge needs an operator: -> <- -- <-> (a [mid] label splits it: -[x]->)",
+      "Line 13: edge needs an operator: -> <- -- <-> (a [mid] label splits it: -[x]->)",
+      "Line 14: edge needs an operator: -> <- -- <-> (a [mid] label splits it: -[x]->)"
+    ],
+    "invariants_pass": false,
+    "missing_nodes": [
+      "poller",
+      "normalizer",
+      "healthprobe",
+      "buffer",
+      "exporter"
+    ],
+    "edge_count": 0,
+    "success": false
+  }
+}

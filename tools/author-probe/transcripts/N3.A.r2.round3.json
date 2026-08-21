@@ -1,0 +1,47 @@
+{
+  "probe_version": "1.0.0",
+  "run": {
+    "utc": "2026-08-19T12:05:11Z",
+    "cli": "2.1.234 (Claude Code)",
+    "condition": "A",
+    "task": "N3",
+    "kind": "normal",
+    "seat": 2,
+    "model_alias": "sonnet",
+    "round": 3,
+    "model_used": "claude-sonnet-5"
+  },
+  "saw": {
+    "skill_path": "skill/figdown/SKILL.md",
+    "skill_sha256": "718f935282ce7a93f4b7e36b83983ac1112e49818384d8eaf35869830d34d6a2",
+    "skill_chars": 16497,
+    "system_sha256": "39117af0175e7d927c8f9c715c9555f91e3357a146f2d6d311d4a3bb889ecaae",
+    "user_sha256": "8c9188ef72f8183dece2adfb53e6a313cb83a40877fb69c5a58dc82345b5bddc"
+  },
+  "integrity": {
+    "turns": 1,
+    "permission_denials": 0,
+    "is_error": false
+  },
+  "usage": {
+    "cost_usd": 0.061995,
+    "duration_ms": 16509
+  },
+  "scrub": {
+    "ran": true,
+    "pattern": "email-regex",
+    "replacements": 0
+  },
+  "raw_answer_text": "Looking at the error: `\"unexpected argument\"` for the quoted `\"yes\"`/`\"no\"` tokens. Per the skeleton doc's quoting rule, **a value drawn from a fixed list of spellings is bare, not quoted** — quoting one is a line error. Decision branch selection (`yes`/`no`) is exactly such a fixed-vocabulary value in `flowchart`, not a free-text label, so it must be written unquoted.\n\n```figdown\n# FigDown — figures as text. Spec: https://github.com/FigDown/figdown\nfigdown 0.1 flowchart\ntitle \"BGP session reset procedure\"\n\nprocess checkcounters \"Check interface error counters\"\ndecision errorsfound \"Errors found?\"\nprocess clearcounters \"Clear interface counters\"\nterminator monitor \"Monitor session\"\nterminator escalate \"Escalate to human operator\"\n\nedge checkcounters -> errorsfound\nedge errorsfound -> clearcounters yes\nedge errorsfound -> escalate no\nedge clearcounters -> monitor\n```",
+  "extracted_document": "# FigDown — figures as text. Spec: https://github.com/FigDown/figdown\nfigdown 0.1 flowchart\ntitle \"BGP session reset procedure\"\n\nprocess checkcounters \"Check interface error counters\"\ndecision errorsfound \"Errors found?\"\nprocess clearcounters \"Clear interface counters\"\nterminator monitor \"Monitor session\"\nterminator escalate \"Escalate to human operator\"\n\nedge checkcounters -> errorsfound\nedge errorsfound -> clearcounters yes\nedge errorsfound -> escalate no\nedge clearcounters -> monitor\n",
+  "validation": {
+    "errors": [
+      "Line 12: unexpected argument \"yes\"",
+      "Line 13: unexpected argument \"no\""
+    ],
+    "invariants_pass": false,
+    "missing_nodes": [],
+    "edge_count": 2,
+    "success": false
+  }
+}

@@ -1,0 +1,57 @@
+{
+  "header": {
+    "version": "0.3",
+    "genre": "block"
+  },
+  "title": "The note= version gate",
+  "note": "title is an acceptor: legal at 0.3, refused below it",
+  "flow": "right",
+  "classes": [],
+  "planes": [
+    {
+      "id": "base",
+      "z": 0
+    }
+  ],
+  "nodes": [
+    {
+      "id": "a",
+      "label": "A",
+      "shape": "box",
+      "plane": "base",
+      "note": "on a node",
+      "line": 22
+    },
+    {
+      "id": "b",
+      "label": "B",
+      "shape": "box",
+      "plane": "base",
+      "line": 23
+    }
+  ],
+  "groups": [
+    {
+      "id": "ring",
+      "label": "Ring",
+      "note": "on a group",
+      "line": 21
+    }
+  ],
+  "edges": [
+    {
+      "a": "a",
+      "op": "->",
+      "b": "b",
+      "plane": "base",
+      "note": "on an edge, which has its own scanner and its own copy of the gate",
+      "line": 24
+    }
+  ],
+  "ranks": [],
+  "pins": [],
+  "thresholds": [],
+  "bands": [],
+  "bundles": [],
+  "regions": []
+}

@@ -1,0 +1,55 @@
+{
+  "probe_version": "1.0.0",
+  "run": {
+    "utc": "2026-08-19T12:05:40Z",
+    "cli": "2.1.234 (Claude Code)",
+    "condition": "A",
+    "task": "N4",
+    "kind": "normal",
+    "seat": 1,
+    "model_alias": "sonnet",
+    "round": 2,
+    "model_used": "claude-sonnet-5"
+  },
+  "saw": {
+    "skill_path": "skill/figdown/SKILL.md",
+    "skill_sha256": "718f935282ce7a93f4b7e36b83983ac1112e49818384d8eaf35869830d34d6a2",
+    "skill_chars": 16497,
+    "system_sha256": "39117af0175e7d927c8f9c715c9555f91e3357a146f2d6d311d4a3bb889ecaae",
+    "user_sha256": "0886569a9015fbab4d715ae8b034b913ce5163123d5e37a875bc12d4ed4ea10a"
+  },
+  "integrity": {
+    "turns": 1,
+    "permission_denials": 0,
+    "is_error": false
+  },
+  "usage": {
+    "cost_usd": 0.068088,
+    "duration_ms": 18071
+  },
+  "scrub": {
+    "ran": true,
+    "pattern": "email-regex",
+    "replacements": 0
+  },
+  "raw_answer_text": "Looking at the validator errors, my previous attempt only contained the Markdown *embed* wrapper — it never contained an actual FigDown source document. I need to author the real `.fd` file (the block diagram itself), then embed its resulting SVG in Markdown separately. Here is the corrected `.fd` source:\n\n```figdown\n# FigDown — figures as text. Spec: https://github.com/FigDown/figdown\nfigdown 0.1 block\ntitle \"Certificate renewal automation\"\n\nblock scheduler \"Scheduler\"\nblock renewaljob \"Renewal Job\"\nblock caclient \"CA Client\"\nblock ca \"Certificate Authority\"\nblock deployagent \"Deploy Agent\"\nblock service \"Service\"\n\nscheduler -> renewaljob \"timer\"\nrenewaljob -> caclient \"obtain cert\"\ncaclient -> ca \"issue cert\"\nrenewaljob -> deployagent \"cert ready\"\ndeployagent -> service \"restart\"\n```\n\nThis is the file to save as `figures/cert-renewal.fd`, then build it (`node build-svg.js figures/cert-renewal.fd`) to produce `figures/cert-renewal.svg`, and embed with the standard footer:\n\n```markdown\n![Certificate renewal automation: a scheduler triggers a renewal job, which obtains a new certificate via a CA client from the certificate authority, then hands off to a deploy agent that restarts the service.](figures/cert-renewal.svg)\n\n<sub>source: [figures/cert-renewal.fd](figures/cert-renewal.fd)</sub>\n```",
+  "extracted_document": "![Certificate renewal automation: a scheduler triggers a renewal job, which obtains a new certificate via a CA client from the certificate authority, then hands off to a deploy agent that restarts the service.](figures/cert-renewal.svg)\n\n<sub>source: [figures/cert-renewal.fd](figures/cert-renewal.fd)</sub>\n",
+  "validation": {
+    "errors": [
+      "Line 1: first line must be \"figdown 0.1 <genre>\"",
+      "Line 1: unrecognized line (unknown keyword \"![Certificate\")",
+      "Line 3: unrecognized line (unknown keyword \"<sub>source:\")"
+    ],
+    "invariants_pass": false,
+    "missing_nodes": [
+      "scheduler",
+      "renewaljob",
+      "caclient",
+      "ca",
+      "deployagent",
+      "service"
+    ],
+    "edge_count": 0,
+    "success": false
+  }
+}

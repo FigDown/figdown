@@ -1,0 +1,85 @@
+{
+  "header": {
+    "version": "0.3",
+    "genre": "flowchart"
+  },
+  "flow": "down",
+  "classes": [],
+  "planes": [
+    {
+      "id": "base",
+      "z": 0
+    }
+  ],
+  "nodes": [
+    {
+      "id": "ingest",
+      "label": "Ingest frame",
+      "role": "process",
+      "shape": "box",
+      "plane": "base",
+      "note": "on a process",
+      "line": 27
+    },
+    {
+      "id": "drop",
+      "label": "Over the threshold?",
+      "role": "decision",
+      "shape": "diamond",
+      "plane": "base",
+      "note": "on a decision — a diamond has no flat side, so this is the hardest note to place",
+      "line": 28
+    },
+    {
+      "id": "done",
+      "label": "Forwarded",
+      "role": "terminator",
+      "shape": "rounded",
+      "plane": "base",
+      "note": "on a terminator",
+      "line": 29
+    },
+    {
+      "id": "dropped",
+      "label": "Dropped",
+      "role": "terminator",
+      "shape": "rounded",
+      "plane": "base",
+      "line": 30
+    }
+  ],
+  "groups": [],
+  "edges": [
+    {
+      "a": "ingest",
+      "op": "->",
+      "b": "drop",
+      "plane": "base",
+      "note": "on a flowline — flowchart's connector, and `edge` under another name",
+      "line": 31
+    },
+    {
+      "a": "drop",
+      "op": "->",
+      "b": "dropped",
+      "mid": "yes",
+      "plane": "base",
+      "note": "a labelled flowline takes both keys at once",
+      "line": 32
+    },
+    {
+      "a": "drop",
+      "op": "->",
+      "b": "done",
+      "mid": "no",
+      "plane": "base",
+      "line": 33
+    }
+  ],
+  "ranks": [],
+  "pins": [],
+  "thresholds": [],
+  "bands": [],
+  "bundles": [],
+  "regions": []
+}

@@ -1,0 +1,53 @@
+{
+  "probe_version": "1.0.0",
+  "run": {
+    "utc": "2026-08-19T12:19:37Z",
+    "cli": "2.1.234 (Claude Code)",
+    "condition": "B",
+    "task": "T2",
+    "kind": "trap",
+    "seat": 3,
+    "model_alias": "haiku",
+    "round": 1,
+    "model_used": "claude-haiku-4-5-20251001"
+  },
+  "saw": {
+    "skill_path": "tools/author-probe/skill-candidate.md",
+    "skill_sha256": "2abdaf0d9211d5ee1464c5f5c3a200b1ae6f7bd71cfd6344e7da94d669e6ed31",
+    "skill_chars": 17591,
+    "system_sha256": "39117af0175e7d927c8f9c715c9555f91e3357a146f2d6d311d4a3bb889ecaae",
+    "user_sha256": "2a10341578c85534d6165fced406df82bebf308a40bf03ab68636f3dfe388e97"
+  },
+  "integrity": {
+    "turns": 1,
+    "permission_denials": 0,
+    "is_error": false
+  },
+  "usage": {
+    "cost_usd": 0.040233,
+    "duration_ms": 47759
+  },
+  "scrub": {
+    "ran": true,
+    "pattern": "email-regex",
+    "replacements": 0
+  },
+  "raw_answer_text": "```figdown\n# FigDown — figures as text. Spec: https://github.com/FigDown/figdown\nfigdown 0.1 flowchart\ntitle \"Change request procedure\"\n\nprocess receive \"Receive request\"\nprocess validate \"Validate\"\ndecision isvalid \"Valid?\"\nprocess apply \"Apply change\"\nterminator confirm \"Confirm success\"\nterminator rollback \"Rollback\"\n\nreceive -> validate\nvalidate -> isvalid\nisvalid -> apply \"yes\"\napply -> confirm\nisvalid -> rollback \"no\"\n\ngroup changewindow \"change window\"\n  validate\n  apply\n```\n\n---\n\n## Commentary\n\nThe document declares a flowchart titled \"Change request procedure\" with the following structure:\n\n**Nodes:**\n- Three process boxes: `receive` (incoming requests), `validate` (policy check), and `apply` (implementing changes)\n- One decision diamond: `isvalid` (the policy validation outcome)\n- Two terminators (endpoints): `confirm` (success path) and `rollback` (failure path)\n\n**Flow:**\nThe request flows from receive → validate → the decision point. The decision branches: if valid (\"yes\"), it flows to apply → confirm; if invalid (\"no\"), it flows directly to rollback.\n\n**Grouping:**\nThe `group` construct encloses `validate` and `apply` with the label \"change window\", which draws a bordered box around these two steps so readers immediately see which operations occur within the scheduled maintenance window.\n\nThe document uses the experimental `flowchart` genre (v0.1), which includes all the node types and edge-flow syntax needed for this procedure visualization.",
+  "extracted_document": "# FigDown — figures as text. Spec: https://github.com/FigDown/figdown\nfigdown 0.1 flowchart\ntitle \"Change request procedure\"\n\nprocess receive \"Receive request\"\nprocess validate \"Validate\"\ndecision isvalid \"Valid?\"\nprocess apply \"Apply change\"\nterminator confirm \"Confirm success\"\nterminator rollback \"Rollback\"\n\nreceive -> validate\nvalidate -> isvalid\nisvalid -> apply \"yes\"\napply -> confirm\nisvalid -> rollback \"no\"\n\ngroup changewindow \"change window\"\n  validate\n  apply\n",
+  "validation": {
+    "errors": [
+      "Line 12: \"receive\" is not allowed in genre flowchart",
+      "Line 13: \"validate\" is not allowed in genre flowchart",
+      "Line 14: \"isvalid\" is not allowed in genre flowchart",
+      "Line 15: \"apply\" is not allowed in genre flowchart",
+      "Line 16: \"isvalid\" is not allowed in genre flowchart",
+      "Line 18: \"group\" is not allowed in genre flowchart — it was WITHDRAWN from this genre, not misspelled: `flowchart` no longer declares `group`. Its one occurrence in the corpus was this genre's own reference figure, which exists to demonstrate every form of every keyword — so citing it as evidence of need is circular. There were no authored uses. Subject vocabulary is per genre (core §3, G2): a spelling accepted by several genres is several independent declarations, and this genre's was withdrawn without touching any other's. (withdrawn, R160; MIGRATIONS 0.3)",
+      "Line 19: \"validate\" is not allowed in genre flowchart",
+      "Line 20: \"apply\" is not allowed in genre flowchart"
+    ],
+    "invariants_pass": false,
+    "missing_nodes": [],
+    "edge_count": 0,
+    "success": false
+  }
+}

@@ -1,0 +1,49 @@
+{
+  "probe_version": "1.0.0",
+  "run": {
+    "utc": "2026-08-19T12:16:17Z",
+    "cli": "2.1.234 (Claude Code)",
+    "condition": "B",
+    "task": "N3",
+    "kind": "normal",
+    "seat": 3,
+    "model_alias": "haiku",
+    "round": 2,
+    "model_used": "claude-haiku-4-5-20251001"
+  },
+  "saw": {
+    "skill_path": "tools/author-probe/skill-candidate.md",
+    "skill_sha256": "2abdaf0d9211d5ee1464c5f5c3a200b1ae6f7bd71cfd6344e7da94d669e6ed31",
+    "skill_chars": 17591,
+    "system_sha256": "39117af0175e7d927c8f9c715c9555f91e3357a146f2d6d311d4a3bb889ecaae",
+    "user_sha256": "66e031c28f94a1f0da1363664f96471252e22fe6eaa091fddf3d14cd9264262a"
+  },
+  "integrity": {
+    "turns": 1,
+    "permission_denials": 0,
+    "is_error": false
+  },
+  "usage": {
+    "cost_usd": 0.049948,
+    "duration_ms": 72324
+  },
+  "scrub": {
+    "ran": true,
+    "pattern": "email-regex",
+    "replacements": 0
+  },
+  "raw_answer_text": "Looking at the error messages, I can see two key issues:\n\n1. **Lines 5-9**: `id=` is an unknown option — the syntax for assigning identifiers is different in flowchart\n2. **Lines 11-14**: Bare identifiers like `checkcounters` are not allowed in edges in this genre\n\nSince the flowchart reference file (`reference/experimental/flowchart.md`) is not included in the documentation provided to me, I'm working from the error signals themselves. The most likely correction based on typical flowchart syntax patterns is that the identifier should come *after* the element type, not as an `id=` option parameter. Here's my corrected attempt:\n\n```figdown\n# FigDown — figures as text. Spec: https://github.com/FigDown/figdown\nfigdown 0.1 flowchart\ntitle \"BGP session reset procedure\"\n\nprocess checkcounters \"Check interface error counters\"\ndecision errorsfound \"Errors found?\"\nprocess clearcounters \"Clear interface counters\"\nterminator monitor \"Monitor session\"\nterminator escalate \"Escalate to operator\"\n\ncheckcounters -> errorsfound\nerrorsfound yes -> clearcounters\nclearcounters -> monitor\nerrorsfound no -> escalate\n```\n\nThe key changes from the previous attempt:\n- Removed `id=` syntax and placed the identifier directly after the element type keyword\n- Kept the label in quotes (still required)\n- Kept the edge references and branching logic the same\n\n**Note:** This represents my best inference from the error messages, since the experimental flowchart reference documentation was not provided. If this still produces errors, the flowchart reference file will be essential to diagnose the actual syntax rules for this genre.",
+  "extracted_document": "# FigDown — figures as text. Spec: https://github.com/FigDown/figdown\nfigdown 0.1 flowchart\ntitle \"BGP session reset procedure\"\n\nprocess checkcounters \"Check interface error counters\"\ndecision errorsfound \"Errors found?\"\nprocess clearcounters \"Clear interface counters\"\nterminator monitor \"Monitor session\"\nterminator escalate \"Escalate to operator\"\n\ncheckcounters -> errorsfound\nerrorsfound yes -> clearcounters\nclearcounters -> monitor\nerrorsfound no -> escalate\n",
+  "validation": {
+    "errors": [
+      "Line 11: \"checkcounters\" is not allowed in genre flowchart",
+      "Line 12: \"errorsfound\" is not allowed in genre flowchart",
+      "Line 13: \"clearcounters\" is not allowed in genre flowchart",
+      "Line 14: \"errorsfound\" is not allowed in genre flowchart"
+    ],
+    "invariants_pass": false,
+    "missing_nodes": [],
+    "edge_count": 0,
+    "success": false
+  }
+}

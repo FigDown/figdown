@@ -1,0 +1,64 @@
+{
+  "probe_version": "1.0.0",
+  "run": {
+    "utc": "2026-08-19T12:13:15Z",
+    "cli": "2.1.234 (Claude Code)",
+    "condition": "B",
+    "task": "N1",
+    "kind": "normal",
+    "seat": 3,
+    "model_alias": "haiku",
+    "round": 1,
+    "model_used": "claude-haiku-4-5-20251001"
+  },
+  "saw": {
+    "skill_path": "tools/author-probe/skill-candidate.md",
+    "skill_sha256": "2abdaf0d9211d5ee1464c5f5c3a200b1ae6f7bd71cfd6344e7da94d669e6ed31",
+    "skill_chars": 17591,
+    "system_sha256": "39117af0175e7d927c8f9c715c9555f91e3357a146f2d6d311d4a3bb889ecaae",
+    "user_sha256": "774ca6290a5154d380b926a9e3ccb2a0499a56adbcc46cfb61f23b4d8874de72"
+  },
+  "integrity": {
+    "turns": 1,
+    "permission_denials": 0,
+    "is_error": false
+  },
+  "usage": {
+    "cost_usd": 0.035214999999999996,
+    "duration_ms": 37939
+  },
+  "scrub": {
+    "ran": true,
+    "pattern": "email-regex",
+    "replacements": 0
+  },
+  "raw_answer_text": "Looking at the documentation and the requirements, I need to create a `block` genre figure for an internal monitoring stack with a data flow showing five components and four connections.\n\nBased on the FigDown specification, for a block diagram I need:\n1. The spec comment (line 1)\n2. The `figdown 0.1 block` header\n3. A title\n4. Block definitions with ids and labels\n5. Edges connecting them in the specified dataflow\n\nHere is the finished document:\n\n```figdown\n# FigDown — figures as text. Spec: https://github.com/FigDown/figdown\nfigdown 0.1 block\ntitle \"Telemetry export pipeline\"\n\nblock poller \"Poller\"\nblock normalizer \"Normalizer\"\nblock healthprobe \"Health Probe\"\nblock buffer \"Ring Buffer\"\nblock exporter \"Exporter\"\n\nedge poller -> normalizer\nedge healthprobe -> normalizer\nedge normalizer -> buffer\nedge buffer -> exporter\n```\n\n**What this describes:**\n\nThe figure captures a telemetry data pipeline with two independent inputs (the poller and health probe) converging into a normalizer, which shapes their data into a common schema. The normalized stream feeds into a ring buffer for buffering, and finally an exporter drains the buffer and ships samples downstream. The component IDs match your requirement, and the four edges implement the four connections described: two sources into the normalizer, then through the buffer, then to the exporter.",
+  "extracted_document": "# FigDown — figures as text. Spec: https://github.com/FigDown/figdown\nfigdown 0.1 block\ntitle \"Telemetry export pipeline\"\n\nblock poller \"Poller\"\nblock normalizer \"Normalizer\"\nblock healthprobe \"Health Probe\"\nblock buffer \"Ring Buffer\"\nblock exporter \"Exporter\"\n\nedge poller -> normalizer\nedge healthprobe -> normalizer\nedge normalizer -> buffer\nedge buffer -> exporter\n",
+  "validation": {
+    "errors": [
+      "Line 5: \"block\" is not allowed in genre block",
+      "Line 6: \"block\" is not allowed in genre block",
+      "Line 7: \"block\" is not allowed in genre block",
+      "Line 8: \"block\" is not allowed in genre block",
+      "Line 9: \"block\" is not allowed in genre block",
+      "Line 11: unknown endpoint \"poller\"",
+      "Line 11: unknown endpoint \"normalizer\"",
+      "Line 12: unknown endpoint \"healthprobe\"",
+      "Line 12: unknown endpoint \"normalizer\"",
+      "Line 13: unknown endpoint \"normalizer\"",
+      "Line 13: unknown endpoint \"buffer\"",
+      "Line 14: unknown endpoint \"buffer\"",
+      "Line 14: unknown endpoint \"exporter\""
+    ],
+    "invariants_pass": false,
+    "missing_nodes": [
+      "poller",
+      "normalizer",
+      "healthprobe",
+      "buffer",
+      "exporter"
+    ],
+    "edge_count": 4,
+    "success": false
+  }
+}

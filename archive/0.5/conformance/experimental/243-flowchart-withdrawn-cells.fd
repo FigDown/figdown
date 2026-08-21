@@ -1,0 +1,23 @@
+# `SCENE-KEYWORD-MEMBERSHIP`: the four cells WITHDRAWN from `flowchart`, each with the
+# ground of its own cell in its own message:
+#
+#   group      one occurrence in the corpus, and it was this genre's OWN
+#              reference figure, which exists to demonstrate every form of
+#              every keyword — citing it as evidence of need is circular.
+#   threshold  a threshold is drawn at a percentage of the target's RENDERED
+#              EXTENT, and a process box's extent is an artifact of its label
+#              length, so the line asserts nothing a reader can read.
+#   band       a range over that same meaningless extent.
+#   bundle     an ANTI-FEATURE here: parallel flowlines between two stages
+#              are different CONDITIONS, and a ring round them hides what the
+#              figure is for.
+#
+# `node` is NOT withdrawn and is written here to prove it: `GENRE-CONNECTOR-SPELLING`'s asymmetry
+# keeps it in this genre, because a stage can have a role the source does not
+# state and `node` is the only spelling for that. The KEEP half is 242.
+figdown 0.2 flowchart
+node a "A"
+group g "G"
+threshold "Budget" 60% in=a
+band "Window" 10..20% in=a
+bundle par a--a

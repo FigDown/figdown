@@ -1,0 +1,11 @@
+# `SEQUENCE-GENRE-VOCABULARY`: `sequence` is surface that `figdown 0.3` does not
+# have, so a 0.3 document naming it is a line error — and NOT `unknown genre`,
+# which would send the author hunting a typo that is not there. core §13.7
+# forbids reinterpreting a document under a version other than the one it
+# declares, so the engine may not quietly promote this file to 0.4; it says
+# which version the genre needs and stops. NO CODE WAS WRITTEN FOR THIS: the
+# later-version search `STATECHART-GENRE-SCOPE` added for `statechart` (fixture 231) answers the
+# second case on its own, which is what this fixture is really pinning.
+# Second header: the same genre at 0.4 is fine.
+figdown 0.3 sequence
+figdown 0.4 sequence

@@ -1,0 +1,54 @@
+{
+  "probe_version": "1.0.0",
+  "run": {
+    "utc": "2026-08-19T12:03:49Z",
+    "cli": "2.1.234 (Claude Code)",
+    "condition": "A",
+    "task": "N1",
+    "kind": "normal",
+    "seat": 2,
+    "model_alias": "sonnet",
+    "round": 3,
+    "model_used": "claude-sonnet-5"
+  },
+  "saw": {
+    "skill_path": "skill/figdown/SKILL.md",
+    "skill_sha256": "718f935282ce7a93f4b7e36b83983ac1112e49818384d8eaf35869830d34d6a2",
+    "skill_chars": 16497,
+    "system_sha256": "39117af0175e7d927c8f9c715c9555f91e3357a146f2d6d311d4a3bb889ecaae",
+    "user_sha256": "f5e4b0fef599a9be8840be3ef57224258e1881603c87c390be6ed37a381e5fe6"
+  },
+  "integrity": {
+    "turns": 1,
+    "permission_denials": 0,
+    "is_error": false
+  },
+  "usage": {
+    "cost_usd": 0.04540199999999999,
+    "duration_ms": 4179
+  },
+  "scrub": {
+    "ran": true,
+    "pattern": "email-regex",
+    "replacements": 0
+  },
+  "raw_answer_text": "The previous attempt failed only because the FigDown source wasn't wrapped in a fenced code block for the validator to find — the content itself was fine. Here it is properly fenced:\n\n```figdown\n# FigDown — figures as text. Spec: https://github.com/FigDown/figdown\nfigdown 0.1 block\ntitle \"Telemetry export pipeline\"\n\nblock poller \"Poller\"\nblock normalizer \"Normalizer\"\nblock healthprobe \"Health Probe\"\nblock buffer \"Ring Buffer\"\nblock exporter \"Exporter\"\n\npoller -> normalizer\nhealthprobe -> normalizer\nnormalizer -> buffer\nbuffer -> exporter\n```\n\nEmbed it as:\n\n```markdown\n![Telemetry export pipeline](figures/telemetry-export-pipeline.svg)\n\n<sub>source: [figures/telemetry-export-pipeline.fd](figures/telemetry-export-pipeline.fd)</sub>\n```",
+  "extracted_document": "![Telemetry export pipeline](figures/telemetry-export-pipeline.svg)\n\n<sub>source: [figures/telemetry-export-pipeline.fd](figures/telemetry-export-pipeline.fd)</sub>\n",
+  "validation": {
+    "errors": [
+      "Line 1: first line must be \"figdown 0.1 <genre>\"",
+      "Line 1: unrecognized line (unknown keyword \"![Telemetry\")",
+      "Line 3: unrecognized line (unknown keyword \"<sub>source:\")"
+    ],
+    "invariants_pass": false,
+    "missing_nodes": [
+      "poller",
+      "normalizer",
+      "healthprobe",
+      "buffer",
+      "exporter"
+    ],
+    "edge_count": 0,
+    "success": false
+  }
+}

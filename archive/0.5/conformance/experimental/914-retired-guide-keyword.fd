@@ -1,0 +1,13 @@
+figdown 0.1 block
+# `THRESHOLD-KEYWORD-SPELLING`: the scene keyword `guide` → `threshold`. In Illustrator,
+# Inkscape, Figma and draw.io a "guide" is an author-only construction line
+# that is NEVER rendered, while FigDown's is drawn output — an inverted name,
+# which `UNSAFE-DEFAULT-ELIMINATION` rates worse than an unfamiliar one. `guide` was also a FigDown
+# coinage (`SIZE-AND-DIRECTION-KEY-NAMING` makes coining a last resort); `threshold` comes whole from
+# Grafana, with IETF RED/AQM min_th/max_th as the secondary source.
+# The two-hop path is one lookup, not two: the pre-0.1 `line` spelling
+# names the CURRENT keyword, not the intermediate one.
+group g "G"
+node a "A" in=g
+guide "Cap" in=g offset=80%
+line "Cap" in=g at=80%

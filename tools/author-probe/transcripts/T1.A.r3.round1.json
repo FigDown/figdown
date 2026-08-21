@@ -1,0 +1,54 @@
+{
+  "probe_version": "1.0.0",
+  "run": {
+    "utc": "2026-08-19T12:07:58Z",
+    "cli": "2.1.234 (Claude Code)",
+    "condition": "A",
+    "task": "T1",
+    "kind": "trap",
+    "seat": 3,
+    "model_alias": "haiku",
+    "round": 1,
+    "model_used": "claude-haiku-4-5-20251001"
+  },
+  "saw": {
+    "skill_path": "skill/figdown/SKILL.md",
+    "skill_sha256": "718f935282ce7a93f4b7e36b83983ac1112e49818384d8eaf35869830d34d6a2",
+    "skill_chars": 16497,
+    "system_sha256": "39117af0175e7d927c8f9c715c9555f91e3357a146f2d6d311d4a3bb889ecaae",
+    "user_sha256": "0a9211466d8e2b366823904ace8f43292e3bd0fa771164554c2eb34f5b6157ea"
+  },
+  "integrity": {
+    "turns": 1,
+    "permission_denials": 0,
+    "is_error": false
+  },
+  "usage": {
+    "cost_usd": 0.0264452,
+    "duration_ms": 52847
+  },
+  "scrub": {
+    "ran": true,
+    "pattern": "email-regex",
+    "replacements": 0
+  },
+  "raw_answer_text": "Looking at the documentation, I need to create a FigDown block diagram with three services in a pipeline, with explicit waypoint routing on one edge.\n\nLet me structure this according to FigDown principles:\n\n1. **Provenance line** (verbatim, with em dash)\n2. **Genre declaration** (block is normative/portable)\n3. **Title** (quoted string)\n4. **Block definitions** with ids and labels (quoted)\n5. **Edge connections**, with waypoints on the probe→normalizer edge\n\nHere's the finished document:\n\n```figdown\n# FigDown — figures as text. Spec: https://github.com/FigDown/figdown\nfigdown 0.1 block\ntitle \"Alert-forwarding chain\"\n\nblock probe \"Probe\"\nblock normalizer \"Normalizer\"\nblock sink \"Sink\"\n\nedge probe normalizer via (60,20) (90,40)\nedge normalizer sink\n```\n\nThis declares the three internal services as blocks, then creates two edges: one from probe to normalizer with explicit waypoints at (60,20) and (90,40) to create the visual jog around the space between them, and one from normalizer to sink. The labels stay minimal (as per FigDown's \"mode 3\" guidance where the figure carries structure and the prose carries detail), allowing the diagram to communicate the dataflow clearly.",
+  "extracted_document": "# FigDown — figures as text. Spec: https://github.com/FigDown/figdown\nfigdown 0.1 block\ntitle \"Alert-forwarding chain\"\n\nblock probe \"Probe\"\nblock normalizer \"Normalizer\"\nblock sink \"Sink\"\n\nedge probe normalizer via (60,20) (90,40)\nedge normalizer sink\n",
+  "validation": {
+    "errors": [
+      "Line 5: \"block\" is not allowed in genre block",
+      "Line 6: \"block\" is not allowed in genre block",
+      "Line 7: \"block\" is not allowed in genre block",
+      "Line 9: edge needs an operator: -> <- -- <-> (a [mid] label splits it: -[x]->)",
+      "Line 10: edge needs an operator: -> <- -- <-> (a [mid] label splits it: -[x]->)"
+    ],
+    "invariants_pass": false,
+    "missing_nodes": [
+      "probe",
+      "normalizer",
+      "sink"
+    ],
+    "edge_count": 0,
+    "success": false
+  }
+}

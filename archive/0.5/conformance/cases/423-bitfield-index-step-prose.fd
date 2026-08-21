@@ -1,0 +1,11 @@
+figdown 0.1 bitfield
+# `RULE-POSITION-ENUMERATION`: what the `step` reservation deliberately does NOT catch.
+# Only the EXACT spelling the extension would use can ever be ambiguous with
+# it, and FigDown's vocabulary is lowercase everywhere (core §1), so `Step`
+# and `steps` can never become that spelling. A wider trigger would reject
+# prose that could never collide — a cost with no reservation behind it.
+bitfield b "Header" numbering=msb0
+field "A" 8 index="0..7 Step 2"
+field "B" 8 index="0..7 in steps of 2"
+field "C" 8 index="0..stepping"
+field "D" 8 index="0..7"

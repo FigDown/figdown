@@ -1,0 +1,4 @@
+Line 17: unknown color "notacolor" (#hex or CSS color name)
+Line 18: unknown color "nope" (#hex or CSS color name)
+Line 19: unknown color "#12" (#hex or CSS color name)
+Line 29: style must be solid|dashed|dotted

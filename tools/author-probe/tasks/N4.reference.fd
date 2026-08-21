@@ -1,0 +1,15 @@
+figdown 0.1 block
+title "Certificate renewal automation"
+
+node scheduler "Renewal scheduler"
+node renewaljob "Renewal job"
+node caclient "CA client"
+node ca "Certificate authority"
+node deployagent "Deploy agent"
+node service "Affected service"
+
+edge scheduler -> renewaljob
+edge renewaljob -> caclient
+edge caclient -> ca
+edge renewaljob -> deployagent
+edge deployagent -> service

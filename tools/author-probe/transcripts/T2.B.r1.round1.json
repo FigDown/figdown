@@ -1,0 +1,54 @@
+{
+  "probe_version": "1.0.0",
+  "run": {
+    "utc": "2026-08-19T12:17:49Z",
+    "cli": "2.1.234 (Claude Code)",
+    "condition": "B",
+    "task": "T2",
+    "kind": "trap",
+    "seat": 1,
+    "model_alias": "sonnet",
+    "round": 1,
+    "model_used": "claude-sonnet-5"
+  },
+  "saw": {
+    "skill_path": "tools/author-probe/skill-candidate.md",
+    "skill_sha256": "2abdaf0d9211d5ee1464c5f5c3a200b1ae6f7bd71cfd6344e7da94d669e6ed31",
+    "skill_chars": 17591,
+    "system_sha256": "39117af0175e7d927c8f9c715c9555f91e3357a146f2d6d311d4a3bb889ecaae",
+    "user_sha256": "2a10341578c85534d6165fced406df82bebf308a40bf03ab68636f3dfe388e97"
+  },
+  "integrity": {
+    "turns": 1,
+    "permission_denials": 0,
+    "is_error": false
+  },
+  "usage": {
+    "cost_usd": 0.06942,
+    "duration_ms": 20776
+  },
+  "scrub": {
+    "ran": true,
+    "pattern": "email-regex",
+    "replacements": 0
+  },
+  "raw_answer_text": "Looking at this task: this is a `flowchart` genre figure (procedure with a decision point), version `0.1` is sufficient (flowchart's floor is `0.1`), and it needs one EXPERIMENTAL (experimental) construct for the grouping box, which the router notes is reachable through `reference/experimental/flowchart.md`. I'll flag that in the file itself since it's outside the normative core.\n\n```figdown\n# FigDown — figures as text. Spec: https://github.com/FigDown/figdown\nfigdown 0.1 flowchart\ntitle \"Change request procedure\"\n\nprocess receive \"Receive change request\"\nprocess validate \"Validate against policy\"\ndecision isvalid \"Valid?\"\nprocess apply \"Apply change to device\"\nterminator confirm \"Confirm success\"\nterminator rollback \"Roll back\"\n\n# Grouping box is an experimental flowchart construct (EXPERIMENTAL);\n# it states which steps fall inside the scheduled maintenance window\n# and carries no other meaning.\ngroup window \"Change window\" {\n  validate\n  apply\n}\n\nreceive -> validate\nvalidate -> isvalid\nisvalid -> apply \"yes\"\nisvalid -> rollback \"no\"\napply -> confirm\n```\n\nNotes:\n- All six nodes use the requested ids and shapes (`process`, `decision`, `terminator`).\n- The five requested edges are present, with the decision's two branches carried as labeled edges (`\"yes\"` / `\"no\"`) out of `isvalid`.\n- `validate` and `apply` are enclosed in a single labeled group box, `\"Change window\"`, per the request.\n- Titles aren't rendered by default (`--with-title` opts in); the `title` line still documents the figure's purpose for the host Markdown caption.\n\nBefore treating this as finished, run `node <skill-dir>/build-svg.js change-request-procedure.fd` and fix any `Line N:` errors it reports — I can't execute the builder from here, so this file is authored to the documented grammar but not yet build-verified.",
+  "extracted_document": "# FigDown — figures as text. Spec: https://github.com/FigDown/figdown\nfigdown 0.1 flowchart\ntitle \"Change request procedure\"\n\nprocess receive \"Receive change request\"\nprocess validate \"Validate against policy\"\ndecision isvalid \"Valid?\"\nprocess apply \"Apply change to device\"\nterminator confirm \"Confirm success\"\nterminator rollback \"Roll back\"\n\n# Grouping box is an experimental flowchart construct (EXPERIMENTAL);\n# it states which steps fall inside the scheduled maintenance window\n# and carries no other meaning.\ngroup window \"Change window\" {\n  validate\n  apply\n}\n\nreceive -> validate\nvalidate -> isvalid\nisvalid -> apply \"yes\"\nisvalid -> rollback \"no\"\napply -> confirm\n",
+  "validation": {
+    "errors": [
+      "Line 15: \"group\" is not allowed in genre flowchart — it was WITHDRAWN from this genre, not misspelled: `flowchart` no longer declares `group`. Its one occurrence in the corpus was this genre's own reference figure, which exists to demonstrate every form of every keyword — so citing it as evidence of need is circular. There were no authored uses. Subject vocabulary is per genre (core §3, G2): a spelling accepted by several genres is several independent declarations, and this genre's was withdrawn without touching any other's. (withdrawn, R160; MIGRATIONS 0.3)",
+      "Line 16: \"validate\" is not allowed in genre flowchart",
+      "Line 17: \"apply\" is not allowed in genre flowchart",
+      "Line 18: \"}\" is not allowed in genre flowchart",
+      "Line 20: \"receive\" is not allowed in genre flowchart",
+      "Line 21: \"validate\" is not allowed in genre flowchart",
+      "Line 22: \"isvalid\" is not allowed in genre flowchart",
+      "Line 23: \"isvalid\" is not allowed in genre flowchart",
+      "Line 24: \"apply\" is not allowed in genre flowchart"
+    ],
+    "invariants_pass": false,
+    "missing_nodes": [],
+    "edge_count": 0,
+    "success": false
+  }
+}

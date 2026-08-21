@@ -1,0 +1,12 @@
+figdown 0.1 block
+# `edge a -[has # hash]-> b` stood here as a THIRD error line until
+# 0.1. It pinned the exact behaviour 253 contradicted: 253 pins
+# `["has # hash"]` as the correct way to write a hash inside a label, this
+# case pinned the bare form as `unterminated [label]`. Two deliberate goldens
+# encoding opposite answers about one verbatim region. `VERBATIM-REGION-SCOPE` made `[ ]` a
+# verbatim region for `#` as it already was for `;`, and the line moved to
+# 262-edge-bracket-hash as a MODEL golden.
+node a "A"
+node b "B"
+edge a -[]-> b
+edge a -[oops-> b

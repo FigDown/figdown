@@ -106,17 +106,24 @@ state admindown "ADMINDOWN\nSta=0" class=states
 # up on each other around INIT.
 flow down
 
-# NO LAYOUT ZONE, AND THAT IS A FORCED CHOICE, NOT A PREFERENCE.
+# NO LAYOUT ZONE. THAT WAS A FORCED CHOICE UNTIL 0.4; IT IS NOW
+# ONLY A CHOICE, AND THE FIGURE HAS NOT BEEN RE-MADE YET.
 # Every RFC-faithful FSM figure in this repository is hand-pinned, and
-# this one cannot be: the engine draws a self-transition as a small side
-# loop ONLY when neither endpoint is pinned. Pin any state here and its
-# self-transition degenerates to a zero-length line at the state's
-# centre, with the trigger label printed on top of the state's own name
-# — all four self-loops vanish and all four state names are obliterated.
-# That was built and looked at before this comment was written. Since
-# all four states carry a self-transition, there is no partial pinning
-# that escapes it, so the figure takes the automatic layout and the
-# render defects noted at the foot of this file.
+# this one could not be: until 0.4 the engine drew a
+# self-transition as a small side loop ONLY when neither endpoint was
+# pinned. Pinning any state degenerated its self-transition to a
+# zero-length line at the state's centre, with the trigger label printed
+# on top of the state's own name — all four self-loops vanished and all
+# four state names were obliterated. That was built and looked at before
+# this comment was first written, and since all four states carry a
+# self-transition there was no partial pinning that escaped it.
+# 0.4 fixed it (engine backlog 64): a self-transition now draws
+# the same way whether its state's coordinate came from a pin or from
+# the layout pass. This figure still takes the automatic layout and
+# still ships with the render defects noted at the foot of this file —
+# what changed is that the arrangement is now available to it, and
+# choosing pins for this machine is a placement decision to be measured
+# and made, not a door that is shut.
 
 # ═══════════════════════════════════════════════════════════════════
 # TRANSITIONS — triggers MERGED onto shared arcs
@@ -237,8 +244,10 @@ transition admindown -[any packet: discarded]-> admindown class=hold
 #  4. Crowding at INIT: the "rx Init" label of Down → Up lands against
 #     INIT's box edge and immediately above INIT's own self-loop label.
 #
-# Nothing below this line changes any of that; see the `flow` note above
-# for why the usual fix (pin the states) is unavailable here.
+# Nothing below this line changes any of that. The usual fix — pin the
+# states — was unavailable when these four were recorded; 0.4
+# made it available (see the `flow` note above), and this artifact has
+# not yet been re-made under it, so the four defects stand as measured.
 
 # ═══════════════════════════════════════════════════════════════════
 # COMPANION TABLE — the totality the statechart cannot assert

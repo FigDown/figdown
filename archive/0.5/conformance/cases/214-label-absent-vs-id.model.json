@@ -1,0 +1,183 @@
+{
+  "sections": [
+    {
+      "header": {
+        "version": "0.1",
+        "genre": "block"
+      },
+      "flow": "right",
+      "classes": [],
+      "planes": [
+        {
+          "id": "base",
+          "z": 0
+        }
+      ],
+      "nodes": [
+        {
+          "id": "a",
+          "shape": "box",
+          "plane": "base",
+          "line": 9
+        },
+        {
+          "id": "b",
+          "label": "b",
+          "shape": "box",
+          "plane": "base",
+          "line": 10
+        },
+        {
+          "id": "c",
+          "label": "C",
+          "shape": "box",
+          "group": "g",
+          "plane": "base",
+          "line": 13
+        }
+      ],
+      "groups": [
+        {
+          "id": "g",
+          "line": 11
+        },
+        {
+          "id": "h",
+          "label": "h",
+          "line": 12
+        }
+      ],
+      "externals": [
+        {
+          "id": "x",
+          "line": 14
+        }
+      ],
+      "edges": [
+        {
+          "a": "a",
+          "op": "->",
+          "b": "c",
+          "plane": "base",
+          "line": 15
+        }
+      ],
+      "ranks": [],
+      "pins": [],
+      "thresholds": [],
+      "bands": [],
+      "bundles": [],
+      "regions": [
+        {
+          "genre": "bitfield",
+          "id": "hdr",
+          "word": 32,
+          "numbering": "lsb0",
+          "fields": [
+            {
+              "name": "ver",
+              "width": 4,
+              "line": 17
+            }
+          ],
+          "line": 16
+        },
+        {
+          "genre": "table",
+          "id": "t",
+          "heads": [
+            [
+              {
+                "v": "A"
+              },
+              {
+                "v": "B"
+              }
+            ]
+          ],
+          "aligns": [
+            "none",
+            "none"
+          ],
+          "rows": [
+            {
+              "cells": [
+                {
+                  "v": "1"
+                },
+                {
+                  "v": "2"
+                }
+              ],
+              "line": 21
+            }
+          ],
+          "line": 18
+        },
+        {
+          "genre": "timing",
+          "id": "w",
+          "signals": [
+            {
+              "name": "clk",
+              "lane": "0101"
+            }
+          ],
+          "line": 22
+        }
+      ]
+    },
+    {
+      "header": {
+        "version": "0.1",
+        "genre": "topology"
+      },
+      "flow": "right",
+      "classes": [],
+      "planes": [
+        {
+          "id": "base",
+          "z": 0
+        }
+      ],
+      "nodes": [
+        {
+          "id": "a",
+          "shape": "box",
+          "plane": "base",
+          "line": 2
+        },
+        {
+          "id": "c",
+          "shape": "box",
+          "plane": "base",
+          "line": 3
+        }
+      ],
+      "groups": [],
+      "edges": [
+        {
+          "a": "a",
+          "op": "->",
+          "b": "c",
+          "plane": "base",
+          "line": 4
+        }
+      ],
+      "ranks": [],
+      "pins": [],
+      "thresholds": [],
+      "bands": [],
+      "bundles": [
+        {
+          "id": "bl",
+          "members": [
+            "a--c"
+          ],
+          "line": 5
+        }
+      ],
+      "regions": []
+    }
+  ]
+}

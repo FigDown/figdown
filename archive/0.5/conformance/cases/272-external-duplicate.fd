@@ -1,0 +1,6 @@
+# duplicate external id is a line error
+figdown 0.1 block
+external ext "PKT in"
+external ext "PKT in again"
+node a "A"
+edge ext -> a

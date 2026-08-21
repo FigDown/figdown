@@ -1,0 +1,9 @@
+figdown 0.1 block
+title "SNMP poll and parse cycle"
+node scheduler "Poll scheduler"
+node poll "Poll interface counters"
+node store "Store sample"
+node alert "Raise threshold alert"
+
+edge scheduler -> poll
+edge store -> alert

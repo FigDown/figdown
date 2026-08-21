@@ -1,0 +1,25 @@
+# 0.5 (`CONNECTOR-IDENTITY-KEY`): the header moves WITH the key. `id=` on a connector is
+# `figdown 0.5` vocabulary, so a section that writes it must declare 0.5 — a
+# tool that hands back `figdown 0.4` + `id=` hands back a document that does
+# not parse, which is worse than handing back nothing.
+figdown 0.4 topology
+title "A LAG whose members are named"
+node sw1 "Switch-1"
+node sw2 "Switch-2"
+edge sw1 -- sw2 id=lag1a
+edge sw1 -- sw2 id=lag1b
+bundle lag1 "LAG-1" lag1a,lag1b
+
+# A second section that writes no `id=` keeps its own version: the bump is per
+# section and only where the key is actually present.
+figdown 0.3 block
+node x "X"
+node y "Y"
+edge x -> y note="no id here"
+
+# A third section already at 0.5 is left alone — the pre-pass must not fire
+# twice, and running this tool over its own output must change nothing.
+figdown 0.5 statechart
+state s1 "Idle"
+state s2 "Busy"
+transition s1 -[start]-> s2 id=t1

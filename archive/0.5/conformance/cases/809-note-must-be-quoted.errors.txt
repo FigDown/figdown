@@ -1,0 +1,3 @@
+Line 26: note= must be quoted: note="bare" — whitespace also separates positionals, so a bare token cannot express a phrase (MIGRATIONS 0.1)
+Line 28: note= must be quoted: note="bare" — whitespace also separates positionals, so a bare token cannot express a phrase (MIGRATIONS 0.1)
+Line 29: note= must be quoted: note="bare" — whitespace also separates positionals, so a bare token cannot express a phrase (MIGRATIONS 0.1)

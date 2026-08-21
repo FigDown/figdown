@@ -1,0 +1,49 @@
+{
+  "probe_version": "1.0.0",
+  "run": {
+    "utc": "2026-08-19T12:14:12Z",
+    "cli": "2.1.234 (Claude Code)",
+    "condition": "B",
+    "task": "N3",
+    "kind": "normal",
+    "seat": 1,
+    "model_alias": "sonnet",
+    "round": 1,
+    "model_used": "claude-sonnet-5"
+  },
+  "saw": {
+    "skill_path": "tools/author-probe/skill-candidate.md",
+    "skill_sha256": "2abdaf0d9211d5ee1464c5f5c3a200b1ae6f7bd71cfd6344e7da94d669e6ed31",
+    "skill_chars": 17591,
+    "system_sha256": "39117af0175e7d927c8f9c715c9555f91e3357a146f2d6d311d4a3bb889ecaae",
+    "user_sha256": "43297339a059a8b173e8828dafb79454ee8b8ea0a6342b1430956895b4f22d4d"
+  },
+  "integrity": {
+    "turns": 1,
+    "permission_denials": 0,
+    "is_error": false
+  },
+  "usage": {
+    "cost_usd": 0.061565999999999996,
+    "duration_ms": 15586
+  },
+  "scrub": {
+    "ran": true,
+    "pattern": "email-regex",
+    "replacements": 0
+  },
+  "raw_answer_text": "```figdown\n# FigDown — figures as text. Spec: https://github.com/FigDown/figdown\nfigdown 0.1 flowchart\ntitle \"BGP session reset procedure\"\n\nprocess checkcounters \"Check interface error counters\"\ndecision errorsfound \"Errors found?\"\nprocess clearcounters \"Clear interface counters\"\nterminator monitor \"Monitor session\"\nterminator escalate \"Escalate to operator\"\n\ncheckcounters -> errorsfound\nerrorsfound -> clearcounters \"yes\"\nerrorsfound -> escalate \"no\"\nclearcounters -> monitor\n```\n\nNotes on the authoring choices:\n\n- Genre is `flowchart`, which per the router is dispatchable at `figdown 0.1` (no version bump needed, just the EXPERIMENTAL withdrawal risk noted here for the record).\n- `errorsfound` is the sole decision node, with its two outgoing edges carrying the branch labels `\"yes\"` and `\"no\"` rather than baking the branch meaning into node labels — keeps the decision reusable and the labels short per the mode-3 guidance.\n- `monitor` and `escalate` are both `terminator` nodes since each ends its path (monitoring vs. escalation), matching the request that they be terminators.\n- This file has not yet been run through `build-svg.js`; I don't have execution access in this session, so I can't report a validated `OK` — flagging that rather than claiming success I haven't verified.",
+  "extracted_document": "# FigDown — figures as text. Spec: https://github.com/FigDown/figdown\nfigdown 0.1 flowchart\ntitle \"BGP session reset procedure\"\n\nprocess checkcounters \"Check interface error counters\"\ndecision errorsfound \"Errors found?\"\nprocess clearcounters \"Clear interface counters\"\nterminator monitor \"Monitor session\"\nterminator escalate \"Escalate to operator\"\n\ncheckcounters -> errorsfound\nerrorsfound -> clearcounters \"yes\"\nerrorsfound -> escalate \"no\"\nclearcounters -> monitor\n",
+  "validation": {
+    "errors": [
+      "Line 11: \"checkcounters\" is not allowed in genre flowchart",
+      "Line 12: \"errorsfound\" is not allowed in genre flowchart",
+      "Line 13: \"errorsfound\" is not allowed in genre flowchart",
+      "Line 14: \"clearcounters\" is not allowed in genre flowchart"
+    ],
+    "invariants_pass": false,
+    "missing_nodes": [],
+    "edge_count": 0,
+    "success": false
+  }
+}

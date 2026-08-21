@@ -1,0 +1,8 @@
+figdown 0.1 topology
+node a "A"
+node b "B"
+node c "C"
+edge a -- b
+edge a -- c
+bundle t1 "T1" a--b,a--b
+bundle t2 "T2" a--c,c--a

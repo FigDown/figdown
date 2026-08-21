@@ -1,0 +1,96 @@
+{
+  "sections": [
+    {
+      "header": {
+        "version": "0.1",
+        "genre": "block"
+      },
+      "title": "Section one",
+      "flow": "right",
+      "classes": [],
+      "planes": [
+        {
+          "id": "base",
+          "z": 0
+        }
+      ],
+      "nodes": [
+        {
+          "id": "a",
+          "label": "First a",
+          "shape": "box",
+          "plane": "base",
+          "line": 3
+        }
+      ],
+      "groups": [
+        {
+          "id": "g",
+          "label": "G",
+          "line": 4
+        }
+      ],
+      "edges": [
+        {
+          "a": "a",
+          "op": "->",
+          "b": "a",
+          "plane": "base",
+          "line": 5
+        }
+      ],
+      "ranks": [],
+      "pins": [],
+      "thresholds": [],
+      "bands": [],
+      "bundles": [],
+      "regions": []
+    },
+    {
+      "header": {
+        "version": "0.1",
+        "genre": "block"
+      },
+      "title": "Section two",
+      "flow": "right",
+      "classes": [],
+      "planes": [
+        {
+          "id": "base",
+          "z": 0
+        }
+      ],
+      "nodes": [
+        {
+          "id": "a",
+          "label": "Second a",
+          "shape": "box",
+          "plane": "base",
+          "line": 3
+        },
+        {
+          "id": "b",
+          "label": "B",
+          "shape": "box",
+          "group": "g",
+          "plane": "base",
+          "line": 5
+        }
+      ],
+      "groups": [
+        {
+          "id": "g",
+          "label": "G again",
+          "line": 4
+        }
+      ],
+      "edges": [],
+      "ranks": [],
+      "pins": [],
+      "thresholds": [],
+      "bands": [],
+      "bundles": [],
+      "regions": []
+    }
+  ]
+}

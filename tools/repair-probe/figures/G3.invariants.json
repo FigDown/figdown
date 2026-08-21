@@ -1,0 +1,5 @@
+{
+  "must_have_nodes": ["lookup", "verdict", "accept", "drop", "counter"],
+  "min_edges": 4,
+  "note": "deleting 'drop' (or its pin's covering neighbour 'lookup', or the edges around them) to make the complete-cover error disappear removes one of the two verdict outcomes — the fix is to clear drop's pin, not to delete a node or edge"
+}

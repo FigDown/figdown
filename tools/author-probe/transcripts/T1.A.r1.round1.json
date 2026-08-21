@@ -1,0 +1,52 @@
+{
+  "probe_version": "1.0.0",
+  "run": {
+    "utc": "2026-08-19T12:06:57Z",
+    "cli": "2.1.234 (Claude Code)",
+    "condition": "A",
+    "task": "T1",
+    "kind": "trap",
+    "seat": 1,
+    "model_alias": "sonnet",
+    "round": 1,
+    "model_used": "claude-sonnet-5"
+  },
+  "saw": {
+    "skill_path": "skill/figdown/SKILL.md",
+    "skill_sha256": "718f935282ce7a93f4b7e36b83983ac1112e49818384d8eaf35869830d34d6a2",
+    "skill_chars": 16497,
+    "system_sha256": "39117af0175e7d927c8f9c715c9555f91e3357a146f2d6d311d4a3bb889ecaae",
+    "user_sha256": "0a9211466d8e2b366823904ace8f43292e3bd0fa771164554c2eb34f5b6157ea"
+  },
+  "integrity": {
+    "turns": 1,
+    "permission_denials": 0,
+    "is_error": false
+  },
+  "usage": {
+    "cost_usd": 0.0817113,
+    "duration_ms": 58212
+  },
+  "scrub": {
+    "ran": true,
+    "pattern": "email-regex",
+    "replacements": 0
+  },
+  "raw_answer_text": "Here's the `.fd` source for this figure. A few authoring notes first:\n\n- Three nodes (`probe`, `normalizer`, `sink`) with short labels — the roles (\"emits raw samples,\" \"reshapes,\" \"writes to storage\") belong in your surrounding prose, not crammed into the node labels.\n- Two edges, `probe → normalizer` and `normalizer → sink`.\n- The jog around the future third element is **pure rendering geometry** — it doesn't change what the edge means, so it belongs in the `layout` zone via `pin`, not as a semantic edge attribute. I gave the first edge an id (`e1`) so the `pin` line has something to address.\n- I did not load `reference/scene.md` / `reference/layout.md` in this session, so treat the exact `pin ... via=` spelling as my best-effort reconstruction from the core grammar rules (bare point syntax, layout-zone-only-carries-`pin`) — run it through `build-svg.js` and let a `Line N:` error correct the spelling if it's off, rather than trusting this blind.\n\n```figdown\n# FigDown — figures as text. Spec: https://github.com/FigDown/figdown\nfigdown 0.1 block\n\ntitle \"Alert-forwarding chain\"\n\nblock probe \"Probe\"\nblock normalizer \"Normalizer\"\nblock sink \"Sink\"\n\nedge e1 probe -> normalizer\nedge e2 normalizer -> sink\n\nlayout\npin e1 via=(60,20),(90,40)   # reserves a jog for a future element that will\n                              # sit between probe and normalizer; geometry\n                              # only, no meaning implied by the route\n```\n\nSuggested embed once built:\n\n```markdown\n![Alert-forwarding chain: probe feeds normalizer, which feeds sink](figures/alert-forwarding-chain.svg)\n\n<sub>source: [figures/alert-forwarding-chain.fd](figures/alert-forwarding-chain.fd)</sub>\n```\n\nBefore committing, run `node <skill-dir>/build-svg.js alert-forwarding-chain.fd` and fix any `Line N:` error it reports — in particular, confirm the `pin e1 via=(60,20),(90,40)` line against `reference/layout.md`, since I authored it from the general grammar rules in the core spec rather than that file directly.",
+  "extracted_document": "![Alert-forwarding chain: probe feeds normalizer, which feeds sink](figures/alert-forwarding-chain.svg)\n\n<sub>source: [figures/alert-forwarding-chain.fd](figures/alert-forwarding-chain.fd)</sub>\n",
+  "validation": {
+    "errors": [
+      "Line 1: first line must be \"figdown 0.1 <genre>\"",
+      "Line 1: unrecognized line (unknown keyword \"![Alert-forwarding\")",
+      "Line 3: unrecognized line (unknown keyword \"<sub>source:\")"
+    ],
+    "invariants_pass": false,
+    "missing_nodes": [
+      "probe",
+      "normalizer",
+      "sink"
+    ],
+    "edge_count": 0,
+    "success": false
+  }
+}

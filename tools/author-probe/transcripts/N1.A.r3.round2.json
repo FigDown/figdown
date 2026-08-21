@@ -1,0 +1,64 @@
+{
+  "probe_version": "1.0.0",
+  "run": {
+    "utc": "2026-08-19T12:03:19Z",
+    "cli": "2.1.234 (Claude Code)",
+    "condition": "A",
+    "task": "N1",
+    "kind": "normal",
+    "seat": 3,
+    "model_alias": "haiku",
+    "round": 2,
+    "model_used": "claude-haiku-4-5-20251001"
+  },
+  "saw": {
+    "skill_path": "skill/figdown/SKILL.md",
+    "skill_sha256": "718f935282ce7a93f4b7e36b83983ac1112e49818384d8eaf35869830d34d6a2",
+    "skill_chars": 16497,
+    "system_sha256": "39117af0175e7d927c8f9c715c9555f91e3357a146f2d6d311d4a3bb889ecaae",
+    "user_sha256": "7527a534e10b01ac66684f5bd55a346d8123d04bec98bd503610c5b1649c91b6"
+  },
+  "integrity": {
+    "turns": 1,
+    "permission_denials": 0,
+    "is_error": false
+  },
+  "usage": {
+    "cost_usd": 0.024231,
+    "duration_ms": 17055
+  },
+  "scrub": {
+    "ran": true,
+    "pattern": "email-regex",
+    "replacements": 0
+  },
+  "raw_answer_text": "Looking at the validation errors, I can see two issues:\n\n1. **\"block\" is not allowed in genre block** — In the block genre, you don't declare nodes using a `block` keyword. You just state the id and label directly.\n\n2. **\"edge needs an operator\"** — Each edge declaration must include a directional operator like `->`, `<-`, `--`, or `<->`.\n\nBased on the error messages and the FigDown documentation structure, here's the corrected document:\n\n```figdown\n# FigDown — figures as text. Spec: https://github.com/FigDown/figdown\nfigdown 0.1 block\ntitle \"Telemetry export pipeline\"\n\npoller \"Poller\"\nhealthprobe \"Health Probe\"\nnormalizer \"Normalizer\"\nbuffer \"Ring Buffer\"\nexporter \"Exporter\"\n\nedge poller -> normalizer\nedge healthprobe -> normalizer\nedge normalizer -> buffer\nedge buffer -> exporter\n```\n\nThe key changes:\n- Removed the `block` keyword — nodes in the block genre are declared as `id \"Label\"` only\n- Added `->` directional operators to each edge to show data flowing in the pipeline direction\n- Kept all five component IDs (poller, healthprobe, normalizer, buffer, exporter) and their labels as specified\n- Maintained all four connections as described in the requirements",
+  "extracted_document": "# FigDown — figures as text. Spec: https://github.com/FigDown/figdown\nfigdown 0.1 block\ntitle \"Telemetry export pipeline\"\n\npoller \"Poller\"\nhealthprobe \"Health Probe\"\nnormalizer \"Normalizer\"\nbuffer \"Ring Buffer\"\nexporter \"Exporter\"\n\nedge poller -> normalizer\nedge healthprobe -> normalizer\nedge normalizer -> buffer\nedge buffer -> exporter\n",
+  "validation": {
+    "errors": [
+      "Line 5: \"poller\" is not allowed in genre block",
+      "Line 6: \"healthprobe\" is not allowed in genre block",
+      "Line 7: \"normalizer\" is not allowed in genre block",
+      "Line 8: \"buffer\" is not allowed in genre block",
+      "Line 9: \"exporter\" is not allowed in genre block",
+      "Line 11: unknown endpoint \"poller\"",
+      "Line 11: unknown endpoint \"normalizer\"",
+      "Line 12: unknown endpoint \"healthprobe\"",
+      "Line 12: unknown endpoint \"normalizer\"",
+      "Line 13: unknown endpoint \"normalizer\"",
+      "Line 13: unknown endpoint \"buffer\"",
+      "Line 14: unknown endpoint \"buffer\"",
+      "Line 14: unknown endpoint \"exporter\""
+    ],
+    "invariants_pass": false,
+    "missing_nodes": [
+      "poller",
+      "normalizer",
+      "healthprobe",
+      "buffer",
+      "exporter"
+    ],
+    "edge_count": 4,
+    "success": false
+  }
+}

@@ -1,0 +1,12 @@
+# `STATECHART-GENRE-SCOPE`: the `statechart` genre header itself. The v0 shape is the header
+# token and NOTHING ELSE — the scene vocabulary with its scene meanings, the
+# scene default flow (`right`, NOT flowchart's `down`), and no keyword of its
+# own. What the genre adds is the READING RULE, which lives in the model as
+# `header.genre` and nowhere else: a node here is a state, an edge a
+# transition, and no geometry says so.
+figdown 0.2 statechart
+state locked "LOCKED"
+state unlocked "UNLOCKED"
+transition locked -[coin]-> unlocked
+transition unlocked -[push]-> locked
+transition locked -[push]-> locked

@@ -1,0 +1,54 @@
+{
+  "probe_version": "1.0.0",
+  "run": {
+    "utc": "2026-08-19T12:03:55Z",
+    "cli": "2.1.234 (Claude Code)",
+    "condition": "A",
+    "task": "N2",
+    "kind": "normal",
+    "seat": 2,
+    "model_alias": "sonnet",
+    "round": 1,
+    "model_used": "claude-sonnet-5"
+  },
+  "saw": {
+    "skill_path": "skill/figdown/SKILL.md",
+    "skill_sha256": "718f935282ce7a93f4b7e36b83983ac1112e49818384d8eaf35869830d34d6a2",
+    "skill_chars": 16497,
+    "system_sha256": "39117af0175e7d927c8f9c715c9555f91e3357a146f2d6d311d4a3bb889ecaae",
+    "user_sha256": "e8bbb8bb800d7d108223fb06e522a5d73fa95892c46d272c5b2f495b633cbe4c"
+  },
+  "integrity": {
+    "turns": 1,
+    "permission_denials": 0,
+    "is_error": false
+  },
+  "usage": {
+    "cost_usd": 0.0313971,
+    "duration_ms": 20925
+  },
+  "scrub": {
+    "ran": true,
+    "pattern": "email-regex",
+    "replacements": 0
+  },
+  "raw_answer_text": "Here's the FigDown document for this topology. A couple of authoring notes first:\n\n- I did not have `reference/experimental/topology.md` loaded (only the genre-independent core doc was provided), so I've used the most conservative, generic constructs shown in the core spec (`node`, `link`, `class`) rather than any topology-specific keyword I can't verify. Run `node build-svg.js branch-wan-uplinks.fd` and fix any line errors it reports against the real topology grammar before treating this as final.\n- The description distinguishes a **primary** vs **backup** WAN link — that's a meaningful fact, so I encoded it as a `class` (with its own stated meaning) rather than baking it into a label or leaving it as bare color, per \"class is how meaning survives.\"\n- `topology` is EXPERIMENTAL (experimental) but dispatchable at `figdown 0.1`, so no version bump is needed — flagged here per the portability rule.\n\n```figdown\n# FigDown — figures as text. Spec: https://github.com/FigDown/figdown\nfigdown 0.1 topology\ntitle \"Branch office WAN uplinks\"\n\nclass primary \"Primary WAN uplink\"\nclass backup \"Backup WAN uplink\" style=dashed\n\nnode access1 \"Access Switch 1\"\nnode access2 \"Access Switch 2\"\nnode branch \"Branch Router\"\nnode hubprimary \"Primary Regional Hub\"\nnode hubbackup \"Backup Regional Hub\"\n\nlink access1 branch\nlink access2 branch\nlink branch hubprimary class=primary\nlink branch hubbackup class=backup\n```\n\nEmbed it as:\n\n```markdown\n![Branch office WAN uplinks](figures/branch-wan-uplinks.svg)\n\n<sub>source: [figures/branch-wan-uplinks.fd](figures/branch-wan-uplinks.fd)</sub>\n```",
+  "extracted_document": "![Branch office WAN uplinks](figures/branch-wan-uplinks.svg)\n\n<sub>source: [figures/branch-wan-uplinks.fd](figures/branch-wan-uplinks.fd)</sub>\n",
+  "validation": {
+    "errors": [
+      "Line 1: first line must be \"figdown 0.1 <genre>\"",
+      "Line 1: unrecognized line (unknown keyword \"![Branch\")",
+      "Line 3: unrecognized line (unknown keyword \"<sub>source:\")"
+    ],
+    "invariants_pass": false,
+    "missing_nodes": [
+      "access1",
+      "access2",
+      "branch",
+      "hubprimary",
+      "hubbackup"
+    ],
+    "edge_count": 0,
+    "success": false
+  }
+}

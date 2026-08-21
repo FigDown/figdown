@@ -1,0 +1,59 @@
+{
+  "probe_version": "1.0.0",
+  "run": {
+    "utc": "2026-08-19T11:48:20Z",
+    "cli": "2.1.234 (Claude Code)",
+    "condition": "A",
+    "task": "N1",
+    "kind": "normal",
+    "seat": 4,
+    "model_alias": "haiku",
+    "model_used": "claude-haiku-4-5-20251001"
+  },
+  "saw": {
+    "skill_path": "skill/figdown/SKILL.md",
+    "skill_sha256": "718f935282ce7a93f4b7e36b83983ac1112e49818384d8eaf35869830d34d6a2",
+    "skill_chars": 16497,
+    "system_sha256": "39117af0175e7d927c8f9c715c9555f91e3357a146f2d6d311d4a3bb889ecaae",
+    "user_sha256": "29cc14016068ed93f99f14daa570f9f10ebf545a0ae968cb17c84f0bc03027eb"
+  },
+  "integrity": {
+    "turns": 1,
+    "permission_denials": 0,
+    "is_error": false
+  },
+  "usage": {
+    "cost_usd": 0.024831,
+    "duration_ms": 19204
+  },
+  "scrub": {
+    "ran": true,
+    "pattern": "email-regex",
+    "replacements": 0
+  },
+  "raw_answer_text": "Looking at the requirements, I need to create a block diagram (architecture/dataflow figure) showing a telemetry pipeline with five components and four data flow connections.\n\nLet me trace through what's needed:\n- **Genre**: `block` (for architecture/dataflow diagrams)\n- **Five components**: poller, normalizer, healthprobe, buffer, exporter\n- **Four connections**: poller→normalizer, healthprobe→normalizer, normalizer→buffer, buffer→exporter\n- **Title**: \"Telemetry export pipeline\"\n\nThe key insight from the description is that this is a **dataflow pipeline** where multiple sources (poller and health probe) feed into a normalizer, which then feeds into a buffer, and finally an exporter ships the data out. This is a classic source-transform-store-export pattern.\n\nHere's the finished FigDown document:\n\n```figdown\n# FigDown — figures as text. Spec: https://github.com/FigDown/figdown\nfigdown 0.1 block\ntitle \"Telemetry export pipeline\"\n\nblock poller \"Poller\"\nblock healthprobe \"Health Probe\"\nblock normalizer \"Normalizer\"\nblock buffer \"Ring Buffer\"\nblock exporter \"Exporter\"\n\nedge poller normalizer\nedge healthprobe normalizer\nedge normalizer buffer\nedge buffer exporter\n```\n\nThis creates a clean dataflow visualization where:\n- The **poller** and **health probe** are independent sources feeding into the **normalizer**\n- The **normalizer** consolidates both inputs into a common schema\n- The **ring buffer** acts as a temporary holding area\n- The **exporter** retrieves samples and sends them downstream\n\nThe four edges represent the exact data flow connections described in the requirements, and the component IDs match exactly as specified.",
+  "extracted_document": "# FigDown — figures as text. Spec: https://github.com/FigDown/figdown\nfigdown 0.1 block\ntitle \"Telemetry export pipeline\"\n\nblock poller \"Poller\"\nblock healthprobe \"Health Probe\"\nblock normalizer \"Normalizer\"\nblock buffer \"Ring Buffer\"\nblock exporter \"Exporter\"\n\nedge poller normalizer\nedge healthprobe normalizer\nedge normalizer buffer\nedge buffer exporter\n",
+  "validation": {
+    "errors": [
+      "Line 5: \"block\" is not allowed in genre block",
+      "Line 6: \"block\" is not allowed in genre block",
+      "Line 7: \"block\" is not allowed in genre block",
+      "Line 8: \"block\" is not allowed in genre block",
+      "Line 9: \"block\" is not allowed in genre block",
+      "Line 11: edge needs an operator: -> <- -- <-> (a [mid] label splits it: -[x]->)",
+      "Line 12: edge needs an operator: -> <- -- <-> (a [mid] label splits it: -[x]->)",
+      "Line 13: edge needs an operator: -> <- -- <-> (a [mid] label splits it: -[x]->)",
+      "Line 14: edge needs an operator: -> <- -- <-> (a [mid] label splits it: -[x]->)"
+    ],
+    "invariants_pass": false,
+    "missing_nodes": [
+      "poller",
+      "normalizer",
+      "healthprobe",
+      "buffer",
+      "exporter"
+    ],
+    "edge_count": 0,
+    "success": false
+  }
+}

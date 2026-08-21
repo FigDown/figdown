@@ -1,0 +1,5 @@
+{
+  "must_have_nodes": ["apply", "verify", "commit", "rollback"],
+  "min_edges": 3,
+  "note": "deleting the misspelled 'egde verify -[no]-> rollback' line instead of fixing the keyword removes the verify->rollback branch, dropping the figure to 2 edges and losing the rollback outcome entirely"
+}

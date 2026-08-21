@@ -23,7 +23,7 @@
 // Default roots when no path is given (resolved from the project root,
 // independent of CWD):
 //
-// top-level *.md only (README, guide/expressing.md, guide/authoring.md, …)
+//   .              top-level *.md only (README, CHANGELOG, PROOF)
 //   spec/          the normative spec
 //   skill/         the agent skill
 //   conformance/   discrepancy + error-coverage notes, full of syntax
@@ -898,7 +898,7 @@ const USAGE = [
   '  ' + DEFAULT_ROOTS.join('/  ') + '/',
   'All of those except `.` are walked recursively for *.md.  The run states the',
   'number of files it scanned — a gate that does not recurse is a gate that',
-  'lies (.github/CONTRIBUTING.md §3.1(d)).',
+  'lies (spec/PROCESS.md §3.1(d)).',
   '',
   'Opt-out markers:',
   '  <!-- fence-check: skip -->           on the line BEFORE a fence: skip that fence',

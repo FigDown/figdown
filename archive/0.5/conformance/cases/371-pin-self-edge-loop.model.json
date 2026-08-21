@@ -1,0 +1,81 @@
+{
+  "header": {
+    "version": "0.1",
+    "genre": "block"
+  },
+  "title": "A pinned node still draws its self-edge as a side loop",
+  "flow": "right",
+  "classes": [],
+  "planes": [
+    {
+      "id": "base",
+      "z": 0
+    }
+  ],
+  "nodes": [
+    {
+      "id": "a",
+      "label": "A",
+      "shape": "box",
+      "plane": "base",
+      "line": 15
+    },
+    {
+      "id": "b",
+      "label": "B",
+      "shape": "box",
+      "plane": "base",
+      "line": 16
+    }
+  ],
+  "groups": [],
+  "edges": [
+    {
+      "a": "a",
+      "op": "->",
+      "b": "b",
+      "mid": "to b",
+      "plane": "base",
+      "line": 19
+    },
+    {
+      "a": "a",
+      "op": "->",
+      "b": "a",
+      "mid": "stay in A",
+      "plane": "base",
+      "line": 20
+    },
+    {
+      "a": "b",
+      "op": "->",
+      "b": "b",
+      "mid": "stay in B",
+      "plane": "base",
+      "line": 21
+    }
+  ],
+  "ranks": [],
+  "pins": [
+    {
+      "id": "a",
+      "x": 0,
+      "y": 0,
+      "width": 120,
+      "height": 60,
+      "line": 17
+    },
+    {
+      "id": "b",
+      "x": 240,
+      "y": 0,
+      "width": 120,
+      "height": 60,
+      "line": 18
+    }
+  ],
+  "thresholds": [],
+  "bands": [],
+  "bundles": [],
+  "regions": []
+}

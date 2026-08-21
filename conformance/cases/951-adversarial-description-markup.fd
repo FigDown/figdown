@@ -1,0 +1,28 @@
+# ADVERSARIAL FIXTURE — hostile TEXT in `description=`, the key written FOR
+# the machine reader.
+#
+# `description=` is the one string in the language whose declared audience is
+# a program rather than a person (case 808): it puts no ink on the page and
+# becomes an SVG `<title>` tooltip. That makes it the surface where a
+# sanitising engine is least likely to be noticed doing it — nobody looks at
+# a tooltip — and the surface a host is most likely to lift back out of the
+# artifact and re-emit somewhere else. So it gets its own fixture.
+#
+# WHAT THIS FIXTURE PINS. Unlike `note=`, `description=` IS projected into
+# the model, per field. The `.model.json` golden therefore holds the hostile
+# strings BYTE FOR BYTE, and that is the assertion: the model carries the
+# author's text, not a cleaned-up version of it. An engine that escaped on
+# the way in, or stripped angle brackets, or dropped the value and kept the
+# key, all fail this golden.
+#
+# The complement — that the same strings reach the artifact as ESCAPED TEXT
+# and never as a `<title>` element containing markup — is `gate:safesvg`'s,
+# which renders this file and reads the output structurally (core §15).
+figdown 0.3 bitfield
+title "<script>alert(1)</script>"
+
+bitfield hdr "]]></metadata><script>alert(1)</script><metadata>" word=32 numbering=msb0
+field "Version" 4 description="<script>alert(1)</script>"
+field "Flags" 12 description="\" onload=\"alert(1)"
+field "Len" 8 description="javascript:alert(1) url(https://example.invalid/x) @import"
+field "Rsvd" 8 description="&amp; & < > ]]> <![CDATA[ </metadata> \\ done"

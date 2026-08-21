@@ -1,0 +1,50 @@
+{
+  "probe_version": "1.0.0",
+  "run": {
+    "utc": "2026-08-19T12:11:04Z",
+    "cli": "2.1.234 (Claude Code)",
+    "condition": "A",
+    "task": "T2",
+    "kind": "trap",
+    "seat": 4,
+    "model_alias": "haiku",
+    "round": 2,
+    "model_used": "claude-haiku-4-5-20251001"
+  },
+  "saw": {
+    "skill_path": "skill/figdown/SKILL.md",
+    "skill_sha256": "718f935282ce7a93f4b7e36b83983ac1112e49818384d8eaf35869830d34d6a2",
+    "skill_chars": 16497,
+    "system_sha256": "39117af0175e7d927c8f9c715c9555f91e3357a146f2d6d311d4a3bb889ecaae",
+    "user_sha256": "eb5a3733bbdddf21e2db69f2c2cbbd1c9787ec0bec4ad4a253986ded37f89c60"
+  },
+  "integrity": {
+    "turns": 1,
+    "permission_denials": 0,
+    "is_error": false
+  },
+  "usage": {
+    "cost_usd": 0.035741999999999996,
+    "duration_ms": 39326
+  },
+  "scrub": {
+    "ran": true,
+    "pattern": "email-regex",
+    "replacements": 0
+  },
+  "raw_answer_text": "Looking at the validation errors, the core issue is that **`container` is not allowed in the `flowchart` genre**. The documentation's router table shows that `container` and similar grouping constructs are features of the `block` genre, not `flowchart`.\n\nOnce the parser encounters the invalid `container` construct, it becomes confused about the subsequent lines and rejects them as well. That's why even the edge declarations fail.\n\nHere's the corrected flowchart document, removing the unsupported container syntax:\n\n```figdown\n# FigDown — figures as text. Spec: https://github.com/FigDown/figdown\nfigdown 0.1 flowchart\ntitle \"Change request procedure\"\n\nprocess receive \"Receive change request\"\nprocess validate \"Validate against policy\"\ndecision isvalid \"Valid?\"\nprocess apply \"Apply change to device\"\nterminator confirm \"Confirm success\"\nterminator rollback \"Rollback\"\n\nreceive -> validate\nvalidate -> isvalid\nisvalid -> apply \"yes\"\nisvalid -> rollback \"no\"\napply -> confirm\n```\n\n**Note on the \"change window\" grouping:** The `flowchart` genre does not support visual container/grouping constructs. If you need to visually enclose `validate` and `apply` in a bordered box labeled \"change window\", you would need to switch to the `block` genre instead, which is designed for hierarchical/structural diagrams and does support containers. The flow logic itself is preserved here; only the visual grouping is omitted.",
+  "extracted_document": "# FigDown — figures as text. Spec: https://github.com/FigDown/figdown\nfigdown 0.1 flowchart\ntitle \"Change request procedure\"\n\nprocess receive \"Receive change request\"\nprocess validate \"Validate against policy\"\ndecision isvalid \"Valid?\"\nprocess apply \"Apply change to device\"\nterminator confirm \"Confirm success\"\nterminator rollback \"Rollback\"\n\nreceive -> validate\nvalidate -> isvalid\nisvalid -> apply \"yes\"\nisvalid -> rollback \"no\"\napply -> confirm\n",
+  "validation": {
+    "errors": [
+      "Line 12: \"receive\" is not allowed in genre flowchart",
+      "Line 13: \"validate\" is not allowed in genre flowchart",
+      "Line 14: \"isvalid\" is not allowed in genre flowchart",
+      "Line 15: \"isvalid\" is not allowed in genre flowchart",
+      "Line 16: \"apply\" is not allowed in genre flowchart"
+    ],
+    "invariants_pass": false,
+    "missing_nodes": [],
+    "edge_count": 0,
+    "success": false
+  }
+}

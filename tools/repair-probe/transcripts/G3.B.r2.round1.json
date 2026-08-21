@@ -1,0 +1,96 @@
+{
+  "probe_version": "1.0.0",
+  "run": {
+    "utc": "2026-08-19T10:42:42Z",
+    "model_alias": "sonnet",
+    "model_used": "claude-sonnet-5",
+    "cli": "2.1.234 (Claude Code)",
+    "seat": 2,
+    "condition": "B",
+    "fixture": "G3",
+    "klass": "geometry/complete-cover",
+    "round": 1
+  },
+  "engine_channel": "dist-public-api",
+  "saw": {
+    "original_fixture_sha256": "045c917a35128653155651797b9ea3f6b7a710fed6a35fe2435e3feac606eddc",
+    "document_shown_sha256": "045c917a35128653155651797b9ea3f6b7a710fed6a35fe2435e3feac606eddc",
+    "system_sha256": "ef2a3cd623ce06b05aa4652d8ace761c4f70f24298bcef0552f22e2e46e277fc",
+    "user_sha256": "23cd729e5c442faba25cd1f3467a757f4d84ff5902f05c8e83bdebcbc7770563"
+  },
+  "integrity": {
+    "turns": 1,
+    "permission_denials": 0,
+    "is_error": false
+  },
+  "usage": {
+    "cost_usd": 0.0031299,
+    "duration_ms": 2503
+  },
+  "scrub": {
+    "ran": true,
+    "pattern": "email-regex",
+    "replacements": 0
+  },
+  "raw_answer_text": "```\nfigdown 0.1 block\ntitle \"RPF verdict outcome pair\"\nnode lookup \"RIB lookup\"\nnode verdict \"Interface matches route back?\"\nnode accept \"Accept and forward\"\nnode drop \"Drop packet\"\nnode counter \"Increment drop counter\"\n\nedge lookup -> verdict\nedge verdict -> accept\nedge verdict -> drop\nedge drop -> counter\n\npin drop at=(0,8) width=60 height=20\n```",
+  "presented": {
+    "document_shown": "figdown 0.1 block\ntitle \"RPF verdict outcome pair\"\nnode lookup \"RIB lookup\"\nnode verdict \"Interface matches route back?\"\nnode accept \"Accept and forward\"\nnode drop \"Drop packet\"\nnode counter \"Increment drop counter\"\n\nedge lookup -> verdict\nedge verdict -> accept\nedge verdict -> drop\nedge drop -> counter\n\npin drop at=(0,40) width=60 height=20\n",
+    "validator_shown": {
+      "errors": [
+        "Line 14: pin puts \"lookup\" completely over \"drop\" — a node drawn entirely inside another is invisible, so the figure states that \"drop\" is not there. Move the pin off \"drop\", or pin \"drop\" too if the cover is deliberate — document order is paint order (R161), so two author-placed boxes may overlap however the author says. Partial overlap is not this error; only a complete cover is."
+      ],
+      "diagnostics": [
+        {
+          "code": "geometry/complete-cover",
+          "line": 14,
+          "message": "pin puts \"lookup\" completely over \"drop\" — a node drawn entirely inside another is invisible, so the figure states that \"drop\" is not there. Move the pin off \"drop\", or pin \"drop\" too if the cover is deliberate — document order is paint order (R161), so two author-placed boxes may overlap however the author says. Partial overlap is not this error; only a complete cover is.",
+          "subject": {
+            "kind": "node",
+            "id": "lookup"
+          },
+          "evidence": {
+            "covering": {
+              "id": "lookup",
+              "box": {
+                "x": 0,
+                "y": 56,
+                "width": 100,
+                "height": 36
+              }
+            },
+            "covered": {
+              "id": "drop",
+              "box": {
+                "x": 0,
+                "y": 60,
+                "width": 60,
+                "height": 20
+              }
+            },
+            "pinned": "drop"
+          },
+          "supportedFixes": [
+            {
+              "kind": "pin",
+              "target": "drop",
+              "at": [
+                0,
+                8
+              ],
+              "note": "verified against this check; other checks may still apply"
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "extracted_document": "figdown 0.1 block\ntitle \"RPF verdict outcome pair\"\nnode lookup \"RIB lookup\"\nnode verdict \"Interface matches route back?\"\nnode accept \"Accept and forward\"\nnode drop \"Drop packet\"\nnode counter \"Increment drop counter\"\n\nedge lookup -> verdict\nedge verdict -> accept\nedge verdict -> drop\nedge drop -> counter\n\npin drop at=(0,8) width=60 height=20\n",
+  "validation": {
+    "errors_after": [],
+    "diagnostics_after": [],
+    "invariants_pass": true,
+    "missing_nodes": [],
+    "edge_count": 4,
+    "success": true
+  }
+}

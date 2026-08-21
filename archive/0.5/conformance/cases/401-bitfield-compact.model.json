@@ -1,0 +1,64 @@
+{
+  "header": {
+    "version": "0.1",
+    "genre": "bitfield"
+  },
+  "flow": "right",
+  "classes": [],
+  "planes": [
+    {
+      "id": "base",
+      "z": 0
+    }
+  ],
+  "nodes": [],
+  "groups": [],
+  "edges": [],
+  "ranks": [],
+  "pins": [],
+  "thresholds": [],
+  "bands": [],
+  "bundles": [],
+  "regions": [
+    {
+      "genre": "bitfield",
+      "id": "tcp",
+      "label": "Flags",
+      "word": 32,
+      "numbering": "lsb0",
+      "fields": [
+        {
+          "name": "C",
+          "width": 1,
+          "line": 3
+        },
+        {
+          "name": "R",
+          "width": 1,
+          "line": 3
+        },
+        {
+          "name": "K",
+          "width": 1,
+          "line": 3
+        },
+        {
+          "name": "Reserved",
+          "width": 9,
+          "line": 4
+        },
+        {
+          "name": "Ver",
+          "width": 3,
+          "line": 4
+        },
+        {
+          "name": "Protocol Type",
+          "width": 16,
+          "line": 4
+        }
+      ],
+      "line": 2
+    }
+  ]
+}

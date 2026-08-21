@@ -1,0 +1,2 @@
+Line 7: duplicate bundle member "a--b" — each member is stated once
+Line 8: duplicate bundle member "c--a" — each member is stated once

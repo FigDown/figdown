@@ -1,0 +1,90 @@
+{
+  "probe_version": "1.0.0",
+  "run": {
+    "utc": "2026-08-19T10:42:40Z",
+    "model_alias": "sonnet",
+    "model_used": "claude-sonnet-5",
+    "cli": "2.1.234 (Claude Code)",
+    "seat": 3,
+    "condition": "B",
+    "fixture": "G2",
+    "klass": "geometry/band-enclosure",
+    "round": 1
+  },
+  "engine_channel": "dist-public-api",
+  "saw": {
+    "original_fixture_sha256": "377e322b239ae3ce461fa7fb3e4982466c38ff435601dab3d1271af7aff3b31c",
+    "document_shown_sha256": "377e322b239ae3ce461fa7fb3e4982466c38ff435601dab3d1271af7aff3b31c",
+    "system_sha256": "ef2a3cd623ce06b05aa4652d8ace761c4f70f24298bcef0552f22e2e46e277fc",
+    "user_sha256": "4422dfd8405a07db2ba4201c319d2baea36899428b215d9d1cc4774438a2c5e4"
+  },
+  "integrity": {
+    "turns": 1,
+    "permission_denials": 0,
+    "is_error": false
+  },
+  "usage": {
+    "cost_usd": 0.0036117,
+    "duration_ms": 2755
+  },
+  "scrub": {
+    "ran": true,
+    "pattern": "email-regex",
+    "replacements": 0
+  },
+  "raw_answer_text": "```\nfigdown 0.1 topology\ntitle \"East campus site map\"\n\ngroup siteA \"Site A campus\"\nnode a1 \"Site A router\" in=siteA\nnode a2 \"Site A switch\" in=siteA\nnode relay \"Relay node\"\nnode siteb \"Site B router\"\n\nedge a1 -> a2\nedge relay -> siteb\nedge a2 -> relay\n\npin siteA at=(0,0)\npin a1 at=(0,0) width=120 height=50\npin a2 at=(0,80) width=120 height=50\npin relay at=(30,-64) width=80 height=30\n```",
+  "presented": {
+    "document_shown": "figdown 0.1 topology\ntitle \"East campus site map\"\n\ngroup siteA \"Site A campus\"\nnode a1 \"Site A router\" in=siteA\nnode a2 \"Site A switch\" in=siteA\nnode relay \"Relay node\"\nnode siteb \"Site B router\"\n\nedge a1 -> a2\nedge relay -> siteb\nedge a2 -> relay\n\npin siteA at=(0,0)\npin a1 at=(0,0) width=120 height=50\npin a2 at=(0,80) width=120 height=50\npin relay at=(30,30) width=80 height=30\n",
+    "validator_shown": {
+      "errors": [
+        "Line 17: pin puts \"relay\" inside the band of group \"siteA\" — a band is the bounding box of the group's members, so this draws \"relay\" as one of them. Move the pin clear of the group's extent, or say what the drawing says with in=siteA."
+      ],
+      "diagnostics": [
+        {
+          "code": "geometry/pin-inside-band",
+          "line": 17,
+          "message": "pin puts \"relay\" inside the band of group \"siteA\" — a band is the bounding box of the group's members, so this draws \"relay\" as one of them. Move the pin clear of the group's extent, or say what the drawing says with in=siteA.",
+          "subject": {
+            "kind": "node",
+            "id": "relay"
+          },
+          "evidence": {
+            "group": "siteA",
+            "node": {
+              "x": 30,
+              "y": 50,
+              "width": 80,
+              "height": 30
+            },
+            "band": {
+              "x": -14,
+              "y": -6,
+              "width": 148,
+              "height": 168
+            }
+          },
+          "supportedFixes": [
+            {
+              "kind": "pin",
+              "target": "relay",
+              "at": [
+                30,
+                -64
+              ],
+              "note": "verified against this check; other checks may still apply"
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "extracted_document": "figdown 0.1 topology\ntitle \"East campus site map\"\n\ngroup siteA \"Site A campus\"\nnode a1 \"Site A router\" in=siteA\nnode a2 \"Site A switch\" in=siteA\nnode relay \"Relay node\"\nnode siteb \"Site B router\"\n\nedge a1 -> a2\nedge relay -> siteb\nedge a2 -> relay\n\npin siteA at=(0,0)\npin a1 at=(0,0) width=120 height=50\npin a2 at=(0,80) width=120 height=50\npin relay at=(30,-64) width=80 height=30\n",
+  "validation": {
+    "errors_after": [],
+    "diagnostics_after": [],
+    "invariants_pass": true,
+    "missing_nodes": [],
+    "edge_count": 3,
+    "success": true
+  }
+}

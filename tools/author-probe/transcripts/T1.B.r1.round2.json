@@ -1,0 +1,46 @@
+{
+  "probe_version": "1.0.0",
+  "run": {
+    "utc": "2026-08-19T12:16:52Z",
+    "cli": "2.1.234 (Claude Code)",
+    "condition": "B",
+    "task": "T1",
+    "kind": "trap",
+    "seat": 1,
+    "model_alias": "sonnet",
+    "round": 2,
+    "model_used": "claude-sonnet-5"
+  },
+  "saw": {
+    "skill_path": "tools/author-probe/skill-candidate.md",
+    "skill_sha256": "2abdaf0d9211d5ee1464c5f5c3a200b1ae6f7bd71cfd6344e7da94d669e6ed31",
+    "skill_chars": 17591,
+    "system_sha256": "39117af0175e7d927c8f9c715c9555f91e3357a146f2d6d311d4a3bb889ecaae",
+    "user_sha256": "4de05361ccb1c2096014b023bd9da0b1803fafeb956a090383335d21be3699a4"
+  },
+  "integrity": {
+    "turns": 1,
+    "permission_denials": 0,
+    "is_error": false
+  },
+  "usage": {
+    "cost_usd": 0.050259,
+    "duration_ms": 6319
+  },
+  "scrub": {
+    "ran": true,
+    "pattern": "email-regex",
+    "replacements": 0
+  },
+  "raw_answer_text": "```figdown\n# FigDown — figures as text. Spec: https://github.com/FigDown/figdown\nfigdown 0.1 block\ntitle \"Alert-forwarding chain\"\n\nnode probe \"Probe\"\nnode normalizer \"Normalizer\"\nnode sink \"Sink\"\n\nedge probe -> normalizer via (60,20) (90,40)\nedge normalizer -> sink\n```\n\nFixed both edge lines by adding the required `->` operator between the endpoints (the earlier attempt omitted it, which is what the validator flagged on lines 9 and 10). The `probe -> normalizer` edge keeps its two explicit waypoints via `via (60,20) (90,40)` so it will jog around the future third element instead of drawing straight; `normalizer -> sink` is left as a plain direct edge.",
+  "extracted_document": "# FigDown — figures as text. Spec: https://github.com/FigDown/figdown\nfigdown 0.1 block\ntitle \"Alert-forwarding chain\"\n\nnode probe \"Probe\"\nnode normalizer \"Normalizer\"\nnode sink \"Sink\"\n\nedge probe -> normalizer via (60,20) (90,40)\nedge normalizer -> sink\n",
+  "validation": {
+    "errors": [
+      "Line 9: unexpected argument \"via\""
+    ],
+    "invariants_pass": false,
+    "missing_nodes": [],
+    "edge_count": 1,
+    "success": false
+  }
+}

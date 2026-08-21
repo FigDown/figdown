@@ -1,0 +1,50 @@
+{
+  "probe_version": "1.0.0",
+  "run": {
+    "utc": "2026-08-19T12:07:46Z",
+    "cli": "2.1.234 (Claude Code)",
+    "condition": "A",
+    "task": "T1",
+    "kind": "trap",
+    "seat": 2,
+    "model_alias": "sonnet",
+    "round": 2,
+    "model_used": "claude-sonnet-5"
+  },
+  "saw": {
+    "skill_path": "skill/figdown/SKILL.md",
+    "skill_sha256": "718f935282ce7a93f4b7e36b83983ac1112e49818384d8eaf35869830d34d6a2",
+    "skill_chars": 16497,
+    "system_sha256": "39117af0175e7d927c8f9c715c9555f91e3357a146f2d6d311d4a3bb889ecaae",
+    "user_sha256": "791240e6a3897d58d59584fef5cd43db73827ce096292e0e08f34a3d7dde1cc5"
+  },
+  "integrity": {
+    "turns": 1,
+    "permission_denials": 0,
+    "is_error": true
+  },
+  "usage": {
+    "cost_usd": 0.103038,
+    "duration_ms": 43982
+  },
+  "scrub": {
+    "ran": true,
+    "pattern": "email-regex",
+    "replacements": 0
+  },
+  "raw_answer_text": "",
+  "extracted_document": null,
+  "validation": {
+    "errors": [
+      "no fenced code block found"
+    ],
+    "invariants_pass": false,
+    "missing_nodes": [
+      "probe",
+      "normalizer",
+      "sink"
+    ],
+    "edge_count": null,
+    "success": false
+  }
+}

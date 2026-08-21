@@ -1,0 +1,7 @@
+{
+  "must_have_nodes": ["fetch", "verify", "accept", "reject", "notify"],
+  "min_edges": 4,
+  "note": "one parse error (misspelled 'egde') and one LATENT geometry error (pin puts fetch completely over reject) that only surfaces once the parse error is fixed. Deleting 'reject' and its edges instead of fixing the keyword and clearing the pin removes one of the two verdict outcomes",
+  "immediate_errors": ["parse/word-not-in-genre (line 12, \"egde\")"],
+  "latent_errors": ["geometry/complete-cover (surfaces after the parse error is fixed: pin puts \"fetch\" completely over \"reject\")"]
+}

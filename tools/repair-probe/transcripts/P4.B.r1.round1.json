@@ -1,0 +1,66 @@
+{
+  "probe_version": "1.0.0",
+  "run": {
+    "utc": "2026-08-19T10:42:34Z",
+    "model_alias": "sonnet",
+    "model_used": "claude-sonnet-5",
+    "cli": "2.1.234 (Claude Code)",
+    "seat": 1,
+    "condition": "B",
+    "fixture": "P4",
+    "klass": "parse/unknown-reference",
+    "round": 1
+  },
+  "engine_channel": "dist-public-api",
+  "saw": {
+    "original_fixture_sha256": "c25c9dda5207b69acc4147bc076cad457b6d3ffd1029206e9d7fb014fc69db93",
+    "document_shown_sha256": "c25c9dda5207b69acc4147bc076cad457b6d3ffd1029206e9d7fb014fc69db93",
+    "system_sha256": "ef2a3cd623ce06b05aa4652d8ace761c4f70f24298bcef0552f22e2e46e277fc",
+    "user_sha256": "0263df02f29914cbdb4fd708596d78edaa47f96d12310819604d81d0558226a5"
+  },
+  "integrity": {
+    "turns": 1,
+    "permission_denials": 0,
+    "is_error": false
+  },
+  "usage": {
+    "cost_usd": 0.004398,
+    "duration_ms": 2126
+  },
+  "scrub": {
+    "ran": true,
+    "pattern": "email-regex",
+    "replacements": 0
+  },
+  "raw_answer_text": "```\nfigdown 0.1 block\ntitle \"Fan controller feedback loop\"\n\nnode sensor \"Temperature sensor\"\nnode ctrl \"Fan controller\"\nnode pwm \"PWM driver\"\nnode fan \"Fan\"\n\nedge sensor -> ctrl\nedge ctrl -> pwm\nedge pwm -> fan\nedge fan -> sensor\n```",
+  "presented": {
+    "document_shown": "figdown 0.1 block\ntitle \"Fan controller feedback loop\"\n\nnode sensor \"Temperature sensor\"\nnode ctrl \"Fan controller\"\nnode pwm \"PWM driver\"\nnode fan \"Fan\"\n\nedge sensor -> ctrl\nedge ctrl -> pwm\nedge pwm -> fan\nedge fan -> sesnor\n",
+    "validator_shown": {
+      "errors": [
+        "Line 12: unknown endpoint \"sesnor\""
+      ],
+      "diagnostics": [
+        {
+          "code": "parse/unknown-reference",
+          "line": 12,
+          "message": "unknown endpoint \"sesnor\"",
+          "subject": {
+            "kind": "node",
+            "id": "sesnor"
+          },
+          "evidence": null,
+          "supportedFixes": []
+        }
+      ]
+    }
+  },
+  "extracted_document": "figdown 0.1 block\ntitle \"Fan controller feedback loop\"\n\nnode sensor \"Temperature sensor\"\nnode ctrl \"Fan controller\"\nnode pwm \"PWM driver\"\nnode fan \"Fan\"\n\nedge sensor -> ctrl\nedge ctrl -> pwm\nedge pwm -> fan\nedge fan -> sensor\n",
+  "validation": {
+    "errors_after": [],
+    "diagnostics_after": [],
+    "invariants_pass": true,
+    "missing_nodes": [],
+    "edge_count": 4,
+    "success": true
+  }
+}

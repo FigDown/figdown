@@ -1,0 +1,35 @@
+figdown 0.1 block
+# `SUBJECT-VOCABULARY-SCOPE`/`SCENE-KEYWORD-MEMBERSHIP`: subject vocabulary is PER GENRE, and `block`
+# declares exactly four subject words of its own — `group`, `external`,
+# `threshold`, `band`. This fixture is the KEEP half of the grid for this
+# genre: all four must still parse, unchanged, after the withdrawals. The
+# WITHDRAW half is 246. `block` is the one NORMATIVE scene genre, which is
+# why this pair lives in cases/ while the other three columns of the grid
+# (topology, flowchart, statechart) are in experimental/ — an implementation
+# restricted to the normative genre surface can run this file.
+#
+# NO RENAMES. `threshold` and `band` keep their spellings here even though
+# `topology` lost both over domain collisions (`SCENE-KEYWORD-MEMBERSHIP`): they are `GENRE-EARNING-THRESHOLD` INTERIM
+# constructs, deliberately left unfrozen so that a future scalar-marker genre
+# can name them once WITH a scale, and renaming them now would hand that
+# genre a retired word. `band` in particular does not collide the way
+# topology's did, because `block` has no single domain — that is what
+# general-purpose means, and the same word being safe in one genre and
+# misleading in another is itself the argument for the ruling.
+#
+# The three CROSS-GENRE words are written too, and they are not subject
+# vocabulary: `class` is a styling declaration and `flow`/`rank` are layout
+# intent, so no genre's domain holds a competing meaning for them and they
+# stay in all four scene genres (audit §2, out of scope of the withdrawals).
+title "block subject vocabulary"
+class hot "Hot path" stroke=#dc2626
+flow down
+group pool "Resource pool"
+node q0 "Queue 0" in=pool
+node q1 "Queue 1" in=pool class=hot
+external wan "to the WAN"
+edge q0 -> q1
+edge q1 -> wan
+rank q0,q1
+threshold "Max depth" in=pool offset=80%
+band "Reserved" 15..35% in=pool

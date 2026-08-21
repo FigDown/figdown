@@ -1,0 +1,31 @@
+# 0.5 (backlog item 69): a bundle's LASSO is the drawn extent of its
+# members, so a non-member drawn inside it is drawn as one of them. The pins
+# below put "ts" — a test station wired to the tap, not part of the
+# aggregation — inside the lasso of "lag". The source is impeccable; the
+# defect exists only in the final coordinates, so the diagnostic comes from
+# render(), never from parse(), exactly like the group-band enclosure error
+# and the complete-cover error (369) it is modelled on.
+#
+# It fires here because an AUTHOR COORDINATE is involved: the intruder is
+# pinned, and so are the devices whose extent the lasso is. When nothing is
+# pinned the engine had the freedom and uses it (959 is the case where it has
+# none left), and the message says so instead.
+figdown 0.4 topology
+title "A pin that puts a bystander inside a bundle's lasso"
+node dut "DUT"
+node lp "LP"
+node lt1 "Tap 1"
+node lt2 "Tap 2"
+node ts "LT.TS9"
+edge dut -- lt1
+edge lt1 -- lp
+edge dut -- lt2
+edge lt2 -- lp
+bundle lag "Aggregated link (2 links)" dut--lt1,lt1--lp,dut--lt2,lt2--lp
+edge lt2 -- ts
+layout
+pin dut at=(0,140) width=100 height=70
+pin lt1 at=(220,40) width=110 height=40
+pin ts at=(220,150) width=110 height=40
+pin lt2 at=(220,260) width=110 height=40
+pin lp at=(440,140) width=100 height=70

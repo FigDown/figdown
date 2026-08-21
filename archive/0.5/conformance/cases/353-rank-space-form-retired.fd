@@ -1,0 +1,15 @@
+figdown 0.1 block
+# 0.1 (`POSITIONAL-LIST-SPELLING`, reversing `POSITIONAL-LIST-SPELLING`'s disposition): `rank a,b,c` is the ONLY
+# spelling. The space form is retired — two spellings with the same
+# accepted-input set give a generating model two attractors and no signal
+# (`PRIOR-ART-BORROWING`) — and the diagnostic prints the comma form to paste.
+# `COMMA-LIST-WHITESPACE`: a comma list is ONE whitespace-free token, so `rank a, b` is the same
+# error; whitespace never separates list elements anywhere in the language.
+node a "A"
+node b "B"
+node c "C"
+rank a b c
+rank a,b c
+rank a, b, c
+rank a,,b
+rank a,

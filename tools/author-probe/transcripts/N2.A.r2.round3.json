@@ -1,0 +1,54 @@
+{
+  "probe_version": "1.0.0",
+  "run": {
+    "utc": "2026-08-19T12:04:38Z",
+    "cli": "2.1.234 (Claude Code)",
+    "condition": "A",
+    "task": "N2",
+    "kind": "normal",
+    "seat": 2,
+    "model_alias": "sonnet",
+    "round": 3,
+    "model_used": "claude-sonnet-5"
+  },
+  "saw": {
+    "skill_path": "skill/figdown/SKILL.md",
+    "skill_sha256": "718f935282ce7a93f4b7e36b83983ac1112e49818384d8eaf35869830d34d6a2",
+    "skill_chars": 16497,
+    "system_sha256": "39117af0175e7d927c8f9c715c9555f91e3357a146f2d6d311d4a3bb889ecaae",
+    "user_sha256": "ffe6871a25722eb757d0e22c8331a021bc0dd63377efec04b4c9f30bc3168385"
+  },
+  "integrity": {
+    "turns": 1,
+    "permission_denials": 0,
+    "is_error": false
+  },
+  "usage": {
+    "cost_usd": 0.0330354,
+    "duration_ms": 22541
+  },
+  "scrub": {
+    "ran": true,
+    "pattern": "email-regex",
+    "replacements": 0
+  },
+  "raw_answer_text": "Looking at the validator errors: my previous attempt emitted the **Markdown embed wrapper** (image tag + source footer) instead of the actual `.fd` source content. The `.fd` file must contain FigDown syntax starting with the spec comment line and `figdown 0.1 <genre>` — never Markdown. Fixing that below.\n\n```figdown\n# FigDown — figures as text. Spec: https://github.com/FigDown/figdown\nfigdown 0.1 topology\ntitle \"Branch office WAN uplinks\"\n\nclass wan \"Primary WAN uplink\"\nclass backup \"Diverse-path backup uplink\" style=dashed\n\nnode access1 \"Access Switch 1\"\nnode access2 \"Access Switch 2\"\nnode branch \"Branch Router\"\nnode hubprimary \"Regional Hub (Primary)\"\nnode hubbackup \"Regional Hub (Backup)\"\n\nedge access1 branch\nedge access2 branch\nedge branch hubprimary class=wan\nedge branch hubbackup class=backup\n```\n\nNotes:\n- Genre is `topology` at `figdown 0.1` — no version floor issue there.\n- The two access-switch links are plain (no stated class in the prompt, so left unclassed rather than inventing meaning).\n- The primary vs. backup WAN links are distinguished via `class`, since that's the only place meaning like \"primary\" / \"diverse-path backup\" belongs — not baked into node labels or color alone.\n- I don't have `reference/experimental/topology.md` loaded in this session, so `node`/`edge` keyword spellings here are my best-effort composition from the general skeleton rules (quoted labels, bare ids, `class=` styling) rather than confirmed topology-genre vocabulary. If `node`/`edge` aren't the genre's actual keywords, `build-svg.js X.fd` will surface that as a line error naming the correct spelling — rerun and fix per the retired-spelling/error-driven workflow described in the docs.\n\nEmbed once it validates:\n\n```markdown\n![Branch office WAN uplinks](figures/branch-wan-uplinks.svg)\n\n<sub>source: [figures/branch-wan-uplinks.fd](figures/branch-wan-uplinks.fd)</sub>\n```",
+  "extracted_document": "![Branch office WAN uplinks](figures/branch-wan-uplinks.svg)\n\n<sub>source: [figures/branch-wan-uplinks.fd](figures/branch-wan-uplinks.fd)</sub>\n",
+  "validation": {
+    "errors": [
+      "Line 1: first line must be \"figdown 0.1 <genre>\"",
+      "Line 1: unrecognized line (unknown keyword \"![Branch\")",
+      "Line 3: unrecognized line (unknown keyword \"<sub>source:\")"
+    ],
+    "invariants_pass": false,
+    "missing_nodes": [
+      "access1",
+      "access2",
+      "branch",
+      "hubprimary",
+      "hubbackup"
+    ],
+    "edge_count": 0,
+    "success": false
+  }
+}

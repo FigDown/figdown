@@ -1,0 +1,47 @@
+{
+  "probe_version": "1.0.0",
+  "run": {
+    "utc": "2026-08-19T12:14:58Z",
+    "cli": "2.1.234 (Claude Code)",
+    "condition": "B",
+    "task": "N3",
+    "kind": "normal",
+    "seat": 2,
+    "model_alias": "sonnet",
+    "round": 3,
+    "model_used": "claude-sonnet-5"
+  },
+  "saw": {
+    "skill_path": "tools/author-probe/skill-candidate.md",
+    "skill_sha256": "2abdaf0d9211d5ee1464c5f5c3a200b1ae6f7bd71cfd6344e7da94d669e6ed31",
+    "skill_chars": 17591,
+    "system_sha256": "39117af0175e7d927c8f9c715c9555f91e3357a146f2d6d311d4a3bb889ecaae",
+    "user_sha256": "54fea59b1b18cf097c585c0d94b2f936fe5cf9717d8e78efa88bb953412b4a01"
+  },
+  "integrity": {
+    "turns": 1,
+    "permission_denials": 0,
+    "is_error": false
+  },
+  "usage": {
+    "cost_usd": 0.015319200000000002,
+    "duration_ms": 9787
+  },
+  "scrub": {
+    "ran": true,
+    "pattern": "email-regex",
+    "replacements": 0
+  },
+  "raw_answer_text": "Looking at the validator error: `edge` in the `flowchart` genre doesn't accept a bare trailing string as a positional label — it needs to be passed as a keyed argument. Fixing both occurrences:\n\n```figdown\n# FigDown — figures as text. Spec: https://github.com/FigDown/figdown\nfigdown 0.1 flowchart\ntitle \"BGP session reset procedure\"\n\nprocess checkcounters \"Check interface error counters\"\ndecision errorsfound \"Errors found?\"\nprocess clearcounters \"Clear interface counters\"\nterminator monitor \"Monitor session\"\nterminator escalate \"Escalate to operator\"\n\nedge checkcounters -> errorsfound\nedge errorsfound -> clearcounters label=\"yes\"\nedge errorsfound -> escalate label=\"no\"\nedge clearcounters -> monitor\n```\n\nChange made: replaced the bare trailing strings `\"yes\"` / `\"no\"` on the two branch edges with the keyed form `label=\"yes\"` / `label=\"no\"`, since `edge` takes labels as a named argument, not a positional one, under `flowchart`. All other structure (nodes, ids, and connections) is unchanged from the prior attempt, matching the described procedure: `checkcounters → errorsfound`, `errorsfound` branching yes→`clearcounters`→`monitor` and no→`escalate`.",
+  "extracted_document": "# FigDown — figures as text. Spec: https://github.com/FigDown/figdown\nfigdown 0.1 flowchart\ntitle \"BGP session reset procedure\"\n\nprocess checkcounters \"Check interface error counters\"\ndecision errorsfound \"Errors found?\"\nprocess clearcounters \"Clear interface counters\"\nterminator monitor \"Monitor session\"\nterminator escalate \"Escalate to operator\"\n\nedge checkcounters -> errorsfound\nedge errorsfound -> clearcounters label=\"yes\"\nedge errorsfound -> escalate label=\"no\"\nedge clearcounters -> monitor\n",
+  "validation": {
+    "errors": [
+      "Line 12: label= is retired — write the label inline: edge A [tail] -[mid]-> [head] B (MIGRATIONS 0.1)",
+      "Line 13: label= is retired — write the label inline: edge A [tail] -[mid]-> [head] B (MIGRATIONS 0.1)"
+    ],
+    "invariants_pass": false,
+    "missing_nodes": [],
+    "edge_count": 2,
+    "success": false
+  }
+}

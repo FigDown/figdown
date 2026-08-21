@@ -1,0 +1,52 @@
+figdown 0.3 block
+# `MARKER-TARGET-KINDS`: `in=` on `threshold` and `band` RESOLVES A REGION ID.
+# Before this release the resolver's accepted set was hard-coded to nodes and
+# groups, so `threshold "Max" in=q offset=50%` where `q` is a typed block
+# answered `unknown target "q" for threshold` — the same message a
+# nonexistent id gets. `bitfield`, `table` and `timing` ids now resolve too.
+#
+# THE HOST HERE IS A NESTED `table` REGION: a `table` block sitting inside a
+# `block`-genre document, which is the shape the two measured WRED figures
+# have. The region box a mark is laid against is the DATA rows.
+#
+# THIS WIDENING IS DELIBERATELY UNGATED, and case 811 is the same document
+# under `figdown 0.1` to prove it. The argument is NOT the generic "widenings
+# are safe" — it is specific and it is the discriminator against `note=`
+# (case 805):
+#
+#   * IT ADDS NO SPELLING. No keyword, no option key, no enum value, no
+#     character. The core §10 option-key registry is byte-unchanged, so a
+#     `figdown 0.1` reader consulting it finds nothing new to learn.
+#   * NO PREVIOUSLY-VALID DOCUMENT CHANGES MEANING, and none becomes invalid.
+#     The only documents affected are ones that DID NOT PARSE AT ALL.
+#   * A widening that makes a previously-ERRORING document parse cannot
+#     produce §13.0.1's hazard. `in=q` where `q` is the document's own region
+#     has exactly one possible meaning; the alternative was no figure, not a
+#     different figure. There is nothing to drift from.
+#
+# WHAT IS NOT BUILT, and is not an oversight: the locator COORDINATE grammar
+# (`in=q(3)`, addressing a row inside the region). It is designed and left
+# unbuilt — RULE 4.7 argues against spending a grammar before a consumer
+# exists — so `in=` reaches the region as a WHOLE and no further.
+#
+# NORMATIVE BY SUBJECT, per STATUS.txt's third criterion, and this is the
+# reading to argue with if it is wrong: `threshold` and `band` are demoted
+# constructs, but what this fixture TESTS is the target RESOLVER — that a
+# region id is a resolvable target at all — and `bitfield`/`table` are
+# normative genres. Read instead as a dedicated `threshold` test it would
+# belong in conformance/experimental/ with a STATUS.txt record.
+group pool "Resource pool"
+node q0 "Q0" in=pool
+table q "Queue depth"
+| Slot | Depth |
+|------|-------|
+| s0 | 12 |
+| s1 | 30 |
+threshold "Max" in=q offset=50%
+band "Reserved" 15..35% in=q
+bitfield hdr "Header" word=32 numbering=msb0
+field "Type" 8
+field "Rest" 24
+threshold "Split" in=hdr offset=25%
+threshold "Group target, unchanged" in=pool offset=80%
+threshold "Node target, unchanged" in=q0 offset=35%

@@ -1,0 +1,47 @@
+{
+  "probe_version": "1.0.0",
+  "run": {
+    "utc": "2026-08-19T12:14:00Z",
+    "cli": "2.1.234 (Claude Code)",
+    "condition": "B",
+    "task": "N2",
+    "kind": "normal",
+    "seat": 3,
+    "model_alias": "haiku",
+    "round": 2,
+    "model_used": "claude-haiku-4-5-20251001"
+  },
+  "saw": {
+    "skill_path": "tools/author-probe/skill-candidate.md",
+    "skill_sha256": "2abdaf0d9211d5ee1464c5f5c3a200b1ae6f7bd71cfd6344e7da94d669e6ed31",
+    "skill_chars": 17591,
+    "system_sha256": "39117af0175e7d927c8f9c715c9555f91e3357a146f2d6d311d4a3bb889ecaae",
+    "user_sha256": "9f0da2b6ceefe0ce9444f5ac987b57819df5a68ed39f2ea48ad1f8d25e2c58e4"
+  },
+  "integrity": {
+    "turns": 1,
+    "permission_denials": 0,
+    "is_error": false
+  },
+  "usage": {
+    "cost_usd": 0.021946,
+    "duration_ms": 10844
+  },
+  "scrub": {
+    "ran": true,
+    "pattern": "email-regex",
+    "replacements": 0
+  },
+  "raw_answer_text": "Looking at the validator output, the issue is clear: every `edge` statement needs an **operator** between the two nodes. The operators available are `->`, `<-`, `--`, or `<->`.\n\nFor a network topology like this, `--` (undirected connection) is the appropriate choice, since these are bidirectional network links.\n\nHere is the corrected document:\n\n```figdown\n# FigDown — figures as text. Spec: https://github.com/FigDown/figdown\nfigdown 0.1 topology\ntitle \"Branch office WAN uplinks\"\n\nnode access1 \"Access Switch 1\"\nnode access2 \"Access Switch 2\"\nnode branch \"Branch Router\"\nnode hubprimary \"Primary Hub\"\nnode hubbackup \"Backup Hub\"\n\nedge access1 -- branch\nedge access2 -- branch\nedge branch -- hubprimary \"Primary WAN\"\nedge branch -- hubbackup \"Backup WAN\"\n```\n\nThe only changes made: added the `--` operator to each `edge` statement. This connects the nodes as bidirectional links, which is semantically correct for network topology connections. The labels on the last two edges (\"Primary WAN\" and \"Backup WAN\") remain in place and will appear on those links.",
+  "extracted_document": "# FigDown — figures as text. Spec: https://github.com/FigDown/figdown\nfigdown 0.1 topology\ntitle \"Branch office WAN uplinks\"\n\nnode access1 \"Access Switch 1\"\nnode access2 \"Access Switch 2\"\nnode branch \"Branch Router\"\nnode hubprimary \"Primary Hub\"\nnode hubbackup \"Backup Hub\"\n\nedge access1 -- branch\nedge access2 -- branch\nedge branch -- hubprimary \"Primary WAN\"\nedge branch -- hubbackup \"Backup WAN\"\n",
+  "validation": {
+    "errors": [
+      "Line 13: unexpected argument \"Primary WAN\"",
+      "Line 14: unexpected argument \"Backup WAN\""
+    ],
+    "invariants_pass": false,
+    "missing_nodes": [],
+    "edge_count": 2,
+    "success": false
+  }
+}

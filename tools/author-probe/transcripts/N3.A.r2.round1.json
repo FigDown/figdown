@@ -1,0 +1,49 @@
+{
+  "probe_version": "1.0.0",
+  "run": {
+    "utc": "2026-08-19T12:04:39Z",
+    "cli": "2.1.234 (Claude Code)",
+    "condition": "A",
+    "task": "N3",
+    "kind": "normal",
+    "seat": 2,
+    "model_alias": "sonnet",
+    "round": 1,
+    "model_used": "claude-sonnet-5"
+  },
+  "saw": {
+    "skill_path": "skill/figdown/SKILL.md",
+    "skill_sha256": "718f935282ce7a93f4b7e36b83983ac1112e49818384d8eaf35869830d34d6a2",
+    "skill_chars": 16497,
+    "system_sha256": "39117af0175e7d927c8f9c715c9555f91e3357a146f2d6d311d4a3bb889ecaae",
+    "user_sha256": "a132efb7518ea63eed35484c99da41bec5d49fe3ee312de5025e2aa134b912f2"
+  },
+  "integrity": {
+    "turns": 1,
+    "permission_denials": 0,
+    "is_error": false
+  },
+  "usage": {
+    "cost_usd": 0.0230337,
+    "duration_ms": 16708
+  },
+  "scrub": {
+    "ran": true,
+    "pattern": "email-regex",
+    "replacements": 0
+  },
+  "raw_answer_text": "Here's the FigDown source for the BGP session reset procedure flowchart. I followed the router's instruction to treat `flowchart` decisions/branches as first-class constructs (process / decision / terminator node kinds, with edges carrying the yes/no branch labels), per the standard flowchart vocabulary this file's genre implies.\n\n```figdown\n# FigDown — figures as text. Spec: https://github.com/FigDown/figdown\nfigdown 0.1 flowchart\ntitle \"BGP session reset procedure\"\n\nprocess checkcounters \"Check interface error counters\"\ndecision errorsfound \"Errors found?\"\nprocess clearcounters \"Clear interface counters\"\nterminator monitor \"Monitor session\"\nterminator escalate \"Escalate to human operator\"\n\ncheckcounters -> errorsfound\nerrorsfound -> clearcounters \"yes\"\nerrorsfound -> escalate \"no\"\nclearcounters -> monitor\n```\n\nNotes:\n- `flowchart` is EXPERIMENTAL (experimental) per the router table, dispatchable at `figdown 0.1` — this is a deliberate, stated choice of genre for a decision procedure with two terminal outcomes, not a portability default.\n- Node ids match exactly what was specified: `checkcounters`, `errorsfound`, `clearcounters`, `monitor`, `escalate`.\n- The two branches out of `errorsfound` are labeled `\"yes\"`/`\"no\"` on the edges themselves, per the described yes/no branching.\n- Labels are kept short (the operator-facing detail — \"session keeps flapping,\" troubleshooting rationale — belongs in surrounding prose, not crammed into the figure).\n\nBefore committing, run `node <skill-dir>/build-svg.js bgp-session-reset.fd` to validate against the actual `reference/experimental/flowchart.md` keyword set (node-kind names and edge-label syntax may differ slightly from what's shown here if my assumptions about that file's exact spellings are off) — fix any `Line N:` errors it reports, then embed the resulting SVG with the standard `source:` footer.",
+  "extracted_document": "# FigDown — figures as text. Spec: https://github.com/FigDown/figdown\nfigdown 0.1 flowchart\ntitle \"BGP session reset procedure\"\n\nprocess checkcounters \"Check interface error counters\"\ndecision errorsfound \"Errors found?\"\nprocess clearcounters \"Clear interface counters\"\nterminator monitor \"Monitor session\"\nterminator escalate \"Escalate to human operator\"\n\ncheckcounters -> errorsfound\nerrorsfound -> clearcounters \"yes\"\nerrorsfound -> escalate \"no\"\nclearcounters -> monitor\n",
+  "validation": {
+    "errors": [
+      "Line 11: \"checkcounters\" is not allowed in genre flowchart",
+      "Line 12: \"errorsfound\" is not allowed in genre flowchart",
+      "Line 13: \"errorsfound\" is not allowed in genre flowchart",
+      "Line 14: \"clearcounters\" is not allowed in genre flowchart"
+    ],
+    "invariants_pass": false,
+    "missing_nodes": [],
+    "edge_count": 0,
+    "success": false
+  }
+}

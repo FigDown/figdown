@@ -1,0 +1,28 @@
+# Backlog 64 (fixed 0.4), in the genre that pays for it: an
+# RFC-faithful state machine is the figure most likely to be BOTH pinned (the
+# source drawing's arrangement is part of what it says) and self-looped (the
+# events whose defined outcome is "stay put"). Until 0.4 it could not
+# be both: pinning any state degenerated its self-transition to a zero-length
+# line at the state's centre and printed the trigger across the state's name,
+# so a figure had to choose between the source's arrangement and the source's
+# self-transitions. Three pinned states, three inter-state transitions and
+# three self-transitions; all three loops now draw.
+#
+# The model is what this golden pins. The DRAWING — every self-loop's path
+# length and its label's clearance from the state's own name — is asserted by
+# tools/shape-check.js on the v0.1 twin, conformance/cases/371-pin-self-edge-loop.fd.
+figdown 0.2 statechart
+title "Pinned states still draw their self-transitions"
+state down "DOWN"
+state init "INIT"
+state up "UP"
+transition down -[rx Down]-> init
+transition init -[rx Init, rx Up]-> up
+transition up -[Detect expired]-> down
+transition down -[rx Up]-> down
+transition init -[rx Down]-> init
+transition up -[rx Init]-> up
+layout
+pin down at=(220,40) width=110 height=56
+pin init at=(60,200) width=110 height=56
+pin up at=(380,200) width=110 height=56

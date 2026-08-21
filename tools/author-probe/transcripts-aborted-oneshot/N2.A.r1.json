@@ -1,0 +1,48 @@
+{
+  "probe_version": "1.0.0",
+  "run": {
+    "utc": "2026-08-19T11:48:34Z",
+    "cli": "2.1.234 (Claude Code)",
+    "condition": "A",
+    "task": "N2",
+    "kind": "normal",
+    "seat": 1,
+    "model_alias": "sonnet",
+    "model_used": "claude-sonnet-5"
+  },
+  "saw": {
+    "skill_path": "skill/figdown/SKILL.md",
+    "skill_sha256": "718f935282ce7a93f4b7e36b83983ac1112e49818384d8eaf35869830d34d6a2",
+    "skill_chars": 16497,
+    "system_sha256": "39117af0175e7d927c8f9c715c9555f91e3357a146f2d6d311d4a3bb889ecaae",
+    "user_sha256": "e8bbb8bb800d7d108223fb06e522a5d73fa95892c46d272c5b2f495b633cbe4c"
+  },
+  "integrity": {
+    "turns": 1,
+    "permission_denials": 0,
+    "is_error": false
+  },
+  "usage": {
+    "cost_usd": 0.066753,
+    "duration_ms": 20497
+  },
+  "scrub": {
+    "ran": true,
+    "pattern": "email-regex",
+    "replacements": 0
+  },
+  "raw_answer_text": "# Branch office WAN uplinks — FigDown source\n\nThis is a `topology` figure: two access switches feeding a single branch router, which in turn carries two diverse-path WAN links to separate regional hubs (primary and backup). Genre chosen per the router table — `topology` is the right genre because the content is nodes and links between named network devices, not conditions-with-outcomes (`table`) or a decision path (`flowchart`).\n\n```figdown\n# FigDown — figures as text. Spec: https://github.com/FigDown/figdown\nfigdown 0.1 topology\ntitle \"Branch office WAN uplinks\"\n\nclass access \"Access-layer switch\" fill=#e0e7ff stroke=#4338ca\nclass router \"Router\" fill=#dcfce7 stroke=#15803d\nclass hub \"Regional hub router\" fill=#fef9c3 stroke=#a16207\nclass primary \"Primary WAN path\" stroke=#15803d\nclass backup \"Backup / diverse WAN path\" stroke=#dc2626 style=dashed\n\nnode access1 \"Access Switch 1\" class=access\nnode access2 \"Access Switch 2\" class=access\nnode branch \"Branch Router\" class=router\nnode hubprimary \"Regional Hub (Primary)\" class=hub\nnode hubbackup \"Regional Hub (Backup, diverse path)\" class=hub\n\nedge access1 branch\nedge access2 branch\nedge branch hubprimary class=primary\nedge branch hubbackup class=backup\n```\n\nNotes:\n- `access1`/`access2`/`branch`/`hubprimary`/`hubbackup` are exactly the ids requested; the four edges are exactly the four links the description states — no additional link (e.g. access1–access2) is drawn, since none was described.\n- The `primary`/`backup` classes carry the \"diverse-path\" and primary-vs-backup meaning in text (per the \"class is how meaning survives\" rule) rather than relying on colour alone; the dashed style on `backup` is a redundant visual cue, not the sole carrier of that meaning.\n- Build/validate with `node build-svg.js branch-wan-uplinks.fd` before embedding; then embed only the resulting SVG in the host document with the standard `source:` footer pointing back at this `.fd`.",
+  "extracted_document": "# FigDown — figures as text. Spec: https://github.com/FigDown/figdown\nfigdown 0.1 topology\ntitle \"Branch office WAN uplinks\"\n\nclass access \"Access-layer switch\" fill=#e0e7ff stroke=#4338ca\nclass router \"Router\" fill=#dcfce7 stroke=#15803d\nclass hub \"Regional hub router\" fill=#fef9c3 stroke=#a16207\nclass primary \"Primary WAN path\" stroke=#15803d\nclass backup \"Backup / diverse WAN path\" stroke=#dc2626 style=dashed\n\nnode access1 \"Access Switch 1\" class=access\nnode access2 \"Access Switch 2\" class=access\nnode branch \"Branch Router\" class=router\nnode hubprimary \"Regional Hub (Primary)\" class=hub\nnode hubbackup \"Regional Hub (Backup, diverse path)\" class=hub\n\nedge access1 branch\nedge access2 branch\nedge branch hubprimary class=primary\nedge branch hubbackup class=backup\n",
+  "validation": {
+    "errors": [
+      "Line 17: edge needs an operator: -> <- -- <-> (a [mid] label splits it: -[x]->)",
+      "Line 18: edge needs an operator: -> <- -- <-> (a [mid] label splits it: -[x]->)",
+      "Line 19: edge needs an operator: -> <- -- <-> (a [mid] label splits it: -[x]->)",
+      "Line 20: edge needs an operator: -> <- -- <-> (a [mid] label splits it: -[x]->)"
+    ],
+    "invariants_pass": false,
+    "missing_nodes": [],
+    "edge_count": 0,
+    "success": false
+  }
+}

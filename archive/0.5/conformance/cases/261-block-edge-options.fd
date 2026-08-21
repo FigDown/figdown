@@ -1,0 +1,6 @@
+# Normative twin of 258-edge-options (topology + plane). Pins edge stroke=
+# and style= under `block` without a plane= or a topology header.
+figdown 0.1 block
+node r1 "R1"
+node r2 "R2"
+edge r1 -> r2 stroke=#dc2626 style=dashed

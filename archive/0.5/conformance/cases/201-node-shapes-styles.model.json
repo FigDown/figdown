@@ -1,0 +1,82 @@
+{
+  "header": {
+    "version": "0.1",
+    "genre": "block"
+  },
+  "flow": "right",
+  "classes": [],
+  "planes": [
+    {
+      "id": "base",
+      "z": 0
+    }
+  ],
+  "nodes": [
+    {
+      "id": "n1",
+      "label": "Box",
+      "shape": "box",
+      "plane": "base",
+      "line": 2
+    },
+    {
+      "id": "n2",
+      "label": "Rounded",
+      "shape": "rounded",
+      "plane": "base",
+      "line": 3
+    },
+    {
+      "id": "n3",
+      "label": "Circle",
+      "shape": "circle",
+      "plane": "base",
+      "line": 4
+    },
+    {
+      "id": "n4",
+      "label": "Ellipse",
+      "shape": "ellipse",
+      "plane": "base",
+      "line": 5
+    },
+    {
+      "id": "n5",
+      "label": "Diamond",
+      "shape": "diamond",
+      "plane": "base",
+      "line": 6
+    },
+    {
+      "id": "n6",
+      "label": "Cylinder",
+      "shape": "cylinder",
+      "plane": "base",
+      "line": 7
+    },
+    {
+      "id": "n7",
+      "label": "Dashed",
+      "shape": "box",
+      "plane": "base",
+      "style": "dashed",
+      "line": 8
+    },
+    {
+      "id": "n8",
+      "label": "Dotted",
+      "shape": "box",
+      "plane": "base",
+      "style": "dotted",
+      "line": 9
+    }
+  ],
+  "groups": [],
+  "edges": [],
+  "ranks": [],
+  "pins": [],
+  "thresholds": [],
+  "bands": [],
+  "bundles": [],
+  "regions": []
+}

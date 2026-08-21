@@ -1,0 +1,44 @@
+{
+  "probe_version": "1.0.0",
+  "run": {
+    "utc": "2026-08-19T12:04:21Z",
+    "cli": "2.1.234 (Claude Code)",
+    "condition": "A",
+    "task": "N2",
+    "kind": "normal",
+    "seat": 3,
+    "model_alias": "haiku",
+    "round": 2,
+    "model_used": "claude-haiku-4-5-20251001"
+  },
+  "saw": {
+    "skill_path": "skill/figdown/SKILL.md",
+    "skill_sha256": "718f935282ce7a93f4b7e36b83983ac1112e49818384d8eaf35869830d34d6a2",
+    "skill_chars": 16497,
+    "system_sha256": "39117af0175e7d927c8f9c715c9555f91e3357a146f2d6d311d4a3bb889ecaae",
+    "user_sha256": "5c74f2adafae70640d6fc7344643e078d71686bd9411e5e78cdcb191efb548e7"
+  },
+  "integrity": {
+    "turns": 1,
+    "permission_denials": 0,
+    "is_error": false
+  },
+  "usage": {
+    "cost_usd": 0.019451,
+    "duration_ms": 6626
+  },
+  "scrub": {
+    "ran": true,
+    "pattern": "email-regex",
+    "replacements": 0
+  },
+  "raw_answer_text": "Looking at the validator output, the issue is clear: edges in FigDown topology require an **operator** that specifies the connection type. The options are `->`, `<-`, `--`, or `<->`.\n\nFor a network topology showing undirected connections (not directional flow), `--` is the appropriate operator.\n\nHere's the corrected document:\n\n```figdown\n# FigDown — figures as text. Spec: https://github.com/FigDown/figdown\nfigdown 0.1 topology\ntitle \"Branch office WAN uplinks\"\n\nclass primary \"Primary WAN\"\nclass backup \"Backup WAN\"\n\nnode access1 \"Access 1\"\nnode access2 \"Access 2\"\nnode branch \"Branch Router\"\nnode hubprimary \"Hub (Primary)\"\nnode hubbackup \"Hub (Backup)\"\n\nedge access1 -- branch\nedge access2 -- branch\nedge branch -- hubprimary class=primary\nedge branch -- hubbackup class=backup\n```\n\nThe only changes are adding the `--` operator to each edge line. This operator denotes an undirected connection, which is the correct semantics for network topology links.",
+  "extracted_document": "# FigDown — figures as text. Spec: https://github.com/FigDown/figdown\nfigdown 0.1 topology\ntitle \"Branch office WAN uplinks\"\n\nclass primary \"Primary WAN\"\nclass backup \"Backup WAN\"\n\nnode access1 \"Access 1\"\nnode access2 \"Access 2\"\nnode branch \"Branch Router\"\nnode hubprimary \"Hub (Primary)\"\nnode hubbackup \"Hub (Backup)\"\n\nedge access1 -- branch\nedge access2 -- branch\nedge branch -- hubprimary class=primary\nedge branch -- hubbackup class=backup\n",
+  "validation": {
+    "errors": [],
+    "invariants_pass": true,
+    "missing_nodes": [],
+    "edge_count": 4,
+    "success": true
+  }
+}

@@ -1,0 +1,70 @@
+{
+  "header": {
+    "version": "0.1",
+    "genre": "block"
+  },
+  "flow": "right",
+  "classes": [],
+  "planes": [
+    {
+      "id": "base",
+      "z": 0
+    }
+  ],
+  "nodes": [
+    {
+      "id": "q0",
+      "label": "Q0",
+      "shape": "box",
+      "group": "pool",
+      "plane": "base",
+      "line": 7
+    },
+    {
+      "id": "q1",
+      "label": "Q1",
+      "shape": "box",
+      "group": "pool",
+      "plane": "base",
+      "line": 8
+    }
+  ],
+  "groups": [
+    {
+      "id": "pool",
+      "label": "Resource pool",
+      "line": 6
+    }
+  ],
+  "edges": [],
+  "ranks": [],
+  "pins": [],
+  "thresholds": [
+    {
+      "label": "Shared cap",
+      "in": "pool",
+      "offset": 80,
+      "line": 9
+    },
+    {
+      "label": "Q1 watermark",
+      "in": "q1",
+      "offset": 35,
+      "stroke": "#a3c93a",
+      "line": 10
+    }
+  ],
+  "bands": [
+    {
+      "label": "Q1 reserved",
+      "in": "q1",
+      "from": 0,
+      "to": 35,
+      "extend": "up",
+      "fill": "#dcfce7",
+      "line": 11
+    }
+  ],
+  "bundles": [],
+  "regions": []
+}

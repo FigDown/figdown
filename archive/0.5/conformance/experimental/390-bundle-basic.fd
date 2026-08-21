@@ -1,0 +1,14 @@
+figdown 0.1 topology
+node bd24a "Leaf-A"
+node bd24b "Leaf-B"
+node srv "Server"
+edge bd24a -- srv
+edge bd24b -- srv
+bundle es1 "ES-1 / LAG-1" bd24a--srv,bd24b--srv stroke=#0ea5e9
+# 0.1: the member list became ONE comma-delimited token, so it
+# terminates at whitespace instead of resting on the `A--B` shape test alone.
+# 0.1 then RETIRED the whitespace-separated form here too, the same
+# ruling that reached `rank` and `width`: `bundle es1 "ES-1" a--s b--s` is a
+# line error, pinned by `123-comma-list-one-token`. Both bundles here use
+# the surviving comma form.
+bundle es2 "ES-2" bd24a--srv,bd24b--srv

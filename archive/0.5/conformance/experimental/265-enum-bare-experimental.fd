@@ -1,0 +1,21 @@
+figdown 0.1 block
+# `RULE-POSITION-ENUMERATION`: RULE 2.4's enum half is language-wide, not
+# surface-wide — the two experimental enum positions are `extend=` on a
+# `band` and `type=` on a `chart`.
+# 0.3 (`SCENE-KEYWORD-MEMBERSHIP`): the first section declared `figdown 0.1 topology` until
+# this release, and `band` was WITHDRAWN from that genre — in a topology
+# document a BAND is a frequency band. This fixture is one of the two
+# occurrences the withdrawal cites: both were conformance fixtures, never a
+# figure anyone needed. The section is REWRITTEN to `block`, which is the
+# genre that still declares `band`, rather than deleted — the subject is
+# `extend=`'s enum position, not the genre it was written under. Both
+# messages are unchanged by the move; only their line numbers shift, with
+# this comment.
+node a "A"
+band "Zone" 15% in=a extend="up"
+figdown 0.1 table
+table t "T"
+| A | B |
+|---|---|
+| 1 | 2 |
+chart t type="bar3d"

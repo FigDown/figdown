@@ -1,0 +1,13 @@
+figdown 0.1 block
+class a1 "A1" fill=#dc2626
+class a2 "A2" fill=#2563eb stroke=#2563eb
+class b1 "B1" stroke=#dc2626
+class b2 "B2" stroke=#2563eb style=dashed
+class c1 "C1" style=dashed
+class c2 "C2" style=dotted
+class hot "Hot" fill=#dc2626 stroke=#dc2626
+class deprecated "Deprecated" style=dashed
+node fill_conflict "Fill" class=a1,a2
+node stroke_conflict "Stroke" class=b1,b2
+node style_conflict "Style" class=c1,c2
+node clean "Clean" class=hot,deprecated

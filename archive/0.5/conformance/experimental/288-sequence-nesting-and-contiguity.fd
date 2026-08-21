@@ -1,0 +1,27 @@
+# `SEQUENCE-CONTAINMENT-SCOPE`: the ONE-LEVEL NESTING CAP, which the prototype did not
+# have, and the CONTIGUITY rule, which it did.
+#
+# The cap is the v0.1 `group` precedent — one level is the whole of the
+# language's containment — and it is a SCOPE decision, not a principle: the
+# message says so, and says a second level lands on measured need.
+#
+# Contiguity is a MODEL rule and not a drawing rule: an operand denotes the
+# ORDERED RUN of the occurrences it contains, so an occurrence that is not in
+# it cannot happen between two that are. One offending line is reported ONCE,
+# against the DEEPEST container it splits, because that is the container whose
+# `in=` repairs the document — reporting the outer one too would give advice
+# that fixes the fragment and leaves the operand split.
+figdown 0.4 sequence
+lifeline c "C"
+lifeline s "S"
+fragment f1 "level 0" type=alt
+operand o1 "a" in=f1
+message c -> s "one" in=o1
+message c -> s "this line splits the run"
+message c -> s "two" in=o1
+fragment f2 "level 1 — legal" type=opt in=o1
+operand o2 "b" in=f2
+message c -> s "three" in=o2
+fragment f3 "level 2 — one too deep" type=loop in=o2
+operand o3 "c" in=f3
+message c -> s "four" in=o3

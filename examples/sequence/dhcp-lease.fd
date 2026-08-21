@@ -232,7 +232,7 @@ message c <-> h "ARP: who-has 192.0.2.44 — and the reply" in=conflict class=pr
 # server and restarts the configuration process", waiting at least ten
 # seconds first.
 message c -> sb "DHCPDECLINE  requested-ip=192.0.2.44" in=conflict class=refuse description="the client waits at least ten seconds before restarting (§3.1 item 5)"
-# AND THE RESTART IS NOW DRAWN. Until this release this INIT could only
+# AND THE RESTART IS NOW DRAWN. Until 0.4 this INIT could only
 # travel in the message's description=: the no-restatement check read a
 # lifeline's occurrences as one linear sequence, so this INIT and the
 # DHCPNAK branch's INIT read as one restating the other. They are on

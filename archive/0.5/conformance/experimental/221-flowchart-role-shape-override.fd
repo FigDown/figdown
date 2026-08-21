@@ -1,0 +1,14 @@
+# `FLOWCHART-ROLE-KEYWORDS`: `shape=` on a role line overrides the DRAWING and nothing else. The
+# role stays the model (core §12.7 — presentation is not meaning on its own),
+# so every node below still carries its role while carrying a shape the role
+# would not have derived. The reverse also holds: `node … shape=diamond` has
+# NO role, which is the whole reason the vocabulary exists.
+figdown 0.2 flowchart
+decision  wide  "Which case?" shape=ellipse
+process   round "Normalize"   shape=rounded
+terminator boxy "Halt"        shape=box
+node      plain "Look-alike"  shape=diamond
+flow down
+flowline wide -[a]-> round
+flowline wide -[b]-> boxy
+flowline round -> plain

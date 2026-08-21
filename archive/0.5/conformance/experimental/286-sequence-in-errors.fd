@@ -1,0 +1,18 @@
+# `SEQUENCE-CONTAINMENT-SCOPE`: the OBJECT rule for `in=`. Its value domain under this
+# genre is a `fragment` or an `operand` id and nothing else, so a lifeline id
+# there is a specific mistake — the author has the relation right and the
+# object wrong — and the diagnostic says so before it lists the acceptors.
+#
+# `operand in=` is narrower still: a compartment belongs to a FRAGMENT, never
+# to another compartment, so both wrong objects get their own sentence.
+figdown 0.4 sequence
+lifeline c "C"
+lifeline s "S"
+fragment f "F" type=alt
+operand o "O" in=f
+message c -> s "names a lifeline" in=c
+message c -> s "names nothing declared" in=nowhere
+state c "X" in=c
+operand p "names an operand" in=o
+operand q "names a lifeline" in=c
+fragment g "names a lifeline" type=opt in=s

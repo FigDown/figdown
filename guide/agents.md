@@ -56,20 +56,20 @@ It is a Claude Code skill by packaging only. The files are ordinary Markdown —
 any agent, in any framework, can read them straight out of the repository.
 
 **If you are only READING a `.fd`, you do not need the skill at all.** The
-per-genre reading files live at [`read/0.4/`](../read/0.4/reading.md) — the source
+per-genre reading files live at [`read/0.5/`](../read/0.5/reading.md) — the source
 of truth, versioned by language version, so a future `read/<X.Y>/` will be
 added beside it rather than over it (the frozen `read/0.1/`–`0.3/` trees are
-exactly that history). Open `read/0.4/reading.md` and the one file for the
+exactly that history). Open `read/0.5/reading.md` and the one file for the
 genre on line 1 and stop. The copy under `skill/figdown/reference/` is
-generated from `read/0.4/` by `tools/make-skill.js` and exists only so the
+generated from `read/0.5/` by `tools/make-skill.js` and exists only so the
 installed bundle works with no repository and no network.
 
 | Your question | Document |
 |---|---|
-| **I have a `.fd` in front of me and need to read it correctly** | [`read/0.4/reading.md`](../read/0.4/reading.md) plus the one file for the genre on line 1. **Nothing to install** — they are ordinary Markdown in this repository. |
+| **I have a `.fd` in front of me and need to read it correctly** | [`read/0.5/reading.md`](../read/0.5/reading.md) plus the one file for the genre on line 1. **Nothing to install** — they are ordinary Markdown in this repository. |
 | How do I write, build and embed a figure? | [`skill/figdown/SKILL.md`](../skill/figdown/SKILL.md), then whatever its router names |
-| What may I conclude from a figure someone else wrote? | [`read/0.4/reading.md`](../read/0.4/reading.md) |
-| How do I turn an existing drawing into a `.fd`? | [`read/0.4/transcribe.md`](../read/0.4/transcribe.md) |
+| What may I conclude from a figure someone else wrote? | [`read/0.5/reading.md`](../read/0.5/reading.md) |
+| How do I turn an existing drawing into a `.fd`? | [`read/0.5/transcribe.md`](../read/0.5/transcribe.md) |
 | It parses, but it reads badly | [layout.md](layout.md) |
 | I need to show X and cannot find the construct | [expressing.md](expressing.md) |
 | How do I decide how to express a figure at all? | [authoring.md](authoring.md) |

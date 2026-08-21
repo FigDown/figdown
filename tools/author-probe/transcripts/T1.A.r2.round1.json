@@ -1,0 +1,57 @@
+{
+  "probe_version": "1.0.0",
+  "run": {
+    "utc": "2026-08-19T12:07:01Z",
+    "cli": "2.1.234 (Claude Code)",
+    "condition": "A",
+    "task": "T1",
+    "kind": "trap",
+    "seat": 2,
+    "model_alias": "sonnet",
+    "round": 1,
+    "model_used": "claude-sonnet-5"
+  },
+  "saw": {
+    "skill_path": "skill/figdown/SKILL.md",
+    "skill_sha256": "718f935282ce7a93f4b7e36b83983ac1112e49818384d8eaf35869830d34d6a2",
+    "skill_chars": 16497,
+    "system_sha256": "39117af0175e7d927c8f9c715c9555f91e3357a146f2d6d311d4a3bb889ecaae",
+    "user_sha256": "0a9211466d8e2b366823904ace8f43292e3bd0fa771164554c2eb34f5b6157ea"
+  },
+  "integrity": {
+    "turns": 1,
+    "permission_denials": 0,
+    "is_error": false
+  },
+  "usage": {
+    "cost_usd": 0.054306299999999995,
+    "duration_ms": 36278
+  },
+  "scrub": {
+    "ran": true,
+    "pattern": "email-regex",
+    "replacements": 0
+  },
+  "raw_answer_text": "I don't have `reference/scene.md` or `reference/layout.md` loaded in this session (only the genre-independent core doc above), so I can't verify the exact block/edge/pin spellings against their authoritative source. I've composed the figure from what the core grammar guarantees — quoted labels, bare ids, `class` for meaning, `layout`/`pin` as the only layout-zone directive — and used `pin` to fix the one edge's route through the two waypoints, since that's exactly what the layout zone is for: geometry to stabilize the render against a future addition, carrying no meaning of its own.\n\n```figdown\n# FigDown — figures as text. Spec: https://github.com/FigDown/figdown\nfigdown 0.1 block\ntitle \"Alert-forwarding chain\"\n\nclass svc \"Internal service\" fill=#e0f2fe stroke=#0284c7\n\nblock probe \"Probe\" class=svc\nblock normalizer \"Normalizer\" class=svc\nblock sink \"Sink\" class=svc\n\nedge probe -> normalizer\nedge normalizer -> sink\n\nlayout\npin probe->normalizer at (60,20) (90,40)\n```\n\nNotes:\n- `probe`, `normalizer`, `sink` are the three services with short labels only — no extra prose crammed into the blocks, per the \"keep labels short\" guidance.\n- The `probe -> normalizer` edge is pinned through `(60,20)` then `(90,40)` so it visibly jogs, leaving room for the future third element; this lives in the layout zone and carries no semantic claim.\n- Before committing this, run `node <skill-dir>/build-svg.js` against it — if `block`/`edge`/`pin` turn out to be spelled differently in `reference/scene.md`/`reference/layout.md`, the build will fail with a `Line N:` error naming the correct keyword, and the fix is mechanical from there.",
+  "extracted_document": "# FigDown — figures as text. Spec: https://github.com/FigDown/figdown\nfigdown 0.1 block\ntitle \"Alert-forwarding chain\"\n\nclass svc \"Internal service\" fill=#e0f2fe stroke=#0284c7\n\nblock probe \"Probe\" class=svc\nblock normalizer \"Normalizer\" class=svc\nblock sink \"Sink\" class=svc\n\nedge probe -> normalizer\nedge normalizer -> sink\n\nlayout\npin probe->normalizer at (60,20) (90,40)\n",
+  "validation": {
+    "errors": [
+      "Line 7: \"block\" is not allowed in genre block",
+      "Line 8: \"block\" is not allowed in genre block",
+      "Line 9: \"block\" is not allowed in genre block",
+      "Line 15: unexpected argument \"at\"",
+      "Line 11: unknown endpoint \"probe\"",
+      "Line 11: unknown endpoint \"normalizer\"",
+      "Line 12: unknown endpoint \"normalizer\"",
+      "Line 12: unknown endpoint \"sink\""
+    ],
+    "invariants_pass": false,
+    "missing_nodes": [
+      "probe",
+      "normalizer",
+      "sink"
+    ],
+    "edge_count": 2,
+    "success": false
+  }
+}

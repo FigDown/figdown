@@ -1,0 +1,9 @@
+figdown 0.1 block
+node n1 "Box" shape=box
+node n2 "Rounded" shape=rounded
+node n3 "Circle" shape=circle
+node n4 "Ellipse" shape=ellipse
+node n5 "Diamond" shape=diamond
+node n6 "Cylinder" shape=cylinder
+node n7 "Dashed" style=dashed
+node n8 "Dotted" style=dotted

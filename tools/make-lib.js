@@ -131,14 +131,27 @@ function __stackSectionSvgs(results) {
 // the default does NOT (embedded figures almost always sit under the
 // host document's caption — the majority case).
 // Multi-section sources are stacked vertically into a single SVG (MULTI-FIGURE-DOCUMENTS).
+//
+// TWO ERROR CHANNELS REACH ONE errors ARRAY. parse cannot see a
+// coordinate, so a document whose SOURCE is impeccable can still draw a false
+// statement — a group band enclosing a non-member, a pin covering a node
+// completely. The engine reports those from render (as .errs on its render
+// result), and core §8 requires a caller to treat a non-empty render
+// diagnostic list EXACTLY as it treats a parse error list. Until 0.4
+// this wrapper discarded that channel and returned errors: [] with an SVG of
+// the picture the engine had just said was wrong — the one copy of the engine
+// a require('figdown') user actually gets. Both channels now land here, and
+// either withholds the SVG.
 function render(text, opts) {
   var p = parse(text);
   if (p.errors.length) return { svg: null, errors: p.errors };
-  if (p.docs.length > 1) {
-    var rs = p.docs.map(function (d) { return __engine.render(d, opts); });
-    return { svg: __engine.stackSectionSvgs(rs), errors: [] };
-  }
-  return { svg: __engine.render(p.doc, opts).svg, errors: [] };
+  if (!p.docs.length) return { svg: null, errors: [] };
+  var rs = p.docs.map(function (d) { return __engine.render(d, opts); });
+  var errs = [];
+  for (var i = 0; i < rs.length; i++) errs = errs.concat(rs[i].errs || []);
+  if (errs.length) return { svg: null, errors: errs };
+  var svg = rs.length > 1 ? __engine.stackSectionSvgs(rs) : rs[0].svg;
+  return { svg: svg, errors: [] };
 }
 // renderDoc(doc, opts) -> svg string, for an already-validated doc from parse().
 // For multi-section, pass parse().docs to renderDocs instead.
@@ -151,10 +164,13 @@ function renderDocs(docs, opts) {
   return __engine.stackSectionSvgs(docs.map(function (d) { return __engine.render(d, opts); }));
 }
 // artifact(text) -> { svg, errors }  svg is the full self-carrying SVG:
-// the render plus a <metadata id="figdown-source"> block embedding the
-// source text, the SHA-256 OF THAT SOURCE, and the engine version that
-// rendered it (same convention as tools/build-svg.js; spec core §7).
-// svg is null when there are errors.
+// the render plus a <metadata id="figdown-source"> block
+// embedding the source text, the SHA-256 OF THAT SOURCE, and the engine
+// version that rendered it (same convention as tools/build-svg.js; spec §7).
+// svg is null when there are errors — parse-time OR geometry-time, on
+// tools/build-svg.js's contract (core §8): a non-empty render diagnostic list
+// refuses the artifact exactly as a parse error does, because writing it
+// anyway publishes the picture the engine has just said is wrong.
 function artifact(text, opts) {
   var src = String(text);
   var p = render(src, opts);

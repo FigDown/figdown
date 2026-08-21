@@ -1,0 +1,13 @@
+figdown 0.1 topology
+title "East campus site map"
+
+group siteA "Site A campus"
+node a1 "Site A router" in=siteA
+node a2 "Site A switch" in=siteA
+node siteb "Site B router"
+
+edge a1 -> a2
+
+pin siteA at=(0,0)
+pin a1 at=(0,0) width=120 height=50
+pin a2 at=(0,80) width=120 height=50

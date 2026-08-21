@@ -1,0 +1,59 @@
+{
+  "header": {
+    "version": "0.3",
+    "genre": "bitfield"
+  },
+  "title": "<script>alert(1)</script>",
+  "flow": "right",
+  "classes": [],
+  "planes": [
+    {
+      "id": "base",
+      "z": 0
+    }
+  ],
+  "nodes": [],
+  "groups": [],
+  "edges": [],
+  "ranks": [],
+  "pins": [],
+  "thresholds": [],
+  "bands": [],
+  "bundles": [],
+  "regions": [
+    {
+      "genre": "bitfield",
+      "id": "hdr",
+      "label": "]]></metadata><script>alert(1)</script><metadata>",
+      "word": 32,
+      "numbering": "msb0",
+      "fields": [
+        {
+          "name": "Version",
+          "width": 4,
+          "description": "<script>alert(1)</script>",
+          "line": 25
+        },
+        {
+          "name": "Flags",
+          "width": 12,
+          "description": "\" onload=\"alert(1)",
+          "line": 26
+        },
+        {
+          "name": "Len",
+          "width": 8,
+          "description": "javascript:alert(1) url(https://example.invalid/x) @import",
+          "line": 27
+        },
+        {
+          "name": "Rsvd",
+          "width": 8,
+          "description": "&amp; & < > ]]> <![CDATA[ </metadata> \\ done",
+          "line": 28
+        }
+      ],
+      "line": 24
+    }
+  ]
+}

@@ -1,0 +1,11 @@
+figdown 0.1 block
+title "First title"
+title "Second title"
+node a "A"
+node b "B"
+flow down
+flow right
+layout
+pin a at=(10,20)
+pin b at=(30,40)
+pin a at=(50,60)

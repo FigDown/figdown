@@ -1,0 +1,18 @@
+# Static err() coverage: "<construct> needs an id"
+figdown 0.1 block
+class
+group
+node
+external
+bitfield
+table
+timing
+# `plane` stood after `bundle` until 0.3 — the directive left the
+# language (`PAINT-ORDER-CONSTRUCT`), so its `needs an id` message left with it: a bare `plane`
+# now answers the withdrawal diagnostic instead, which case 918 pins.
+
+figdown 0.1 topology
+# `bundle` is here rather than in section 1 because `topology` is the only
+# genre that still declares it (`SCENE-KEYWORD-MEMBERSHIP`). The message is the same
+# one; what changed is which genre can be asked for it.
+bundle

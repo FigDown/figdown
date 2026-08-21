@@ -1,0 +1,18 @@
+figdown 0.1 block
+# 0.1: `title` takes exactly ONE quoted string. The unquoted
+# rest-of-line form is retired — it was the only directive that accepted an
+# unquoted string containing spaces (`node`, `class`, `group` and `boundary`
+# all report `unexpected argument "..."`), and it carried three defects.
+title TCP Header
+# (1) a title could never contain a `#`: the comment scanner cut the line, so
+# this used to yield "A", never "A # note".
+title A # note
+# (2) inner quotes escaped into the value: this used to yield `A B C`.
+title A "B" C
+# (3) escapes resolved ONLY in the quoted form, so the same visible text gave
+# different values depending on quoting — a literal backslash-n here, a real
+# newline in `title "A\nB"`.
+title A\nB
+# one quoted string, and nothing after it
+title "TCP Header" extra
+node a "A"

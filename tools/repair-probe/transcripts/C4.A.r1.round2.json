@@ -1,0 +1,92 @@
+{
+  "probe_version": "1.0.0",
+  "run": {
+    "utc": "2026-08-19T11:07:53Z",
+    "model_alias": "haiku",
+    "model_used": "claude-haiku-4-5-20251001",
+    "cli": "2.1.234 (Claude Code)",
+    "seat": 1,
+    "condition": "A",
+    "fixture": "C4",
+    "klass": "compound/unknown-reference+pin-inside-band (staged)",
+    "round": 2
+  },
+  "engine_channel": "dist-public-api",
+  "saw": {
+    "original_fixture_sha256": "40e1c2e8a223baee642956bb19f2ff0b1020459c9f26336e75a3864ba919ad91",
+    "document_shown_sha256": "bd8e735fe9eb9ff8984921301bdf53597e7e0389bfe851ff04bb669170659822",
+    "system_sha256": "ef2a3cd623ce06b05aa4652d8ace761c4f70f24298bcef0552f22e2e46e277fc",
+    "user_sha256": "57c48bf9f76b2f790976fbb872e28413e947ec75b0453510f505f6ae9ebaf71d"
+  },
+  "integrity": {
+    "turns": 1,
+    "permission_denials": 0,
+    "is_error": false
+  },
+  "usage": {
+    "cost_usd": 0.011266,
+    "duration_ms": 14593
+  },
+  "scrub": {
+    "ran": true,
+    "pattern": "email-regex",
+    "replacements": 0
+  },
+  "raw_answer_text": "```\nfigdown 0.1 block\ntitle \"Storage cluster monitoring tap\"\n\ngroup cluster \"Storage cluster\"\nnode n1 \"Node 1\" in=cluster\nnode n2 \"Node 2\" in=cluster\nnode tap \"Monitoring tap\"\nnode collector \"Metrics collector\"\nnode archiver \"Archiver\"\n\nedge n1 -> n2\nedge tap -> collector\nedge collector -> archiver\n\npin cluster at=(0,0)\npin n1 at=(0,0) width=120 height=50\npin n2 at=(140,0) width=120 height=50\npin tap at=(60,60) width=80 height=30\n```",
+  "presented": {
+    "document_shown": "figdown 0.1 block\ntitle \"Storage cluster monitoring tap\"\n\ngroup cluster \"Storage cluster\"\nnode n1 \"Node 1\" in=cluster\nnode n2 \"Node 2\" in=cluster\nnode tap \"Monitoring tap\"\nnode collector \"Metrics collector\"\nnode archiver \"Archiver\"\n\nedge n1 -> n2\nedge tap -> collector\nedge collector -> archiver\n\npin cluster at=(0,0)\npin n1 at=(0,0) width=120 height=50\npin n2 at=(140,0) width=120 height=50\npin tap at=(60,10) width=80 height=30\n",
+    "validator_shown": {
+      "errors": [
+        "Line 18: pin puts \"tap\" inside the band of group \"cluster\" — a band is the bounding box of the group's members, so this draws \"tap\" as one of them. Move the pin clear of the group's extent, or say what the drawing says with in=cluster."
+      ],
+      "diagnostics": []
+    }
+  },
+  "extracted_document": "figdown 0.1 block\ntitle \"Storage cluster monitoring tap\"\n\ngroup cluster \"Storage cluster\"\nnode n1 \"Node 1\" in=cluster\nnode n2 \"Node 2\" in=cluster\nnode tap \"Monitoring tap\"\nnode collector \"Metrics collector\"\nnode archiver \"Archiver\"\n\nedge n1 -> n2\nedge tap -> collector\nedge collector -> archiver\n\npin cluster at=(0,0)\npin n1 at=(0,0) width=120 height=50\npin n2 at=(140,0) width=120 height=50\npin tap at=(60,60) width=80 height=30\n",
+  "validation": {
+    "errors_after": [
+      "Line 18: pin puts \"tap\" inside the band of group \"cluster\" — a band is the bounding box of the group's members, so this draws \"tap\" as one of them. Move the pin clear of the group's extent, or say what the drawing says with in=cluster."
+    ],
+    "diagnostics_after": [
+      {
+        "code": "geometry/pin-inside-band",
+        "line": 18,
+        "message": "pin puts \"tap\" inside the band of group \"cluster\" — a band is the bounding box of the group's members, so this draws \"tap\" as one of them. Move the pin clear of the group's extent, or say what the drawing says with in=cluster.",
+        "subject": {
+          "kind": "node",
+          "id": "tap"
+        },
+        "evidence": {
+          "group": "cluster",
+          "node": {
+            "x": 60,
+            "y": 80,
+            "width": 80,
+            "height": 30
+          },
+          "band": {
+            "x": -14,
+            "y": -6,
+            "width": 288,
+            "height": 88
+          }
+        },
+        "supportedFixes": [
+          {
+            "kind": "pin",
+            "target": "tap",
+            "at": [
+              60,
+              70
+            ],
+            "note": "verified against this check; other checks may still apply"
+          }
+        ]
+      }
+    ],
+    "invariants_pass": true,
+    "missing_nodes": [],
+    "edge_count": 3,
+    "success": false
+  }
+}

@@ -1,0 +1,2 @@
+Line 2: "Node" is not allowed in genre block
+Line 3: unknown shape "Box" (box|rounded|circle|ellipse|diamond|cylinder)

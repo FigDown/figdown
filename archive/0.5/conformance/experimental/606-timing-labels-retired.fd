@@ -1,0 +1,4 @@
+figdown 0.1 timing
+# `SIGNAL-DATA-KEY-SPELLING`: `labels=` → `data=`, WaveDrom's own key.
+timing w "W"
+signal a x=..x labels=v

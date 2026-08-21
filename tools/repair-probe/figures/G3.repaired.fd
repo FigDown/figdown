@@ -1,0 +1,12 @@
+figdown 0.1 block
+title "RPF verdict outcome pair"
+node lookup "RIB lookup"
+node verdict "Interface matches route back?"
+node accept "Accept and forward"
+node drop "Drop packet"
+node counter "Increment drop counter"
+
+edge lookup -> verdict
+edge verdict -> accept
+edge verdict -> drop
+edge drop -> counter

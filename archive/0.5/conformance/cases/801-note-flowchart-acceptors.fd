@@ -1,0 +1,33 @@
+figdown 0.3 flowchart
+# `DRAWN-ANNOTATION-FORM`: `note=` on the four acceptors the `flowchart` genre owns
+# — `process`, `decision`, `terminator` and `flowline`.
+#
+# `CATEGORICAL-MEANING-MAPPING`'s standing rule is why they are listed at all: EACH GENRE DECLARES ITS
+# OWN VOCABULARY SEPARATELY, even when the list is identical to another
+# genre's. `process`/`decision`/`terminator` are `node` under a role (`FLOWCHART-ROLE-KEYWORDS`)
+# and `flowline` is `edge` renamed (`GENRE-CONNECTOR-SPELLING`), so it would have been possible to
+# let them inherit the key silently from the shapes they are built on. They
+# do not: each row in DIRECTIVE_OPTS names `note` itself, and this fixture is
+# what would go red if one of them were dropped on the assumption that the
+# block genre's row covers it.
+#
+# `decision` is the carrier worth having a fixture for on its own: a diamond
+# has no flat side to sit a box against, so it is the shape most likely to
+# push its note out to a leader line. That is a RENDERER fact and is not in
+# the model (core §12.7).
+#
+# See case 800 for the GOLDEN GAP that applies here too: normalize.js does not
+# project `note`, so this fixture pins acceptance, not the strings.
+#
+# EXPERIMENTAL-ADJACENT, NORMATIVE BY SUBJECT. `flowchart` is an experimental
+# GENRE (`CONSTRUCT-STATUS-TIERS`), which by STATUS.txt's first criterion would put a fixture with
+# this header in conformance/experimental/. Read that before quoting this
+# file's bucket: its subject is the NORMATIVE key `note=`, but its header is
+# not, and the maintainer criterion is decided by the header for genre cases.
+process ingest "Ingest frame" note="on a process"
+decision drop "Over the threshold?" note="on a decision — a diamond has no flat side, so this is the hardest note to place"
+terminator done "Forwarded" note="on a terminator"
+terminator dropped "Dropped"
+flowline ingest -> drop note="on a flowline — flowchart's connector, and `edge` under another name"
+flowline drop -[yes]-> dropped note="a labelled flowline takes both keys at once"
+flowline drop -[no]-> done

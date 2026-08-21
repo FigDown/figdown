@@ -1,0 +1,63 @@
+{
+  "probe_version": "1.0.0",
+  "run": {
+    "utc": "2026-08-19T12:21:12Z",
+    "cli": "2.1.234 (Claude Code)",
+    "condition": "B",
+    "task": "T2",
+    "kind": "trap",
+    "seat": 4,
+    "model_alias": "haiku",
+    "round": 2,
+    "model_used": "claude-haiku-4-5-20251001"
+  },
+  "saw": {
+    "skill_path": "tools/author-probe/skill-candidate.md",
+    "skill_sha256": "2abdaf0d9211d5ee1464c5f5c3a200b1ae6f7bd71cfd6344e7da94d669e6ed31",
+    "skill_chars": 17591,
+    "system_sha256": "39117af0175e7d927c8f9c715c9555f91e3357a146f2d6d311d4a3bb889ecaae",
+    "user_sha256": "0866e978ce4b0584df81084ed57256adc8335fc8745350d613c73a5a6b056941"
+  },
+  "integrity": {
+    "turns": 1,
+    "permission_denials": 0,
+    "is_error": false
+  },
+  "usage": {
+    "cost_usd": 0.046431,
+    "duration_ms": 61429
+  },
+  "scrub": {
+    "ran": true,
+    "pattern": "email-regex",
+    "replacements": 0
+  },
+  "raw_answer_text": "Looking at the validation errors, I can identify the issues:\n\n1. **Node type must be quoted** — `\"process\"`, `\"decision\"`, `\"terminator\"` need double quotes\n2. **Node label must be quoted** — already correct in your labels\n3. **Edge syntax requires an operator** — use `->`, `<-`, `--`, or `<->`, and mid-labels use `-[label]->`  \n4. **Container not supported** — flowchart genre does not support the `container` construct\n\nThe corrected syntax for nodes is: `node <id> \"<type>\" \"<label>\"`\n\nAnd for edges: `edge <from> <to> <operator>` or `edge <from> <to> -[label]<operator>` for labeled edges.\n\nUnfortunately, flowchart genre does not support visual grouping of nodes into bordered containers. The \"change window\" context will need to be conveyed through surrounding prose rather than as a visual artifact in the diagram itself.\n\nHere is the corrected document:\n\n```figdown\n# FigDown — figures as text. Spec: https://github.com/FigDown/figdown\nfigdown 0.1 flowchart\ntitle \"Change request procedure\"\n\nnode receive \"process\" \"Receive request\"\nnode validate \"process\" \"Validate\"\nnode isvalid \"decision\" \"Valid?\"\nnode apply \"process\" \"Apply change\"\nnode confirm \"terminator\" \"Confirm success\"\nnode rollback \"terminator\" \"Rollback\"\n\nedge receive validate ->\nedge validate isvalid ->\nedge isvalid apply -[yes]->\nedge apply confirm ->\nedge isvalid rollback -[no]->\n```\n\n**Note on the \"change window\" grouping:** The flowchart genre does not provide a container or grouping construct. The visual separation you wanted between the validate and apply steps (those occurring within the scheduled maintenance window) should be described in the prose that accompanies this figure rather than embedded in the diagram itself. If the grouped-region feature is essential to your design, you might consider using `block` genre instead, which supports hierarchical grouping, though that would frame the figure differently.",
+  "extracted_document": "# FigDown — figures as text. Spec: https://github.com/FigDown/figdown\nfigdown 0.1 flowchart\ntitle \"Change request procedure\"\n\nnode receive \"process\" \"Receive request\"\nnode validate \"process\" \"Validate\"\nnode isvalid \"decision\" \"Valid?\"\nnode apply \"process\" \"Apply change\"\nnode confirm \"terminator\" \"Confirm success\"\nnode rollback \"terminator\" \"Rollback\"\n\nedge receive validate ->\nedge validate isvalid ->\nedge isvalid apply -[yes]->\nedge apply confirm ->\nedge isvalid rollback -[no]->\n",
+  "validation": {
+    "errors": [
+      "Line 5: unexpected argument \"Receive request\"",
+      "Line 6: unexpected argument \"Validate\"",
+      "Line 7: unexpected argument \"Valid?\"",
+      "Line 8: unexpected argument \"Apply change\"",
+      "Line 9: unexpected argument \"Confirm success\"",
+      "Line 10: unexpected argument \"Rollback\"",
+      "Line 12: edge needs an operator: -> <- -- <-> (a [mid] label splits it: -[x]->)",
+      "Line 13: edge needs an operator: -> <- -- <-> (a [mid] label splits it: -[x]->)",
+      "Line 14: edge needs an operator: -> <- -- <-> (a [mid] label splits it: -[x]->)",
+      "Line 15: edge needs an operator: -> <- -- <-> (a [mid] label splits it: -[x]->)",
+      "Line 16: edge needs an operator: -> <- -- <-> (a [mid] label splits it: -[x]->)"
+    ],
+    "invariants_pass": false,
+    "missing_nodes": [
+      "receive",
+      "validate",
+      "isvalid",
+      "apply",
+      "confirm",
+      "rollback"
+    ],
+    "edge_count": 0,
+    "success": false
+  }
+}

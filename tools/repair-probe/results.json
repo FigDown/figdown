@@ -1,0 +1,328 @@
+{
+  "probe_version": "1.0.0",
+  "generated_by": "tools/repair-probe/repair-probe.js --write-results (recomputed from stored transcripts; no model was called)",
+  "run1": {
+    "about": "the original 8 single-error fixtures (P1-P4, G1-G4), sonnet reader — HISTORICAL RECORD, hit a ceiling (both conditions 24/24 first-round) and does not gate anything. See decisions/registry.md.",
+    "fixture_set": "run1 (P/G, single-error)",
+    "fixture_ids": [
+      "P1",
+      "P2",
+      "P3",
+      "P4",
+      "G1",
+      "G2",
+      "G3",
+      "G4"
+    ],
+    "model_alias_observed": [
+      "sonnet"
+    ],
+    "conditions": {
+      "A": {
+        "chains": 24,
+        "first_round_success_rate": 1,
+        "first_round_success": 24,
+        "mean_rounds_to_success": 1,
+        "eventual_success_rate": 1,
+        "eventual_success": 24,
+        "per_fixture": {
+          "P1": {
+            "chains": 3,
+            "first_round_success_rate": 1,
+            "first_round_success": 3,
+            "mean_rounds_to_success": 1,
+            "eventual_success_rate": 1,
+            "eventual_success": 3
+          },
+          "P2": {
+            "chains": 3,
+            "first_round_success_rate": 1,
+            "first_round_success": 3,
+            "mean_rounds_to_success": 1,
+            "eventual_success_rate": 1,
+            "eventual_success": 3
+          },
+          "P3": {
+            "chains": 3,
+            "first_round_success_rate": 1,
+            "first_round_success": 3,
+            "mean_rounds_to_success": 1,
+            "eventual_success_rate": 1,
+            "eventual_success": 3
+          },
+          "P4": {
+            "chains": 3,
+            "first_round_success_rate": 1,
+            "first_round_success": 3,
+            "mean_rounds_to_success": 1,
+            "eventual_success_rate": 1,
+            "eventual_success": 3
+          },
+          "G1": {
+            "chains": 3,
+            "first_round_success_rate": 1,
+            "first_round_success": 3,
+            "mean_rounds_to_success": 1,
+            "eventual_success_rate": 1,
+            "eventual_success": 3
+          },
+          "G2": {
+            "chains": 3,
+            "first_round_success_rate": 1,
+            "first_round_success": 3,
+            "mean_rounds_to_success": 1,
+            "eventual_success_rate": 1,
+            "eventual_success": 3
+          },
+          "G3": {
+            "chains": 3,
+            "first_round_success_rate": 1,
+            "first_round_success": 3,
+            "mean_rounds_to_success": 1,
+            "eventual_success_rate": 1,
+            "eventual_success": 3
+          },
+          "G4": {
+            "chains": 3,
+            "first_round_success_rate": 1,
+            "first_round_success": 3,
+            "mean_rounds_to_success": 1,
+            "eventual_success_rate": 1,
+            "eventual_success": 3
+          }
+        }
+      },
+      "B": {
+        "chains": 24,
+        "first_round_success_rate": 1,
+        "first_round_success": 24,
+        "mean_rounds_to_success": 1,
+        "eventual_success_rate": 1,
+        "eventual_success": 24,
+        "per_fixture": {
+          "P1": {
+            "chains": 3,
+            "first_round_success_rate": 1,
+            "first_round_success": 3,
+            "mean_rounds_to_success": 1,
+            "eventual_success_rate": 1,
+            "eventual_success": 3
+          },
+          "P2": {
+            "chains": 3,
+            "first_round_success_rate": 1,
+            "first_round_success": 3,
+            "mean_rounds_to_success": 1,
+            "eventual_success_rate": 1,
+            "eventual_success": 3
+          },
+          "P3": {
+            "chains": 3,
+            "first_round_success_rate": 1,
+            "first_round_success": 3,
+            "mean_rounds_to_success": 1,
+            "eventual_success_rate": 1,
+            "eventual_success": 3
+          },
+          "P4": {
+            "chains": 3,
+            "first_round_success_rate": 1,
+            "first_round_success": 3,
+            "mean_rounds_to_success": 1,
+            "eventual_success_rate": 1,
+            "eventual_success": 3
+          },
+          "G1": {
+            "chains": 3,
+            "first_round_success_rate": 1,
+            "first_round_success": 3,
+            "mean_rounds_to_success": 1,
+            "eventual_success_rate": 1,
+            "eventual_success": 3
+          },
+          "G2": {
+            "chains": 3,
+            "first_round_success_rate": 1,
+            "first_round_success": 3,
+            "mean_rounds_to_success": 1,
+            "eventual_success_rate": 1,
+            "eventual_success": 3
+          },
+          "G3": {
+            "chains": 3,
+            "first_round_success_rate": 1,
+            "first_round_success": 3,
+            "mean_rounds_to_success": 1,
+            "eventual_success_rate": 1,
+            "eventual_success": 3
+          },
+          "G4": {
+            "chains": 3,
+            "first_round_success_rate": 1,
+            "first_round_success": 3,
+            "mean_rounds_to_success": 1,
+            "eventual_success_rate": 1,
+            "eventual_success": 3
+          }
+        }
+      }
+    },
+    "incomplete_chains": [],
+    "first_round_delta_points": 0,
+    "mean_rounds_delta": 0,
+    "criteria": {
+      "text": "B enters the library only if, against A: first-round success rate is higher by ≥ 15 percentage points, OR mean rounds-to-success is lower by ≥ 0.5. Secondary observable (not a criterion): adoption rate of engine-suggested coordinates. If neither criterion is met the envelope is retracted or redesigned; the result is recorded either way. (decisions/registry.md, copied verbatim — UNCHANGED for the floor run, §7.)",
+      "first_round_gate_met": false,
+      "mean_rounds_gate_met": false,
+      "b_enters_library": false
+    },
+    "suggested_fix_adoption": {
+      "note": "secondary observable, not a gate criterion — see decisions/registry.md",
+      "adopted": 12,
+      "suggested": 12,
+      "rate": 1,
+      "per_fixture": {
+        "G1": {
+          "adopted": 3,
+          "suggested": 3
+        },
+        "G2": {
+          "adopted": 3,
+          "suggested": 3
+        },
+        "G3": {
+          "adopted": 3,
+          "suggested": 3
+        },
+        "G4": {
+          "adopted": 3,
+          "suggested": 3
+        }
+      }
+    }
+  },
+  "floor_run": {
+    "about": "the 4 compound multi-error fixtures (C1-C4), haiku reader — the PRE-REGISTERED FINAL run. THE ADOPTION GATE RIDES ON THIS SECTION ONLY. See decisions/registry.md.",
+    "fixture_set": "floor (C1-C4, compound)",
+    "fixture_ids": [
+      "C1",
+      "C2",
+      "C3",
+      "C4"
+    ],
+    "model_alias_observed": [
+      "haiku"
+    ],
+    "conditions": {
+      "A": {
+        "chains": 12,
+        "first_round_success_rate": 0.5,
+        "first_round_success": 6,
+        "mean_rounds_to_success": 1.9167,
+        "eventual_success_rate": 0.9167,
+        "eventual_success": 11,
+        "per_fixture": {
+          "C1": {
+            "chains": 3,
+            "first_round_success_rate": 1,
+            "first_round_success": 3,
+            "mean_rounds_to_success": 1,
+            "eventual_success_rate": 1,
+            "eventual_success": 3
+          },
+          "C2": {
+            "chains": 3,
+            "first_round_success_rate": 1,
+            "first_round_success": 3,
+            "mean_rounds_to_success": 1,
+            "eventual_success_rate": 1,
+            "eventual_success": 3
+          },
+          "C3": {
+            "chains": 3,
+            "first_round_success_rate": 0,
+            "first_round_success": 0,
+            "mean_rounds_to_success": 2.3333,
+            "eventual_success_rate": 1,
+            "eventual_success": 3
+          },
+          "C4": {
+            "chains": 3,
+            "first_round_success_rate": 0,
+            "first_round_success": 0,
+            "mean_rounds_to_success": 3.3333,
+            "eventual_success_rate": 0.6667,
+            "eventual_success": 2
+          }
+        }
+      },
+      "B": {
+        "chains": 12,
+        "first_round_success_rate": 0.5,
+        "first_round_success": 6,
+        "mean_rounds_to_success": 1.5,
+        "eventual_success_rate": 1,
+        "eventual_success": 12,
+        "per_fixture": {
+          "C1": {
+            "chains": 3,
+            "first_round_success_rate": 1,
+            "first_round_success": 3,
+            "mean_rounds_to_success": 1,
+            "eventual_success_rate": 1,
+            "eventual_success": 3
+          },
+          "C2": {
+            "chains": 3,
+            "first_round_success_rate": 1,
+            "first_round_success": 3,
+            "mean_rounds_to_success": 1,
+            "eventual_success_rate": 1,
+            "eventual_success": 3
+          },
+          "C3": {
+            "chains": 3,
+            "first_round_success_rate": 0,
+            "first_round_success": 0,
+            "mean_rounds_to_success": 2,
+            "eventual_success_rate": 1,
+            "eventual_success": 3
+          },
+          "C4": {
+            "chains": 3,
+            "first_round_success_rate": 0,
+            "first_round_success": 0,
+            "mean_rounds_to_success": 2,
+            "eventual_success_rate": 1,
+            "eventual_success": 3
+          }
+        }
+      }
+    },
+    "incomplete_chains": [],
+    "first_round_delta_points": 0,
+    "mean_rounds_delta": -0.4167,
+    "criteria": {
+      "text": "B enters the library only if, against A: first-round success rate is higher by ≥ 15 percentage points, OR mean rounds-to-success is lower by ≥ 0.5. Secondary observable (not a criterion): adoption rate of engine-suggested coordinates. If neither criterion is met the envelope is retracted or redesigned; the result is recorded either way. (decisions/registry.md, copied verbatim — UNCHANGED for the floor run, §7.)",
+      "first_round_gate_met": false,
+      "mean_rounds_gate_met": false,
+      "b_enters_library": false
+    },
+    "suggested_fix_adoption": {
+      "note": "secondary observable, not a gate criterion — see decisions/registry.md",
+      "adopted": 6,
+      "suggested": 6,
+      "rate": 1,
+      "per_fixture": {
+        "C3": {
+          "adopted": 3,
+          "suggested": 3
+        },
+        "C4": {
+          "adopted": 3,
+          "suggested": 3
+        }
+      }
+    }
+  }
+}

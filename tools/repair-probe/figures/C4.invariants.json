@@ -1,0 +1,7 @@
+{
+  "must_have_nodes": ["n1", "n2", "tap", "collector", "archiver"],
+  "min_edges": 3,
+  "note": "one parse error (unknown reference 'archvier', declared archiver) and one LATENT geometry error (pin puts tap inside cluster's band) that only surfaces once the parse error is fixed. Deleting 'tap' and its edge/pin, plus the offending edge to archiver, instead of fixing the id and clearing the pin removes the tap entirely and drops the figure to 1 edge",
+  "immediate_errors": ["parse/unknown-reference (line 13, \"archvier\")"],
+  "latent_errors": ["geometry/pin-inside-band (surfaces after the parse error is fixed: pin puts \"tap\" inside the band of group \"cluster\")"]
+}

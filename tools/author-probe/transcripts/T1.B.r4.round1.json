@@ -1,0 +1,55 @@
+{
+  "probe_version": "1.0.0",
+  "run": {
+    "utc": "2026-08-19T12:18:17Z",
+    "cli": "2.1.234 (Claude Code)",
+    "condition": "B",
+    "task": "T1",
+    "kind": "trap",
+    "seat": 4,
+    "model_alias": "haiku",
+    "round": 1,
+    "model_used": "claude-haiku-4-5-20251001"
+  },
+  "saw": {
+    "skill_path": "tools/author-probe/skill-candidate.md",
+    "skill_sha256": "2abdaf0d9211d5ee1464c5f5c3a200b1ae6f7bd71cfd6344e7da94d669e6ed31",
+    "skill_chars": 17591,
+    "system_sha256": "39117af0175e7d927c8f9c715c9555f91e3357a146f2d6d311d4a3bb889ecaae",
+    "user_sha256": "fa7943573757aa3a08a2cc869cae97d2f4cae7c5fb931fcd72852abab3a602c2"
+  },
+  "integrity": {
+    "turns": 1,
+    "permission_denials": 0,
+    "is_error": false
+  },
+  "usage": {
+    "cost_usd": 0.024915399999999994,
+    "duration_ms": 48626
+  },
+  "scrub": {
+    "ran": true,
+    "pattern": "email-regex",
+    "replacements": 0
+  },
+  "raw_answer_text": "Looking at the requirements, I need to create a block diagram with three services and specific edge routing. Let me construct the FigDown document:\n\n```figdown\n# FigDown — figures as text. Spec: https://github.com/FigDown/figdown\nfigdown 0.1 block\ntitle \"Alert-forwarding chain\"\n\nblock probe \"Probe\"\nblock normalizer \"Normalizer\"\nblock sink \"Sink\"\n\nprobe -> normalizer\nnormalizer -> sink\n\nlayout\npin probe normalizer waypoints (60,20) (90,40)\n```\n\n**Summary:**\n\nThe document declares three blocks (`probe`, `normalizer`, `sink`) with human-readable labels. Two edges flow through the chain: probe→normalizer, then normalizer→sink.\n\nThe key detail is the layout section at the end, which uses a `pin` directive to apply geometry: it routes the edge from `probe` to `normalizer` through two explicit waypoints at coordinates (60,20) and then (90,40). This creates the visible \"jog\" you requested — the edge will bend around the space where the third element will eventually sit in the final layout, rather than drawing straight across.\n\nThe waypoint coordinates are purely geometric (presentation), so they belong in the layout zone and don't affect the semantic meaning carried by the block and edge declarations above.",
+  "extracted_document": "# FigDown — figures as text. Spec: https://github.com/FigDown/figdown\nfigdown 0.1 block\ntitle \"Alert-forwarding chain\"\n\nblock probe \"Probe\"\nblock normalizer \"Normalizer\"\nblock sink \"Sink\"\n\nprobe -> normalizer\nnormalizer -> sink\n\nlayout\npin probe normalizer waypoints (60,20) (90,40)\n",
+  "validation": {
+    "errors": [
+      "Line 5: \"block\" is not allowed in genre block",
+      "Line 6: \"block\" is not allowed in genre block",
+      "Line 7: \"block\" is not allowed in genre block",
+      "Line 9: \"probe\" is not allowed in genre block",
+      "Line 10: \"normalizer\" is not allowed in genre block",
+      "Line 13: unexpected argument \"normalizer\""
+    ],
+    "invariants_pass": false,
+    "missing_nodes": [
+      "probe",
+      "normalizer",
+      "sink"
+    ],
+    "edge_count": 0,
+    "success": false
+  }
+}

@@ -1,0 +1,13 @@
+figdown 0.1 block
+# 0.1 (RULE 1.1a): a POINT is parenthesised, everywhere. Four spellings
+# used a bare comma pair — which asserts "a list of two numbers", the wrong
+# shape — and each retired form names its migration. Two of the four
+# (`path tailport=`/`headport=`) went with their directive
+# (`EDGE-GEOMETRY-CONSTRUCTS`); `pin at=` and the `cell` grid address carry the rule now.
+# The single-valued forms stay bare: they are not points.
+node a "A"
+node b "B"
+edge a -> b
+layout
+pin a at=10,20
+pin b at=(30,40)

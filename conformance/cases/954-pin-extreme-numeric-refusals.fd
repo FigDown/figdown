@@ -1,0 +1,36 @@
+# Core §15.5 — THE EXTREME-NUMERIC REFUSALS, PINNED.
+#
+# §15.5 claims that the closed grammar refuses the extreme-numeric class
+# before anything reaches the layout pass, and a security claim may only say
+# what a fixture or a gate demonstrates. Two fixtures already carried half of
+# it — `361-pin-errors` pins that `at=` takes a parenthesised point, and
+# `367-pin-extent-strict-value` pins `width=0`, `width=-50` and `width=1e3`
+# as *width must be a positive number (px)*. What neither carried is the
+# INSIDE of the parens: the values an attacker or a confused generator
+# actually reaches for once it has learned the `at=(x,y)` shape.
+#
+# So this file writes them. `1e12` is scientific notation, which the point
+# grammar does not admit at all; `NaN` and `Infinity` are the two IEEE
+# non-finite spellings that a naive `parseFloat` accepts and that would reach
+# geometry as a coordinate no viewBox can hold. All three get the SAME
+# message as a malformed point, and that is the finding worth pinning: the
+# grammar does not have a special case for them, it simply never had a
+# production they could match. §15.5 says "none of this is a security feature
+# that was designed" — this golden is what makes that sentence checkable.
+#
+# THE COMPLEMENT, and it is why §15.5 does not overclaim: a LARGE PLAIN
+# DECIMAL is accepted. `pin at=(999999999999999999999,0)` renders, to a
+# document whose viewBox is `0 0 1e+21 76`. That is not written here because
+# it is not an error — it is the unbounded-canvas half of §15.5, which is
+# UNSPECIFIED and has no gate by construction. The refusals below are a
+# grammar boundary, not a magnitude limit, and a reader who mistook one for
+# the other would trust a bound that does not exist.
+figdown 0.4 block
+node a "A"
+node b "B"
+layout
+pin a at=(1e12,1e12)
+pin b at=(NaN,NaN)
+pin a at=(Infinity,0)
+pin b at=(-1e12,-1e12)
+pin a at=(1e400,0)

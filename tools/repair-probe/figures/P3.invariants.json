@@ -1,0 +1,5 @@
+{
+  "must_have_nodes": ["sw1", "sw2", "agg1", "core1"],
+  "min_edges": 4,
+  "note": "deleting the 'edge s1w -> core1' line instead of retargeting it to sw1 drops the figure to 3 edges and silently removes sw1's direct uplink to the core"
+}

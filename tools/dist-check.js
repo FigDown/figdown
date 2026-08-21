@@ -43,11 +43,23 @@
 //      ESM build, and run a document through each: parse+render must succeed
 //      and the two builds must agree byte-for-byte on the SVG. A build that
 //      is byte-current but throws on import is still a broken publish.
-//   D. THE FROZEN SURFACE PARSES. Every `.fd` under `examples/` and
-//      `figures/` that the reference engine accepts must ALSO be accepted by
-//      the `dist/` build, with the same error set. This is the check stated
-//      in the shape the published defect actually took: a user's copy
-//      rejecting a shipped example.
+//   D. THE FROZEN SURFACE PARSES *AND RENDERS THE SAME*. Every `.fd` under
+//      `examples/` and `figures/` that the reference engine accepts must ALSO
+//      be accepted by the `dist/` build, with the same error set. This is the
+//      check stated in the shape the published defect actually took: a user's
+//      copy rejecting a shipped example.
+//
+//      BOTH ERROR CHANNELS ARE COMPARED, not just the parse one. Until
+//      0.4 this check read `parse` alone, and the geometry channel —
+//      the diagnostics only `render` can raise, which core §8 says a caller
+//      MUST treat exactly as parse errors — was compared by nothing. That is
+//      how `make-lib.js` came to build a `render` wrapper returning
+//      `errors: []` next to an SVG of a figure the engine had just refused:
+//      every fixture in scope parsed clean, so a parse-only comparison saw
+//      two identical empty lists and agreed. `conformance/cases/`'s
+//      geometry fixture is added to the corpus below for exactly this reason
+//      — a fixture whose whole subject is a non-empty render diagnostic, so
+//      the regression cannot silently return.
 //
 // `--strict` is accepted for symmetry with the other gates; every finding
 // here is already fatal, so it changes nothing.
@@ -155,7 +167,17 @@ function loadReferenceEngine() {
   const start = h.indexOf('const SHAPES');
   const end = h.indexOf('// 3. UI');
   if (start < 0 || end < 0) throw new Error('cannot locate engine in ' + ENGINE_HTML);
-  return new Function(h.slice(start, end) + '\nreturn {parse};')();
+  return new Function(h.slice(start, end) + '\nreturn {parse, render, stackSectionSvgs};')();
+}
+
+// The reference engine's GEOMETRY channel for one source, in the shape
+// `dist`'s `render()` reports it: parse errors first (they pre-empt geometry —
+// nothing is rendered), otherwise every section's render diagnostics.
+function referenceErrors(ref, src) {
+  const p = ref.parse(src);
+  if (p.errs.length) return p.errs.slice().sort();
+  const docs = p.docs && p.docs.length ? p.docs : (p.doc ? [p.doc] : []);
+  return docs.reduce((a, d) => a.concat(ref.render(d).errs || []), []).sort();
 }
 
 function checkCorpus() {
@@ -163,21 +185,63 @@ function checkCorpus() {
   if (!fs.existsSync(distPath)) return;
   const lib = require(distPath);
   const ref = loadReferenceEngine();
+  // The published corpus, PLUS the conformance fixtures whose subject is a
+  // geometry-time diagnostic. `examples/` and `figures/` are all figures that
+  // are meant to render clean, so on their own they can only ever compare two
+  // empty geometry lists — which is precisely how the discarded channel stayed
+  // invisible. A fixture that MUST report is named here so the comparison has
+  // something to be wrong about.
+  const GEOMETRY_FIXTURES = [
+    path.join(ROOT, 'conformance', 'cases', '369-pin-complete-cover-refused.fd'),
+  ];
+  for (const f of GEOMETRY_FIXTURES) {
+    if (!fs.existsSync(f)) fail('missing geometry fixture ' + path.relative(ROOT, f)
+      + ' — it pins the render/geometry channel through dist/; do not delete it without a replacement');
+  }
   const files = [].concat(walkFd(path.join(ROOT, 'examples'), []),
-                          walkFd(path.join(ROOT, 'figures'), [])).sort();
-  let diverged = 0;
+                          walkFd(path.join(ROOT, 'figures'), [])).sort()
+                  .concat(GEOMETRY_FIXTURES.filter(f => fs.existsSync(f)));
+  let diverged = 0, geometryPinned = 0;
   for (const f of files) {
     const src = fs.readFileSync(f, 'utf8');
-    const want = ref.parse(src).errs.slice().sort();
-    const got = lib.parse(src).errors.slice().sort();
-    if (JSON.stringify(want) !== JSON.stringify(got)) {
+    // PARSE CHANNEL
+    const wantP = ref.parse(src).errs.slice().sort();
+    const gotP = lib.parse(src).errors.slice().sort();
+    if (JSON.stringify(wantP) !== JSON.stringify(gotP)) {
       diverged++;
-      fail(path.relative(ROOT, f) + ' — dist/ and the reference engine disagree\n'
-        + '        reference: ' + JSON.stringify(want) + '\n'
-        + '        dist:      ' + JSON.stringify(got));
+      fail(path.relative(ROOT, f) + ' — dist/ and the reference engine disagree on the PARSE channel\n'
+        + '        reference: ' + JSON.stringify(wantP) + '\n'
+        + '        dist:      ' + JSON.stringify(gotP));
+      continue;
+    }
+    // RENDER / GEOMETRY CHANNEL (core §8: a caller must treat it as it treats
+    // a parse error, so `render()` must SURFACE it, not swallow it).
+    const wantR = referenceErrors(ref, src);
+    const r = lib.render(src);
+    const gotR = (r.errors || []).slice().sort();
+    if (JSON.stringify(wantR) !== JSON.stringify(gotR)) {
+      diverged++;
+      fail(path.relative(ROOT, f) + ' — dist/ and the reference engine disagree on the RENDER/GEOMETRY channel\n'
+        + '        reference: ' + JSON.stringify(wantR) + '\n'
+        + '        dist:      ' + JSON.stringify(gotR));
+      continue;
+    }
+    if (wantR.length) {
+      geometryPinned++;
+      // The contract build-svg.js establishes and core §8 states: a non-empty
+      // render diagnostic list withholds the artifact. A build that reports
+      // the diagnostics and hands back the picture anyway has not refused.
+      if (r.svg !== null)
+        { diverged++; fail(path.relative(ROOT, f) + ' — dist/ render() reported ' + wantR.length
+          + ' geometry diagnostic(s) and STILL returned an svg; core §8 says nothing is drawn'); }
+      const art = lib.artifact(src);
+      if (art.svg !== null || !art.errors.length)
+        { diverged++; fail(path.relative(ROOT, f) + ' — dist/ artifact() did not refuse a figure with '
+          + 'geometry diagnostics (svg must be null, errors non-empty)'); }
     }
   }
-  if (!diverged) ok(files.length + ' published .fd: dist/ and the reference engine agree on every error set');
+  if (!diverged) ok(files.length + ' published .fd: dist/ and the reference engine agree on every '
+    + 'error set, parse AND geometry (' + geometryPinned + ' with a non-empty geometry channel, refused by both)');
 }
 
 checkBuilds().then(() => {

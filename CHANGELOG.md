@@ -65,6 +65,136 @@ Statuses referred to above are defined in [`spec/README.md`](spec/README.md).
 
 Nothing yet.
 
+## v0.5.0 — 2026-08-21
+
+**Release `v0.5.0`, language version `figdown 0.5`.** The fourth `Y`: new
+language surface is added and nothing is removed. Every `figdown 0.1` through
+`0.4` document parses to the same model it always did. Five behaviour
+corrections act on documents that never change their header — all five are
+listed under *Upgrading* below. This is also the first release whose archive
+carries more than an engine page.
+
+**Language — a connector may be named:
+[`id=`](spec/core.md) on the four scene connectors, requires `figdown 0.5`.**
+`edge`, `flowline`, `transition` and `message` accept a trailing, keyword-only,
+optional `id=`, unique within its section and sharing the section's existing id
+namespace. The key is a **handle and nothing else**: naming a message asserts
+no order, no equivalence and no identity across a branch boundary, so
+`sequence`'s total order is still declaration order and its no-restatement rule
+is untouched. `figdown 0.5` adds **no genre** — its genre table is a copy of
+`0.4`'s, and the language number moves for one option key, which is what a `Y`
+is for. A document that writes `id=` under `figdown 0.4` gets a line error
+naming the version and the one-step fix.
+
+**Language — the rule behind the version gate is restated, and one sentence is
+withdrawn.** `spec/core.md` §13.7.2 said a key that had never been spelled
+before "would carry no such risk and would need no gate". Every prior gated
+change contradicts it — two connector keywords, two genre tokens and one option
+key were all gated, and the only ungated change added no spelling at all. The
+sentence is **withdrawn, kept visible in place**, and replaced by the rule the
+record actually shows: **the gate engages on adding a spelling to the accepted
+surface, never on what the spelling used to mean.**
+
+**Language — three consumers land with the handle.** A `bundle` member may now
+be a connector id as well as an endpoint pair, in the same comma list;
+[`figdown-diff`](tools/figdown-diff.js) pairs identified edges by id in a pass
+ahead of its tuple passes, leaving anonymous edges to the three conservative
+passes they already had; and every rendered connector carries `data-edge` —
+the authored id where it has one, the source line where it does not.
+
+**Changed — a source character XML forbids is a line error.** An adversarial
+probe of every label surface found no escaping hole and one defect that was not
+an injection: a raw code point XML forbids passed through the parser, rendered
+clean, and produced an `.svg` that no conforming XML reader will open. The
+parser now refuses the document, names the code point, and renders nothing —
+an artifact that cannot be well-formed is not an artifact. The reasoning, the
+threat model and what is deliberately left unspecified are new normative text
+at [`spec/core.md` §15](spec/core.md), with a gate
+([`tools/safe-svg-check.js`](tools/safe-svg-check.js)) that measures every
+shipped artifact against the Safe SVG profile rather than asserting it.
+
+**Changed — a `bundle` member is stated once.** A member repeated in one member
+list used to draw a two-member bundle over a single link. It is now a line
+error, bound to the resolved link rather than to the spelling, so the two ways
+of writing the same member collide too.
+
+**Changed — one paint channel, one class.** `class=` is multi-valued, and where
+two carried classes both declared the same channel (`fill`, `stroke` or
+`style`) the engine silently drew whichever was written last. That is now a
+line error. Classes that **partition** the channels stay exactly as legal as
+they have always been; the rule fires only on a channel two classes both claim.
+
+**Changed — a lasso may ring only what it collects.** A `bundle`'s ring is the
+drawn extent of its member links, so a node drawn wholly inside it is drawn as
+one of them. In two tiers, inheriting the group band's own principle — whoever
+chose the position bears the responsibility: where an author coordinate put the
+bystander inside, the engine reports on the `bundle` line and writes no
+artifact; where no author coordinate is involved, the separation pass moves the
+bystander clear before anything is drawn and reports only when there is nowhere
+to move it to.
+
+**Changed — a typed block's canvas covers its own title.** The canvas a
+`bitfield`, `table`, `timing` or `chart` section returns is now the union of its
+data extent and its title's extent. A title wider than the data used to run off
+the right edge of the section it names. `pin width=`/`height=` stays refused for
+a typed block: the author states the title's text, the engine owns how much room
+the drawing gives it.
+
+**Fixed — a pinned state keeps its self-transition.** A self-transition on a
+pinned state collapsed to a zero-length line at the state's centre and printed
+its trigger label across the state's name, so pinning silently deleted a
+construct the language grants. A self-loop now draws the same way whether its
+state's coordinate came from a pin or from the layout pass, on the same side
+selection as before.
+
+**Changed — a port is drawn as a fitting on the border it belongs to.** The
+`topology` genre's interface names sit in the border crossing as a drawn
+fitting rather than as free-floating text near the box, so a reader can tell
+which side of which device an interface is on without tracing the line.
+
+**Added — the editor becomes an editor.** The GUI edit path is now a single
+transaction — one parse, one model edit, one re-render — instead of a sequence
+of writes any one of which could leave the document half-changed. On top of it:
+a **property inspector** for the selected element; **parametric GUIs** for
+`table` and `bitfield`; **multi-select** with align, distribute and duplicate,
+all section-aware; and a **source pane** whose highlighting is driven by the
+keyword registry rather than by a second hand-kept copy of the grammar. Edge
+editing calls the same connector grammar the parser does, so the two can no
+longer disagree.
+
+**Added — the archive freezes the suite and the spec, from this release
+forward.** `archive/<X.Y>/figdown.html` answers "which engine drew this?"; it
+never answered "what was a conforming implementation of `figdown X.Y` required
+to do?" or "which words fixed what this document means?", and neither question
+could be answered from a live tree, because `conformance/` tracks the
+development language and `spec/` is edited continuously. This release freezes
+both beside the page — `archive/0.5/conformance/` and `archive/0.5/spec/` — held
+byte-for-byte by `archive/MANIFEST.tsv` and its gate. The mechanism is
+**forward-only**: `0.1`–`0.4` are released trees, and adding files to a released
+archive is rewriting it, so their suite and their spec text are reached through
+their release tags, which the stability promise already guarantees. The gap is
+real, it is named where a reader will look for it, and it closes by itself as
+versions ship.
+
+**Added — the reading contract for `figdown 0.5`,
+[`read/0.5/`](read/0.5/reading.md), frozen at this release.**
+
+**Added — [`PROOF.md`](PROOF.md): check this project instead of believing it.**
+Every claim this repository makes about itself is listed beside the command that
+decides it, and the page is generated from the tree it ships in, so a claim
+whose evidence moved cannot quietly keep standing.
+
+**Upgrading.** Raise a document's header to `figdown 0.5` only to use `id=` on a
+connector. Five checks act regardless of header, and each names its own fix: a
+source character XML forbids is refused (remove the code point the error names);
+a `bundle` member repeated in one list is refused (state it once); two carried
+classes claiming one paint channel is refused (split the channels, or carry one
+class); a `bundle` lasso that would enclose a non-member is refused where an
+author coordinate put it there (move the pin clear, or state the membership);
+and a typed block's title now widens its own section, which changes no meaning
+and may change a figure's width. Full details:
+[`spec/migrations.md`](spec/migrations.md).
+
 ## v0.4.1 — 2026-08-18
 
 **Release `v0.4.1`, language version `figdown 0.4`.** A patch release: the

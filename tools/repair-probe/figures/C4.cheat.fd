@@ -1,0 +1,14 @@
+figdown 0.1 block
+title "Storage cluster monitoring tap"
+
+group cluster "Storage cluster"
+node n1 "Node 1" in=cluster
+node n2 "Node 2" in=cluster
+node collector "Metrics collector"
+node archiver "Archiver"
+
+edge n1 -> n2
+
+pin cluster at=(0,0)
+pin n1 at=(0,0) width=120 height=50
+pin n2 at=(140,0) width=120 height=50

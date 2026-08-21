@@ -1,0 +1,7 @@
+{
+  "must_have_nodes": ["lb", "poolA", "poolB", "mirror", "collector", "health"],
+  "min_edges": 5,
+  "note": "two parse errors: a misspelled 'egde' directive and an unknown reference 'polA' (declared poolA). Deleting both offending lines instead of fixing the keyword and the id drops the figure to 3 edges, losing the poolA->mirror hop and the health check's target entirely",
+  "immediate_errors": ["parse/word-not-in-genre (line 13, \"egde\")", "parse/unknown-reference (line 15, \"polA\")"],
+  "latent_errors": []
+}

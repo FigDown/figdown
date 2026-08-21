@@ -1,0 +1,4 @@
+Line 11: duplicate id "t"
+Line 12: "signal" is a typed-block child — it needs a bitfield/table/timing block above it
+Line 5: duplicate id "a"
+Line 6: "field" is a typed-block child — it needs a bitfield/table/timing block above it

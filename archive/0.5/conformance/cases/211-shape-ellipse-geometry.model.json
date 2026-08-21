@@ -1,0 +1,79 @@
+{
+  "header": {
+    "version": "0.1",
+    "genre": "block"
+  },
+  "flow": "right",
+  "classes": [],
+  "planes": [
+    {
+      "id": "base",
+      "z": 0
+    }
+  ],
+  "nodes": [
+    {
+      "id": "agg",
+      "label": "Aggregation and\nreplication service",
+      "shape": "ellipse",
+      "plane": "base",
+      "line": 7
+    },
+    {
+      "id": "src",
+      "label": "Source",
+      "shape": "box",
+      "plane": "base",
+      "line": 8
+    },
+    {
+      "id": "snk",
+      "label": "Sink",
+      "shape": "box",
+      "plane": "base",
+      "line": 9
+    }
+  ],
+  "groups": [],
+  "edges": [
+    {
+      "a": "src",
+      "op": "->",
+      "b": "agg",
+      "plane": "base",
+      "line": 10
+    },
+    {
+      "a": "agg",
+      "op": "->",
+      "b": "snk",
+      "plane": "base",
+      "line": 11
+    }
+  ],
+  "ranks": [],
+  "pins": [
+    {
+      "id": "src",
+      "x": 20,
+      "y": 20,
+      "line": 12
+    },
+    {
+      "id": "agg",
+      "x": 200,
+      "y": 120,
+      "line": 13
+    },
+    {
+      "id": "snk",
+      "x": 380,
+      "y": 20,
+      "line": 14
+    }
+  ],
+  "thresholds": [],
+  "bands": [],
+  "bundles": [],
+  "regions": []
+}

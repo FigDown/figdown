@@ -1,0 +1,41 @@
+figdown 0.1 block
+# 0.1: BOTH spellings of the text channel are now retired, and v0.1
+# has no author-facing label colour at all — the default is derived from the
+# fill the label sits on (core §5, `LABEL-COLOUR-SOURCE`), and the owner-level key that could
+# be added instead would colour an edge's [tail]/[mid]/[head] labels
+# identically, which is the wrong shape (core §9 `ANNOTATION-LOCATOR-SPLIT`).
+# `color=` is the one key whose diagnostic must name TWO eras and refuse to
+# choose: in one era it set the FILL, in another it set the
+# LABEL. No engine can tell the two source files apart, which is exactly why
+# the key had to leave — while it was live a pre-0.1 document parsed
+# and drew a legal, WRONG figure in silence.
+#
+# 0.3 (`SCENE-KEYWORD-MEMBERSHIP`): the two `bundle` hosts moved to section 2, the only
+# genre that still declares the directive. They are hosts, not the subject —
+# what is pinned is that the retired-key sweep runs AHEAD of the per-genre
+# allowlist and per-directive option rows, so a retired spelling is answered
+# by its own diagnostic on every directive that ever accepted it, in every
+# genre. `external e text=#fff` proves the same point from the other side:
+# `external` takes no option key at all since `plane=` was withdrawn (`PAINT-ORDER-CONSTRUCT`),
+# and it still gets the `text=` retirement rather than `does not take`.
+class hot "Hot path" fill=#dc2626 stroke=#dc2626
+group g "G" text=#fee2e2
+node a "A" text=#fee2e2
+edge a -> a text=#dc2626
+external e text=#fff
+# the retirement fires on every directive that ever accepted the key …
+node b "B" color=#1f2937
+group g2 "G2" color=#1f2937
+band "Reserved" 15% in=g color=#dcfce7
+# … including the typed-block openers and their items.
+bitfield bf "Bits" numbering=msb0 color=#0f172a
+field "One" 32 color=#0f172a
+# the interior-less ones (§8.4): fill= and stroke= named one channel
+edge a -> a fill=#dc2626
+threshold "cap" in=g offset=50% fill=#a3c93a
+
+figdown 0.1 topology
+node a "A"
+edge a -> a
+bundle es1 "ES" a--a text=#0ea5e9
+bundle es2 "ES2" a--a fill=#0ea5e9 stroke=#0ea5e9

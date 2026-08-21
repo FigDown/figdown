@@ -1,0 +1,2 @@
+Line 2: bitfield has no fields
+Line 3: break has no preceding field in the current row

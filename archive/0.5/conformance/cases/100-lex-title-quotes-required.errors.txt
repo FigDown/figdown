@@ -1,0 +1,5 @@
+Line 11: title needs a quoted string: title "<text>" (MIGRATIONS 0.1)
+Line 15: title needs a quoted string: title "<text>" (MIGRATIONS 0.1)
+Line 17: unexpected argument "extra"
+Line 6: title needs a quoted string: title "<text>" (MIGRATIONS 0.1)
+Line 9: title needs a quoted string: title "<text>" (MIGRATIONS 0.1)

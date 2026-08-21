@@ -1,0 +1,50 @@
+# ADVERSARIAL FIXTURE — hostile TEXT in every `block` label surface at once.
+#
+# This is a VALID document. That is the whole point. Nothing below is a
+# syntax probe: every line is ordinary FigDown, and the only unusual thing
+# about it is that the STRINGS spell markup, event handlers, a `javascript:`
+# URL, a CSS fetch and an `@import`. A `.fd` is untrusted text (core §15),
+# and the language's answer to hostile text is not to refuse it — refusing
+# `<` would make the language unable to write a figure about XML — but to
+# carry it as DATA the whole way to the artifact.
+#
+# WHAT THIS FIXTURE PINS, and what it cannot.
+#
+#   PINNED HERE (the `.model.json` golden): every author string arrives in
+#   the semantic model BYTE FOR BYTE — the title, the class MEANING, the
+#   group and node labels, all three edge-label positions, and every `note=`.
+#   `<script>` is four fewer characters than `&lt;script&gt;` and one more
+#   token than nothing at all, so a golden that holds the exact string
+#   catches an engine that escapes on the way IN, and an engine that strips
+#   or sanitises. Escaping belongs to the OUTPUT stage; the model is the
+#   source's own text. (Case 800 was written while `note=` had no row in
+#   normalize.js and says so; it has one now, and this golden holds six
+#   note strings on five different carriers.)
+#
+#   NOT PINNED HERE: that the same strings reach the ARTIFACT as escaped
+#   text and never as markup. That is `gate:safesvg`'s half — it renders
+#   this file and reads the output structurally. The two split the claim:
+#   the model golden owns "hostile text survives as data", the gate owns
+#   "hostile text never becomes markup".
+#
+#   NOT PINNED ANYWHERE, and said plainly: the SVG has no golden by design
+#   (spec §3 — only same source + same renderer version is byte-identical),
+#   so nothing here freezes the rendered bytes. `gate:safesvg` asserts a
+#   PROPERTY of the output, never its bytes.
+figdown 0.3 block
+title "</svg><script>alert(1)</script>" note="onload=alert(1) onerror=alert(2)"
+
+# A class label is a MEANING string (`MEANING-RECOVERY-SOURCE`) and reaches the legend, which is a
+# second text surface with its own emitter.
+class hostile "<foreignObject><body>x</body></foreignObject>" stroke=#b91c1c
+
+# A group label draws on the band; a node label inside the shape.
+group g "javascript:alert(1)" note="url(https://example.invalid/x.png)"
+node a "<script>alert(1)</script>" in=g note="@import url(\"https://example.invalid/x.css\");"
+node b "\" onclick=\"alert(1)" class=hostile
+node c "&amp; & < > \\ done"
+
+# Three edge-label positions, all three hostile. `[ ]` is the bracket form and
+# cannot itself contain `]`; the quoted surfaces carry the rest.
+edge a [<tail>] -[<mid onload=x>]-> [<head>] b
+edge b -> c note="]]> </metadata> <![CDATA["

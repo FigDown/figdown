@@ -1,0 +1,18 @@
+# `SEQUENCE-GENRE-VOCABULARY`: `type=` is MANDATORY on `fragment`, and the twelve
+# values are UML's `InteractionOperatorKind` taken whole. The clause number in
+# both diagnostics is §17.12.15.3 — NOT §17.6.2, which is Abstract Syntax and
+# is registered as a FALSE citation in spec/standards-claims.tsv (S024).
+#
+# The missing-key case and the wrong-value case are different mistakes and get
+# different sentences: the first says why there is no default (UML has one and
+# FigDown declines it), the second just lists the twelve.
+#
+# `operand` needs `in=` for the same kind of reason and is pinned in the same
+# file: a compartment with no fragment is not a smaller thing, it is nothing.
+figdown 0.4 sequence
+lifeline c "C"
+lifeline s "S"
+fragment a "no operator at all"
+fragment b "not one of the twelve" type=maybe
+fragment d "the enum is bare, not quoted" type="alt"
+operand o "no fragment"

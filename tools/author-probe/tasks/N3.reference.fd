@@ -1,0 +1,13 @@
+figdown 0.1 flowchart
+title "BGP session reset procedure"
+
+process checkcounters "Check interface error counters"
+decision errorsfound "Errors found?"
+process clearcounters "Clear interface counters"
+terminator monitor "Monitor session"
+terminator escalate "Escalate to operator"
+
+edge checkcounters -> errorsfound
+edge errorsfound -[yes]-> clearcounters
+edge clearcounters -> monitor
+edge errorsfound -[no]-> escalate

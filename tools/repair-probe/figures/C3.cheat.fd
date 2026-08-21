@@ -1,0 +1,10 @@
+figdown 0.1 block
+title "Firmware update verdict pair"
+
+node fetch "Fetch firmware image"
+node verify "Verify checksum"
+node accept "Apply update"
+node notify "Notify operator"
+
+edge fetch -> verify
+edge verify -> accept

@@ -1,0 +1,9 @@
+{
+  "id": "N1",
+  "kind": "normal",
+  "genre": "block",
+  "version": "0.1",
+  "brief": "Draw a block figure titled \"Telemetry export pipeline\" for an internal monitoring stack. A poller collects raw samples from a device on a timer. A normalizer reshapes the raw samples into a common schema. A separate health probe independently pings the device and feeds its status into the same normalizer. Once normalized, samples pass into a ring buffer that holds them briefly, and an exporter drains the buffer and ships samples to a remote collector. Use these ids for the five components: poller, normalizer, healthprobe, buffer, exporter. Show the four connections the description implies: poller into the normalizer, the health probe into the normalizer, the normalizer into the buffer, and the buffer into the exporter.",
+  "must_have_nodes": ["poller", "normalizer", "healthprobe", "buffer", "exporter"],
+  "min_edges": 4
+}

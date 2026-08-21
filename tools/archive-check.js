@@ -56,10 +56,59 @@
 //      least one runnable engine page. This is §13.5's obligation restated as
 //      a test, so a release that ships with a tag and no page fails here
 //      rather than being noticed years later by the reader who needed it.
+//      ONE EXCEPTION, and it is structural rather than a softening: a release
+//      whose archived rows are ALL under `archive/<v>/conformance/` or
+//      `archive/<v>/spec/` has not reached the publish step that writes its
+//      page. Those two partitions are frozen BEFORE the release commit, in
+//      the source repository, by `tools/snapshot-release.js`; the page is
+//      written afterwards, in the published tree, by the pipeline's
+//      `postfix.py` T16, from the PUBLISHED engine — which is the only engine
+//      that ever satisfies §13.5, and which does not exist while the source
+//      tree is being prepared. Demanding the page here would make the source
+//      repository permanently red for every language it freezes, and would be
+//      demanding a file this tree is not the one that owes. The obligation
+//      does not go unchecked: `publish/release-identity.py`'s `archive-page`
+//      check asks it of the finished, tagged, published tree, which is where
+//      the page has to be. The exception is stated by the ROWS, not by which
+//      tree this is, so a published release that lost its page still fails —
+//      its rows include a page row, and B catches the missing file.
+//   E. STRUCTURAL COVERAGE. Every version directory that actually exists
+//      under archive/ must have at least one manifest row (and its read/
+//      sibling too, if that also exists on disk). A, C and D all key off the
+//      manifest's own rows to decide what to check; this is the one check
+//      that does not start from the manifest, so a release whose rows are
+//      gone cannot make its own directory invisible to it. Scoped to
+//      archive/ rather than read/ in general: read/0.2 onward legitimately
+//      sits on disk with no rows until PUBLISH performs the archive act (see
+//      WHAT BOUGHT CHECK E below) — an archive/<v> directory has no such
+//      excuse, since nothing places one except that same archive act.
 //
 // The check is over ALL archived versions, every run — not the newest one.
 // An archive that is only verified at the moment it is written is not an
 // archive; the whole promise is about the years afterwards.
+//
+// WHAT BOUGHT CHECK E
+//
+// prefixesOf() used to read prefixes from the manifest alone — "derived from
+// the manifest itself rather than written out here" was the reasoning, and
+// for what it was guarding (A, C, D not going stale as new releases land) it
+// was right. But A, C and D all then iterate the manifest's own rows or
+// releases, so deleting every row for a shipped release — every `0.4` line,
+// say — does not just remove those rows: it removes archive/0.4/ (and its
+// read/0.4/ rows) from `prefixes` too. A skips their files (not in the
+// manifest, nothing to re-hash). C's unlisted-file scan never walks the
+// directory (not in its prefix list, nothing to compare against). D reports
+// on the releases that ARE still named and says nothing about 0.4, because
+// 0.4 is not in `releases` either. The gate exits 0 and prints "every
+// archived version is byte-unchanged from the release that shipped it" —
+// true of every version it looked at, silent about the one that no longer
+// had rows to look at. A manifest emptied of a release read as a release
+// with nothing to check. That is the T15 incident shape: the record and the
+// thing it records were allowed to drift apart because every check
+// consulted only the record. Check E derives its prefixes from the second,
+// independent source — the archive/ directories actually on disk — so a
+// directory with no rows is no longer absent from consideration; it is a
+// named failure.
 //
 // SCOPE — this repository, not the published site. The manifest records the
 // bytes as they stand HERE, which is what the maintainer's constraint asks
@@ -87,7 +136,23 @@ function prefixesOf(rows) {
     const parts = r.file.split('/');
     set.add(parts.slice(0, 2).join('/'));   // archive/0.1, read/0.1
   }
-  return [...set].sort();
+  return set;
+}
+
+// The second, independent source: version directories that physically exist
+// under archive/ or read/, read straight off the filesystem — nothing here
+// consults MANIFEST.tsv. This is what check E cross-checks prefixesOf()
+// against, so a release's rows going missing from the manifest cannot also
+// make its directory invisible (see "WHAT BOUGHT CHECK E" above).
+function dirsOf(base) {
+  const set = new Set();
+  const dir = path.join(ROOT, base);
+  if (!fs.existsSync(dir)) return set;
+  for (const e of fs.readdirSync(dir, { withFileTypes: true })) {
+    if (!e.isDirectory() || e.name.startsWith('.')) continue;
+    set.add(base + '/' + e.name);
+  }
+  return set;
 }
 
 const strict = process.argv.includes('--strict');
@@ -163,13 +228,17 @@ if (wi !== -1) { write(process.argv[wi + 1]); process.exit(0); }
 
 // ---- the gate
 const rows = readManifest();
-const prefixes = prefixesOf(rows);
+const manifestPrefixes = prefixesOf(rows);
+const diskPrefixes = new Set([...dirsOf('archive'), ...dirsOf('read')]);
+const prefixes = [...manifestPrefixes].sort();
+const allPrefixes = [...new Set([...manifestPrefixes, ...diskPrefixes])].sort();
 const releases = [...new Set(rows.map(r => r.release))].sort();
 
 console.log('archive-check — archived content is byte-unchanged from release');
 console.log('  manifest: ' + MANIFEST_REL + '  (' + rows.length + ' file(s), ' +
   releases.length + ' release(s): ' + releases.join(', ') + ')');
-console.log('  prefixes: ' + prefixes.join(', '));
+console.log('  prefixes (manifest): ' + (prefixes.length ? prefixes.join(', ') : '(none)'));
+console.log('  prefixes (on disk):  ' + (allPrefixes.length ? allPrefixes.join(', ') : '(none)'));
 console.log('');
 
 // A + B
@@ -211,16 +280,64 @@ if (extra.length) {
 }
 
 // D
+// A row is a "pre-publish partition" if it is the frozen conformance suite or
+// the frozen spec text — the two things `tools/snapshot-release.js` writes in
+// the SOURCE tree, before the release commit. See the exception in WHAT IT
+// CHECKS above: a release holding only these has not yet reached the publish
+// step that writes its engine page, and the page is owed by the published
+// tree, not by this one.
+const PARTITION_RE = /^archive\/[^/]+\/(conformance|spec)\//;
 for (const rel of releases) {
   const pages = rows.filter(r => r.release === rel && /^archive\/[^/]+\/.*\.html$/.test(r.file)
     && fs.existsSync(path.join(ROOT, r.file)));
-  if (!pages.length) {
+  const archived = rows.filter(r => r.release === rel && r.file.startsWith('archive/'));
+  const partitionsOnly = archived.length > 0 && archived.every(r => PARTITION_RE.test(r.file));
+  if (!pages.length && partitionsOnly) {
+    ok('release ' + rel + ': ' + archived.length + ' frozen partition file(s), no engine page yet —\n' +
+       '        the page is written at PUBLISH from the published engine (postfix.py T16);\n' +
+       '        publish/release-identity.py `archive-page` is what asks the published tree for it.');
+  } else if (!pages.length) {
     fail('release ' + rel + ' has no runnable engine page under archive/' + rel + '/.\n' +
          '          core.md §13.5 owes every released version a tag AND a page.');
   } else {
     ok('release ' + rel + ': ' + pages.length + ' runnable engine page(s) — ' +
        pages.map(p => p.file).join(', '));
   }
+}
+
+// E. STRUCTURAL COVERAGE — the second, independent source. A, C and D above
+// all iterate the manifest's own rows or releases, so they can only ever be
+// as complete as the manifest is; none of them can notice a release whose
+// rows are gone. This check starts from the other direction: every version
+// directory that physically exists under archive/ is a claim that the
+// version was archived, and that claim must have at least one manifest row
+// backing it, independent of whether the manifest currently agrees. read/ is
+// checked on the same terms, but only for a version that already has an
+// archive/ directory — read/0.2, read/0.3 and read/0.4 legitimately live on
+// disk with no rows yet in this tree, because §13.5's archive act (and the
+// manifest rows that record it) happens at PUBLISH, and only 0.1 was ever
+// carried into this repository by hand (see core.md §13.5, migrations.md).
+// A directory with an archive/ sibling has no such excuse: it was archived.
+const archiveDirs = [...dirsOf('archive')].sort();
+const uncovered = [];
+for (const p of archiveDirs) {
+  const v = p.split('/')[1];
+  if (!rows.some(r => r.file === p || r.file.startsWith(p + '/'))) uncovered.push(p);
+  const rp = 'read/' + v;
+  if (diskPrefixes.has(rp) && !rows.some(r => r.file === rp || r.file.startsWith(rp + '/'))) uncovered.push(rp);
+}
+if (uncovered.length) {
+  for (const p of uncovered) {
+    fail('UNCOVERED  ' + p + '/  exists on disk but no row in ' + MANIFEST_REL + ' covers it.\n' +
+         '          A directory with zero manifest rows is not an empty archive; it is an\n' +
+         '          archive that checks A, C and D above cannot see, because all three read\n' +
+         '          their scope from the manifest and the manifest says nothing about ' + p + '.\n' +
+         '          Run `node tools/archive-check.js --write ' + p.split('/')[1] + '` if the rows were\n' +
+         '          never written, or restore the deleted rows if they were.');
+  }
+} else {
+  ok('every archived directory has manifest rows covering it' +
+     (archiveDirs.length ? ' — ' + archiveDirs.join(', ') : ' (none archived yet)'));
 }
 
 console.log('');

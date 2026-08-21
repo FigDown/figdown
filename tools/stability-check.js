@@ -398,7 +398,8 @@ function editChangeLabelLonger(src, nodes) {
   // Replace the exact original form (quotedForm) with the new quoted label.
   const newSrc = src.replace(target.sourceLine, target.sourceLine.replace(
     target.quotedForm,
-    newLabel));
+    newLabel,
+  ));
   if (newSrc === src) return null; // replacement didn't work
   return { editName: 'longer-label', newSrc, editedNodeId: target.id };
 }
@@ -637,7 +638,8 @@ function main() {
           lpad('-', C.moved)          + '  ' +
           lpad('-', C.maxDisp)        + '  ' +
           lpad('-', C.spill)          +
-          '  (render failed)');
+          '  (render failed)',
+        );
         continue;
       }
 
@@ -711,7 +713,8 @@ function main() {
         lpad(movedNodes.length,     C.moved) + '  ' +
         lpad(fmtFloat(maxDisp, 1),  C.maxDisp) + '  ' +
         lpad(fmtFloat(spillover, 1),C.spill) +
-        flag);
+        flag,
+      );
     }
   }
 

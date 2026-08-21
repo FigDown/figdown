@@ -1,0 +1,7 @@
+Line 10: terminator does not take width=/height= — use a pin line
+Line 11: process does not take description=
+Line 4: process needs an id
+Line 5: ids are bare and match [A-Za-z_][A-Za-z0-9_-]* — text with spaces or punctuation belongs in the label: node <id> "your text"
+Line 7: duplicate id "dup"
+Line 8: decision label must be quoted: decision q "unquoted" — whitespace also separates positionals, so a bare token cannot express a phrase (MIGRATIONS 0.1)
+Line 9: unknown shape "hexagon" (box|rounded|circle|ellipse|diamond|cylinder)

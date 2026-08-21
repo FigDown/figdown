@@ -1,0 +1,6 @@
+Line 10: duplicate gap at cycle 2
+Line 3: data= must not be empty
+Line 4: data= has 3 labels, expected 2 (one per = in the lane)
+Line 5: data= must not contain empty members
+Line 7: gap needs a non-negative integer cycle
+Line 8: gap cycle 99 is past the end of the timing lane (length 3)

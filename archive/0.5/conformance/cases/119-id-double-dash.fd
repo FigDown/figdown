@@ -1,0 +1,27 @@
+figdown 0.1 block
+# 0.1 (`LINK-OPERATOR-IN-IDS`): `--` is the LINK OPERATOR, so it may not also occur
+# inside an id. While it could, `bundle t1 a-x--b` had two legal readings and
+# the greedy member regex silently committed to one, making the other
+# unreachable (RULE 6.3: malformed input is an error, never a guess).
+# The ban also settles the whitespace disagreement: `edge a--b` now means the
+# same thing `bundle t1 a--b` does.
+node a "A"
+node b "B"
+edge a--b
+node x--y "Double dash in a node id"
+class c--1 "meaning"
+# `plane l--1` stood here until 0.3 — the whole directive left the
+# language (`PAINT-ORDER-CONSTRUCT`), so that id position left with it.
+
+figdown 0.1 topology
+# Section 2: the `bundle` half, which is the half `LINK-OPERATOR-IN-IDS` was
+# written for — `bundle` is now declared by `topology` only (`SCENE-KEYWORD-MEMBERSHIP`), so the
+# lines moved here rather than being deleted. Losing them would leave the
+# rule pinned only on the ids that never had two readings, and the greedy
+# member regex is the whole reason the ban exists.
+node a "A"
+node b "B"
+edge a--b
+bundle ok a--b
+bundle t--1 "L" a--b
+bundle t2 "L" a--b--a

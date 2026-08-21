@@ -1,0 +1,5 @@
+Line 26: w= has been renamed: use width= (SVG, CSS, DOT, mxGraph and D2 all spell it in full — no standard abbreviates it) (MIGRATIONS 0.1)
+Line 27: h= has been renamed: use height= (SVG, CSS, DOT, mxGraph and D2 all spell it in full — no standard abbreviates it) (MIGRATIONS 0.1)
+Line 28: dir= has been renamed: use extend= (HTML's dir= is text writing direction; this one says which way the band extends from its anchor) (MIGRATIONS 0.1)
+Line 31: w= has been renamed: use width= (SVG, CSS, DOT, mxGraph and D2 all spell it in full — no standard abbreviates it) (MIGRATIONS 0.1)
+Line 32: dir= has been renamed: use extend= (HTML's dir= is text writing direction; this one says which way the band extends from its anchor) (MIGRATIONS 0.1)

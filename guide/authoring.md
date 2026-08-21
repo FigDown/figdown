@@ -8,10 +8,10 @@
 ## Field-tested pitfalls (quick reference)
 
 For the full explanation of each entry see the per-genre reading files: scene
-pitfalls in [read/0.4/scene.md](../read/0.4/scene.md), bit-numbering in
-[read/0.4/bitfield.md](../read/0.4/bitfield.md), arrangement in
-[read/0.4/layout.md](../read/0.4/layout.md), ladders in
-[read/0.4/experimental/sequence.md](../read/0.4/experimental/sequence.md).
+pitfalls in [read/0.5/scene.md](../read/0.5/scene.md), bit-numbering in
+[read/0.5/bitfield.md](../read/0.5/bitfield.md), arrangement in
+[read/0.5/layout.md](../read/0.5/layout.md), ladders in
+[read/0.5/experimental/sequence.md](../read/0.5/experimental/sequence.md).
 (`read/` is versioned by **language** version and `0.4` is the live set;
 the older directories stay frozen beside it.)
 
@@ -49,7 +49,7 @@ such as SVG/EMF — extract text and geometry structurally, infer topology
 from geometry, use vision only for the residue; Tier 3: raster-only —
 vision is legitimate but last resort and must be verified); state the tier
 in the provenance comment. The full check is
-[`read/0.4/transcribe.md`](../read/0.4/transcribe.md).
+[`read/0.5/transcribe.md`](../read/0.5/transcribe.md).
 
 ## Step 2 — Pick the genre (main standard first)
 

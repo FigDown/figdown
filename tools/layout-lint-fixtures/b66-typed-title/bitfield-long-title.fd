@@ -1,0 +1,22 @@
+# FigDown — figures as text. Spec: https://github.com/FigDown/figdown
+#
+# Regression fixture for backlog item 66 (`TYPED-BLOCK-TITLE-CANVAS`): a typed block's
+# own title must join its canvas computation. This is deliberately the
+# smallest possible bitfield — two fields, one byte — under a title chosen to
+# be far wider than the data, the shape FR-4's own repro used (severity scales
+# INVERSELY with figure size). Not a documentation example: gate:layout is the
+# only reader of this file (see package.json's gate:layout script), so it
+# stays outside examples/reference-coverage, cite-check and the other
+# corpus-quality gates scoped to examples/ and figures/, none of which this
+# fixture is trying to satisfy.
+#
+# Reverting `TYPED-BLOCK-TITLE-CANVAS` (drop the `typedBlockTitleW` union in `renderBitfield`'s
+# return) makes this fixture's title run off the canvas at x<0 and turns
+# `gate:layout --strict`'s offcv axis red on it. With `TYPED-BLOCK-TITLE-CANVAS` in place it scores
+# offcv=0.
+
+figdown 0.1 bitfield
+
+bitfield tb "IPv4/IPv6 DS field (the old ToS byte) — RFC 2474 + RFC 3168" word=8 numbering=msb0
+field "DSCP" 6
+field "ECN" 2

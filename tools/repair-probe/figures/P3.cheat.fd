@@ -1,0 +1,11 @@
+figdown 0.1 topology
+title "Access switch uplink map"
+
+node sw1 "Access switch 1"
+node sw2 "Access switch 2"
+node agg1 "Aggregation switch"
+node core1 "Core router"
+
+edge sw1 -> agg1
+edge sw2 -> agg1
+edge agg1 -> core1

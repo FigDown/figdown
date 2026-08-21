@@ -1,0 +1,54 @@
+{
+  "probe_version": "1.0.0",
+  "run": {
+    "utc": "2026-08-19T12:08:17Z",
+    "cli": "2.1.234 (Claude Code)",
+    "condition": "A",
+    "task": "T1",
+    "kind": "trap",
+    "seat": 3,
+    "model_alias": "haiku",
+    "round": 2,
+    "model_used": "claude-haiku-4-5-20251001"
+  },
+  "saw": {
+    "skill_path": "skill/figdown/SKILL.md",
+    "skill_sha256": "718f935282ce7a93f4b7e36b83983ac1112e49818384d8eaf35869830d34d6a2",
+    "skill_chars": 16497,
+    "system_sha256": "39117af0175e7d927c8f9c715c9555f91e3357a146f2d6d311d4a3bb889ecaae",
+    "user_sha256": "654f965fed2716f12d9aeb943048c57c40912e6dd7e72141ded3e985e371bd6e"
+  },
+  "integrity": {
+    "turns": 1,
+    "permission_denials": 0,
+    "is_error": false
+  },
+  "usage": {
+    "cost_usd": 0.0094146,
+    "duration_ms": 18307
+  },
+  "scrub": {
+    "ran": true,
+    "pattern": "email-regex",
+    "replacements": 0
+  },
+  "raw_answer_text": "Looking at the error messages, I can identify the issues:\n\n1. **Lines 5-7**: The `block` keyword is not valid syntax in the block genre. In block diagrams, you declare nodes directly with their ID and label.\n2. **Lines 9-10**: Edges need an operator (like `->`, `<-`, `--`, or `<->`) to specify the direction of the connection.\n\nThe corrections needed:\n- Remove the `block` keyword before each node declaration\n- Add the `->` operator to the edge declarations to indicate directed flow\n\nHere's the corrected document:\n\n```figdown\n# FigDown — figures as text. Spec: https://github.com/FigDown/figdown\nfigdown 0.1 block\ntitle \"Alert-forwarding chain\"\n\nprobe \"Probe\"\nnormalizer \"Normalizer\"\nsink \"Sink\"\n\nprobe -> normalizer via (60,20) (90,40)\nnormalizer -> sink\n```\n\nThis declares three blocks (probe, normalizer, sink) and connects them with directed edges. The first edge includes the explicit waypoints at (60,20) and (90,40) to create the visual jog you requested around the space where a third element might sit.",
+  "extracted_document": "# FigDown — figures as text. Spec: https://github.com/FigDown/figdown\nfigdown 0.1 block\ntitle \"Alert-forwarding chain\"\n\nprobe \"Probe\"\nnormalizer \"Normalizer\"\nsink \"Sink\"\n\nprobe -> normalizer via (60,20) (90,40)\nnormalizer -> sink\n",
+  "validation": {
+    "errors": [
+      "Line 5: \"probe\" is not allowed in genre block",
+      "Line 6: \"normalizer\" is not allowed in genre block",
+      "Line 7: \"sink\" is not allowed in genre block",
+      "Line 9: \"probe\" is not allowed in genre block",
+      "Line 10: \"normalizer\" is not allowed in genre block"
+    ],
+    "invariants_pass": false,
+    "missing_nodes": [
+      "probe",
+      "normalizer",
+      "sink"
+    ],
+    "edge_count": 0,
+    "success": false
+  }
+}

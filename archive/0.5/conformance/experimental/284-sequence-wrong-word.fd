@@ -1,0 +1,17 @@
+# `GENRE-CONNECTOR-SPELLING`/`GENRE-NODE-SPELLING` applied a FOURTH time. A word this genre spells
+# differently is not an unknown word, and the diagnostic says which word and
+# why. Both directions, in two sections:
+#   `node` and `edge` under `sequence`   -> write `lifeline` / `message`
+#   `lifeline` and `message` under `block` -> write `node` / `edge`
+# There is no version gate on either spelling, unlike `flowline`: the GENRE
+# requires figdown 0.4, so neither word is reachable from an earlier document.
+figdown 0.4 sequence
+lifeline c "C"
+node x "X"
+edge c -> x
+
+figdown 0.1 block
+node a "A"
+node b "B"
+lifeline l "L"
+message a -> b

@@ -1,0 +1,5 @@
+figdown 0.1 block
+node a "A" shape=hexagon
+node b "B" style=bold
+node c "C"
+node c "Dup"

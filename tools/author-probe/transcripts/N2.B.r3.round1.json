@@ -1,0 +1,49 @@
+{
+  "probe_version": "1.0.0",
+  "run": {
+    "utc": "2026-08-19T12:13:48Z",
+    "cli": "2.1.234 (Claude Code)",
+    "condition": "B",
+    "task": "N2",
+    "kind": "normal",
+    "seat": 3,
+    "model_alias": "haiku",
+    "round": 1,
+    "model_used": "claude-haiku-4-5-20251001"
+  },
+  "saw": {
+    "skill_path": "tools/author-probe/skill-candidate.md",
+    "skill_sha256": "2abdaf0d9211d5ee1464c5f5c3a200b1ae6f7bd71cfd6344e7da94d669e6ed31",
+    "skill_chars": 17591,
+    "system_sha256": "39117af0175e7d927c8f9c715c9555f91e3357a146f2d6d311d4a3bb889ecaae",
+    "user_sha256": "5cb75a0dcbc2a731f18bde3a976bd9c2f3dade7d39ca3addd99bdea9111443ab"
+  },
+  "integrity": {
+    "turns": 1,
+    "permission_denials": 0,
+    "is_error": false
+  },
+  "usage": {
+    "cost_usd": 0.024704999999999998,
+    "duration_ms": 18156
+  },
+  "scrub": {
+    "ran": true,
+    "pattern": "email-regex",
+    "replacements": 0
+  },
+  "raw_answer_text": "```figdown\n# FigDown — figures as text. Spec: https://github.com/FigDown/figdown\nfigdown 0.1 topology\ntitle \"Branch office WAN uplinks\"\n\nnode access1 \"Access Switch 1\"\nnode access2 \"Access Switch 2\"\nnode branch \"Branch Router\"\nnode hubprimary \"Primary Hub\"\nnode hubbackup \"Backup Hub\"\n\nedge access1 branch\nedge access2 branch\nedge branch hubprimary \"Primary WAN\"\nedge branch hubbackup \"Backup WAN\"\n```\n\nThis topology figure models the branch office network you described:\n\n- **Two access switches** (access1, access2) sit at the branch and connect to the branch router\n- **The branch router** is the convergence point, connecting the local access layer to the WAN\n- **Two regional hub routers** receive traffic from the branch: the primary hub carries the preferred WAN link, and the backup hub carries the diverse-path failover link\n\nThe labels on the WAN edges (`Primary WAN` and `Backup WAN`) make the redundancy strategy explicit without overstuffing node labels. The topology genre is experimental (EXPERIMENTAL), so rendering behavior may vary across versions before v1.0.",
+  "extracted_document": "# FigDown — figures as text. Spec: https://github.com/FigDown/figdown\nfigdown 0.1 topology\ntitle \"Branch office WAN uplinks\"\n\nnode access1 \"Access Switch 1\"\nnode access2 \"Access Switch 2\"\nnode branch \"Branch Router\"\nnode hubprimary \"Primary Hub\"\nnode hubbackup \"Backup Hub\"\n\nedge access1 branch\nedge access2 branch\nedge branch hubprimary \"Primary WAN\"\nedge branch hubbackup \"Backup WAN\"\n",
+  "validation": {
+    "errors": [
+      "Line 11: edge needs an operator: -> <- -- <-> (a [mid] label splits it: -[x]->)",
+      "Line 12: edge needs an operator: -> <- -- <-> (a [mid] label splits it: -[x]->)",
+      "Line 13: edge needs an operator: -> <- -- <-> (a [mid] label splits it: -[x]->)",
+      "Line 14: edge needs an operator: -> <- -- <-> (a [mid] label splits it: -[x]->)"
+    ],
+    "invariants_pass": false,
+    "missing_nodes": [],
+    "edge_count": 0,
+    "success": false
+  }
+}

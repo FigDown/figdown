@@ -1,0 +1,3 @@
+figdown 0.1 block
+node a "A" fill=#fee2e2 fill=#dbeafe
+node b "B" shape=rounded shape=circle

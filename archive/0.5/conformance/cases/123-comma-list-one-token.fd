@@ -1,0 +1,26 @@
+figdown 0.1 block
+# 0.1 (`COMMA-LIST-WHITESPACE`): ONE whitespace policy for every comma list — the list is
+# ONE whitespace-free token. It is the only policy compatible with RULE 3.1
+# (a positional list must terminate so the rest of the line can be reserved
+# for `key=` options), and four of the five constructs already did it.
+# Whitespace INSIDE an element is still expressible: quote the element.
+node a "A"
+node b "B"
+node c "C"
+edge a -- b
+edge a -- c
+rank a, b
+node d "D" class=x, y
+
+figdown 0.1 topology
+# Section 2: the `bundle` member list. `bundle t1 "LAG" a--b,
+# a--c` stood after the `rank` line until `SCENE-KEYWORD-MEMBERSHIP` withdrew `bundle` from
+# `block`; it moved to the genre that still declares it rather than being
+# deleted, because a member list is one of the five comma lists the ONE
+# policy is a policy about, and dropping it would pin the rule on two.
+node a "A"
+node b "B"
+node c "C"
+edge a -- b
+edge a -- c
+bundle t1 "LAG" a--b, a--c

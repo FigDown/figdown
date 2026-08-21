@@ -1,0 +1,38 @@
+figdown 0.2 block
+# `DRAWN-ANNOTATION-FORM`: the VERSION GATE, refusing half. `note=` requires
+# `figdown 0.3`; under `figdown 0.1` or `figdown 0.2` every acceptor answers
+# a line error that NAMES the version and offers the one-step fix (`KEYWORD-RENAME-SCOPE`'s
+# device, the same one `flowline` and `statechart` use).
+#
+# CASE 806 IS THIS DOCUMENT WITH ONE CHARACTER CHANGED — `0.2` → `0.3` in
+# the header — and it parses CLEAN. The pair is the gate, in both directions.
+#
+# WHY THE KEY IS GATED AT ALL, since a new option key normally is not.
+# `note=` HAS A PRIOR MEANING ON THE RECORD. From 0.1 to 0.3 it
+# was the RETIRED spelling of `description=`, and the retirement diagnostic
+# actively told authors to write `description=` for a tooltip. A document
+# written in that window and headed `figdown 0.2` may well have meant a
+# tooltip; accepting the spelling silently would repaint it as INK — core
+# §13.0.1's own named hazard, "a figure that looks right and means something
+# else". The revival hazard IS the gate's reason, and it is specific to this
+# key rather than a general policy about new keys (contrast case 810, where
+# an ungated widening adds no spelling at all).
+#
+# ONE ERROR PER LINE. Each line below reports the gate and stops; the
+# quoting check and the value checks do not also fire.
+#
+# The `figdown 0.2` header also proves the SECOND half of "0.1 and 0.2 are
+# otherwise unaffected" (case 807): the failure here is the KEY, not the
+# header — every other line in this document is legal 0.2.
+title "The note= version gate" note="title is an acceptor: legal at 0.3, refused below it"
+group ring "Ring" note="on a group"
+node a "A" note="on a node"
+node b "B"
+edge a -> b note="on an edge, which has its own scanner and its own copy of the gate"
+
+figdown 0.1 block
+# Section 2, under the OLDEST header. The message INTERPOLATES the declared
+# version — twice, once to report it and once to name what the spelling still
+# means there — so both spellings the gate can produce are pinned, and an
+# engine that hard-coded "0.2" into the string fails here.
+node c "C" note="the same gate, reported against 0.1"

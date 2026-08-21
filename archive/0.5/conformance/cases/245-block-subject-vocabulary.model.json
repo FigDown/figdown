@@ -1,0 +1,104 @@
+{
+  "header": {
+    "version": "0.1",
+    "genre": "block"
+  },
+  "title": "block subject vocabulary",
+  "flow": "down",
+  "classes": [
+    {
+      "id": "hot",
+      "meaning": "Hot path",
+      "stroke": "#dc2626",
+      "line": 25
+    }
+  ],
+  "planes": [
+    {
+      "id": "base",
+      "z": 0
+    }
+  ],
+  "nodes": [
+    {
+      "id": "q0",
+      "label": "Queue 0",
+      "shape": "box",
+      "group": "pool",
+      "plane": "base",
+      "line": 28
+    },
+    {
+      "id": "q1",
+      "label": "Queue 1",
+      "shape": "box",
+      "group": "pool",
+      "plane": "base",
+      "class": [
+        "hot"
+      ],
+      "line": 29
+    }
+  ],
+  "groups": [
+    {
+      "id": "pool",
+      "label": "Resource pool",
+      "line": 27
+    }
+  ],
+  "externals": [
+    {
+      "id": "wan",
+      "label": "to the WAN",
+      "line": 30
+    }
+  ],
+  "edges": [
+    {
+      "a": "q0",
+      "op": "->",
+      "b": "q1",
+      "plane": "base",
+      "line": 31
+    },
+    {
+      "a": "q1",
+      "op": "->",
+      "b": "wan",
+      "plane": "base",
+      "line": 32
+    }
+  ],
+  "ranks": [
+    {
+      "ids": [
+        "q0",
+        "q1"
+      ],
+      "line": 33
+    }
+  ],
+  "pins": [],
+  "thresholds": [
+    {
+      "label": "Max depth",
+      "in": "pool",
+      "offset": 80,
+      "line": 34
+    }
+  ],
+  "bands": [
+    {
+      "label": "Reserved",
+      "in": "pool",
+      "from": 15,
+      "to": 35,
+      "extend": "up",
+      "fill": "#e5e7eb",
+      "line": 35
+    }
+  ],
+  "bundles": [],
+  "regions": []
+}

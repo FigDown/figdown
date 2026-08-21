@@ -1,0 +1,50 @@
+{
+  "probe_version": "1.0.0",
+  "run": {
+    "utc": "2026-08-19T12:18:21Z",
+    "cli": "2.1.234 (Claude Code)",
+    "condition": "B",
+    "task": "T2",
+    "kind": "trap",
+    "seat": 1,
+    "model_alias": "sonnet",
+    "round": 2,
+    "model_used": "claude-sonnet-5"
+  },
+  "saw": {
+    "skill_path": "tools/author-probe/skill-candidate.md",
+    "skill_sha256": "2abdaf0d9211d5ee1464c5f5c3a200b1ae6f7bd71cfd6344e7da94d669e6ed31",
+    "skill_chars": 17591,
+    "system_sha256": "39117af0175e7d927c8f9c715c9555f91e3357a146f2d6d311d4a3bb889ecaae",
+    "user_sha256": "27e4a32a263d6511801fa24ac3a2d4ceeecc892a0c6ed978328616ff4fffd67b"
+  },
+  "integrity": {
+    "turns": 1,
+    "permission_denials": 0,
+    "is_error": false
+  },
+  "usage": {
+    "cost_usd": 0.09024599999999999,
+    "duration_ms": 31428
+  },
+  "scrub": {
+    "ran": true,
+    "pattern": "email-regex",
+    "replacements": 0
+  },
+  "raw_answer_text": "```figdown\n# FigDown — figures as text. Spec: https://github.com/FigDown/figdown\nfigdown 0.1 flowchart\ntitle \"Change request procedure\"\n\n# GAP: the flowchart genre withdrew \"group\" (its bordered-container\n# construct); there is no remaining way in this genre to draw\n# a literal border around a subset of nodes. Composed substitute instead: a\n# shared class marks the two steps that fall inside the scheduled\n# maintenance window, and its meaning text carries that claim through the\n# legend. This is NOT a bordered box — flag this to the reader, it is an\n# approximation, not the requested enclosure.\nclass window \"Falls within the scheduled change window\" stroke=#2563eb\n\nprocess receive \"Receive change request\"\nprocess validate \"Validate against policy\" class=window\ndecision isvalid \"Valid?\"\nprocess apply \"Apply change to device\" class=window\nterminator confirm \"Confirm success\"\nterminator rollback \"Roll back\"\n\nreceive -> validate\nvalidate -> isvalid\nisvalid -> apply \"yes\"\nisvalid -> rollback \"no\"\napply -> confirm\n```\n\nNote on what changed and why: the validator's own message said `group` was **withdrawn** from `flowchart` at 0.3 — not misspelled, not misused — so there is no keyword left in this genre that draws a literal bordered container around a subset of nodes. Per \"do not invent syntax,\" I did not fabricate a replacement keyword. Instead I composed the closest available substitute from declared vocabulary: a shared `class window` on `validate` and `apply`, whose meaning text (\"Falls within the scheduled change window\") surfaces in the legend and whose shared `stroke=` visually links the two nodes.\n\nThis is **not equivalent** to the requested enclosure — there is no border, and a reader could plausibly group the two nodes by class without reading it as \"same box.\" I'm reporting that gap here rather than papering over it in the figure: if a literal bordered container is a hard requirement, the fix is upstream (a language change re-adding `group` to `flowchart`, or knowingly trading down to `block` genre — which does support hierarchy/containers — at the cost of losing the decision/branch semantics `apply -> confirm` / `isvalid -> rollback` need). I kept `flowchart` because the branching logic is the figure's substance; the box is secondary and is exactly the kind of thing that should be stated as an unresolved gap rather than silently approximated as if it were the real thing.",
+  "extracted_document": "# FigDown — figures as text. Spec: https://github.com/FigDown/figdown\nfigdown 0.1 flowchart\ntitle \"Change request procedure\"\n\n# GAP: the flowchart genre withdrew \"group\" (its bordered-container\n# construct); there is no remaining way in this genre to draw\n# a literal border around a subset of nodes. Composed substitute instead: a\n# shared class marks the two steps that fall inside the scheduled\n# maintenance window, and its meaning text carries that claim through the\n# legend. This is NOT a bordered box — flag this to the reader, it is an\n# approximation, not the requested enclosure.\nclass window \"Falls within the scheduled change window\" stroke=#2563eb\n\nprocess receive \"Receive change request\"\nprocess validate \"Validate against policy\" class=window\ndecision isvalid \"Valid?\"\nprocess apply \"Apply change to device\" class=window\nterminator confirm \"Confirm success\"\nterminator rollback \"Roll back\"\n\nreceive -> validate\nvalidate -> isvalid\nisvalid -> apply \"yes\"\nisvalid -> rollback \"no\"\napply -> confirm\n",
+  "validation": {
+    "errors": [
+      "Line 21: \"receive\" is not allowed in genre flowchart",
+      "Line 22: \"validate\" is not allowed in genre flowchart",
+      "Line 23: \"isvalid\" is not allowed in genre flowchart",
+      "Line 24: \"isvalid\" is not allowed in genre flowchart",
+      "Line 25: \"apply\" is not allowed in genre flowchart"
+    ],
+    "invariants_pass": false,
+    "missing_nodes": [],
+    "edge_count": 0,
+    "success": false
+  }
+}

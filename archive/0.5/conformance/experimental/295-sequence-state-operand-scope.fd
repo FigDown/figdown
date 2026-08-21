@@ -1,0 +1,24 @@
+# 0.4 (backlog 35, ruled 2026-08-17): the no-restatement check is
+# OPERAND-SCOPED. `c` ends the `granted` branch in BOUND and the `refused`
+# branch in INIT, and it entered the fragment in REQUESTING. At most one
+# operand of an `alt` occurs, so the branch INIT does not restate anything —
+# it is compared with REQUESTING, the most recent occurrence in a scope that
+# encloses its own, and not with BOUND, which is on the path it excludes.
+#
+# This is the case the ruling was made for: `examples/sequence/dhcp-lease.fd`
+# had to carry the DHCPNAK/DHCPDECLINE restart in a `description=` because the
+# check read a lifeline's occurrences as one linear sequence.
+figdown 0.4 sequence
+title "Exclusive branches may end in the same state"
+lifeline c "Client"
+lifeline s "Server"
+state c "INIT"
+message c -> s "REQUEST"
+state c "REQUESTING"
+fragment commit "can the server satisfy it?" type=alt
+operand granted "yes" in=commit
+message c <- s "ACK" in=granted
+state c "BOUND" in=granted
+operand refused "no" in=commit
+message c <- s "NAK" in=refused
+state c "INIT" in=refused

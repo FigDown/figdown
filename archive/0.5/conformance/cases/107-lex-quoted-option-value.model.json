@@ -1,0 +1,40 @@
+{
+  "header": {
+    "version": "0.1",
+    "genre": "bitfield"
+  },
+  "flow": "right",
+  "classes": [],
+  "planes": [
+    {
+      "id": "base",
+      "z": 0
+    }
+  ],
+  "nodes": [],
+  "groups": [],
+  "edges": [],
+  "ranks": [],
+  "pins": [],
+  "thresholds": [],
+  "bands": [],
+  "bundles": [],
+  "regions": [
+    {
+      "genre": "bitfield",
+      "id": "x",
+      "label": "Header",
+      "word": 32,
+      "numbering": "lsb0",
+      "fields": [
+        {
+          "name": "Flags",
+          "width": 8,
+          "description": "on miss",
+          "line": 3
+        }
+      ],
+      "line": 2
+    }
+  ]
+}

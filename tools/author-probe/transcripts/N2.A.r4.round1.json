@@ -1,0 +1,49 @@
+{
+  "probe_version": "1.0.0",
+  "run": {
+    "utc": "2026-08-19T12:04:01Z",
+    "cli": "2.1.234 (Claude Code)",
+    "condition": "A",
+    "task": "N2",
+    "kind": "normal",
+    "seat": 4,
+    "model_alias": "haiku",
+    "round": 1,
+    "model_used": "claude-haiku-4-5-20251001"
+  },
+  "saw": {
+    "skill_path": "skill/figdown/SKILL.md",
+    "skill_sha256": "718f935282ce7a93f4b7e36b83983ac1112e49818384d8eaf35869830d34d6a2",
+    "skill_chars": 16497,
+    "system_sha256": "39117af0175e7d927c8f9c715c9555f91e3357a146f2d6d311d4a3bb889ecaae",
+    "user_sha256": "e8bbb8bb800d7d108223fb06e522a5d73fa95892c46d272c5b2f495b633cbe4c"
+  },
+  "integrity": {
+    "turns": 1,
+    "permission_denials": 0,
+    "is_error": false
+  },
+  "usage": {
+    "cost_usd": 0.006279600000000001,
+    "duration_ms": 11270
+  },
+  "scrub": {
+    "ran": true,
+    "pattern": "email-regex",
+    "replacements": 0
+  },
+  "raw_answer_text": "Looking at the requirements, I need to create a topology figure showing a branch office WAN network with:\n- 2 access switches\n- 1 branch router  \n- 2 regional hub routers\n- 4 links connecting them as specified\n\nSince this is a network topology, I'll use the `topology` genre (experimental, so requires the experimental/topology.md reference). Here's the FigDown document:\n\n```figdown\n# FigDown — figures as text. Spec: https://github.com/FigDown/figdown\nfigdown 0.1 topology\ntitle \"Branch office WAN uplinks\"\n\nnode access1 \"Access Switch 1\"\nnode access2 \"Access Switch 2\"\nnode branch \"Branch Router\"\nnode hubprimary \"Regional Hub (Primary)\"\nnode hubbackup \"Regional Hub (Backup)\"\n\nedge access1 branch\nedge access2 branch\nedge branch hubprimary \"Primary WAN\"\nedge branch hubbackup \"Backup WAN\"\n```\n\nThis document defines:\n- **Five nodes** with the requested IDs and descriptive labels\n- **Four edges** representing the links: \n  - Both access switches connecting to the branch router (local switching)\n  - Branch router to primary hub (primary WAN uplink)\n  - Branch router to backup hub (backup WAN uplink for diversity/redundancy)\n\nThe labels on the WAN links make the primary/backup distinction clear. When rendered, this will show a typical branch office architecture with dual regional connectivity for high availability.",
+  "extracted_document": "# FigDown — figures as text. Spec: https://github.com/FigDown/figdown\nfigdown 0.1 topology\ntitle \"Branch office WAN uplinks\"\n\nnode access1 \"Access Switch 1\"\nnode access2 \"Access Switch 2\"\nnode branch \"Branch Router\"\nnode hubprimary \"Regional Hub (Primary)\"\nnode hubbackup \"Regional Hub (Backup)\"\n\nedge access1 branch\nedge access2 branch\nedge branch hubprimary \"Primary WAN\"\nedge branch hubbackup \"Backup WAN\"\n",
+  "validation": {
+    "errors": [
+      "Line 11: edge needs an operator: -> <- -- <-> (a [mid] label splits it: -[x]->)",
+      "Line 12: edge needs an operator: -> <- -- <-> (a [mid] label splits it: -[x]->)",
+      "Line 13: edge needs an operator: -> <- -- <-> (a [mid] label splits it: -[x]->)",
+      "Line 14: edge needs an operator: -> <- -- <-> (a [mid] label splits it: -[x]->)"
+    ],
+    "invariants_pass": false,
+    "missing_nodes": [],
+    "edge_count": 0,
+    "success": false
+  }
+}

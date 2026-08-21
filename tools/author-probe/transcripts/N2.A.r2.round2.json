@@ -1,0 +1,54 @@
+{
+  "probe_version": "1.0.0",
+  "run": {
+    "utc": "2026-08-19T12:04:15Z",
+    "cli": "2.1.234 (Claude Code)",
+    "condition": "A",
+    "task": "N2",
+    "kind": "normal",
+    "seat": 2,
+    "model_alias": "sonnet",
+    "round": 2,
+    "model_used": "claude-sonnet-5"
+  },
+  "saw": {
+    "skill_path": "skill/figdown/SKILL.md",
+    "skill_sha256": "718f935282ce7a93f4b7e36b83983ac1112e49818384d8eaf35869830d34d6a2",
+    "skill_chars": 16497,
+    "system_sha256": "39117af0175e7d927c8f9c715c9555f91e3357a146f2d6d311d4a3bb889ecaae",
+    "user_sha256": "ffe6871a25722eb757d0e22c8331a021bc0dd63377efec04b4c9f30bc3168385"
+  },
+  "integrity": {
+    "turns": 1,
+    "permission_denials": 0,
+    "is_error": false
+  },
+  "usage": {
+    "cost_usd": 0.066744,
+    "duration_ms": 19063
+  },
+  "scrub": {
+    "ran": true,
+    "pattern": "email-regex",
+    "replacements": 0
+  },
+  "raw_answer_text": "Looking at the validator error: the previous attempt emitted the **Markdown embed** (image + source footer) instead of the actual `.fd` source content. The task asks for the FigDown document itself — that's what needs the `figdown 0.1 <genre>` first line, node/edge declarations, etc. Below is the corrected `.fd` source (topology genre, since this is a network topology of switches, a router, and two upstream hubs — nodes/links with roles and diverse paths, not a table or block diagram).\n\n```figdown\n# FigDown — figures as text. Spec: https://github.com/FigDown/figdown\nfigdown 0.1 topology\ntitle \"Branch office WAN uplinks\"\n\nnode access1 \"access1\"\nnode access2 \"access2\"\nnode branch \"branch\"\nnode hubprimary \"hubprimary\"\nnode hubbackup \"hubbackup\"\n\nlink access1 branch\nlink access2 branch\nlink branch hubprimary \"primary\"\nlink branch hubbackup \"backup\"\n```\n\nTo embed this in a host Markdown document once built and validated:\n\n```markdown\n![Branch office WAN uplinks](figures/branch-wan-uplinks.svg)\n\n<sub>source: [figures/branch-wan-uplinks.fd](figures/branch-wan-uplinks.fd)</sub>\n```\n\nNotes:\n- The five nodes and four links match exactly what the description specifies: `access1`–`branch`, `access2`–`branch`, `branch`–`hubprimary`, `branch`–`hubbackup`.\n- The primary/backup distinction is carried as link labels (`\"primary\"` / `\"backup\"`) rather than colour alone, per the rule that meaning must survive in text, not paint.\n- I did not have `reference/experimental/topology.md` open in this session to confirm its exact preferred keyword spellings (e.g., whether it ranks `node`/`link` against more specific alternates). Before this file is treated as final, run `node <skill-dir>/build-svg.js branch-wan-uplinks.fd` and fix any `Line N:` errors it reports against that genre file's actual vocabulary.",
+  "extracted_document": "![Branch office WAN uplinks](figures/branch-wan-uplinks.svg)\n\n<sub>source: [figures/branch-wan-uplinks.fd](figures/branch-wan-uplinks.fd)</sub>\n",
+  "validation": {
+    "errors": [
+      "Line 1: first line must be \"figdown 0.1 <genre>\"",
+      "Line 1: unrecognized line (unknown keyword \"![Branch\")",
+      "Line 3: unrecognized line (unknown keyword \"<sub>source:\")"
+    ],
+    "invariants_pass": false,
+    "missing_nodes": [
+      "access1",
+      "access2",
+      "branch",
+      "hubprimary",
+      "hubbackup"
+    ],
+    "edge_count": 0,
+    "success": false
+  }
+}

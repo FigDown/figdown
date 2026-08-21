@@ -1,0 +1,8 @@
+figdown 0.1 block
+# `CONTENT-LAYOUT-ZONE-SPLIT`: `edge` is a semantic directive — it has its own dispatch path and
+# must be caught by the layout-zone gate exactly like `node` is.
+node a "A"
+node b "B"
+layout
+pin a at=(0,0)
+edge a -> b

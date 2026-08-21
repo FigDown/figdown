@@ -1,0 +1,65 @@
+{
+  "header": {
+    "version": "0.1",
+    "genre": "bitfield"
+  },
+  "title": "Spanning geometry",
+  "flow": "right",
+  "classes": [],
+  "planes": [
+    {
+      "id": "base",
+      "z": 0
+    }
+  ],
+  "nodes": [],
+  "groups": [],
+  "edges": [],
+  "ranks": [],
+  "pins": [],
+  "thresholds": [],
+  "bands": [],
+  "bundles": [],
+  "regions": [
+    {
+      "genre": "bitfield",
+      "id": "span",
+      "label": "Spanning geometry (word=32)",
+      "word": 32,
+      "numbering": "msb0",
+      "fields": [
+        {
+          "name": "Whole rows",
+          "width": 128,
+          "line": 33
+        },
+        {
+          "name": "L shape",
+          "width": 48,
+          "line": 35
+        },
+        {
+          "name": "Staircase",
+          "width": 32,
+          "line": 37
+        },
+        {
+          "name": "Tail",
+          "width": 16,
+          "line": 39
+        },
+        {
+          "name": "Narrow head",
+          "width": 31,
+          "line": 41
+        },
+        {
+          "name": "Two column staircase",
+          "width": 2,
+          "line": 42
+        }
+      ],
+      "line": 30
+    }
+  ]
+}

@@ -1,0 +1,85 @@
+{
+  "header": {
+    "version": "0.3",
+    "genre": "block"
+  },
+  "title": "</svg><script>alert(1)</script>",
+  "note": "onload=alert(1) onerror=alert(2)",
+  "flow": "right",
+  "classes": [
+    {
+      "id": "hostile",
+      "meaning": "<foreignObject><body>x</body></foreignObject>",
+      "stroke": "#b91c1c",
+      "line": 39
+    }
+  ],
+  "planes": [
+    {
+      "id": "base",
+      "z": 0
+    }
+  ],
+  "nodes": [
+    {
+      "id": "a",
+      "label": "<script>alert(1)</script>",
+      "shape": "box",
+      "group": "g",
+      "plane": "base",
+      "note": "@import url(\"https://example.invalid/x.css\");",
+      "line": 43
+    },
+    {
+      "id": "b",
+      "label": "\" onclick=\"alert(1)",
+      "shape": "box",
+      "plane": "base",
+      "class": [
+        "hostile"
+      ],
+      "line": 44
+    },
+    {
+      "id": "c",
+      "label": "&amp; & < > \\ done",
+      "shape": "box",
+      "plane": "base",
+      "line": 45
+    }
+  ],
+  "groups": [
+    {
+      "id": "g",
+      "label": "javascript:alert(1)",
+      "note": "url(https://example.invalid/x.png)",
+      "line": 42
+    }
+  ],
+  "edges": [
+    {
+      "a": "a",
+      "op": "->",
+      "b": "b",
+      "tail": "<tail>",
+      "mid": "<mid onload=x>",
+      "head": "<head>",
+      "plane": "base",
+      "line": 49
+    },
+    {
+      "a": "b",
+      "op": "->",
+      "b": "c",
+      "plane": "base",
+      "note": "]]> </metadata> <![CDATA[",
+      "line": 50
+    }
+  ],
+  "ranks": [],
+  "pins": [],
+  "thresholds": [],
+  "bands": [],
+  "bundles": [],
+  "regions": []
+}

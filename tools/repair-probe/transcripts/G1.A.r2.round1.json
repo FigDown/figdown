@@ -1,0 +1,54 @@
+{
+  "probe_version": "1.0.0",
+  "run": {
+    "utc": "2026-08-19T10:42:00Z",
+    "model_alias": "sonnet",
+    "model_used": "claude-sonnet-5",
+    "cli": "2.1.234 (Claude Code)",
+    "seat": 2,
+    "condition": "A",
+    "fixture": "G1",
+    "klass": "geometry/band-enclosure",
+    "round": 1
+  },
+  "engine_channel": "dist-public-api",
+  "saw": {
+    "original_fixture_sha256": "ca00f6ee664bb4ab112c00f98cdc40c5d599593b4848794b8b73f8c0188f5821",
+    "document_shown_sha256": "ca00f6ee664bb4ab112c00f98cdc40c5d599593b4848794b8b73f8c0188f5821",
+    "system_sha256": "ef2a3cd623ce06b05aa4652d8ace761c4f70f24298bcef0552f22e2e46e277fc",
+    "user_sha256": "317994b978a26e2649daf2786cf98fe4dde29b3eaa8873936a5fe46817b46ff1"
+  },
+  "integrity": {
+    "turns": 1,
+    "permission_denials": 0,
+    "is_error": false
+  },
+  "usage": {
+    "cost_usd": 0.007455,
+    "duration_ms": 3867
+  },
+  "scrub": {
+    "ran": true,
+    "pattern": "email-regex",
+    "replacements": 0
+  },
+  "raw_answer_text": "```\nfigdown 0.1 block\ntitle \"Cluster monitoring tap placement\"\n\ngroup cluster \"Switch cluster\"\nnode sw1 \"Switch 1\" in=cluster\nnode sw2 \"Switch 2\" in=cluster\nnode tap \"Monitoring tap\"\nnode collector \"Flow collector\"\n\nedge sw1 -> sw2\nedge tap -> collector\n\npin cluster at=(0,0)\npin sw1 at=(0,0) width=120 height=50\npin sw2 at=(140,0) width=120 height=50\npin tap at=(60,80) width=80 height=30\n```",
+  "presented": {
+    "document_shown": "figdown 0.1 block\ntitle \"Cluster monitoring tap placement\"\n\ngroup cluster \"Switch cluster\"\nnode sw1 \"Switch 1\" in=cluster\nnode sw2 \"Switch 2\" in=cluster\nnode tap \"Monitoring tap\"\nnode collector \"Flow collector\"\n\nedge sw1 -> sw2\nedge tap -> collector\n\npin cluster at=(0,0)\npin sw1 at=(0,0) width=120 height=50\npin sw2 at=(140,0) width=120 height=50\npin tap at=(60,10) width=80 height=30\n",
+    "validator_shown": {
+      "errors": [
+        "Line 16: pin puts \"tap\" inside the band of group \"cluster\" — a band is the bounding box of the group's members, so this draws \"tap\" as one of them. Move the pin clear of the group's extent, or say what the drawing says with in=cluster."
+      ],
+      "diagnostics": []
+    }
+  },
+  "extracted_document": "figdown 0.1 block\ntitle \"Cluster monitoring tap placement\"\n\ngroup cluster \"Switch cluster\"\nnode sw1 \"Switch 1\" in=cluster\nnode sw2 \"Switch 2\" in=cluster\nnode tap \"Monitoring tap\"\nnode collector \"Flow collector\"\n\nedge sw1 -> sw2\nedge tap -> collector\n\npin cluster at=(0,0)\npin sw1 at=(0,0) width=120 height=50\npin sw2 at=(140,0) width=120 height=50\npin tap at=(60,80) width=80 height=30\n",
+  "validation": {
+    "errors_after": [],
+    "diagnostics_after": [],
+    "invariants_pass": true,
+    "missing_nodes": [],
+    "edge_count": 2,
+    "success": true
+  }
+}

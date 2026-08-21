@@ -1,0 +1,20 @@
+figdown 0.1 bitfield
+# `BITFIELD-REPETITION-CONSTRUCT`: every `index=` error, each a LINE error with its own
+# named diagnostic. One document, one error per line.
+# 0.1 adds the two the first pass let through: a dot RUN longer than
+# two (`0...7` split into two parts and read the third dot as prose), and an
+# end above the largest integer a FigDown number carries exactly.
+bitfield hdr "Index errors" word=32 numbering=msb0
+field "No separator" 8 index=07
+field "Two separators" 8 index=0..7..9
+field "Three dots" 8 index=0...7
+field "Prose first index" 8 index=n..7
+field "Signed first index" 8 index=-1..7
+field "First index unrepresentable" 8 index=9007199254740993..9007199254740999
+field "Last index unrepresentable" 8 index=0..9007199254740993
+field "One element" 8 index=3..3
+field "Empty last end" 8 index=0..
+field "Twice on one line" 8 index=0..7 index=1..2
+field "Star" * index=0..7
+field a:8,b:8 index=0..7
+field "Something to draw" 8

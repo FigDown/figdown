@@ -1,0 +1,10 @@
+# `STATECHART-GENRE-SCOPE`: `statechart` is surface that `figdown 0.1` does not have, so a 0.1
+# document naming it is a line error — and NOT the `unknown genre` error, which
+# would send the author hunting a typo that is not there. core §13.7 forbids
+# reinterpreting a document under a version other than the one it declares, so
+# the engine may not quietly promote this file to 0.2; it says which version
+# the genre needs and stops. Second header: the same genre at 0.2 is fine.
+figdown 0.1 statechart
+state a "A"
+figdown 0.2 statechart
+state b "B"

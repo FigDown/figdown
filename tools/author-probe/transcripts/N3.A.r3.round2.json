@@ -1,0 +1,44 @@
+{
+  "probe_version": "1.0.0",
+  "run": {
+    "utc": "2026-08-19T12:05:06Z",
+    "cli": "2.1.234 (Claude Code)",
+    "condition": "A",
+    "task": "N3",
+    "kind": "normal",
+    "seat": 3,
+    "model_alias": "haiku",
+    "round": 2,
+    "model_used": "claude-haiku-4-5-20251001"
+  },
+  "saw": {
+    "skill_path": "skill/figdown/SKILL.md",
+    "skill_sha256": "718f935282ce7a93f4b7e36b83983ac1112e49818384d8eaf35869830d34d6a2",
+    "skill_chars": 16497,
+    "system_sha256": "39117af0175e7d927c8f9c715c9555f91e3357a146f2d6d311d4a3bb889ecaae",
+    "user_sha256": "ac01f2a47c5ec335eeead15624eee287c80cae33ff8a72648603ccd3061140f7"
+  },
+  "integrity": {
+    "turns": 1,
+    "permission_denials": 0,
+    "is_error": false
+  },
+  "usage": {
+    "cost_usd": 0.020356,
+    "duration_ms": 7624
+  },
+  "scrub": {
+    "ran": true,
+    "pattern": "email-regex",
+    "replacements": 0
+  },
+  "raw_answer_text": "Looking at the validator errors, the issue is that each `edge` statement is missing the **operator** that specifies the direction of the arrow. The valid operators are `->`, `<-`, `--`, or `<->`. When a label is present (like \"yes\" or \"no\"), it goes in brackets as `-[label]->`.\n\nHere's the corrected document:\n\n```figdown\n# FigDown — figures as text. Spec: https://github.com/FigDown/figdown\nfigdown 0.1 flowchart\ntitle \"BGP session reset procedure\"\n\nprocess checkcounters \"Check interface error counters\"\ndecision errorsfound \"Errors found?\"\nprocess clearcounters \"Clear interface counters\"\nterminator monitor \"Monitor session\"\nterminator escalate \"Escalate to operator\"\n\nedge checkcounters -> errorsfound\nedge errorsfound -[yes]-> clearcounters\nedge clearcounters -> monitor\nedge errorsfound -[no]-> escalate\n```\n\nThe key changes:\n- Line 11: `checkcounters errorsfound` → `checkcounters -> errorsfound`\n- Line 12: `errorsfound clearcounters yes` → `errorsfound -[yes]-> clearcounters`\n- Line 13: `clearcounters monitor` → `clearcounters -> monitor`\n- Line 14: `errorsfound escalate no` → `errorsfound -[no]-> escalate`\n\nEach edge now has the `->` operator to indicate forward direction, and the branch labels (\"yes\" and \"no\") are placed in brackets on the edge that carries them.",
+  "extracted_document": "# FigDown — figures as text. Spec: https://github.com/FigDown/figdown\nfigdown 0.1 flowchart\ntitle \"BGP session reset procedure\"\n\nprocess checkcounters \"Check interface error counters\"\ndecision errorsfound \"Errors found?\"\nprocess clearcounters \"Clear interface counters\"\nterminator monitor \"Monitor session\"\nterminator escalate \"Escalate to operator\"\n\nedge checkcounters -> errorsfound\nedge errorsfound -[yes]-> clearcounters\nedge clearcounters -> monitor\nedge errorsfound -[no]-> escalate\n",
+  "validation": {
+    "errors": [],
+    "invariants_pass": true,
+    "missing_nodes": [],
+    "edge_count": 4,
+    "success": true
+  }
+}

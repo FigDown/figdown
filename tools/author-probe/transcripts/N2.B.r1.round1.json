@@ -1,0 +1,49 @@
+{
+  "probe_version": "1.0.0",
+  "run": {
+    "utc": "2026-08-19T12:13:16Z",
+    "cli": "2.1.234 (Claude Code)",
+    "condition": "B",
+    "task": "N2",
+    "kind": "normal",
+    "seat": 1,
+    "model_alias": "sonnet",
+    "round": 1,
+    "model_used": "claude-sonnet-5"
+  },
+  "saw": {
+    "skill_path": "tools/author-probe/skill-candidate.md",
+    "skill_sha256": "2abdaf0d9211d5ee1464c5f5c3a200b1ae6f7bd71cfd6344e7da94d669e6ed31",
+    "skill_chars": 17591,
+    "system_sha256": "39117af0175e7d927c8f9c715c9555f91e3357a146f2d6d311d4a3bb889ecaae",
+    "user_sha256": "5cb75a0dcbc2a731f18bde3a976bd9c2f3dade7d39ca3addd99bdea9111443ab"
+  },
+  "integrity": {
+    "turns": 1,
+    "permission_denials": 0,
+    "is_error": false
+  },
+  "usage": {
+    "cost_usd": 0.072129,
+    "duration_ms": 22418
+  },
+  "scrub": {
+    "ran": true,
+    "pattern": "email-regex",
+    "replacements": 0
+  },
+  "raw_answer_text": "```figdown\n# FigDown — figures as text. Spec: https://github.com/FigDown/figdown\nfigdown 0.1 topology\ntitle \"Branch office WAN uplinks\"\n\nclass backup \"Diverse-path backup WAN link\" style=dashed\n\nnode access1 \"Access Switch 1\"\nnode access2 \"Access Switch 2\"\nnode branch \"Branch Router\"\nnode hubprimary \"Regional Hub Router (Primary)\"\nnode hubbackup \"Regional Hub Router (Backup)\"\n\nedge access1 branch\nedge access2 branch\nedge branch hubprimary \"primary WAN\"\nedge branch hubbackup \"backup WAN\" class=backup\n```\n\nNotes on how I built this:\n\n- Genre is `topology` at `figdown 0.1` — per the router, `topology` is dispatchable at 0.1 and only carries the experimental-withdrawal risk, so no version bump or portability trade-off comment was needed.\n- I did not have `reference/experimental/topology.md` or `reference/layout.md` in hand, so I used the minimal, genre-neutral `node`/`edge` vocabulary implied by the document skeleton (bare ids, quoted labels, `class=` for meaning) rather than guessing at any topology-specific keywords I haven't seen documented. Before treating this as final, run `node <skill-dir>/build-svg.js branch-office-wan-uplinks.fd` — if `node`/`edge` aren't the genre's actual spellings, the parser's line-numbered error will name the correct ones, per \"Do not invent syntax.\"\n- The five links/nodes named in the brief are all present: `access1`–`branch`, `access2`–`branch`, `branch`–`hubprimary`, `branch`–`hubbackup`. No extra structure was added.\n- The backup link carries a `class` stating *why* it's different (diverse-path backup) rather than relying on the dashed style alone to imply meaning, per \"class is how meaning survives.\"",
+  "extracted_document": "# FigDown — figures as text. Spec: https://github.com/FigDown/figdown\nfigdown 0.1 topology\ntitle \"Branch office WAN uplinks\"\n\nclass backup \"Diverse-path backup WAN link\" style=dashed\n\nnode access1 \"Access Switch 1\"\nnode access2 \"Access Switch 2\"\nnode branch \"Branch Router\"\nnode hubprimary \"Regional Hub Router (Primary)\"\nnode hubbackup \"Regional Hub Router (Backup)\"\n\nedge access1 branch\nedge access2 branch\nedge branch hubprimary \"primary WAN\"\nedge branch hubbackup \"backup WAN\" class=backup\n",
+  "validation": {
+    "errors": [
+      "Line 13: edge needs an operator: -> <- -- <-> (a [mid] label splits it: -[x]->)",
+      "Line 14: edge needs an operator: -> <- -- <-> (a [mid] label splits it: -[x]->)",
+      "Line 15: edge needs an operator: -> <- -- <-> (a [mid] label splits it: -[x]->)",
+      "Line 16: edge needs an operator: -> <- -- <-> (a [mid] label splits it: -[x]->)"
+    ],
+    "invariants_pass": false,
+    "missing_nodes": [],
+    "edge_count": 0,
+    "success": false
+  }
+}

@@ -1,0 +1,1 @@
+Line 27: the lasso for bundle "lag" would enclose non-member "x" and the layout pass could not separate them; the figure is not drawn rather than drawn wrongly. Give "x" a pin outside the bundle's extent, or add its link to "lag".

@@ -1,0 +1,59 @@
+{
+  "probe_version": "1.0.0",
+  "run": {
+    "utc": "2026-08-19T11:48:24Z",
+    "cli": "2.1.234 (Claude Code)",
+    "condition": "A",
+    "task": "N1",
+    "kind": "normal",
+    "seat": 1,
+    "model_alias": "sonnet",
+    "model_used": "claude-sonnet-5"
+  },
+  "saw": {
+    "skill_path": "skill/figdown/SKILL.md",
+    "skill_sha256": "718f935282ce7a93f4b7e36b83983ac1112e49818384d8eaf35869830d34d6a2",
+    "skill_chars": 16497,
+    "system_sha256": "39117af0175e7d927c8f9c715c9555f91e3357a146f2d6d311d4a3bb889ecaae",
+    "user_sha256": "29cc14016068ed93f99f14daa570f9f10ebf545a0ae968cb17c84f0bc03027eb"
+  },
+  "integrity": {
+    "turns": 1,
+    "permission_denials": 0,
+    "is_error": false
+  },
+  "usage": {
+    "cost_usd": 0.068388,
+    "duration_ms": 23681
+  },
+  "scrub": {
+    "ran": true,
+    "pattern": "email-regex",
+    "replacements": 0
+  },
+  "raw_answer_text": "# Telemetry export pipeline (FigDown)\n\nI don't have `reference/scene.md`/`reference/layout.md` loaded in this session, so I've kept the block-genre syntax to the minimal, unambiguous forms the core spec itself shows (bare ids, quoted labels, plain `->` edges) and avoided any layout/pin or class machinery the figure doesn't need. Five nodes, four edges, exactly as the description states — poller and health probe both feed normalizer, normalizer feeds buffer, buffer feeds exporter.\n\n```figdown\n# FigDown — figures as text. Spec: https://github.com/FigDown/figdown\nfigdown 0.1 block\ntitle \"Telemetry export pipeline\"\n\nblock poller \"Poller\"\nblock healthprobe \"Health probe\"\nblock normalizer \"Normalizer\"\nblock buffer \"Ring buffer\"\nblock exporter \"Exporter\"\n\npoller -> normalizer\nhealthprobe -> normalizer\nnormalizer -> buffer\nbuffer -> exporter\n```\n\nNext step per the workflow: `node <skill-dir>/build-svg.js telemetry-export-pipeline.fd`, fix any `Line N:` errors it reports (in particular, confirm the exact `block`-opener and edge-arrow spellings against `reference/scene.md` if the build rejects either), then embed the resulting SVG with the standard `source:` footer pointing at this `.fd`.",
+  "extracted_document": "# FigDown — figures as text. Spec: https://github.com/FigDown/figdown\nfigdown 0.1 block\ntitle \"Telemetry export pipeline\"\n\nblock poller \"Poller\"\nblock healthprobe \"Health probe\"\nblock normalizer \"Normalizer\"\nblock buffer \"Ring buffer\"\nblock exporter \"Exporter\"\n\npoller -> normalizer\nhealthprobe -> normalizer\nnormalizer -> buffer\nbuffer -> exporter\n",
+  "validation": {
+    "errors": [
+      "Line 5: \"block\" is not allowed in genre block",
+      "Line 6: \"block\" is not allowed in genre block",
+      "Line 7: \"block\" is not allowed in genre block",
+      "Line 8: \"block\" is not allowed in genre block",
+      "Line 9: \"block\" is not allowed in genre block",
+      "Line 11: \"poller\" is not allowed in genre block",
+      "Line 12: \"healthprobe\" is not allowed in genre block",
+      "Line 13: \"normalizer\" is not allowed in genre block",
+      "Line 14: \"buffer\" is not allowed in genre block"
+    ],
+    "invariants_pass": false,
+    "missing_nodes": [
+      "poller",
+      "normalizer",
+      "healthprobe",
+      "buffer",
+      "exporter"
+    ],
+    "edge_count": 0,
+    "success": false
+  }
+}

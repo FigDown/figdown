@@ -1,0 +1,22 @@
+# Shape geometry, curved outline reached SQUARE-ON (engine backlog 14/16;
+# DISCREPANCIES `SHAPE-AWARE-GEOMETRY`). Unpinned, so the return edge `pe -> net` is pushed
+# into the side channel and arrives on the ellipse horizontally instead of
+# along a ray from the centre — the touch-down path 210/211/212 never take
+# (210 is unpinned but fans out only forward; 211/212 are pinned and purely
+# diagonal). Parse model unaffected; tools/shape-check.js asserts the
+# geometry.
+#
+# Repurposed: this case was `213-shape-cloud-geometry`, and
+# its cloud-specific half — an outline drawn OUTSIDE its box (rx=w/2+10,
+# ry=h/2+8), so a bounding-box clip stopped the edge under the fill — was
+# deleted with the shape, not lost: no registered shape is drawn outside its
+# box any more, so there is nothing left to assert. The half that survives is
+# the back edge and its square-on touch-down, which no other case covers.
+figdown 0.2 flowchart
+node ce "CE router"
+node net "Transit provider\nbackbone" shape=ellipse
+node pe "PE router"
+flow down
+flowline ce -> net
+flowline net -> pe
+flowline pe -> net

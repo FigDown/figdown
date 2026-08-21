@@ -1,0 +1,5 @@
+figdown 0.1 block
+class v1 "First"
+class v1 "Dup"
+class v2
+class v3 "Bad style" style=bold

@@ -1,0 +1,50 @@
+{
+  "probe_version": "1.0.0",
+  "run": {
+    "utc": "2026-08-19T12:16:17Z",
+    "cli": "2.1.234 (Claude Code)",
+    "condition": "B",
+    "task": "N4",
+    "kind": "normal",
+    "seat": 3,
+    "model_alias": "haiku",
+    "round": 2,
+    "model_used": "claude-haiku-4-5-20251001"
+  },
+  "saw": {
+    "skill_path": "tools/author-probe/skill-candidate.md",
+    "skill_sha256": "2abdaf0d9211d5ee1464c5f5c3a200b1ae6f7bd71cfd6344e7da94d669e6ed31",
+    "skill_chars": 17591,
+    "system_sha256": "39117af0175e7d927c8f9c715c9555f91e3357a146f2d6d311d4a3bb889ecaae",
+    "user_sha256": "5f110ff9e7d6535cf25d8d7fc67d9bfe41e4701aa1c67a60442b1bfa710e58bf"
+  },
+  "integrity": {
+    "turns": 1,
+    "permission_denials": 0,
+    "is_error": false
+  },
+  "usage": {
+    "cost_usd": 0.025853,
+    "duration_ms": 19360
+  },
+  "scrub": {
+    "ran": true,
+    "pattern": "email-regex",
+    "replacements": 0
+  },
+  "raw_answer_text": "Looking at the validator errors, I can see two clear issues:\n\n1. **\"block\" is not allowed in genre block** — The keyword for declaring nodes in block diagrams is not `block`. Based on the error and common conventions in diagram languages, it should be `node`.\n\n2. **Edge needs an operator** — The edge declarations are missing directional operators. For a workflow like certificate renewal (where data/control flows in one direction), the operator should be `->` for a directed edge.\n\nHere's the corrected document:\n\n```figdown\n# FigDown — figures as text. Spec: https://github.com/FigDown/figdown\nfigdown 0.1 block\ntitle \"Certificate renewal automation\"\n\nnode scheduler \"Scheduler\"\nnode renewaljob \"Renewal Job\"\nnode caclient \"CA Client\"\nnode ca \"Certificate Authority\"\nnode deployagent \"Deploy Agent\"\nnode service \"Service\"\n\nscheduler -> renewaljob\nrenewaljob -> caclient\ncaclient -> ca\nrenewaljob -> deployagent\ndeployagent -> service\n```\n\nThe changes:\n- Replaced `block` with `node` for all node declarations (lines 5–10)\n- Added `->` operators to all edges (lines 12–16), making them directed edges that flow left-to-right through the automation pipeline",
+  "extracted_document": "# FigDown — figures as text. Spec: https://github.com/FigDown/figdown\nfigdown 0.1 block\ntitle \"Certificate renewal automation\"\n\nnode scheduler \"Scheduler\"\nnode renewaljob \"Renewal Job\"\nnode caclient \"CA Client\"\nnode ca \"Certificate Authority\"\nnode deployagent \"Deploy Agent\"\nnode service \"Service\"\n\nscheduler -> renewaljob\nrenewaljob -> caclient\ncaclient -> ca\nrenewaljob -> deployagent\ndeployagent -> service\n",
+  "validation": {
+    "errors": [
+      "Line 12: \"scheduler\" is not allowed in genre block",
+      "Line 13: \"renewaljob\" is not allowed in genre block",
+      "Line 14: \"caclient\" is not allowed in genre block",
+      "Line 15: \"renewaljob\" is not allowed in genre block",
+      "Line 16: \"deployagent\" is not allowed in genre block"
+    ],
+    "invariants_pass": false,
+    "missing_nodes": [],
+    "edge_count": 0,
+    "success": false
+  }
+}

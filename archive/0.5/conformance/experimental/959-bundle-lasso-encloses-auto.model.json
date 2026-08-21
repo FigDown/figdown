@@ -1,0 +1,115 @@
+{
+  "header": {
+    "version": "0.4",
+    "genre": "topology"
+  },
+  "title": "A lasso the layout closed round a bystander",
+  "flow": "right",
+  "classes": [],
+  "planes": [
+    {
+      "id": "base",
+      "z": 0
+    }
+  ],
+  "nodes": [
+    {
+      "id": "a",
+      "label": "Switch A",
+      "shape": "box",
+      "plane": "base",
+      "line": 16
+    },
+    {
+      "id": "t1",
+      "label": "Tap 1",
+      "shape": "box",
+      "plane": "base",
+      "line": 17
+    },
+    {
+      "id": "x",
+      "label": "Console",
+      "shape": "box",
+      "plane": "base",
+      "line": 18
+    },
+    {
+      "id": "t2",
+      "label": "Tap 2",
+      "shape": "box",
+      "plane": "base",
+      "line": 19
+    },
+    {
+      "id": "b",
+      "label": "Switch B",
+      "shape": "box",
+      "plane": "base",
+      "line": 20
+    }
+  ],
+  "groups": [],
+  "edges": [
+    {
+      "a": "a",
+      "op": "--",
+      "b": "t1",
+      "plane": "base",
+      "line": 21
+    },
+    {
+      "a": "t1",
+      "op": "--",
+      "b": "b",
+      "plane": "base",
+      "line": 22
+    },
+    {
+      "a": "a",
+      "op": "--",
+      "b": "x",
+      "plane": "base",
+      "line": 23
+    },
+    {
+      "a": "x",
+      "op": "--",
+      "b": "b",
+      "plane": "base",
+      "line": 24
+    },
+    {
+      "a": "a",
+      "op": "--",
+      "b": "t2",
+      "plane": "base",
+      "line": 25
+    },
+    {
+      "a": "t2",
+      "op": "--",
+      "b": "b",
+      "plane": "base",
+      "line": 26
+    }
+  ],
+  "ranks": [],
+  "pins": [],
+  "thresholds": [],
+  "bands": [],
+  "bundles": [
+    {
+      "id": "lag",
+      "label": "LAG",
+      "members": [
+        "a--t1",
+        "t1--b",
+        "a--t2",
+        "t2--b"
+      ],
+      "line": 27
+    }
+  ],
+  "regions": []
+}

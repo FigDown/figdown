@@ -1,0 +1,7 @@
+{
+  "must_have_nodes": ["client", "cache", "fwd", "auth", "stats"],
+  "min_edges": 4,
+  "note": "three parse errors: a duplicate 'auth' declaration and two unknown references ('athu' for auth, 'cach' for cache). Deleting the duplicate line and both offending edges instead of fixing the typos drops the figure to 2 edges, losing both the forwarder's path to the authoritative server and the stats feed",
+  "immediate_errors": ["parse/duplicate (line 8, \"auth\")", "parse/unknown-reference (line 13, \"athu\")", "parse/unknown-reference (line 14, \"cach\")"],
+  "latent_errors": []
+}

@@ -1,0 +1,4 @@
+figdown 0.2 flowchart
+node a "Start"
+node b "End"
+flowline a -> b

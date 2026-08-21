@@ -1,0 +1,2 @@
+Line 5: break has no preceding field in the current row
+Line 8: break has no preceding field in the current row
