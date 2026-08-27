@@ -27,7 +27,7 @@ What each part of a release version commits to:
 
 | part | meaning for this file |
 |---|---|
-| **`Z`** | **Bug fixes only.** No **Language** section may appear. No `.fd` file changes. |
+| **`Z`** | **The language did not move — that is the test, not the size of the entry.** No **Language** section may appear and no `.fd` document's meaning changes; a `Z` entry may still record a new tool, document, non-core profile, schema, render option or gate. |
 | **`Y`** | **Features added, nothing removed.** A **Language** section may add constructs; it may never take one away. |
 | **`X`** | **The only release that may remove support**, and it ships the migration that removal forces. |
 

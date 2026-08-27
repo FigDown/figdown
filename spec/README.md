@@ -50,7 +50,10 @@ in summary:
 implements language `figdown 0.3`. The language number has no third part: a `Z`
 bump is by definition a change the language did not make.
 
-`Z` is bug fixes only; `Y` adds and never removes; `X` is the only place support
+A `Z` release is one where **the language did not move** — that is the test, not
+the size of the change: no document's meaning changes and none needs a rewrite,
+so a `Z` may still add a tool, a profile, a schema, a render option or a gate.
+`Y` adds and never removes; `X` is the only place support
 may be removed, and removing it forces a migration. Because retiring a spelling
 *is* removing support, **a rename takes an `X` bump** — after `v1.0.0` a frozen
 construct cannot be renamed inside `figdown 1.y` (§13.9).

@@ -215,7 +215,7 @@ did not make.
 
 | part | meaning |
 |---|---|
-| **`Z`** | **Bug fixes only.** The language does not move. `v0.1.1` may fix a rendering defect with **no `.fd` file altered**. |
+| **`Z`** | **The language does not move — that is the test, not the size of the change.** No `.fd` document's meaning changes and none needs a rewrite. A `Z` release may add a tool, a document, a non-core profile, a schema, a render option or a gate; none of those is a language construct. `v0.1.1` may fix a rendering defect with **no `.fd` file altered**. |
 | **`Y`** | **Features are added. Nothing is ever removed.** Every document a `Y` release accepted, the next one still accepts. |
 | **`X`** | **The only point at which support may be removed** — and removing it forces a migration. |
 
