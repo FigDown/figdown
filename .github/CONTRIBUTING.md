@@ -62,6 +62,36 @@ Two rules govern the *name*, once the meaning is agreed:
   Between an opaque candidate and one that inverts a known prior, the opaque one
   wins.
 
+## Not planned
+
+Read this before you spend the evidence the gate above asks for. Some things
+get asked for more than once, and each row below is a decision already taken
+and recorded — not a preference, and not a claim that the need is imaginary.
+The last column is the part that matters: every one of these reopens on
+something, and naming that something is cheaper for you than re-arguing the
+row.
+
+An `IDENTIFIER` in *Recorded in* is a row in
+[`decisions/registry.md`](../decisions/registry.md); a section number is
+[`spec/core.md`](../spec/core.md).
+
+| What is asked | Decision | Why, in one sentence | Recorded in | What would reopen it |
+|---|---|---|---|---|
+| Author-drawn edge routes — waypoints, port anchors, a routing mode | **Withdrawn** from the language; nothing replaces them | A source-graded survey of mxGraph, ELK, Visio and draw.io found the realisation sits outside the narrow stable intersection those four share — they disagree about what happens when an endpoint moves, and a disagreement about behaviour cannot be settled by choosing a better word. | `EDGE-GEOMETRY-CONSTRUCTS`; `DOMAIN-CONVENTION-DIRECTIVES` — the author names the meaning, the engine owns the drawing convention | The withdrawal **released** both spellings, so a genre may claim either as its own subject vocabulary through the ordinary evidence gate above — never again as edge geometry. The underlying need is filed as `EDGE-IDENTITY-AND-GEOMETRY` |
+| A colour or label colour written straight onto an element | **Retired language-wide**; a permanent line error | Colour that classifies is a `class` whose label states what it classifies, and a live colour key was also the one thing letting an older document draw a legal, wrong figure in silence across 1602 downstream sites. | `COLOUR-KEY-STATUS`; `CATEGORICAL-MEANING-MAPPING` — a `class` plus the derived legend | The residual question is filed as `ANNOTATION-LOCATOR-SPLIT` ([`spec/core.md`](../spec/core.md) §9), and a re-proposal goes through it carrying a channel a `class` is measured to lose — an `edge` carries three labels, so an owner-level key is the wrong shape |
+| An overlay or z-order keyword for painting one set of elements above another | **Withdrawn** from the language; no replacement spelling | Stripping it from its only two authored figures moved exactly one edge index and changed no ink, while to the network engineers who write those figures the word already names the control/data/management partition — the wrong reading, for precisely the intended readers. | `PAINT-ORDER-CONSTRUCT`; `RESERVED-SPELLINGS` — the word is held against the need returning | A measured figure that document order plus `class=` cannot draw: a real z-order need, not a labelled one |
+| A genre's subject keyword made available under the other genres | **Withdrawn per genre** — sixteen of twenty-four genre-and-keyword pairs at once | A subject word belongs to the genre whose domain gives it a referent, and the withdrawn pairs had either no evidence of need in that genre or a domain meaning already occupying the word — most had both. | `SCENE-KEYWORD-MEMBERSHIP`; `SUBJECT-VOCABULARY-SCOPE` — subject vocabulary is per genre, never inherited | Pair by pair, on measured need inside that genre; the grid was decided pair by pair and is re-decidable the same way |
+| A lenient mode: warn on a line the parser does not recognise and carry on | **Never** | The grammar is closed by axiom — every unrecognised line is an error carrying a 1-based line number, and that is the whole reason a write → validate → fix loop terminates instead of drifting. | `CLOSED-GRAMMAR`; [`spec/core.md`](../spec/core.md) §0 and §8 | Nothing. A construct you cannot express is a syntax proposal, not a tolerance |
+| A structured diagnostics envelope in the public library, beside the error strings | **Built, measured, retracted** | A pre-registered A/B at the model floor — 24 repair chains, 12 per condition — moved first-round repair by **0 points** against a ≥ 15-point bar and mean rounds-to-success by **−0.4167** against a ≤ −0.5 bar. | [`PROOF.md`](../PROOF.md) §4.3 — the criteria, the run, and the one result it argues against itself with | An editor or language-server consumer with measured demand, re-measured against **that** consumer's criteria; this probe's criteria do not carry over |
+| An interactive per-figure runtime — scripted SVG, hover, click, live animation | **Out of scope** | An artifact is a pure function of its source plus its recorded render options, so behaviour would be the one thing in the figure with no source to read it from. | `STATIC-DYNAMIC-PRIORITY`; `DYNAMIC-FIGURE-PURPOSE`; [`spec/core.md`](../spec/core.md) §6 (dynamic is reserved, not specified) and §7 | The reserved dynamic layer being specified after the static core — and it lands as an ordered list of page deltas, not as a runtime |
+| A chart or plot construct — X-Y trend, bar, line | **Out of the normative vocabulary** | A trend chart's knowledge is its values, and a `table` answers *which is highest* and *is it rising* with equal accuracy, so the rendered shape is an idiom for the values rather than knowledge of its own. | `CHART-SCOPE-BOUNDARY` — about 1% of the measured 774-document corpus, and a semantic-completeness score of zero | Case by case on `COMPLETENESS-DEFINITION`'s irreplaceability test: strip the encoding, restate the knowledge, and see whether the central question survives. The proportional-area encoding (`MEANINGFUL-ARRANGEMENT`) is the first candidate |
+| A full proposal-lifecycle process, a public roadmap board, promotion channels | **Held as premature** | The decision record already says what was decided and why, and a lifecycle process currently has zero external contributors to serve. | Not a language ruling and so not a registry row — it is a project-shape decision, kept in the project's working record | A second regular contributor, or the first substantial external proposal — whichever arrives first |
+
+A row here is not a closed door with the handle removed. If you have the thing
+in the last column, bring it: the reopen condition **is** the evidence gate for
+that row, and each one is deliberately written as something a contributor can
+go and measure.
+
 ## Route A — changing a frozen construct
 
 Frozen does not mean unchangeable. It means the change must be **managed**, and
