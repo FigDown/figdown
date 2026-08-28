@@ -19,7 +19,8 @@ which one your change touches.
 | propose a new directive, option key, enum value or genre | the **Syntax proposal** issue form |
 | change or remove a **frozen** construct | the **Syntax proposal** issue form — read [Route A](#route-a--changing-a-frozen-construct) first |
 | change or remove an **experimental** construct | the **Syntax proposal** issue form — [Route B](#route-b--changing-an-experimental-construct) is much lighter |
-| report a parser or renderer bug, a specification contradiction, or broken determinism | the **Bug report** issue form |
+| report a figure that renders wrongly or illegibly, a specification contradiction, or broken determinism | the **Figure defect** issue form |
+| ask something the docs didn't answer, or you're unsure which form fits | the **Question** issue form |
 | report a security problem | [`SECURITY.md`](SECURITY.md) — never a public issue |
 | write a figure rather than change the language | [`guide/authoring.md`](../guide/authoring.md), then [`guide/expressing.md`](../guide/expressing.md) |
 

@@ -30,7 +30,7 @@ would also affect the library it is generated from.
 ## What is not a vulnerability
 
 A document that fails to parse, renders unexpectedly, or produces a poor layout
-is a bug, not a security issue — use the bug-report issue form. A determinism
+is a bug, not a security issue — use the figure-defect issue form. A determinism
 breakage is likewise a bug, and a loud one: see
 [`conformance/README.md`](../conformance/README.md).
 
