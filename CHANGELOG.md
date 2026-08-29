@@ -65,6 +65,207 @@ Statuses referred to above are defined in [`spec/README.md`](spec/README.md).
 
 Nothing yet.
 
+## v0.5.1 — 2026-08-29
+
+**Release `v0.5.1`, language version `figdown 0.5`.** A `Z`: **the language did
+not move.** Every `figdown 0.5` document parses to the same model it did under
+`v0.5.0`, and no document needs a rewrite. What moved is what the specification
+says, what the engine draws in three places, and what this project can
+demonstrate — a `Z` is defined by the first of those and not by the size of the
+other two, which is itself one of this release's corrections
+(`VERSION-PART-SEMANTICS`).
+
+Nineteen published figures change their drawing; forty-one change only the
+version stamp they carry. Both sets are named under *Upgrading*.
+
+### Added
+
+**Three normative profiles, and they are normative for someone other than the
+language.** [`spec/host-profile.md`](spec/host-profile.md) states what a
+Markdown host must do to make a figure work — discovery, verification, multiple
+sections, and the failure modes — with a claim-to-anchor table and its
+CommonMark behaviour checked first-hand.
+[`spec/figdown-manifest.md`](spec/figdown-manifest.md) and its
+[schema](spec/figdown-manifest.schema.json) define an optional JSON sidecar
+recording where a figure's knowledge came from and how far anyone has checked
+it (`PUBLICATION-MANIFEST-PROFILE`).
+[`spec/figdown-a11y.md`](spec/figdown-a11y.md) states what a *published* figure
+owes a reader who cannot see it (`ACCESSIBILITY-PROFILE`). Each is optional,
+none changes the language, and each says in its own first line who it is for.
+
+**A review state that is bound to the bytes it is about.** The manifest's
+`review` records one of four claims — authored, transcribed, reviewed,
+source-verified — together with the hash of the source it was made about. A
+state whose hash no longer matches is reported as **stale and fatal**, because
+a review that outlives its subject is a claim still standing after the thing it
+described has changed. The field exists because a production corpus built it by
+hand first, after measuring an audit that still read *verified* about a figure
+that had silently regressed.
+
+**`--with-a11y`, an opt-in render option.** It emits `role="graphics-document"`,
+a non-visual `<title>` taken unchanged from the document's own `title`, and a
+`<desc>` derived from the model and flagged with the state that produced it
+(`ACCESSIBLE-TEXT-EMISSION`). **Default output is unchanged**: a figure built
+without the flag is byte-identical to one built by the previous engine, apart
+from its version stamp. The derived description covers three genres and
+deliberately covers no others — an uncovered genre gets no description rather
+than one invented outside a ruling.
+
+**The conformance suite can be run by an implementation this project did not
+write** (`CONFORMANCE-HARNESS-CONTRACT`). `conformance/run.js` gained
+`--engine-cmd=<command>`: the runner writes each fixture to the command's stdin
+and compares its stdout against the same goldens. The command may be in any
+language. The contract — input, output, exit codes, error ordering, encoding —
+is written in [`conformance/README.md`](conformance/README.md), with a worked
+adapter beside it. The in-process path stays the default and its results are
+unchanged. `--update` is refused in subprocess mode: an implementation that
+could mint a golden could pass by minting one.
+
+**A published JSON Schema for the semantic model**
+([`spec/figdown-model.schema.json`](spec/figdown-model.schema.json)), derived
+from the projection the conformance goldens already use, and checked against
+every golden on every run.
+
+**A migration guide, published for the first time**
+([`spec/migrate.md`](spec/migrate.md)) — the upgrade path for a corpus, beside
+[`migrations.md`](spec/migrations.md), which is the chronological log. It was
+always cited by the specification and had never been publishable.
+
+**Ten more gates** (28 → 38 in the development tree, 36 in this one). They
+check: edit locality, the model's shape against its schema, a non-empty `alt`
+on every embed, the manifest's five assertions, the accessibility profile's
+six, the requirement-keyword forms, the vocabulary carrier against the
+registry in both directions, the closed list of conformance classes, the
+harness contract's refusal branches, and the currency of the project's own
+working figures. **A gate is a check, not a proof**: several of these pass on
+an empty scope or an unarmed threshold, which is stated where each one is
+documented rather than counted as coverage.
+
+### Changed
+
+**The derived legend draws what a class actually paints**
+(`LEGEND-SWATCH-SHAPE`). A class carried only by connectors now draws a **line**
+in the legend, in its own stroke and dash; a class carried only by boxes keeps
+its rectangle; a class carried by both draws both. Previously every class drew
+a rectangle, so a class that paints lines was explained by a shape it never
+draws. A declared `fill` always draws an area, since a fill with no area is
+invisible; a class that declares no paint still draws no swatch.
+
+**A group's band is crossed, not terminated on** (`GROUP-BOUNDARY-OBSTACLE`).
+An edge with one endpoint inside a `group` and one outside now runs to its
+endpoint. It previously detoured to the group's rectangle and entered the
+member from the side. The cause was the strip that carries the group's **name**:
+element labels became routing obstacles in an earlier release, correctly, and
+the exemption that change wrote for an element's own edge was never extended to
+a group over its own members. The band and its name remain obstacles to an edge
+that neither starts nor ends inside the group. The behaviour was previously
+unspecified and is now stated in [`spec/core.md` §2.2](spec/core.md).
+
+**Every header tier of a table carries its own cell identity.** `data-cell` is
+now emitted for all header rows, not the first alone.
+
+**Requirement keywords are declared, once, and mean what BCP 14 says**
+(`NORMATIVE-KEYWORD-DECLARATION`). The specification used MUST, SHOULD and MAY
+throughout and had never said it used them in RFC 2119's sense. It says so now,
+in one place, using RFC 8174's wording. The audit this creates — every existing
+occurrence is now a claim — is named and scheduled in the same section rather
+than discovered later.
+
+**The specification says whom its requirements bind**
+(`CONFORMANCE-CLASS-LIST`, `CONFORMANCE-CLASS-OBLIGATIONS`). Six classes,
+closed: Parser, Renderer, Reading agent, Host, Publisher, and Document as an
+artifact class. *Engine* and *Implementation* are labels for a conjunction of
+classes rather than classes. Each class's obligations are pointers to sentences
+that already existed. The list is derived from the parties the specification
+already named, not invented for the occasion, and it says out loud what had
+been true and unstated: **the normative fixtures are the Parser class's
+conformance suite.**
+
+**The language is closed, and the reserved prefix says so to the author who
+meets it** (`LANGUAGE-EXTENSION-POLICY`, `RESERVED-PREFIX-ENFORCEMENT`). A
+document writing `x-something` used to get the diagnostic a typo gets. It now
+gets one naming the reservation, saying the prefix will not open by waiting,
+and giving three routes that are open: record the fact in a publication
+manifest, propose the construct through the evidence gate, or fork with your
+own header token. Identifiers are untouched — `node x-foo` and `class x-bar`
+parse — and the message says so.
+
+**The grammar's layers are written down** (`GRAMMAR-LAYERING-MODEL`): a scope
+axis (core, genre, profile) and a stage axis, carried on the vocabulary file
+the project already maintained. Four places where the language crosses its own
+layering are **declared rather than repaired** — an exception that is written
+down is a boundary; an exception that is not is a trap.
+
+**Error recovery is specified.** A line that reports an error performs none of
+its state effects, and no other line's parse changes because of it — with the
+stage table, the effects that are skipped, the one exception and the cascade
+shapes. Investigation found the behaviour had been frozen by the multi-error
+goldens all along; what was missing was the rule that predicts them, so no
+golden moved.
+
+**What a reader may conclude from a figure has classes**
+(`spec/core.md` §12.7): explicit, derived, not asserted, unknown — and the rule
+that **a drawn graph cannot assert the totality of its relation**, so what a
+figure omits is not a claim that the thing does not exist.
+
+### Fixed
+
+- An edge crossing a `group` boundary is routed to its endpoint. Introduced in a
+  `0.4` development release and present in `v0.5.0`; see *Changed* above.
+- The legend no longer explains a line with a rectangle; see *Changed* above.
+- `spec/core.md` §10 said `type=` was live only on the experimental `chart`
+  genre. It has been a mandatory key on `sequence`'s `fragment`, with a
+  disjoint value set, since `0.4`. The registry is corrected, and the gap the
+  error sat in is filled: the language had a rule for a keyword used twice and
+  none for a genre giving a registered option key a second value grammar.
+- The vocabulary carrier was missing `id=` — added at `0.5` and never recorded —
+  and its own arithmetic had been wrong since `0.1`, attributing a duplicate
+  count to the wrong key. Both are corrected and both are now machine-checked
+  in both directions.
+- The genre status table described the `v0.1` surface and read as though it
+  described the current one. It keeps its content and gains its date, and a
+  current table sits beside it listing all eight genres with the release that
+  added each.
+- A registered claim about RFC 2119 quoted a span that does not exist in that
+  document — it crossed a line break. Eight further register rows presented
+  joined text as verbatim. All are corrected against the fetched sources, and
+  the convention the register had only ever followed implicitly is now written
+  into it.
+- The editor's transaction postconditions asked their question in a grammar
+  that does not govern the bytes they check, refusing a legal edit; and the
+  table toolbar acted on the first table in a document rather than the selected
+  one — as did the postconditions that verified it.
+- The conformance runner ignored an unrecognised flag. A mistyped
+  `--engine-cmd` therefore ran the reference engine and reported its pass as
+  the caller's. Unknown flags are refused.
+
+### Upgrading
+
+**No document needs a rewrite.** No keyword, option key, enum value or genre
+changed; `figdown 0.5` accepts exactly what it accepted at `v0.5.0`.
+
+**Rebuilt artifacts will differ.** Of the figures published here, **nineteen
+change their drawing** — those with a legend class carried only by connectors,
+and those with an edge crossing a `group` boundary — and **forty-one change
+only their `data-engine-version` stamp**. If you keep rendered `.svg` files
+under version control, expect that split and check it against these two causes;
+anything outside them is worth reporting.
+
+**If you consume `data-*`**, table header cells now carry `data-cell` on every
+tier rather than the first.
+
+**If you have been reading the specification for a rule about `x-`**, it is now
+stated: the prefix is reserved against FigDown's own vocabulary and is not an
+extension namespace.
+
+### Experimental
+
+The `sequence` genre remains experimental and gains no construct here. The
+accessibility profile's default emission — making the option's output the
+default rather than opt-in — is registered for a future language release and is
+deliberately not in this one, because changing default output is a language
+event and this is not one.
+
 ## v0.5.0 — 2026-08-21
 
 **Release `v0.5.0`, language version `figdown 0.5`.** The fourth `Y`: new
