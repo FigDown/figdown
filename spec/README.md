@@ -135,8 +135,23 @@ experimental as something you have agreed to rewrite by hand later.**
 | [`genres/README.md`](genres/README.md) | how genres work as namespaces, and the index of the per-genre documents |
 | [`genres/block.md`](genres/block.md), [`genres/bitfield.md`](genres/bitfield.md), [`genres/table.md`](genres/table.md) | one self-contained normative document per frozen genre: defaults, the **complete vocabulary table** (every keyword, option key, enum value and default valid under that genre, each with its status), semantic model, errors, a worked example, and what the genre does *not* own |
 | [`migrations.md`](migrations.md) | the version log: every syntax change with its mechanical rewrite rule and its named diagnostic |
+| [`migrate.md`](migrate.md) | the upgrade guide for a corpus, where `migrations.md` is the chronological log: the one place to start when the documents were written against mixed `0.1` engines whose headers cannot say which, so every rewrite it gives is detection-based and idempotent |
+| [`figdown-model.schema.json`](figdown-model.schema.json) | the SHAPE contract for `core.md` §12's normalized model — what keys exist, which are always present, what their value domains are. Derived from `conformance/normalize.js` and checked against every `.model.json` golden by `gate:schema`; it states shape only, and not §12.5's byte-level serialization or the parse-time referential rules |
 | [`syntax-style.md`](syntax-style.md) | the internal style rules the syntax obeys, so that a new construct is spelled the way the existing ones are |
 | [`vocabulary-sources.tsv`](vocabulary-sources.tsv) | for each borrowed term, the external standard it was taken from |
+
+**Normative, but not the language.** Each of the three profiles says so in its
+own status line: nothing in them adds, removes or changes a FigDown construct.
+They bind a party the language does not — a host, or a publisher — and they are
+in this directory because they are normative documents, not because they are
+part of `figdown X.Y`. The manifest schema sits with the profile it constrains.
+
+| File | What it is |
+|---|---|
+| [`host-profile.md`](host-profile.md) | normative for **hosts**: what a Markdown renderer, static-site generator, wiki, viewer or documentation pipeline must do to understand FigDown — the fence word, same-basename sidecar pairing, hash verification and stale-artifact policy — each written out once as a consequence of `core.md` so that two hosts implement it the same way |
+| [`figdown-manifest.md`](figdown-manifest.md) | normative for the **publication manifest profile**: the sidecar `X.manifest.json` beside a published `X.fd` ⇔ `X.svg` pair, recording identity, hashes, provenance, review state and dependencies, and nothing else. Nothing in it is read by the engine, and nothing in it is required to render, embed or ship a figure |
+| [`figdown-manifest.schema.json`](figdown-manifest.schema.json) | the SHAPE contract for that manifest: what `tools/manifest-check.js` (`gate:manifest`) validates every manifest against |
+| [`figdown-a11y.md`](figdown-a11y.md) | normative for the **accessibility profile**: how a figure says what it is to a reader who cannot see it — the non-visual name, the description, and the review state of that description. A renderer that emits no accessibility markup stays a conforming renderer; the profile's audience is the publisher who makes the claim, and the tool that checks it |
 
 **Experimental — outside the promise.**
 
