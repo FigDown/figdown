@@ -1,0 +1,8 @@
+MALFORMED HASH — `source.sha256` is not 64 lower-case hex characters.
+
+Every hash in this profile is checked against `^[0-9a-f]{64}$`
+(spec/figdown-manifest.schema.json `$defs/hash`) — the same shape core §7's
+`data-sha256` uses. A string that is not well-formed cannot be compared to
+anything (assertion C depends on this shape holding first), so a malformed
+hash is rejected at the schema level before any binding check runs.
+does not match

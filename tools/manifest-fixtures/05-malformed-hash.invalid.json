@@ -1,0 +1,8 @@
+{
+  "figdown_manifest": "1",
+  "document": { "id": "example-malformed-hash" },
+  "language": { "version": "0.1" },
+  "source": {
+    "sha256": "not-a-real-sha256-hash"
+  }
+}

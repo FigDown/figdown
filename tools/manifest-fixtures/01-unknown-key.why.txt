@@ -1,0 +1,9 @@
+UNKNOWN KEY — a root-level "notes" the profile never defines.
+
+The manifest is CLOSED, exactly as the language and the model schema are
+(figdown-manifest.md §3 rule 1, `PUBLICATION-MANIFEST-PROFILE`): an unrecognized key is an error, never
+something a consumer may ignore. This control is the whole reason
+`additionalProperties: false` is set at every object level in
+spec/figdown-manifest.schema.json — a new field must fail this gate until the
+schema and figdown-manifest.md are edited to admit it.
+unknown key "notes"

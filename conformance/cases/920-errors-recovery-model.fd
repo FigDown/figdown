@@ -1,0 +1,71 @@
+# ADV-17 (2026-08-22): the ERROR-RECOVERY MODEL of core §8.3, pinned.
+#
+# §8.3 stated recovery as OBSERVED behaviour until this fixture landed; the
+# rule it now states — a line that reports an error performs none of its state
+# effects, and every other line is unaffected — was reachable only by matching
+# the reference engine. Five sections, one recovery clause each. None of the
+# five had a fixture of its own: the classes were pinned only as side effects
+# of files whose subject was something else, or not at all.
+
+figdown 0.1 block
+# §8.3.4, cascade 1: an abandoned declaration contributes NO model element, so
+# a later reference to it is a SECOND error. This is §8.3's own worked example
+# (the shape, then the endpoint) plus the same shape on `class`.
+node a "A" shape=hexagon
+node b "B"
+edge a -> b
+class c
+node d "D" class=c
+
+figdown 0.1 block
+# §8.3.5: a failed `layout` line does not OPEN the zone and does not consume
+# the single-valued slot — `node c "C"` below is therefore accepted (an engine
+# that opened the zone anyway would report a second error here) and the second
+# `layout` opens the zone rather than answering `duplicate layout line`.
+#
+# §8.3.6: after the zone IS open, a CONNECTOR meets the zone gate ahead of its
+# option pass and every other directive meets it after — one error either way,
+# but not the same one.
+node a "A"
+node b "B"
+layout junk
+node c "C"
+layout
+edge a -> b stroke=notacolor
+node e "E" fill=notacolor
+
+figdown 0.1 bitfield
+# §8.3.3 and §8.3.5. Line by line: `numbering=` is a TOLERATED fault, so the
+# region opens and `field "A" 8` lands in it; a reserved-`;` line is refused
+# BEFORE dispatch, so the region stays open and `field "C" 16` lands in it too
+# (which is why there is no `bitfield has no fields`); and the failed opener
+# `bitfield y` CLOSES x's region while opening none of its own, which is what
+# `field "D" 8` reports.
+bitfield x "X" numbering=zzz
+field "A" 8
+field "B" 24;
+field "C" 16
+bitfield y "Y" numbering=lsb0 fill=notacolor
+field "D" 8
+
+figdown 0.1 table
+# §8.3.6: `duplicate width` is reported and the value fault on the same line
+# is swallowed — the POSITIONAL half of the precedence asymmetry.
+table t "T"
+| A | B |
+|---|---|
+| 1 | 2 |
+width auto,90
+width auto,12em
+
+figdown 0.1 block
+# §8.3.6, the other half. The option stage runs ahead of every check the
+# directive makes on its own, so the colour beats `duplicate id "a"`; and
+# `pin`'s own value check runs ahead of ITS duplicate check, so the point
+# beats `duplicate pin for "a"`. The two read in opposite directions and the
+# asymmetry is engine-backlog item 79.
+node a "A"
+node a "B" fill=notacolor
+layout
+pin a at=(1,2)
+pin a at=zz

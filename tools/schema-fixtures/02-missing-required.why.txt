@@ -1,0 +1,8 @@
+MISSING REQUIRED KEY — a Node without `shape`.
+
+`shape` is MATERIALIZED (§12.2): the engine resolves the default "box" before
+the model is visible, so the key is always present and its absence is not the
+same statement as an unstated shape. An implementation that omits materialized
+defaults produces a model that reads as "shape unknown" where the language
+says "box".
+missing required key "shape"

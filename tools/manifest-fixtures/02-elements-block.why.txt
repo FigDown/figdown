@@ -1,0 +1,13 @@
+THE `elements` BLOCK — per-element provenance, RULED REFUSED.
+
+decisions/registry.md sketched a per-element `elements`
+array binding `node <- RFC X §4.2`; the ruling (`PER-ELEMENT-PROVENANCE`, 2026-08-22) REFUSED it
+against its own three-condition bar (§6.3) — measured demand unmet by the one
+corpus large enough to demonstrate it, the reading-contract problem (a fact
+that exists only in a sidecar is invisible to a reading agent, core §12.7),
+and identity stability not met project-wide. This fixture PINS that refusal:
+`additionalProperties: false` makes `elements` an ordinary unknown key, so
+reviving it under this name fails this gate loudly rather than passing
+unnoticed, exactly the discipline spec/figdown-model.schema.json states for
+its own deliberately-undeclared slots.
+unknown key "elements"

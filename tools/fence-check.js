@@ -693,7 +693,7 @@ function scanInlineSpans(engine, isKeyword, mdSrc) {
     if (migrationRecord && /^\s*\|/.test(line) && !/^\s*\|[\s:|-]+\|\s*$/.test(line)) {
       const bars = [];
       for (let k = 0; k < line.length; k++) if (line[k] === '|' && line[k - 1] !== '\\') bars.push(k);
-      // Cell 1 must actually contain a code span.  spec/migrations.md:56 is
+      // Cell 1 must actually contain a code span.  spec/migrate.md:56 is
       // `| *(none — NON-MECHANICAL)* | the legacy keyword `fill <pct>% in=` |`
       // — prose on the left and the retired spelling on the right, where it is
       // the FROM, not the target.  With no span in cell 1 there is no pair.

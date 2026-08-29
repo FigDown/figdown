@@ -1,0 +1,10 @@
+Assertion D (WARN, as ruled), spec/figdown-a11y.md §2.2.
+
+`role="img"` with no manifest beside the artifact and no aria-label on the
+root. Two things are wrong and the fixture pins the first: the downgrade is
+undeclared. Under `img` the per-element <title>s become unreachable
+(WAI-ARIA 1.2 §5.4, Children Presentational: True) and the accessible name
+must come from aria-label/aria-labelledby, so a child <title> is not the
+sanctioned name either.
+
+is not declared — no manifest beside this artifact

@@ -1,0 +1,8 @@
+{
+  "figdown_manifest": "1",
+  "document": { "id": "example-minimal" },
+  "language": { "version": "0.1" },
+  "source": {
+    "sha256": "bba3f3c41cb0caf47bb14d43e29da6cc67b8995660749aa4f18f9f0239abd99d"
+  }
+}

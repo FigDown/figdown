@@ -84,12 +84,12 @@ function loadEditorCore() {
     'declarationOptionAbsent',
     'ensureLayoutMarker','upsertLayoutDirective','mergePinKeys','upsertPin',
     'splitPipeSource','buildPipeSource','delimiterParts','tableSourceInfo','tableRowsInfo','tableCellId','parseTableCellId',
-    'tableSelectionModel','tableMark','dropLinePreserveComment','rewriteTableCellOption','tableCellOptionAbsent','setTableCellText',
+    'firstTypedBlock','tableActionTarget','tableSelectionModel','tableMark','dropLinePreserveComment','rewriteTableCellOption','tableCellOptionAbsent','setTableCellText',
     'rewriteTableCellRefsRange','rewriteTableCellRefs','tableWidthValues','setTableWidths','setTableRowHighlight',
     'insertTableRow','insertTableColumn','deleteTableRow','deleteTableColumn',
     'sourceTokenSpans','commaElementSpans','classicFieldParts','bitfieldSourceInfo','bitfieldItems','bitfieldSelectionId',
     'parseBitfieldSelectionId','bitfieldSelectionModel','encodeCompactName','compactItemParts','rewriteClassicFieldName',
-    'rewriteClassicFieldWidth','rewriteCompactFieldItem','rewriteFieldOption','fieldOptionAbsent','setBitfieldOption',
+    'rewriteClassicFieldWidth','rewriteCompactFieldItem','rewriteFieldOption','fieldOptionAbsent','fieldOptionWritten','setBitfieldOption',
     'addBitfieldField','addBitfieldBreak','deleteBitfieldItem','moveBitfieldLine','moveBitfieldLineBefore','bitfieldBudget',
     'moveNodeLineSource','moveNodeOrderMatches',
     'sourceLineContexts','sourceHighlightLine','inspectorHtml'];
@@ -101,9 +101,10 @@ function loadEditorCore() {
     'rewriteConnectorLabel,rewriteConnectorOperator,rewriteConnectorEndpoint,rewriteConnectorOption,flipConnector,deleteConnector,'+
     'rewriteTitle,rewriteFlow,upsertClassDeclaration,deleteClassDeclaration,insertExternalDeclaration,rewriteExternalLabel,'+
     'deleteExternalDeclaration,ungroupDeclaration,declarationOptionAbsent,connectorOptionAbsent,connectorSelectionId,'+
-    'tableRowsInfo,tableSelectionModel,rewriteTableCellOption,tableCellOptionAbsent,setTableCellText,setTableWidths,setTableRowHighlight,'+
+    'tableRowsInfo,tableSelectionModel,tableActionTarget,tableCellId,rewriteTableCellOption,tableCellOptionAbsent,setTableCellText,setTableWidths,setTableRowHighlight,'+
     'insertTableRow,insertTableColumn,deleteTableRow,deleteTableColumn,bitfieldItems,bitfieldSelectionId,bitfieldSelectionModel,'+
-    'rewriteClassicFieldName,rewriteClassicFieldWidth,rewriteCompactFieldItem,rewriteFieldOption,fieldOptionAbsent,setBitfieldOption,'+
+    'rewriteClassicFieldName,rewriteClassicFieldWidth,rewriteCompactFieldItem,rewriteFieldOption,fieldOptionAbsent,fieldOptionWritten,setBitfieldOption,'+
+    'escapeFdString,'+
     'addBitfieldField,addBitfieldBreak,deleteBitfieldItem,moveBitfieldLine,moveBitfieldLineBefore,bitfieldBudget,'+
     'moveNodeLineSource,moveNodeOrderMatches,sourceLineContexts,sourceHighlightLine};')(
       engine.parse,engine.render,engine.findComment,engine.scanConnectorLine,engine.connectorKwAt,engine.GENRE_NODE_KW,
@@ -747,6 +748,65 @@ let bdel=editorCore.deleteBitfieldItem(bitBase.slice(),0,'bf',6,1);
 passBuilt('compact item delete preserves the remaining items and comment',bitBase,bdel,(d,ls)=>{
   const fs=d.blocks[0].fields.filter(x=>x.line===6);return fs.map(x=>x.name).join('|')==='A|C'&&ls[5].endsWith('# compact tail');
 });
+// backlog 74 (DESIGN-ARTIFACT-DRIFT-DETECTION) — a raw control character is LEGAL in a FigDown string
+// and ILLEGAL in a JSON one, so the field-option postcondition must be
+// answered in the grammar that governs the bytes. The value below is exactly
+// what the inspector hands `opt`: quoted, and escaped by the editor's own
+// `escapeFdString`, whose escape set is `\`, `"` and newline only.
+const tabValue='"'+editorCore.escapeFdString('a\tb')+'"';
+let jsonThrew=false; try{ JSON.parse(tabValue); }catch(e){ jsonThrew=true; }
+check('backlog 74 premise: the value the editor writes is legal FigDown and illegal JSON',
+  jsonThrew&&tabValue==='"a\tb"',JSON.stringify(tabValue));
+const bTab=editorCore.rewriteFieldOption(bitBase.slice(),0,'bf',5,'description',tabValue);
+passBuilt('a TAB inside description= is written correctly and read back by the engine',
+  bitBase,bTab,d=>d.blocks[0].fields[0].description==='a\tb');
+check('field-option postcondition accepts the write the grammar accepts (no JSON round-trip)',
+  editorCore.fieldOptionWritten(bTab.lines.join('\n'),0,'bf',5,'description',tabValue)===true,
+  bTab&&bTab.lines&&bTab.lines[4]);
+// Falsifiability, both directions: a value that was NOT written must be
+// refused, and an option that is absent must be refused. Without these the
+// check would pass against a `return true`.
+check('field-option postcondition is falsifiable by a value that was not written',
+  editorCore.fieldOptionWritten(bTab.lines.join('\n'),0,'bf',5,'description','"other"')===false&&
+  editorCore.fieldOptionWritten(bTab.lines.join('\n'),0,'bf',5,'present','"nope"')===false);
+check('field-option postcondition still holds for the ordinary unquoted keys',
+  editorCore.fieldOptionWritten(bitBase.join('\n'),0,'bf',5,'class','warm,border')===true&&
+  editorCore.fieldOptionWritten(bitBase.join('\n'),0,'bf',5,'fill','#ffffff')===true);
+// Scoped to the inspector rather than the whole file: `fieldOptionWritten`'s
+// own header comment names the defect it replaced, and a file-wide string
+// search would read that sentence as the defect.
+check('the JSON round-trip is gone from the bitfield inspector (backlog 74)',
+  !uiFunction('buildBitfieldInspector').includes('JSON.parse')&&
+  uiFunction('buildBitfieldInspector').includes('fieldOptionWritten(after,sectionIndex,block.id,a.line,key,value)'));
+
+// backlog 75 (DESIGN-ARTIFACT-DRIFT-DETECTION) — the toolbar's `+ Row`/`+ Col` act on the table the
+// SELECTION names. `tableActionTarget` is pure so the choice is exercisable
+// here; before the fix both actions called `firstTypedBlock` and this first
+// check returned `t1`.
+const twoTables=['figdown 0.1 table','table t1 "One"','| A | B |','|---|---|','| 1 | 2 |','','table t2 "Two"','| C |','|---|','| 3 |'];
+const twoDoc=engine.parse(twoTables.join('\n')).doc;
+const cellInT2={sectionIndex:0,kind:'cell',id:editorCore.tableCellId('t2','1',1)};
+check('toolbar table target follows the selected cell to the SECOND table',
+  editorCore.tableActionTarget(twoDoc,cellInT2).id==='t2',
+  JSON.stringify(editorCore.tableActionTarget(twoDoc,cellInT2).id));
+check('toolbar table target falls back to the first table when nothing is selected',
+  editorCore.tableActionTarget(twoDoc,null).id==='t1');
+check('toolbar table target falls back when the selection names a table that is gone',
+  editorCore.tableActionTarget(twoDoc,{sectionIndex:0,kind:'cell',id:editorCore.tableCellId('gone','1',1)}).id==='t1');
+// The mutation the transaction makes and the postcondition that checks it must
+// name the SAME table: appending to `t2` while verifying `t1` would refuse a
+// correct edit, which is the old code's second, hidden half.
+const appendT2=editorCore.insertTableRow(twoTables.slice(),0,'t2',1);
+passBuilt('append to the second table adds a row THERE and leaves the first alone',
+  twoTables,appendT2,d=>{
+    const t1=d.blocks.find(x=>x.id==='t1'),t2=d.blocks.find(x=>x.id==='t2');
+    return t1.rows.length===1&&t2.rows.length===2;
+  });
+check('both toolbar table actions consult the selection and verify by block id',
+  occurrences(html,"tableActionTarget(lastDoc,oneSelected('cell'))")===2&&
+  occurrences(html,"const nt=(parsed.docs[0].blocks||[]).find(x=>x.type==='table'&&x.id===t.id);")===2&&
+  !/const nt=firstTypedBlock\(parsed\.docs\[0\],'table'\)/.test(html));
+
 const budget=editorCore.bitfieldBudget(engine.parse(bitBase.slice(0,8).join('\n')).doc.blocks[0]);
 check('bitfield budget reports declared bits, word, rows and last-row usage',
   JSON.stringify(budget)===JSON.stringify({declared:20,remainder:false,rows:2,last:8,word:16,rowFields:true}),JSON.stringify(budget));
@@ -803,11 +863,34 @@ check('smart-guide candidates are node boxes only',
 check('a drag that resolved no node box writes nothing',
   html.includes("if(!wasSelected&&setSelection({sectionIndex:0,kind:'node',id},ev.shiftKey)===false) return;")&&
   /if\(!boxes\.length\) return failEdit\('drag: /.test(html));
-// The UI cell address run is taken in anchor order past the tiers the engine
-// does not address; where its own channel speaks, the two must agree, or the
-// table gets no address at all.
-check('UI cell addresses are cross-checked against the engine data-cell channel',
-  html.includes("const own=rects[i].dataset.cell; if(!own) continue;")&&html.includes('if(!agree) continue;'));
+// Backlog 71: the engine now addresses EVERY header tier through data-cell
+// (renderTable), not just the bottom one, so the UI reads that channel
+// directly instead of scraping the caption ink and zipping it against the
+// model's anchor order. Render a real two-tier table and check the upper
+// tier's anchors carry `data-cell="tt:h1:c"` — merged continuations (col 2
+// under "Group A", col 4 under "Group B") must still carry nothing — while
+// the bottom tier keeps its historical `:0:` spelling and the data row is
+// `:1:`. This is mutation-sensitive: reverting renderTable's `addrR` to the
+// old `(r===H-1?0:null)` drops the h1 attributes and turns this red.
+const T71 = ['figdown 0.1 table','table tt "T"',
+  '| Group A || Group B ||','| P | Q | R | S |','|---|---|---|---|','| 1 | 2 | 3 | 4 |'].join('\n');
+const t71p = engine.parse(T71);
+if (t71p.errs.length) fail('backlog-71 fixture fails to parse: '+t71p.errs.join('; '));
+const t71svg = t71p.errs.length ? '' : (engine.render(t71p.doc,{title:true}).svg||'');
+check('engine addresses the upper header tier through data-cell (backlog 71)',
+  /data-cell="tt:h1:1"/.test(t71svg) && /data-cell="tt:h1:3"/.test(t71svg) &&
+  !/data-cell="tt:h1:2"/.test(t71svg) && !/data-cell="tt:h1:4"/.test(t71svg) &&
+  /data-cell="tt:0:1"/.test(t71svg) && /data-cell="tt:0:4"/.test(t71svg) &&
+  /data-cell="tt:1:1"/.test(t71svg),
+  t71svg.slice(0,600));
+// The editor's UI-cell re-spelling reads that channel only — no caption/rect
+// scrape, and no separate agreement guard, because there is nothing left to
+// disagree with.
+check('installTableCellAddresses reads data-cell only — the caption scrape is gone',
+  html.includes("for(const el of root.querySelectorAll('[data-cell]')){") &&
+  html.includes("rowTok=parts[1]==='0'?'h'+H:parts[1]") &&
+  !html.includes('tableCaptionElements') &&
+  !/font-size="13"\]\[font-weight="600"/.test(html));
 
 console.log('\nD. connector scanner (scanConnectorLine — one grammar, two callers)');
 // The battery is the request's own hard cases plus the ones the grammar has

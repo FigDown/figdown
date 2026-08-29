@@ -1,0 +1,49 @@
+{
+  "figdown_manifest": "1",
+  "document": {
+    "id": "example-state-machine",
+    "path": "examples/showcase/example-state-machine.fd",
+    "sections": 1
+  },
+  "language": { "version": "0.2", "genres": ["statechart"] },
+  "renderer": {
+    "name": "figdown-svg",
+    "engine_version": "0.5",
+    "render_options": "with-title"
+  },
+  "source": {
+    "sha256": "98af703491a434d75f7a2093ae5a34e89f770839239b29457e51fcc8b5a04a74",
+    "bytes": 4096
+  },
+  "review": {
+    "state": "source-verified",
+    "by": "the maintainer",
+    "date": "2026-08-22",
+    "of_source_sha256": "98af703491a434d75f7a2093ae5a34e89f770839239b29457e51fcc8b5a04a74",
+    "note": "checked statement by statement against the cited source's own text"
+  },
+  "provenance": [
+    {
+      "relation": "transcribed-from",
+      "document_id": "EXAMPLE-STD-1",
+      "revision": "v1.0, 2025-01-01",
+      "document_sha256": "8c223ca27d9502daee386e9859b447ad46959edbbb9ab2fa648253b4ca9d06c2",
+      "uri": "https://example.org/example-std-1",
+      "section": "§3.1",
+      "figure": "Figure 2",
+      "locator": { "paragraph": 12 },
+      "bbox": { "page": 5, "unit": "pt", "x": 10, "y": 20, "w": 300, "h": 150 }
+    }
+  ],
+  "accessibility": {
+    "state": "derived",
+    "by": "a derived-description producer (unshipped; see decisions/registry.md P2)",
+    "date": "2026-08-22",
+    "of_source_sha256": "98af703491a434d75f7a2093ae5a34e89f770839239b29457e51fcc8b5a04a74"
+  },
+  "dependencies": [
+    { "kind": "source", "path": "figures/common-legend.fd", "sha256": "108b7e9e1ab4dd43cd9a470c87915973da4bbe7e2dc3f424b80571e8648d706b" },
+    { "kind": "external", "id": "EXAMPLE-STD-1", "sha256": "8c223ca27d9502daee386e9859b447ad46959edbbb9ab2fa648253b4ca9d06c2" }
+  ],
+  "x-example-note": "x-<owner>-<key> is the ruled spelling (R206): legal, reported as a delegated extension key, never an error"
+}

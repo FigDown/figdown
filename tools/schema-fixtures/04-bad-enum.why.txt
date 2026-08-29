@@ -1,0 +1,7 @@
+BAD ENUM — `shape: "hexagon"`, which is not one of the six geometric shapes.
+
+§2.1's shape set is closed and adding to it is a version-gated language change
+(§13.7). A consumer that accepted an unknown shape would have to invent a
+drawing for it, which is precisely the "a missing edge still looks fine"
+failure the language exists to refuse.
+is not one of

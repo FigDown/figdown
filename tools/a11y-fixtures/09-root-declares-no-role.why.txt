@@ -1,0 +1,9 @@
+Assertion D (WARN, as ruled), spec/figdown-a11y.md §2.1.
+
+The root <svg> carries no role. SVG-AAM §5.2.55 maps a bare <svg> to
+graphics-document by default, so this artifact is not misdescribed — it
+simply states nothing, and there is nothing to test. `ACCESSIBLE-TEXT-EMISSION` set D's severity
+to warn and declined to tighten it; this fixture pins the warning, not a
+failure.
+
+the root <svg> declares no role

@@ -1,0 +1,10 @@
+UNKNOWN VERSION — `figdown_manifest: "2"`, which no shipped consumer
+recognises (and a MISSING `figdown_manifest` key fails the same way, via the
+schema's own `required` list).
+
+figdown-manifest.md §3 rule 3 (`PUBLICATION-MANIFEST-PROFILE`) versions the profile in its first key:
+"figdown_manifest": "1" today, and a consumer that does not know the version
+MUST stop rather than guess — the same rule core §13.7 states for an engine
+reading a declared language version. This is verifier assertion A's second
+half: the manifest may parse as JSON perfectly well and still fail here.
+unknown or missing "figdown_manifest" version

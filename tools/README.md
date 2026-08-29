@@ -84,6 +84,9 @@ the run aborts with a named error instead.
   checked by running it, never by reading it** — the rule PROCESS §3.1(c)
   states for the migration tool, applied here.
 - `stability-check.js` — axiom-3 evidence harness (see below).
+- `layout-stability/` — the locality instrument (`gate:locality`, ADV-9): nine
+  mechanical edit classes over a written 12-figure subset, graded per class
+  against the clause that promised stillness (see below).
 - `build-svg.js` — the sidecar generator: `node tools/build-svg.js
   [--with-title] <file.fd | dir> ...` validates and renders deterministically
   (titles are not drawn by default — the majority embedding case has a
@@ -142,7 +145,7 @@ the run aborts with a named error instead.
 - `isolation-check.js` — the gate for the frozen/experimental file split:
   `node tools/isolation-check.js [--strict] [--verbose] [<file.md | dir> ...]`
   (default paths: repo-root `*.md`, `spec/`, `conformance/`,
-  `examples/reference/`, `tools/README.md`, `CONTRIBUTING.md`; **recursive**).
+  `examples/reference/`, `tools/README.md`, `.github/CONTRIBUTING.md`; **recursive**).
   It mechanises the 0.1 ruling's own success criterion — *delete the
   experimental file set and what remains must still be a complete,
   self-consistent standard with no dangling normative references* — by taking
@@ -501,7 +504,7 @@ the run aborts with a named error instead.
   <file.fd|dir>…`. Option-key renames touch the CODE portion of a line
   only — never inside a quoted value or a comment. Report-only items
   include the compact-`field` unquoted-name rule, which
-  prints the exact quoted line to paste. See `spec/migrations.md`.
+  prints the exact quoted line to paste. See `spec/migrate.md`.
 
   **Requirement (spec core §13.4): this tool MUST be cumulative and
   idempotent ACROSS VERSIONS**, not merely correct for the latest hop.
@@ -676,9 +679,9 @@ is everything else scanned.
 
 Tier 2's scope is `spec/core.md`, `spec`, the `.md` files
 directly in `spec/genres/`, `conformance/README.md`,
-`examples/reference/index*.md`, `CONTRIBUTING.md` and this file. Three classes
+`examples/reference/index*.md`, `.github/CONTRIBUTING.md` and this file. Three classes
 are excluded, each for a stated reason rather than for convenience: the
-**change logs** (`spec/MIGRATIONS*`, `spec/MIGRATE*`,
+**change logs** (`spec/migrations*`, `spec/migrate*`,
 `conformance/DISCREPANCIES.md`), whose job is to name a construct as it was at
 the time; the **teaching guides** (`guide/agents.md*`, `guide/layout.md*`,
 `guide/showcase.md*`, `guide/expressing.md*`, `guide/authoring.md*`, `README*`, `skill/`), which teach the
@@ -941,6 +944,50 @@ Engine lookup order: `$FIGDOWN_HTML`, co-located `figdown.html`,
 `../editor/figdown.html`. If a render throws, the figure is retried once
 after 30 s; persistent failures are reported per row and skipped in totals.
 
+## layout-stability/ — the locality instrument (`gate:locality`, ADV-9)
+
+`stability-check.js` above asks **how far** things move. This asks whether the
+things the edit did not name moved **at all**, and grades the answer against the
+clause that promised they would not. Two instruments, one axiom, different
+questions — see `decisions/registry.md` for the division and for
+today's measured numbers.
+
+```
+node tools/layout-stability/run.js                  # measure + ratchet (the gate)
+node tools/layout-stability/run.js --verbose        # + what each edit changed
+node tools/layout-stability/run.js --strict         # a parser refusal also fails
+node tools/layout-stability/run.js --write-baseline # rewrite results.json
+node tools/layout-stability/run.js --figure <path>  # one figure, no ratchet
+```
+
+- `edit-pairs.js` owns the corpus subset (12 scene figures, written down, spanning
+  all five scene genres and both layout modes) and the **nine mechanical edit
+  classes**: `comment-add`, `class-recolor`, `note-text`, `label-same-length`,
+  `label-longer`, `edge-remove`, `node-add-free`, `node-add-linked`, `pin-move`.
+  Edits are generated, never hand-authored, so adding a figure to the list edits
+  it nine ways the same day. No genre keyword is written in the file: declaration
+  spellings and connector forms are read off the lines being imitated.
+- `run.js` measures three axes per pair — displacement of every node the edit did
+  not name (count + max), foreign-connector reroute scope, canvas delta — and
+  issues a per-class **locality verdict** against a cited clause.
+- `results.json` is the committed baseline. The run is deterministic (same tree →
+  byte-identical file), so it is a ratchet in the `gate:layout` F5/F6 sense: the
+  recorded residue is tolerated, a **regression** (a pair that was local and is
+  not, or a count that rose) exits 1.
+
+Exit codes: `0` clean or matching the baseline, `1` regression (or `--strict`
+harness defect), `2` the tool could not do its job — engine missing, a corpus
+file moved, `results.json` unreadable. A corpus file that has moved is a hard
+error, never a silent skip: the denominator is written down, so it must be
+defended like a walked one.
+
+**It is an `audit:`, not a `gate:`, and that is a measured decision rather than
+a preference** — the 2026-08-21 baseline carries 6 contractual violations and 2
+refusals, so `npm test` would inherit a red instrument on its first day. The
+promotion condition and the one-line diff that performs it are in
+`decisions/registry.md`. It is deterministic and takes ~2 s, so
+nothing but the residue is keeping it out.
+
 ## layout-lint.js
 
 Checks rendered scene figures for layout defects.
@@ -980,7 +1027,7 @@ that was never FigDown source.
 | `thru` | edges passing through node rectangles they are not incident to |
 | `novlp` | peer node-node rectangle overlaps (group containers excluded) |
 | `lblcol` | a label that has stopped saying which line it belongs to: one count per overlapping label PAIR, plus one count per label an edge STRIKES (however many edges cross it). Boxes are rebuilt with the engine's own `cand()` geometry — widest line × 6.5 px × `fs`/11, line height 1.3 `fs` — honouring `text-anchor` and joining `<tspan>` lines; the strike test is against the box's centre band (middle 40 % of height, inset 2 px), so a corner graze is not a strike |
-| `coinc` | distinct edge pairs whose segments overlap collinearly for > 10 px — **except between two members of the same merge bus**, which are not charged. A bus draws one trunk stroked once per member (every member still emits its own full path), so shared ink there is the convention rather than a defect, and the junction dots are what tell a reader how many lines the trunk carries. Members are recognised by the `data-bus="<target-id>"` attribute the engine writes on each bus path. Coincidence with anything else — including between members of **two different** buses — is charged exactly as before |
+| `coinc` | distinct edge pairs whose segments overlap collinearly for > 10 px — **except between two members of the same merge bus**, which are not charged. A bus draws one trunk stroked once per member (every member still emits its own full path), so shared ink there is the convention rather than a defect, and the junction dots are what tell a reader how many lines the trunk carries. Members are recognised by the `data-bus="<target-id>"` attribute the engine writes on each bus path. Coincidence with anything else — including between members of **two different** buses — is charged exactly as before (`EDGE-MERGE-BUS`) |
 | `ink/e` | total edge path length ÷ edge count |
 | `score` | weighted sum: cross×2 + thru×3 + novlp×3 + lblcol×2 + coinc×2 |
 
@@ -1155,6 +1202,50 @@ the `fanned` column. Self-loops draw a small side loop on their own node
 `--verbose` prints the per-node and per-endpoint norms (the numbers to
 quote in a review); `--strict` exits 1 on any failure. Deterministic;
 engine lookup order is the same as `build-svg.js`.
+
+## schema-check.js — the model's SHAPE contract (`gate:schema`, ADV-7 / S1)
+
+`conformance/run.js` asks whether the engine still emits the goldens' **bytes**.
+This asks whether the model's **shape** still matches
+`spec/figdown-model.schema.json`, the published JSON Schema (2020-12) that is
+§12.2's tables in machine-readable form. A byte comparison against a frozen file
+cannot notice that the contract is wrong, because there the golden *is* the
+contract; the schema is a contract that can be wrong, so it is checked.
+
+```
+node tools/schema-check.js            # report only
+node tools/schema-check.js --strict   # exit 1 on any failure (the gate)
+node tools/schema-check.js --verbose  # list every file checked
+```
+
+Four assertions, all on every run:
+
+- **A. the schema itself** — 2020-12, and it may use **no keyword this file's
+  validator does not implement**. An unimplemented keyword asserts nothing, so
+  it is refused rather than ignored (the `LANE-ALPHABET-KEY-RESERVATION` guard discipline).
+- **B. the goldens** — every `.model.json` in `conformance/cases/` and
+  `conformance/experimental/`.
+- **C. the published corpus** — every `.fd` under `examples/` and `figures/`,
+  parsed by the reference engine and projected through the same
+  `conformance/normalize.js` the goldens are minted with. These are figures an
+  *author* wrote, and `run.js` never reads them.
+- **D. the negative controls** — `tools/schema-fixtures/*.invalid.json`, each a
+  model mutated in exactly one way (wrong type, missing required, unknown field,
+  bad enum, malformed id), each beside a `.why.txt` whose **last line is the
+  substring the rejection must contain**. B and C alone prove nothing: a schema
+  that accepts everything passes them perfectly. To add a control, write the
+  mutated model and the `.why.txt`; the gate requires at least five.
+
+The schema is CLOSED — `additionalProperties: false` everywhere — so a **new
+engine field fails this gate** until the schema and core §12.2 are edited
+together. That is the point of it, not a friction to route around.
+
+What it deliberately does not check: the byte binding (key order, indentation,
+escaping, the trailing newline — core §12.5, and no JSON Schema can state them),
+and referential integrity (that `a`/`b`/`in`/`group`/`class` resolve, that ids
+are unique, that a genre admits the keywords used), which are parse-time rules
+whose violation produces an error set and no model at all. No dependencies: the
+validator is ~100 lines covering exactly the keyword subset the schema uses.
 
 ## Ingesting a Word-document corpus (docx → figures → .fd)
 

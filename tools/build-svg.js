@@ -24,7 +24,8 @@ function loadEngine() {
   const start = h.indexOf('const SHAPES');
   const end = h.indexOf('// 3. UI');
   if (start < 0 || end < 0) throw new Error('cannot locate engine in ' + ENGINE);
-  const factory = new Function(h.slice(start, end) + '\nreturn {parse, render, stackSectionSvgs, FIGDOWN_VERSION};');
+  const factory = new Function(h.slice(start, end) +
+    '\nreturn {parse, render, stackSectionSvgs, a11yApply, renderOptionsAttr, FIGDOWN_VERSION};');
   return factory();
 }
 
@@ -52,16 +53,23 @@ function buildOne(engine, fdPath) {
     for (const e of gerrs) console.error('  ' + e);
     return false;
   }
-  const svg = docs.length > 1
+  let svg = docs.length > 1
     ? engine.stackSectionSvgs(rendered)
     : rendered[0].svg;
+  // THE ACCESSIBILITY PROFILE (spec/figdown-a11y.md). Opt-in, and applied to
+  // the FINISHED root rather than inside a per-section render: an artifact
+  // has ONE root, ONE name, and that name is the FIRST section's `title`.
+  // Nothing here runs when the option is off, which is what keeps every
+  // artifact rendered before the option existed byte-identical — core §7
+  // makes an artifact a pure function of (source, recorded options).
+  if (RENDER_OPTS.a11y === true) svg = engine.a11yApply(svg, docs[0]);
   const hash = crypto.createHash('sha256').update(src, 'utf8').digest('hex');
   // The artifact records three things (spec core §7): the SHA-256 OF THE
   // SOURCE, the ENGINE VERSION that rendered it, and any non-default render
   // option — so a third-party rebuild (same source + same engine version +
   // same recorded options) stays bit-identical, and a diff between two
   // renderings of one source has somewhere to point.
-  const optAttr = RENDER_OPTS.title === true ? ' data-render-options="with-title"' : '';
+  const optAttr = engine.renderOptionsAttr(RENDER_OPTS);
   const meta = '<metadata id="figdown-source" data-sha256="' + hash + '"'
     + ' data-engine-version="' + engine.FIGDOWN_VERSION + '"' + optAttr + '><![CDATA[\n'
     + src.replace(/]]>/g, ']]]]><![CDATA[>') + '\n]]></metadata>';
@@ -77,10 +85,15 @@ const RENDER_OPTS = {};
 const args = argv.filter(a => {
   if (a === '--with-title') { RENDER_OPTS.title = true; return false; }
   if (a === '--no-title') { return false; }  // already the default; accepted so old command lines keep working
+  // The accessibility profile's emission route: a role on the root, the
+  // non-visual title as its first child, and a state-flagged derived <desc>.
+  // Orthogonal to --with-title: one decides ink, the other the accessible
+  // name, and a figure rendered with both does not get two names.
+  if (a === '--with-a11y') { RENDER_OPTS.a11y = true; return false; }
   return true;
 });
 if (!args.length) {
-  console.error('usage: node tools/build-svg.js [--with-title] <file.fd | dir> ...');
+  console.error('usage: node tools/build-svg.js [--with-title] [--with-a11y] <file.fd | dir> ...');
   process.exit(2);
 }
 // RECURSIVE. "A gate that does not recurse is a gate that lies" was written

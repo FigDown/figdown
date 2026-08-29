@@ -1,0 +1,384 @@
+{
+  "id": "annotated-datapath",
+  "genre": "block",
+  "figure": "examples/annotated-datapath.fd",
+  "subject": "The receive/ingress path of an IEEE 802.3 Ethernet MAC and its handling of link flow-control frames: IEEE 802.3 PAUSE (MAC Control sublayer, Clause 31 and Annex 31B) and Priority-based Flow Control (PFC, IEEE 802.1Q-2018 Clause 36, originally 802.1Qbb, carried as the MAC Control operation of Annex 31D).",
+  "source": {
+    "standard": "IEEE Std 802.3 (Clause 4 MAC and frame check sequence; Clause 31 MAC Control; Annex 31A opcodes; Annex 31B PAUSE; Annex 31D PFC) and IEEE Std 802.1Q-2018 Clause 36 (Priority-based Flow Control)",
+    "locator": "802.3 Cl.4.2.4.2.2 (receive frame validity / FCS discard), Cl.31.1-31.5 (MAC Control sublayer placement, opcode parsing, sinking of MAC Control frames), Annex 31B.1-31B.3 (PAUSE operation and effect on transmission), Annex 31A/31D (PFC opcode); 802.1Q-2018 Cl.36 (PFC entity, PFC Multiplexer / PFC Receiver, per-priority inhibition) and 802.1Q Table 8-1 / reserved group address 01-80-C2-00-00-01 (never relayed by a bridge)",
+    "url": "https://www.ieee802.org/1/files/public/docs2024/dt-seaman-clause-36-proposal-0124-v1.pdf",
+    "anchor_strength": "moderate"
+  },
+  "why_this_figure": "block is the largest genre in the corpus and the only scene genre inside the v0.1 compatibility promise, and it had no figure in this suite at all (decisions/registry.md item 51). Of the eleven block figures in examples/, this is the one that is BOTH a real mechanism and a full scene: it is the only non-reference block figure carrying group, class and external together - the three constructs that make `block` a scene rather than a list of boxes - plus labelled edges, three node shapes and a flow direction. examples/reference/block.fd is richer still and was excluded on the same ground the sequence run excluded its reference figure: its only source is this project's own specification. The remaining nine draw invented subjects (patterns/block-a,-b,-c, partition-map, rainbow, erd-a), a composition demo of three nested genres (telemetry-export), or a data structure rather than an architecture (hash-chaining), and a question set cannot be authored from a source that does not exist.",
+  "authored": {
+    "protocol": "source-first: the author agent read only public IEEE 802.3 / 802.1Q material and never saw the .fd file, the repository, or any other file in it",
+    "saw_figure": false,
+    "key_discipline": "question-set v1.1: regex-tolerant keys, no compound question asking more than two facts, none_of empty everywhere",
+    "scope_as_given": "The ORDERED STAGES a received frame passes through on the ingress path and the DISPOSITION of a frame at each stage - reception from the medium, frame-check-sequence validation, identification and handling of MAC Control (PAUSE) and PFC frames, and the forward-versus-discard outcome - together with WHICH SUBLAYER performs each function and what the flow-control frame causes to happen. Deliberately out of scope: PAUSE/PFC frame field encodings and bit layouts, pause-quanta arithmetic, transmit-side scheduling detail, and any congestion-notification protocol other than PAUSE/PFC.",
+    "scope_fixed_by": "the suite maintainer, from the figure's one-line title and the source's own clauses",
+    "recorded_deviation": "In the 2026-08-16 sets the maintainer fixed each scope before reading the figure body. Here the maintainer had already read every block figure in examples/ - choosing WHICH figure represents the genre cannot be done blind. The scope above was written from the title line and the standard, and the part of the protocol that carries the measurement - the questions, the canonical answers and the keys - was authored by an agent that never saw the file. Recorded rather than smoothed."
+  },
+  "score_rules_reviewed": "The author hand-checked every key against its canonical answer plus two paraphrases it wrote itself, one terse-technical and one deliberately colloquial that avoids the standard's vocabulary (8/8 canonical, 16/16 paraphrase). One maintainer review pass followed, BEFORE any reader answer existed and before any reading was taken: q7's first key group carried a bare `re:\\bno\\b` alternative that any answer containing the word \"no\" satisfies, including a committed wrong one - the mirror image of the brittleness in decisions/registry.md 7, accepting too much instead of too little. It was replaced by the opening refusal forms `re:^no( |$)` and `re:^no it`. Nothing else was altered, and no key has been touched since.",
+  "presentation_note": "This figure is the first in the suite whose `syntax` condition carries authored PROSE: four `note=` annotations survive comment stripping because note= is an attribute, not a comment. That is legitimate - it is syntax the author wrote - but it is a real difference from the other figures and must be read with this row's number. None of the four notes bears on any question in this set.",
+  "questions": [
+    {
+      "qid": "q1",
+      "ask": "A frame arrives from the medium and its frame check sequence does not match the frame's contents. What becomes of that frame, and which part of the receiver decides that?",
+      "tests": "Whether the reader knows that the integrity check is a discard gate on the ingress path, and that it belongs to the MAC (data-link) reception function rather than to anything above it.",
+      "source_locator": "IEEE Std 802.3, Cl. 4.2.4.2.2 (frame reception: frames with an invalid FCS are not passed to the MAC client)",
+      "answer": "The frame is discarded and never handed to the layer above; the MAC sublayer's receive function makes that decision as part of validating the frame check sequence.",
+      "score": {
+        "all_of": [
+          [
+            "re:discard",
+            "re:drop",
+            "re:thrown away",
+            "re:throws it away",
+            "re:binned",
+            "re:not (passed|accepted|delivered|kept|used)",
+            "re:never (passed|delivered|reaches)",
+            "re:junked",
+            "re:chuck"
+          ],
+          [
+            "re:mac sub ?layer",
+            "re:the mac",
+            "re:mac s receive",
+            "re:media access control",
+            "re:ethernet mac",
+            "re:link layer",
+            "re:layer 2",
+            "re:receiv(e|er|ing) (logic|function|side|path|block|hardware)",
+            "re:network (card|interface|adapter)",
+            "re:nic",
+            "re:the hardware",
+            "re:the chip",
+            "re:the adapter"
+          ]
+        ],
+        "none_of": []
+      }
+    },
+    {
+      "qid": "q2",
+      "ask": "Where does the entity that interprets PAUSE frames sit relative to the basic MAC and to the client that consumes ordinary frames?",
+      "tests": "Whether the reader can place the MAC Control sublayer correctly in the ingress stack - above the MAC, below the MAC client - rather than treating flow control as something the client or the PHY handles.",
+      "source_locator": "IEEE Std 802.3, Cl. 31.1-31.2 (MAC Control sublayer is an optional sublayer interposed between the MAC and the MAC client)",
+      "answer": "It sits directly on top of the MAC and directly below the MAC client, so a received frame passes through the MAC first and the MAC Control sublayer inspects it before anything can reach the client.",
+      "score": {
+        "all_of": [
+          [
+            "re:above",
+            "re:on top of",
+            "re:over the mac",
+            "re:between the mac",
+            "re:higher than the mac",
+            "re:after the mac",
+            "re:sits on"
+          ],
+          [
+            "re:below",
+            "re:under",
+            "re:beneath",
+            "re:between the mac",
+            "re:before .{0,60}(client|software|stack|upper|higher|application)",
+            "re:lower than the",
+            "re:in front of the (client|software|stack)"
+          ]
+        ],
+        "none_of": []
+      }
+    },
+    {
+      "qid": "q3",
+      "ask": "Once a received PAUSE frame has been recognised and acted upon, is the frame itself delivered onward to the MAC client, and what happens to it?",
+      "tests": "Whether the reader knows that a MAC Control frame terminates at the MAC Control sublayer - it is sunk and discarded there, never surfacing as ordinary received data.",
+      "source_locator": "IEEE Std 802.3, Cl. 31.4 / 31.5 (MAC Control sublayer always sinks MAC Control frames; they are not passed to the MAC client)",
+      "answer": "No. The MAC Control sublayer consumes (sinks) the frame and discards it after acting on it; it is never delivered to the MAC client, so higher layers see no trace of it.",
+      "score": {
+        "all_of": [
+          [
+            "re:not (passed|delivered|forwarded|sent|handed|given|relayed)",
+            "re:never (passed|delivered|forwarded|sent|handed|reaches|reach|makes it|gets)",
+            "re:doesn t (get|go|reach|make it)",
+            "re:does not (reach|go|get|make it)",
+            "re:stops? (at|there|here)",
+            "re:terminat",
+            "re:no(t)? .{0,25}(client|upper layer|higher layer|software)",
+            "re:nothing above"
+          ],
+          [
+            "re:discard",
+            "re:consum",
+            "re:sink",
+            "re:sunk",
+            "re:absorb",
+            "re:swallow",
+            "re:eat",
+            "re:drop",
+            "re:thrown away",
+            "re:binned",
+            "re:terminat",
+            "re:used up"
+          ]
+        ],
+        "none_of": []
+      }
+    },
+    {
+      "qid": "q4",
+      "ask": "What does a station do when it receives a valid PAUSE frame on a link?",
+      "tests": "Whether the reader knows the causal effect of PAUSE: the receiving station withholds its own outgoing data traffic, and only for a bounded interval requested by the frame.",
+      "source_locator": "IEEE Std 802.3, Annex 31B.1-31B.3 (PAUSE inhibits transmission of data frames by the MAC client for a specified period)",
+      "answer": "It stops transmitting data frames from its MAC client onto that link for the length of time the frame asks for; its own reception is unaffected, and it may still send MAC Control frames.",
+      "score": {
+        "all_of": [
+          [
+            "re:stop(s|ped|ping)?",
+            "re:halt",
+            "re:paus",
+            "re:ceas",
+            "re:suspend",
+            "re:hold(s|ing)? (off|back)",
+            "re:held",
+            "re:quit",
+            "re:shut(s)? up",
+            "re:back off",
+            "re:no longer (sends|transmits|puts)",
+            "re:refrain",
+            "re:withhold"
+          ],
+          [
+            "re:for (a|the|some|that) ?(specified|given|certain|set|requested|specific|short|stated|period|while|time|duration|interval|bit|moment)",
+            "re:temporar",
+            "re:period of time",
+            "re:amount of time",
+            "re:length of time",
+            "re:until .{0,40}(expire|timer|resume|time|up|elapse|over)",
+            "re:timer",
+            "re:for a bit",
+            "re:a while",
+            "re:briefly",
+            "re:then resumes?",
+            "re:time (specified|requested|asked)"
+          ]
+        ],
+        "none_of": []
+      }
+    },
+    {
+      "qid": "q5",
+      "ask": "How does the effect of a received PFC frame differ from the effect of a received PAUSE frame?",
+      "tests": "Whether the reader grasps the selective, per-priority nature of PFC as against the link-wide, all-or-nothing stop that PAUSE imposes.",
+      "source_locator": "IEEE Std 802.1Q-2018, Cl. 36 (PFC inhibits transmission only for the priorities indicated); IEEE Std 802.3 Annex 31B (PAUSE inhibits all data frame transmission)",
+      "answer": "PAUSE stops all data traffic on the link, whereas PFC stops only the priorities or traffic classes named in the frame and lets the remaining ones keep flowing.",
+      "score": {
+        "all_of": [
+          [
+            "re:per priority",
+            "re:priorit",
+            "re:traffic class",
+            "re:class(es)? of",
+            "re:queue",
+            "re:lane",
+            "re:selectiv",
+            "re:only (this|that|those|these|certain|some|particular|specific|the) ",
+            "re:kind(s)? of traffic",
+            "re:type(s)? of traffic",
+            "re:some traffic",
+            "re:individual"
+          ],
+          [
+            "re:all (traffic|data|frames|packets|of it)",
+            "re:everything",
+            "re:anything",
+            "re:entire link",
+            "re:whole link",
+            "re:link wide",
+            "re:every(thing| priority| class| kind)",
+            "re:the lot",
+            "re:blanket",
+            "re:the whole",
+            "re:total",
+            "re:across the board",
+            "re:no distinction",
+            "re:indiscriminat"
+          ]
+        ],
+        "none_of": []
+      }
+    },
+    {
+      "qid": "q6",
+      "ask": "A frame arrives that is a MAC Control frame but asks for an operation the station does not implement. What does the station do with it, and does the MAC client ever see it?",
+      "tests": "Whether the reader knows that MAC Control frames are a closed, terminating category on ingress: unrecognised control operations are discarded without action and are still never passed upward as data.",
+      "source_locator": "IEEE Std 802.3, Cl. 31.4 (opcode check: a frame whose opcode is not implemented is discarded with no further action; MAC Control frames are always sunk)",
+      "answer": "It discards the frame without taking any action on it, and the MAC client never sees it - unsupported control frames are not promoted to ordinary data.",
+      "score": {
+        "all_of": [
+          [
+            "re:discard",
+            "re:drop",
+            "re:ignor",
+            "re:thrown away",
+            "re:binned",
+            "re:no action",
+            "re:without .{0,25}(action|doing|acting)",
+            "re:does nothing",
+            "re:nothing happens",
+            "re:silently",
+            "re:junk",
+            "re:chuck"
+          ],
+          [
+            "re:not (passed|forwarded|delivered|sent|relayed|handed|given)",
+            "re:never (passed|forwarded|delivered|reaches|sees|see|gets|hears|makes it)",
+            "re:doesn t (reach|get|see|hear|make it)",
+            "re:does not (reach|get|see|hear)",
+            "re:no(t)? .{0,25}(client|upper layer|higher layer|software|stack)",
+            "re:nothing (above|higher|upstream)",
+            "re:stays? (in|at|down)",
+            "re:never leaves"
+          ]
+        ],
+        "none_of": []
+      }
+    },
+    {
+      "qid": "q7",
+      "ask": "If a switch receives a PAUSE or PFC frame on one of its ports, does it send that frame out of its other ports?",
+      "tests": "Whether the reader understands that link flow control is strictly a one-hop, link-local mechanism whose frames terminate at the receiving port and are never relayed.",
+      "source_locator": "IEEE Std 802.3 Annex 31B (PAUSE frames use a reserved multicast destination that is not forwarded); IEEE Std 802.1Q Table 8-1 / reserved group address 01-80-C2-00-00-01, which a bridge never relays",
+      "answer": "No. These frames act only between the two ends of a single link; they carry a reserved link-local destination address that a bridge never relays, so the frame is terminated at the port that received it.",
+      "score": {
+        "all_of": [
+          [
+            "re:not (forwarded|relayed|propagat|passed|repeated|sent on|flooded)",
+            "re:never (forwarded|relayed|propagat|leaves|sent)",
+            "re:doesn t (forward|relay|pass|leave|send|repeat)",
+            "re:does not (forward|relay|pass|leave)",
+            "re:^no( |$)",
+            "re:^no it",
+            "re:nope",
+            "re:stops? at",
+            "re:terminat",
+            "re:consum",
+            "re:discard",
+            "re:drop",
+            "re:absorb"
+          ],
+          [
+            "re:link local",
+            "re:single (link|hop|port)",
+            "re:one (link|hop|port)",
+            "re:hop by hop",
+            "re:point to point",
+            "re:per link",
+            "re:between .{0,40}(neighbou?r|adjacent|two ends|directly connected|link partner|the two)",
+            "re:only .{0,30}(link|hop|segment|neighbou?r|port|end)",
+            "re:reserved (multicast|group|address|destination)",
+            "re:does not (cross|traverse|leave)",
+            "re:next hop",
+            "re:local to the link",
+            "re:that link",
+            "re:other end",
+            "re:the cable",
+            "re:the wire",
+            "re:directly attached",
+            "re:immediate"
+          ]
+        ],
+        "none_of": []
+      }
+    },
+    {
+      "qid": "q8",
+      "ask": "On the ingress path, does the integrity check on a received frame happen before or after the frame is examined as a possible flow-control command, and what does that mean for a PAUSE frame that arrives corrupted?",
+      "tests": "Whether the reader has the stage ordering right - validation precedes interpretation - and can derive the consequence that a damaged control frame is dropped and produces no flow-control effect.",
+      "source_locator": "IEEE Std 802.3, Cl. 4.2.4.2.2 (FCS validated on reception before the frame is passed up) with Cl. 31.4 (MAC Control parses only frames received from the MAC)",
+      "answer": "Before: the frame check sequence is validated at the MAC first, and only frames that pass are handed up to be examined as MAC Control commands, so a corrupted PAUSE frame is simply discarded and has no effect on transmission.",
+      "score": {
+        "all_of": [
+          [
+            "re:(fcs|crc|check ?sum|frame check|integrity|error check).{0,90}(first|before|precede|earlier|up front)",
+            "re:(first|before|precede|earlier|up front).{0,90}(fcs|crc|check ?sum|frame check|integrity|error check)",
+            "re:before .{0,70}(interpret|examin|look|control|pause|opcode|acted|read|parse)",
+            "re:after .{0,70}(fcs|crc|check ?sum|frame check|integrity|error check)",
+            "re:only .{0,50}(valid|good|intact|pass|clean).{0,60}(control|pause|interpret|examin|parse|up)",
+            "re:check(ed|s|ing)? .{0,40}(first|before)"
+          ],
+          [
+            "re:discard",
+            "re:drop",
+            "re:no effect",
+            "re:has no",
+            "re:ignor",
+            "re:thrown away",
+            "re:binned",
+            "re:does nothing",
+            "re:nothing happens",
+            "re:never (acted|takes effect|applied|obeyed|honou?red)",
+            "re:doesn t (pause|take effect|count|stop|apply)",
+            "re:not (acted|obeyed|honou?red|applied)",
+            "re:no pause"
+          ]
+        ],
+        "none_of": []
+      }
+    },
+    {
+      "qid": "q9",
+      "class": "unanswerable",
+      "ask": "After a station acts on a received PAUSE frame, for how long does it withhold its own transmissions?",
+      "tests": "Refusal to hallucinate a duration. The pause interval is a real, in-scope property of the mechanism the subject names, and the presented text carries no interval of any kind.",
+      "source_locator": "IEEE Std 802.3 Annex 31B.1-31B.3 (the pause_time operand, in units of 512 bit times)",
+      "answer": "NOT STATED. The text names a flow-control stage and the two dispositions of a frame, and says nothing about how long a pause lasts.",
+      "absent_from_figure": {
+        "claim": "none of these tokens appears in the presented text of either file condition",
+        "tokens": [
+          "quanta",
+          "pause time",
+          "timer",
+          "microsecond",
+          "millisecond",
+          "duration",
+          "512 bit",
+          "bit times"
+        ],
+        "checked_by": "node tools/comprehension-check.js --check"
+      },
+      "score": {
+        "all_of": [],
+        "none_of": []
+      },
+      "key_note": "ADV-14 refusal class. `none_of` is EMPTY by the v1.1 discipline and for a reason specific to this class: a CORRECT refusal is free to name the very thing it is refusing (\"NOT STATED - nothing here says the frame is discarded\"), so any none_of built from the tempting claim's own vocabulary would reject correct refusals. The class's grading rule already does the work: only an answer that OPENS with NOT STATED scores, and any committed answer is wrong by construction. none_of is reserved for a spelling a correct refusal could never produce."
+    },
+    {
+      "qid": "q10",
+      "class": "forbidden-inference",
+      "ask": "A received frame is corrupted and its frame check sequence does not match. Which stage does that frame reach next, and what becomes of it?",
+      "tests": "Refusal to complete a path the text does not draw. A reader that sees an integrity-check stage and, further along, a discard stage is strongly tempted to join them - but the only edge leaving the check goes to the flow-control stage, and the only edge into the discard stage carries a different trigger.",
+      "source_locator": "IEEE Std 802.3 Cl. 4.2.4.2.2 (a frame with an invalid FCS is not passed to the MAC client) - true of the SUBJECT, and not carried by the presented text",
+      "answer": "NOT STATED. The only edge leaving the integrity-check stage leads to the flow-control stage, and the only edge into the discard stage carries a different trigger, so nothing here says what becomes of a frame that fails the check.",
+      "absent_from_figure": {
+        "claim": "none of these tokens appears in the presented text of either file condition",
+        "tokens": [
+          "invalid",
+          "crc",
+          "error",
+          "mismatch",
+          "corrupt",
+          "fcs fail",
+          "bad fcs"
+        ],
+        "checked_by": "node tools/comprehension-check.js --check"
+      },
+      "score": {
+        "all_of": [],
+        "none_of": []
+      },
+      "key_note": "ADV-14 refusal class. `none_of` is EMPTY by the v1.1 discipline and for a reason specific to this class: a CORRECT refusal is free to name the very thing it is refusing (\"NOT STATED - nothing here says the frame is discarded\"), so any none_of built from the tempting claim's own vocabulary would reject correct refusals. The class's grading rule already does the work: only an answer that OPENS with NOT STATED scores, and any committed answer is wrong by construction. none_of is reserved for a spelling a correct refusal could never produce."
+    }
+  ],
+  "adv14_extension": "2026-08-21: 2 refusal-class question(s) appended (ADV-14). The 8 recall questions above are BYTE-IDENTICAL and in their original order, so the hash the 2026-08 transcripts recorded still reproduces and no published number moves. The refusal questions have never been read; they score in their own denominator when they are."
+}

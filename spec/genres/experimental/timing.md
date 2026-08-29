@@ -175,7 +175,7 @@ But lane mode is consulted *second* — a token whose key is REGISTERED is
 taken as an option before the guard is reached. The alphabet contains the
 letters `p`, `n` and `x`, so:
 
-> A single-letter option key spelled `p`, `n` or `x` MUST NEVER be
+> A single-letter option key spelled `p`, `n` or `x` MUST NOT be
 > registered, in this genre or any other, present or future.
 
 `x=01` is a valid lane today only because no option key is spelled `x`.

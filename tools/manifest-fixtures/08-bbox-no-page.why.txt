@@ -1,0 +1,9 @@
+BBOX WITHOUT PAGE — a `bbox` with `unit` and four coordinates but no `page`.
+
+figdown-manifest.md §4.5 (`PUBLICATION-MANIFEST-PROFILE`) states it plainly: "a bounding box with no
+coordinate system is four numbers, not a locator." `bbox` REQUIRES `page`
+(the only stated frame this profile implements today; the design text
+reserves room for "another stated frame" without naming one) and a stated
+`unit`. Four coordinates floating with no page to be coordinates ON are not
+a claim about where in the source document anything is.
+missing required key "page"

@@ -40,7 +40,7 @@ box below; read it before you rely on the sentence above.
 >    rejected and can match the `Line N:` frame, but **has no way to learn
 >    the required words.** What would change it: a fixture per `err()`
 >    site, which `ERROR-COVERAGE.md` already measures the distance to.
-> 2. **Error RECOVERY, on the fixtures where a failure cascades.** A line
+> 2. ~~**Error RECOVERY, on the fixtures where a failure cascades.** A line
 >    that errors abandons its declaration, so a later reference to it
 >    raises a second error — and the reference engine is not consistent
 >    about this (core §8.3, §9 `ERROR-RECOVERY-MODEL`). An implementation that recovers by
@@ -49,7 +49,21 @@ box below; read it before you rely on the sentence above.
 >    Matching those means matching the reference engine's behaviour, which
 >    is reasoning the normative documents do not supply. What would change
 >    it: a recovery model and a precedence rule in §8, in that order — a
->    MIGRATIONS-entry change, because it moves existing goldens.
+>    MIGRATIONS-entry change, because it moves existing goldens.~~
+>    **CLOSED 2026-08-22, struck rather than deleted because it
+>    was this file's own named boundary for a year of releases.** Core §8.3
+>    is now the recovery model — *a line that reports an error performs none
+>    of its state effects, and no other line's parse changes because of it* —
+>    with the stage table, the five state effects, the one exception (the
+>    compact `field` list), the four cascade shapes as SPECIFIED behaviour,
+>    the region open/close rule and the precedence rules; §9 `ERROR-RECOVERY-MODEL` is
+>    CLOSED; `920-errors-recovery-model` pins the five clauses that had no
+>    fixture of their own. **It moved no golden and needed no MIGRATIONS
+>    entry**, because the recovery behaviour was already frozen by the sorted
+>    lists this directory compares — what was missing was the rule that
+>    predicts them. What remains is §8.3.8's residue: which of two competing
+>    directive-stage faults on ONE line is reported. It cannot change an
+>    error count.
 > 3. **Normative fixtures write an experimental keyword**, so
 >    `spec/experimental.md`'s skip promise is conditional, not absolute.
 >    They are enumerated in that file's §E0.1 with what a skipping
@@ -581,7 +595,7 @@ clean, `.errors.txt` if it does not. Case numbering groups by area
 | `4xx` | `bitfield` (`418` is the `DECLARATION-ORDER-SEMANTICS` worked example: the bit numbers a reader DERIVES from `numbering=`, which the model deliberately does not carry — spec core §12.7; `419` is the `PRESENCE-CONDITION-EXPRESSION` `present=` tri-state worked example; `420`/`421` are `BITFIELD-REPETITION-CONSTRUCT`'s `index=` — the repetition tri-state in the model, and every one of its five errors) |
 | `5xx` | `table` (`520` is the `ROW-HIGHLIGHT-CELL-FILL-COLLISION` `highlight`/cell-`fill=` collision worked example) |
 | `6xx` | `timing` (spelled `wave` until 0.1, `TIMING-GENRE-NAMING`) — **EXPERIMENTAL, in `experimental/`** (experimental genre, `CONSTRUCT-STATUS-TIERS`) |
-| `9xx` | cross-cutting errors (unknown keyword, misplaced child, reserved dynamic keywords, duplicate single-valued directives, retired keywords, the retired `text=` option key, and the per-release retirement diagnostics — `912` `plot`, `913` the WITHDRAWN edge-geometry option keys (`EDGE-GEOMETRY-CONSTRUCTS` — seven spellings, no replacement), `914` `guide` → `threshold` (`THRESHOLD-KEYWORD-SPELLING`), `915` the DELETED `chart level=` (`CHART-LEVEL-KEY`), `916` `wave` → `timing` (`TIMING-GENRE-NAMING`), `917` `size` → `pin` (`ELEMENT-GEOMETRY-DIRECTIVE`), and `918`/`919` the WITHDRAWN `plane`/`plane=`/`z-index=` (`PAINT-ORDER-CONSTRUCT` — three spellings, no replacement); `914`, `915`, `916` and `919` are **EXPERIMENTAL, in `experimental/`**, the rest are not — `913` moved into `cases/` at 0.1. `918` and `919` are one claim in two files, split by bucket: the keyword sweep runs AHEAD of the genre allowlist and answers the same message in every genre, so checking "every genre" needs all eight written down, and three of them are experimental genres that a normative fixture cannot declare) |
+| `9xx` | cross-cutting errors (unknown keyword, misplaced child, reserved dynamic keywords, duplicate single-valued directives, retired keywords, the retired `text=` option key, and the per-release retirement diagnostics — `912` `plot`, `913` the WITHDRAWN edge-geometry option keys (`EDGE-GEOMETRY-CONSTRUCTS` — seven spellings, no replacement), `914` `guide` → `threshold` (`THRESHOLD-KEYWORD-SPELLING`), `915` the DELETED `chart level=` (`CHART-LEVEL-KEY`), `916` `wave` → `timing` (`TIMING-GENRE-NAMING`), `917` `size` → `pin` (`ELEMENT-GEOMETRY-DIRECTIVE`), and `918`/`919` the WITHDRAWN `plane`/`plane=`/`z-index=` (`PAINT-ORDER-CONSTRUCT` — three spellings, no replacement); `914`, `915`, `916` and `919` are **EXPERIMENTAL, in `experimental/`**, the rest are not — `913` moved into `cases/` at 0.1. `918` and `919` are one claim in two files, split by bucket: the keyword sweep runs AHEAD of the genre allowlist and answers the same message in every genre, so checking "every genre" needs all eight written down, and three of them are experimental genres that a normative fixture cannot declare). **`920` (0.5, `ERROR-RECOVERY-MODEL`) is the ERROR-RECOVERY MODEL of core §8.3** — five sections, 14 error lines, NORMATIVE: the reference cascade, the failed `layout` that opens no zone and spends no single-valued slot, the tolerated fault that still opens a region beside a pre-dispatch refusal that leaves one open, and both directions of the duplicate-versus-value precedence asymmetry. It is in this band rather than beside `903` (duplicate single-valued directives) because its subject is not one construct's rule but what happens to the REST of a document after any line fails; five of its clauses had no fixture at all before it, and the rest were pinned only as side effects of files whose subject was something else |
 | `7xx` | `chart` (spelled `plot` until 0.1) — in `experimental/`, outside the conformance surface. Until 0.1 these two fixtures were the ONLY residents of that directory and no default run executed them |
 | `955` | **the bundle duplicate-member fix** (`MEMBER-LIST-DUPLICATION` — identity-model-proposal probe 5) — one **EXPERIMENTAL** fixture in `experimental/`, `955-bundle-duplicate-member`: the same resolved edge named twice in one `bundle`'s member list, once by identical spelling (`a--b,a--b`) and once by a reversed spelling of an undirected pair (`a--c,c--a`), both caught because the check is on the resolved *Edge*, not the string. It is not in `39x` — the `bundle` band, and thematically where it belongs — because that band is exhausted: `390`–`396` are in use and `397`–`399` were deleted with `routing`/`path` at `EDGE-GEOMETRY-CONSTRUCTS` and are not reused (the band's own rule, README above) |
 | `95x` | **adversarial input** (core §15) — five **NORMATIVE** fixtures in `cases/`, and the only `9xx` run that carries BOTH kinds of golden. The split is the claim: §15 says the language does **not** refuse hostile-looking text (it carries it as data) but **does** refuse input that could not produce a well-formed artifact, and one fixture kind alone would pin the wrong half. **`950`–`952` are VALID documents with `.model.json` goldens** — their STRINGS spell markup, and what the golden pins is that hostile text arrives in the model byte for byte, unescaped and unstripped: `950` puts `<script>`, an event handler, a `javascript:` URL, a `foreignObject` and an `@import` into the title, a class meaning, group and node labels, all three edge-label positions and six `note=` strings; `951` does the same to `description=`, the one string written FOR a machine reader; `952` is the CDATA attack on §7's embedded source — `]]>`, the pre-spliced `]]]]><![CDATA[>`, a closing `</metadata>` and a `<script>` behind it. **`953`–`954` are REFUSALS with `.errors.txt` goldens** — `953` is `XML-CHARACTER-LEGALITY`'s XML-illegal characters (eleven lines over two diagnostics, plus a same-file node carrying tab, `U+007F`, C1 and an astral character that must produce NONE; it contains raw bytes no editor will show you, and it cannot cover the unpaired-surrogate half, which has no UTF-8 encoding — the gate probes that one through `parse()` instead), and `954` is the extreme-numeric class inside `pin at=(…)`. For `950`–`952` the complement — that the same strings reach the ARTIFACT as escaped text and never as markup — has no golden and cannot have one (spec §3 gives no byte-identity across renderer versions); it is `gate:safesvg`'s, which renders all three fresh in both render modes and reads the output structurally |
@@ -718,6 +732,10 @@ node conformance/run.js 4              # substring filter on the file name
 node conformance/run.js table          # ... or by name fragment
 node conformance/run.js --update       # rewrite goldens (see policy below)
 node conformance/run.js --experimental # the experimental/ corpus, on its own
+
+node conformance/run.js --engine-cmd='./my-parser'   # SUBPROCESS mode: run the
+                                       #   suite against ANY implementation —
+                                       #   see "The harness contract" below
 ```
 
 Exit code 0 = all pass; 1 = any failure **in either bucket** — an
@@ -754,6 +772,111 @@ second implementation. The recipe:
    text. Where a golden and the spec conflict, the conflict is listed
    there — match the golden to pass the suite, and track the item for
    the spec/engine resolution.
+
+Steps 1–3 are a recipe you implement yourself, in whatever language you
+are working in. **You do not have to**: the section below is the same
+comparison, done for you by `run.js`, against an implementation it knows
+nothing about.
+
+## The harness contract — how an implementation this project did not write runs this suite
+
+**The problem this closes, said plainly.** Core §0.2 tells an outside
+claimant that `conformance/cases/`'s 206 normative fixtures **are** the
+**Parser** class's conformance suite, and `INDEPENDENT-IMPLEMENTATION-CRITERION`'s adversarial exercise
+hands a reader the frozen partitions and asks for a parser that passes
+them. Until this contract landed, the fixture DATA was portable and the
+RUNNER was not: `run.js` obtained its engine by slicing `figdown.html`
+between two markers and evaluating the slice for seven named symbols, so
+a reader who wrote their parser in anything but JavaScript could not
+execute the harness they had been pointed at, and `$FIGDOWN_HTML` only
+substituted a second **JavaScript** engine mimicking this one's private
+module shape. Filed as a defect against `INDEPENDENT-IMPLEMENTATION-CRITERION` (`decisions/registry.md`
+item 80, `NORMATIVE-SENTENCE-ACTOR`(c)); resolved by **`CONFORMANCE-HARNESS-CONTRACT`**.
+
+**The contract.** You supply one command. The runner invokes it **once
+per fixture** and compares what it writes against the same goldens the
+in-process path uses.
+
+```sh
+node conformance/run.js --engine-cmd='<command>'   # primary spelling
+FIGDOWN_ENGINE_CMD='<command>' node conformance/run.js   # same switch
+```
+
+The command runs through the system shell, so a full command line with
+arguments is fine (`--engine-cmd='python3 -m myfigdown --model'`). The
+CLI form wins when both are set. Only the `--engine-cmd=<command>`
+spelling exists: a space-separated form would be indistinguishable from
+the positional name-filter. **The in-process JavaScript path remains the
+default** — a run with neither switch behaves exactly as it always did.
+
+| | rule |
+|---|---|
+| **input** | the fixture's bytes, verbatim, on **stdin**. Read to EOF. UTF-8, no BOM added by the harness; a fixture may contain any byte sequence a `.fd` file may contain, including code points no editor will display (`cases/953`). Nothing else is passed: no file name, no arguments, no environment |
+| **output** | **stdout**, and stdout alone. **stderr is never compared** — write diagnostics there freely |
+| **exit 0** | *accepted.* stdout is the canonical JSON model of core **§12.5** and **§12.5.1**, **byte for byte**, including the single trailing LF §12.5 requires. Multi-section documents use §12.5's `sections` wrapper. This is compared against `NNN-name.model.json` as bytes; §12.5.1 states the serialization without reference to any language, so an implementer with no `JSON.stringify` reads that rather than emulating one |
+| **exit 1** | *refused.* stdout is the parse errors of core **§8**, one `Line N: <message>` per line, LF-terminated. **Order is free** — the harness sorts both sides before comparing, exactly as core §8.3.7 promises, so only the multiset has to match. The final LF is required by this contract and tolerated if missing; an **empty** line is a hard failure, because no diagnostic is empty and swallowing one would hide a truncated list. Compared against `NNN-name.errors.txt` |
+| **any other exit** | *adapter failure.* The fixture fails the run and the exit status is reported. Exit 1 with an empty stdout is the same kind of failure: refusing a document without naming an error is not a verdict |
+| **encoding** | UTF-8 both ways. Comparison is of UTF-8 bytes (§12.5) |
+
+**A document does not both parse and error.** Core §8 settles this
+before the harness sees it: *"a document with errors renders nothing"*,
+and every fixture carries exactly one kind of golden — `.errors.txt` or
+`.model.json`, never both, and the runner fails a case that has the
+wrong one for what your command said. So the two exit codes are a
+partition, not a preference: emit a model **or** an error list. If your
+implementation recovers from an error and can still produce a partial
+model, exit 1 and report the errors; the partial model is not this
+suite's subject.
+
+**What the contract covers, and what it does not.** It covers the
+**Parser** class of core §0.2 — `.model.json` and `.errors.txt`, which
+is every golden in `conformance/cases/` but one. It does **not** cover:
+
+- **`.geometry.txt` goldens** — core §8's geometry-time errors are
+  raised by the **Renderer** from a model, not by a parser from a
+  source, so they are the Renderer class's and a parser cannot produce
+  them. A subprocess run counts the geometry goldens it did not check
+  and **prints the number** rather than absorbing the gap (one in
+  `cases/`, two in `experimental/`).
+- **the determinism self-check** (spec §3's renderer tier) and the three
+  reference-engine property tests (`OPT_KEYS`/`LANE_RE`,
+  `findComment`/`tokenize`, and the group-crossing edge property that
+  renders one figure and asserts a drawn route, `GROUP-BOUNDARY-OBSTACLE`) — all four reach
+  into the reference engine's private surface and are in-process only.
+- **`--update`.** It is refused in subprocess mode, exit 2. Goldens are
+  minted by the reference engine and by nothing else; a foreign
+  implementation that could rewrite them could pass by rewriting them.
+
+A **Renderer-class** contract — a second command taking a model on stdin
+and emitting SVG — is a plausible extension and is deliberately not
+built here: spec §3 grants no byte-identity across renderer versions, so
+there is nothing for it to be compared against except the geometry
+diagnostics, and three fixtures do not need an interface.
+
+**The worked example, which is also the proof.**
+[`adapters/reference-engine.js`](adapters/reference-engine.js) satisfies
+this contract by driving the reference engine. It is a **client** of the
+contract, not part of the harness — it reaches into the runner for
+nothing — and running the whole suite through it must reproduce the
+in-process run verdict for verdict:
+
+```sh
+node conformance/run.js                                                   # in-process
+node conformance/run.js --engine-cmd='node conformance/adapters/reference-engine.js'
+```
+
+Both print **206 normative / 84 experimental / 290 total, 0 failed**,
+and the per-fixture `PASS` lines are identical. **In subprocess mode the
+reference engine is never loaded** — `run.js` does not look for
+`figdown.html` at all, so a tree containing only `conformance/` and your
+command runs the suite, which is the whole point and is worth checking
+if you ever doubt it. That full run costs
+about 33 s against the in-process run's 0.6 s — a process start per
+fixture — so it is a reproduction command rather than a gate.
+`npm run gate:harness` ([tools/harness-check.js](../tools/harness-check.js))
+is the gate: ~3 s over a five-fixture slice plus the refusal branches
+above, which the 290-fixture run never exercises because a well-behaved
+adapter never hits one.
 
 ## Update policy
 
@@ -816,12 +939,17 @@ that moment checks A–E hold these bytes exactly as they hold the engine
 page: modified fails, deleted fails, and **an added file fails too**.
 
 **What is frozen, and what is not.** The whole of `conformance/` goes in
-— fixtures, `run.js`, `normalize.js`, this file, `STATUS.txt` — because
-a curated "just the files you need" list is a closed list, and a closed
-list is wrong the first time a file is added. The frozen `run.js` finds
+— fixtures, `run.js`, `normalize.js`, this file, `STATUS.txt`,
+`adapters/` — because a curated "just the files you need" list is a
+closed list, and a closed list is wrong the first time a file is added.
+The `adapters/` directory is the standing demonstration of that
+sentence: it did not exist when the rule was written and it is inside
+the partition anyway. The frozen `run.js` finds
 `../figdown.html`, which is the archived engine page for that same
 language version, so the partition runs **against the engine users
-actually had**, with no repository around it. From `spec/`, `core.md`
+actually had**, with no repository around it — and since `CONFORMANCE-HARNESS-CONTRACT` it runs
+against an implementation that is not this one either, given a command
+that satisfies the harness contract above. From `spec/`, `core.md`
 and `genres/**` are frozen. In this repository that includes the
 `.zh-tw` twins — freezing half a pair is precisely how the halves are
 allowed to drift, the frozen English going on being corrected by errata

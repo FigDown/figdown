@@ -2,7 +2,7 @@
 #
 # Regression fixture for backlog item 66 (`TYPED-BLOCK-TITLE-CANVAS`): `timing` never
 # had `table`'s 0.3 caption fix, so before `TYPED-BLOCK-TITLE-CANVAS` this fixture clipped
-# its own title exactly like the bitfield case (FR-4). One signal, four
+# its own title exactly like the bitfield case. One signal, four
 # cycles: the smallest timing diagram a long title can outrun. See
 # bitfield-long-title.fd in this directory for why this file lives here
 # rather than under examples/.

@@ -1,0 +1,20 @@
+UNOWNED EXTENSION KEY — `x-status`, an extension key that names no owner.
+
+`MANIFEST-EXTENSION-NAMESPACE` (2026-08-23) rules the spelling of the profile's one extension door:
+`x-<owner>-<key>`, where `<owner>` is a token the owner controls and can be
+traced to — a DNS label they hold, a GitHub org, a registered project name.
+`x-acme-review-queue`, not `x-queue`.
+
+The reason is not tidiness. An unowned `x-` key is a name two publishers
+collide on, and the collision is SILENT: both manifests validate, both call
+the key `x-status`, and a consumer merging two trees now holds one key with
+two meanings and no way to tell which it has. Owner-prefixing makes that
+collision impossible WITHOUT a registry, which is the whole point — the
+namespace is delegated to the owner rather than administered by this project
+(figdown-manifest.md §3.1(a)).
+
+So this fixture is not a well-formed extension key that the verifier reports;
+it is an unknown key with a misleading prefix, and it FAILS. Its sibling
+`00-valid-full.valid.json` carries `x-example-note`, which is well-formed and
+is REPORTED as a notice — the two fixtures pin the two halves of the rule.
+an extension key is spelled x-<owner>-<key>

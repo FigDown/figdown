@@ -94,7 +94,15 @@ const MECHANISM_AFTER = [0, 4];
 
 // The spec paths that carry normative meaning for a language version. A
 // PREFIX list, not a file list — `spec/genres/` gains files every release.
-const SPEC_ROOTS = ['spec/core.md', 'spec', 'spec/genres/'];
+//
+// `figdown-model.schema.json` joined the list when it was published (v1 exit
+// criterion S1, ADV-7): §12.5 now names it as the SHAPE half of the model
+// contract, so a frozen partition that carried core.md without it would carry
+// a normative cross-reference to a file the archive does not hold — which is
+// the availability promise of §13.5 broken by omission. Forward-only: the
+// releases at or below MECHANISM_AFTER are immutable and are not backfilled.
+const SPEC_ROOTS = ['spec/core.md', 'spec',
+                    'spec/figdown-model.schema.json', 'spec/genres/'];
 const CONFORMANCE_ROOT = 'conformance/';
 
 function die(msg) {

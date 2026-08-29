@@ -1,0 +1,15 @@
+{
+  "figdown_manifest": "1",
+  "document": { "id": "example-stale-binding" },
+  "language": { "version": "0.1" },
+  "source": {
+    "sha256": "e83be0aaeeb8df33e7e627251724bd8054708ba430cb6d215d64d1c28faaf006"
+  },
+  "review": {
+    "state": "source-verified",
+    "by": "the maintainer",
+    "date": "2026-08-10",
+    "of_source_sha256": "b97e059ebfdf4090ed9db820ad3b34a9b3d9f7d87114ae6826a29067d6209edd",
+    "note": "checked before the figure was last edited"
+  }
+}

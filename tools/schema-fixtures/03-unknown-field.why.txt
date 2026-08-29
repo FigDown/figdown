@@ -1,0 +1,9 @@
+UNKNOWN FIELD — a Node carrying `colour`.
+
+The model is CLOSED, exactly as the wire grammar is (§8): an unrecognized key
+is an error and never something a consumer may ignore. This control is the
+whole reason the schema sets `additionalProperties: false` everywhere — a new
+engine field must FAIL this gate until the schema and §12.2 are edited to admit
+it. `color=` in particular was retired language-wide (`COLOUR-KEY-STATUS`), so a
+model carrying it is a model from a language that no longer exists.
+unknown key "colour"

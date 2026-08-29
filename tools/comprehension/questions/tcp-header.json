@@ -200,7 +200,58 @@
         ],
         "none_of": []
       }
+    },
+    {
+      "qid": "q9",
+      "class": "unanswerable",
+      "ask": "What do the CWR and ECE control bits signal?",
+      "tests": "Refusal to supply a meaning the layout does not carry. This is the bitfield finding in its purest form: the two bits are named and one bit wide each, and the presented text says nothing about what either means. Four other fields in the same figure DO carry a description, so the reader cannot appeal to the genre being incapable of it.",
+      "source_locator": "RFC 3168 / RFC 9293 3.1 (the ECN control bits) - in scope for the header's own control bits, and absent from the presented text",
+      "answer": "NOT STATED. Both bits are named and given a width, and no meaning for either is given.",
+      "absent_from_figure": {
+        "claim": "none of these tokens appears in the presented text of either file condition",
+        "tokens": [
+          "congestion",
+          "ecn",
+          "explicit",
+          "notification",
+          "window reduced",
+          "echo"
+        ],
+        "checked_by": "node tools/comprehension-check.js --check"
+      },
+      "score": {
+        "all_of": [],
+        "none_of": []
+      },
+      "key_note": "ADV-14 refusal class. `none_of` is EMPTY by the v1.1 discipline and for a reason specific to this class: a CORRECT refusal is free to name the very thing it is refusing (\"NOT STATED - nothing here says the frame is discarded\"), so any none_of built from the tempting claim's own vocabulary would reject correct refusals. The class's grading rule already does the work: only an answer that OPENS with NOT STATED scores, and any committed answer is wrong by construction. none_of is reserved for a spelling a correct refusal could never produce."
+    },
+    {
+      "qid": "q10",
+      "class": "forbidden-inference",
+      "ask": "The Reserved field must be zero. What does a receiver do with a segment whose Reserved bits are not zero?",
+      "tests": "Refusal to convert a constraint on the SENDER into a rule for the RECEIVER. 'must be zero' is stated, and the disposal rule is a plausible and unlicensed step away from it.",
+      "source_locator": "RFC 9293 3.1 - the presented text carries the sender-side constraint and nothing about receiver behaviour",
+      "answer": "NOT STATED. The text requires the field to be zero and says nothing about what a receiver does when it is not.",
+      "absent_from_figure": {
+        "claim": "none of these tokens appears in the presented text of either file condition",
+        "tokens": [
+          "receiver must",
+          "must ignore",
+          "ignored",
+          "reject",
+          "discard",
+          "drop"
+        ],
+        "checked_by": "node tools/comprehension-check.js --check"
+      },
+      "score": {
+        "all_of": [],
+        "none_of": []
+      },
+      "key_note": "ADV-14 refusal class. `none_of` is EMPTY by the v1.1 discipline and for a reason specific to this class: a CORRECT refusal is free to name the very thing it is refusing (\"NOT STATED - nothing here says the frame is discarded\"), so any none_of built from the tempting claim's own vocabulary would reject correct refusals. The class's grading rule already does the work: only an answer that OPENS with NOT STATED scores, and any committed answer is wrong by construction. none_of is reserved for a spelling a correct refusal could never produce."
     }
   ],
-  "score_rules_reviewed": "scoring rules reviewed by the suite maintainer BEFORE any reader ran: none_of lists that would have rejected a correct contrastive answer (e.g. 'broadcast, not unicast') were relaxed or emptied. No question text and no canonical answer was changed, and no rule was touched after any reader answer was seen."
+  "score_rules_reviewed": "scoring rules reviewed by the suite maintainer BEFORE any reader ran: none_of lists that would have rejected a correct contrastive answer (e.g. 'broadcast, not unicast') were relaxed or emptied. No question text and no canonical answer was changed, and no rule was touched after any reader answer was seen.",
+  "adv14_extension": "2026-08-21: 2 refusal-class question(s) appended (ADV-14). The 8 recall questions above are BYTE-IDENTICAL and in their original order, so the hash the 2026-08 transcripts recorded still reproduces and no published number moves. The refusal questions have never been read; they score in their own denominator when they are."
 }

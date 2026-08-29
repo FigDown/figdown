@@ -1,0 +1,37 @@
+{
+  "header": {
+    "version": "0.1",
+    "genre": "block"
+  },
+  "flow": "right",
+  "classes": [],
+  "planes": [
+    {
+      "id": "base",
+      "z": 0
+    }
+  ],
+  "nodes": [
+    {
+      "id": "a",
+      "shape": "box",
+      "plane": "base",
+      "line": 2
+    },
+    {
+      "id": "b",
+      "label": "Packet Parser",
+      "shape": "hexagon",
+      "plane": "base",
+      "line": 3
+    }
+  ],
+  "groups": [],
+  "edges": [],
+  "ranks": [],
+  "pins": [],
+  "thresholds": [],
+  "bands": [],
+  "bundles": [],
+  "regions": []
+}

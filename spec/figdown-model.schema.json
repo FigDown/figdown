@@ -1,0 +1,782 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://figdown.org/spec/figdown-model.schema.json",
+  "title": "FigDown normalized document model",
+  "description": "The SHAPE contract for the canonical semantic model of spec/core.md §12 — what keys exist, which are always present, what their value domains are. It is derived from conformance/normalize.js, which is the projection every golden is minted through, and it is checked against every .model.json golden and every published corpus model by `npm run gate:schema` (tools/schema-check.js). It is NOT the byte-level canonical serialization: key ORDER, two-space indentation, the trailing newline and the UTF-8 escaping rules are §12.5's and JSON Schema cannot state them. A model that this schema accepts may still fail §12.5 byte comparison; a model that fails this schema is wrong under §12.2 whatever its bytes are. It is not REFERENTIAL INTEGRITY either: that every `a`/`b`/`in`/`group`/`class` names something the document declares, that ids are unique in their namespace, that a genre admits the keywords used, and that a version admits the genre are all PARSE-time rules (§8) whose violation never reaches a model — the engine emits an error set instead. A schema that accepted a well-shaped model with a dangling reference is reporting correctly: it is answering the shape question, and the document that produced it could not have parsed.",
+  "$comment": "CLOSED, like the language. `additionalProperties: false` everywhere: an unknown key is an error, never ignored (§8, §12.3). A new engine field therefore fails this gate until the schema is edited, which is the point — the schema is a contract, not a description that drifts. ENUM POLICY: a value set is enumerated when a new member is a language-visible event that already forces a spec edit and a version gate (§13.7) — genres, shapes, operators, roles, interaction-operator kinds, alignments, merge directions, numbering bases, line styles, flow directions. A set whose growth is per-release bookkeeping, or whose membership lives in a table the engine owns rather than the spec (CSS colour names), is written as a `pattern` with the rule in a `$comment` instead. THREE MODEL SLOTS ARE DELIBERATELY NOT DECLARED HERE although conformance/normalize.js still lists them: `plane` on Class/Group/External/Threshold/Band/Bundle and `class` on a Region. `PAINT-ORDER-CONSTRUCT` withdrew `plane=` from the language and the engine refuses `class=` on `bitfield`/`table`/`timing`, so no source line can fill them; §12.2 and experimental.md §E5 list no such row either. They are unreachable projection slots, and leaving them undeclared means reviving one fails this gate loudly instead of passing unnoticed.",
+
+  "oneOf": [
+    { "$ref": "#/$defs/document" },
+    { "$ref": "#/$defs/sections" }
+  ],
+
+  "$defs": {
+    "sections": {
+      "title": "Multi-section file (§12.5)",
+      "$comment": "Two or more `figdown` sections in one .fd: the top level is an object with EXACTLY ONE key, `sections`, in document order. A one-section file never takes the wrapper, not even as an array of one — two spellings for one document would defeat byte comparison.",
+      "type": "object",
+      "required": ["sections"],
+      "additionalProperties": false,
+      "properties": {
+        "sections": {
+          "type": "array",
+          "minItems": 2,
+          "items": { "$ref": "#/$defs/document" }
+        }
+      }
+    },
+
+    "document": {
+      "title": "Document (§12.2)",
+      "type": "object",
+      "required": [
+        "header", "flow", "classes", "planes", "nodes", "groups",
+        "edges", "ranks", "pins", "thresholds", "bands", "bundles", "regions"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "header": { "$ref": "#/$defs/header" },
+        "title": {
+          "type": "string",
+          "$comment": "Present when a `title` line is written. `title \"\"` is a written value and stays \"\" (§12.3, `EMPTY-LABEL-STATE`)."
+        },
+        "note": {
+          "type": "string",
+          "$comment": "The FIGURE-LEVEL drawn annotation, from `title … note=` (§2.9, `DRAWN-ANNOTATION-FORM`). At most one, so it is a document key rather than an array."
+        },
+        "flow": { "$ref": "#/$defs/flow" },
+        "classes": { "type": "array", "items": { "$ref": "#/$defs/class" } },
+        "planes": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 1,
+          "items": { "$ref": "#/$defs/plane" },
+          "$comment": "Always exactly one entry: `PAINT-ORDER-CONSTRUCT` withdrew the only directive that could declare a second."
+        },
+        "nodes": { "type": "array", "items": { "$ref": "#/$defs/node" } },
+        "groups": { "type": "array", "items": { "$ref": "#/$defs/group" } },
+        "externals": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "$ref": "#/$defs/external" },
+          "$comment": "Omit-when-absent: the key appears only when the document declares at least one `external`, and then it is never empty."
+        },
+        "edges": { "type": "array", "items": { "$ref": "#/$defs/edge" } },
+        "ranks": { "type": "array", "items": { "$ref": "#/$defs/rank" } },
+        "pins": { "type": "array", "items": { "$ref": "#/$defs/pin" } },
+        "thresholds": { "type": "array", "items": { "$ref": "#/$defs/threshold" } },
+        "bands": { "type": "array", "items": { "$ref": "#/$defs/band" } },
+        "bundles": { "type": "array", "items": { "$ref": "#/$defs/bundle" } },
+        "regions": { "type": "array", "items": { "$ref": "#/$defs/region" } },
+        "lifelines": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/lifeline" } },
+        "messages": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/message" } },
+        "states": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/stateOccurrence" } },
+        "fragments": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/fragment" } },
+        "operands": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/operand" } }
+      }
+    },
+
+    "header": {
+      "title": "Header (§12.2)",
+      "type": "object",
+      "required": ["version", "genre"],
+      "additionalProperties": false,
+      "properties": {
+        "version": {
+          "type": "string",
+          "pattern": "^(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)$",
+          "$comment": "The wire-grammar version AS THE DOCUMENT DECLARED IT (§13.7) — `0.1` … `0.5` today. A pattern rather than an enum by the policy above: the set gains exactly one token per language release, which is bookkeeping, and the authoritative acceptance test is the engine's own version gate, not this file. NOT the dev increment (0.5), which never appears in a model."
+        },
+        "genre": {
+          "type": "string",
+          "enum": ["block", "topology", "flowchart", "bitfield", "table", "timing", "statechart", "sequence"],
+          "$comment": "Enumerated: a genre is the NAMESPACE every non-core keyword resolves against (§1 `GENRE-NAMESPACE`, §12.7), and adding one is an R-numbered ruling behind a version gate (`statechart` at 0.2, `sequence` at 0.4), so the schema edit rides along with a change that is already spec work. Which genres are legal at which `version` is §1's rule, not this file's — the schema states the union."
+        }
+      }
+    },
+
+    "class": {
+      "title": "Class (§2.7, §12.2)",
+      "type": "object",
+      "required": ["id", "meaning", "line"],
+      "additionalProperties": false,
+      "properties": {
+        "id": { "$ref": "#/$defs/id" },
+        "meaning": {
+          "type": "string",
+          "$comment": "MANDATORY on the directive, so the key is never absent — but the VALUE may be \"\", a written value meaning no meaning is claimed (`EMPTY-LABEL-STATE`/`CLASS-EMPTY-MEANING`). Normalizing \"\" to an omitted key destroys the distinction."
+        },
+        "fill": { "$ref": "#/$defs/color" },
+        "stroke": { "$ref": "#/$defs/color" },
+        "style": { "$ref": "#/$defs/style" },
+        "line": { "$ref": "#/$defs/line" }
+      }
+    },
+
+    "plane": {
+      "title": "Plane (§12.2) — the implicit base, and nothing else",
+      "type": "object",
+      "required": ["id", "z"],
+      "additionalProperties": false,
+      "properties": {
+        "id": { "const": "base", "$comment": "The only plane id the language can produce (`PAINT-ORDER-CONSTRUCT`)." },
+        "z": { "const": 0, "$comment": "Paint order among elements is DOCUMENT ORDER; z is 0 for the one plane there is." }
+      },
+      "$comment": "A Plane carries NO `line`: the engine records none, and the one plane is never declared."
+    },
+
+    "node": {
+      "title": "Node (§2.1, §12.2) — also flowchart process/decision/terminator and the statechart state",
+      "type": "object",
+      "required": ["id", "shape", "plane", "line"],
+      "additionalProperties": false,
+      "properties": {
+        "id": { "$ref": "#/$defs/id" },
+        "label": {
+          "type": "string",
+          "$comment": "When written. An absent label is ABSENT, never the id — `node a` and `node a \"a\"` are different documents (§12.3)."
+        },
+        "role": {
+          "type": "string",
+          "enum": ["process", "decision", "terminator"],
+          "$comment": "Present only when a role keyword was written (`FLOWCHART-ROLE-KEYWORDS`). NOT materialized: a bare `node` is role-UNSTATED, which is a fourth state and not a defaulted \"process\"."
+        },
+        "shape": { "$ref": "#/$defs/shape" },
+        "group": { "$ref": "#/$defs/id" },
+        "plane": { "$ref": "#/$defs/planeRef" },
+        "fill": { "$ref": "#/$defs/color" },
+        "stroke": { "$ref": "#/$defs/color" },
+        "style": { "$ref": "#/$defs/style" },
+        "class": { "$ref": "#/$defs/classRefs" },
+        "note": { "$ref": "#/$defs/note" },
+        "line": { "$ref": "#/$defs/line" }
+      }
+    },
+
+    "group": {
+      "title": "Group (§2.2, §12.2)",
+      "$comment": "Membership is recorded on the MEMBER, as node.group; a Group holds no child list.",
+      "type": "object",
+      "required": ["id", "line"],
+      "additionalProperties": false,
+      "properties": {
+        "id": { "$ref": "#/$defs/id" },
+        "label": { "type": "string" },
+        "gap": { "type": "number", "minimum": 0, "$comment": "Member spacing in px (presentation)." },
+        "fill": { "$ref": "#/$defs/color" },
+        "stroke": { "$ref": "#/$defs/color" },
+        "style": { "$ref": "#/$defs/style" },
+        "class": { "$ref": "#/$defs/classRefs" },
+        "note": { "$ref": "#/$defs/note" },
+        "line": { "$ref": "#/$defs/line" }
+      }
+    },
+
+    "external": {
+      "title": "External (§2.8, §12.2)",
+      "$comment": "Carries NO presentation key (`COLOUR-KEY-STATUS`) and NO option key (`PAINT-ORDER-CONSTRUCT`) — id, an optional label, and the source line.",
+      "type": "object",
+      "required": ["id", "line"],
+      "additionalProperties": false,
+      "properties": {
+        "id": { "$ref": "#/$defs/id" },
+        "label": { "type": "string", "$comment": "No id fallback: an unlabelled external draws no text, and so does \"\"." },
+        "line": { "$ref": "#/$defs/line" }
+      }
+    },
+
+    "edge": {
+      "title": "Edge (§2.3, §12.2) — also the flowchart flowline and the statechart transition",
+      "type": "object",
+      "required": ["a", "op", "b", "plane", "line"],
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/id",
+          "$comment": "The connector's HANDLE, from `id=` (`CONNECTOR-IDENTITY-KEY`, `figdown 0.5`). OPTIONAL everywhere: an anonymous connector is the language's default and its absent key asserts nothing less. The spelling carries no category, no ordinal and no relation to a similarly-spelled id (§12.7)."
+        },
+        "a": { "$ref": "#/$defs/id", "$comment": "The FIRST endpoint as written; may name a node, group, external or region." },
+        "op": {
+          "type": "string",
+          "enum": ["--", "->", "<-", "<->"],
+          "$comment": "The operator AS WRITTEN; the direction of the relationship is derived from it, never from endpoint order (§12.4)."
+        },
+        "b": { "$ref": "#/$defs/id" },
+        "tail": { "type": "string" },
+        "mid": { "type": "string" },
+        "head": { "type": "string" },
+        "plane": { "$ref": "#/$defs/planeRef" },
+        "stroke": { "$ref": "#/$defs/color" },
+        "style": { "$ref": "#/$defs/style" },
+        "class": { "$ref": "#/$defs/classRefs" },
+        "note": { "$ref": "#/$defs/note" },
+        "line": { "$ref": "#/$defs/line" }
+      },
+      "$comment": "There is NO `fill`: an edge has no interior, so `fill=` is a line error naming `stroke=` (§5, `INTERIOR-LESS-ELEMENT-PAINT`)."
+    },
+
+    "rank": {
+      "title": "Rank (§3, §12.2)",
+      "type": "object",
+      "required": ["ids", "line"],
+      "additionalProperties": false,
+      "properties": {
+        "ids": {
+          "type": "array",
+          "minItems": 2,
+          "items": { "$ref": "#/$defs/id" },
+          "$comment": "Two or more node ids sharing a rank. Array order is document order and is NOT a ranking (§12.4 rule 6, §12.7)."
+        },
+        "line": { "$ref": "#/$defs/line" }
+      }
+    },
+
+    "pin": {
+      "title": "Pin (§3 layout tier, §12.2)",
+      "$comment": "ONE object per pinned element, carrying the whole of its declared geometry (`ELEMENT-GEOMETRY-DIRECTIVE`). The separate `sizes` array is gone.",
+      "type": "object",
+      "required": ["id", "line"],
+      "additionalProperties": false,
+      "dependentRequired": { "x": ["y"], "y": ["x"] },
+      "anyOf": [
+        { "required": ["x", "y"] },
+        { "required": ["width"] },
+        { "required": ["height"] }
+      ],
+      "properties": {
+        "id": { "$ref": "#/$defs/id" },
+        "x": { "type": "number", "$comment": "px in the element's positioning context; MAY be negative or fractional. `at=` is a POINT, so x and y never split — see dependentRequired." },
+        "y": { "type": "number" },
+        "width": { "type": "number", "exclusiveMinimum": 0, "$comment": "Positive px, NODES only; a group, external or typed block carrying either extent is a line error (§3)." },
+        "height": { "type": "number", "exclusiveMinimum": 0 },
+        "line": { "$ref": "#/$defs/line" }
+      }
+    },
+
+    "threshold": {
+      "title": "Threshold (experimental.md §E3/§E5) — EXPERIMENTAL",
+      "type": "object",
+      "required": ["label", "in", "offset", "line"],
+      "additionalProperties": false,
+      "properties": {
+        "label": { "type": "string", "$comment": "MANDATORY on the directive, so never absent." },
+        "in": { "$ref": "#/$defs/id", "$comment": "The target: a node id OR a group id." },
+        "offset": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100,
+          "$comment": "A fraction of the target's rendered extent, 0–100, WITHOUT the % sign; MAY be fractional. It is not a value of any quantity — the target declares no scale (§12.7)."
+        },
+        "stroke": { "$ref": "#/$defs/color" },
+        "style": { "$ref": "#/$defs/style" },
+        "line": { "$ref": "#/$defs/line" }
+      },
+      "$comment": "No `fill`: a threshold has no interior, and the engine refuses `fill=` on it naming `stroke=` (core §5's carve-out table). experimental.md §E5's key table still lists a `fill` row for this element and for Bundle; the projection has never emitted one and no golden carries one."
+    },
+
+    "band": {
+      "title": "Band (experimental.md §E3/§E5) — EXPERIMENTAL",
+      "type": "object",
+      "required": ["label", "in", "from", "to", "extend", "fill", "line"],
+      "additionalProperties": false,
+      "properties": {
+        "label": { "type": "string", "$comment": "MANDATORY (`BAND-LABEL-STATUS`)." },
+        "in": { "$ref": "#/$defs/id" },
+        "from": { "type": "number", "minimum": 0, "maximum": 100, "$comment": "Percentages without the % sign: `band \"R\" 15%` yields from 0, to 15." },
+        "to": { "type": "number", "minimum": 0, "maximum": 100 },
+        "extend": {
+          "type": "string",
+          "enum": ["up", "down", "left", "right"],
+          "$comment": "Materialized default \"up\". Spelled `dir` in source and model until 0.1."
+        },
+        "fill": { "$ref": "#/$defs/color", "$comment": "MATERIALIZED — the engine default #e5e7eb when none is written (§12.4 caveat)." },
+        "stroke": { "$ref": "#/$defs/color" },
+        "style": { "$ref": "#/$defs/style" },
+        "line": { "$ref": "#/$defs/line" }
+      }
+    },
+
+    "bundle": {
+      "title": "Bundle (experimental.md §E2/§E5) — EXPERIMENTAL",
+      "type": "object",
+      "required": ["id", "members", "line"],
+      "additionalProperties": false,
+      "properties": {
+        "id": { "$ref": "#/$defs/id" },
+        "label": { "type": "string" },
+        "members": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "pattern": "^[A-Za-z_](?:[A-Za-z0-9_]|-(?!-))*(?:--[A-Za-z_](?:[A-Za-z0-9_]|-(?!-))*)?$",
+            "$comment": "ONE array of ONE type in two shapes (`CONNECTOR-IDENTITY-KEY`): an endpoint PAIR `\"a--b\"` with the endpoints in the order written, or a CONNECTOR ID `\"lag1a\"` declared with `id=`. They are told apart by lexis, not by a flag — `--` cannot occur inside an id (`LINK-OPERATOR-IN-IDS`). A mixed list is legal."
+          }
+        },
+        "stroke": { "$ref": "#/$defs/color" },
+        "style": { "$ref": "#/$defs/style" },
+        "line": { "$ref": "#/$defs/line" }
+      },
+      "$comment": "No `fill`: a bundle draws connectors, which have no interior (core §5)."
+    },
+
+    "region": {
+      "title": "Region (§4, §12.2) — a nested genre, discriminated by `genre`",
+      "oneOf": [
+        { "$ref": "#/$defs/regionBitfield" },
+        { "$ref": "#/$defs/regionTable" },
+        { "$ref": "#/$defs/regionTiming" },
+        { "$ref": "#/$defs/regionChart" }
+      ]
+    },
+
+    "regionBitfield": {
+      "type": "object",
+      "required": ["genre", "id", "word", "numbering", "fields", "line"],
+      "additionalProperties": false,
+      "properties": {
+        "genre": { "const": "bitfield" },
+        "id": { "$ref": "#/$defs/id" },
+        "label": { "type": "string" },
+        "word": { "type": "integer", "exclusiveMinimum": 0, "$comment": "Bits per row; materialized default 32." },
+        "numbering": {
+          "type": "string",
+          "enum": ["lsb0", "msb0"],
+          "$comment": "REQUIRED in the source — no default (`UNSAFE-DEFAULT-ELIMINATION`)."
+        },
+        "fill": { "$ref": "#/$defs/color" },
+        "stroke": { "$ref": "#/$defs/color" },
+        "fields": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "$ref": "#/$defs/bitfieldItem" },
+          "$comment": "Field and break items interleaved in document order; never empty (a bitfield with no field is a line error)."
+        },
+        "line": { "$ref": "#/$defs/line" }
+      },
+      "$comment": "A region takes no `style=` and no `class=` — the engine refuses both."
+    },
+
+    "bitfieldItem": {
+      "oneOf": [
+        { "$ref": "#/$defs/bitfieldBreak" },
+        { "$ref": "#/$defs/bitfieldField" }
+      ]
+    },
+
+    "bitfieldBreak": {
+      "title": "Break marker (spelled `wrap` until 0.1, `ROW-BREAK-NAMING`)",
+      "type": "object",
+      "required": ["break", "line"],
+      "additionalProperties": false,
+      "properties": {
+        "break": { "const": true, "$comment": "Present only when true; a break marker carries exactly this key and `line`." },
+        "line": { "$ref": "#/$defs/line" }
+      }
+    },
+
+    "bitfieldField": {
+      "type": "object",
+      "required": ["name", "width", "line"],
+      "additionalProperties": false,
+      "properties": {
+        "name": { "type": "string" },
+        "width": {
+          "oneOf": [
+            { "type": "number", "exclusiveMinimum": 0 },
+            { "const": "*" }
+          ],
+          "$comment": "A bit count, or the string \"*\" for the variable-length form."
+        },
+        "present": {
+          "type": "string",
+          "$comment": "The presence CONDITION as authored prose (`PRESENCE-CONDITION-EXPRESSION`). Tri-state: key absent = no presence claim; \"\" = conditional with no condition stated; a string = the condition. The test is ABSENCE, never truthiness."
+        },
+        "index": { "$ref": "#/$defs/bitfieldIndex" },
+        "fill": { "$ref": "#/$defs/color" },
+        "stroke": { "$ref": "#/$defs/color" },
+        "class": { "$ref": "#/$defs/classRefs" },
+        "description": { "type": "string", "$comment": "Never-drawn authored prose (spelled `note` until 0.1, `DESCRIPTION-KEY-SPELLING`)." },
+        "line": { "$ref": "#/$defs/line" }
+      },
+      "$comment": "A field carries NO `style` (`STYLE-KEY-SCOPE`): the dash is conditional presence's only carrier."
+    },
+
+    "bitfieldIndex": {
+      "title": "index — an OBJECT, and the shape is the ruling (`BITFIELD-REPETITION-CONSTRUCT`)",
+      "$comment": "Absent = no repetition claim. {} = it repeats, no index stated. {first,last} with a NUMBER last = a determinate run. {first,last} with a STRING last = the base is known and the count is not in the document. DETERMINACY IS A JSON TYPE TEST ON `last` — never a quoting test and never a regex over the author's text. `first` is always a number. Each literal end is at most 9007199254740991 (§12.5 binds a number to an ECMAScript Number, so a larger integer would be stored rounded).",
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {},
+          "$comment": "{} — `index=\"\"`: it repeats, no index stated."
+        },
+        {
+          "type": "object",
+          "required": ["first", "last"],
+          "additionalProperties": false,
+          "properties": {
+            "first": { "type": "integer", "minimum": -9007199254740991, "maximum": 9007199254740991 },
+            "last": {
+              "oneOf": [
+                { "type": "integer", "minimum": -9007199254740991, "maximum": 9007199254740991 },
+                { "type": "string" }
+              ]
+            }
+          }
+        }
+      ]
+    },
+
+    "regionTable": {
+      "type": "object",
+      "required": ["genre", "id", "heads", "aligns", "rows", "line"],
+      "additionalProperties": false,
+      "properties": {
+        "genre": { "const": "table" },
+        "id": { "$ref": "#/$defs/id" },
+        "label": { "type": "string" },
+        "fill": { "$ref": "#/$defs/color" },
+        "stroke": { "$ref": "#/$defs/color" },
+        "heads": {
+          "type": "array",
+          "items": { "type": "array", "items": { "$ref": "#/$defs/cell" } },
+          "$comment": "Header tiers, top-down (h1, h2, …)."
+        },
+        "aligns": {
+          "type": "array",
+          "items": { "type": "string", "enum": ["left", "center", "right", "none"] },
+          "$comment": "Per column. A column with no explicit `:` alignment is \"none\" — the absence of a claim, materialized so a consumer never has to branch on arity."
+        },
+        "rows": { "type": "array", "items": { "$ref": "#/$defs/tableRow" } },
+        "width": { "$ref": "#/$defs/tableWidth" },
+        "marks": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "$ref": "#/$defs/tableMark" },
+          "$comment": "Keyed on EMPTINESS, not absence: emit the key when the array is non-empty, never [] and never null."
+        },
+        "highlights": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "$ref": "#/$defs/tableHighlight" },
+          "$comment": "Same emptiness rule as `marks`."
+        },
+        "line": { "$ref": "#/$defs/line" }
+      }
+    },
+
+    "cell": {
+      "title": "Cell (§12.2)",
+      "$comment": "A Cell carries no `line`; its position in heads/rows is its address.",
+      "type": "object",
+      "required": ["v"],
+      "additionalProperties": false,
+      "properties": {
+        "v": { "type": "string", "$comment": "The cell text." },
+        "merge": {
+          "type": "string",
+          "enum": ["left", "up"],
+          "$comment": "\"left\" = a colspan into the cell on its left, \"up\" = a rowspan into the cell above. Present only when the cell is merged."
+        }
+      }
+    },
+
+    "tableRow": {
+      "type": "object",
+      "required": ["cells", "line"],
+      "additionalProperties": false,
+      "properties": {
+        "cells": { "type": "array", "items": { "$ref": "#/$defs/cell" } },
+        "line": { "$ref": "#/$defs/line" }
+      }
+    },
+
+    "tableWidth": {
+      "type": "object",
+      "required": ["widths", "line"],
+      "additionalProperties": false,
+      "properties": {
+        "widths": {
+          "type": "array",
+          "items": {
+            "oneOf": [
+              { "const": "auto" },
+              {
+                "type": "object",
+                "required": ["px"],
+                "additionalProperties": false,
+                "properties": { "px": { "type": "number", "exclusiveMinimum": 0 } }
+              },
+              {
+                "type": "object",
+                "required": ["pct"],
+                "additionalProperties": false,
+                "properties": { "pct": { "type": "number", "exclusiveMinimum": 0, "maximum": 100 } }
+              }
+            ]
+          },
+          "$comment": "One member per column: \"auto\", {px: n} or {pct: n}."
+        },
+        "line": { "$ref": "#/$defs/line" }
+      }
+    },
+
+    "tableMark": {
+      "type": "object",
+      "required": ["row", "col", "line"],
+      "additionalProperties": false,
+      "properties": {
+        "header": {
+          "const": true,
+          "$comment": "Present only when the address is a header tier; header tiers h1..hN address as row 1..N."
+        },
+        "row": { "type": "integer", "minimum": 1 },
+        "col": { "type": "integer", "minimum": 1 },
+        "fill": { "$ref": "#/$defs/color" },
+        "stroke": { "$ref": "#/$defs/color" },
+        "class": { "$ref": "#/$defs/classRefs" },
+        "line": { "$ref": "#/$defs/line" }
+      },
+      "$comment": "A Mark carries NO `style` (`STYLE-KEY-SCOPE`)."
+    },
+
+    "tableHighlight": {
+      "type": "object",
+      "required": ["row", "line"],
+      "additionalProperties": false,
+      "properties": {
+        "row": { "type": "integer", "minimum": 1 },
+        "line": { "$ref": "#/$defs/line" }
+      }
+    },
+
+    "regionTiming": {
+      "type": "object",
+      "required": ["genre", "id", "signals", "line"],
+      "additionalProperties": false,
+      "properties": {
+        "genre": { "const": "timing" },
+        "id": { "$ref": "#/$defs/id" },
+        "label": { "type": "string" },
+        "fill": { "$ref": "#/$defs/color" },
+        "stroke": { "$ref": "#/$defs/color" },
+        "signals": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "$ref": "#/$defs/signal" },
+          "$comment": "In document order; never empty."
+        },
+        "gaps": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "type": "integer", "minimum": 0 },
+          "$comment": "Cycle indices of the visual breaks; present when at least one `gap` child is written."
+        },
+        "line": { "$ref": "#/$defs/line" }
+      }
+    },
+
+    "signal": {
+      "$comment": "A Signal carries no `line` — the engine records none, and lane order is carried by array position — and NO `style` (`STYLE-KEY-SCOPE`).",
+      "type": "object",
+      "required": ["name", "lane"],
+      "additionalProperties": false,
+      "properties": {
+        "name": { "type": "string" },
+        "lane": {
+          "type": "string",
+          "pattern": "^[01pnx=.]+$",
+          "$comment": "The raw lane string: one character per cycle over the closed alphabet [01pnx=.]. The alphabet is closed by `LANE-ALPHABET-KEY-RESERVATION` — a single-letter option key drawn from it would silently turn existing lanes into options."
+        },
+        "data": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "type": "string" },
+          "$comment": "Present when `data=` is written (spelled `labels` until 0.1, `SIGNAL-DATA-KEY-SPELLING`). ABSENCE, never truthiness: an empty list is a line error."
+        },
+        "fill": { "$ref": "#/$defs/color" },
+        "stroke": { "$ref": "#/$defs/color" }
+      }
+    },
+
+    "regionChart": {
+      "$comment": "EXPERIMENTAL (`CONSTRUCT-STATUS-TIERS`) and outside the v0.1 conformance surface — a normative-surface reader never meets it. The genre value was \"plot\" and the type field `kind` until 0.1 (`CHART-BLOCK-NAMING`); `level` was deleted (`CHART-LEVEL-KEY`). A chart region carries no id and no label of its own.",
+      "type": "object",
+      "required": ["genre", "table", "type", "line"],
+      "additionalProperties": false,
+      "properties": {
+        "genre": { "const": "chart" },
+        "table": { "$ref": "#/$defs/id", "$comment": "The referenced table region's id." },
+        "type": { "type": "string", "enum": ["bar3d"] },
+        "line": { "$ref": "#/$defs/line" }
+      }
+    },
+
+    "lifeline": {
+      "title": "Lifeline (sequence, §12.2) — EXPERIMENTAL",
+      "type": "object",
+      "required": ["id", "line"],
+      "additionalProperties": false,
+      "properties": {
+        "id": { "$ref": "#/$defs/id" },
+        "label": { "type": "string", "$comment": "The participant's name. Absent is ABSENT, never the id." },
+        "in": { "$ref": "#/$defs/id", "$comment": "The fragment or operand id this participant exists inside (sense 1)." },
+        "fill": { "$ref": "#/$defs/color" },
+        "stroke": { "$ref": "#/$defs/color" },
+        "style": { "$ref": "#/$defs/style" },
+        "class": { "$ref": "#/$defs/classRefs" },
+        "note": { "$ref": "#/$defs/note" },
+        "description": { "type": "string" },
+        "line": { "$ref": "#/$defs/line" }
+      }
+    },
+
+    "message": {
+      "title": "Message (sequence, §12.2) — EXPERIMENTAL",
+      "$comment": "A Message is NOT an Edge, and the separation is normative: an Edge's array order is not meaning, while a Message is an OCCURRENCE whose place in the total order IS the figure's content. The figure's TIME AXIS is messages ∪ states sorted on `line`; a consumer that discards `line` loses content.",
+      "type": "object",
+      "required": ["a", "op", "b", "line"],
+      "additionalProperties": false,
+      "properties": {
+        "id": { "$ref": "#/$defs/id", "$comment": "The same optional handle the other three connectors carry (`CONNECTOR-IDENTITY-KEY`). It orders nothing and equates nothing." },
+        "a": { "$ref": "#/$defs/id" },
+        "op": {
+          "type": "string",
+          "enum": ["->", "<-", "<->"],
+          "$comment": "`--` is a LINE ERROR in this genre: every UML Message has a send event and a receive event."
+        },
+        "b": { "$ref": "#/$defs/id" },
+        "label": {
+          "type": "string",
+          "$comment": "The message text, from EITHER the trailing quoted string or the inline -[mid]-> form; writing both is a line error, so the model never holds two. There is no `mid` key — on a message the mid position IS the label."
+        },
+        "tail": { "type": "string" },
+        "head": { "type": "string" },
+        "in": { "$ref": "#/$defs/id" },
+        "stroke": { "$ref": "#/$defs/color" },
+        "style": { "$ref": "#/$defs/style" },
+        "class": { "$ref": "#/$defs/classRefs" },
+        "note": { "$ref": "#/$defs/note" },
+        "description": { "type": "string" },
+        "line": { "$ref": "#/$defs/line" }
+      }
+    },
+
+    "stateOccurrence": {
+      "title": "State occurrence (sequence, §12.2) — EXPERIMENTAL",
+      "$comment": "Distinct from a `statechart` state, which is a Node. `lifeline` REFERENCES a declared lifeline — slot 1 does not declare an id — and `name` is MANDATORY, which is why it is not spelled `label`.",
+      "type": "object",
+      "required": ["lifeline", "name", "line"],
+      "additionalProperties": false,
+      "properties": {
+        "lifeline": { "$ref": "#/$defs/id" },
+        "name": { "type": "string" },
+        "in": { "$ref": "#/$defs/id" },
+        "fill": { "$ref": "#/$defs/color" },
+        "stroke": { "$ref": "#/$defs/color" },
+        "style": { "$ref": "#/$defs/style" },
+        "class": { "$ref": "#/$defs/classRefs" },
+        "note": { "$ref": "#/$defs/note" },
+        "description": { "type": "string" },
+        "line": { "$ref": "#/$defs/line" }
+      }
+    },
+
+    "fragment": {
+      "title": "Fragment (sequence, §12.2) — EXPERIMENTAL",
+      "type": "object",
+      "required": ["id", "type", "line"],
+      "additionalProperties": false,
+      "properties": {
+        "id": { "$ref": "#/$defs/id" },
+        "label": { "type": "string" },
+        "type": {
+          "type": "string",
+          "enum": ["alt", "opt", "loop", "par", "strict", "seq", "critical", "neg", "assert", "ignore", "consider", "break"],
+          "$comment": "MANDATORY and always present. UML 2.5.1 §17.12.15.3 InteractionOperatorKind TAKEN WHOLE — a single-source vocabulary, so the enum is the standard's list and adding to it would mean leaving the source."
+        },
+        "in": { "$ref": "#/$defs/id" },
+        "stroke": { "$ref": "#/$defs/color" },
+        "style": { "$ref": "#/$defs/style" },
+        "class": { "$ref": "#/$defs/classRefs" },
+        "note": { "$ref": "#/$defs/note" },
+        "description": { "type": "string" },
+        "line": { "$ref": "#/$defs/line" }
+      },
+      "$comment": "No `fill`: a fragment is a frame over the messages it holds."
+    },
+
+    "operand": {
+      "title": "Operand (sequence, §12.2) — EXPERIMENTAL",
+      "type": "object",
+      "required": ["id", "in", "line"],
+      "additionalProperties": false,
+      "properties": {
+        "id": { "$ref": "#/$defs/id" },
+        "label": { "type": "string" },
+        "in": { "$ref": "#/$defs/id", "$comment": "MANDATORY and always present: an operand is a compartment OF a fragment, and it MUST resolve to a fragment." },
+        "stroke": { "$ref": "#/$defs/color" },
+        "style": { "$ref": "#/$defs/style" },
+        "class": { "$ref": "#/$defs/classRefs" },
+        "note": { "$ref": "#/$defs/note" },
+        "description": { "type": "string" },
+        "line": { "$ref": "#/$defs/line" }
+      }
+    },
+
+    "id": {
+      "type": "string",
+      "pattern": "^[A-Za-z_](?:[A-Za-z0-9_]|-(?!-))*$",
+      "$comment": "The bare-id grammar of `LINK-OPERATOR-IN-IDS`/`QUOTED-IDS`: [A-Za-z_] then [A-Za-z0-9_-], with `--` forbidden anywhere inside because it is the LINK OPERATOR. The same production is used at every id position — declaration and reference alike — because the model records references as the author wrote them and resolution is the reader's job (§12.6)."
+    },
+
+    "line": {
+      "type": "integer",
+      "minimum": 1,
+      "$comment": "1-based source line, and FILE-WIDE in a multi-section file: it counts from the first line of the .fd, so it is a valid address into the source whichever section it came from."
+    },
+
+    "flow": {
+      "type": "string",
+      "enum": ["right", "down", "left", "up"],
+      "$comment": "The reading axis (§3), materialized from the genre default when no `flow` line is written."
+    },
+
+    "shape": {
+      "type": "string",
+      "enum": ["box", "rounded", "circle", "ellipse", "diamond", "cylinder"],
+      "$comment": "The §2.1 geometric enum; materialized default \"box\", or DERIVED from `role` (process→box, decision→diamond, terminator→rounded). A `shape=` on a role line changes THIS field and never `role`."
+    },
+
+    "style": {
+      "type": "string",
+      "enum": ["solid", "dashed", "dotted"],
+      "$comment": "§5. Absent from a field, a table cell mark and a timing signal (`STYLE-KEY-SCOPE`)."
+    },
+
+    "color": {
+      "type": "string",
+      "pattern": "^(#([0-9a-fA-F]{3}|[0-9a-fA-F]{6})|[A-Za-z]+)$",
+      "$comment": "§5. Either a #RGB / #RRGGBB hex or a bare CSS colour name (including `transparent`). Written as a PATTERN rather than an enum by the policy above: the ~148 CSS named colours are a table the ENGINE owns and already refuses an unknown member of at parse time, so copying it here would duplicate a list without adding a check. There is NO text-colour channel anywhere in the model — `color=` was retired language-wide (`COLOUR-KEY-STATUS`) and label ink is a DERIVED renderer default, which is not model (§12.4 rule 4)."
+    },
+
+    "planeRef": {
+      "const": "base",
+      "$comment": "Materialized, and since `PAINT-ORDER-CONSTRUCT` \"base\" is its only value. Kept as a declared key rather than dropped because §12.2 lists it on Node and Edge and a second implementation must emit it."
+    },
+
+    "classRefs": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "#/$defs/id" },
+      "$comment": "REFERENCES to declared classes, never their resolved values (§12.6). ALWAYS an array, even for one class — `class=hot` emits [\"hot\"] — because `class=` is multi-valued and a consumer must not have to branch on arity (§12.5)."
+    },
+
+    "note": {
+      "type": "string",
+      "$comment": "The DRAWN annotation attached to this element (§2.9, `DRAWN-ANNOTATION-FORM`). Prose, never structure (§12.7) — and not a label position: a label is ON the element, a note is BESIDE it."
+    }
+  }
+}

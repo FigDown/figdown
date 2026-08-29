@@ -80,6 +80,207 @@ From the requirements log, the syntax is boxed in by:
 6. **Static first** — dynamic (page/step sequences) reserves keywords but
    is out of scope for v0. (`STATIC-DYNAMIC-PRIORITY`, `DYNAMIC-FIGURE-PURPOSE`)
 
+### 0.1 Requirement keywords — BCP 14 (normative, `NORMATIVE-KEYWORD-DECLARATION`)
+
+The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
+"SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and
+"OPTIONAL" in this document are to be interpreted as described in BCP 14
+[RFC 2119](https://www.rfc-editor.org/rfc/rfc2119)
+[RFC 8174](https://www.rfc-editor.org/rfc/rfc8174) when, and only when,
+they appear in all capitals, as shown here.
+
+That is RFC 8174 §2's replacement wording, taken whole rather than
+reconstructed. RFC 2119's own 1997 phrase was NOT copied: it omits
+"NOT RECOMMENDED", which §4 of that same RFC defines, and it carries no
+capitalization caveat — which is the entire subject of RFC 8174.
+
+**Placed here, above §13, and that is the load-bearing half.** The
+declaration lived in §13's opening paragraph from the first draft until
+`NORMATIVE-KEYWORD-DECLARATION`, where it named four of the eleven spellings and cited one of the two
+RFCs. Measured at the time of that ruling, `spec/core.md` carried **219**
+all-caps keyword occurrences outside code fences, **44** of them inside
+§13 — so **175, four in five, sat outside the only paragraph that said
+what the words meant**. A declaration whose scope is one section of a
+document cannot bind the other fourteen. This subsection's scope is the
+document, and §13 now points here rather than declaring for itself.
+
+**What this does NOT do to the lowercase modals, stated because the
+opposite reading is the expensive one.** RFC 8174 §2: *"These words can be
+used as defined here, but using them is not required. Specifically,
+normative text does not require the use of these key words,"* and *"When
+these words are not capitalized, they have their normal English meanings
+and are not affected by this document."* This tree holds **779** lowercase
+modal occurrences in its English `spec/*.md` files. **None of them is
+promoted, reviewed or rewritten by this subsection.** They remain normative
+English prose, and adopting BCP 14 creates no obligation to convert one of
+them. What the adoption does bind is the all-caps occurrences — **567** in
+this document set on the day it landed.
+
+**This document's convention, declared.** `core.md` uses the eleven
+spellings above in ALL CAPITALS, in prose. A keyword inside a fenced code
+block, inside an inline code span, or inside a quotation is not a
+requirement of this document; and where this document *mentions* a keyword
+rather than using it — *"turning that MAY into a MUST would be a stricter
+rule"* — the sentence is about the word. The three profile documents follow
+a different practice and each declares it; see `spec/host-profile.md`,
+`spec/figdown-manifest.md` and `spec/figdown-a11y.md`.
+
+**SCHEDULED — the audit this subsection creates (`NORMATIVE-KEYWORD-DECLARATION`).** Adopting BCP 14
+turns every existing all-caps occurrence into a claim on the day the
+sentence lands, so the audit is not optional and is named here rather than
+discovered later. Denominator: **567** occurrences in this document set,
+unit = one occurrence, priced at roughly **9 hours** at the rate a
+63-occurrence sample was classified. A 71% correct rate (95% CI 60–83%) was
+measured on that sample; the largest non-correct class, at 14%, is the
+keyword being MENTIONED rather than used, which is **expected and is not a
+defect**. `tools/bcp14-check.js` (`gate:bcp14`) holds the three parts of
+this that a machine can check, and states in its own header the parts it
+must not pretend to check. The audit itself is tracked in
+`decisions/registry.md` `NORMATIVE-KEYWORD-DECLARATION` and in `decisions/registry.md` L1.
+**It is now ONE pass, merged with §0.2's actor pass (`CONFORMANCE-CLASS-LIST`)** — the two ask
+different questions of the same sentence, *"is this a genuine requirement or
+a mention?"* and *"who is bound by it?"*, and a reader holding the sentence
+for the first is already holding what the second needs. Merged price
+**~12 hours** against ~18 run separately. Nobody schedules two.
+
+### 0.2 Conformance classes — whom the keywords bind (normative, `CONFORMANCE-CLASS-LIST`)
+
+§0.1 says what the keywords mean. **This subsection says whom they bind.**
+RFC 2119 §6 confines the imperatives to *"what is actually required for
+interoperation"*, and interoperation is between **parties**, so a keyword
+discipline with no party list is incomplete on its own standard's terms.
+The classes below are not invented here: they are the parties `spec/`
+already names, counted and collapsed in
+`decisions/registry.md`
+and ruled as `CONFORMANCE-CLASS-LIST`.
+
+**The requirements in this document, in the genre documents and in the three
+profiles apply to the conformance classes in the table below, and to no
+others. The list is CLOSED**: a party not named here is not a conformance
+class of FigDown, for the same reason the language itself is closed (`CLOSED-GRAMMAR`) —
+an open list is a promise whose cost is paid by whoever believes it.
+
+| Class | Kind | What it does | Where its obligations are already written |
+|---|---|---|---|
+| **Parser** | implementation | source → model | §1, §8, §10, §11, §12.1–§12.6, §13.7; each genre's vocabulary and its refusals |
+| **Renderer** | implementation | model → artifact | §7, §13.0.3 `RENDERING-DETERMINISM`, §14, §15; each genre's drawing rules |
+| **Reading agent** | implementation | model → conclusions | §12.7, plus each genre's own *MAY conclude* / *MUST NOT conclude* pair (`GENRE-DOCUMENT-CONTRACT`) |
+| **Host** | implementation | Markdown / pipeline integration | [`host-profile.md`](host-profile.md) §§1–5, whole |
+| **Publisher** | implementation | what leaves a repository | [`figdown-manifest.md`](figdown-manifest.md), [`figdown-a11y.md`](figdown-a11y.md) |
+| **Document** | **artifact**, not an implementation | a `.fd` source that conforms | §1's header rule, §10's status table (the *portable v0.1* label), each genre's per-line `REQUIRED` / `OPTIONAL` rules |
+
+**Every cell in the last column is a POINTER.** This subsection creates no
+obligation of its own and moves no keyword: each class's minimum set is
+sentences that were already normative before it landed, and the assembled
+sets are listed, with a citation per entry, in the proposal `CONFORMANCE-CLASS-LIST` ruled on.
+
+**Engine and Implementation are LABELS for a conjunction, not classes.**
+*Engine* = **Parser ∧ Renderer**; *implementation*, unqualified, means the
+same conjunction. The genre status blocks' *"a conforming implementation
+MUST support it"* therefore binds the **Parser** (accept the vocabulary) and,
+for a construct that draws, the **Renderer** — not a sixth party. Classes
+OVERLAP by design: one program is routinely three of them at once.
+
+**The nouns already in the tree, and what each one is.** `spec/` names
+eighteen grammatical subjects for its obligations. Every one of them is on
+this table, so that an implementer reading any normative sentence can tell
+which class — if any — is being addressed:
+
+| Noun as written in `spec/` | Is |
+|---|---|
+| *parser*, *producer*, *model producer* | the **Parser** |
+| *renderer* (and §14's *conformant renderer*) | the **Renderer** |
+| *reading agent*, *agent* (reading sense), *reader* (of a model), *consumer* (model sense, `migrations.md`) | the **Reading agent** |
+| *host*, *caller*, *viewer*, *agent tool* (display sense) | the **Host** |
+| *publisher* | the **Publisher** |
+| *document*, *source*, *figure* (as a document) | the **Document** |
+| *engine*, *implementation* | a **LABEL** for Parser ∧ Renderer |
+| *verifier*, *consumer* (manifest sense) | a **ROLE** inside a profile |
+| *author* | not a class — the requirement is the Document's |
+| *editor*, *authoring agent*, *authoring tool* | **not a class today**; an authoring surface's own duties are unwritten, and one `SHOULD` repeated in three documents is not a class (`CONFORMANCE-CLASS-LIST`) |
+| *tool*, *migration tool*, *the project* | **out of scope** — the maintainers, below |
+
+**A profile MAY name a ROLE local to itself, and MUST NOT create a
+conformance class.** Two exist: the manifest profile's **verifier**
+([`figdown-manifest.md`](figdown-manifest.md) §4) and its **consumer**
+(§2.1(b)). Both are scoped by that document alone. **The manifest's
+*consumer* is not §12.7's Reading agent** — it is a party that reads a
+*manifest*, where the Reading agent reads the *model* — and the two must not
+be read as one class because they share a spelling.
+
+**Author is not a conformance class, and a requirement phrased on an author
+is a requirement on the DOCUMENT.** That is the HTML Standard's own rule for
+the same situation, adopted here whole rather than reinvented (W3C;
+`standards-claims.tsv` `S259`), and it is what gives every
+author-phrased sentence a party that can actually comply. Naming the author
+in prose stays free; an Author cannot be tested and has nothing to claim.
+
+**The specification's maintainers are named here and declared OUT OF
+SCOPE.** **126 of the 590** English all-caps occurrences — 21%, over 113
+sentences in [`migrations.md`](migrations.md),
+[`syntax-style.md`](syntax-style.md), [`.github/CONTRIBUTING.md`](../.github/CONTRIBUTING.md),
+[`ERRATA.md`](ERRATA.md) and [`migrate.md`](migrate.md) — bind **this
+project**: what a frozen construct may still change, what a revived spelling
+must return as, when a mechanical rewrite is owed. **Nobody implements
+FigDown by obeying them**, no conformance claim is made or denied by them,
+and a list that appeared to include them would invite an implementer to
+think a fifth of the specification is theirs to satisfy.
+
+**A class is ORTHOGONAL to SCOPE (§1.1) and only a READING AID over STAGE.**
+A Parser implements core *and* genres; a Renderer likewise: SCOPE says whose
+rule it is, a class says whose duty it is, and the cross-product is
+populated except that **Host and Publisher have no core and no genre
+obligations at all** — they are profile-only classes, which is §1.1's
+profile sentence seen from the other axis. Against STAGE the correspondence
+is *"Grammar + Context + Resolution → Parser, Semantic → Reading agent,
+Rendering → Renderer"*, and it is a reading aid with **three exceptions**
+that stop it being a correspondence: (a) Host and Publisher have no stage at
+all; (b) the Renderer owes rules whose origin is Semantic — *"the group band
+encloses exactly its members"* is a model fact enforced at draw time; (c) the
+Document has no stage either, because a document-validity rule is *checked
+at* a stage without being *of* one.
+
+**Core-only is not a conformance point.** A Parser or a Renderer claiming
+the name supports **core plus the three NORMATIVE genres** (`block`, `bitfield`,
+`table`) — which every frozen genre's status block already says in its own
+words — while EXPERIMENTAL material stays `MAY` (§10's status tables;
+`conformance/STATUS.txt` records the experimental fixtures a second
+implementation may skip entirely). There is no claim of the form *"implements
+FigDown core and no genre"*, and there is not one because it would make
+*"I implemented FigDown"* mean something that cannot read a single figure in
+this repository.
+
+**How a claim is checked, per class, stated honestly — including where it
+cannot be.** A conformance class nobody can test is a label, so the state of
+each instrument is printed here rather than implied:
+
+| Class | What a claimant runs | State |
+|---|---|---|
+| **Parser** | `conformance/cases/` — one `.fd` per fixture, each paired with a `.model.json` or a `.errors.txt` golden, plus the suite's single `.geometry.txt` golden (`369-pin-complete-cover-refused`); **no `.svg` goldens at all**, so nothing in this class is judged on rendered bytes. `PROOF.md` reports the suite's size; no count of it is typed here | **These fixtures ARE this class's conformance test suite**, said out loud (`CONFORMANCE-CLASS-OBLIGATIONS`): `conformance/README.md`'s first line already calls it *"the parser-conformance suite"* and `INDEPENDENT-IMPLEMENTATION-CRITERION`'s exercise already asks for *"a parser and model producer"* that passes them |
+| **Renderer** | §15.2's Safe SVG list and §14's F1–F6, both stated as decidable from the emitted SVG alone; `gate:safesvg`, `gate:legend`, `gate:layout` | **Partly checkable, and honestly so.** `RENDERING-DETERMINISM` determinism is checkable only against the *same* renderer, and this repository's `gate:artifact` re-renders with the reference engine, which is self-reference |
+| **Reading agent** | nothing | **NOT CHECKABLE TODAY.** No instrument exists. `tools/comprehension-check.js` scores a *model reading a picture*, not an implementation reading a model, and it is not re-pointed here to make this table look complete |
+| **Host** | [`host-profile.md`](host-profile.md) §6's resolution table | Checkable, with the two holes that profile prints itself |
+| **Publisher** | `gate:manifest`, `gate:a11y`, `gate:alt`, `figdown-manifest.schema.json` | Checkable |
+| **Document** | a Parser | Checkable by construction — which is the argument for the class |
+
+**One spelling, and the second is a filed defect.** The adjective is
+**conforming**. §14's *"conformant renderer"* names the Renderer class under
+a second spelling; it is not a second class, and it is on the audit's defect
+list below rather than fixed silently in a normative sentence.
+
+**SCHEDULED — the actor-tagging audit, MERGED with §0.1's (`CONFORMANCE-CLASS-LIST`).** ONE pass
+over the same sentences, priced at **+3 hours** on §0.1's 9 rather than a
+second 9. **Grain: per SECTION by default** — 187 `(file, §)` pairs of which
+123 are on the live implementation surface, against 499 keyword-bearing
+sentences; a document whose every section binds one class is tagged once
+(`host-profile.md` already is), and a sentence is tagged on its own only
+where its section genuinely mixes classes. The deliverable is **an actor per
+section and a defect list**, not a rewrite: tagging a sentence with its party
+is not an occasion to move its strength. Until that pass runs, this class
+list has not been applied sentence by sentence, which is stated here rather
+than implied — **adopt-then-audit, as §0.1 did**. The defects it starts from
+are recorded in `decisions/registry.md` `NORMATIVE-SENTENCE-ACTOR`.
+
 ## 1. Document skeleton
 
 A FigDown document is a UTF-8 text, one directive per line.
@@ -457,12 +658,20 @@ nested typed regions. Putting `node` under `figdown 0.1 bitfield` is a
 line error — not a hybrid pattern.
 
 **Version compatibility.** The header carries the wire-grammar version
-and the genre. An unknown major version MUST be rejected. The
-minor-version leniency is scoped by conformance mode (§10): a
-viewer-tier (lenient-mode) implementation SHOULD parse an unknown minor
-version in lenient mode; a strict authoring-tier implementation MAY
-reject an unknown minor version outright (the reference engine does).
-An unknown genre MUST be rejected in strict mode.
+and the genre. An unknown major version MUST be rejected. **There is no
+minor-version leniency left to scope, and this paragraph no longer
+pretends otherwise (`NORMATIVE-SENTENCE-ACTOR`).** v0.1 has one conformance mode, **strict**
+(§10); the *lenient* mode this sentence once scoped a `SHOULD` to was
+closed permanently by `LANGUAGE-EXTENSION-POLICY`, and the *viewer-tier* / *strict
+authoring-tier* pair it named was invented ad hoc to settle
+`conformance/DISCREPANCIES.md` `UNKNOWN-MINOR-VERSION` and is not a conformance class —
+§0.2's list is closed and neither tier is on it. What holds instead is
+§13.0.1's compatibility rule, whole, and it is the Parser's: a declared
+minor version at or below the one the Parser implements is accepted and
+rendered under its own semantics, one above it is rejected with a named
+diagnostic, and nothing is ever guessed (§13.7). The reference engine's
+accepted set is stated in §13.7. An unknown genre MUST be rejected in
+strict mode.
 
 Lexical rules:
 
@@ -561,6 +770,239 @@ Lexical rules:
 - One directive per line. No line continuations. No expressions, loops,
   or macros — ever. (framework axiom)
 
+### 1.1 The layering: two axes, SCOPE × STAGE (normative, `GRAMMAR-LAYERING-MODEL`)
+
+Everything above this subsection describes the language's structure one
+piece at a time. This subsection says what the pieces are pieces OF, so
+that a second implementation reporting a divergence can name **where** it
+diverged instead of reporting *"the fixtures fail"*. It states no new
+restriction: every clause below is a restatement of `GENRE-NAMESPACE` (`GENRE-NAMESPACE`–`UNIVERSAL-CORE-KEYWORDS`), `LAYOUT-ZONE-NAMESPACE`/`EDGE-GEOMETRY-CONSTRUCTS`
+(`LAYOUT-ZONE-NAMESPACE`), `GENRE-DOCUMENT-CONTRACT`, `GENRE-CONNECTOR-SPELLING`/`GENRE-NODE-SPELLING`, §8.3 or `EXTENSIBILITY-MECHANISMS`, and the four places the language crosses
+its own layering are DECLARED at the end rather than repaired.
+
+**A rule needs TWO coordinates, and one of them alone answers nothing.**
+*"`type=` takes `alt` here and `bar3d` there"* is a **Context**-stage
+divergence at **genre** scope — an implementation that gets it wrong
+produces a wrong message, not a wrong picture. *"The compact `field` list
+contributed an element after reporting an error"* is a **Grammar**-stage
+divergence at **genre** scope. *"The renderer drew the group band around a
+non-member"* is a **Rendering**-stage divergence at **core** scope. Naming
+only the stage leaves an implementer asking which document to read; naming
+only the scope says "genre layer" about a thing that could be a lexer bug
+or a reading rule.
+
+#### SCOPE — whose rule is it
+
+| Layer | What is in it | Governed by |
+|---|---|---|
+| **core** | the line grammar (tokenization, `key=value`, quoting, comments, `eol`, UTF-8, BOM); the header; the error model (§8); the model and its canonical binding (§12); versioning (§13); the legibility floor (§14); Safe SVG (§15). Keywords `figdown` `title` `layout` (`UNIVERSAL-CORE-KEYWORDS`) | `UNIVERSAL-CORE-KEYWORDS`, §8, §12–§15 |
+| **core, layout SUB-layer** | the namespace `LAYOUT-ZONE-NAMESPACE` closes: the keyword `pin` and the option keys `at` `width` `height` on it | `LAYOUT-ZONE-NAMESPACE` (`LAYOUT-ZONE-NAMESPACE`/`EDGE-GEOMETRY-CONSTRUCTS`) |
+| **genre** | subject vocabulary, node and connector spellings, per-genre defaults, per-genre option keys, region children, refusals, and each genre's reading rules | `GENRE-NAMESPACE`, `GENRE-VOCABULARY-OBLIGATION`, `GENRE-COMPOSITION`, `PER-GENRE-DEFAULTS`, `GENRE-DOCUMENT-CONTRACT` |
+| **profile** | non-core and **outside the language proper**: the host integration profile, the publication manifest, the accessibility profile | `EXTENSIBILITY-MECHANISMS`'s fourth mechanism; each profile's own status block |
+
+**The layout namespace is a SUB-layer of core and not a fourth layer.**
+`LAYOUT-ZONE-NAMESPACE` makes `pin` genre-independent and forbids any genre from defining,
+redefining or extending it; §10's own words are *"owned by no genre"*,
+which is the same relation to genres that `UNIVERSAL-CORE-KEYWORDS` has. What differs is
+**fixity against ubiquity**, the distinction `UNIVERSAL-CORE-KEYWORDS` already draws for itself —
+so the sub-layer records which of the two rules binds a construct without
+buying a top-level row that would put two of the crossing rules below in
+duplicate.
+
+**Ubiquity is not membership, and `class` is the case that proves it.**
+`class` is accepted at the top level of **all eight** genres and it is
+**not core**, because a future genre MAY define its own meaning and
+defaults for it under `GENRE-VOCABULARY-OBLIGATION` (§10). A construct present everywhere is not
+thereby core.
+
+**The twenty option keys with no live acceptor anywhere are a `status`,
+not a layer.** Each is a registered spelling kept alive only so a retired
+or withdrawn word earns a named diagnostic instead of a generic one (`SEMICOLON-STATUS`,
+§10's last namespace row). They are core by fixity and belong to no genre;
+what distinguishes them from a live core key is their STATUS, and the
+carrier below already has a status column, so no fourth layer is created
+for them.
+
+#### STAGE — when does the rule apply
+
+L1's five classes are named groupings of §8.3.2's eight stages. The eight
+remain normatively underneath: where a rule needs the finer name, §8.3.2
+is the authority and this table is the reading aid over it.
+
+| Class | §8.3.2 stage(s) | What a divergence there looks like |
+|---|---|---|
+| **Grammar** | source scan · section split · pre-dispatch refusal | a different error on a lexically bad line; a section boundary in a different place |
+| **Context** | dispatch · option stage · directive stage | the line is well formed and this genre or this directive does not take it |
+| **Resolution** | resolution | a reference that names nothing; an incomplete region |
+| **Semantic** | *(no error stage)* — §12, §12.3, §12.4, §12.7 and the genre reading rules | the model differs, or two readers draw different conclusions from the same model |
+| **Rendering** | geometry, plus §14 and §15 | the bytes differ, or the picture contradicts the model |
+
+**One honest wrinkle, recorded rather than smoothed.** Grouping *section
+split* — which **cannot fail**, as §8.3.2 says in terms — with *source
+scan* and *pre-dispatch refusal*, which abandon or join, makes "Grammar"
+mean two things at once. The five names are used anyway because they are
+what a second implementer arriving from an IETF background expects, and
+because nothing is lost: the eight stages stay normative and a report may
+always name one of them instead.
+
+#### The carrier
+
+The classification's unit is the **construct**, and its carrier is
+[`vocabulary-sources.tsv`](vocabulary-sources.tsv), which holds one row per
+registered option key, positional value shape, keyword spelling and mark —
+one row each, however many that is today: `node tools/vocab-check.js`
+reports the row count and `gate:vocab` runs it every time, so the number is
+never typed here to go stale — and carries a `layer` column and a `stage` column
+beside its existing `kind` and `status`. The **normative fixtures** are the
+independent CROSS-CHECK on what those cells claim, never the classification
+itself: a fixture pins a rule but is not one, several fixtures pin one
+rule, and one fixture pins several. A classification is a claim about the
+engine, so it must be checkable against the engine; that is why it lives in
+a machine-readable file and not in prose.
+
+The carrier's own limit is stated in its header and is repeated here so it
+is not discovered as a surprise: **no row is `semantic` or `rendering`
+today**, because §12's model rules and §14/§15's picture rules are not
+constructs and have no vocabulary row. Extending the classification to
+reach them would need a second carrier, and that is the condition on which
+this choice reopens.
+
+#### What a genre MAY
+
+1. **Declare subject vocabulary of its own** (`GENRE-VOCABULARY-OBLIGATION`), documented completely
+   in its own genre document (`GENRE-DOCUMENT-CONTRACT`).
+2. **Rename the node and the connector** for its domain (`GENRE-CONNECTOR-SPELLING`/`GENRE-NODE-SPELLING`), the
+   renamed directive taking the original's grammar, option keys and model
+   shape exactly.
+3. **Reuse another genre's spelling with a different meaning** (`GENRE-VOCABULARY-OBLIGATION`, §1),
+   the header being the disambiguator, subject to `UNSAFE-DEFAULT-ELIMINATION`'s *"must not cost
+   the reader"*.
+4. **Set its own defaults**, with no justification beyond its own census
+   (`PER-GENRE-DEFAULTS`).
+5. **REFUSE a word** — `sequence` refuses `group`, `gap` and `lost=` — the
+   refusal being part of the registry, with a diagnostic that gives the
+   ground.
+6. **Declare option keys of its own**, and accept core-registered keys on
+   its own directives — including, under §10's third arm, a second value
+   grammar for a registered key on the four conditions stated there.
+
+#### What a genre MUST NOT
+
+1. **Redefine a core keyword's meaning** (`UNIVERSAL-CORE-KEYWORDS`, fixity).
+2. **Define, redefine or extend a member of the layout namespace** (`LAYOUT-ZONE-NAMESPACE`).
+3. **Change the error model** — the abandon-vs-keep rule, the stage order,
+   the per-stage error counts, cascade behaviour (§8.3). *(One DECLARED
+   EXCEPTION today: crossing 4 below.)*
+4. **Add a line shape the core parser cannot tokenize.** *(One DECLARED
+   EXCEPTION today: crossing 2 below.)*
+5. **Re-lex another genre's tokens** — §10 states this one already, of
+   `LANE-ALPHABET-KEY-RESERVATION`: *"a genre may redefine a spelling's MEANING, but it cannot re-lex
+   another genre's lanes."* *(The converse crossing is real: crossing 3.)*
+6. **Widen what a reading agent may conclude** beyond §12.7. A genre's
+   reading rules are additive within its own document (`GENRE-DOCUMENT-CONTRACT`), never a
+   licence over the core contract.
+7. **Change the shape of the canonical model.** A genre adds element kinds
+   and fields; it does not change the wrapper, the ordering rules or the
+   normalization (§12.4, §12.5).
+
+#### What a profile MAY and MUST NOT — one sentence
+
+**A profile MAY add a sidecar format, a host or publisher obligation, an
+artifact-level convention, and a render option whose effect is confined to
+its own output surface (at the cost of a `FIGDOWN_VERSION` bump, `VERSION-EVENT-TRIGGER` and
+`VERSION-EVENT-TRIGGER` clause 1); and a profile MUST NOT add, remove or change a construct, a
+model field, a byte of an artifact rendered without its option, or what a
+reading agent may conclude about the FIGURE (§12.7) — MUST NOT be required
+for the language to be complete, a renderer implementing no profile being a
+conforming renderer — and MUST NOT enter a conformance claim about the
+LANGUAGE (`INDEPENDENT-IMPLEMENTATION-CRITERION`).** The three profiles each already say the prohibition in
+their own words; this is the layer's sentence, hoisted so that the fourth
+profile does not have to reinvent it.
+
+#### What the CORE MUST NOT do — the direction nobody writes down
+
+1. **Enumerate a genre's vocabulary in a production a genre cannot amend**
+   without that being a language change. *(Two DECLARED EXCEPTIONS today:
+   crossings 1 and 2.)*
+2. **Take a permanent constraint from an EXPERIMENTAL construct** without
+   saying so where the constraint lives. *(One DECLARED EXCEPTION today:
+   crossing 3, and it is the sharpest one in the language.)*
+
+#### The four crossings — DECLARED EXCEPTIONS, not defects
+
+`syntax-style.md` §0's honesty obligation applied to the layers: **every
+crossing is DECLARED or it is a defect**, and *"a rule with an undocumented
+exception is worse than no rule."* These four are the census as of `LAYER-CROSSING-RULES`.
+A fifth found later is a defect until it is written down.
+
+**Crossing 1 — the core grammar enumerates the genres and the versions.**
+§11's `version` and `genre` productions are literal lists, so adding a
+genre edits the core grammar and releasing a language version edits the
+core grammar. **DECLARED, and it is the right design**: the header must be
+readable before the genre is known (`UNIVERSAL-CORE-KEYWORDS`'s own reason), so the core parser
+has to know the genre token set in order to dispatch at all. Not repaired,
+because both repairs cost more than the crossing: a
+`genre = <keyword-shaped token>` production moves a Grammar-stage error to
+the Context stage and therefore moves goldens, and a per-genre ABNF
+fragment splits one grammar into nine while still needing `genre` to
+dispatch. **Reopens** if the language ever gains a genre-registration
+mechanism that is not a literal list.
+
+**Crossing 2 — one of the three alternatives of `line` belongs to a
+genre.** `table-row` and `cell-content` are the `table` genre's and they
+sit in the core's own top-level production; §8.3.2's pre-dispatch stage
+knows about it too, listing *"a pipe row outside a `table` region"* among
+its four members. Counted, **3 of §11's 29 productions are genre-owned
+outright** and **2 more are widened by a genre** — `option-value` and
+`bare-token` both permit `=` inside a token, for the `timing` genre's
+lanes. **DECLARED**, with the honest note that a layering which called this
+a violation would be a layering this language cannot adopt: the alternative
+is a per-genre lexer, which breaks the *readable before the genre is known*
+property `UNIVERSAL-CORE-KEYWORDS` exists to protect. **Reopens** if a second genre ever earns its
+own line shape, at which point one exception is a pattern and a mechanism
+is worth having.
+
+**Crossing 3 — an EXPERIMENTAL genre permanently constrains the CORE
+namespace.** The `timing` lane alphabet's reservation in §10 — that a
+single-letter option key spelled `p`, `n` or `x` is never registered, in
+any genre including a future one — runs UPWARD: an EXPERIMENTAL genre
+(`CONSTRUCT-STATUS-TIERS`), outside the conformance surface and withdrawable in a later `0.x`,
+reserves three spellings in the core option-key namespace permanently and
+language-wide, and because the language cannot express the constraint it is
+enforced outside the engine by `conformance/run.js`, which refuses to run
+while such a key is registered. **DECLARED.** Two invariants it makes
+explicit: **a constraint that flows upward carries its own reason to where
+it lands** (a reader of §10's namespace rule must be able to find out that
+an experimental construct put it there), and **a layer's status does not
+bound the reach of the constraints it imposes** — status governs the
+compatibility promise about a construct, not what the construct's existence
+has already made impossible. Not repaired: `p`, `n` and `x` are the source
+standard's own lane characters (`UNSAFE-DEFAULT-ELIMINATION`), and renaming them would spend a
+borrowed spelling to buy back three single letters nobody has asked for.
+**Reopens** the day a key spelled `p=`, `n=` or `x=` is actually wanted.
+
+> **OPEN SUB-QUESTION, deliberately unruled (`LAYER-CROSSING-RULES`).** If `timing` were
+> withdrawn — which its EXPERIMENTAL status expressly permits — does the
+> reservation survive it? **The reservation's own text says yes** (*"in any
+> genre, including a future one"*). **The `plane=` / `z-index=` precedent
+> says no**: both were withdrawn with their keyword under the coupling
+> §10(b′) states, *"neither half can outlive the other."* `LAYER-CROSSING-RULES` declines to
+> decide between them, and says so rather than leaving the silence to be
+> read as an answer: deciding today would be deciding for a future with no
+> evidence in it, and the question is answerable the moment there is a
+> withdrawal to answer it about. Until then, the reservation stands as
+> written.
+
+**Crossing 4 — the one exception to the core error model is a genre's.**
+§8.3.1's rule is *"a line that reports an error performs none of its state
+effects"*, and §8.3.3 names the single exception: the compact `field` list
+keeps the items parsed before the bad one. `field` is a `bitfield` child
+keyword, so the one exception to the CORE error model belongs to one GENRE.
+**DECLARED**; §8.3.3 already carries the whole text, its reason (without it
+a bitfield with one bad field raises a second, useless *bitfield has no
+fields*) and its fixture, and this is the cross-reference the layering owed
+it.
+
 ## 2. Core scene model (covers block-architecture, topology, flowchart)
 
 > **Spec split (`GENRE-DOCUMENT-CONTRACT`).** The scene model — boxes, containment, and
@@ -636,6 +1078,18 @@ position**:
 An implementation that draws the band without this guarantee is **not
 conforming**, however many fixtures it passes: the defect is invisible in
 the source and visible only in the output.
+
+**The band is CROSSED, not terminated on** (`GROUP-BOUNDARY-OBSTACLE`). An edge
+with one endpoint inside a group and one endpoint outside it connects the
+two ELEMENTS it names; the band — the rectangle AND the label strip that
+names it — is something that run passes **through**, never something it
+arrives at. A renderer MUST NOT re-anchor such an edge to the band, and
+MUST NOT treat the band or its name as an obstacle to it: the source says
+the line reaches the member, so the drawing has to say the same, and a
+line stopped at the container states a connection to the container. The
+band and its name stay obstacles to an edge that **neither starts nor
+ends inside** the group — there, going round them asserts nothing the
+source denies.
 
 ### 2.3 Edges
 
@@ -759,7 +1213,41 @@ declared, and nothing the author did not.** Every channel a class can
 still declare (`fill`, `stroke`, `style`) is drawn there, so "declared but
 not shown" is unreachable — which it was not before 0.1, when a
 class whose only channel was the label colour rendered an empty swatch in
-the legend the language derives FOR its meaning.
+the legend the language derives FOR its meaning. That rule settles
+WHETHER a swatch is drawn and WHAT PAINT it carries, and it still holds
+whole. It never settled what SHAPE the swatch takes, and the shape is not
+the author's to declare.
+
+**The swatch depicts the channel the class actually paints** (
+`LEGEND-SWATCH-SHAPE`). Whether an entry appears is a fact about the DECLARATION; what the
+swatch is shaped like is a fact about the DOCUMENT — what the class is
+carried BY — and a renderer MUST read that off the model instead of
+always drawing a box:
+
+1. A class carried **only by connector-kind elements** — the four
+   connector spellings `edge` `flowline` `transition` `message` (§10),
+   which are exactly `doc.edges` and `doc.messages` — draws a LINE
+   sample: the class's `stroke` (defaulting to `#555`), the stroke width
+   this engine gives a drawn connector, and the class's `style=` as the
+   dash pattern, so a dashed class dashes ALONG a line rather than around
+   a rectangle's perimeter.
+2. A class carried **only by box-kind elements** — every other collection
+   that carries `class=`: `node` `group` `lifeline` `state` `fragment`
+   `operand` `field` `cell`, and a typed block itself — keeps the rect.
+3. A class carried **by both** draws BOTH samples, side by side, LINE then
+   BOX, then the meaning text. The legend exists to explain, and the extra
+   sample is cheaper than making a reader guess which half of the figure
+   the entry is about.
+4. A class that declares `fill=` always gets a box sample, because a fill
+   needs an area to be visible.
+5. A class that declares no paint still draws no swatch (`CLASS-PAINT-REQUIREMENT`, unchanged).
+
+Which kinds are connectors is READ OFF THE MODEL, not stored: no model
+field, no option key and no spelling was added for this. A renderer that
+draws a rect for a connector-only class is **not conforming**, however
+many model goldens it passes — the entry would show a filled area where
+the figure shows a line, and `DECLARATION-ORDER-SEMANTICS` forbids the drawing disagreeing with the
+source, of which the derived legend is a part.
 
 > **Considered and rejected: a per-class `legend=show|hide` option (`CLASS-EMPTY-MEANING`).**
 > Prior art is exact — Highcharts' `series.showInLegend` and ECharts'
@@ -961,8 +1449,23 @@ Normative rules:
   deviations are recorded loudly in its DISCREPANCIES file, never
   frozen silently.
 - **Size adaptation** (`UNDECLARED-ATTRIBUTE-BEHAVIOUR`): an explicit extent → content shrinks to fit
-  (font may step down). No explicit extent → box grows minimally without
-  displacing the global layout. Extents are **px only** in v0.1 —
+  (font may step down). No explicit extent → box grows minimally.
+  **CORRECTED (`BOUNDED-GROWTH-ACCOMMODATION`, 2026-08-21): this said "without displacing the global
+  layout" — the layout-locality instrument measured that promise was never
+  delivered (6 of 12 corpus pairs, `decisions/registry.md`
+  §5(a)). `BOUNDED-GROWTH-ACCOMMODATION`'s first amendment attempt, SAME-RANK LOCALITY, was itself
+  measured undelivered the day it landed (a label grows a box's WIDTH,
+  which is the main-axis/rank-progression extent whenever flow is
+  horizontal, so growth there is structurally cross-rank) and is
+  SUPERSEDED. The promise is now BOUNDED ACCOMMODATION: an unnamed node
+  may move, but never farther than the named node's own box grew — a
+  moved node displaced past the growth delta is a violation. Measured
+  12 of 12 clean at ruling time. Instrument-guarded by
+  `tools/layout-stability/run.js`'s `label-longer` class
+  (`boundedGrowth`). Reopen condition: any measured displacement exceeding
+  the growth delta — see `BOUNDED-GROWTH-ACCOMMODATION` for the full ruling, including the
+  superseded same-rank attempt and why it failed.**
+  Extents are **px only** in v0.1 —
   percentage sizes are reserved for a future version. The value grammar
   is exactly `\d+(\.\d+)?` and the number MUST be **positive** (no unit
   suffix, no scientific notation, no zero, no negative — `at=` keeps
@@ -1363,7 +1866,7 @@ bare `fill=` remains for decoration. Semantic-color profiles can be layered on l
 document scenario keeps colors free. (resolves the `PRESENTATION-CONTROL-TIERS` tension)
 
 General principle (`PRESENTATION-AS-MEANING-CARRIER`): **any attribute this spec calls presentation MAY
-render meaning but MUST NEVER be its only carrier** — if something is
+render meaning but MUST NOT be its only carrier** — if something is
 knowledge, some text in the content zone must say it. Two consequences.
 When the colours are the figure's SUBJECT MATTER (a spectrum, colour bands,
 a wire colour code), the colour NAME MUST appear as text (a cell/node label
@@ -1424,17 +1927,29 @@ transient). Deferred until the static core ships.
   line could not honestly claim to name an element across revisions.
 - Same-basename pairing (`X.fd` ⇔ `X.svg`) is normative.
 - **Render options (renderer tier, not language).** A renderer MAY
-  accept presentation options — v0.1 defines one: `with-title` (draw
-  the title inside the SVG). The DEFAULT is not drawn: embedded
-  figures almost always sit under the host document's caption (`DEFAULT-VALUE-SELECTION` —
-  defaults follow the majority; mainstream tools also do not draw
-  titles by default). The title TEXT stays semantic in the source
-  either way. Any non-default option MUST be recorded in the artifact
-  metadata (`data-render-options="…"`), so an artifact remains a pure
-  function of (source, recorded options) and third-party rebuilds
-  stay bit-identical. Options never appear in the source grammar —
-  the registry is untouched, and option vocabulary is kept minimal
-  (a knob must justify its existence like syntax must).
+  accept presentation options — v0.1 defined one and there are now
+  **two**: `with-title` (draw the title inside the SVG) and
+  `with-a11y` (emit the accessibility profile's role, non-visual
+  `<title>` and state-flagged `<desc>` — see
+  [`figdown-a11y.md`](figdown-a11y.md), adopted `ACCESSIBLE-TEXT-EMISSION` as the emission
+  route for `ACCESSIBILITY-PROFILE`/`ACCESSIBLE-DESCRIPTION-SOURCES`). For `with-title` the DEFAULT is not drawn:
+  embedded figures almost always sit under the host document's
+  caption (`DEFAULT-VALUE-SELECTION` — defaults follow the majority; mainstream tools also
+  do not draw titles by default). The title TEXT stays semantic in
+  the source either way. **The two options are ORTHOGONAL**: one
+  decides ink, the other decides the accessible name, and a figure
+  rendered with both does not get two names. `with-a11y` also
+  defaults to off, which is what keeps every artifact rendered before
+  it byte-identical. Any non-default option MUST be recorded in the
+  artifact metadata (`data-render-options="…"`), so an artifact
+  remains a pure function of (source, recorded options) and
+  third-party rebuilds stay bit-identical; when more than one option
+  is in force the value is the option names **in the order listed
+  here, separated by single spaces** (`with-title with-a11y`), so
+  that one render has exactly one spelling. Options never appear in
+  the source grammar — the registry is untouched, and option
+  vocabulary is kept minimal (a knob must justify its existence like
+  syntax must).
 
 ## 8. Error model
 
@@ -1591,36 +2106,223 @@ project implied a catalogue existed somewhere in `spec/`, and none did.
   [conformance/ERROR-COVERAGE.md](../conformance/ERROR-COVERAGE.md)
   already measures; neither is a v0.1 deliverable.
 
-### 8.3 Error recovery and precedence: UNSPECIFIED in v0.1
+### 8.3 Error recovery and precedence (normative)
 
-A line that fails **abandons its declaration** — the element it would have
-created does not enter the model — and the failure can therefore
-**cascade** into later lines that referred to it. `node a "A" shape=hexagon`  <!-- fence-check: skip -->
-followed by `edge a -> b` yields **two** errors: the bad shape, and
-`unknown endpoint "a"`.
+~~**8.3 Error recovery and precedence: UNSPECIFIED in v0.1**~~ — the heading
+this section carried until **`ERROR-RECOVERY-MODEL` (2026-08-22)**, struck
+through rather than deleted because every citation of it, in this repository
+and outside it, was written against a section that said *v0.1 does not specify
+recovery*, and a reader arriving from one of those citations has to be able to
+see what replaced it.
 
-**This is observed behaviour, pinned in the goldens, and it is NOT a
-normative rule.** v0.1 does not specify recovery, and the reference engine
-is not self-consistent about it:
+**Nothing in the reference engine changed, and no golden moved.** What changed
+is the direction the knowledge flows. The recovery behaviour was already
+FROZEN — the `.errors.txt` goldens compare **sorted, complete error lists**,
+so every multi-error fixture in `conformance/` has been pinning it since the
+day it landed, and there are more of those than there are single-error ones
+(§8.2 gives the command that counts them, and states why no count is written
+here) — but the RULE that predicts those lists was not written down,
+so a second implementation could only match them by matching the PoC. The
+rule below is that missing half. It is derived from the engine and the
+goldens, it is stated as it IS rather than as it ought to be (the three
+asymmetries §8.3.6 names are specified, not repaired), and what it still does
+not cover is named in §8.3.8 rather than left to be discovered.
 
-- `bitfield x "X" numbering=zzz` errors and **still opens the block**, so  <!-- fence-check: skip -->
-  its children parse.
-- `bitfield x "X" class=c` errors and **does not** open the block, so  <!-- fence-check: skip -->
-  every child raises a second error of its own.
-- Duplicate-versus-bad-value precedence resolves in **opposite
-  directions**: a second `width` line reports only `duplicate width` and
-  swallows the value error the same line would otherwise raise, while a
-  second `pin` reports only the value error and never fires
-  `duplicate pin for "<id>"`.
+#### 8.3.1 The rule
 
-The consequence for a second implementation is concrete and should not be
-discovered the hard way: **an implementation that recovers differently —
-by keeping the failed declaration, say — produces a different error SET
-for the same input, and fails fixtures whose subject is not recovery at
-all.** Until v0.1 specifies recovery, matching the goldens on these cases
-means matching the reference engine's recovery, which is the one place
-this suite is not reachable from the normative documents by reasoning
-alone. Recorded as an open question in §9.
+**A line that reports an error performs none of its state effects. No other
+line's parse changes because of it.**
+
+That is the whole model. Everything below is the enumeration a second
+implementation needs to apply it: which effects are *state* effects (§8.3.2),
+the one place a line contributes anything at all while failing (§8.3.3), what
+follows for later lines (§8.3.4, §8.3.5), which single error a multi-fault
+line reports (§8.3.6), and how conformance compares the result (§8.3.7).
+
+#### 8.3.2 The stages, and how many errors each may report
+
+A document is processed in stages. A fault found in one stage **abandons the
+line** and the later stages never see it, so an earlier stage's message
+SUPPRESSES every message a later stage would have produced for that line.
+
+| stage | scope | on a fault |
+|---|---|---|
+| **source scan** | the whole document, before it is split | reports **every** illegal character (§15.3, `XML-CHARACTER-LEGALITY`); suppresses nothing — its findings JOIN the pass |
+| **section split** | the whole document | purely lexical — a section starts at any line whose first token is `figdown`, valid or not. **It cannot fail, and no error can move a boundary** |
+| **pre-dispatch refusal** | one line | **one** error, line abandoned, **an open region stays open** (§8.3.5). Four members: a lexical fault (an unterminated string, a bad escape), the reserved `;` (`SEMICOLON-STATUS`), a pipe row outside a `table` region, and a RETIRED or WITHDRAWN top-level spelling |
+| **dispatch** | one line | **one** error, line abandoned. Closes any open region *first* (§8.3.5). The reserved dynamic words (§6), the genre allowlist (`GENRE-KEYWORD-ALLOWLIST`), the connector-word rules (`GENRE-CONNECTOR-SPELLING`/`GENRE-NODE-SPELLING`) and typed-block-child placement are decided here |
+| **option stage** | one line | reports **every** offending key rather than stopping at the first, then abandons the line. Repeated key on one line, unknown key, a key this directive or this genre does not take, a retired or withdrawn key, and the value grammar of the language-wide keys (`fill=`/`stroke=`, `style=`, `class=`, the id-valued keys such as `in=`, and the quoted-string keys `description=`/`present=`/`note=`) |
+| **directive stage** | one line | reports the **FIRST** fault and nothing else, then abandons the line. The keyword's own checks: the layout-zone gate (`CONTENT-LAYOUT-ZONE-SPLIT`), id spelling, uniqueness, arity, positional form and the directive's own option values (`shape=`, `at=`, `word=`, `numbering=`, `gap=`) |
+| **resolution** | one section, after every line has been read | reports **every** unresolved reference and **every** incomplete region. Independent per element: one failure never stops a sibling |
+| **geometry** | the render channel | §8 above. Reached only by a document whose parse reported nothing, so a geometry diagnostic and a parse error never appear in one list |
+
+Two consequences an implementer should read off the table directly. **A
+directive whose keyword is refused never runs its option pass** — `zork
+fill=bad` reports the keyword and not the colour. And **the header line is the
+one line that reports several of its own faults**: a bad version, a bad genre
+and a surplus positional on one `figdown` line each get their own message,
+because the header has no single fault to abandon on.
+
+#### 8.3.3 State effects, and the one exception
+
+The state effects a line can perform, all of which a failing line skips:
+
+1. **declaring an id** into the node/group/`external`/typed-block namespace
+   (or into the `class`, `plane` or `bundle` namespace);
+2. **contributing an element** to the model — a node, an edge, a field, a row,
+   a `pin`, a `rank`;
+3. **opening a region** — `bitfield`, `table`, `timing` (§8.3.5);
+4. **consuming a single-valued slot** — `title`, `flow`, `layout`, a per-id
+   `pin`, a per-table `width` and delimiter row (§8.1). A failed `title` line
+   does not spend the slot, so the next `title` is the first one, not a
+   duplicate;
+5. **establishing the header** — the declared version and genre. A header line
+   that fails leaves both UNESTABLISHED, which is visible in later
+   diagnostics: after `figdown 0.1 blok`, an unknown keyword answers  <!-- fence-check: skip -->
+   `unrecognized line` and not `"…" is not allowed in genre block`, because
+   there is no genre to be outside of.
+
+**The one exception, and it is the only one: the compact `field` list keeps
+the items parsed before the bad one.** `field a:8,b:99,c:8` under `word=32`
+reports the overflow on `b:99` and still contributes `a`. This is deliberate —
+without it a bitfield whose only `field` line has a fault in the middle would
+raise a second, useless *bitfield has no fields* — and it is the sole place in
+the language where a line reports an error and writes to the model anyway.
+
+#### 8.3.4 Cascades are the specified behaviour, not a defect
+
+Because a failed line declares nothing, later lines that name it fail too, and
+a second implementation that "recovers" by keeping the failed declaration
+reports FEWER errors and fails fixtures whose subject is not recovery at all.
+The four cascade shapes, each with the fixture that pins it:
+
+- **Reference cascade.** `node a "A" shape=hexagon` then `edge a -> b`  <!-- fence-check: skip -->
+  yields **two** errors: the shape, then `unknown endpoint "a"`. The same
+  shape holds for `in=` over a failed `group`, and for `class=` over a failed
+  `class` (`920-errors-recovery-model` §1).
+- **Region-completeness cascade.** A failed child line leaves its region
+  short, and the region's own completeness check — *bitfield has no fields*,
+  *timing has no signals*, *table has no header row* — reports on the OPENER's
+  line, not the failing one (`112-lex-extra-args-every-directive`, where a
+  surplus positional on line 13 produces *timing has no signals* on line 12).
+- **Orphan-child cascade.** A failed region opener opens nothing, so every
+  child line below it reports `"<kw>" is a typed-block child …`
+  (`407`, `410`, `414`).
+- **Diagnostic-shape cascade.** A failed header changes the WORDS of later
+  messages, per §8.3.2's fifth state effect. No extra error, a different one.
+
+**Cascaded errors are never suppressed** — there is no de-duplication pass and
+no "errors downstream of a failure are hidden" rule. The engine's one
+suppression of this kind is the compact-field exception in §8.3.3, and it
+works by contributing to the model, not by hiding a message.
+
+#### 8.3.5 Regions open and close by rule
+
+A `bitfield`, `table` or `timing` line opens a REGION that subsequent child
+lines join. Both halves are normative:
+
+- **A region opens only if its opener line completes.** An opener that fails
+  at any stage opens nothing — `bitfield x "X" trailing` (arity, directive
+  stage) and `bitfield x "X" at=50%` (option stage) both leave the following  <!-- fence-check: skip -->
+  `field` orphaned. The **exception is the tolerated fault**: the two checks
+  the engine performs AFTER building the region — a missing or invalid
+  `numbering=`, and a non-integer `word=` — report and let the region open, so
+  the child lines still get their own diagnostics in the same pass. These two
+  are the complete list.
+- **A region closes when a line reaches DISPATCH**, whether or not that line
+  then succeeds. A failed opener therefore closes the region above it while
+  opening none of its own (`414-block-id-cross-kind-collision`: the failing
+  `timing t` closes the `table` before it, which is why the `signal` under it
+  is an orphan and not a table child). The four PRE-DISPATCH refusals of
+  §8.3.2 are the ones that do **not** close it: a `;` line, a lexical fault, a
+  stray pipe row and a withdrawn spelling all leave the region open, and the
+  next child line still lands in it.
+
+`layout` is the same rule in a different shape: a failed `layout` line does
+not open the zone, so the semantic directives after it are ACCEPTED rather
+than refused by `CONTENT-LAYOUT-ZONE-SPLIT`'s gate (`920-errors-recovery-model` §2).
+
+**A section is an island.** No id, header, single-valued slot, open region or
+layout zone crosses a `figdown` line. Line numbers are re-based to the whole
+file (§8.2) and nothing else about a section is shared.
+
+#### 8.3.6 Precedence: which single error a multi-fault line reports
+
+Between stages, the earlier stage wins (§8.3.2). Within one line carrying
+several faults, three rules decide which single message it gets:
+
+- **ONE TOKEN, ONE ERROR.** A quoted token in a BARE position (an id, an enum
+  value, the header's version and genre) reports the quoting rule and
+  suppresses the value check on that same token: `shape="bkx"` says the
+  spelling is wrong, once, and never adds `unknown shape` (§2.1, `RULE-POSITION-ENUMERATION`).
+- **The uniqueness check runs first — with one construct's exception.**
+  `duplicate id`, `duplicate title line`, `duplicate flow directive`,
+  `duplicate layout line`, `duplicate width` and `duplicate delimiter row` are
+  reported in preference to any other directive-stage fault on the same line;
+  under a two-column table, `width auto,auto` followed by `width auto,12em`
+  reports `duplicate width` on the second line and swallows the bad value.
+  **`pin` is the exception**: its `at=`, `width=` and `height=`
+  value checks run BEFORE its uniqueness check, so a second `pin a at=zz`
+  reports the point and never `duplicate pin for "a"`.
+- **A `width` that fails its ARITY spends the slot; one that fails its VALUE
+  does not** — so the bullet above only bites when the FIRST `width` got far
+  enough to spend it. A value-failing `width` follows §8.3.3 state effect 4
+  exactly: `width auto,12em` written twice under a two-column table reports
+  **two** `bad width` and never `duplicate width`, because the first line
+  never spent the slot and the second is therefore the first `width`. An
+  arity-failing one does the opposite: `width auto` then `width auto,auto`
+  reports `width has 1 values, expected 2` on the first line **and**
+  `duplicate width` on the second (`510-table-width-errors`), so that failure
+  DID spend the slot. Same directive, opposite answer, and unlike the other
+  two asymmetries this one moves the document's error COUNT — one error or
+  two from the same pair of lines, according to which check the first one
+  failed.
+- **The layout-zone gate is applied to a connector line ahead of its option
+  pass and to every other directive after it.** One error either way, but not
+  the same one: inside the zone, `edge a -> b stroke=notacolor` reports the  <!-- fence-check: skip -->
+  zone and `node e "E" fill=notacolor` reports the colour.  <!-- fence-check: skip -->
+
+The three asymmetries — `pin` against every other single-valued construct, the
+connector against every other directive, and an arity-failing `width` against
+a value-failing one — are **specified as they are and not repaired**.
+Repairing any of them moves existing goldens, which §13 makes a
+MIGRATIONS-entry change rather than a bug fix; they are filed as
+**engine-backlog item 79** so
+the cost is on a list rather than in this paragraph. What this section
+guarantees is that both are now PREDICTABLE, which is what a second
+implementation actually needed.
+
+#### 8.3.7 Conformance compares SORTED LISTS, and order is not promised
+
+`conformance/run.js` sorts both sides before comparing, so **an
+implementation's own emission order is free** and only the multiset of
+messages has to match. The sort is a plain lexicographic sort of the whole
+`Line N: <message>` string, which is why `Line 18` precedes `Line 3` in a
+golden — the goldens are ordered for stable diffing, not for reading. Nothing
+in this specification states an emission order, within a pass or between
+stages, and an implementation MUST NOT be judged on one.
+
+#### 8.3.8 What is still UNSPECIFIED, named
+
+- **The order of a directive's own checks beyond §8.3.6's rules.** When two
+  directive-stage faults compete and neither is a uniqueness check —
+  `node a B C`, which is both an unquoted label and a surplus positional —  <!-- fence-check: skip -->
+  which one is reported is not stated here. The engine is deterministic and
+  the goldens pin the cases the suite covers; the general rule is not written
+  down, and an implementation may differ on an input no fixture reaches.
+- **The message TEXT for any error no fixture covers** — unchanged by this
+  section, and still §8.2's gap.
+
+Both are narrower than what this section closed, and neither can change an
+error COUNT: a line with several directive-stage faults reports exactly one
+error under any reading of the rule above. **That is a guarantee about ONE
+LINE, and it must not be read as one about a document.** A document's total
+is not invariant, and §8.3.6's third asymmetry is exactly where it moves:
+whether a failed `width` spent the single-valued slot decides whether the
+next `width` is a duplicate, so the same two lines yield two errors or one
+according to which check the first of them failed. That behaviour is
+SPECIFIED in §8.3.6, not residue; it is named here only so this paragraph's
+per-line guarantee is not mistaken for a per-document one.
 
 ## 9. Open syntax questions
 
@@ -1855,19 +2557,65 @@ alone. Recorded as an open question in §9.
   needs, and it declares no relation between regions. `note=` does not
   reach this either: an aside is not a subordination claim, and §12.7
   forbids reading one out of it.
-- `PUBLICATION-MANIFEST-PROFILE`: **publication manifest and provenance profile** (`PUBLICATION-MANIFEST-PROFILE`,
-  2026-07-26) — a standardized non-core JSON manifest profile per
-  published figure: source page/bbox provenance, original-image hash,
-  panel logical id, review/render status, accessibility description
-  review status, hash-based dependency invalidation. Non-core: no
-  grammar impact; currently served by a private downstream sidecar.
-  Post-freeze profile work, v0.2+.
-- `ACCESSIBILITY-PROFILE`: **accessibility contract profile** (`ACCESSIBILITY-PROFILE`, 2026-07-26) — a
-  normative profile covering SVG `role="img"`, non-visual `<title>`
-  (distinct from the `TITLE-RENDER-DEFAULT` visual-title render option), `<desc>` semantic
-  summary from reviewer-approved text (not free LLM generation), Markdown
-  alt-text conventions, `aria-hidden` for decorative output, and
-  validation severity per profile. New territory; profile-level, v0.2+.
+- ~~`PUBLICATION-MANIFEST-PROFILE`: **publication manifest and provenance profile**~~ —
+  **CLOSED at `PUBLICATION-MANIFEST-PROFILE` (2026-08-22)**, filed 2026-07-26 (`PUBLICATION-MANIFEST-PROFILE`). **Answered
+  by the ruling, tracked to a shipped document by the exit criteria.** The
+  profile RULED into existence is exactly the non-core JSON sidecar this
+  entry filed: `X.manifest.json`, per file, closed and versioned (`PUBLICATION-MANIFEST-PROFILE`);
+  the core `document`/`language`/`renderer`/`source` blocks with the
+  restatement rule; the `provenance` array with its closed `relation`
+  vocabulary; the `accessibility` field as a pointer into `ACCESSIBILITY-PROFILE`'s states;
+  a five-assertion verifier (`PUBLICATION-MANIFEST-PROFILE`); the four-state `review` enum and its
+  hash binding (`MANIFEST-REVIEW-STATE`); `dependencies`' cache-signal rule and
+  `semantic_sha256` as a designed, RESERVED slot still blocked on the semantic-projection
+  work, which is registered and not yet ruled (`MANIFEST-DEPENDENCY-AND-SEMANTIC-SLOTS`); and per-element provenance, this entry's own
+  "panel logical id"-adjacent want, REFUSED against a measured
+  reading-contract bar (`PER-ELEMENT-PROVENANCE`). **What closing does not do**: it does not
+  ship `spec/figdown-manifest.schema.json`, and it does not build the
+  verifier — `decisions/registry.md` P1 carries that remaining work
+  as a still-open row, narrowed but not satisfied by a ruling. Original
+  filing kept below for the record.
+  *As filed (`PUBLICATION-MANIFEST-PROFILE`, 2026-07-26):* a standardized non-core JSON manifest
+  profile per published figure: source page/bbox provenance,
+  original-image hash, panel logical id, review/render status,
+  accessibility description review status, hash-based dependency
+  invalidation. Non-core: no grammar impact; currently served by a
+  private downstream sidecar. Post-freeze profile work, v0.2+.
+- ~~`ACCESSIBILITY-PROFILE`: **accessibility contract profile**~~ — **CLOSED at
+  `ACCESSIBILITY-PROFILE` (2026-08-22)**, filed 2026-07-26 (`ACCESSIBILITY-PROFILE`). **The role changed
+  from this entry's own filed `role="img"` to `role="graphics-document"`,
+  on the first-hand W3C reading `spec/standards-claims.tsv` registers as
+  S223–S238 (`ACCESSIBILITY-PROFILE`): `role="img"` carries ARIA's `img`
+  *Children Presentational: True*, which would flatten away the
+  per-element `<title>` elements this project's own artifacts already
+  carry, against the WAI-ARIA Graphics Module's own SHOULD for exactly
+  this class of structured graphic. `role="img"` survives only as a
+  publisher's DECLARED downgrade, recorded in the manifest.** The
+  non-visual `<title>` and the decoration rule land the same way, also
+  `ACCESSIBILITY-PROFILE`. The `<desc>` semantic summary lands as a five-state vocabulary
+  (`absent`/`derived`/`generated`/`authored`/`reviewed`) rather than the
+  filed *"reviewer-approved text (not free LLM generation)"* read as a
+  blanket ban: `ACCESSIBLE-DESCRIPTION-SOURCES` keeps this entry's ban on SILENT machine text
+  permanently, and separately DECLINES a blanket ban on `derived` text,
+  which is a function of the model rather than free generation. The
+  Markdown alt-text convention lands in `spec/host-profile.md` §1.2, not
+  in this profile (`ACCESSIBLE-TEXT-EMISSION`); `aria-hidden` for decorative output lands in
+  its weak, MAY form (`ACCESSIBILITY-PROFILE`); and validation severity per profile lands as
+  a six-assertion A–F set, with assertion E (non-empty `alt` on every
+  embed) shipped immediately as `gate:alt` (`ACCESSIBLE-TEXT-EMISSION`). **What closing did
+  not do**: it did not ship the `with-a11y` render option that makes a
+  renderer emit any of this, and it did not build assertions A–D/F of the
+  verifier. **Both shipped 2026-08-22 under `decisions/registry.md`
+  P2, now SATISFIED**: the profile is normative at
+  [`figdown-a11y.md`](figdown-a11y.md), the render option is §7's second,
+  and the verifier is `tools/a11y-check.js` (`gate:a11y`). Original filing
+  kept below for the record.
+  *As filed (`ACCESSIBILITY-PROFILE`, 2026-07-26):* a normative profile covering SVG
+  `role="img"`, non-visual `<title>` (distinct from the `TITLE-RENDER-DEFAULT` visual-title
+  render option), `<desc>` semantic summary from reviewer-approved text
+  (not free LLM generation), Markdown alt-text conventions, `aria-hidden`
+  for decorative output, and validation severity per profile. New
+  territory; profile-level, v0.2+.
 - `TIMING-MEASUREMENT-ANNOTATIONS`: **timing measurement annotations** (`TIMING-MEASUREMENT-ANNOTATIONS`, 2026-07-27) —
   named timing parameters (setup, hold, cycle) spanning two signal events,
   with dimension arrows, edge-alignment guides, and cycle numbering. The
@@ -1885,12 +2633,11 @@ alone. Recorded as an open question in §9.
   accepted on `signal` at all — an aside beside a lane would be floating
   text against two events it cannot name, which is the `MEANING-RECOVERY-SOURCE` failure this
   entry already rules out. Nothing here is unblocked.
-  **Production evidence, 2026-08-20:** field report **FR-2** adds the
+  **Production evidence, 2026-08-20:** a downstream figure adds the
   real-duration case — equal-width cycles cannot carry the ratio between a
   20-second cell and a sub-second one, and the sanctioned workaround is a
   not-to-scale statement in the `title`, which makes the figure truthful by
-  subtracting the fact
-  (field-reports-2026-08-20.md).
+  subtracting the fact.
 - `BYTE-UNIT-PACKET-BLOCKS`: **byte-unit packet-block figures** (2026-07-27) — downstream
   first authoring pass found one figure where `bitfield` was misused for
   a byte-sized header block diagram, producing a misleading bit ruler.
@@ -2516,10 +3263,9 @@ alone. Recorded as an open question in §9.
   diagrams, org charts, circuit and piping schematics — by whole classes
   of figure, not by any one subject domain. Nothing here scopes the
   requirement to the corpus that happened to exercise it.
-  **Production evidence, 2026-08-20:** field report **FR-1** hit this blocker
+  **Production evidence, 2026-08-20:** a downstream figure hit this blocker
   from the other side — a `bundle` cannot name the three parallel links it
-  aggregates, because an endpoint pair stops identifying anything at N > 1
-  (field-reports-2026-08-20.md).
+  aggregates, because an endpoint pair stops identifying anything at N > 1.
   **Reopen trigger — either one suffices:** (a) an **edge-identity
   construct** is designed, which unblocks the per-edge scope and `ANNOTATION-LOCATOR-SPLIT`
   together; or (b) the **edge-geometry family** is designed as a family
@@ -2588,8 +3334,51 @@ alone. Recorded as an open question in §9.
   when the syntax carrying it is RESERVED, not merely UNUSED.** A future OQ
   that files a spelling for a later release owes a reservation in the same
   release, or it is filing a migration it has not priced.
-- `ERROR-RECOVERY-MODEL`: **error RECOVERY is unspecified, and it changes the error set**
-  (2026-08-09). §8 says errors are reported in one pass and a
+- ~~`ERROR-RECOVERY-MODEL`: **error RECOVERY is unspecified, and it changes the error
+  set**~~ — **CLOSED 2026-08-22**, filed 2026-08-09.
+  **The subject that closes is THE SPECIFICATION, and no engine byte moved.**
+  §8.3 is now the recovery model: *a line that reports an error performs none
+  of its state effects, and no other line's parse changes because of it*, with
+  the stage table that says how many errors each stage may report, the five
+  state effects a failing line skips, the single exception (the compact
+  `field` list), the four cascade shapes as SPECIFIED behaviour, the region
+  open/close rule, and the precedence rules for a multi-fault line.
+  **The key fact this entry did not see is that recovery was already FROZEN.**
+  The `.errors.txt` goldens compare complete sorted error LISTS, so every
+  multi-error fixture in `conformance/` had been pinning the engine's recovery
+  since the day it landed. What was missing was never the obligation — it was
+  the RULE that predicts the list. That is why closing this needed no
+  migration: the resolution order this entry wrote for itself (model, then
+  precedence, then fixtures) assumed the model would MOVE goldens, and it does
+  not, because the model states what the goldens already say.
+  **Both recorded inconsistencies dissolve into one stage rule, and the
+  residue of the second is specified rather than repaired.** (a) is not an
+  inconsistency at all: `numbering=zzz` is one of exactly two TOLERATED
+  faults — checks the engine performs after the region is built — while
+  `class=` on a `bitfield` is an OPTION-stage fault, and the option stage runs
+  before the directive ever sees the line. §8.3.5 states both halves and
+  enumerates the tolerated pair. (b) survives as a genuine asymmetry and is
+  now PREDICTABLE rather than repaired: the uniqueness check runs first on
+  `title`/`flow`/`layout`/`width`/`duplicate id`, and `pin` is the one
+  construct whose value checks run ahead of it (§8.3.6). Repairing it would
+  move goldens — the MIGRATIONS-entry change this entry correctly identified —
+  so it is filed as **engine-backlog item 79** instead, with a third
+  asymmetry the survey found and this entry never named: the layout-zone gate
+  is applied to a connector line ahead of its option pass and to every other
+  directive after it.
+  **The fixture obligation is met, not deferred.**
+  `920-errors-recovery-model` pins five recovery clauses that had no fixture
+  of their own — the reference cascade, the failed `layout` that opens no zone
+  and spends no slot, the tolerated fault that still opens a region beside a
+  pre-dispatch refusal that leaves one open, and both directions of (b).
+  **What is left is smaller than this entry and is NOT recovery.** §8.3.8
+  names it: when two directive-stage faults compete on one line and neither is
+  a uniqueness check, which is reported is unstated. It cannot change an error
+  COUNT, and the message-text gap it sits beside is §8.2's, which this closure
+  does not touch.
+  **The question as filed, kept whole — a deleted rejection is a trap, and the
+  paragraphs below are what the model above was derived from.** *Filed
+  2026-08-09:* §8 says errors are reported in one pass and a
   document with errors renders nothing. It does not say what happens to the
   *rest* of a document after a line fails, and the answer is observable:
   a failed line abandons its declaration, so a later reference to it raises
@@ -2614,6 +3403,9 @@ alone. Recorded as an open question in §9.
   bug fix. §8.3 states the position for v0.1: the goldens pin the
   reference engine's recovery, and this is the one place the suite is not
   reachable from the normative documents by reasoning alone. v0.2.
+  *(That last sentence is the one the closure above retires: the suite is
+  reachable, and the premise that a recovery model must move goldens was
+  wrong in the direction that made this cheap.)*
 - `COLSPAN-EMPTY-CELL-SPELLING`: **the table colspan is spelled by an INVISIBLE character, and `TABLE-ROW-SYNTAX`
   already argued against exactly this** (2026-08-09). The rule is
   that a pipe-row cell whose RAW segment is empty — zero characters between
@@ -2662,10 +3454,10 @@ alone. Recorded as an open question in §9.
   and it belongs in `tools/`, not in the engine — filed in
   `decisions/registry.md`. v0.2.
 - `MULTI-CELL-SINGLE-MARK`: **several INDEPENDENT cells cannot be marked as one thing**
-  (2026-08-11). `class=` attaches to one `cell` and to one `field`, so
+  (2026-08-11, `BLANK-CELL-MEANING`). `class=` attaches to one `cell` and to one `field`, so
   four adjacent cells that share a class draw **four separate rings**, not one
   frame around the four. A MERGED region does not have this problem — it is one
-  cell, and the engine draws its mark as one ring around the whole region — so the
+  cell, and under `SHARED-CELL-BOUNDARY` the engine draws its mark as one ring around the whole region — so the
   gap is precisely: the language can say "these squares are ONE CELL" and can
   say "this cell means X", and cannot say "these several cells, still
   themselves, are one thing". The workaround is to merge them, which asserts a
@@ -2682,7 +3474,7 @@ alone. Recorded as an open question in §9.
   **What would reopen it:** a measured figure in the production corpus that
   needs the outer frame and cannot honestly merge. v0.2.
 - `GLYPH-WIDTH-GROUND-TRUTH`: **glyph advance widths are checked only against the engine
-  itself** (2026-08-11). `gate:shape` verifies that emitted geometry is
+  itself** (2026-08-11, `TEXT-ADVANCE-MEASUREMENT`). `gate:shape` verifies that emitted geometry is
   consistent with the character widths the engine used, but it takes `cw`
   **from** the engine under test, so it asserts self-consistency, not truth
   about glyphs. A wrong advance width — the CJK glyphs that 0.1 drew outside
@@ -2899,7 +3691,7 @@ alone. Recorded as an open question in §9.
   **It depends on message identity, and that dependency is the whole of why this
   is an open question and not a proposal.** An arrival has to name the message it
   is the arrival of, and this language has no construct that names a message. So
-  this entry waits on the identity model (**ADV-5**), and behind it on the same
+  this entry waits on the identity model, and behind it on the same
   blocker **`EDGE-IDENTITY-AND-GEOMETRY`** records for edges — one reference mechanism, designed once,
   or three inventions.
   **Census status: PENDING, and stated plainly rather than left as an
@@ -2910,8 +3702,8 @@ alone. Recorded as an open question in §9.
   would close it:** that count, plus a spelling that survives the two checks
   above. All v0.2.
 - `MULTICAST-MESSAGE-DELIVERY`: **`sequence` cannot say ONE SEND, MANY RECEIVERS, and the workaround
-  states two messages where the fact is one** (2026-08-20, from production field
-  report FR-3 — field-reports-2026-08-20.md).
+  states two messages where the fact is one** (2026-08-20, from downstream
+  production authoring).
   A station transmits once and every station on the medium receives it. The fact
   is **one transmission with a receiver set**; reaching several lifelines is a
   property of the one event, not a count of events. A `message` has one tail and
@@ -2927,7 +3719,7 @@ alone. Recorded as an open question in §9.
   **This is the first PRODUCTION evidence against a measured exclusion.**
   sequence-genre-draft.md §34 row 5 excluded
   fan-out on **1 of 27 RFC figures, 0 of 14 corpus, 1 of 14 breadth**, with the
-  interim recorded as N messages plus a `class` naming them one broadcast. FR-3
+  interim recorded as N messages plus a `class` naming them one broadcast. That evidence
   moves the corpus half of that count off zero and does it **twice, in two
   unrelated figures of one review batch** — which is what makes this an entry
   rather than a note on the draft.
@@ -3368,17 +4160,39 @@ sketch uses. `step` was reserved until 0.1 and is now **released**
 (`CONSTRUCT-STATUS-TIERS`): it appeared in no sketch and no genre claimed it, so it is an
 ordinary unknown keyword again and an author may have the word.
 
-**Genre status (`CONSTRUCT-STATUS-TIERS`).** The v0.1 NORMATIVE genre surface is **`block`,
-`bitfield`, `table`**. **`topology`, `flowchart` and `timing` are
+**Genre status (`CONSTRUCT-STATUS-TIERS`), the v0.1 record.** The v0.1 NORMATIVE genre surface is
+**`block`, `bitfield`, `table`**. **`topology`, `flowchart` and `timing` are
 EXPERIMENTAL**: the header accepts them, their documents parse and render
 exactly as before, and no `.fd` needs rewriting — but they sit outside the
 conformance surface and outside the compatibility promise, and each genre
-document says so at the top.
+document says so at the top. The table below is that v0.1 snapshot,
+preserved as history rather than updated in place — it is not a claim
+about today's genre surface (see the current table immediately after it).
 
 | Genre | Status |
 |---|---|
 | `block` `bitfield` `table` | NORMATIVE |
 | `topology` `flowchart` `timing` | EXPERIMENTAL |
+
+**Genre status, current (`GENRE-STATUS-RECORD`).** All eight genres the tree holds today,
+each row sourced from that genre's own status line and, for the two added
+after v0.1, from core §11's ABNF `genre` production:
+
+| Genre | Status | Since | Minimum `figdown` |
+|---|---|---|---|
+| `block` | NORMATIVE | 0.1 (`CONSTRUCT-STATUS-TIERS`) | 0.1 |
+| `bitfield` | NORMATIVE | 0.1 (`CONSTRUCT-STATUS-TIERS`) | 0.1 |
+| `table` | NORMATIVE | 0.1 (`CONSTRUCT-STATUS-TIERS`) | 0.1 |
+| `topology` | EXPERIMENTAL | 0.1 (`CONSTRUCT-STATUS-TIERS`) | 0.1 |
+| `flowchart` | EXPERIMENTAL | 0.1 (`CONSTRUCT-STATUS-TIERS`) | 0.1 |
+| `timing` | EXPERIMENTAL | 0.1 (`CONSTRUCT-STATUS-TIERS`) | 0.1 |
+| `statechart` | EXPERIMENTAL | 0.2 (`STATECHART-GENRE-SCOPE`) | 0.2 |
+| `sequence` | EXPERIMENTAL | 0.4 (`SEQUENCE-GENRE-VOCABULARY`) | 0.4 |
+
+`gate:vocab` CHECK E cross-checks this current table, two-way, against core
+§11's ABNF `genre` production — a genre present in one and missing from the
+other FAILS the gate, so this table cannot go stale silently the way the
+v0.1 table above did.
 
 **The honest v0.1 state of `GENRE-NAMESPACE` (updated 0.1, `GENRE-KEYWORD-ALLOWLIST`; 0.1).** `GENRE-NAMESPACE` is
 **enforced** as a per-section top-level **allowlist**. Pure `bitfield` /
@@ -3470,6 +4284,35 @@ reader has already had to cross, and never on the same line, in the same
 region, or under the same allowlist. Directionality is preserved: this
 exception rests on section disjointness, not on one side being retired, and
 it does not license a third pair without the same argument.
+
+**A THIRD ARM of the same exception (`REGISTERED-KEY-VALUE-GRAMMAR`): a genre MAY give a REGISTERED
+OPTION KEY a second value grammar, on the same test.** The two arms above
+are one spelling in two NAMESPACES. This one is one spelling inside ONE
+namespace — the option-key namespace — carrying two disjoint value
+grammars, which the paragraph below would otherwise read as *"a collision
+INSIDE one namespace … remains a defect no genre boundary can excuse."*
+It is permitted **only** where all four of the `gap` test's conditions
+hold: the two registrations are **section-disjoint** (neither accepting
+directive is legal under the other's genre), **both are live**, **each is
+documented completely in its own genre document** under `GENRE-DOCUMENT-CONTRACT`, and this
+registry's own row names **both** acceptors. A genre MUST NOT give a
+second value grammar to a key whose existing acceptor is legal in the
+same section, and MUST NOT do it silently: an undeclared second grammar
+is the defect, not the second grammar.
+The instance that forced the rule is `type=` — one registered key,
+`bar3d` on `chart` and a mandatory twelve-member interaction-operator
+enum on `sequence`'s `fragment`, the two enums sharing
+no value. The language had a stated rule for a genre reusing a KEYWORD
+(`GENRE-VOCABULARY-OBLIGATION`, §1) and no stated rule at all for this, which is why the case went
+unrecorded in the release that created it, while the parallel KEYWORD
+case in the same release (`state`, under `statechart` and under
+`sequence`) got three paragraphs. **Neither half is renamed**: `chart`'s
+spelling is the word Vega, Chart.js and ECharts use (`UNSAFE-DEFAULT-ELIMINATION`) and
+`fragment`'s is the source standard's own attribute name, so both survive
+RULE 4.1 and a rename would spend a borrowed spelling to buy tidiness.
+The arm is nevertheless a permission and not an invitation: a second
+value grammar costs every reader of this registry a lookup, and a genre
+that can spell a key of its own SHOULD.
 The same rule retired `render`: it read as a command, it
 collided with the *renderer* and the render options of §7, and the zone
 it opened admits only geometry — so it became `layout`, the cross-tool
@@ -3583,7 +4426,7 @@ of a key, so the reservation is unchanged). Therefore:
 
 > A single-letter option key drawn from the timing lane alphabet — today
 > `p`, `n` and `x`, the only lane characters that are legal first
-> characters of a key — MUST NEVER be registered in the option-key
+> characters of a key — MUST NOT be registered in the option-key
 > namespace, in any genre, including a future one.
 
 Registering one would not produce an error anywhere: every existing lane
@@ -3624,7 +4467,7 @@ not the whole rule. The right-hand column is the complete set of
 directives that accept the key.
 
 **Namespaces (`GENRE-NAMESPACE`).** An option key belongs to the namespace of the
-directives that accept it. All 45 are classified; the fourth column of the
+directives that accept it. All 46 are classified; the fourth column of the
 table below is the same classification key by key. The last row is the one
 kind of registration that belongs to NO directive: a spelling retired from
 the language altogether, kept registered only so its rename — or its **withdrawal** — gets a named message wherever it appears.
@@ -3640,8 +4483,8 @@ only host directive, and they appear in the last row now.
 | **`bitfield`** | `word` `numbering` `description` `present` `index` | 5 | NORMATIVE (0.1: `note` → `description`, `DESCRIPTION-KEY-SPELLING` — a rename **out of this namespace**, and the vacated spelling is live again language-wide since 0.3 (`DRAWN-ANNOTATION-FORM`) without returning here: `field` still refuses `note=`, §10 audience table. The positional flag `optional` became the key `present`, `PRESENCE-CONDITION-EXPRESSION`. 0.1: `index`, the repetition range, `BITFIELD-REPETITION-CONSTRUCT`) |
 | **`timing`** | `data` | 1 | EXPERIMENTAL (inherited from the `timing` genre) |
 | **`table`** | *(none of its own)* | 0 | NORMATIVE |
-| **cross-namespace** (§5 presentation + `class` + `note`) | `fill` `stroke` `style` `class` `note` | 5 | NORMATIVE (0.1: `style` lost its `field`/`cell`/`signal` acceptors — `STYLE-KEY-SCOPE` — and is now cross-namespace across the scene directives only. 0.3: `note` REVIVED as the drawn annotation, `DRAWN-ANNOTATION-FORM` — its acceptors span the scene namespace, `flowchart`'s and `statechart`'s own connector spellings and the `UNIVERSAL-CORE-KEYWORDS` core `title`, so no single namespace holds it) |
-| **experimental** (outside the conformance surface) | `type` (on `chart`) | 1 | EXPERIMENTAL |
+| **cross-namespace** (§5 presentation + `class` + `note` + `id`) | `fill` `stroke` `style` `class` `note` `id` | 6 | NORMATIVE (0.1: `style` lost its `field`/`cell`/`signal` acceptors — `STYLE-KEY-SCOPE` — and is now cross-namespace across the scene directives only. 0.3: `note` REVIVED as the drawn annotation, `DRAWN-ANNOTATION-FORM` — its acceptors span the scene namespace, `flowchart`'s and `statechart`'s own connector spellings and the `UNIVERSAL-CORE-KEYWORDS` core `title`, so no single namespace holds it. **0.5: `id` FILED here, `CONNECTOR-IDENTITY-KEY`/`REGISTERED-KEY-VALUE-GRAMMAR`** — its acceptors are `edge`, `flowline`, `transition` and `message`, which is the scene namespace plus `flowchart`'s, `statechart`'s and `sequence`'s own connector spellings, exactly the shape that made `note` cross-namespace. It was registered at `CONNECTOR-IDENTITY-KEY` and classified by no row of this table until `GRAMMAR-LAYERING-MODEL`, which is why the paragraph above read *"All 45"* against a registry of 46) |
+| **experimental** (outside the conformance surface) | `type` (on `chart` and on `sequence`'s `fragment`) | 1 | EXPERIMENTAL |
 | **retired language-wide** (no acceptor at all) | `w` `h` `dir` · `text` `z` · `kind` `layer` `labels` `unit` `via` `src` `dst` · `level` (DELETED not renamed) · `color` (`COLOUR-KEY-STATUS` — retired with NO replacement) · `points` `tailport` `headport` `routing` (`EDGE-GEOMETRY-CONSTRUCTS` — **WITHDRAWN** with the `path` directive, NO replacement) · `plane` `z-index` (`PAINT-ORDER-CONSTRUCT` — **WITHDRAWN** with the `plane` directive, NO replacement) | 20 | NORMATIVE (diagnostic) |
 
 **`note` moved BETWEEN two rows of this table (`DRAWN-ANNOTATION-FORM`), and
@@ -3743,7 +4586,16 @@ is a second channel written on the same line.
 — and 0.1 ended the straddle by retiring it language-wide (the
 live half is now `type=` on `chart`).
 
-The **cross-namespace** keys are shared by all six genres today and are
+The **cross-namespace** keys reach the genres unevenly, and the honest
+statement is the per-key number rather than a single count. Measured over
+the eight genres' top-level allowlists (`REGISTERED-KEY-VALUE-GRAMMAR`): **`fill` 8, `stroke` 8,
+`style` 8, `note` 8, `class` 7** — reach being where the key may be
+WRITTEN on some directive legal at that genre's top level, which is not
+the same as where it does something.
+*(This paragraph said "shared by all six genres today", twice,
+until `REGISTERED-KEY-VALUE-GRAMMAR`. There have been EIGHT genres, so
+the count was stale by two — and "all eight" would be wrong too, which is
+why the corrected form is per key.)* They are
 deliberately neither core nor layout. `UNIVERSAL-CORE-KEYWORDS` fixes only the document's
 structure and `LAYOUT-ZONE-NAMESPACE` only the layout zone, while
 `fill`/`stroke`/`style`/`class` are the figure's vocabulary, so a
@@ -3755,8 +4607,15 @@ so no genre may redefine them, ever. All four are NORMATIVE
 (`STROKE-KEY-STATUS` promoted `stroke=`; `COLOUR-KEY-STATUS` retired `color=`, which
 was the fifth).
 
-**`note=` joined this row and is the one member that is
-cross-namespace WITHOUT being shared by all six genres (`DRAWN-ANNOTATION-FORM`).** Its
+**`note=` joined this row and is the one member no genre's
+own directive set admits (`DRAWN-ANNOTATION-FORM`).** *(This sentence read "WITHOUT being
+shared by all six genres" until `REGISTERED-KEY-VALUE-GRAMMAR`, and it was misleading twice over:
+the count was stale, and `note=` IS writable under every genre —
+`title "T" note="x"` is accepted under `figdown 0.3 timing`, verified, because
+`title` is a core keyword legal in every genre and this very paragraph
+names it as an acceptor three sentences on. What is true is the narrower
+claim now stated: no typed-block genre accepts it on a directive of its
+own.)* Its
 acceptors are the scene directives, `flowchart`'s and `statechart`'s own
 role and connector spellings, and the `UNIVERSAL-CORE-KEYWORDS` core `title`; the three typed-block
 genres accept it on no directive of theirs, and `field` refuses it by name.
@@ -3814,7 +4673,7 @@ and only its error text remains.
 
 | Key | Value | Accepted by | Status |
 |---|---|---|---|
-| `at` | `(x,y)` canvas px — a PAREN point (RULE 1.1a) | `pin` | NORMATIVE |
+| `at` | `(x,y)` canvas px — a PAREN point (RULE 1.1a) | `pin` · `threshold` (diagnostic only) | NORMATIVE |
 | `offset` | `0..100%`, the `%` mandatory | `threshold` | EXPERIMENTAL |
 | `class` | id of a declared `class` | `node` (incl. `process`/`decision`/`terminator`) `group` `edge` `field` `cell` | NORMATIVE |
 | `fill` | `#rgb`/`#rrggbb`/CSS name/`transparent` | `node` (incl. `process`/`decision`/`terminator`) `group` `band` `class` `bitfield` `table` `timing` `field` `cell` `signal` | NORMATIVE |
@@ -3846,7 +4705,7 @@ and only its error text remains.
 | `headport` | WITHDRAWN language-wide at 0.1 (`EDGE-GEOMETRY-CONSTRUCTS`) — same reasoning as `tailport` | *(no acceptor; every directive rejects)* | NORMATIVE (diagnostic) |
 | `text` | RETIRED 0.1 — was renamed `color=`, which 0.1 then retired too (`COLOUR-KEY-STATUS`); v0.1 has no label-colour key | *(no acceptor; every directive rejects)* | NORMATIVE (diagnostic) |
 | `to` | `0..100%` — RETIRED, see below | `band` (rejects) | NORMATIVE (diagnostic) |
-| `type` | the chart-type enum — one value, `bar3d` (spelled `bars3d` until 0.1) | `chart` | EXPERIMENTAL |
+| `type` | **one registered key with TWO live value grammars, and they share no value.** On `chart`: the chart-type enum, one value, `bar3d` (spelled `bars3d` until 0.1). On `sequence`'s `fragment` (`SEQUENCE-GENRE-VOCABULARY`): the interaction-operator enum, **twelve** values (`alt` `opt` `loop` `par` `strict` `seq` `critical` `neg` `assert` `ignore` `consider` `break`), and **MANDATORY** — §12.5's model row says `always`. The two are section-disjoint (`chart` is not legal under `sequence` and `fragment` is not legal outside it), which is the third arm of the `gap` DECLARED EXCEPTION above | `chart` · `fragment` | EXPERIMENTAL |
 | `unit` | RETIRED language-wide at 0.1 — renamed `word=` (`BITS-PER-ROW-KEY-NAMING`) | *(no acceptor; every directive rejects)* | NORMATIVE (diagnostic) |
 | `via` | RETIRED language-wide at 0.1 — renamed `points=` (`WAYPOINT-KEY-SPELLING`), and `points=` was itself **WITHDRAWN at 0.1 (`EDGE-GEOMETRY-CONSTRUCTS`)**. There is **no replacement**: delete the line | *(no acceptor; every directive rejects)* | NORMATIVE (diagnostic) |
 | `word` | bits per row | `bitfield` | NORMATIVE |
@@ -3981,8 +4840,17 @@ which is the opposite of unconverged — but the pin is not currently in
 the normative corpus, and this sentence says so rather than claiming a
 coverage that does not exist.
 `width=`/`height=` are live on `pin` (on `size` until 0.1);
-`type=` is live only on the experimental `chart`, outside
-the v0.1 conformance surface (`level=` was its sibling there until 0.1 deleted it, `CHART-LEVEL-KEY`). `fill=` was registered for the same
+`type=` is live on the experimental `chart`, outside
+the v0.1 conformance surface (`level=` was its sibling there until 0.1 deleted it, `CHART-LEVEL-KEY`) — **and on `sequence`'s
+`fragment` as well** (`SEQUENCE-GENRE-VOCABULARY`), where it is MANDATORY and carries a
+twelve-member enum disjoint from `chart`'s single value. *(This sentence
+read "live only on the experimental `chart`" until `REGISTERED-KEY-VALUE-GRAMMAR`,
+which is nine dev states after `fragment` took the key. It was a FALSE
+statement about the registry, not a stale emphasis: the "Accepted by"
+column is defined four paragraphs above as "the complete set of directives
+that accept the key", and it named one of the two. Nothing moved to correct
+it — no construct, no diagnostic, no golden; the sentence and the two
+registry cells were wrong and are now right.)* `fill=` was registered for the same
 reason until 0.1 and left the registry with the `fill` → `band`
 keyword rename; it came BACK, as the live spelling
 `color=` was renamed to. That is the declared `UNSAFE-DEFAULT-ELIMINATION` exception recorded
@@ -3997,13 +4865,57 @@ keyword, unknown option, malformed line, or unsupported registered
 value → line error; a document with errors MUST NOT render. A *lenient*
 mode and an `x-` extension namespace were sketched in earlier drafts
 but had zero implementation, zero tests and no enablement path; both
-are deferred to v0.2. Until then every unknown line —
-including any keyword that happens to start with `x-` — is the ordinary
-unknown-keyword error.
+were deferred to v0.2, and **`LANGUAGE-EXTENSION-POLICY` (2026-08-23) closes
+both, permanently**. **The language stays CLOSED at 1.0**: no lenient
+mode, no `x-` keyword, no `x-` option key, no private-use range. The
+language's extensibility mechanisms are the four `EXTENSIBILITY-MECHANISMS` named — the
+version header plus the compatibility rules (§13), the keyword-initial
+line grammar (new capability = new keyword, gated by `.github/CONTRIBUTING.md` §2),
+the `key=value` option slots, and the profile mechanism (new domain =
+new profile, the core untouched) — and a vendor namespace is not among
+them.
 
-**Extension namespace (deferred to v0.2).** Keywords and option keys
-beginning with `x-` are reserved for a future experimental/vendor
-extension mechanism; standard keywords MUST NOT begin with `x-`.
+**The `x-` prefix is a NAMING BAN, not an extension namespace
+(`LANGUAGE-EXTENSION-POLICY`).** The single sentence this section carried until 0.5 stated two
+different things, and they are separated here because they have
+opposite fates:
+
+- **KEPT, permanently and unconditionally.** Standard FigDown keywords
+  and option keys **MUST NOT** begin with `x-`. Nothing in the registry
+  may be spelled that way, in this version or any later one.
+- **RETIRED.** The prefix is **not** reserved *for* anything: the
+  promise of a future experimental/vendor extension mechanism is
+  withdrawn. `x-foo` does not become legal by waiting, and an engine
+  MUST NOT admit it under any mode.
+
+**What `x-` means, family-wide.** Since `PUBLICATION-MANIFEST-PROFILE` the publication manifest
+([`figdown-manifest.md`](figdown-manifest.md) §2 rule 2) spends `^x-`
+for keys **delegated to a publisher**. So across the whole FigDown
+family the prefix means **"not FigDown's"**, and a standard keyword
+beginning `x-` would make the family's most visible prefix mean two
+opposite things in two file formats — the hazard
+[`syntax-style.md`](syntax-style.md) RULE 4.7 names (a spelling spent
+in one namespace is spent everywhere).
+
+**Where an extension lives instead**, in order of preference: express
+it with what exists (`class=` plus `meaning=` is the declared,
+machine-readable category channel, §2.7); propose it through
+[`.github/CONTRIBUTING.md`](../.github/CONTRIBUTING.md) §2; record it beside the figure in a
+publication manifest, spelled `x-<owner>-<key>`
+([`figdown-manifest.md`](figdown-manifest.md) §2 rule 2); or fork
+honestly — a forked engine that accepts constructs `figdown X.Y` does
+not accept **MUST NOT** read or write the token `figdown` in a header,
+because that is a conformance claim (`INDEPENDENT-IMPLEMENTATION-CRITERION`) its documents cannot make.
+
+**The reservation is enforced, which is what makes it one** (`SEMICOLON-STATUS`: *a
+reservation that is not enforced is not a reservation*). A keyword or
+an option key beginning `x-` gets its **own named diagnostic**, not the
+words a typo gets — two call sites, keyword position and option-key
+position, pinned by `conformance/cases/909-errors-reserved-x-prefix`
+and by `900-errors-unknown-keyword`'s third line (`RESERVED-PREFIX-ENFORCEMENT`, 2026-08-23).
+**The ban does not reach identifiers**: `node x-foo "A"` and
+`class x-bar "meaning"` parse and render, because the reservation is
+about the language's own vocabulary and an id is the author's.
 
 **Teachability check (`AGENT-TEACHING-COST`).** Target: the full AI authoring guide fits
 in ≤120 lines (the always-loaded `skill/figdown/SKILL.md` is the
@@ -4111,7 +5023,8 @@ no brackets, so the genre token is REQUIRED (§1).
 ("any common newline form") from the first draft, and bare CR was never
 implemented: a CR-only file reaches the reference engine as a single line
 and fails on the second directive's first token. No fixture pinned it, and
-all 162 case sources are LF. Rather than add a terminator no document uses,
+every case source in `conformance/cases/` is LF — all of them then, all of
+them still. Rather than add a terminator no document uses,
 the grammar was corrected to what is accepted — which is also what §1 now
 states in prose. A `document` production does not show the BOM: §1 strips a
 leading U+FEFF before this grammar applies.
@@ -4128,8 +5041,12 @@ mechanically implementable without consulting the reference PoC.
 holds for the GRAMMAR and for the model, including the `sections` wrapper
 (§12.5). It does **not** hold for two things, and §8.2 and §8.3 name them
 rather than leave the requirement reading as an achievement: error
-messages for cases no fixture covers, and error RECOVERY on inputs where
-a failure cascades. `conformance/README.md` carries the same boundary.
+messages for cases no fixture covers, and ~~error RECOVERY on inputs where
+a failure cascades~~ — **the second was closed by `ERROR-RECOVERY-MODEL` (2026-08-22)**: §8.3
+now states the recovery model as a rule, and what survives of it is the
+narrower residue §8.3.8 names, the order of two competing directive-stage
+faults on ONE line, which cannot change an error count.
+`conformance/README.md` carries the same boundary.
 
 ## 12. The semantic model (normative)
 
@@ -4839,11 +5756,39 @@ The list is exhaustive for v0.1.
 **normative serialization** of the model. It is what a second
 implementation is compared against, byte for byte.
 
+**Two contracts, and they answer different questions.**
+[spec/figdown-model.schema.json](figdown-model.schema.json) is the
+**SHAPE** contract — a JSON Schema (2020-12) stating what keys exist on
+each element, which are always present, and what each value's domain is.
+It is the machine-readable form of §12.2's tables and it is CLOSED:
+`additionalProperties: false` everywhere, so an unknown key is an error
+and a new engine field fails the gate until the schema and §12.2 are
+edited together (§8's closed-grammar rule, applied to the model). The
+rest of §12.5 is the **BYTE** contract — key order, indentation,
+escaping, the trailing newline — and no JSON Schema can state it. The two
+do not substitute for each other: a model the schema accepts may still
+fail byte comparison, and a model that fails the schema is wrong under
+§12.2 whatever its bytes are. The schema does not state **referential
+integrity** either — that `a`/`b`/`in`/`group`/`class` name something the
+document declares, that ids are unique, that a genre admits the keywords
+used — because those are PARSE-time rules (§8) whose violation produces
+an error set and no model at all. `npm run gate:schema`
+([tools/schema-check.js](../tools/schema-check.js), the 30th gate) checks
+the schema against every `.model.json` golden in `conformance/cases/` and
+`conformance/experimental/`, against every published figure in
+`examples/` and `figures/` projected through the same `normalize.js`, and
+against five negative controls that must be REJECTED for a recorded
+reason — because a schema that accepts everything passes the first two
+perfectly.
+
 - **Encoding**: UTF-8, no BOM. Comparison is of **UTF-8 bytes**.
 - **Serialization**: `JSON.stringify(model, null, 2)` — two-space
-  indentation — followed by exactly one trailing newline (LF). That
-  call is the reference algorithm; a second implementation must match
-  its output bytes, not invent an equivalent JSON text.
+  indentation — followed by exactly one trailing newline (LF). A second
+  implementation must match its output bytes, not invent an equivalent
+  JSON text. **That call is a REFERENCE, no longer the statement**: the
+  same bytes are specified without reference to any language in §12.5.1,
+  and an implementer in a language that has no `JSON.stringify` reads
+  that rather than emulating this one.
 - **Key names**: exactly the names of §12.2. They are the model's
   vocabulary and are versioned like the grammar: renaming one is a
   migration entry (`template` → `genre`, 0.1, is the precedent).
@@ -4945,6 +5890,109 @@ and every fixture in `conformance/experimental/` is not — those are the ones
 whose subject `CONSTRUCT-STATUS-TIERS` placed outside the conformance surface (an experimental
 genre, or a demoted keyword), and `conformance/STATUS.txt` records the reason
 for each. They still run and still pass; they simply carry no obligation.
+
+#### 12.5.1 The serialization algorithm, stated without an implementation
+
+Everything above binds the canonical bytes to a JavaScript call. This
+subsection states the same bytes as an algorithm, so that an implementer
+in a language whose JSON writer sorts keys, escapes non-ASCII, or omits
+the trailing newline knows exactly what to override. **It adds no rule and
+changes no byte**; where it and `JSON.stringify(model, null, 2)` could
+disagree, the goldens decide and this text is the defect.
+
+Write the *Document* object of §12.2 (or the `sections` wrapper) as UTF-8,
+no BOM, LF line endings, with:
+
+1. **Key order is the EMISSION order of §12.2 — never sorted.** Top level
+   and per element. This is a deliberate choice against lexicographic
+   order; §12.5.2 records why.
+2. **Array order is document order** (§12.4 rule 6).
+3. **Absent keys are omitted, never `null`** (§12.3). A `null` anywhere in
+   a canonical model is a defect, never a value.
+4. **Indentation.** A non-empty object is `{`, LF, then one line per
+   member indented by **two spaces per nesting level**, members separated
+   by `,` at the end of the line, then LF and the closing `}` indented by
+   the level of the object's own line. Arrays are the same with `[` `]`.
+   A member line is `"key": value` — the key in double quotes, a colon,
+   **exactly one space**, the value. An **empty** object is the two bytes
+   `{}` and an empty array the two bytes `[]`, with no interior
+   whitespace and no line break. No trailing whitespace on any line.
+5. **Strings.** Escape `"` as `\"` and `\` as `\\`. Escape U+0008, U+0009,
+   U+000A, U+000C and U+000D as `\b`, `\t`, `\n`, `\f`, `\r`. Escape every
+   other code point below U+0020 as `\u00XX` with **lowercase** hex
+   digits. Emit **every other code point as raw UTF-8** — including
+   U+007F and everything above U+00FF (`"title": "中文"`, never
+   `中文`). Do **not** escape `/`. Apply no Unicode normalization:
+   the model holds the author's scalar values as the `.fd` wrote them
+   (§12.4 rule 7). Fixture `114-lex-utf8-strings` pins this.
+6. **Numbers** are serialized by the ECMA-262 `Number::toString` production
+   — the shortest decimal that round-trips to the same double. An integral
+   value carries no decimal point and no exponent (`20`, not `20.0` or
+   `2e1`); a fractional value uses ordinary JSON number syntax (source
+   `1.10` is the number 1.1 and serializes as `1.1`, so trailing zeros and
+   the source token's spelling are not preserved); negative zero
+   serializes as `0`. The exponent forms of that production
+   (`1e+21`, `1e-7`) are unreachable from this language's value grammars
+   but are part of the rule, not an exception to it. `NaN` and the
+   infinities cannot occur: a value that is not a finite number is an
+   engine defect (§12.3).
+7. **Terminate the file with exactly one LF** after the closing brace.
+
+Two edge cases are named so an implementer does not have to guess whether
+the reference call has a rule they are missing. **Lone surrogates**: the
+reference call would escape one as `\uXXXX`, and the case is unreachable
+here because a `.fd` source is UTF-8 and cannot encode one. **Duplicate
+keys**: impossible by construction — the model is built from §12.2's fixed
+key list, so no object is ever offered the same key twice.
+
+#### 12.5.2 RFC 8785 (JCS) — evaluated, and DECLINED for this binding
+
+[RFC 8785](https://www.rfc-editor.org/rfc/rfc8785.html), the JSON
+Canonicalization Scheme (Independent Submission, Informational, June
+2020), is the obvious candidate for "canonical JSON" and it was evaluated
+against §12.5 clause by clause. **The verdict is DECLINE**, and the
+interesting part is that the disagreement is narrow.
+
+| | JCS | §12.5 | |
+|---|---|---|---|
+| numbers | ECMA-262 `Number::toString` (§3.2.2.3) | ECMA-262 `Number::toString` (§12.5.1 rule 6) | **agree** |
+| strings | minimal escaping, raw UTF-8 above U+001F (§3.2.2.2) | the same (§12.5.1 rule 5) | **agree** |
+| encoding | UTF-8 (§3.2.4) | UTF-8, no BOM | **agree** |
+| key order | sorted by UTF-16 code unit (§3.2.3) | §12.2 emission order | **conflict** |
+| whitespace | none between tokens (§3.2.1) | two-space indentation, one member per line | **conflict** |
+| file end | no trailing newline | exactly one LF | **conflict** |
+
+**Grounds for declining.** JCS's two substantive rules are the two this
+project chose against on purpose, and both choices are load-bearing:
+
+- **Key order.** A sorted model reads alphabetically, which is an order
+  nothing in the language means. §12.2's order is the order a *reader*
+  needs — `id`, then what the element declares about itself, then `note`
+  as the aside, then `line`, which is the source address and not content
+  at all — and at the top level it reads as history: the v0.1 shape, then
+  what each later version appended (`DRAWN-ANNOTATION-FORM`'s `note`, `SEQUENCE-GENRE-VOCABULARY`'s five
+  `sequence` collections). Sorting would also DESTROY that appending
+  property: under JCS, adding `note` reorders keys inside every element
+  that can carry one, so goldens written before the key existed would move
+  bytes, and §13's whole "no earlier golden moves" discipline would have
+  nothing to stand on.
+- **Whitespace.** A golden is REVIEWED. Every model in
+  `conformance/cases/` is read by a human in a diff before it is frozen,
+  and the model is the conformance surface precisely because a person can
+  check it. One-line JCS output would make a one-key change an unreadable
+  whole-file diff, which is a real cost paid for a benefit — invariance
+  under a JSON parse/re-emit round trip — this tier does not need, because
+  the golden is compared as **bytes** and never round-tripped.
+
+**What DECLINE does not mean.** It is declined as *this* binding, not as a
+tool. §12.5 is a human-reviewed comparison tier; a **hash** is not read by
+anyone, and the objections above are objections about reading. If the
+semantic projection and `semantic_sha256` of §9 `PUBLICATION-MANIFEST-PROFILE` land, JCS is the
+right shape for that input and it should be evaluated on its own terms
+there — a hash over a canonical form that a third party can reproduce
+without this repository's key-order table is worth more than one over a
+form only this spec defines. That question is open and is not settled
+here; what is settled is that the *golden* tier keeps the readable order.
 
 **Worked example.** This document — deliberately written on the FROZEN
 surface only, so that the model below needs nothing from
@@ -5376,7 +6424,7 @@ An agent MUST NOT infer:
   consult §10's status column rather than infer status from the fact that
   a line parsed.
 - **Presentation is not meaning on its own.** `fill`, `stroke`,
-  `style`, `gap` and `z` MAY render meaning but MUST NEVER be its only
+  `style`, `gap` and `z` MAY render meaning but MUST NOT be its only
   carrier (§5, `PRESENTATION-AS-MEANING-CARRIER`). An agent is entitled to discard them; if a
   distinction exists only there, the document has lost it, and the agent
   SHOULD say so rather than reconstruct it.
@@ -5397,13 +6445,165 @@ An agent MUST NOT infer:
   this bullet exists for — the moment some connectors are named, a reader is
   tempted to treat the named ones as the important ones.
 
+#### 12.7.1 Four classes of conclusion, and where absence is not negation
+
+The two lists above license some conclusions and forbid others. This section
+names the **four classes** every conclusion falls into. It adds no key, no
+keyword and no licence that was not already granted somewhere; it exists so
+that a reader can say, of each sentence it writes about a figure, **which
+class that sentence belongs to** — and so that the two classes that must be
+declined are named rather than left to judgement.
+
+**1. EXPLICIT — the author wrote it.** This node exists; this edge relates
+these two; the label is this string; this `class` means this sentence; this
+field is 16 bits wide; this cell holds this text. An EXPLICIT conclusion is
+quotable back to a line of the source. `label: ""` is one of them: it says the
+author deliberately wrote an empty label, which is a different fact from
+having written none (§12.3).
+
+**2. DERIVED — a stated reading rule licenses it.** Not written, but computed
+from what is written, deterministically, by a rule that is itself written
+down, and with no appeal to the drawing (`MEANING-RECOVERY-SOURCE`). **A licence always has an
+address**, and a reader that cannot name the address is inferring rather than
+deriving. The addresses, complete as of this version: §12.7's own list above
+(edge direction from `op`, containment from `node.group`, category from
+`class` plus its `meaning`, bit numbers from `word` / `numbering` / the
+declared widths, relative threshold order from `offset`); the derived legend
+(§2.7); and each genre document's normative **Semantic model** section —
+[genres/bitfield.md](genres/bitfield.md) (declared offset, drawing position,
+bit number), [genres/table.md](genres/table.md) (the logical grid, merges
+included),
+[genres/experimental/timing.md](genres/experimental/timing.md) (cycle *t* is
+the *t*-th lane character),
+[genres/experimental/statechart.md](genres/experimental/statechart.md)
+(reading rules 1–5),
+[genres/experimental/sequence.md](genres/experimental/sequence.md) (reading
+rules 1–7). §12.6 says why the model records the inputs and never the computed
+result.
+
+**3. NOT-ASSERTED — the figure makes no claim, and makes no denial either.**
+
+> **THE ABSENCE RULE.** **A relationship a figure does not draw is NOT a claim
+> that the relationship does not exist.** Absence is omission, and an agent
+> **MUST NOT** convert it into negation — not from a missing edge, not from a
+> missing transition, not from an absent row, and not from an option key
+> nobody wrote (§12.3 states the key-level twin: an absent `present=` is *no
+> presence claim*, and never a claim of unconditional presence). **The one
+> exception is a genre reading rule declaring a stated extent TOTAL, and a
+> reader must be able to cite that rule by address.** §12.7.2 enumerates every
+> such rule the language has; outside them the reading is open-world.
+
+> **No genre asserts closed-world completeness about its SUBJECT.** Where a
+> genre calls a set *closed as drawn* — `statechart` reading rule 5 for
+> states, `sequence` reading rule 1 for participants — the sentence is about
+> the FIGURE (these are the modes, or the participants, that this figure
+> asserts; an undeclared one *is not asserted to exist*) and never about the
+> subject (the machine has no other mode). Rule 5 carries the mirror clause in
+> the same breath: *"Absence is still not prohibition — a transition not drawn
+> is not stated to be forbidden."* **`STATECHART-TRANSITION-TOTALITY` settled the harder direction: a
+> `statechart` cannot assert that its transition function is TOTAL**, and the
+> ground is not a missing FigDown keyword but UML 2.5.1 §14.2.3.9.1, whose
+> run-to-completion paradigm *discards* an event with no enabled transition
+> and completes the step trivially — so the undrawn case and the
+> drawn-and-deliberately-ignoring case are indistinguishable in any model,
+> UML's own included. Generalised, and this is the sentence the rule exists
+> for: **a drawn graph cannot assert the totality of its relation.** What an
+> author writes instead is prose, attributed and never inferred — a `note=` on
+> the element (`DRAWN-ANNOTATION-FORM`), a `class` meaning, or a companion `table` whose filled
+> grid IS the enumeration the graph cannot make. The worked example is
+> [../examples/statechart/bfd-session.fd](../examples/statechart/bfd-session.fd),
+> which carries both halves and states in its own comments why the second one
+> is there.
+
+**4. UNKNOWN — the document does not settle it, and its silence is not
+evidence either way.** NOT-ASSERTED is a fact about the FIGURE; UNKNOWN is the
+reader's position with respect to the SUBJECT. The source behind the figure
+may or may not carry the fact, and this document cannot tell you which. Two
+shapes recur, and neither is a defect to be repaired by guessing:
+
+- **opaque by design** — a channel that is quotable and never parsable, so the
+  value is present and unresolvable: `description=` (`DESCRIPTION-KEY-SPELLING`), `note=` (`DRAWN-ANNOTATION-FORM`),
+  `present=` and the prose end of `index=` (`PRESENCE-CONDITION-EXPRESSION`, `BITFIELD-REPETITION-CONSTRUCT`), a `statechart`
+  `[mid]` inscription, a `sequence` `state` name;
+- **indeterminate by construction** — a `*` field's length, every declared
+  offset after a `*` or an undeclared repetition (`BITFIELD-REPETITION-CONSTRUCT`), and any offset across
+  a conditional field that has not been branched (`BITFIELD-CONDITIONAL-OFFSETS`).
+
+**The reader's obligation, and it is the same for both.** For a NOT-ASSERTED
+and for an UNKNOWN question the correct answer is **NOT STATED** — with, where
+it helps, one clause saying which of the two it is and why. A committed answer
+to either is a hallucination and not a helpful guess. Every gap in this section
+degrades to NOT STATED except one: `BITFIELD-REPETITION-CONSTRUCT`'s repetition arithmetic degrades to a
+*confidently wrong number*, which is why it is written as a MUST NOT. **This is
+measured, not merely asked for:** `tools/comprehension-check.js` scores two
+refusal question classes — `unanswerable` (an in-scope fact of the subject the
+figure honestly does not carry) and `forbidden-inference` (a conclusion a
+reader is tempted to draw from a MISSING element) — in a denominator of their
+own, where any committed answer counts as a hallucination
+(decisions/registry.md).
+
+This is the same discipline §15.5 applies to itself, where the security
+chapter names the claims that resolve to *no gate* instead of leaving the
+absence to be discovered: a contract that states what it does not cover is the
+only kind a second implementation can meet.
+
+#### 12.7.2 Where each genre sits
+
+Open-world is the default and needs no rule. What needs a rule — and what the
+absence rule of §12.7.1 requires a reader to cite by address — is a **stated
+extent that is TOTAL**, where absence *inside* the extent is itself a fact.
+This table is the complete enumeration.
+
+| Genre | Extent that is TOTAL (absence inside it is a stated fact) | Open-world (absence is NOT-ASSERTED) | Order |
+|---|---|---|---|
+| `block`, `topology`, `flowchart` | none | the whole figure: nodes, edges, containment. A scene genre can draw that something happened; it cannot state that something did not | declaration order is not precedence (§12.7); `flow` is a reading axis |
+| `statechart` (EXPERIMENTAL) | none. The state set is *closed as drawn* — a claim about what the figure asserts, not about the machine | transitions above all: absence is not prohibition, and the transition function is NOT assertable as total (`STATECHART-TRANSITION-TOTALITY`). No current, initial or final state | peer transitions out of a state have no sequence (reading rule 8) |
+| `sequence` (EXPERIMENTAL) | **the ORDER of the declared occurrences**, by declared divergence (`SEQUENCE-ORDER-MODEL`) | participants (*closed as drawn*), elapsed time, concurrency without `par`, activation, loss, retransmission | **EXPLICIT, not derived** — see below |
+| `bitfield` | **the interior of the declared bit sequence**: no implicit padding anywhere, so there are no undeclared bits between two declared fields — see below | the tail: nothing requires the widths to fill a word, and `*`, `present=` and undeclared repetition each end the determinate region | declaration order IS bit order and drawing order (`DECLARATION-ORDER-SEMANTICS`); the offsets are DERIVED from it |
+| `table` | **the logical grid**: every address inside it exists, and an empty cell is a stated empty cell | whether the axes enumerate the subject's whole domain — that claim lives in the header prose, not in the model. A row nobody wrote is simply not in the grid | row and column order is the grid's addressing, `h1..hN` top-down and data rows 1-based |
+| `timing` (EXPERIMENTAL) | **the lane, over its own length**: cycle *t* is the *t*-th character, `.` is a stated continuation and not a gap, and `gap` never removes or renumbers a cycle | everything after a lane's last character; lanes need not be equally long | the character positions ARE the axis; cycles are contiguous and aligned across the block's signals |
+
+`chart` is not a genre (§4.4): it reads an existing `table`'s grid, so the
+`table` row governs it.
+
+**`bitfield`'s totality claim is contiguity, and it is narrower than it
+looks.** The rule is *"there is no implicit padding anywhere — a real
+padding/reserved region MUST be declared as an explicit field"*
+([genres/bitfield.md](genres/bitfield.md) §Semantic model), and that is a
+genuine closed-world claim: between two declared fields there are no
+undeclared bits, so a reader may compute the second field's offset by adding
+the first field's width and nothing else. It does **not** extend to the word:
+no rule requires the declared widths to sum to a multiple of `word`, no error
+fires when they do not, and a figure whose last word is partly declared is
+legal and common. Such a figure asserts the bits it declares and says nothing
+about the rest of the word.
+
+**`sequence`'s order is EXPLICIT, and that is why it costs what it costs.**
+Under every other genre, statement order is arrangement and a reader is
+forbidden to read precedence out of it (§12.7). Under `sequence` the genre's
+own reading rule makes the declaration order of `message` and `state` lines
+the time order of **every** occurrence in the figure — so an order conclusion
+there is a declared fact, not a derivation, and `SEQUENCE-ORDER-MODEL` records that this is
+**stronger than both source standards**, which order events along one lifeline
+only. The cost is on the record and is not softened here: where two messages
+cross — both ends transmitting at once, neither send preceding the other in
+the protocol — the figure must pick an order, and the picked one is a fact the
+source does not state (**`MESSAGE-OCCURRENCE-GRANULARITY`**). A figure that means to leave two messages
+unordered says so with `fragment … type=par`, which is part of the order model
+rather than a convenience. An author who cannot say it truthfully should say
+so in prose and attribute it, on the same terms as every other fact a genre
+cannot carry.
+
 ## 13. Stability and versioning (normative)
 
 **If you are adopting FigDown, read this section first.** It states what
 the project promises about a document you write today, what it does not
-promise, and what it commits to instead. `MUST`, `MUST NOT`, `SHOULD`
-and `MAY` are used with their [RFC 2119](https://www.rfc-editor.org/rfc/rfc2119)
-meanings.
+promise, and what it commits to instead. The requirement keywords in this
+section are the document's, declared once in **§0.1** under BCP 14
+(RFC 2119 + RFC 8174) with the capitalization caveat. *(Until `NORMATIVE-KEYWORD-DECLARATION` this
+paragraph carried the declaration itself, naming four of the eleven
+spellings and one of the two RFCs; four in five of this document's
+all-caps occurrences were outside it.)*
 
 ### 13.0 The version scheme (normative)
 
@@ -5426,7 +6626,7 @@ defined more strictly than semver requires:
 
 | part | meaning |
 |---|---|
-| **`Z`** | **Bug fixes only.** No new features. The language does not move. `v0.1.1` MAY fix a rendering defect with **no `.fd` file altered** and the language unchanged. |
+| **`Z`** | **The language does not move — that is the test, not the size of the change (`VERSION-PART-SEMANTICS`).** No `.fd` document's meaning changes and none needs a rewrite. A `Z` release MAY add a tool, a document, a non-core profile, a schema, a render option, or a gate — anything that is not itself a language construct — because none of those move `figdown X.Y`. `v0.1.1` MAY fix a rendering defect with **no `.fd` file altered** and the language unchanged, on the same test. |
 | **`Y`** | **New features are added. Nothing is ever removed.** Every document that a `Y` release accepted, the next `Y` release still accepts. |
 | **`X`** | **The only point at which support may be removed**, and removing it **forces a migration**. |
 
@@ -5503,7 +6703,7 @@ one carries meanwhile.
 | the engine's version constant, stamped into `data-engine-version` | a **dev increment** `X.Y-dev.N` | rewritten to `X.Y.Z` at publish |
 
 **The dev counter does not reset and does not adopt the release
-number.** `N` counts source states of the engine and only ever
+number (`SOURCE-VERSION-COUNTER`).** `N` counts source states of the engine and only ever
 increases: `v0.1.0` was published from 0.1, and the next source
 state is 0.1, then 0.1. A reset would make `N`
 ambiguous across releases, and adopting `X.Y.Z` early would put a
@@ -5526,6 +6726,43 @@ A reader who meets `X.Y-dev.N` in an artifact is looking at output from
 between two releases. It is not a version of the **language** — the
 language number is still `figdown X.Y` (§13.0) — and nothing about
 `figdown X.Y` compatibility turns on it.
+
+#### 13.0.5 Which lever a change pulls — the three-file rule (`VERSION-EVENT-TRIGGER`)
+
+§13.0 says the project carries two version numbers. This says **which
+one a given change moves**, because a change arrives at one of three
+files and the file decides the lever. Written as a rule so an
+implementer does not have to re-derive it, and so that no extension can
+buy an exemption from either lever by choosing where to live.
+
+| the change alters | the lever | what it costs |
+|---|---|---|
+| **the rendered artifact's BYTES** for an unchanged source | the **engine/release** version `vX.Y.Z` | `FIGDOWN_VERSION` moves, `data-engine-version` records it, and every shipped artifact is rebuilt. `RENDERING-DETERMINISM` is a promise per renderer version (§13.0.3), so this is what makes the old bytes still explicable |
+| **what a reading agent may CONCLUDE** from the source | the **language** version `figdown X.Y` | §13.7's acceptance rule, a [`migrations.md`](migrations.md) entry, and the whole of §13's migration machinery. No exception, for anything |
+| **neither** | **no version event at all** | it belongs in a file that is neither the source nor the artifact — the sidecar ([`figdown-manifest.md`](figdown-manifest.md)), which carries its own version key, never enters the SVG, and whose absence asserts nothing (§12.3's rule, one layer out) |
+
+**Three consequences worth stating, because each has already been got
+wrong once.**
+
+- **The two levers are separable, and one may move without the other.**
+  A `Y` bump MAY change rendering while removing nothing (§13.0.2 limit
+  2), and a render option MAY change bytes only when it is asked for,
+  which is why `with-a11y` shipped without a `FIGDOWN_VERSION` bump
+  (`VERSION-EVENT-TRIGGER`). Byte change and meaning change are different events and are
+  priced separately.
+- **A change that alters no bytes and no meaning is not made into a
+  version event by being conspicuous.** A diagnostic's wording is the
+  worked example: it moves a golden and owes a `migrations.md` entry
+  under [`.github/CONTRIBUTING.md`](../.github/CONTRIBUTING.md) §3, and it moves neither number,
+  because no document's rendering and no document's meaning changed
+  (`RESERVED-PREFIX-ENFORCEMENT` is the first application).
+- **The corollary, which is the sentence to remember:** *an extension
+  that needs a version bump is not an extension; it is a feature that
+  has not been through the gate.* Row 3 is the only place where
+  extension is genuinely free, and that is the definition of the space
+  rather than a coincidence — it is why the manifest can carry
+  `x-<owner>-<key>` keys (§10; `figdown-manifest.md` §2 rule 2) without
+  touching either number.
 
 ### 13.1 0.x is a preview, and it is NOT stable
 
@@ -5883,9 +7120,9 @@ not "new" versus "old".**
   again under SYNTAX-STYLE RULE 4.9 (§10). A revival removes nothing —
   it removes a diagnostic.
 - **Why the LANGUAGE number had to move at all**, and not only the
-  release: §13.0 defines `Z` as bug fixes with no new features and **the
-  language not moving**, and a new option key is a new feature of the
-  document format. §13.0 also binds `figdown X.Y` to the first two parts
+  release: §13.0 defines `Z` by whether **the language moved**, not by
+  the size of the change, and a new option key **is** a language
+  construct — grammar `figdown X.Y` accepts. §13.0 also binds `figdown X.Y` to the first two parts
   of the release version, so shipping `note=` under a `v0.2.z` would make
   `figdown 0.2` name **two different languages** — the one `v0.2.0`
   published and the one with `note=`. The engine constant is
@@ -6055,7 +7292,8 @@ increment, one genre later.
   passes unmodified.
 - **Why the LANGUAGE number had to move, and not only the release.** A genre
   token is language surface: it is a value the header's second position accepts,
-  and §13.0 defines `Z` as bug fixes with no new features. Shipping `sequence`
+  and §13.0 defines `Z` by whether the language moved, not by how big the
+  change is. Shipping `sequence`
   under a `v0.3.z` would make `figdown 0.3` name two different languages, the
   same argument §13.7.2 made for `note=`. `STATECHART-GENRE-SCOPE` settled this for `statechart`;
   nothing about the second genre changes it.
@@ -6130,9 +7368,9 @@ increment, one genre later.
   goldens pass unmodified. The published `.fd` corpus changes zero lines,
   because the key is optional and nothing had to be renamed to make room
   for it.
-- **Why the LANGUAGE number had to move.** §13.0 defines `Z` as bug fixes
-  with no new features, and a new option key is a new feature of the
-  document format. Shipping `id=` under a `v0.4.z` would make `figdown
+- **Why the LANGUAGE number had to move.** §13.0 defines `Z` by whether
+  the language moved, not by the size of the change, and a new option
+  key **is** a language construct. Shipping `id=` under a `v0.4.z` would make `figdown
   0.4` name two different languages — the one `v0.4.0` published and the
   one with `id=` — which is §13.7.2's argument for `note=`, unchanged. The
   engine constant is 0.5: `N` counts source states and never
@@ -6440,16 +7678,76 @@ holds its floor rules to.
    dangerous today, and 5 fails the day any *new* output construct appears,
    dangerous or not, so it is looked at before it ships.
 
-**On the current tree the set is fifteen element names and sixty-one
+**On the current tree the set is sixteen element names and sixty-three
 attribute names.** The elements: `svg`, `defs`, `g`, `metadata`, `title`,
-`rect`, `line`, `path`, `polygon`, `circle`, `ellipse`, `text`, `tspan`,
-`marker`, `pattern`. The attributes are structure, geometry, paint, type,
-marker and pattern names, plus FigDown's own `data-*` provenance channel
-(§7) — and no others. Both sets are **measured, not aspirational**: they are
-the exact union over the 60 shipped artifacts and all 178 documents in the
-tree that render, and a name that is allowed but never emitted would weaken
+`desc`, `rect`, `line`, `path`, `polygon`, `circle`, `ellipse`, `text`,
+`tspan`, `marker`, `pattern`. The attributes are structure, geometry, paint,
+type, marker and pattern names, plus FigDown's own `data-*` provenance channel
+(§7) — and no others. Both sets are **measured, not aspirational**, and the
+evidence has two parts of unequal strength, named separately because only one
+of them is standing:
+
+- **Standing, every run.** `gate:safesvg` opens **every committed `.svg` in
+  the tree** — its corpus is the query `git ls-files '*.svg'`, not a number,
+  so an artifact added tomorrow is in it without anyone editing a count — plus
+  the adversarial fixtures rendered FRESH, both ways, because the profile is a
+  property of the renderer and a stored file only proves what the renderer did
+  once. Any element or attribute name outside the enumeration fails the run.
+  This is what keeps the set closed from here on.
+- **One-shot, offline, 2026-08-19 (`XML-CHARACTER-LEGALITY`).** The enumeration was
+  originally DERIVED by rendering every `.fd` in the tree that rendered at
+  that date and taking the union with the committed artifacts. Nothing
+  re-runs that sweep. The document corpus has grown substantially since, and
+  the standing gate reaches those documents only through whatever artifacts
+  of theirs are committed. It is recorded here as the set's provenance, not
+  as a continuing measurement, and it must not be quoted as one.
+
+A name that is allowed but never emitted would weaken
 the assertion to nothing. `gate:safesvg` holds the enumeration; growing it is
 a deliberate edit, which is the point.
+
+**The `data-*` half of that set, enumerated here rather than left to the
+gate's source (`LAYER-EXTENSION-DOORS`, 2026-08-23).** Twenty names are emitted, and until this
+paragraph five of them were named in normative prose, one in passing, and
+**fourteen existed only in an engine and a gate's set literal** — a
+measurable gap between what the profile claims to enumerate and what a reader
+of the specification could actually enumerate. It is closed by writing them
+down, with each one's specification state stated rather than implied:
+
+| state | count | names |
+|---|---|---|
+| **SPECIFIED** in normative text | 5 | `data-sha256`, `data-engine-version`, `data-render-options`, `data-edge` (all §7); `data-desc-state` ([`figdown-a11y.md`](figdown-a11y.md), `ACCESSIBLE-DESCRIPTION-SOURCES`) |
+| **MENTIONED**, never defined | 1 | `data-note-for` (§2.9, one clause) |
+| **ENUMERATED ONLY** — carried by this list and `gate:safesvg`, and promised nowhere | 14 | `data-node`, `data-x`, `data-y`, `data-group`, `data-gx`, `data-gy`, `data-gline`, `data-gtop`, `data-gbot`, `data-cell`, `data-bus`, `data-lasso`, `data-note-on`, `data-port-sq` |
+
+**Listing a name here is not a promise about it.** The third row's fourteen
+are the renderer's own working channel: they are what this engine emits
+today, they are inside the closed vocabulary assertion, and **nothing in this
+specification says any of them is stable, addressable, or safe to build on**
+— which is the honest state and is stated so a consumer does not read the
+enumeration as a contract. Promoting one of them to the first row is an
+ordinary spec change with its own ruling.
+
+**The namespace belongs to the producing engine.** A party that ADDS a
+`data-*` attribute to a rendered artifact has produced a **derived file**,
+not a FigDown artifact — see [`host-profile.md`](host-profile.md) §5 for the
+rule and what may then be published (`LAYER-EXTENSION-DOORS`). `gate:safesvg` scans every
+committed `.svg` in this repository, which is how that rule is kept true of
+the tree rather than only of `examples/` and `figures/` (`RESERVED-PREFIX-ENFORCEMENT`).
+
+**Three of those names belong to a render option, not to the default
+output.** `desc`, `role=` and `data-desc-state=` are emitted only by a
+`with-a11y` render (§7; the accessibility profile,
+[`figdown-a11y.md`](figdown-a11y.md), `ACCESSIBILITY-PROFILE`); no default render and no
+`with-title` render produces any of them. They are held to the same measured
+standard as every other name: `gate:safesvg` renders the adversarial fixtures
+a third way, under `with-a11y`, so the two new text sinks that option opens —
+a root `<title>` and a derived `<desc>`, both carrying author text — are
+exercised against hostile input rather than assumed safe. `aria-hidden=` and
+`aria-label=` are **not** in the set, because this engine emits neither:
+decorative hiding is a publisher's MAY with no producer (`ACCESSIBILITY-PROFILE`), and the
+`role="img"` downgrade that would need `aria-label` is a publisher's choice
+recorded in a manifest, never something the renderer writes.
 
 **What IS in an artifact, recorded so that "clean" is not mistaken for
 "empty".** Font names (`system-ui,sans-serif` and `monospace`) are generic
@@ -6600,9 +7898,14 @@ defect and one fix (§8.1's duplication rule). Before 0.4 such a source
 parsed clean, rendered clean, and produced an artifact no XML reader would
 open; `spec/migrations.md` records the behaviour change.
 
-**One thing is still UNSPECIFIED, recorded rather than omitted.** **Error
+~~**One thing is still UNSPECIFIED, recorded rather than omitted.** **Error
 recovery** (§8.3), so the *set* of diagnostics a hostile document produces is
-not a contract. Nothing in this section depends on it.
+not a contract.~~ **CORRECTED at `ERROR-RECOVERY-MODEL` (2026-08-22): error recovery IS
+specified** (§8.3), so the *set* of diagnostics a hostile document produces is
+now a contract, up to §8.3.8's residue — which is a choice between two
+messages on one line, never a difference in how many. Nothing in this section
+depended on it either way; the sentence is struck rather than deleted because
+a reader who came here for the honest limit must see that it moved.
 
 ### 15.6 What `data-sha256` proves, and what it does not
 
@@ -6639,17 +7942,17 @@ evidence is not in this table because it is not in this section.
 
 | # | Claim (§) | Evidence |
 |---|---|---|
-| 1 | No `script` element in any artifact (§15.2.1) | `gate:safesvg` B, over 60 shipped `.svg` + 3 fixtures × 2 render modes = 66 documents every run; negative control: a doctored artifact with `<script>` fails B |
+| 1 | No `script` element in any artifact (§15.2.1) | `gate:safesvg` B, over every committed `.svg` in the tree (86: 73 renderer-output artifacts judged, 9 hand-edited counter-examples named and skipped, 4 fork-written files pinned as PENDING — `RESERVED-PREFIX-ENFORCEMENT`) + 3 fixtures × 3 render modes every run; negative control: a doctored artifact with `<script>` fails B |
 | 2 | No attribute beginning `on` (§15.2.2) | `gate:safesvg` C (absolute rule, independent of the allowlist); negative control: `<svg onload=…>` fails C |
 | 3 | No `foreignObject` (§15.2.3) | `gate:safesvg` B; negative control fails B |
 | 4 | No `href`/`xlink:href`/`src`, no external `url(…)`, no `@import` (§15.2.4) | `gate:safesvg` C and D; negative controls (`<image href=https://…>`, `style="fill:url(https://…)"`, `@import`) each fail |
-| 5 | Output vocabulary is closed at 15 elements / 61 attributes (§15.2.5) | `gate:safesvg` B and C enumerate it, measured over 60 shipped + 178 rendering documents; any name outside the set fails. `style=` values are enumerated too (three `cursor:` values) |
+| 5 | Output vocabulary is closed at 16 elements / 63 attributes (§15.2.5) | `gate:safesvg` B and C enumerate it and re-assert it every run over `git ls-files '*.svg'` plus the adversarial fixtures rendered fresh; the set's original derivation (a one-shot 2026-08-19 sweep of the rendering documents, `XML-CHARACTER-LEGALITY`) is recorded in §15.2 and is not re-run. The last three names are emitted under `with-a11y` only; any name outside the set fails. `style=` values are enumerated too (three `cursor:` values) |
 | 6 | The only absolute URI is the SVG namespace, as `xmlns` (§15.2) | `gate:safesvg` E, over markup regions only — an absolute URI written in a *label* is text and is not a finding |
 | 7 | Hostile text reaches the model unescaped and unstripped (§15.3) | `conformance/cases/950-adversarial-label-markup.model.json` (title, class meaning, group/node labels, three edge-label positions, six `note=` strings); `951-adversarial-description-markup.model.json` (four `description=` strings) |
-| 8 | Hostile text reaches the artifact as text, never markup (§15.3) | `gate:safesvg`, fixtures 950–952 rendered fresh in **both** render modes (default and `with-title`): every byte classified, hostile tokens present in the document and in no markup region |
+| 8 | Hostile text reaches the artifact as text, never markup (§15.3) | `gate:safesvg`, fixtures 950–952 rendered fresh in **all three** render modes (default, `with-title`, `with-a11y`): every byte classified, hostile tokens present in the document and in no markup region. The third mode is the one that carries a hostile `title` into a root `<title>` and a derived `<desc>` |
 | 9 | The embedded source cannot terminate its own CDATA container (§15.4) | `conformance/cases/952-adversarial-metadata-breakout.fd` + `gate:safesvg` F: source recovered byte-identical, `data-sha256` equal to the hash of those bytes, no `script` element among the scanned tags |
 | 10 | Extreme numerics are refused by the grammar (§15.5) | `conformance/cases/954-pin-extreme-numeric-refusals` (`1e12`, `NaN`, `Infinity`, `-1e12`, `1e400` inside `at=(…)` — five golden error lines), `367-pin-extent-strict-value` (five width values) and `361-pin-errors` (the paren-point rule) |
 | 11 | Resource limits are UNSPECIFIED (§15.5) | **No gate — by construction.** The measurements quoted are a record, not a bound; nothing asserts a ceiling because none is specified |
 | 12 | XML-illegal characters in a source are refused, and legal ones are not (§15.5) | `conformance/cases/953-source-illegal-xml-characters` — eleven golden error lines over both diagnostics, with a same-file node carrying tab, U+007F, C1 and an astral character that must produce none. Plus `gate:safesvg` A upstream: 12 forbidden code points must error and 5 legal ones plus a paired astral character must not, asserted against the live engine every run |
-| 13 | `data-sha256` detects staleness (§15.6) | `gate:artifact` — recorded hash vs the SHA-256 of the paired `.fd`; 60 artifacts every run |
+| 13 | `data-sha256` detects staleness (§15.6) | `gate:artifact` — recorded hash vs the SHA-256 of the paired `.fd`, over every artifact it finds, every run |
 | 14 | `data-sha256` authenticates nothing (§15.6) | **No gate, and none is possible** — this is a statement about what the mechanism is, not a behaviour to test |

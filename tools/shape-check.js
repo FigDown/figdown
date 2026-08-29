@@ -72,7 +72,7 @@ function loadEngine() {
   if (start < 0 || end < 0) throw new Error('cannot locate engine in ' + enginePath);
   // cw is taken FROM the engine, never restated here: this check re-derives a
   // label's width from the drawn SVG, and a second copy of the advance table
-  // would let the two disagree about any non-Latin label.
+  // would let the two disagree about any non-Latin label (TEXT-ADVANCE-MEASUREMENT).
   const factory = new Function(h.slice(start, end) + '\nreturn {parse, render, cw};');
   const api = factory();
   api.path = enginePath;
@@ -90,7 +90,7 @@ const END_TOL  = 0.02;   // endpoint norm must be 1 +/- this (2% of the radius)
 // still clears it. The defect it exists to catch measured 0.0.
 const LOOP_MIN = 24;     // px of drawn run below which a self-loop is not drawn
 const OVL_TOL  = 0.5;    // px of box overlap tolerated before it is a collision
-const CH       = 7.2;    // engine's advance per LATIN unit at font-size 13
+const CH       = 7.2;    // engine's advance per LATIN unit at font-size 13 (TEXT-ADVANCE-MEASUREMENT)
 const FONT     = 13;
 
 // ── outline algebra ───────────────────────────────────────────────────────────

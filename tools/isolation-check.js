@@ -64,7 +64,7 @@
 //            `.md` directly in `spec/genres/` (README, block, bitfield, table
 //            and their zh twins — NOT `genres/experimental/`, which is
 //            experimental anyway), `conformance/README.md`,
-//            `examples/reference/index.md` (+ zh), `CONTRIBUTING.md`,
+//            `examples/reference/index.md` (+ zh), `.github/CONTRIBUTING.md`,
 //            `tools/README.md`.
 //
 // WHY TIER 2 IS NARROWER — a stated exposure, not a loophole
@@ -73,7 +73,7 @@
 // isolation checks. Each exclusion has a reason, and one of them is an open
 // hole that must not be read as a clean result:
 //
-//   CHANGE LOGS AND HISTORY — `spec/MIGRATIONS*.md`, `spec/MIGRATE*.md`,
+//   CHANGE LOGS AND HISTORY — `spec/migrations*.md`, `spec/migrate*.md`,
 //     `spec/core.md`, `conformance/DISCREPANCIES.md`,
 //     `conformance/ERROR-COVERAGE.md`.
 //     A migration entry's JOB is to name a construct as it stood at the time,
@@ -207,9 +207,8 @@
 //     examples/reference/   recursive
 //     <project root>/*.md   NOT recursive — just the .md files sitting there
 //     tools/README.md
-//     CONTRIBUTING.md
-//     must not report on files that are not in the repository, and their
-//     links point at other local companions that are not there either.
+//     .github/CONTRIBUTING.md
+//   never searched: .git/, node_modules/, any dot-directory
 //   only `.md` is analysed; other files met while walking are counted as
 //   `skipped` and otherwise ignored
 //
@@ -727,7 +726,7 @@ function main() {
     '  (non-.md skipped: ' + stats.skipped +
     ', local untracked companions excluded by name: ' + stats.excluded + ')');
   console.log('  verify the count:  find spec conformance examples/reference -name \'*.md\' ' +
-    ' | wc -l   plus the root *.md files and tools/README.md,');
+    ' | wc -l   plus the root *.md files and tools/README.md.');
   console.log('findings ' + total +
     '  |  tier 1 ' + t1 + ': ' + TIER1_CHECKS.map(c => c + ' ' + totals[c]).join('  ') +
     '  |  tier 2 ' + t2 + ': ' + TIER2_CHECKS.map(c => c + ' ' + totals[c]).join('  '));

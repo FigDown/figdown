@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 // plugin-check.js — the Claude Code plugin wrapper must stay a WRAPPER.
 //
-// 0.1 added two manifests and NOT a second copy of the skill:
+// 0.1 (SKILL-INSTALL-MECHANISM) added two manifests and NOT a second copy of the skill:
 //
 //   .claude-plugin/plugin.json       plugin root = the repository root, with
 //                                    "skills": "./skill/" pointing at the ONE

@@ -735,7 +735,7 @@ that alphabet reserves the corresponding spellings in every namespace the
 lexer consults before it.**
 
 Concretely and permanently: **single-letter option keys drawn from the timing
-lane alphabet `[01pnx=.]` — that is `p`, `n` and `x` — MUST NEVER be
+lane alphabet `[01pnx=.]` — that is `p`, `n` and `x` — MUST NOT be
 registered in the option-key namespace, in any genre, present or future.**
 
 Registering one produces no error anywhere: every existing lane containing
@@ -775,8 +775,12 @@ opener, so keyword-echo is evidence of nothing.
 
 `page`, `set`, `pulse` are reserved for the dynamic profile and produce a
 named diagnostic (figdown.html:939). Keywords and option keys beginning
-`x-` are reserved for a future extension mechanism and MUST NOT be used by
-standard vocabulary (core.md:1464-1466). `step` was reserved until 0.1 and **released**: a word reserved against nothing costs authors
+`x-` MUST NOT be used by standard vocabulary — permanently, and **not**
+because a future extension mechanism is coming: `LANGUAGE-EXTENSION-POLICY` (2026-08-23) RETIRED
+that promise and kept the naming ban, so `x-` now means *"not FigDown's"*
+family-wide (core §10; the sidecar's delegated `^x-` keys,
+`figdown-manifest.md` §2 rule 2). It too produces a named diagnostic since
+`RESERVED-PREFIX-ENFORCEMENT`, which is what makes it pass this section's own test. `step` was reserved until 0.1 and **released**: a word reserved against nothing costs authors
 a name for nothing (core.md:1137-1140). Reviewers should apply that test to
 every reservation they propose.
 

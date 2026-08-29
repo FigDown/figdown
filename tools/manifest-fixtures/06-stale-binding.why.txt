@@ -1,0 +1,12 @@
+STALE BINDING — `review.of_source_sha256` differs from `source.sha256`.
+
+figdown-manifest.md §4.6 (`MANIFEST-REVIEW-STATE`) binds a review state to the hash it is
+ABOUT. This is the field the ruling adopted whole from a measured production
+pipeline failure: an audit statement still read "verified" on a figure that
+had silently regressed after the review was recorded. A verifier MUST report
+a manifest whose `review.of_source_sha256` differs from `source.sha256` as
+STALE — fatal, not a warning, because the figure changed after review and
+the claim no longer has a subject. (Contrast an ABSENT `of_source_sha256`,
+which is UNBOUND — reported, not fatal, a backfill note rather than a
+failure. This fixture is bound to the WRONG hash, not unbound.)
+STALE (fatal)

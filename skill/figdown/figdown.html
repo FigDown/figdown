@@ -184,14 +184,14 @@ const SHAPES = ['box','rounded','circle','ellipse','diamond','cylinder'];
 // input to that promise, and under core §13 a 0.x renderer may differ from
 // the next — which makes the recorded version the only thing that can
 // explain a diff between two renderings of one source.
-const FIGDOWN_VERSION = '0.5.0';
+const FIGDOWN_VERSION = '0.5.1';
 // `TYPED-BLOCK-TITLE-CANVAS`: a `Z`-only dev bump — RENDERER ONLY, no keyword, no
 // option key, no model field, so `figdown 0.5` still names one language. A
 // typed block's own title (bitfield/table/timing/chart) now joins the
 // section's canvas computation: the returned width is the union of the data
 // extent and the title extent (`typedBlockTitleW`, shared by all four
 // renderers), so a title wider than the data widens the canvas instead of
-// running off it at x=0. Fixes backlog item 66 (FR-4). Corpus impact
+// running off it at x=0. Fixes backlog item 66, raised downstream. Corpus impact
 // surveyed first: zero shipped drawings change (every typed-block title in
 // the corpus already fit its data-derived canvas); the fix only reaches
 // fixtures the corpus does not yet have. See spec/migrations.md.
@@ -1458,6 +1458,35 @@ const WORD_WHY={
 const WRONG_WORD=(surf,want,genre)=>
   '"'+surf+'" is not the word genre '+genre+' uses for this — write "'+want+'": '+WORD_WHY[want]+
   '. Each genre takes the term its own domain uses (block/topology `node` `edge`, flowchart `node` `flowline`, statechart `state` `transition`, sequence `lifeline` `message`) — run tools/migrate-figdown.js to rewrite it (MIGRATIONS 0.2)';
+// `LANGUAGE-EXTENSION-POLICY`/`RESERVED-PREFIX-ENFORCEMENT` (2026-08-23): the `x-` prefix is RESERVED against FigDown's own
+// vocabulary and is NOT an extension namespace. Until this entry it was the
+// one reservation core §10 wrote down by name and NOTHING enforced: `x-note`
+// earned `"x-note" is not allowed in genre block` — the same words a typo
+// gets — while `page`, `;` and `step` each got a diagnostic naming their
+// reservation. `SEMICOLON-STATUS`'s own title says a reservation that is not enforced is not
+// a reservation, so this is what makes `x-` one.
+//
+// The message says three things, and the THIRD is the whole value: `LANGUAGE-EXTENSION-POLICY`
+// RETIRED the promise of a future extension mechanism, so an author who reads
+// core §10's pre-0.5 wording is being told the opposite of the rule. It must
+// say the prefix will not open, not merely that it is taken.
+//
+// IT MUST NOT REACH IDENTIFIERS. The reservation is about the language's own
+// vocabulary; an id is the author's. `node x-foo "A"` and `class x-bar
+// "meaning"` parsed and rendered before this entry and still do, which is why
+// both call sites below are in KEYWORD position and OPTION-KEY position and
+// nowhere else.
+const X_RESERVED_WHY =
+  ': the "x-" prefix is reserved against FigDown\'s OWN vocabulary — no standard '+
+  'keyword or option key may begin "x-" — and it is NOT an extension namespace. '+
+  'The language is CLOSED, so this does not become legal by waiting (core §10, `LANGUAGE-EXTENSION-POLICY`). '+
+  'Record the fact in a publication manifest instead, spelled x-<owner>-<key> '+
+  '(spec/figdown-manifest.md §2.1); propose the construct through .github/CONTRIBUTING.md §2; '+
+  'or fork with your own header token. Identifiers are untouched: node x-foo "A" and '+
+  'class x-bar "meaning" both parse';
+const X_RESERVED_KW  = kw => '"'+kw+'" is RESERVED, not an extension keyword'+X_RESERVED_WHY;
+const X_RESERVED_OPT = k  => 'option "'+k+'=" is RESERVED, not an extension option key'+X_RESERVED_WHY;
+const isXReserved = s => typeof s==='string' && s.slice(0,2)==='x-';
 // `SCENE-KEYWORD-MEMBERSHIP`: a word WITHDRAWN FROM ONE GENRE is not an unknown word,
 // and `"threshold" is not allowed in genre topology` would send an author
 // looking for a typo. Each cell below was legal until 0.3 and states
@@ -2097,7 +2126,12 @@ function parseOne(text){
     // `message` is scanned by this function and never reaches that one.
     if(u2.length){
       const ro=(doc.genre&&REFUSED_OPT_IN[doc.genre])||null;
-      if(ro && ro[u2[0]]!==undefined) err(n,REFUSED_OPT_IN_GENRE(u2[0],doc.genre));
+      // `RESERVED-PREFIX-ENFORCEMENT` (2026-08-23): CALL SITE 2a of 2 — the reserved `x-` prefix in
+      // OPTION-KEY position, on the connector path. `message` is scanned by
+      // this function and never reaches `badOpts`, which is why the check has
+      // to exist in both places (the same reason `UNDELIVERED-MESSAGE-MARKING`'s genre refusal does).
+      if(isXReserved(u2[0])) err(n,X_RESERVED_OPT(u2[0]));
+      else if(ro && ro[u2[0]]!==undefined) err(n,REFUSED_OPT_IN_GENRE(u2[0],doc.genre));
       else err(n,'unknown option "'+u2[0]+'="');
       return; }
     // `SEQUENCE-GENRE-VOCABULARY`: `message` adds ONE trailing positional — the
@@ -2438,7 +2472,12 @@ function parseOne(text){
       // ground and the replacement spelling instead of a spellcheck.
       const roOpt=(doc.genre&&REFUSED_OPT_IN[doc.genre])||null;
       for(const u of unk){
-        if(roOpt && roOpt[u]!==undefined) err(n,REFUSED_OPT_IN_GENRE(u,doc.genre));
+        // `RESERVED-PREFIX-ENFORCEMENT` (2026-08-23): CALL SITE 2b of 2 — the reserved `x-` prefix in
+        // OPTION-KEY position, on the ordinary directive path. Checked before
+        // the genre refusal and before the generic message, because a key the
+        // language will never register is a stronger fact than either.
+        if(isXReserved(u)) err(n,X_RESERVED_OPT(u));
+        else if(roOpt && roOpt[u]!==undefined) err(n,REFUSED_OPT_IN_GENRE(u,doc.genre));
         else err(n,'unknown option "'+u+'="');
         bad=true; }
       // `MEMBERSHIP-KEY-ACCEPTANCE`: the PER-GENRE option-key withdrawal, checked here —
@@ -2619,6 +2658,18 @@ function parseOne(text){
         continue;
       } else { err(n,'first line must be "figdown 0.1 <genre>"'); }
     } else if(kw==='figdown'){ err(n,'duplicate version header'); continue; }
+
+    // `RESERVED-PREFIX-ENFORCEMENT` (2026-08-23): CALL SITE 1 of 2 — the reserved `x-` prefix in
+    // KEYWORD position. It sits here, above every other keyword answer, for
+    // two reasons: no registered keyword begins `x-`, so it can pre-empt
+    // nothing legitimate; and every downstream answer this would otherwise
+    // reach (`not allowed in genre <g>`, `not valid inside <block>`,
+    // `unrecognized line`) is a message about a typo, which is what §8.4 of
+    // decisions/registry.md measured and what this replaces.
+    // It sits BELOW the first-line header check deliberately: "first line
+    // must be figdown …" is the more important thing to tell an author, and
+    // an `x-` first line reports both, exactly as it reported two before.
+    if(isXReserved(kw)){ err(n,X_RESERVED_KW(kw)); continue; }
 
     // Retired spelling: `colw` → `width`. Keyword naming
     // discipline — one lowercase word, borrowed standard terminology; `colw`
@@ -4090,6 +4141,163 @@ function stackSectionSvgs(results){
     +chunks.join('')+'</svg>';
 }
 
+// ---- the accessibility profile's emission (spec/figdown-a11y.md) ----------
+// `ACCESSIBILITY-PROFILE`/`ACCESSIBLE-DESCRIPTION-SOURCES`/`ACCESSIBLE-TEXT-EMISSION` (decisions/registry.md).
+// The publication profile wants three things in a published artifact: a role,
+// a NON-VISUAL name, and a description whose review state a machine can read.
+// None of it is emitted by default and none of it is a language construct —
+// the `with-a11y` RENDER OPTION (core §7, `ACCESSIBLE-TEXT-EMISSION` route 1) is the only way in,
+// exactly as `with-title` (`TITLE-RENDER-DEFAULT`) is the only way to draw the title as ink.
+//
+// WHY THIS SITS OUTSIDE `render` AND NOT INSIDE IT. Two reasons, and the
+// second is the load-bearing one:
+//   1. Core §7/`RENDERING-DETERMINISM` make an artifact a pure function of (source, recorded
+//      options) and promise byte-identical output for one engine version.
+//      Code that never runs cannot move a byte, and `render` is left exactly
+//      as it was so that every existing artifact and golden is untouched.
+//   2. `ACCESSIBILITY-PROFILE` rules ONE artifact, ONE root, ONE name — the FIRST section's
+//      `title`. A multi-section artifact's root is built by
+//      `stackSectionSvgs` from N per-section renders, so a `<title>` emitted
+//      inside `render` would land inside a `<g>` (naming the group, per `DESCRIPTION-KEY-SPELLING`
+//      and SVG 1.1 §5.4) and there would be N of them. The name belongs to
+//      the finished root, which only the artifact layer holds.
+// So the artifact layer (tools/build-svg.js, dist/figdown.js's `artifact()`)
+// calls `a11yApply(svg, docs[0])` on the finished root and records
+// `with-a11y` in `data-render-options`.
+const A11Y_ROLE = 'graphics-document';
+
+// `ACCESSIBILITY-PROFILE` item 3: the accessible name is the document's `title` string,
+// UNMODIFIED — not truncated, not prefixed, never invented. `title` is
+// optional in the grammar and stays optional (`ACCESSIBILITY-PROFILE` is explicit that the
+// untitled figure still parses and still renders): a document with no
+// `title` line gets NO root `<title>`, and whether such a figure may be
+// PUBLISHED is the profile's question and the verifier's, never the
+// engine's. The test is ABSENCE, not truthiness (`EMPTY-LABEL-STATE`): `title ""` is a
+// written empty name and is emitted as one.
+function a11yTitleOf(doc){
+  return (doc && doc.title!==null && doc.title!==undefined) ? String(doc.title) : null;
+}
+
+// ---- the derived description (`ACCESSIBLE-DESCRIPTION-SOURCES` item 7) --------------------------------
+// A `derived` description is a deterministic projection of the MODEL into
+// prose — "exactly as good as the model, and no better" — and `ACCESSIBLE-DESCRIPTION-SOURCES`'s
+// operative half is the NEGATIVE rule: it MUST NOT state what the model does
+// not assert. No causality, no "this shows how X works", no count the model
+// cannot produce. Every sentence below is an inventory statement over a
+// collection the model actually carries.
+//
+// COVERED GENRES ARE EXACTLY THE THREE `ACCESSIBLE-DESCRIPTION-SOURCES` RULED CONTENT RULES FOR:
+// `topology`, `bitfield`, `sequence`. Every other genre the engine supports
+// (`block`, `flowchart`, `statechart`, `table`, `timing`, and the
+// experimental `chart` region) gets NO derived description — the state stays
+// `absent` — because inventing content rules for them here would be design,
+// not implementation. That boundary is stated, not silent: spec/figdown-a11y.md
+// §4.4 records which genres are covered, which are not, and why.
+const A11Y_DERIVED_GENRES = ['topology','bitfield','sequence'];
+function a11yQ(s){ return '"'+String(s)+'"'; }
+function a11yCount(n,word){ return n+' '+word+(n===1?'':'s'); }
+// id, plus the label the model carries WHEN it carries one. The renderer's
+// id-for-absent-label fallback (`OMITTED-LABEL-RECORDING`) is a DISPLAY rule and deliberately does
+// not run here: the model records absence, and a derived description that
+// silently promoted an id to a name would assert a name nobody wrote.
+function a11yNamed(x){
+  return (x.label===null||x.label===undefined) ? String(x.id) : String(x.id)+' '+a11yQ(x.label);
+}
+function a11yDeriveTopology(doc){
+  const s=[];
+  s.push('Topology figure'+(a11yTitleOf(doc)!==null?' '+a11yQ(doc.title):'')+'.');
+  s.push(a11yCount(doc.nodes.length,'node')+', '+a11yCount(doc.edges.length,'connector')
+        +', '+a11yCount(doc.groups.length,'group')+'.');
+  s.push('Flow direction: '+String(doc.flow)+'.');
+  if(doc.nodes.length) s.push('Nodes: '+doc.nodes.map(a11yNamed).join(', ')+'.');
+  for(const g of doc.groups){
+    const mem=doc.nodes.filter(n=>n.group===g.id).map(n=>String(n.id));
+    s.push('Group '+a11yNamed(g)+(mem.length?' contains: '+mem.join(', ')+'.':' has no declared members.'));
+  }
+  // A class's MEANING is `label` on the engine object (the canonical
+  // projection renames it `meaning`). `ACCESSIBLE-DESCRIPTION-SOURCES` says "each declared class and its
+  // stated meaning (which the legend already prints)", so the legend's own
+  // filter is inherited rather than re-invented: `class x ""` is an attribute
+  // grouping that states no meaning, it prints no legend entry, and it makes
+  // no sentence here either.
+  for(const c of (doc.classes||[])) if(c.label!=='')
+    s.push('Class '+String(c.id)+' means '+a11yQ(c.label)+'.');
+  return s.join(' ');
+}
+function a11yDeriveBitfield(doc){
+  const s=[];
+  s.push('Bitfield figure'+(a11yTitleOf(doc)!==null?' '+a11yQ(doc.title):'')+'.');
+  const blocks=(doc.blocks||[]).filter(b=>b.type==='bitfield');
+  if(!blocks.length) return null;
+  for(const b of blocks){
+    s.push('Bitfield '+a11yNamed(b)+': word '+a11yCount(b.word,'bit')
+          +', numbering '+String(b.numbering)+'.');
+    // `wrap` entries are ROW BREAKS (projected as `break`), a division of the
+    // drawing and not a field; `ACCESSIBLE-DESCRIPTION-SOURCES`'s rule is "fields in order with widths".
+    // A field's width is `w` on the engine object: a bit count, or the string
+    // `*` for the remainder of the row.
+    const fields=(b.fields||[]).filter(f=>!f.wrap);
+    if(!fields.length){ s.push('No fields declared.'); continue; }
+    s.push('Fields in order: '+fields.map(f=>
+      a11yQ(f.name)+' '+(String(f.w)==='*'?'width *':a11yCount(f.w,'bit'))).join(', ')+'.');
+  }
+  return s.join(' ');
+}
+function a11yDeriveSequence(doc){
+  const s=[];
+  s.push('Sequence figure'+(a11yTitleOf(doc)!==null?' '+a11yQ(doc.title):'')+'.');
+  const lls=doc.lifelines||[], msgs=doc.messages||[], frags=doc.fragments||[];
+  s.push('Lifelines in declaration order: '+(lls.length?lls.map(a11yNamed).join(', '):'none')+'.');
+  // The time axis is declaration order and it is TOTAL (`SEQUENCE-GENRE-VOCABULARY`, draft §31),
+  // so "in their stated total order" is `line` ascending — the model's own
+  // ordering key, not a re-reading of the picture.
+  const ordered=msgs.slice().sort((p,q)=>p.line-q.line);
+  s.push('Messages in stated order: '+(ordered.length?ordered.map((m,i)=>
+    (i+1)+'. '+String(m.a)+' '+String(m.op)+' '+String(m.b)
+    +(m.label===null||m.label===undefined?'':' '+a11yQ(m.label))).join('; '):'none')+'.');
+  if(frags.length) s.push('Fragments: '+frags.map(f=>
+    a11yNamed(f)+' (type '+String(f.type)+')').join(', ')+'.');
+  return s.join(' ');
+}
+function a11yDerivedDesc(doc){
+  if(!doc||A11Y_DERIVED_GENRES.indexOf(doc.genre)<0) return null;
+  if(doc.genre==='topology') return a11yDeriveTopology(doc);
+  if(doc.genre==='bitfield') return a11yDeriveBitfield(doc);
+  if(doc.genre==='sequence') return a11yDeriveSequence(doc);
+  return null;   // state `absent` — an uncovered genre, spec/figdown-a11y.md §4.4
+}
+
+// Apply the profile to a FINISHED root `<svg>`: the role on the root, the
+// non-visual `<title>` as its FIRST child (SVG 1.1 §5.4 / `DESCRIPTION-KEY-SPELLING` — a `<title>`
+// names its parent and belongs first), then the `<desc>` carrying the derived
+// description with its state in a `data-*` attribute (`ACCESSIBLE-DESCRIPTION-SOURCES` item 6, way 1; the
+// manifest carries the evidence, way 3). Idempotent: a root that already
+// declares a role is returned unchanged.
+function a11yApply(svg, doc){
+  const s=String(svg);
+  const m=/^<svg\b[^>]*>/.exec(s);
+  if(!m) return s;
+  if(/\brole="/.test(m[0])) return s;
+  const parts=[];
+  const t=a11yTitleOf(doc);
+  if(t!==null) parts.push('<title>'+esc(t)+'</title>');
+  const d=a11yDerivedDesc(doc);
+  if(d!==null&&d!=='') parts.push('<desc data-desc-state="derived">'+esc(d)+'</desc>');
+  return m[0].replace(/>$/,' role="'+A11Y_ROLE+'">')+parts.join('')+s.slice(m[0].length);
+}
+
+// The `data-render-options` value for a render (core §7). ONE spelling, in
+// ONE place, so the artifact layers cannot drift: options in declaration
+// order, space-separated — the SVG/HTML idiom for a token list. A default
+// render writes no attribute at all, which is why the empty string is
+// returned rather than an empty attribute.
+function renderOptionsAttr(opts){
+  const names=[];
+  if(opts&&opts.title===true) names.push('with-title');
+  if(opts&&opts.a11y===true) names.push('with-a11y');
+  return names.length?' data-render-options="'+names.join(' ')+'"':'';
+}
+
 // `SEMICOLON-STATUS`: `;` is RESERVED for a future statement separator, and
 // RULE 1.3 says a reserved mark MUST NOT be given any other meaning. Until
 // this release it was an ordinary character: `node a ;` parsed and `;`
@@ -4166,7 +4374,7 @@ function findComment(s){
 // ============================================================
 const FONT=13, CH=7.2, PADX=14, NH=36, GAPX=56, GAPY=44;
 
-// ---- cw(): script-aware advance width --------------------------------
+// ---- cw(): script-aware advance width (`TEXT-ADVANCE-MEASUREMENT`) --------------------------------
 // Every px-per-character constant in this file — CH here, and its siblings at
 // the other font sizes (8.6 title, 6.6 legend, 6.5 edge label, 6.3/6.2 bitfield
 // caption) — is calibrated on LATIN, where one character advances ~0.554 em.
@@ -4737,15 +4945,80 @@ function render(doc,ropts){
     // Retiring `color=` removes the first case; omitting the swatch removes
     // the second. Every channel a class can still declare (`fill`, `stroke`,
     // `style`) is drawn, so "declared but not shown" is now unreachable.
+    // 0.5 (`LEGEND-SWATCH-SHAPE`): the swatch depicts THE CHANNEL THE CLASS ACTUALLY
+    // PAINTS. `CLASS-PAINT-REQUIREMENT` ruled WHETHER a swatch is drawn and never WHAT SHAPE it
+    // takes, so every painting class got a `<rect>` — and a class that
+    // declares only `stroke=` and is carried only by CONNECTORS then appeared
+    // as a white box with a coloured outline while the drawing showed a
+    // coloured LINE. The legend's visual vocabulary did not match the
+    // figure's, and with `style=dashed` the dash landed on a rectangle's
+    // perimeter instead of along a run. Measured on 2026-08-26: 36 of this
+    // repository's 76 legend-bearing class-uses are connector-only (33 of them
+    // stroke-without-fill) and 10 figures are entirely connector-only; in the
+    // production corpus behind the field reports, 160 of 1350 legend-bearing
+    // class-uses are connector-only and 159 of those are stroke-without-fill.
+    //
+    // WHICH KINDS ARE CONNECTORS is read off the model, not guessed and not
+    // stored: the four connector spellings (`edge` `flowline` `transition`
+    // `message`, core §10) are exactly `doc.edges` and `doc.messages` in the
+    // model — every other collection that carries `class=` is a box, a frame
+    // or a cell, i.e. something with an area. This adds no model field, no
+    // option key and no spelling; it is a byte-moving RENDER change.
+    const clsUse={};
+    { const use=(x,conn)=>{
+        const ids=(x.cls===undefined||x.cls===null)?[]:(Array.isArray(x.cls)?x.cls:[x.cls]);
+        for(const id of ids){ const u=clsUse[id]||(clsUse[id]={conn:false,box:false});
+          if(conn) u.conn=true; else u.box=true; } };
+      for(const x of doc.nodes) use(x,false);
+      for(const x of doc.groups) use(x,false);
+      for(const x of doc.edges) use(x,true);
+      for(const x of (doc.messages||[])) use(x,true);
+      for(const x of (doc.lifelines||[])) use(x,false);
+      for(const x of (doc.states||[])) use(x,false);
+      for(const x of (doc.fragments||[])) use(x,false);
+      for(const x of (doc.operands||[])) use(x,false);
+      for(const b of doc.blocks){ use(b,false);
+        if(b.fields) for(const f of b.fields) use(f,false);
+        if(b.marks)  for(const mk of b.marks) use(mk,false); } }
     for(const c of legendCls){
       const paints=c.fill!==undefined||c.stroke!==undefined||c.style!==undefined;
-      const tw=cw(c.label)*6.6+(paints?30:9);
-      if(lx>0 && lx+tw>wrapW){ lx=0; ly+=rowH; }
+      // The samples this class earns, in the ruled order: LINE then BOX.
+      //  · carried only by connectors → a line sample (`LEGEND-SWATCH-SHAPE` clause 1)
+      //  · carried only by boxes      → the `<rect>` `CLASS-PAINT-REQUIREMENT` already drew (2)
+      //  · carried by both            → both samples, side by side (3): the
+      //    legend exists to explain, and the extra width is cheaper than
+      //    making a reader guess which half of the figure an entry is about.
+      //  · declares `fill=`           → a box sample WHATEVER it is carried
+      //    by (4), because a fill needs an area to be visible. A box on a
+      //    connector-only class is then the class declaring a channel its
+      //    elements cannot show — `CLASS-CHANNEL-COLLISION`'s territory, reported there, not
+      //    re-ruled here (and `gate:legend`'s unreachable-channel check
+      //    already refuses that shape in this repository's corpus).
+      //  · declares no paint          → no sample at all (5, `CLASS-PAINT-REQUIREMENT` unchanged).
+      //  · declared but never carried → the shape comes from the DECLARED
+      //    channels alone: `fill` → box, stroke-only → line. Nothing else is
+      //    known about it, and its own paint is the only evidence there is.
+      const u=clsUse[c.id];
+      const samples=[];
       if(paints){
-        const dash=c.style==='dashed'?' stroke-dasharray="6 4"':(c.style==='dotted'?' stroke-dasharray="2 4"':'');
-        es.push('<rect x="'+lx+'" y="'+(ly+3)+'" width="16" height="11" fill="'+(c.fill||'#fff')+'" stroke="'+(c.stroke||'#555')+'"'+dash+'/>');
+        if(u ? u.conn : c.fill===undefined) samples.push('line');
+        if(u ? (u.box||c.fill!==undefined) : c.fill!==undefined) samples.push('box');
       }
-      es.push('<text x="'+(lx+(paints?21:0))+'" y="'+(ly+12.5)+'" font-size="11" fill="#1d1d1b">'+esc(c.label)+'</text>');
+      const tw=cw(c.label)*6.6+9+21*samples.length;
+      if(lx>0 && lx+tw>wrapW){ lx=0; ly+=rowH; }
+      const dash=c.style==='dashed'?' stroke-dasharray="6 4"':(c.style==='dotted'?' stroke-dasharray="2 4"':'');
+      let sx=lx;
+      for(const s of samples){
+        // Both samples take the SAME 16 px advance, so a mixed entry is two
+        // swatches and not a wider one. The line is drawn at the rect's own
+        // vertical centre (3 + 11/2) and at 1.6 — the stroke-width every
+        // router in this engine gives a drawn connector — so the sample is
+        // the same ink the figure lays down, at the same weight.
+        if(s==='line') es.push('<line x1="'+sx+'" y1="'+(ly+8.5)+'" x2="'+(sx+16)+'" y2="'+(ly+8.5)+'" stroke="'+(c.stroke||'#555')+'" stroke-width="1.6"'+dash+'/>');
+        else es.push('<rect x="'+sx+'" y="'+(ly+3)+'" width="16" height="11" fill="'+(c.fill||'#fff')+'" stroke="'+(c.stroke||'#555')+'"'+dash+'/>');
+        sx+=21;
+      }
+      es.push('<text x="'+(lx+21*samples.length)+'" y="'+(ly+12.5)+'" font-size="11" fill="#1d1d1b">'+esc(c.label)+'</text>');
       lx+=tw+14; maxW=Math.max(maxW,lx);
     }
     parts.push(es.join(''));
@@ -6674,7 +6947,18 @@ function renderScene(doc,y0){
   // node box, which is already an obstacle.
   //
   // An external's label is NOT an obstacle to its OWN edge — that edge must
-  // reach the anchor the label names.
+  // reach the anchor the label names. A GROUP's name is the same rule one
+  // construct over, and 0.4 shipped only half of it (`GROUP-BOUNDARY-OBSTACLE`): a group's
+  // name strip runs the full width of the band's TOP, so it lies across every
+  // approach an outside node has to a member inside. Made an obstacle to all
+  // comers, it turned every boundary-crossing edge into a detour that left the
+  // corridor, ran down the band's outer edge and entered the member from the
+  // side — the drawing then said the line arrives at the CONTAINER when the
+  // source says it arrives at the MEMBER. `EDGE-BEND-RETENTION` had already ruled the group
+  // BOX is an obstacle only to an edge that "neither starts nor ends inside";
+  // the name is part of the same band and takes the same exemption. A foreign
+  // shaft — neither endpoint in the group — is still detoured, which is the
+  // whole of what 0.4 was right about.
   const extLbl=n=>{
     const cx=n.x+n.w/2, cy=n.y+n.h/2, [bdx,bdy]=bDir(n);
     const bw=lblPx(n.label), bl=String(n.label).split('\n').length, bh=13*bl;
@@ -6689,18 +6973,24 @@ function renderScene(doc,y0){
   for(const k in gBox){ const g=doc.groups.find(z=>z.id===k);
     if(!g||!g.label) continue;
     const B=gBox[k];
-    nameObs.push({x:B.x0+10, y:B.yA+16-11.5*0.85, w:cwMax(g.label)*6.5*11.5/11, h:11.5*1.1});
+    nameObs.push({x:B.x0+10, y:B.yA+16-11.5*0.85, w:cwMax(g.label)*6.5*11.5/11, h:11.5*1.1, id:k});
   }
-  // The obstacle list a given edge must respect: every band name, plus every
-  // external label except the ones this edge itself terminates at.
+  // Which group an endpoint id belongs to, for the name-strip exemption below.
+  const grpOfId=new Map();
+  for(const n of nodes) if(n.group) grpOfId.set(n.id,n.group);
+  // The obstacle list a given edge must respect: every band name except the
+  // ones this edge terminates AT or INSIDE, plus every external label except
+  // the ones this edge itself terminates at.
   // A label's ink is its glyphs plus the clearance that keeps a line from
   // READING as struck through it. 4 px on every side — the same number the
   // legibility floor uses for a label's association margin — so a shaft that
   // grazes a name at 3 px is detoured rather than tolerated.
   const LBL_PAD=4;
   const padded=o=>({x:o.x-LBL_PAD,y:o.y-LBL_PAD,w:o.w+2*LBL_PAD,h:o.h+2*LBL_PAD});
+  const ownsName=(o,e)=>o.id===e.a||o.id===e.b||
+                        o.id===grpOfId.get(e.a)||o.id===grpOfId.get(e.b);
   const lblObs=e=>extObs.filter(o=>o.id!==e.a&&o.id!==e.b).map(padded)
-                        .concat(nameObs.map(padded));
+                        .concat(nameObs.filter(o=>!ownsName(o,e)).map(padded));
   const rings=new Map();
   for(const t of doc.trunks||[]){ const R=ringOf(t); if(R) rings.set(t,R); }
   // ── A LASSO THAT ENCLOSES A NON-MEMBER IS A FALSE DRAWING (item 69) ──────
@@ -9819,8 +10109,8 @@ function r2(v){ return Math.round(v*100)/100; }
 // canvas grows right and down only, so text at a negative coordinate is
 // CLIPPED, never merely misplaced (`LABEL-PLACEMENT-METRIC`, which fixed exactly this
 // for a `table` caption and a `chart` row/column label gutter but not for a
-// bitfield/timing title or a chart's own top caption — production field
-// report FR-4, decisions/registry.md).
+// bitfield/timing title or a chart's own top caption — reported from
+// downstream production authoring).
 //
 // ONE MEASUREMENT, used by all four renderers below, so the calibration lives
 // in one place rather than four. Bold text at this size is measured ~8%
@@ -10327,9 +10617,14 @@ function renderTable(t,y0){
       const mk=markOf(r,c);
       // block fill= is the default DATA-cell fill (header tint is structural)
       const fill=(mk&&mk.fill)||(cell.hdr?'#eeede6':(hlRow(r)?'#fef3c7':(t.fill||'#fff')));
-      // addressable cells carry table-id:row:col (row 0 = bottom header tier)
-      const addrR = r>=H ? (r-H+1) : (r===H-1 ? 0 : null);
-      const addr = addrR===null ? '' : ' data-cell="'+t.id+':'+addrR+':'+(c+1)+'" style="cursor:pointer"';
+      // addressable cells carry table-id:row:col for EVERY tier (backlog 71):
+      // data rows are 1..n, the bottom header tier keeps its historical `0`
+      // spelling so existing consumers of that channel see no change, and
+      // every tier above it is `hN` (1-indexed from the top) — the same
+      // spelling the editor's own internal row-token model already used, so
+      // the editor can read this channel with no translation table.
+      const addrR = r>=H ? String(r-H+1) : (r===H-1 ? '0' : 'h'+(r+1));
+      const addr = ' data-cell="'+t.id+':'+addrR+':'+(c+1)+'" style="cursor:pointer"';
       // A merged cell owns every grid square it spans, so its internal
       // boundaries have the same owner on both sides and are never drawn.
       const rec={id:'c'+r+'_'+c, c:(mk&&mk.stroke)||null, d:false};
@@ -11645,6 +11940,18 @@ function snapshotAbs(overrides){
 // snapshotted origin); ungrouped nodes and group origins are canvas px.
 function emitPins(snap, frame, sourceDoc){
   const left=frame.left||0, top=frame.top||0, pins=[];
+  // THREE DECIMALS, not integers, and the reason is §4.3's fixed point.
+  // `materializePins` writes pins, re-renders to read back the pinned
+  // regime's own frame, and re-emits the SAME absolute targets against it;
+  // that second pass is only a fixed point if a coordinate survives the
+  // write. `Math.round(v)` did not: a guide hit or an aligned axis produced
+  // by align/distribute is generally fractional, so rounding moved the very
+  // element the gesture had just placed, by up to half a pixel, and the
+  // alignment the user had asked for was not the alignment written down.
+  // The cost is that EVERY node in the snapshot is written to three
+  // decimals, not only the one the gesture moved, which is noisier source
+  // for a language whose case is that a reader can check it — filed, with
+  // its measurement and a candidate fix, as backlog 73 (§7).
   const coord=v=>Math.round(v*1000)/1000;
   sourceDoc=sourceDoc||lastDoc;
   for(const gid in snap.groups){
@@ -12246,8 +12553,9 @@ function installDirectEdit(){
     hit.addEventListener('click',choose);
     hit.addEventListener('dblclick',choose);
   });
-  // Table cell addresses are UI-only and cover every header tier, not just
-  // the bottom header row carried by the artifact's public data-cell channel.
+  // Table cell addresses are UI-only: `data-ui-cell` re-spells the engine's
+  // own `data-cell` channel (which now covers every header tier, backlog 71)
+  // into the editor's internal row-token form — see installTableCellAddresses.
   svg.querySelectorAll('[data-ui-cell]').forEach(rc=>{
     if(!editable(rc)) return;
     rc.addEventListener('click',ev=>{
@@ -12732,6 +13040,23 @@ function highlightSelection(){
     sh.classList.add('element-selected');
   }
 }
+// THE ZERO-LENGTH SEGMENT IS A MERGE. This is the single distinction the
+// whole merge-safety of `setTableCellText`, `insertTableColumn` and
+// `deleteTableColumn` rests on, and nothing in the code says it out loud:
+//
+//   `| a || b |`   ->  ['a', '', 'b']    the '' is a COLSPAN CONTINUATION:
+//                                        the cell to its left spans into it
+//   `| a |  | b |` ->  ['a', '  ', 'b']  two spaces is an EMPTY CELL that
+//                                        occupies its own column
+//
+// So the segments are returned VERBATIM — no trimming, ever. Trimming them
+// would map both of the rows above onto the same array and silently turn
+// every empty cell into a merge (and every merge into an empty cell on the
+// way back through `buildPipeSource`, which joins with no padding of its
+// own). The three call sites each read the distinction differently: a write
+// into '' is refused outright, a column inserted at a '' must itself be ''
+// to stay inside the span, and a delete moves the left neighbour's text
+// rightwards into a trailing '' rather than dropping the span's head.
 function splitPipeSource(line){
   const s=String(line).trim();
   if(!s.startsWith('|')||!s.endsWith('|')) return null;
@@ -12826,6 +13151,8 @@ function setTableCellText(lines,sectionIndex,tid,rowTok,col,text){
   const idx=hm?info.headers[+hm[1]-1]:info.dataRows[+rowTok-1];
   if(idx===undefined)return {ok:false,error:'table cell row '+rowTok+' does not exist'};
   const parts=splitPipeSource(lines[idx]); if(!parts||col<1||col>parts.length)return {ok:false,error:'table column '+col+' does not exist'};
+  // '' is a merge continuation, not an empty cell (see `splitPipeSource`):
+  // writing text into it would give the span two texts.
   if(parts[col-1]==='')return {ok:false,error:'a merged continuation cell cannot be edited directly'};
   const old=parts[col-1],lead=(/^\s*/.exec(old)||[''])[0],tail=(/\s*$/.exec(old)||[''])[0];
   const escaped=String(text).replace(/\|/g,'\\|').replace(/\r/g,'').replace(/\n/g,'<br>');
@@ -12922,6 +13249,11 @@ function insertTableColumn(lines,sectionIndex,tid,afterCol){
   const pos=Math.max(0,Math.min(afterCol,info.nCols));
   for(const idx of info.headers.concat([info.delimiter],info.dataRows)){
     const parts=splitPipeSource(lines[idx]); if(!parts)return {ok:false,error:'cannot parse table pipe row'};
+    // Inserting INSIDE a span must widen the span, not punch a cell into it:
+    // a '' at the insertion point means the column being pushed right is a
+    // merge continuation, so the new segment is '' too (see
+    // `splitPipeSource`). Everywhere else the new segment is '  ' — two
+    // spaces, an EMPTY CELL, which is a different thing from ''.
     const insideMerge=idx!==info.delimiter&&parts[pos]==='';
     parts.splice(pos,0,idx===info.delimiter?'---':(insideMerge?'':'  '));
     lines[idx]=buildPipeSource(parts);
@@ -12955,6 +13287,11 @@ function deleteTableColumn(lines,sectionIndex,tid,col){
   for(const idx of info.headers.concat([info.delimiter],info.dataRows)){
     const parts=splitPipeSource(lines[idx]); if(!parts)return {ok:false,error:'cannot parse table pipe row'};
     const k=col-1;
+    // Deleting the HEAD of a span would delete the span's only text and
+    // leave its continuations ('' segments, see `splitPipeSource`) headless —
+    // the row would re-parse with the merge starting one column later and no
+    // label. So the text moves rightwards into the first continuation, which
+    // becomes the span's new head, before the column is spliced out.
     if(idx!==info.delimiter&&parts[k]!==''&&parts[k+1]==='')parts[k+1]=parts[k];
     parts.splice(k,1);lines[idx]=buildPipeSource(parts);
   }
@@ -12994,40 +13331,30 @@ function tableAnchorInRow(table,rowTok,col){
   anchors.sort((a,b)=>Math.abs(a-col)-Math.abs(b-col)||a-b);
   return anchors[0];
 }
-function tableCaptionElements(root){
-  return [...root.querySelectorAll('text[font-size="13"][font-weight="600"]')];
-}
+// installTableCellAddresses reads the engine's own `data-cell` channel —
+// backlog 71 closed the gap where the upper header tiers carried no channel
+// and the UI had to zip a scraped caption/rect run against the model as a
+// stand-in identity. The engine now addresses every tier (see renderTable),
+// so the UI's job is a pure re-spelling: `data-cell`'s row component uses
+// `0` for the bottom header tier (its historical, compatibility spelling)
+// and `hN` (1-indexed from the top) for every tier above it; the editor's
+// own internal row-token model spells ALL header tiers `h1..hH` including
+// the bottom one, so the only translation is `0` -> `h<H>`. An element that
+// carries no `data-cell` (an old render, or a DOM fixture that predates this
+// channel) is simply never visited here and stays unaddressed — losing the
+// cell affordance is recoverable, and there is no ink-based fallback left to
+// reach for.
 function installTableCellAddresses(root,doc){
-  const captions=tableCaptionElements(root),tables=(doc.blocks||[]).filter(x=>x.type==='table');
-  let from=0;
-  for(const table of tables){
-    let cap=null;
-    for(let i=from;i<captions.length;i++)if(captions[i].textContent===String(table.label==null?'':table.label)){cap=captions[i];from=i+1;break;}
-    if(!cap)continue;
-    const rects=[];let el=cap.nextElementSibling;
-    while(el){
-      if(el.matches&&el.matches('text[font-size="13"][font-weight="600"]'))break;
-      if(el.tagName&&el.tagName.toLowerCase()==='rect'&&el.getAttribute('stroke')==='none')rects.push(el);
-      el=el.nextElementSibling;
-    }
-    const addrs=tableAnchorAddresses(table);
-    // WHERE BOTH CHANNELS SPEAK, THEY MUST AGREE. The run above is taken in
-    // anchor order because the upper header tiers have no public channel to
-    // read; the engine's own `data-cell` covers the bottom tier and every data
-    // row, and a run that has slipped by one shows up there first. A table
-    // whose ink stops matching its model is left unaddressed — losing the cell
-    // affordance is recoverable, editing the cell the click did not name is
-    // not.
+  const tables=(doc.blocks||[]).filter(x=>x.type==='table');
+  if(!tables.length)return;
+  const byId={}; for(const t of tables) byId[t.id]=t;
+  for(const el of root.querySelectorAll('[data-cell]')){
+    const parts=String(el.getAttribute('data-cell')).split(':');
+    if(parts.length!==3)continue;
+    const table=byId[parts[0]]; if(!table)continue;
     const H=(table.heads||[]).length;
-    const n=Math.min(rects.length,addrs.length);
-    let agree=n===addrs.length;
-    for(let i=0;i<n&&agree;i++){
-      const own=rects[i].dataset.cell; if(!own) continue;
-      agree=own===table.id+':'+(addrs[i].rowTok==='h'+H?'0':addrs[i].rowTok)+':'+addrs[i].col;
-    }
-    if(!agree) continue;
-    for(let i=0;i<n;i++)
-      rects[i].dataset.uiCell=tableCellId(table.id,addrs[i].rowTok,addrs[i].col);
+    const rowTok=parts[1]==='0'?'h'+H:parts[1];
+    el.dataset.uiCell=tableCellId(table.id,rowTok,+parts[2]);
   }
 }
 function tableSelectableElement(id){
@@ -13136,6 +13463,21 @@ function bitfieldItems(lines,sectionIndex,bid){
   }
   return Object.assign(info,{items});
 }
+// A bitfield item's identity has TWO shapes because the source has two
+// spellings, and the arity of the id is what distinguishes them:
+//
+//   `bid:line`            a CLASSIC field, or a `break` — one line, one item,
+//                         so the line IS the identity
+//   `bid:line:itemIndex`  one item of a COMPACT list (`field A:2,B:2,C:4`) —
+//                         several items share one line, so the line alone
+//                         cannot name one
+//
+// The two-part form is not "index 0 omitted": a `null` itemIndex means *the
+// whole line is the item*, which is why `parseBitfieldSelectionId` returns
+// `null` rather than `0` for it and every consumer branches on that. The
+// per-item transactions (`rewriteCompactFieldItem`, the `data-compact-*`
+// controls) need the index; the per-LINE ones (move up/down, and the drag
+// reorder) act on the line and must not be given one.
 function bitfieldSelectionId(bid,line,itemIndex){
   return bid+':'+line+(itemIndex===undefined||itemIndex===null?'':':'+itemIndex);
 }
@@ -13214,6 +13556,30 @@ function fieldOptionAbsent(text,sectionIndex,bid,line,key){
   const item=info.items.find(x=>x.line===line&&x.kind!=='break');if(!item)return false;
   return !authoredOptionSpan(splitLineComment(lines[item.abs]).code,key,0,null);
 }
+// `fieldOptionAbsent`'s positive twin: the option IS on the field line, and
+// the authored bytes are exactly `key=<value>` — the value as the caller
+// spelled it, quoting and FigDown escaping included.
+//
+// It exists because the postcondition it serves used to recover the authored
+// value with `JSON.parse(value)`, which is a SECOND string grammar over bytes
+// the first one already governs. `escapeFdString` escapes `\`, `"` and
+// newline and nothing else, so a raw control character — a TAB, which has to
+// be pasted rather than typed — is written verbatim, is legal FigDown, and is
+// read back correctly by the engine. JSON forbids a raw control character in
+// a string literal, so the check threw and the transaction reported
+// `postcondition threw` for a write that was already correct: a legal edit
+// refused by the postcondition rather than by the grammar (backlog 74, `DESIGN-ARTIFACT-DRIFT-DETECTION`).
+//
+// `authoredOptionSpan` is the same locator `rewriteFieldOption` uses to PLACE
+// the write, so the two agree by construction; comparing the span's bytes
+// asks the only question a source-transaction postcondition can honestly ask
+// — are the bytes I claimed to write the bytes that are there?
+function fieldOptionWritten(text,sectionIndex,bid,line,key,value){
+  const lines=String(text).split('\n'),info=bitfieldItems(lines,sectionIndex,bid);if(!info.ok)return false;
+  const item=info.items.find(x=>x.line===line&&x.kind!=='break');if(!item)return false;
+  const code=splitLineComment(lines[item.abs]).code,span=authoredOptionSpan(code,key,0,null);
+  return !!span&&code.slice(span.start,span.end).trim()===key+'='+value;
+}
 function setBitfieldOption(lines,sectionIndex,bid,key,val){
   const info=bitfieldSourceInfo(lines,sectionIndex,bid);if(!info.ok)return info;
   const sp=splitLineComment(lines[info.start]),span=authoredOptionSpan(sp.code,key,0,null);
@@ -13268,6 +13634,27 @@ function moveBitfieldLineBefore(lines,sectionIndex,bid,line,beforeLine,after){
   order.forEach((oldLine,i)=>{lineMap[oldLine]=positions[i];});
   return {ok:true,lines,line:at-b.start+1,lineMap};
 }
+// Bit budget for the inspector's read-out. `pos` is a running bit CURSOR over
+// the whole diagram, not an offset inside one row, and every awkward
+// expression below is that cursor meeting a row boundary:
+//
+//   f.wrap        a `break`. `Math.ceil((pos||1)/word)*word` rounds the
+//                 cursor UP to the next row boundary — the `||1` is what
+//                 makes a break at bit 0 advance one full row instead of
+//                 staying put (ceil(0/word) is 0), so a leading break draws
+//                 an empty row rather than nothing.
+//   f.w==='*'     the row remainder. `word-(pos%word||0)` is the distance to
+//                 the next boundary, and the `||0` -> `||word` pair is the
+//                 boundary case: sitting exactly ON a boundary, `pos%word`
+//                 is 0, `rest` computes as the full `word`, and `rest||word`
+//                 keeps it a full row rather than a zero-width field.
+//   last          bits used in the FINAL row, 1-based: `((occupied-1)%word)+1`
+//                 rather than `occupied%word`, so a row filled exactly to the
+//                 word reads `word` and not 0.
+//
+// `declared` deliberately counts only fixed widths — a `*` declares no
+// number — and `rowFields` tracks whether the CURRENT row has any field yet,
+// which is why a break resets it.
 function bitfieldBudget(block){
   let declared=0,pos=0,occupied=0,remainder=false,rowFields=false;
   for(const f of block.fields||[]){
@@ -13451,18 +13838,38 @@ function buildTableInspector(ins,item,doc){
     if(r&&r.ok)setSelection(null,false);
   };
 }
+// WHICH table the toolbar's `+ Row` / `+ Col` act on. The selection is the
+// answer whenever it names one: the inspector's own insert/delete already
+// honour the selected cell's table, and a toolbar that quietly appended to a
+// different table than the one the user was standing in reported success for
+// an edit they did not ask for (backlog 75, `DESIGN-ARTIFACT-DRIFT-DETECTION`). Resolution is via
+// `parseTableCellId` and the block id — NOT `tableSelectionModel` — because
+// the toolbar needs the TABLE, and `tableSelectionModel` additionally
+// requires the addressed cell to exist and not be a merge continuation
+// (`cell&&!cell.m`); routing through it would silently fall back to the first
+// table whenever the caret sat in a merged span, which is the same defect in
+// a rarer case. `firstTypedBlock` remains the fallback for the only situation
+// that has no better answer: nothing names a table.
+// PURE on purpose — `(doc, selection item)` in, block out — so the choice is
+// exercisable by tools/editor-check.js, which cannot reach `$()` or a live
+// selection.
+function tableActionTarget(doc,sel){
+  const a=sel?parseTableCellId(sel.id):null;
+  const named=a?((doc&&doc.blocks||[]).find(x=>x.type==='table'&&x.id===a.tid)||null):null;
+  return named||firstTypedBlock(doc,'table');
+}
 function addTableRowAction(){
-  const t=firstTypedBlock(lastDoc,'table');if(!t)return failEdit('the first editable section has no table');
+  const t=tableActionTarget(lastDoc,oneSelected('cell'));if(!t)return failEdit('the first editable section has no table');
   const before=t.rows.length,refs=tableRefState(t);
   return commitGuiEdit('append table row',({lines})=>insertTableRow(lines,0,t.id,before),
-    ({parsed})=>{const nt=firstTypedBlock(parsed.docs[0],'table');
+    ({parsed})=>{const nt=(parsed.docs[0].blocks||[]).find(x=>x.type==='table'&&x.id===t.id);
       return !!nt&&nt.rows.length===before+1&&tableRefState(nt)===refs;},{sectionIndex:0});
 }
 function addTableColumnAction(){
-  const t=firstTypedBlock(lastDoc,'table');if(!t)return failEdit('the first editable section has no table');
+  const t=tableActionTarget(lastDoc,oneSelected('cell'));if(!t)return failEdit('the first editable section has no table');
   const before=t.cols.length,refs=tableRefState(t);
   return commitGuiEdit('append table column',({lines})=>insertTableColumn(lines,0,t.id,before),
-    ({parsed})=>{const nt=firstTypedBlock(parsed.docs[0],'table');
+    ({parsed})=>{const nt=(parsed.docs[0].blocks||[]).find(x=>x.type==='table'&&x.id===t.id);
       return !!nt&&nt.cols.length===before+1&&(!nt.width||nt.width.vals.length===nt.cols.length)&&tableRefState(nt)===refs;},{sectionIndex:0});
 }
 function addBitfieldFieldAction(){
@@ -13510,6 +13917,15 @@ function buildBitfieldInspector(ins,item,doc){
         '<button data-field-up="'+row.line+'">↑</button><button data-field-down="'+row.line+'">↓</button><button class="danger" data-field-delete="'+row.line+'">×</button></div>';
       continue;
     }
+    // A compact list draws one row PER ITEM but reorders one SOURCE LINE, so
+    // only the first item carries the drag handle and the ↑/↓ buttons
+    // (`i===0`, twice below). Giving every item a handle would offer the user
+    // three ways to drag the same line and let them "reorder" items within a
+    // list by a gesture that in fact moves the whole line — a control that
+    // lies about its own grain. Reordering WITHIN a compact list is
+    // `rewriteCompactFieldItem`'s business, not the drag's. The delete button
+    // is per ITEM (`row.line+':'+i`) because deleting one item of a list is a
+    // real operation; every other per-line control is on `row.line` alone.
     row.fields.forEach((f,i)=>{
       const rid=bitfieldSelectionId(block.id,row.line,i);
       list+='<div class="field-row'+(rid===selectedKey?' selected':'')+'"'+(i===0?' draggable="true" data-field-dnd="'+row.line+'"':'')+'>'+
@@ -13610,11 +14026,15 @@ function buildBitfieldInspector(ins,item,doc){
     $('iFieldName').onchange=()=>fieldName(a.line,idx,$('iFieldName').value);
     $('iFieldWidth').onchange=()=>fieldWidth(a.line,idx,$('iFieldWidth').value);
     $('iFieldStar').onclick=()=>fieldWidth(a.line,idx,'*');
+    // The postcondition reads back the AUTHORED SPAN (`fieldOptionWritten`),
+    // never a round-trip of the value through a second string grammar — see
+    // that function for why (backlog 74, `DESIGN-ARTIFACT-DRIFT-DETECTION`). The model lookup is kept
+    // ahead of it: the field must still be addressable after the edit.
     const opt=(key,value)=>commitGuiEdit((value===''?'clear ':'set ')+'field '+key,({lines})=>rewriteFieldOption(lines,sectionIndex,block.id,a.line,key,value),
       ({after,parsed})=>{
         if(value==='')return fieldOptionAbsent(after,sectionIndex,block.id,a.line,key);
         const m=bitfieldSelectionModel(parsed.docs[sectionIndex],item);if(!m)return false;
-        return key==='class'?(m.field.cls||[]).join(',')===value:String(m.field[key])===String(key==='present'||key==='description'?JSON.parse(value):value);
+        return fieldOptionWritten(after,sectionIndex,block.id,a.line,key,value);
       },{sectionIndex});
     const auth=bitfieldAuthoredOptions(item);
     $('iFieldFill').onchange=()=>opt('fill',$('iFieldFill').value.trim());if(auth.fill)$('iFieldFillClear').onclick=()=>opt('fill','');

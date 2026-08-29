@@ -1,0 +1,9 @@
+Assertion C (fatal), spec/figdown-a11y.md §4.2.
+
+`data-desc-state="generated"` in a published artifact. The state is marked
+honestly, so assertion B is satisfied — and it is still a failure, because a
+`generated` description is never publishable on its own under this profile.
+This fixture is the one that keeps B and C from collapsing into each other:
+marking is necessary and not sufficient.
+
+a `generated` description is published

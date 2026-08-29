@@ -1,0 +1,11 @@
+BAD RELATION — `relation: "quotes-from"`, which is not one of the three
+closed vocabulary members.
+
+figdown-manifest.md §4.5 (`PUBLICATION-MANIFEST-PROFILE`) closes `provenance[].relation` to exactly
+`transcribed-from`, `derived-from` and `about` — three different claims about
+where a figure came from. `quotes-from` is a plausible-looking word that is
+not one of them, which is exactly the failure mode a closed enum exists to
+catch: a reader who cannot tell the claims apart cannot use any of them, and
+a schema that accepted a near-miss spelling would let that confusion into a
+published manifest silently.
+is not one of

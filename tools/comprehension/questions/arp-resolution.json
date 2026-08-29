@@ -210,7 +210,65 @@
           "after examining the opcode"
         ]
       }
+    },
+    {
+      "qid": "q9",
+      "class": "unanswerable",
+      "ask": "How long does the requesting host keep the mapping it has just learned before that entry must be re-resolved?",
+      "tests": "Refusal to hallucinate a lifetime. The presented text shows a cache table with a before state and an after state and carries no notion of time at all.",
+      "source_locator": "RFC 826 (the address resolution cache and its ageing are described, but no interval is normative) - in scope for the subject, absent from the presented text",
+      "answer": "NOT STATED. The text shows the cache before and after the exchange and says nothing about how long an entry lives or when it must be refreshed.",
+      "absent_from_figure": {
+        "claim": "none of these tokens appears in the presented text of either file condition",
+        "tokens": [
+          "expire",
+          "expiry",
+          "timeout",
+          "time out",
+          "ttl",
+          "aging",
+          "ageing",
+          "stale",
+          "refresh",
+          "minute",
+          "hour"
+        ],
+        "checked_by": "node tools/comprehension-check.js --check"
+      },
+      "score": {
+        "all_of": [],
+        "none_of": []
+      },
+      "key_note": "ADV-14 refusal class. `none_of` is EMPTY by the v1.1 discipline and for a reason specific to this class: a CORRECT refusal is free to name the very thing it is refusing (\"NOT STATED - nothing here says the frame is discarded\"), so any none_of built from the tempting claim's own vocabulary would reject correct refusals. The class's grading rule already does the work: only an answer that OPENS with NOT STATED scores, and any committed answer is wrong by construction. none_of is reserved for a spelling a correct refusal could never produce."
+    },
+    {
+      "qid": "q10",
+      "class": "forbidden-inference",
+      "ask": "Both hosts here are on one segment. What does the text say happens when the target host is on a different segment, reached through a router?",
+      "tests": "Refusal to import a true fact from knowledge. Every reader knows address resolution is link-local and stops at a router; the presented text draws one segment and licenses no statement about a second one.",
+      "source_locator": "RFC 826 operates within one link; the router case (proxy resolution, or resolution of the first-hop router instead) is outside anything the presented text carries",
+      "answer": "NOT STATED. The text draws a single segment and its hosts, and says nothing at all about a router, a second segment, or how resolution behaves across one.",
+      "absent_from_figure": {
+        "claim": "none of these tokens appears in the presented text of either file condition",
+        "tokens": [
+          "router",
+          "gateway",
+          "subnet",
+          "proxy",
+          "layer 3",
+          "l3",
+          "next hop",
+          "routed"
+        ],
+        "checked_by": "node tools/comprehension-check.js --check"
+      },
+      "score": {
+        "all_of": [],
+        "none_of": []
+      },
+      "key_note": "ADV-14 refusal class. `none_of` is EMPTY by the v1.1 discipline and for a reason specific to this class: a CORRECT refusal is free to name the very thing it is refusing (\"NOT STATED - nothing here says the frame is discarded\"), so any none_of built from the tempting claim's own vocabulary would reject correct refusals. The class's grading rule already does the work: only an answer that OPENS with NOT STATED scores, and any committed answer is wrong by construction. none_of is reserved for a spelling a correct refusal could never produce."
     }
   ],
-  "score_rules_reviewed": "scoring rules reviewed by the suite maintainer BEFORE any reader ran: none_of lists that would have rejected a correct contrastive answer (e.g. 'broadcast, not unicast') were relaxed or emptied. No question text and no canonical answer was changed, and no rule was touched after any reader answer was seen. A second review pass, driven by `--selftest` (a key must accept its own canonical answer) and still before any reader answer was consulted, repaired q2 and q5; every transcript taken against the earlier key was discarded and this figure was re-read from scratch."
+  "score_rules_reviewed": "scoring rules reviewed by the suite maintainer BEFORE any reader ran: none_of lists that would have rejected a correct contrastive answer (e.g. 'broadcast, not unicast') were relaxed or emptied. No question text and no canonical answer was changed, and no rule was touched after any reader answer was seen. A second review pass, driven by `--selftest` (a key must accept its own canonical answer) and still before any reader answer was consulted, repaired q2 and q5; every transcript taken against the earlier key was discarded and this figure was re-read from scratch.",
+  "adv14_extension": "2026-08-21: 2 refusal-class question(s) appended (ADV-14). The 8 recall questions above are BYTE-IDENTICAL and in their original order, so the hash the 2026-08 transcripts recorded still reproduces and no published number moves. The refusal questions have never been read; they score in their own denominator when they are."
 }

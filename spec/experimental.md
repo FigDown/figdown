@@ -11,9 +11,11 @@
 >
 > **One exception, measured and stated: an implementation
 > that skips this file entirely CANNOT pass the normative conformance
-> suite.** 23 of the 192 fixtures in `conformance/cases/` write an
-> experimental keyword at line start. See §E0.1 for the list and for what
-> a skipping implementation should do instead.
+> suite.** 23 fixtures in `conformance/cases/` write an experimental
+> keyword at line start — the 23 §E0.1 enumerates, out of however many
+> that directory holds today (`PROOF.md` reports the suite's size, and it
+> grows; no count of it is typed here). See §E0.1 for the list and for
+> what a skipping implementation should do instead.
 >
 > **This file no longer DECLARES anything (`SUBJECT-VOCABULARY-SCOPE`).** Each
 > surviving construct is declared by the one genre that has it, and this
@@ -167,8 +169,10 @@ the DOCUMENTS. It was read — including by this file — as also promising
 that an implementation could skip experimental material and still conform.
 **That second reading is false, and this section is the correction.**
 
-**23 of the 192 normative fixtures write an experimental keyword at line
-start**, so an implementation that rejects those keywords as unknown fails
+**23 normative fixtures write an experimental keyword at line start** —
+the 23 tabulated immediately below, which is what makes that numerator
+checkable; the suite's own size is reported by `PROOF.md` and is not
+retyped here — so an implementation that rejects those keywords as unknown fails
 all 23: on the error fixtures it emits a different message (`unknown
 keyword` where the golden says `bundle needs an id`), and on the model
 fixtures it emits an empty array where the golden carries members.
@@ -243,7 +247,9 @@ files exist to provide, so it was not done.
 
 **What this means for an implementation, stated as a rule.**
 
-- To claim **parser conformance** — the 192 normative fixtures — an
+- To claim **parser conformance** — every fixture in
+  `conformance/cases/`, the normative suite whose size `PROOF.md`
+  reports — an
   implementation MUST parse `bundle`, `threshold` and `band`, and the
   `timing` genre with its `signal` child, at least well enough to produce
   their model shapes (§E5) and their error messages. **Skipping this file

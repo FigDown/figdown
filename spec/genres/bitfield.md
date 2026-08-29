@@ -448,7 +448,7 @@ no option key for it.
   engine speaking for the author.
 - key absent → solid, no caption.
 
-**Where the dash actually lands.** A field's boundary is
+**Where the dash actually lands (`SHARED-CELL-BOUNDARY`).** A field's boundary is
 *shared* with its neighbour, and the renderer draws each boundary exactly once.
 An edge is dashed **iff at least one of the two fields touching it carries
 `present=`** — so a conditional field is enclosed by a dashed outline even

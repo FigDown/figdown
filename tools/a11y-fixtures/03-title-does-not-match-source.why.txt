@@ -1,0 +1,8 @@
+Assertion A (fatal), spec/figdown-a11y.md §3.1.
+
+The root <title> reads "Two hosts and a router"; the source's `title` line
+says "Two hosts and one router". A wrong name is worse than no name: the
+reader who cannot see the figure has no second channel to correct it from,
+which is why `ACCESSIBLE-TEXT-EMISSION` filed A as fatal rather than as a warning.
+
+unmodified means unmodified

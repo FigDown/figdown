@@ -202,7 +202,65 @@
           "data field is excluded"
         ]
       }
+    },
+    {
+      "qid": "q9",
+      "class": "unanswerable",
+      "ask": "What is the minimum total length, in bytes, of a valid frame on the wire, and what makes a short frame reach it?",
+      "tests": "Refusal to hallucinate a whole-frame constraint from per-field byte counts. Every field's width is given, so a reader can add them up - but the minimum frame size is a rule about the frame, not a sum of its parts, and the presented text carries no such rule.",
+      "source_locator": "IEEE Std 802.3 Cl. 3.2.7 / 4.2.3.3 (minimum frame size and padding of the MAC client data field)",
+      "answer": "NOT STATED. The text gives each field's byte count and the payload range, and states no minimum frame length and no padding rule.",
+      "absent_from_figure": {
+        "claim": "none of these tokens appears in the presented text of either file condition",
+        "tokens": [
+          "minimum",
+          "runt",
+          "pad",
+          "padding",
+          "64 byte",
+          "512 bit"
+        ],
+        "checked_by": "node tools/comprehension-check.js --check"
+      },
+      "score": {
+        "all_of": [],
+        "none_of": []
+      },
+      "key_note": "ADV-14 refusal class. `none_of` is EMPTY by the v1.1 discipline and for a reason specific to this class: a CORRECT refusal is free to name the very thing it is refusing (\"NOT STATED - nothing here says the frame is discarded\"), so any none_of built from the tempting claim's own vocabulary would reject correct refusals. The class's grading rule already does the work: only an answer that OPENS with NOT STATED scores, and any committed answer is wrong by construction. none_of is reserved for a spelling a correct refusal could never produce."
+    },
+    {
+      "qid": "q10",
+      "class": "forbidden-inference",
+      "ask": "How many 802.1Q tags may one frame carry?",
+      "tests": "Refusal to read a limit off a layout. The text offers exactly two variants, untagged and tagged, and one tag column - which reads as an exhaustive enumeration and is not one.",
+      "source_locator": "IEEE Std 802.1Q (a service VLAN tag may precede a customer VLAN tag) - the presented text enumerates two variants and states no limit",
+      "answer": "NOT STATED. The text contrasts an untagged frame with a tagged one and says nothing about how many tags are permitted.",
+      "absent_from_figure": {
+        "claim": "none of these tokens appears in the presented text of either file condition",
+        "tokens": [
+          "q in q",
+          "qinq",
+          "double",
+          "stacked",
+          "outer",
+          "inner",
+          "88a8",
+          "at most",
+          "only one",
+          "one tag",
+          "service vlan",
+          "customer vlan",
+          "provider bridge"
+        ],
+        "checked_by": "node tools/comprehension-check.js --check"
+      },
+      "score": {
+        "all_of": [],
+        "none_of": []
+      },
+      "key_note": "ADV-14 refusal class. `none_of` is EMPTY by the v1.1 discipline and for a reason specific to this class: a CORRECT refusal is free to name the very thing it is refusing (\"NOT STATED - nothing here says the frame is discarded\"), so any none_of built from the tempting claim's own vocabulary would reject correct refusals. The class's grading rule already does the work: only an answer that OPENS with NOT STATED scores, and any committed answer is wrong by construction. none_of is reserved for a spelling a correct refusal could never produce."
     }
   ],
-  "score_rules_reviewed": "scoring rules reviewed by the suite maintainer BEFORE any reader ran: none_of lists that would have rejected a correct contrastive answer (e.g. 'broadcast, not unicast') were relaxed or emptied. No question text and no canonical answer was changed, and no rule was touched after any reader answer was seen."
+  "score_rules_reviewed": "scoring rules reviewed by the suite maintainer BEFORE any reader ran: none_of lists that would have rejected a correct contrastive answer (e.g. 'broadcast, not unicast') were relaxed or emptied. No question text and no canonical answer was changed, and no rule was touched after any reader answer was seen.",
+  "adv14_extension": "2026-08-21: 2 refusal-class question(s) appended (ADV-14). The 8 recall questions above are BYTE-IDENTICAL and in their original order, so the hash the 2026-08 transcripts recorded still reproduces and no published number moves. The refusal questions have never been read; they score in their own denominator when they are."
 }

@@ -1,6 +1,6 @@
 figdown 0.1 table
 # A CLASS MARK ON A MERGED REGION FRAMES THE REGION, NOT ITS PIECES.
-# Standing regression item for the shared-edge grid: a
+# Standing regression item for the shared-edge grid (`SHARED-CELL-BOUNDARY`): a
 # merged cell owns every grid square it spans, so both sides of every boundary
 # INSIDE it have the same owner and nothing is drawn there, and its mark is one
 # ring around the whole region rather than one ring per square. The four
@@ -14,7 +14,7 @@ figdown 0.1 table
 #      class, so the boundary between the 2x2 region and column D has two
 #      differently-marked owners. That is the hardest case in the language:
 #      the shared edge is drawn once in the default grid colour, and each side
-#      keeps its own colour on its own side of it. Before this release one of the two
+#      keeps its own colour on its own side of it. Before `SHARED-CELL-BOUNDARY` one of the two
 #      marks was overwritten by the other and the figure lost it.
 #
 # WHAT THE GOLDEN PINS, AND WHAT IT CANNOT. The model records STRUCTURE —

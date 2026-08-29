@@ -219,7 +219,7 @@ is normative: the cell addresses, the `highlight` flag and the span markers,
 which carry the grid's meaning, and the column widths and alignment, which
 are presentation but have converged just as firmly.
 
-**How a cell's border draws.** A boundary between two cells
+**How a cell's border draws (`SHARED-CELL-BOUNDARY`).** A boundary between two cells
 belongs to both of them and is drawn **exactly once**, in the block's `stroke=`
 colour at full weight. A `cell`'s own `stroke=` (or the one it inherits from a
 `class=`) is drawn as a solid full-weight ring **inside** that cell, so a marked

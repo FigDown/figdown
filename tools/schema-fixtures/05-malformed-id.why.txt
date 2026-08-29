@@ -1,0 +1,8 @@
+MALFORMED ID — `a--b` in an id position.
+
+`LINK-OPERATOR-IN-IDS` makes `--` the LINK OPERATOR, so it cannot occur inside an id: the two
+shapes a `bundle` member may take, an endpoint pair "a--b" and a bare connector
+id, are told apart by exactly this rule. An id containing `--` makes that
+distinction undecidable, so the id grammar excludes it rather than leaving a
+consumer to guess.
+does not match

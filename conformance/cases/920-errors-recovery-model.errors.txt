@@ -1,0 +1,14 @@
+Line 14: unknown shape "hexagon" (box|rounded|circle|ellipse|diamond|cylinder)
+Line 16: unknown endpoint "a"
+Line 17: class needs a meaning: class c "<meaning>" (write "" to declare no meaning: the class then groups attributes only and draws no legend entry)
+Line 18: unknown class "c"
+Line 31: layout takes no arguments
+Line 34: "edge" is a semantic directive — it must appear before the layout zone (`CONTENT-LAYOUT-ZONE-SPLIT`)
+Line 35: unknown color "notacolor" (#hex or CSS color name)
+Line 44: numbering must be lsb0 or msb0
+Line 46: ";" is reserved for a future statement separator and has no meaning in v0.1 — write one directive per line; a literal ";" belongs inside a quoted string, an [edge label] or a comment (MIGRATIONS 0.1)
+Line 48: unknown color "notacolor" (#hex or CSS color name)
+Line 49: "field" is a typed-block child — it needs a bitfield/table/timing block above it
+Line 59: duplicate width
+Line 68: unknown color "notacolor" (#hex or CSS color name)
+Line 71: pin at= needs a paren point: at=(<x>,<y>)

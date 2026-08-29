@@ -3,8 +3,9 @@
 # Regression fixture for backlog item 66 (`TYPED-BLOCK-TITLE-CANVAS`): a typed block's
 # own title must join its canvas computation. This is deliberately the
 # smallest possible bitfield — two fields, one byte — under a title chosen to
-# be far wider than the data, the shape FR-4's own repro used (severity scales
-# INVERSELY with figure size). Not a documentation example: gate:layout is the
+# be far wider than the data, the shape the downstream report's own repro
+# used (severity scales INVERSELY with figure size). Not a documentation
+# example: gate:layout is the
 # only reader of this file (see package.json's gate:layout script), so it
 # stays outside examples/reference-coverage, cite-check and the other
 # corpus-quality gates scoped to examples/ and figures/, none of which this

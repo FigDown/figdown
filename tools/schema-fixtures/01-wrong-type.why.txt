@@ -1,0 +1,9 @@
+WRONG TYPE — `line` is the string "2" instead of the number 2.
+
+The mutation is the one a hand-written or template-generated model makes most
+often: JSON has both, and a source line printed rather than emitted is a string
+that LOOKS right in a diff. §12.2 types every `line` as a number and §12.5
+binds it to an ECMAScript Number, so a string here is not a formatting choice —
+arithmetic over it (the sequence genre's time axis is `line`-sorted) silently
+becomes string comparison, where 10 sorts before 2.
+expected type integer, got string

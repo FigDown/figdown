@@ -1,0 +1,10 @@
+PROVENANCE ENTRY WITH NO LOCATOR — `document_id` and `revision` name a
+document but say nothing about WHERE in it.
+
+figdown-manifest.md §4.5 (`PUBLICATION-MANIFEST-PROFILE`, verifier assertion D) requires every
+`provenance` entry to carry `relation` AND at least one locator field —
+`section`, `figure`, `locator` or `bbox`. `document_id`/`revision`/`uri`/
+`document_sha256` say WHICH document; they are not locators inside it. A
+provenance entry with none of the four locator fields names a source and
+points at nothing in it, which is not a usable claim under this profile.
+carries no locator field

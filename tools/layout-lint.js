@@ -1374,13 +1374,40 @@ const NOT_JUDGED = [
 // ADVISORY: it is absent from score(), from --max-score and from --strict, so
 // the regression is printed and does not fail the gate while the axis soaks.
 const F6_BASELINE = {
-  // A shaft grazing the band name at 2.8 px, not a strike. The edge is drawn
-  // as a plain <line> because `routeAround` reports "boxed in" for it — the
-  // detour the padded name obstacle asks for is blocked by the neighbouring
-  // group rects — so the router cannot clear this one and the residue is
-  // honest rather than papered over. It clears when the router can leave a
-  // corridor for it (engine-backlog items 26/41/44's territory).
-  'examples/pvlan-flows.fd': 1, // band `Promiscuous — VID_P` — 2.8px from edge line 77
+  // A shaft grazing the band name at 2.8 px, not a strike. Until this release
+  // this edge was drawn as a plain <line> because `routeAround` reported
+  // "boxed in" for it — the detour the padded name obstacle asked for was
+  // blocked by the neighbouring group rects. GROUP-BOUNDARY-OBSTACLE makes it a
+  // plain <line> for a REASON instead of by luck: `pp1` is a member of the
+  // group whose name this is, so the name is not an obstacle to an edge that
+  // terminates inside it. Same pixels, different ground.
+  //
+  // RAISED 1 -> 2, and this is a DISCLOSED COST of GROUP-BOUNDARY-OBSTACLE, not a
+  // silenced regression. The second entry is `Isolated — VID_I` at 0.0 px from
+  // edge line 81 (`pp1 <-> ip1`). Before GROUP-BOUNDARY-OBSTACLE that edge did not graze the name
+  // — it was DETOURED around it, out of its corridor, down the band's outer
+  // edge and into `I1` from the side, so the drawing said the line arrives at
+  // the CONTAINER when the source says it arrives at the MEMBER. GROUP-BOUNDARY-OBSTACLE rules
+  // that false statement out, and the straight run it restores crosses the
+  // tail of the name box. Measured: the name box (deliberately OVER-measured,
+  // §14.4's safe direction) runs x 200..308.7, and the edge crosses that band
+  // between x 296.8 and x 303.8 — past the last glyph in the render, inside
+  // the measured box. The truer drawing costs this much clearance and the
+  // number is kept where a reader can see it.
+  //
+  // NOT DONE, and recorded so it is not re-discovered as new: F6's denominator
+  // was NOT narrowed to stop counting a group's own member-edge as "foreign".
+  // The axis's stated question — does a shaft near a label invite the reader
+  // to connect the two — genuinely does not arise here (the line DOES belong
+  // to the group the label names), so the narrowing is arguable; it was
+  // refused because ink over glyphs is a reading cost whatever the semantics,
+  // and because narrowing an axis in the same change that makes it fire is how
+  // a cost disappears. It reopens if a second figure lands the same pair.
+  //
+  // Both entries clear when the router can leave a corridor for them
+  // (engine-backlog items 26/41/44's territory).
+  'examples/pvlan-flows.fd': 2, // band `Promiscuous — VID_P` — 2.8px from edge line 77;
+                                // band `Isolated — VID_I` — 0.0px from edge line 81 (GROUP-BOUNDARY-OBSTACLE)
 };
 
 const F5_BASELINE = {

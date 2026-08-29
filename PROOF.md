@@ -31,9 +31,9 @@ npm test          # every gate, in order, with a pass/fail line each
 npm run gates:list # the enumeration alone, without running anything
 ```
 
-There are **27 gates**. Each note below is the tool's own
+There are **36 gates**. Each note below is the tool's own
 one-line description of itself, read out of its header comment, so a note cannot
-drift from the tool it describes; 4 are stated here instead, where the
+drift from the tool it describes; 10 are stated here instead, where the
 header's first line does not stand alone:
 
 | gate | command | what it asserts |
@@ -53,6 +53,7 @@ header's first line does not stand alone:
 | `gate:isolation` | `node tools/isolation-check.js --strict` | the FROZEN set must survive deletion of the EXPERIMENTAL set |
 | `gate:boundary` | `node tools/boundary-check.js --strict` | render-side check for boundary placement in pinned scenes |
 | `gate:stability` | `node tools/stability-check.js` | axiom-3 evidence harness for FigDown |
+| `gate:locality` | `node tools/layout-stability/run.js --strict` | THE LAYOUT-LOCALITY INSTRUMENT (ADV-9, axiom LAYOUT-STABILITY) |
 | `gate:migrate` | `node tools/migrate-check.js` | the fixture suite for tools/migrate-figdown.js |
 | `gate:skill-coverage` | `node tools/skill-coverage.js --strict` | the agent skill teaches the whole registry, and nothing retired |
 | `gate:legend` | `node tools/legend-check.js --strict` | FigDown legend gate — the legend must draw exactly the distinctions the figure makes, and no others |
@@ -64,6 +65,14 @@ header's first line does not stand alone:
 | `gate:mcp` | `node integrations/mcp-server/test.js` | Test for the FigDown MCP server |
 | `gate:proof` | `node tools/make-proof.js --check` | this page is not stale — regenerating it from the tree must reproduce the committed bytes |
 | `gate:safesvg` | `node tools/safe-svg-check.js --strict` | the Safe SVG profile gate (gate:safesvg) |
+| `gate:schema` | `node tools/schema-check.js --strict` | the gate over `spec/figdown-model.schema.json`, the published SHAPE contract for the canonical semantic model (core §12) |
+| `gate:alt` | `node tools/alt-check.js --strict` | every Markdown embed of a FigDown artifact must carry an alt that says what the figure is |
+| `gate:manifest` | `node tools/manifest-check.js --strict` | the publication manifest verifier — five assertions (parses/versioned, restates the pair correctly, hashes well-formed and bound, provenance has a relation and a locator, unknown keys fail) over every `X.manifest.json` in the tree and over `tools/manifest-fixtures/` |
+| `gate:a11y` | `node tools/a11y-check.js --strict` | the accessibility profile verifier — five of six ruled assertions (root `<title>` equals the source title, a `<desc>` carries an admissible state, no `generated` description is published, a declared role, no `aria-hidden` on an element carrying an identity) over every artifact that claims the profile, over the whole source corpus rendered fresh under `--with-a11y`, and over `tools/a11y-fixtures/`; the sixth is `gate:alt` |
+| `gate:bcp14` | `node tools/bcp14-check.js --strict` | the BCP 14 declaration is where NORMATIVE-KEYWORD-DECLARATION put it (core §0.1, both languages, both RFCs, the capitalization caveat), every all-caps modal construction in `spec/` is one of the eleven BCP 14 spellings, and every document with its own status block points at the declaration — and it refuses to judge whether an occurrence is a genuine requirement, which party it binds, or whether a lowercase modal should have been uppercase |
+| `gate:vocab` | `node tools/vocab-check.js --strict` | `spec/vocabulary-sources.tsv` is shape-clean (every row the header's column count, no empty or stray-whitespace cell), its `layer`/`stage` columns are in the GRAMMAR-LAYERING-MODEL vocabulary, and it agrees two-way with `spec/core.md` §10 on option keys (the check that would have caught the missing `id=` row), on live keywords, and on the option-key and genre totals — and it refuses to verify a `source` claim's truth, judge whether a `layer`/`stage` value is the right one, or cross-check retired keywords, positionals or marks, for which core.md carries no comprehensive registry table |
+| `gate:actor` | `node tools/actor-check.js --strict` | the conformance-class declaration is where CONFORMANCE-CLASS-LIST put it (core §0.2, both languages, all six classes, the closed-list statement, the label sentence and the maintainers-out-of-scope sentence), every party `spec/` calls *conforming* or *conformant* is one of those six classes or a declared label or a declared non-party, and every profile names core §0.2 and the class it binds — and it refuses to decide which class any given normative sentence binds, which is reading and is what the per-section audit core §0.2 schedules |
+| `gate:harness` | `node tools/harness-check.js --strict` | the language-agnostic harness contract is ALIVE: the conformance runner's subprocess mode still feeds a `.fd` on stdin, still compares an external command's stdout against the same goldens the in-process path uses, and still refuses a command that breaks a rule |
 | `gate:reference` | `node tools/reference-gate.js` | makes tools/reference-coverage.js a GATE |
 
 ## 2. What the language promises, and where that is pinned
@@ -80,16 +89,16 @@ node conformance/run.js                  # the normative surface
 node conformance/run.js --experimental   # the corpus outside it
 ```
 
-- **204 normative fixtures**, 204 passing, 0 failing. This is the number that may
+- **206 normative fixtures**, 206 passing, 0 failing. This is the number that may
   be quoted as "the conformance suite" — `conformance/cases/`.
 - **84 experimental fixtures**, 84 passing, 0 failing (69 by genre, 48 by demoted construct, 33 both). They pin
   reference-engine behaviour and are required to pass, but their subject is
   outside the v0.1 surface, so a second implementation may skip the whole
   directory and still conform. The reason for each is recorded in
   `conformance/STATUS.txt`.
-- **288 fixtures run in total**, 288 passing, 0 failing.
+- **290 fixtures run in total**, 290 passing, 0 failing.
 
-The corpus on disk is **204** `.fd` files under `conformance/cases/` and **84**
+The corpus on disk is **206** `.fd` files under `conformance/cases/` and **84**
 under `conformance/experimental/` — the same counts the runner reports, so no fixture is present and unrun.
 
 Every audited engine-vs-spec deviation is written down in
@@ -154,8 +163,8 @@ The engine is one hand-edited file, `editor/figdown.html`; the other copies are
 generated from it and byte-gated against it. It stamps its own version into every
 artifact it builds, because the reproducibility promise is per-renderer-version.
 
-- `FIGDOWN_VERSION` — **`0.5.0`** (read from `editor/figdown.html`).
-- package version — **`0.5.0`**.
+- `FIGDOWN_VERSION` — **`0.5.1`** (read from `editor/figdown.html`).
+- package version — **`0.5.1`**.
 - engine copies present, each gated against that source copy — **4**: `editor/figdown.html`, `skill/figdown/figdown.html`, `dist/figdown.js`, `dist/figdown.mjs`.
 
 ## 4. What was measured rather than asserted
@@ -254,7 +263,7 @@ of `results.json` rather than restated:
 > observable (not a criterion): adoption rate of engine-suggested coordinates.
 > If neither criterion is met the envelope is retracted or redesigned; the
 > result is recorded either way. (decisions/registry.md, copied verbatim —
-> UNCHANGED for the floor run, §7.)
+> UNCHANGED for the floor run.)
 
 | floor (C1-C4, compound) | chains | first-round success | mean rounds to success | eventual success |
 |---|---:|---:|---:|---:|
@@ -291,7 +300,7 @@ down before any condition-`B` call; quoted out of `results.json`:
 > not lower than A's by more than 10 points (non-inferiority). Otherwise the
 > clauses are retracted or redesigned; the result is recorded either way.
 > (decisions/registry.md, copied verbatim — amended after the aborted one-shot
-> run, before any condition-B call; see §3/§6.)
+> run, before any condition-B call.)
 
 | condition | normal tasks valid | mean rounds to valid | trap tasks reported truthfully |
 |---|---:|---:|---:|

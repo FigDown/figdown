@@ -1,4 +1,4 @@
-// figdown.js — FigDown embeddable library (0.5.0)
+// figdown.js — FigDown embeddable library (0.5.1)
 // GENERATED FILE, DO NOT EDIT. Built from editor/figdown.html.
 // Regenerate with: node tools/make-lib.js
 (function (root, factory) {
@@ -10,7 +10,7 @@
   }
 }(typeof globalThis !== 'undefined' ? globalThis : this, function () {
   'use strict';
-var VERSION = "0.5.0";
+var VERSION = "0.5.1";
 
 // ---- engine (extracted verbatim from editor/figdown.html) ----
 var __engine = (function () {
@@ -24,14 +24,14 @@ const SHAPES = ['box','rounded','circle','ellipse','diamond','cylinder'];
 // input to that promise, and under core §13 a 0.x renderer may differ from
 // the next — which makes the recorded version the only thing that can
 // explain a diff between two renderings of one source.
-const FIGDOWN_VERSION = '0.5.0';
+const FIGDOWN_VERSION = '0.5.1';
 // `TYPED-BLOCK-TITLE-CANVAS`: a `Z`-only dev bump — RENDERER ONLY, no keyword, no
 // option key, no model field, so `figdown 0.5` still names one language. A
 // typed block's own title (bitfield/table/timing/chart) now joins the
 // section's canvas computation: the returned width is the union of the data
 // extent and the title extent (`typedBlockTitleW`, shared by all four
 // renderers), so a title wider than the data widens the canvas instead of
-// running off it at x=0. Fixes backlog item 66 (FR-4). Corpus impact
+// running off it at x=0. Fixes backlog item 66, raised downstream. Corpus impact
 // surveyed first: zero shipped drawings change (every typed-block title in
 // the corpus already fit its data-derived canvas); the fix only reaches
 // fixtures the corpus does not yet have. See spec/migrations.md.
@@ -1298,6 +1298,35 @@ const WORD_WHY={
 const WRONG_WORD=(surf,want,genre)=>
   '"'+surf+'" is not the word genre '+genre+' uses for this — write "'+want+'": '+WORD_WHY[want]+
   '. Each genre takes the term its own domain uses (block/topology `node` `edge`, flowchart `node` `flowline`, statechart `state` `transition`, sequence `lifeline` `message`) — run tools/migrate-figdown.js to rewrite it (MIGRATIONS 0.2)';
+// `LANGUAGE-EXTENSION-POLICY`/`RESERVED-PREFIX-ENFORCEMENT` (2026-08-23): the `x-` prefix is RESERVED against FigDown's own
+// vocabulary and is NOT an extension namespace. Until this entry it was the
+// one reservation core §10 wrote down by name and NOTHING enforced: `x-note`
+// earned `"x-note" is not allowed in genre block` — the same words a typo
+// gets — while `page`, `;` and `step` each got a diagnostic naming their
+// reservation. `SEMICOLON-STATUS`'s own title says a reservation that is not enforced is not
+// a reservation, so this is what makes `x-` one.
+//
+// The message says three things, and the THIRD is the whole value: `LANGUAGE-EXTENSION-POLICY`
+// RETIRED the promise of a future extension mechanism, so an author who reads
+// core §10's pre-0.5 wording is being told the opposite of the rule. It must
+// say the prefix will not open, not merely that it is taken.
+//
+// IT MUST NOT REACH IDENTIFIERS. The reservation is about the language's own
+// vocabulary; an id is the author's. `node x-foo "A"` and `class x-bar
+// "meaning"` parsed and rendered before this entry and still do, which is why
+// both call sites below are in KEYWORD position and OPTION-KEY position and
+// nowhere else.
+const X_RESERVED_WHY =
+  ': the "x-" prefix is reserved against FigDown\'s OWN vocabulary — no standard '+
+  'keyword or option key may begin "x-" — and it is NOT an extension namespace. '+
+  'The language is CLOSED, so this does not become legal by waiting (core §10, `LANGUAGE-EXTENSION-POLICY`). '+
+  'Record the fact in a publication manifest instead, spelled x-<owner>-<key> '+
+  '(spec/figdown-manifest.md §2.1); propose the construct through .github/CONTRIBUTING.md §2; '+
+  'or fork with your own header token. Identifiers are untouched: node x-foo "A" and '+
+  'class x-bar "meaning" both parse';
+const X_RESERVED_KW  = kw => '"'+kw+'" is RESERVED, not an extension keyword'+X_RESERVED_WHY;
+const X_RESERVED_OPT = k  => 'option "'+k+'=" is RESERVED, not an extension option key'+X_RESERVED_WHY;
+const isXReserved = s => typeof s==='string' && s.slice(0,2)==='x-';
 // `SCENE-KEYWORD-MEMBERSHIP`: a word WITHDRAWN FROM ONE GENRE is not an unknown word,
 // and `"threshold" is not allowed in genre topology` would send an author
 // looking for a typo. Each cell below was legal until 0.3 and states
@@ -1937,7 +1966,12 @@ function parseOne(text){
     // `message` is scanned by this function and never reaches that one.
     if(u2.length){
       const ro=(doc.genre&&REFUSED_OPT_IN[doc.genre])||null;
-      if(ro && ro[u2[0]]!==undefined) err(n,REFUSED_OPT_IN_GENRE(u2[0],doc.genre));
+      // `RESERVED-PREFIX-ENFORCEMENT` (2026-08-23): CALL SITE 2a of 2 — the reserved `x-` prefix in
+      // OPTION-KEY position, on the connector path. `message` is scanned by
+      // this function and never reaches `badOpts`, which is why the check has
+      // to exist in both places (the same reason `UNDELIVERED-MESSAGE-MARKING`'s genre refusal does).
+      if(isXReserved(u2[0])) err(n,X_RESERVED_OPT(u2[0]));
+      else if(ro && ro[u2[0]]!==undefined) err(n,REFUSED_OPT_IN_GENRE(u2[0],doc.genre));
       else err(n,'unknown option "'+u2[0]+'="');
       return; }
     // `SEQUENCE-GENRE-VOCABULARY`: `message` adds ONE trailing positional — the
@@ -2278,7 +2312,12 @@ function parseOne(text){
       // ground and the replacement spelling instead of a spellcheck.
       const roOpt=(doc.genre&&REFUSED_OPT_IN[doc.genre])||null;
       for(const u of unk){
-        if(roOpt && roOpt[u]!==undefined) err(n,REFUSED_OPT_IN_GENRE(u,doc.genre));
+        // `RESERVED-PREFIX-ENFORCEMENT` (2026-08-23): CALL SITE 2b of 2 — the reserved `x-` prefix in
+        // OPTION-KEY position, on the ordinary directive path. Checked before
+        // the genre refusal and before the generic message, because a key the
+        // language will never register is a stronger fact than either.
+        if(isXReserved(u)) err(n,X_RESERVED_OPT(u));
+        else if(roOpt && roOpt[u]!==undefined) err(n,REFUSED_OPT_IN_GENRE(u,doc.genre));
         else err(n,'unknown option "'+u+'="');
         bad=true; }
       // `MEMBERSHIP-KEY-ACCEPTANCE`: the PER-GENRE option-key withdrawal, checked here —
@@ -2459,6 +2498,18 @@ function parseOne(text){
         continue;
       } else { err(n,'first line must be "figdown 0.1 <genre>"'); }
     } else if(kw==='figdown'){ err(n,'duplicate version header'); continue; }
+
+    // `RESERVED-PREFIX-ENFORCEMENT` (2026-08-23): CALL SITE 1 of 2 — the reserved `x-` prefix in
+    // KEYWORD position. It sits here, above every other keyword answer, for
+    // two reasons: no registered keyword begins `x-`, so it can pre-empt
+    // nothing legitimate; and every downstream answer this would otherwise
+    // reach (`not allowed in genre <g>`, `not valid inside <block>`,
+    // `unrecognized line`) is a message about a typo, which is what §8.4 of
+    // decisions/registry.md measured and what this replaces.
+    // It sits BELOW the first-line header check deliberately: "first line
+    // must be figdown …" is the more important thing to tell an author, and
+    // an `x-` first line reports both, exactly as it reported two before.
+    if(isXReserved(kw)){ err(n,X_RESERVED_KW(kw)); continue; }
 
     // Retired spelling: `colw` → `width`. Keyword naming
     // discipline — one lowercase word, borrowed standard terminology; `colw`
@@ -3930,6 +3981,163 @@ function stackSectionSvgs(results){
     +chunks.join('')+'</svg>';
 }
 
+// ---- the accessibility profile's emission (spec/figdown-a11y.md) ----------
+// `ACCESSIBILITY-PROFILE`/`ACCESSIBLE-DESCRIPTION-SOURCES`/`ACCESSIBLE-TEXT-EMISSION` (decisions/registry.md).
+// The publication profile wants three things in a published artifact: a role,
+// a NON-VISUAL name, and a description whose review state a machine can read.
+// None of it is emitted by default and none of it is a language construct —
+// the `with-a11y` RENDER OPTION (core §7, `ACCESSIBLE-TEXT-EMISSION` route 1) is the only way in,
+// exactly as `with-title` (`TITLE-RENDER-DEFAULT`) is the only way to draw the title as ink.
+//
+// WHY THIS SITS OUTSIDE `render` AND NOT INSIDE IT. Two reasons, and the
+// second is the load-bearing one:
+//   1. Core §7/`RENDERING-DETERMINISM` make an artifact a pure function of (source, recorded
+//      options) and promise byte-identical output for one engine version.
+//      Code that never runs cannot move a byte, and `render` is left exactly
+//      as it was so that every existing artifact and golden is untouched.
+//   2. `ACCESSIBILITY-PROFILE` rules ONE artifact, ONE root, ONE name — the FIRST section's
+//      `title`. A multi-section artifact's root is built by
+//      `stackSectionSvgs` from N per-section renders, so a `<title>` emitted
+//      inside `render` would land inside a `<g>` (naming the group, per `DESCRIPTION-KEY-SPELLING`
+//      and SVG 1.1 §5.4) and there would be N of them. The name belongs to
+//      the finished root, which only the artifact layer holds.
+// So the artifact layer (tools/build-svg.js, dist/figdown.js's `artifact()`)
+// calls `a11yApply(svg, docs[0])` on the finished root and records
+// `with-a11y` in `data-render-options`.
+const A11Y_ROLE = 'graphics-document';
+
+// `ACCESSIBILITY-PROFILE` item 3: the accessible name is the document's `title` string,
+// UNMODIFIED — not truncated, not prefixed, never invented. `title` is
+// optional in the grammar and stays optional (`ACCESSIBILITY-PROFILE` is explicit that the
+// untitled figure still parses and still renders): a document with no
+// `title` line gets NO root `<title>`, and whether such a figure may be
+// PUBLISHED is the profile's question and the verifier's, never the
+// engine's. The test is ABSENCE, not truthiness (`EMPTY-LABEL-STATE`): `title ""` is a
+// written empty name and is emitted as one.
+function a11yTitleOf(doc){
+  return (doc && doc.title!==null && doc.title!==undefined) ? String(doc.title) : null;
+}
+
+// ---- the derived description (`ACCESSIBLE-DESCRIPTION-SOURCES` item 7) --------------------------------
+// A `derived` description is a deterministic projection of the MODEL into
+// prose — "exactly as good as the model, and no better" — and `ACCESSIBLE-DESCRIPTION-SOURCES`'s
+// operative half is the NEGATIVE rule: it MUST NOT state what the model does
+// not assert. No causality, no "this shows how X works", no count the model
+// cannot produce. Every sentence below is an inventory statement over a
+// collection the model actually carries.
+//
+// COVERED GENRES ARE EXACTLY THE THREE `ACCESSIBLE-DESCRIPTION-SOURCES` RULED CONTENT RULES FOR:
+// `topology`, `bitfield`, `sequence`. Every other genre the engine supports
+// (`block`, `flowchart`, `statechart`, `table`, `timing`, and the
+// experimental `chart` region) gets NO derived description — the state stays
+// `absent` — because inventing content rules for them here would be design,
+// not implementation. That boundary is stated, not silent: spec/figdown-a11y.md
+// §4.4 records which genres are covered, which are not, and why.
+const A11Y_DERIVED_GENRES = ['topology','bitfield','sequence'];
+function a11yQ(s){ return '"'+String(s)+'"'; }
+function a11yCount(n,word){ return n+' '+word+(n===1?'':'s'); }
+// id, plus the label the model carries WHEN it carries one. The renderer's
+// id-for-absent-label fallback (`OMITTED-LABEL-RECORDING`) is a DISPLAY rule and deliberately does
+// not run here: the model records absence, and a derived description that
+// silently promoted an id to a name would assert a name nobody wrote.
+function a11yNamed(x){
+  return (x.label===null||x.label===undefined) ? String(x.id) : String(x.id)+' '+a11yQ(x.label);
+}
+function a11yDeriveTopology(doc){
+  const s=[];
+  s.push('Topology figure'+(a11yTitleOf(doc)!==null?' '+a11yQ(doc.title):'')+'.');
+  s.push(a11yCount(doc.nodes.length,'node')+', '+a11yCount(doc.edges.length,'connector')
+        +', '+a11yCount(doc.groups.length,'group')+'.');
+  s.push('Flow direction: '+String(doc.flow)+'.');
+  if(doc.nodes.length) s.push('Nodes: '+doc.nodes.map(a11yNamed).join(', ')+'.');
+  for(const g of doc.groups){
+    const mem=doc.nodes.filter(n=>n.group===g.id).map(n=>String(n.id));
+    s.push('Group '+a11yNamed(g)+(mem.length?' contains: '+mem.join(', ')+'.':' has no declared members.'));
+  }
+  // A class's MEANING is `label` on the engine object (the canonical
+  // projection renames it `meaning`). `ACCESSIBLE-DESCRIPTION-SOURCES` says "each declared class and its
+  // stated meaning (which the legend already prints)", so the legend's own
+  // filter is inherited rather than re-invented: `class x ""` is an attribute
+  // grouping that states no meaning, it prints no legend entry, and it makes
+  // no sentence here either.
+  for(const c of (doc.classes||[])) if(c.label!=='')
+    s.push('Class '+String(c.id)+' means '+a11yQ(c.label)+'.');
+  return s.join(' ');
+}
+function a11yDeriveBitfield(doc){
+  const s=[];
+  s.push('Bitfield figure'+(a11yTitleOf(doc)!==null?' '+a11yQ(doc.title):'')+'.');
+  const blocks=(doc.blocks||[]).filter(b=>b.type==='bitfield');
+  if(!blocks.length) return null;
+  for(const b of blocks){
+    s.push('Bitfield '+a11yNamed(b)+': word '+a11yCount(b.word,'bit')
+          +', numbering '+String(b.numbering)+'.');
+    // `wrap` entries are ROW BREAKS (projected as `break`), a division of the
+    // drawing and not a field; `ACCESSIBLE-DESCRIPTION-SOURCES`'s rule is "fields in order with widths".
+    // A field's width is `w` on the engine object: a bit count, or the string
+    // `*` for the remainder of the row.
+    const fields=(b.fields||[]).filter(f=>!f.wrap);
+    if(!fields.length){ s.push('No fields declared.'); continue; }
+    s.push('Fields in order: '+fields.map(f=>
+      a11yQ(f.name)+' '+(String(f.w)==='*'?'width *':a11yCount(f.w,'bit'))).join(', ')+'.');
+  }
+  return s.join(' ');
+}
+function a11yDeriveSequence(doc){
+  const s=[];
+  s.push('Sequence figure'+(a11yTitleOf(doc)!==null?' '+a11yQ(doc.title):'')+'.');
+  const lls=doc.lifelines||[], msgs=doc.messages||[], frags=doc.fragments||[];
+  s.push('Lifelines in declaration order: '+(lls.length?lls.map(a11yNamed).join(', '):'none')+'.');
+  // The time axis is declaration order and it is TOTAL (`SEQUENCE-GENRE-VOCABULARY`, draft §31),
+  // so "in their stated total order" is `line` ascending — the model's own
+  // ordering key, not a re-reading of the picture.
+  const ordered=msgs.slice().sort((p,q)=>p.line-q.line);
+  s.push('Messages in stated order: '+(ordered.length?ordered.map((m,i)=>
+    (i+1)+'. '+String(m.a)+' '+String(m.op)+' '+String(m.b)
+    +(m.label===null||m.label===undefined?'':' '+a11yQ(m.label))).join('; '):'none')+'.');
+  if(frags.length) s.push('Fragments: '+frags.map(f=>
+    a11yNamed(f)+' (type '+String(f.type)+')').join(', ')+'.');
+  return s.join(' ');
+}
+function a11yDerivedDesc(doc){
+  if(!doc||A11Y_DERIVED_GENRES.indexOf(doc.genre)<0) return null;
+  if(doc.genre==='topology') return a11yDeriveTopology(doc);
+  if(doc.genre==='bitfield') return a11yDeriveBitfield(doc);
+  if(doc.genre==='sequence') return a11yDeriveSequence(doc);
+  return null;   // state `absent` — an uncovered genre, spec/figdown-a11y.md §4.4
+}
+
+// Apply the profile to a FINISHED root `<svg>`: the role on the root, the
+// non-visual `<title>` as its FIRST child (SVG 1.1 §5.4 / `DESCRIPTION-KEY-SPELLING` — a `<title>`
+// names its parent and belongs first), then the `<desc>` carrying the derived
+// description with its state in a `data-*` attribute (`ACCESSIBLE-DESCRIPTION-SOURCES` item 6, way 1; the
+// manifest carries the evidence, way 3). Idempotent: a root that already
+// declares a role is returned unchanged.
+function a11yApply(svg, doc){
+  const s=String(svg);
+  const m=/^<svg\b[^>]*>/.exec(s);
+  if(!m) return s;
+  if(/\brole="/.test(m[0])) return s;
+  const parts=[];
+  const t=a11yTitleOf(doc);
+  if(t!==null) parts.push('<title>'+esc(t)+'</title>');
+  const d=a11yDerivedDesc(doc);
+  if(d!==null&&d!=='') parts.push('<desc data-desc-state="derived">'+esc(d)+'</desc>');
+  return m[0].replace(/>$/,' role="'+A11Y_ROLE+'">')+parts.join('')+s.slice(m[0].length);
+}
+
+// The `data-render-options` value for a render (core §7). ONE spelling, in
+// ONE place, so the artifact layers cannot drift: options in declaration
+// order, space-separated — the SVG/HTML idiom for a token list. A default
+// render writes no attribute at all, which is why the empty string is
+// returned rather than an empty attribute.
+function renderOptionsAttr(opts){
+  const names=[];
+  if(opts&&opts.title===true) names.push('with-title');
+  if(opts&&opts.a11y===true) names.push('with-a11y');
+  return names.length?' data-render-options="'+names.join(' ')+'"':'';
+}
+
 // `SEMICOLON-STATUS`: `;` is RESERVED for a future statement separator, and
 // RULE 1.3 says a reserved mark MUST NOT be given any other meaning. Until
 // this release it was an ordinary character: `node a ;` parsed and `;`
@@ -4006,7 +4214,7 @@ function findComment(s){
 // ============================================================
 const FONT=13, CH=7.2, PADX=14, NH=36, GAPX=56, GAPY=44;
 
-// ---- cw(): script-aware advance width --------------------------------
+// ---- cw(): script-aware advance width (`TEXT-ADVANCE-MEASUREMENT`) --------------------------------
 // Every px-per-character constant in this file — CH here, and its siblings at
 // the other font sizes (8.6 title, 6.6 legend, 6.5 edge label, 6.3/6.2 bitfield
 // caption) — is calibrated on LATIN, where one character advances ~0.554 em.
@@ -4577,15 +4785,80 @@ function render(doc,ropts){
     // Retiring `color=` removes the first case; omitting the swatch removes
     // the second. Every channel a class can still declare (`fill`, `stroke`,
     // `style`) is drawn, so "declared but not shown" is now unreachable.
+    // 0.5 (`LEGEND-SWATCH-SHAPE`): the swatch depicts THE CHANNEL THE CLASS ACTUALLY
+    // PAINTS. `CLASS-PAINT-REQUIREMENT` ruled WHETHER a swatch is drawn and never WHAT SHAPE it
+    // takes, so every painting class got a `<rect>` — and a class that
+    // declares only `stroke=` and is carried only by CONNECTORS then appeared
+    // as a white box with a coloured outline while the drawing showed a
+    // coloured LINE. The legend's visual vocabulary did not match the
+    // figure's, and with `style=dashed` the dash landed on a rectangle's
+    // perimeter instead of along a run. Measured on 2026-08-26: 36 of this
+    // repository's 76 legend-bearing class-uses are connector-only (33 of them
+    // stroke-without-fill) and 10 figures are entirely connector-only; in the
+    // production corpus behind the field reports, 160 of 1350 legend-bearing
+    // class-uses are connector-only and 159 of those are stroke-without-fill.
+    //
+    // WHICH KINDS ARE CONNECTORS is read off the model, not guessed and not
+    // stored: the four connector spellings (`edge` `flowline` `transition`
+    // `message`, core §10) are exactly `doc.edges` and `doc.messages` in the
+    // model — every other collection that carries `class=` is a box, a frame
+    // or a cell, i.e. something with an area. This adds no model field, no
+    // option key and no spelling; it is a byte-moving RENDER change.
+    const clsUse={};
+    { const use=(x,conn)=>{
+        const ids=(x.cls===undefined||x.cls===null)?[]:(Array.isArray(x.cls)?x.cls:[x.cls]);
+        for(const id of ids){ const u=clsUse[id]||(clsUse[id]={conn:false,box:false});
+          if(conn) u.conn=true; else u.box=true; } };
+      for(const x of doc.nodes) use(x,false);
+      for(const x of doc.groups) use(x,false);
+      for(const x of doc.edges) use(x,true);
+      for(const x of (doc.messages||[])) use(x,true);
+      for(const x of (doc.lifelines||[])) use(x,false);
+      for(const x of (doc.states||[])) use(x,false);
+      for(const x of (doc.fragments||[])) use(x,false);
+      for(const x of (doc.operands||[])) use(x,false);
+      for(const b of doc.blocks){ use(b,false);
+        if(b.fields) for(const f of b.fields) use(f,false);
+        if(b.marks)  for(const mk of b.marks) use(mk,false); } }
     for(const c of legendCls){
       const paints=c.fill!==undefined||c.stroke!==undefined||c.style!==undefined;
-      const tw=cw(c.label)*6.6+(paints?30:9);
-      if(lx>0 && lx+tw>wrapW){ lx=0; ly+=rowH; }
+      // The samples this class earns, in the ruled order: LINE then BOX.
+      //  · carried only by connectors → a line sample (`LEGEND-SWATCH-SHAPE` clause 1)
+      //  · carried only by boxes      → the `<rect>` `CLASS-PAINT-REQUIREMENT` already drew (2)
+      //  · carried by both            → both samples, side by side (3): the
+      //    legend exists to explain, and the extra width is cheaper than
+      //    making a reader guess which half of the figure an entry is about.
+      //  · declares `fill=`           → a box sample WHATEVER it is carried
+      //    by (4), because a fill needs an area to be visible. A box on a
+      //    connector-only class is then the class declaring a channel its
+      //    elements cannot show — `CLASS-CHANNEL-COLLISION`'s territory, reported there, not
+      //    re-ruled here (and `gate:legend`'s unreachable-channel check
+      //    already refuses that shape in this repository's corpus).
+      //  · declares no paint          → no sample at all (5, `CLASS-PAINT-REQUIREMENT` unchanged).
+      //  · declared but never carried → the shape comes from the DECLARED
+      //    channels alone: `fill` → box, stroke-only → line. Nothing else is
+      //    known about it, and its own paint is the only evidence there is.
+      const u=clsUse[c.id];
+      const samples=[];
       if(paints){
-        const dash=c.style==='dashed'?' stroke-dasharray="6 4"':(c.style==='dotted'?' stroke-dasharray="2 4"':'');
-        es.push('<rect x="'+lx+'" y="'+(ly+3)+'" width="16" height="11" fill="'+(c.fill||'#fff')+'" stroke="'+(c.stroke||'#555')+'"'+dash+'/>');
+        if(u ? u.conn : c.fill===undefined) samples.push('line');
+        if(u ? (u.box||c.fill!==undefined) : c.fill!==undefined) samples.push('box');
       }
-      es.push('<text x="'+(lx+(paints?21:0))+'" y="'+(ly+12.5)+'" font-size="11" fill="#1d1d1b">'+esc(c.label)+'</text>');
+      const tw=cw(c.label)*6.6+9+21*samples.length;
+      if(lx>0 && lx+tw>wrapW){ lx=0; ly+=rowH; }
+      const dash=c.style==='dashed'?' stroke-dasharray="6 4"':(c.style==='dotted'?' stroke-dasharray="2 4"':'');
+      let sx=lx;
+      for(const s of samples){
+        // Both samples take the SAME 16 px advance, so a mixed entry is two
+        // swatches and not a wider one. The line is drawn at the rect's own
+        // vertical centre (3 + 11/2) and at 1.6 — the stroke-width every
+        // router in this engine gives a drawn connector — so the sample is
+        // the same ink the figure lays down, at the same weight.
+        if(s==='line') es.push('<line x1="'+sx+'" y1="'+(ly+8.5)+'" x2="'+(sx+16)+'" y2="'+(ly+8.5)+'" stroke="'+(c.stroke||'#555')+'" stroke-width="1.6"'+dash+'/>');
+        else es.push('<rect x="'+sx+'" y="'+(ly+3)+'" width="16" height="11" fill="'+(c.fill||'#fff')+'" stroke="'+(c.stroke||'#555')+'"'+dash+'/>');
+        sx+=21;
+      }
+      es.push('<text x="'+(lx+21*samples.length)+'" y="'+(ly+12.5)+'" font-size="11" fill="#1d1d1b">'+esc(c.label)+'</text>');
       lx+=tw+14; maxW=Math.max(maxW,lx);
     }
     parts.push(es.join(''));
@@ -6514,7 +6787,18 @@ function renderScene(doc,y0){
   // node box, which is already an obstacle.
   //
   // An external's label is NOT an obstacle to its OWN edge — that edge must
-  // reach the anchor the label names.
+  // reach the anchor the label names. A GROUP's name is the same rule one
+  // construct over, and 0.4 shipped only half of it (`GROUP-BOUNDARY-OBSTACLE`): a group's
+  // name strip runs the full width of the band's TOP, so it lies across every
+  // approach an outside node has to a member inside. Made an obstacle to all
+  // comers, it turned every boundary-crossing edge into a detour that left the
+  // corridor, ran down the band's outer edge and entered the member from the
+  // side — the drawing then said the line arrives at the CONTAINER when the
+  // source says it arrives at the MEMBER. `EDGE-BEND-RETENTION` had already ruled the group
+  // BOX is an obstacle only to an edge that "neither starts nor ends inside";
+  // the name is part of the same band and takes the same exemption. A foreign
+  // shaft — neither endpoint in the group — is still detoured, which is the
+  // whole of what 0.4 was right about.
   const extLbl=n=>{
     const cx=n.x+n.w/2, cy=n.y+n.h/2, [bdx,bdy]=bDir(n);
     const bw=lblPx(n.label), bl=String(n.label).split('\n').length, bh=13*bl;
@@ -6529,18 +6813,24 @@ function renderScene(doc,y0){
   for(const k in gBox){ const g=doc.groups.find(z=>z.id===k);
     if(!g||!g.label) continue;
     const B=gBox[k];
-    nameObs.push({x:B.x0+10, y:B.yA+16-11.5*0.85, w:cwMax(g.label)*6.5*11.5/11, h:11.5*1.1});
+    nameObs.push({x:B.x0+10, y:B.yA+16-11.5*0.85, w:cwMax(g.label)*6.5*11.5/11, h:11.5*1.1, id:k});
   }
-  // The obstacle list a given edge must respect: every band name, plus every
-  // external label except the ones this edge itself terminates at.
+  // Which group an endpoint id belongs to, for the name-strip exemption below.
+  const grpOfId=new Map();
+  for(const n of nodes) if(n.group) grpOfId.set(n.id,n.group);
+  // The obstacle list a given edge must respect: every band name except the
+  // ones this edge terminates AT or INSIDE, plus every external label except
+  // the ones this edge itself terminates at.
   // A label's ink is its glyphs plus the clearance that keeps a line from
   // READING as struck through it. 4 px on every side — the same number the
   // legibility floor uses for a label's association margin — so a shaft that
   // grazes a name at 3 px is detoured rather than tolerated.
   const LBL_PAD=4;
   const padded=o=>({x:o.x-LBL_PAD,y:o.y-LBL_PAD,w:o.w+2*LBL_PAD,h:o.h+2*LBL_PAD});
+  const ownsName=(o,e)=>o.id===e.a||o.id===e.b||
+                        o.id===grpOfId.get(e.a)||o.id===grpOfId.get(e.b);
   const lblObs=e=>extObs.filter(o=>o.id!==e.a&&o.id!==e.b).map(padded)
-                        .concat(nameObs.map(padded));
+                        .concat(nameObs.filter(o=>!ownsName(o,e)).map(padded));
   const rings=new Map();
   for(const t of doc.trunks||[]){ const R=ringOf(t); if(R) rings.set(t,R); }
   // ── A LASSO THAT ENCLOSES A NON-MEMBER IS A FALSE DRAWING (item 69) ──────
@@ -9659,8 +9949,8 @@ function r2(v){ return Math.round(v*100)/100; }
 // canvas grows right and down only, so text at a negative coordinate is
 // CLIPPED, never merely misplaced (`LABEL-PLACEMENT-METRIC`, which fixed exactly this
 // for a `table` caption and a `chart` row/column label gutter but not for a
-// bitfield/timing title or a chart's own top caption — production field
-// report FR-4, decisions/registry.md).
+// bitfield/timing title or a chart's own top caption — reported from
+// downstream production authoring).
 //
 // ONE MEASUREMENT, used by all four renderers below, so the calibration lives
 // in one place rather than four. Bold text at this size is measured ~8%
@@ -10167,9 +10457,14 @@ function renderTable(t,y0){
       const mk=markOf(r,c);
       // block fill= is the default DATA-cell fill (header tint is structural)
       const fill=(mk&&mk.fill)||(cell.hdr?'#eeede6':(hlRow(r)?'#fef3c7':(t.fill||'#fff')));
-      // addressable cells carry table-id:row:col (row 0 = bottom header tier)
-      const addrR = r>=H ? (r-H+1) : (r===H-1 ? 0 : null);
-      const addr = addrR===null ? '' : ' data-cell="'+t.id+':'+addrR+':'+(c+1)+'" style="cursor:pointer"';
+      // addressable cells carry table-id:row:col for EVERY tier (backlog 71):
+      // data rows are 1..n, the bottom header tier keeps its historical `0`
+      // spelling so existing consumers of that channel see no change, and
+      // every tier above it is `hN` (1-indexed from the top) — the same
+      // spelling the editor's own internal row-token model already used, so
+      // the editor can read this channel with no translation table.
+      const addrR = r>=H ? String(r-H+1) : (r===H-1 ? '0' : 'h'+(r+1));
+      const addr = ' data-cell="'+t.id+':'+addrR+':'+(c+1)+'" style="cursor:pointer"';
       // A merged cell owns every grid square it spans, so its internal
       // boundaries have the same owner on both sides and are never drawn.
       const rec={id:'c'+r+'_'+c, c:(mk&&mk.stroke)||null, d:false};
@@ -10457,7 +10752,8 @@ function renderTiming(w,y0){
 }
 
 // ============================================================
-return { parse: parse, render: render, stackSectionSvgs: stackSectionSvgs };
+return { parse: parse, render: render, stackSectionSvgs: stackSectionSvgs,
+         a11yApply: a11yApply, renderOptionsAttr: renderOptionsAttr };
 })();
 
 // ---- minimal synchronous SHA-256 (FIPS 180-4), hex output ----
@@ -10528,7 +10824,11 @@ function __stackSectionSvgs(results) {
 // (determinism over convenience: no partial renders of invalid input).
 // opts (presentation, renderer tier): { title: true } draws the title;
 // the default does NOT (embedded figures almost always sit under the
-// host document's caption — the majority case).
+// host document's caption — the majority case). { a11y: true } adds the
+// accessibility profile's emission (spec/figdown-a11y.md; ACCESSIBILITY-PROFILE):
+// role="graphics-document" on the root, the non-visual <title> as its first
+// child, and a state-flagged derived <desc>. The two are ORTHOGONAL — one
+// decides ink, the other the accessible name — and both default to off.
 // Multi-section sources are stacked vertically into a single SVG (MULTI-FIGURE-DOCUMENTS).
 //
 // TWO ERROR CHANNELS REACH ONE errors ARRAY. parse cannot see a
@@ -10550,17 +10850,27 @@ function render(text, opts) {
   for (var i = 0; i < rs.length; i++) errs = errs.concat(rs[i].errs || []);
   if (errs.length) return { svg: null, errors: errs };
   var svg = rs.length > 1 ? __engine.stackSectionSvgs(rs) : rs[0].svg;
-  return { svg: svg, errors: [] };
+  return { svg: __a11y(svg, p.docs[0], opts), errors: [] };
+}
+// The accessibility profile's emission (spec/figdown-a11y.md; ACCESSIBILITY-PROFILE).
+// Applied to the FINISHED root, never inside a per-section render: ACCESSIBILITY-PROFILE gives
+// an artifact ONE root, ONE name, and the name is the FIRST section's title.
+// A caller that does not ask gets the byte-identical default (core §7 / RENDERING-DETERMINISM).
+function __a11y(svg, doc, opts) {
+  if (!svg || !(opts && opts.a11y === true)) return svg;
+  if (typeof __engine.a11yApply !== 'function') return svg;
+  return __engine.a11yApply(svg, doc);
 }
 // renderDoc(doc, opts) -> svg string, for an already-validated doc from parse().
 // For multi-section, pass parse().docs to renderDocs instead.
 function renderDoc(doc, opts) {
-  return __engine.render(doc, opts).svg;
+  return __a11y(__engine.render(doc, opts).svg, doc, opts);
 }
 function renderDocs(docs, opts) {
   if (!docs || !docs.length) return '';
-  if (docs.length === 1) return __engine.render(docs[0], opts).svg;
-  return __engine.stackSectionSvgs(docs.map(function (d) { return __engine.render(d, opts); }));
+  if (docs.length === 1) return __a11y(__engine.render(docs[0], opts).svg, docs[0], opts);
+  return __a11y(__engine.stackSectionSvgs(docs.map(function (d) { return __engine.render(d, opts); })),
+                docs[0], opts);
 }
 // artifact(text) -> { svg, errors }  svg is the full self-carrying SVG:
 // the render plus a <metadata id="figdown-source"> block
@@ -10577,7 +10887,7 @@ function artifact(text, opts) {
   // The artifact records the SHA-256 OF THE SOURCE, the ENGINE VERSION that
   // rendered it, and any non-default render option (core §7) — together they
   // keep third-party rebuilds bit-identical and give a diff somewhere to point
-  var optAttr = (opts && opts.title === true) ? ' data-render-options="with-title"' : '';
+  var optAttr = __engine.renderOptionsAttr(opts);
   var meta = '<metadata id="figdown-source" data-sha256="' + __sha256hex(src) + '"'
     + ' data-engine-version="' + VERSION + '"' + optAttr + '><![CDATA[\n'
     + src.replace(/]]>/g, ']]]]><![CDATA[>') + '\n]]></metadata>';

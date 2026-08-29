@@ -94,13 +94,40 @@ const STRICT = process.argv.includes('--strict');
 const VERBOSE = process.argv.includes('--verbose');
 
 // ── the closed output vocabulary ─────────────────────────────────────────────
-// THIS IS THE MEASURED SET, NOT A WISH LIST. It is the exact union of every
-// element and attribute name emitted across the 60 shipped artifacts and all
-// 178 `.fd` documents in the tree that render (examples/, figures/,
-// conformance/cases/, conformance/experimental/), plus `data-render-options=`
-// which only a `with-title` render emits and which the adversarial fixtures
-// are rendered twice to exercise — 15 element names and 61 attribute names,
-// and core §15.2 quotes those two numbers.
+// THIS IS THE MEASURED SET, NOT A WISH LIST — but the two halves of the
+// measurement are not the same strength, and core §15.2 now says so too.
+//
+//   STANDING: every committed renderer-output artifact in the tree. The
+//   corpus below is the query `git ls-files '*.svg'`, so this half re-measures
+//   itself on every run and no count of it is written down anywhere.
+//
+//   ONE-SHOT, 2026-08-19 (XML-CHARACTER-LEGALITY): the set was originally derived
+//   by ALSO rendering every `.fd` in the tree that rendered at that date
+//   (examples/, figures/, conformance/cases/, conformance/experimental/) and
+//   taking the union. Nothing re-runs that sweep, and the document corpus has
+//   grown a long way past it since; it is provenance, not a live measurement.
+//   Do not quote it as one, and do not restore a count of it here.
+//
+// Plus `data-render-options=`, which only a `with-title` render emits and
+// which the adversarial fixtures are rendered twice to exercise. The result
+// is 16 element names and 63 attribute names, and core §15.2 quotes those two
+// numbers.
+//
+// THE THREE `with-a11y` NAMES (ACCESSIBILITY-PROFILE/ACCESSIBLE-DESCRIPTION-SOURCES; spec/figdown-a11y.md).
+// `desc`, `role=` and `data-desc-state=` are emitted by NO default render and
+// by no `with-title` render: they exist only under the accessibility
+// profile's own render option. They are here under the SAME rule as
+// `data-render-options=` and not a weaker one — the adversarial fixtures are
+// rendered a THIRD way below so every one of them is measured, not wished
+// for. That third mode is the interesting one for this gate: `with-a11y`
+// carries the figure's `title` — the string an author is most likely to make
+// hostile — into a root `<title>` AND into a derived `<desc>`, so the
+// escaping of two new sinks is exercised against fixtures 950-952 rather
+// than assumed. `aria-hidden=`/`aria-label=` are deliberately NOT here: ACCESSIBILITY-PROFILE
+// makes decorative hiding a publisher's MAY with no producer in this engine,
+// and `role="img"` (the declared downgrade that would need `aria-label`) is a
+// publisher's choice recorded in the manifest, never something the engine
+// writes. A name nothing emits does not belong in a measured set.
 //
 // `data-lasso` (backlog item 69) is the sixty-first: a `bundle`'s
 // ellipse carries the bundle's id, and every node the ellipse was derived from
@@ -116,6 +143,7 @@ const VERBOSE = process.argv.includes('--verbose');
 // having decided it belongs in the profile.
 const ELEMENTS = new Set([
   'svg', 'defs', 'g', 'metadata', 'title',
+  'desc',                       // with-a11y only (ACCESSIBLE-DESCRIPTION-SOURCES) — the description carrier
   'rect', 'line', 'path', 'polygon', 'circle', 'ellipse',
   'text', 'tspan', 'marker', 'pattern',
 ]);
@@ -134,6 +162,8 @@ const ATTRS = new Set([
   // markers / patterns
   'markerWidth', 'markerHeight', 'refX', 'refY', 'orient',
   'patternUnits', 'patternTransform',
+  // the accessibility profile (ACCESSIBILITY-PROFILE/ACCESSIBLE-DESCRIPTION-SOURCES) — with-a11y renders only
+  'role', 'data-desc-state',
   // FigDown's own provenance channel (core §7) — data-* only
   'data-sha256', 'data-engine-version', 'data-render-options',
   'data-node', 'data-edge', 'data-group', 'data-cell', 'data-bus',
@@ -340,22 +370,222 @@ console.log('');
 let failures = 0, considered = 0;
 const fail = m => { failures++; console.log('  FAIL  ' + m); };
 
-// ── corpus 1: every shipped artifact ─────────────────────────────────────────
-const shipped = [...walk(path.join(ROOT, 'examples'), '.svg', []),
-                 ...walk(path.join(ROOT, 'figures'), '.svg', [])].sort();
-if (!shipped.length) {
-  console.error('safe-svg-check: no shipped .svg found — the corpus has moved or the gate is misconfigured.');
+// ── corpus 1: EVERY COMMITTED `.svg` IN THE TREE ─────────────────────────────
+//
+// WHY THE CORPUS IS THE WHOLE TREE AND NOT TWO DIRECTORIES (RESERVED-PREFIX-ENFORCEMENT, 2026-08-23)
+//
+// Until this entry the corpus was `examples/` + `figures/` — 60 artifacts —
+// and that is exactly the shape of a gate that measures where it already
+// knows the answer. `decisions/registry.md` measured what
+// the two-directory scope could not see: a 21st `data-*` name, `data-message`,
+// on 39 `<line>` elements across 4 COMMITTED artifacts in
+// `design/sequence-poc/`, written by a fork of the reference engine and
+// policed by nothing. The tree was failing a rule the project believed it
+// held, and the reason nobody knew is that no gate had ever looked.
+//
+// The corpus is now `git ls-files '*.svg'`: everything this repository
+// COMMITS, which is the honest scope for a claim about what the project
+// ships. Tracked-ness is the test rather than a directory list because
+// untracked working material (`design/prototypes/bench/`, the ignored
+// private exchange areas `.gitignore` names) is not something this
+// repository publishes, and a filesystem walk would have to re-encode
+// `.gitignore` by hand to say so. If `git` cannot answer, the gate exits 2
+// rather than falling back to a smaller corpus — a gate that silently
+// narrows its own scope is the failure this entry exists to fix.
+//
+// TWO CLASSES OF COMMITTED `.svg` ARE NOT RENDERER OUTPUT, AND EACH IS NAMED
+//
+// The profile is a RENDERER obligation (core §15.2: it "says nothing about an
+// `.svg` that arrives claiming to be a FigDown artifact and was written by
+// something else"). Two classes in this tree are not renderer output, and
+// both are listed below with their reason rather than filtered out silently:
+// a file the gate skips without saying so is a file nobody remembers.
+//
+//   NOT_RENDERER_OUTPUT — deliberately-damaged counter-examples. A verifier
+//   needs invalid input, and `tools/a11y-fixtures/*.invalid.svg` are engine
+//   output hand-edited to carry the violation their own filename names.
+//   `08-identity-element-aria-hidden.invalid.svg` carries `aria-hidden`,
+//   which core §15.2 names as deliberately NOT in the set. Judging them
+//   against the profile would assert that a counter-example must not be a
+//   counter-example. The `.valid.svg` fixtures are ordinary renderer output
+//   and stay IN the corpus.
+//
+//   RULED_DERIVED — the four artifacts §8.3 found, now RULED (UNREPRODUCIBLE-ARTIFACT-DISPOSITION,
+//   2026-08-23; decisions/registry.md): each row pins the file, the
+//   single foreign attribute name, and its exact occurrence count, and the
+//   gate FAILS if a row's file is missing, if its count moves, or if the file
+//   carries any finding other than that one name. So the exclusion cannot
+//   grow, drift, or hide a second defect — it stays a declared, printed
+//   category with its ground stated, the same protection the quarantine it
+//   replaces had, not a wider one. It is BY EXPLICIT FILE PATH, never a
+//   directory glob, because a glob would silently absorb a future defect
+//   placed anywhere under `design/sequence-poc/`. The ground: the four
+//   artifacts were built by a FORKED engine (`design/sequence-poc/
+//   make-poc-engine.py`, `0.3+sequence-poc`), the reference engine
+//   emits no `data-message` and the `sequence` genre still has no renderer at
+//   all, so `data-message` is NOT a FigDown emission and MUST NOT be added to
+//   `ATTRS`. Under spec/host-profile.md §5 (LAYER-EXTENSION-DOORS) a party that ADDS to the
+//   artifact `data-*` namespace has produced a DERIVED FILE, not a
+//   publishable FigDown artifact — core §15.2's profile is a RENDERER
+//   obligation and says nothing about an `.svg` written by something else.
+//   UNREPRODUCIBLE-ARTIFACT-DISPOSITION ruled the four files KEPT, as the only visual evidence of the
+//   `sequence` prototype (regeneration is impossible: their sources use Part
+//   III spellings — `lost=`, `branch`, `gap` — that UNDELIVERED-MESSAGE-MARKING, FRAGMENT-OPERAND-SPELLING and SEQUENCE-TIME-GAP
+//   respectively refused or renamed), and LABELLED, which is this exclusion
+//   and the README next to it.
+//
+//   A ROW WHOSE WHOLE DIRECTORY IS ABSENT IS INAPPLICABLE, NOT DRIFT
+//   (2026-08-28). "The row's file is missing" was one question, and it has
+//   two different answers. `design/` is a SOURCE-ONLY directory: the publish
+//   pipeline does not carry it, so in the published tree the four rows name
+//   files that are absent BY CONSTRUCTION, and the gate failed there four
+//   times for a tree that had removed nothing. So when a row's file is not in
+//   the corpus the gate asks a second question first — does this tree track
+//   ANY file at all under the row's own top-level directory? — using the same
+//   authority the corpus uses, `git ls-files`, so the answer means "tracked
+//   in this tree" and untracked scratch cannot forge it. No tracked file
+//   anywhere under it: the row is INAPPLICABLE in this tree, printed by name
+//   with the directory and the reason, and it does not fail. The directory
+//   present but the named file gone: that is drift, and it fails exactly as
+//   it did before.
+//
+//   THIS IS WHY THE NEW BRANCH IS SAFE: the row still fails whenever its
+//   directory is present, and in the SOURCE repository `design/` always is —
+//   so deleting one of the four artifacts fails there exactly as it always
+//   has, and the only thing this branch can excuse is a tree that never
+//   carried the directory at all. The alternative, a published-only variant
+//   of the tool with the rows scrubbed out, was refused: an outside
+//   implementer reads the PUBLISHED copy, and a gate that behaves differently
+//   there is a gate they cannot check us with. Source and published run the
+//   same tool, and it MEASURES the difference between the two trees instead
+//   of being told about it.
+const NOT_RENDERER_OUTPUT = [
+  { re: /^tools\/a11y-fixtures\/[^/]*\.invalid\.svg$/,
+    why: 'hand-edited counter-example: engine output deliberately damaged so ' +
+         'tools/a11y-check.js has invalid input to reject (core §15.2 — the ' +
+         'profile binds the RENDERER, not every file claiming to be an artifact)' },
+];
+const RULED_DERIVED = [
+  { file: 'design/sequence-poc/1-bfd-handshake.svg',  attr: 'data-message', n: 6 },
+  { file: 'design/sequence-poc/2-widevine-cdm.svg',   attr: 'data-message', n: 13 },
+  { file: 'design/sequence-poc/3-two-cdms.svg',       attr: 'data-message', n: 16 },
+  { file: 'design/sequence-poc/4-tls13-handshake.svg', attr: 'data-message', n: 4 },
+];
+const RULED_DERIVED_WHY =
+  'foreign data-* written by a FORK of the reference engine ' +
+  '(design/sequence-poc/make-poc-engine.py, 0.3+sequence-poc). RULED ' +
+  '(LAYER-EXTENSION-DOORS, UNREPRODUCIBLE-ARTIFACT-DISPOSITION; design/sequence-poc/README.md): a party that ADDS to the ' +
+  'artifact data-* namespace has produced a DERIVED FILE, not a publishable ' +
+  'FigDown artifact — kept as the sequence PoC\'s only visual evidence, ' +
+  'excluded from the profile the way core §15.2 says an .svg written by ' +
+  'something else is excluded, not judged as if it were renderer output.';
+
+let committed;
+try {
+  committed = require('child_process')
+    .execFileSync('git', ['ls-files', '-z', '*.svg'], { cwd: ROOT, encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] })
+    .split('\0').filter(Boolean).sort();
+} catch (e) {
+  console.error('safe-svg-check: cannot enumerate committed .svg (' + e.message.split('\n')[0] + ').');
+  console.error('  The corpus of this gate is `git ls-files \'*.svg\'`; without it the gate would');
+  console.error('  silently scan a smaller tree than it claims to, which is the defect RESERVED-PREFIX-ENFORCEMENT closed.');
   process.exit(2);
 }
-console.log('SHIPPED ARTIFACTS (' + shipped.length + ')');
+if (!committed.length) {
+  console.error('safe-svg-check: no committed .svg found — the corpus has moved or the gate is misconfigured.');
+  process.exit(2);
+}
+
+// Does this tree track ANY file under `dir`? Asked with the SAME authority
+// the corpus is built from — `git ls-files`, never a filesystem stat — so
+// the answer means "tracked in THIS tree" and untracked working material
+// (`design/prototypes/bench/`, the ignored private exchange areas) cannot
+// forge a directory into existence. If git cannot answer, the gate exits 2
+// for the same reason the corpus query does: guessing here would either
+// excuse a real deletion or fail a tree that never had the directory.
+const trackedDirCache = new Map();
+function tracksAnythingUnder(dir) {
+  if (trackedDirCache.has(dir)) return trackedDirCache.get(dir);
+  let any;
+  try {
+    any = require('child_process')
+      .execFileSync('git', ['ls-files', '-z', '--', dir + '/'], { cwd: ROOT, encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] })
+      .split('\0').filter(Boolean).length > 0;
+  } catch (e) {
+    console.error('safe-svg-check: cannot ask git whether ' + dir + '/ is tracked here (' + e.message.split('\n')[0] + ').');
+    console.error('  Without that answer the gate cannot tell a directory this tree never carries');
+    console.error('  from an artifact someone deleted, and either guess breaks a protection UNREPRODUCIBLE-ARTIFACT-DISPOSITION ruled.');
+    process.exit(2);
+  }
+  trackedDirCache.set(dir, any);
+  return any;
+}
+
+const skipped = [];
+const ruledByFile = new Map(RULED_DERIVED.map(r => [r.file, r]));
+const shipped = [];
+for (const f of committed) {
+  const hit = NOT_RENDERER_OUTPUT.find(x => x.re.test(f));
+  if (hit) { skipped.push({ f, why: hit.why }); continue; }
+  shipped.push(path.join(ROOT, f));
+}
+
+console.log('COMMITTED ARTIFACTS (' + shipped.length + ' of ' + committed.length + ' committed .svg)');
+let ruledFindings = 0;
 for (const f of shipped) {
   considered++;
   const src = fs.readFileSync(f, 'utf8');
-  const bad = judge(rel(f), src);
-  if (bad.length) { for (const b of bad) fail(rel(f) + ': ' + b); }
-  else if (VERBOSE) console.log('  ok    ' + rel(f));
+  const r = rel(f).replace(/\\/g, '/');
+  const bad = judge(r, src);
+  const ruled = ruledByFile.get(r);
+  if (ruled) {
+    ruledByFile.delete(r);
+    const mine = bad.filter(b => b.indexOf(ruled.attr + '=') !== -1);
+    const other = bad.filter(b => b.indexOf(ruled.attr + '=') === -1);
+    if (mine.length !== ruled.n)
+      fail(r + ': RULED_DERIVED row records ' + ruled.n + ' ' + ruled.attr +
+           ' finding(s), the file now has ' + mine.length + ' — the exclusion has drifted');
+    for (const b of other) fail(r + ': ' + b);
+    ruledFindings += mine.length;
+    console.log('  DRVD  ' + r + ': ' + mine.length + ' × ' + ruled.attr + '= (not in the profile)');
+    continue;
+  }
+  if (bad.length) { for (const b of bad) fail(r + ': ' + b); }
+  else if (VERBOSE) console.log('  ok    ' + r);
+}
+// A row whose file is not in the corpus gets a SECOND question before it
+// fails: does this tree track anything at all under the row's own top-level
+// directory? The directory is derived from the row's path, not hardcoded.
+// Absent directory → INAPPLICABLE here (printed below, never silent). Present
+// directory, file gone → drift, and it fails with the message it always had.
+const inapplicable = [];
+for (const [f] of ruledByFile) {
+  const slash = f.indexOf('/');
+  const dir = slash === -1 ? null : f.slice(0, slash);
+  if (dir !== null && !tracksAnythingUnder(dir)) { inapplicable.push({ f, dir }); continue; }
+  fail('RULED_DERIVED row names ' + f + ', which is not a committed .svg — the exclusion has drifted');
 }
 console.log('  ' + shipped.length + ' considered, ' + failures + ' finding(s)');
+if (skipped.length) {
+  console.log('  NOT RENDERER OUTPUT, skipped by name (' + skipped.length + '):');
+  for (const s of skipped) console.log('    - ' + s.f);
+  console.log('    reason: ' + NOT_RENDERER_OUTPUT[0].why);
+}
+if (ruledFindings) {
+  console.log('  RULED DERIVED FILES, EXCLUDED (' + RULED_DERIVED.length + ' file(s), ' + ruledFindings + ' finding(s)):');
+  console.log('    ' + RULED_DERIVED_WHY);
+}
+if (inapplicable.length) {
+  const dirs = [...new Set(inapplicable.map(s => s.dir))].sort();
+  console.log('  RULED DERIVED ROWS, INAPPLICABLE IN THIS TREE (' + inapplicable.length +
+              ' of ' + RULED_DERIVED.length + ' row(s)):');
+  for (const s of inapplicable) console.log('    - ' + s.f + '  (' + s.dir + '/ absent)');
+  console.log('    reason: this tree tracks no file at all under ' +
+              dirs.map(d => d + '/').join(', ') + ', so the row names a file that is absent BY');
+  console.log('    CONSTRUCTION and there is nothing here for it to measure — not drift. The row still');
+  console.log('    FAILS in any tree that does carry the directory, which is every source tree, so a');
+  console.log('    deleted artifact is caught exactly as UNREPRODUCIBLE-ARTIFACT-DISPOSITION ruled it must be.');
+}
 console.log('');
 
 // ── corpus 2: the adversarial fixtures, rendered FRESH ───────────────────────
@@ -378,7 +608,15 @@ const before = failures;
 // (`data-render-options=`) that no default render produces, so rendering
 // only the default would leave a name in the allowlist that the corpus
 // never exercises.
-const MODES = [['default', undefined], ['with-title', { title: true }]];
+//
+// `with-a11y` (ACCESSIBLE-TEXT-EMISSION route 1) is the THIRD mode, added for the same reason and
+// with one more of its own: it is the only render that emits `<desc>`,
+// `role=` and `data-desc-state=`, and it puts the author's `title` string
+// into a root `<title>` and into the derived `<desc>` — two new sinks for
+// exactly the hostile text fixtures 950-952 exist to carry. Rendering it here
+// is what makes those three names MEASURED rather than merely permitted.
+const MODES = [['default', undefined], ['with-title', { title: true }],
+               ['with-a11y', { a11y: true }]];
 for (const f of adversarial) {
  for (const [mode, opts] of MODES) {
   considered++;

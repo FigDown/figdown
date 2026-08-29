@@ -89,8 +89,13 @@
 //      silenced gate. The consequence is real and is the audit's largest single
 //      block of unverified claims: ~24 rows of spec/vocabulary-sources.tsv
 //      attribute spellings to W3C through its `source` column alone. They are in
-//      the register anyway (S371) — the register may hold MORE than the harvest
-//      finds, never less — and assertion B keeps them honest through an alias.
+//      the register anyway, as S151 — the one row that holds this whole block,
+//      `unread`, quote `-`, and it is the ONLY thing discharging this blind
+//      spot, so it must not be repointed without repointing this comment. (This
+//      line cited a non-existent `S371` from the day it was written until
+//      2026-08-27; the register's ids have never reached S3xx.) The register may
+//      hold MORE than the harvest finds, never less — and assertion B keeps them
+//      honest through an alias.
 //
 // SOURCE TEXTS LIVE OUTSIDE THE REPOSITORY. The standards themselves are not
 // redistributable and a session-local path is not a citation, so assertion E is
@@ -227,6 +232,7 @@ const PATTERNS = [
   // key on and the acronym IS the token. Its `clause` column carries the YANG
   // grouping name instead.
   [/\b(?:ONF\s+|LF\s+ONMI\s+)?TAPI\b/g,               () => 'ONF TAPI'],
+  [/\bCommonMark\b/g,                                   () => 'CommonMark'],
   [/\bRFC\s*(\d{3,4})/g,                              m => 'RFC ' + m[1]],
   [/\bUML\b/g,                                        () => 'UML'],
   [/\bBPMN\b/g,                                       () => 'OMG BPMN'],

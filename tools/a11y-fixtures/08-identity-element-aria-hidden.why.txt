@@ -1,0 +1,9 @@
+Assertion F (fatal), spec/figdown-a11y.md §5.
+
+`aria-hidden="true"` on the <g data-node="r"> that carries the Router node.
+The decoration rule is deliberately weak — a publisher MAY hide decorative
+ink — but an element carrying a `data-*` identity is never decorative, and
+hiding one removes a node from the figure for one class of reader while the
+picture still shows it.
+
+is never decorative and MUST NOT be hidden

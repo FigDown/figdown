@@ -1,0 +1,36 @@
+{
+  "figdown_manifest": "1",
+  "document": {
+    "id": "tcp-state-machine",
+    "path": "examples/showcase/tcp-state-machine.fd",
+    "sections": 1
+  },
+  "language": { "version": "0.2", "genres": ["statechart"] },
+  "renderer": {
+    "name": "figdown-svg",
+    "engine_version": "0.5.1"
+  },
+  "source": {
+    "sha256": "57b42da67a86c0efb89d82ca6abe85c3fb27e364420cf2dbc7fbeb5682bc4522",
+    "bytes": 12143
+  },
+  "review": {
+    "state": "authored",
+    "by": "figdown-maintainer",
+    "date": "2026-08-22",
+    "of_source_sha256": "57b42da67a86c0efb89d82ca6abe85c3fb27e364420cf2dbc7fbeb5682bc4522",
+    "note": "authored directly against RFC 9293 §3.3.2 Figure 5, transcribing its states and transitions plus the Note 2 transition the canonical figure omits (see the .fd's own comments); the claim is 'this .fd was written by a person', nothing stronger about the source — see provenance for the transcription claim"
+  },
+  "provenance": [
+    {
+      "relation": "transcribed-from",
+      "document_id": "RFC 9293",
+      "uri": "https://www.rfc-editor.org/rfc/rfc9293",
+      "section": "§3.3.2",
+      "figure": "Figure 5"
+    }
+  ],
+  "accessibility": {
+    "state": "absent"
+  }
+}

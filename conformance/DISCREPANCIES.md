@@ -340,6 +340,19 @@ below; each carries its resolution note.
   viewer-tier (lenient-mode) implementations; a strict authoring-tier
   implementation MAY reject an unknown minor version outright (the
   reference engine does). No engine change; golden 014 unchanged.
+- **That resolution is SUPERSEDED, and the record is dated rather than
+  rewritten (2026-08-23, `LANGUAGE-EXTENSION-POLICY` + `NORMATIVE-SENTENCE-ACTOR`).** `LANGUAGE-EXTENSION-POLICY` abolished lenient mode
+  permanently, which left the two tiers this entry invented — *viewer-tier*
+  and *strict authoring-tier* — binding nothing the language admits, and
+  core §1 carried the orphaned `SHOULD` until `NORMATIVE-SENTENCE-ACTOR` repaired it. **The
+  divergence itself is still resolved and still costs no engine change**:
+  core §1 now defers to §13.0.1's compatibility rule, whose `Y` < `y` branch
+  makes rejecting `figdown 0.2` the required behaviour rather than a
+  permitted one, and names the **Parser** class (core §0.2) as the party.
+  Golden 014 remains unchanged. **The general lesson is on the record in
+  core §0.2**: a conformance class invented in one paragraph to settle one
+  discrepancy is in no list, and a thing in no list cannot be checked when
+  its ground moves.
 
 ## `UNKNOWN-OPTION-DEGRADATION` — unknown option keys degrade to positional arguments
 

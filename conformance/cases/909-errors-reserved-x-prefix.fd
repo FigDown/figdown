@@ -1,0 +1,7 @@
+figdown 0.1 block
+node a "A"
+x-vendor-thing a
+node b "B" x-vendor-key=1
+edge a -> b x-vendor-key=2
+node x-foo "an id may begin x-"
+class x-bar "and so may a class id"

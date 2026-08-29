@@ -1,0 +1,9 @@
+Assertion A (fatal), spec/figdown-a11y.md §3.1.
+
+The <title> is present and its text is right, but it sits after <defs>
+instead of first. SVG 1.1 §5.4 says a title element should be the first
+child of its parent, and `DESCRIPTION-KEY-SPELLING` already settled that a <title> names its
+parent — a title that is not first is a title whose parentage a reader has
+to guess at.
+
+no root <title> as the FIRST child

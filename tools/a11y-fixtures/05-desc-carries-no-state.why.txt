@@ -1,0 +1,8 @@
+Assertion B (fatal), spec/figdown-a11y.md §4.3.
+
+A <desc> with the `data-desc-state` attribute stripped. This is the exact
+failure `ACCESSIBLE-DESCRIPTION-SOURCES` keeps permanently banned: a machine-written sentence that reads
+as authoritative with nothing in the artifact to say otherwise. The artifact
+travels alone, so the flag has to travel with it.
+
+the root <desc> declares no state

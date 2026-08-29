@@ -171,7 +171,7 @@
     "first_round_delta_points": 0,
     "mean_rounds_delta": 0,
     "criteria": {
-      "text": "B enters the library only if, against A: first-round success rate is higher by ≥ 15 percentage points, OR mean rounds-to-success is lower by ≥ 0.5. Secondary observable (not a criterion): adoption rate of engine-suggested coordinates. If neither criterion is met the envelope is retracted or redesigned; the result is recorded either way. (decisions/registry.md, copied verbatim — UNCHANGED for the floor run, §7.)",
+      "text": "B enters the library only if, against A: first-round success rate is higher by ≥ 15 percentage points, OR mean rounds-to-success is lower by ≥ 0.5. Secondary observable (not a criterion): adoption rate of engine-suggested coordinates. If neither criterion is met the envelope is retracted or redesigned; the result is recorded either way. (decisions/registry.md, copied verbatim — UNCHANGED for the floor run.)",
       "first_round_gate_met": false,
       "mean_rounds_gate_met": false,
       "b_enters_library": false
@@ -303,7 +303,7 @@
     "first_round_delta_points": 0,
     "mean_rounds_delta": -0.4167,
     "criteria": {
-      "text": "B enters the library only if, against A: first-round success rate is higher by ≥ 15 percentage points, OR mean rounds-to-success is lower by ≥ 0.5. Secondary observable (not a criterion): adoption rate of engine-suggested coordinates. If neither criterion is met the envelope is retracted or redesigned; the result is recorded either way. (decisions/registry.md, copied verbatim — UNCHANGED for the floor run, §7.)",
+      "text": "B enters the library only if, against A: first-round success rate is higher by ≥ 15 percentage points, OR mean rounds-to-success is lower by ≥ 0.5. Secondary observable (not a criterion): adoption rate of engine-suggested coordinates. If neither criterion is met the envelope is retracted or redesigned; the result is recorded either way. (decisions/registry.md, copied verbatim — UNCHANGED for the floor run.)",
       "first_round_gate_met": false,
       "mean_rounds_gate_met": false,
       "b_enters_library": false

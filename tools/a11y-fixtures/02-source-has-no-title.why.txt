@@ -1,0 +1,10 @@
+Assertion A (fatal), spec/figdown-a11y.md §3.3.
+
+A real `with-a11y` render of a source with no `title` line. The engine did
+exactly the right thing: it emitted no root <title>, because no renderer
+invents a name and `title` stays optional in the grammar. What makes this
+artifact invalid is the PROFILE, not the parse — a figure with no name is
+not publishable under it, and this is the fixture that pins the distinction
+between "the language allows it" and "this profile publishes it".
+
+NOT PUBLISHABLE until it has one

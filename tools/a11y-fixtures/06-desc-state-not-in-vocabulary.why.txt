@@ -1,0 +1,8 @@
+Assertion B (fatal), spec/figdown-a11y.md §4.2.
+
+`data-desc-state="machine"` — a plausible word that is not one of the five
+ruled states. A state vocabulary that accepted anything would record nothing;
+five values, closed, is what makes the flag readable by a machine that did
+not write it.
+
+is not one of the five states

@@ -58,7 +58,8 @@ const BODY = `var VERSION = ${JSON.stringify(VERSION)};
 // ---- engine (extracted verbatim from editor/figdown.html) ----
 var __engine = (function () {
 ${engine.trimEnd()}
-return { parse: parse, render: render, stackSectionSvgs: stackSectionSvgs };
+return { parse: parse, render: render, stackSectionSvgs: stackSectionSvgs,
+         a11yApply: a11yApply, renderOptionsAttr: renderOptionsAttr };
 })();
 
 // ---- minimal synchronous SHA-256 (FIPS 180-4), hex output ----
@@ -129,7 +130,11 @@ function __stackSectionSvgs(results) {
 // (determinism over convenience: no partial renders of invalid input).
 // opts (presentation, renderer tier): { title: true } draws the title;
 // the default does NOT (embedded figures almost always sit under the
-// host document's caption — the majority case).
+// host document's caption — the majority case). { a11y: true } adds the
+// accessibility profile's emission (spec/figdown-a11y.md; ACCESSIBILITY-PROFILE):
+// role="graphics-document" on the root, the non-visual <title> as its first
+// child, and a state-flagged derived <desc>. The two are ORTHOGONAL — one
+// decides ink, the other the accessible name — and both default to off.
 // Multi-section sources are stacked vertically into a single SVG (MULTI-FIGURE-DOCUMENTS).
 //
 // TWO ERROR CHANNELS REACH ONE errors ARRAY. parse cannot see a
@@ -151,17 +156,27 @@ function render(text, opts) {
   for (var i = 0; i < rs.length; i++) errs = errs.concat(rs[i].errs || []);
   if (errs.length) return { svg: null, errors: errs };
   var svg = rs.length > 1 ? __engine.stackSectionSvgs(rs) : rs[0].svg;
-  return { svg: svg, errors: [] };
+  return { svg: __a11y(svg, p.docs[0], opts), errors: [] };
+}
+// The accessibility profile's emission (spec/figdown-a11y.md; ACCESSIBILITY-PROFILE).
+// Applied to the FINISHED root, never inside a per-section render: ACCESSIBILITY-PROFILE gives
+// an artifact ONE root, ONE name, and the name is the FIRST section's title.
+// A caller that does not ask gets the byte-identical default (core §7 / RENDERING-DETERMINISM).
+function __a11y(svg, doc, opts) {
+  if (!svg || !(opts && opts.a11y === true)) return svg;
+  if (typeof __engine.a11yApply !== 'function') return svg;
+  return __engine.a11yApply(svg, doc);
 }
 // renderDoc(doc, opts) -> svg string, for an already-validated doc from parse().
 // For multi-section, pass parse().docs to renderDocs instead.
 function renderDoc(doc, opts) {
-  return __engine.render(doc, opts).svg;
+  return __a11y(__engine.render(doc, opts).svg, doc, opts);
 }
 function renderDocs(docs, opts) {
   if (!docs || !docs.length) return '';
-  if (docs.length === 1) return __engine.render(docs[0], opts).svg;
-  return __engine.stackSectionSvgs(docs.map(function (d) { return __engine.render(d, opts); }));
+  if (docs.length === 1) return __a11y(__engine.render(docs[0], opts).svg, docs[0], opts);
+  return __a11y(__engine.stackSectionSvgs(docs.map(function (d) { return __engine.render(d, opts); })),
+                docs[0], opts);
 }
 // artifact(text) -> { svg, errors }  svg is the full self-carrying SVG:
 // the render plus a <metadata id="figdown-source"> block
@@ -178,7 +193,7 @@ function artifact(text, opts) {
   // The artifact records the SHA-256 OF THE SOURCE, the ENGINE VERSION that
   // rendered it, and any non-default render option (core §7) — together they
   // keep third-party rebuilds bit-identical and give a diff somewhere to point
-  var optAttr = (opts && opts.title === true) ? ' data-render-options="with-title"' : '';
+  var optAttr = __engine.renderOptionsAttr(opts);
   var meta = '<metadata id="figdown-source" data-sha256="' + __sha256hex(src) + '"'
     + ' data-engine-version="' + VERSION + '"' + optAttr + '><![CDATA[\\n'
     + src.replace(/]]>/g, ']]]]><![CDATA[>') + '\\n]]></metadata>';
