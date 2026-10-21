@@ -65,6 +65,191 @@ Statuses referred to above are defined in [`spec/README.md`](spec/README.md).
 
 Nothing yet.
 
+## v0.5.2 — 2026-10-21
+
+**Release `v0.5.2`, language version `figdown 0.5`.** A `Z`: **the language did
+not move.** No keyword, option key, enum value or genre changed, every
+existing conformance golden passes unmodified, and `read/0.5/` is reused byte-for-byte.
+What ships is repair work: one layout defect, eight engine fixes, nine editor
+fixes, a set of hardened gates, and corrections to the specification's text.
+**Three changes act on documents without touching their headers.** They are
+listed first under *Upgrading*.
+
+No published figure changes its drawing. Every published artifact changes its
+version stamp. Four also embed a source whose comments were corrected.
+
+### Changed
+
+- **Where a release's archived page lives is now ruled**
+  (`RELEASE-ARCHIVE-GRANULARITY`). `archive/0.5/figdown.html` is `v0.5.0`'s
+  page. A `Z` release adds no page under `archive/`: its immutable page is the
+  `editor/figdown.html` its own tag carries, which the release's archival
+  deposit also holds. [`spec/core.md` §13.5](spec/core.md) says so. Before,
+  §13.5 promised one page per release and practice wrote one per language
+  version. To reproduce `v0.5.1`'s exact output, run `v0.5.1`'s tagged page.
+
+### Fixed — engine
+
+- **The group-separation push keeps every node on the canvas and off every
+  other node** (`GROUP-SEPARATION-PLACEMENT`). The push could carry a node past
+  the figure's edge, where it was clipped away, or land a node on top of
+  another. Both rendered with exit 0. Figures with groups may re-render. On
+  random group figures this removes every off-canvas drawing, halves the
+  refusals and newly refuses none. The residue is disclosed: of 6,000 random
+  figures, 2 that `v0.5.1` refused and 1 it drew off the canvas are now
+  drawn with one partial node overlap. No published figure changes.
+- **An artifact embeds its source exactly.** A source containing `$$`, `$&`,
+  `` $` `` or `$'` was expanded as a replacement pattern when written into the
+  artifact, so the embedded source did not match its own hash. This is fixed in
+  the engine, the library build and both CLI copies.
+- **A `node` line refused for its arity no longer claims its id.** The
+  corrected line no longer gets a false `duplicate id`, and an edge to the
+  refused node reports `unknown endpoint`, as the error-recovery rules say.
+- **Diagnostics name the right thing.**
+  - A line that holds only options names its first token instead of
+    `"undefined"`.
+  - In a multi-section file, an error whose message contains a newline, and a
+    fragment's `(lines A–B)` range, now give file line numbers rather than
+    section-local ones.
+  - Complete-cover advice names the node the author did not pin. Before, it
+    could tell the author to pin a node again, which is itself an error.
+- **Very large inputs no longer overflow the stack.** This covers labels, table
+  cells and timing figures of about 130,000 lines. Output for every input that
+  rendered before is unchanged.
+
+### Fixed — editor
+
+- Creating a group from several nodes works again. Every multi-node group was
+  refused. An `in=` inside a label or `note=` no longer counts as membership.
+- A threshold drag commits again. Every drag was refused. An `offset=` inside a
+  label or comment is left alone.
+- A commented `layout` line counts as the layout marker. Before, pin-writing
+  edits added a second one and were refused.
+- A document that opens with a comment no longer gains a second header on
+  every drag or add.
+- Deleting a line keeps its trailing comment, as a line of its own. This
+  applies to deleting a title, connector, class, external or node, to
+  ungrouping, and to removing an empty container.
+- Deleting an endpoint that a `bundle` names by connector id keeps the
+  bundle's other members. The delete was refused before.
+- Inserts land after a trailing typed region, not inside it.
+- Deleting a rowspan head row keeps its text in the span.
+- A table-cell edit keeps a leading literal caret pair as text.
+
+### Fixed — tools and integrations
+
+- The MCP server dispatches only its own tool names. A name such as
+  `constructor` now gets `-32601`.
+- `migrate-figdown --flag-experimental` also flags `statechart` and
+  `sequence`.
+- `safe-svg-check` rejects processing instructions and DOCTYPE or markup
+  declarations, and it decodes XML character references before judging.
+- The schema and manifest validators apply keywords beside `$ref`. A manifest
+  `date` must be a real calendar day.
+
+### Changed — gates
+
+No gate was added or removed. Several now fail where they used to pass
+silently.
+
+- Fence detection now handles:
+  - `~~~` fences, longer fences, info strings, and a space before the info
+    string;
+  - closers matched to their openers;
+  - a triple-backtick span at the start of a line, which is not a fence.
+- The requirement-keyword and conformance-actor checks catch capitalised,
+  emphasised and line-wrapped claims, including inside blockquotes. The
+  standards check sees "IEEE Std".
+- The comment check reads edge labels, escaped quotes and bare drawn text.
+- The capability check works in both directions and refuses a missing genre
+  document.
+- The skill-coverage check byte-compares the bundled engine and CLI and sees
+  stray files that are not `.md`.
+- Empty or vacuous inputs now fail:
+  - an empty legend corpus;
+  - an unfired boundary probe under `--strict`;
+  - a broken `.fd`/`.svg` pair under `artifact --strict`;
+  - a negative control with no recorded reason;
+  - an unreadable file, which is a tool error, not a skip.
+- The conformance runner fails on a golden with no `.fd` beside it. A refused
+  case may not keep a geometry golden.
+- Six conformance cases (290 → 296) pin the engine fixes above. A property
+  test pins the large-input fix.
+- The accessibility check catches an identity element under a hidden ancestor.
+  It recovers an embedded source that contains `</metadata>`. Node and edge
+  readers accept any attribute order.
+- An artifact round-trip now pins the embedded-source fix at every entry
+  point.
+
+A gate is still a check, not a proof. The gates that pass on an empty scope or
+an unarmed threshold are the same ones as at `v0.5.1`, and each is documented
+where it lives.
+
+### Fixed — documentation and specification
+
+- **Specification, the one normative correction:**
+  [`spec/core.md`](spec/core.md) §12.4 rule 7 said `cell` coordinates keep
+  their sign and any fraction. The engine refused both at `v0.5.1` and still
+  does. The rule now says they are 1-based unsigned integers.
+- **Specification, other corrections:** fixes to cross-references, quoted
+  diagnostics, counts and table rows; none of them changes a rule. Among them:
+  - ids in `sequence` share the section's namespace, not the document's;
+  - `state` derives a rounded shape;
+  - typed-block openers do not take `class=`;
+  - thresholds and bundles take no `fill=`;
+  - a threshold or band `in=` may name a region.
+- **Errata:** [`spec/ERRATA.md`](spec/ERRATA.md) gains **E2**.
+  `read/0.5/experimental/statechart.md` gives `box` as `state`'s default shape
+  where the engine derives `rounded`. It also points readers of `read/0.4/` to
+  the release where that default changed.
+- **Layout guidance:** the pipeline and flowchart sketches in
+  [`guide/layout.md`](guide/layout.md) and
+  [`guide/expressing.md`](guide/expressing.md) no longer `rank` the main chain.
+  Under `flow right` that stacked the chain into one column. They rank the side
+  exit instead.
+- **Authoring:** in [`guide/authoring.md`](guide/authoring.md), `flow` and
+  `rank` are line errors in `sequence` and `pin` moves nothing there.
+  `description=` is offered only where it is accepted.
+- **Showcase:** every [`guide/showcase.md`](guide/showcase.md) fence quotes its
+  `.fd` verbatim again.
+- **Counts:** the examples index, `conformance/README.md`, `tools/README.md`,
+  the MCP README and the skill's version list are recounted against the tree.
+- **README:** the reading route for a handed `.fd` points at `read/0.5/`,
+  including its experimental genre files. The two file sizes that row quoted
+  are dropped, because they drifted; the comparison stays.
+
+### Upgrading
+
+**Three changes act on documents without a header change.** None is
+version-gated.
+
+1. **Experimental `sequence`:** a `lifeline`, or a `message`'s `id=`, that
+   reuses the id of an earlier `fragment` or `operand` is now refused. Rename
+   one of the two. See *Experimental*.
+2. **Figures with groups** may re-render where the push used to clip a node or
+   overlap two. No published figure is affected.
+3. **Artifacts whose source contains `$$`, `$&`, `` $` `` or `$'`** were written
+   with a corrupt embedded source. Rebuild them.
+
+No frozen-surface document needs a rewrite. If you keep rendered `.svg` files
+under version control, expect a stamp-only change on every rebuilt artifact
+whose source did not change. Anything beyond the changes above is worth
+reporting. Full details:
+[`spec/migrations.md`](spec/migrations.md).
+
+### Experimental
+
+- **`sequence` id collisions are now refused in both orders.** Ids were always
+  meant to be unique per section, but a lifeline or message `id=` declared
+  *after* a fragment or operand of the same id was accepted, and `in=` then
+  resolved to the lifeline. An experimental change owes no migration
+  ([`spec/experimental.md`](spec/experimental.md) §E7). It is disclosed here
+  because it makes an accepted document need a rewrite. No shipped document
+  had one.
+- **An open question ships open** (`FLOWCHART-CONNECTOR-READING`):
+  `flowchart` never states what its connector asserts, and the reading
+  contract's generic rule says a relationship. No rule moves in this release.
+
 ## v0.5.1 — 2026-08-29
 
 **Release `v0.5.1`, language version `figdown 0.5`.** A `Z`: **the language did
