@@ -1,0 +1,28 @@
+# 0.5 (`REFUSED-DECLARATION-ID`): a `node` line refused for its ARITY
+# declares nothing, like every other failing line (core §8.3.3 item 1, §8.3.4).
+#
+# Before this fix the engine recorded the node's id BEFORE its surplus-argument
+# check, so a refused line still claimed the id. Two visible consequences, one
+# section each.
+#
+# Section 1, the missing cascade: `node a "A" extra` is refused, so `edge a -> b`
+# names an endpoint that was never declared and MUST be a second error,
+# `unknown endpoint "a"`. The old engine reported only the first.
+#
+# Section 2, the false duplicate: the author repairs the line by writing it
+# again. The corrected `node a "A"` is the FIRST declaration of `a`, so the
+# section reports the refused line and nothing else. The old engine also
+# answered `duplicate id "a"` on the repair.
+#
+# 920 pins the same cascade for a VALUE fault (`shape=hexagon`); this file pins
+# it for an arity fault, which took a different code path.
+figdown 0.5 block
+node a "A" extra
+node b "B"
+edge a -> b
+
+figdown 0.5 block
+node a "A" extra
+node a "A"
+node b "B"
+edge a -> b

@@ -578,9 +578,7 @@ DECLARATION, columns by `lifeline` order and time by the order the
 occurrence lines are written, so `flow` and `rank` are not its keywords
 and there is nothing for a layout intent to set. It also opens no nested
 region, because there is no scene to stack one beside; that is an OPEN
-question rather than a refusal. And it is the one genre with **no
-renderer**: a `sequence` document parses to a complete model, reports no
-error, and draws an empty canvas.
+question rather than a refusal.
 
 **Where several scene genres accept the same keyword, that is an
 INTERSECTION and not a shared surface** (`SUBJECT-VOCABULARY-SCOPE`). Each genre
@@ -1137,8 +1135,9 @@ EXPERIMENTAL. Registry row: §10 (b), (b′).
 **EXPERIMENTAL scene markers (`CONSTRUCT-STATUS-TIERS`).** Definition:
 [experimental.md](experimental.md) §E3, which also records why they stay
 experimental (they are the `GENRE-EARNING-THRESHOLD` *interim general constructs* for the
-candidate genre in §9). Listed on scene-genre allowlists; registry row:
-§10 (b). Not part of the taught main-standard path.
+candidate genre in §9). Declared by `block` only (`SCENE-KEYWORD-MEMBERSHIP`,
+[genres/block.md](genres/block.md) §2.6); registry row: §10 (b). Not part of the taught
+main-standard path.
 
 `threshold` was spelled `guide` in an earlier release (`THRESHOLD-KEYWORD-SPELLING`, §10).
 `band` gained a MANDATORY quoted label (`BAND-LABEL-STATUS`).
@@ -1233,7 +1232,7 @@ always drawing a box:
    a rectangle's perimeter.
 2. A class carried **only by box-kind elements** — every other collection
    that carries `class=`: `node` `group` `lifeline` `state` `fragment`
-   `operand` `field` `cell`, and a typed block itself — keeps the rect.
+   `operand` `field` `cell` — keeps the rect.
 3. A class carried **by both** draws BOTH samples, side by side, LINE then
    BOX, then the meaning text. The legend exists to explain, and the extra
    sample is cheaper than making a reader guess which half of the figure
@@ -1698,7 +1697,7 @@ rule, not an exception.** On anything with an interior — a `node`, a
 `threshold` there is no interior: the construct IS a line, so `stroke=`
 is the whole of it and `fill=` is a line error naming `stroke=` (the
 carve-out table below and the §10 registry row; `INTERIOR-LESS-ELEMENT-PAINT` — the citation read
-"§8.4" until 0.1 and §8 has no subsections). This is SVG's asymmetry borrowed unaltered — `<rect stroke>` is a
+"§8.4" until 0.1, when §8 had no subsections). This is SVG's asymmetry borrowed unaltered — `<rect stroke>` is a
 border, `<line stroke>` is the line — and every surveyed system reads it
 the same way: mxGraph's `strokeColor` applies to vertices and edges
 alike, D2's `style.stroke` is documented as applying "to shapes and
@@ -1818,9 +1817,9 @@ grammar is closed (§10):
 | element | NOT supported | why |
 |---|---|---|
 | `edge`, `bundle`, `threshold` | `fill=` | none of the three has an **interior**: the construct IS a line, so `fill=` and `stroke=` would name one channel and `fill=` was the one that lost silently. Retired at 0.1 (`INTERIOR-LESS-ELEMENT-PAINT`, and the paragraph above); the message names `stroke=`. `stroke=` and `style=` stay live on all three — a line has ink and a dash. |
-| `external` | `fill=`, `stroke=`, `style=` | an external endpoint is **never drawn** (`EXTERNAL-EDGE-ENDPOINTS`, §2.8): there is no fill, no border and no dash for the attribute to act on. Since 0.1 (`COLOUR-KEY-STATUS`) it takes `plane=` and nothing else: its label was the one thing it drew and `color=` was the one key it kept, so retiring that key leaves it with no paint at all. The label is still drawn, in the canvas ink (`LABEL-COLOUR-SOURCE`). |
-| `bitfield`, `table`, `timing` | `style=`, `plane=` | typed blocks stack in document order **outside** the scene, so there is nothing to layer them against; and a block-wide `style=` would collide with the per-item dash convention (a field carrying `present=` is drawn dashed). |
-| `field`, `cell`, `signal` | `plane=`, **`style=` (since 0.1, `STYLE-KEY-SCOPE`)** | a block item lives inside its block, which is not part of the plane stack. `style=` was accepted per item until 0.1 and was removed for a reason stronger than tidiness: on a `field` the dash is conditional presence's ONLY visual carrier, so `field "B" 8 present="" style=solid` erased it while the model still recorded the field as conditionally present — a reading agent and a human got different figures from one line, which is exactly what `MEANINGFUL-ARRANGEMENT` forbids. (The construct was the bare flag `optional` when `STYLE-KEY-SCOPE` was written; `PRESENCE-CONDITION-EXPRESSION` replaced it with `present=` at 0.1.) The three were removed together as one minimum set (11 in-repo uses, **0 downstream**); a per-item dash now comes only from the item's own semantics (`present=`) or from a `class=` it joins. | <!-- fence-check: skip -->
+| `external` | `fill=`, `stroke=`, `style=` | an external endpoint is **never drawn** (`EXTERNAL-EDGE-ENDPOINTS`, §2.8): there is no fill, no border and no dash for the attribute to act on. Since 0.1 (`COLOUR-KEY-STATUS`) it takes `plane=` and nothing else: its label was the one thing it drew and `color=` was the one key it kept, so retiring that key leaves it with no paint at all; and since 0.3 (`PAINT-ORDER-CONSTRUCT` withdrew `plane=`) it takes no option key at all. The label is still drawn, in the canvas ink (`LABEL-COLOUR-SOURCE`). |
+| `bitfield`, `table`, `timing` | `style=` (`plane=` too, until `PAINT-ORDER-CONSTRUCT` withdrew the key) | typed blocks stack in document order **outside** the scene, so there is nothing to layer them against; and a block-wide `style=` would collide with the per-item dash convention (a field carrying `present=` is drawn dashed). |
+| `field`, `cell`, `signal` | **`style=` (since 0.1, `STYLE-KEY-SCOPE`)** (`plane=` too, until `PAINT-ORDER-CONSTRUCT` withdrew the key) | a block item lives inside its block, which is not part of the plane stack. `style=` was accepted per item until 0.1 and was removed for a reason stronger than tidiness: on a `field` the dash is conditional presence's ONLY visual carrier, so `field "B" 8 present="" style=solid` erased it while the model still recorded the field as conditionally present — a reading agent and a human got different figures from one line, which is exactly what `MEANINGFUL-ARRANGEMENT` forbids. (The construct was the bare flag `optional` when `STYLE-KEY-SCOPE` was written; `PRESENCE-CONDITION-EXPRESSION` replaced it with `present=` at 0.1.) The three were removed together as one minimum set (11 in-repo uses, **0 downstream**); a per-item dash now comes only from the item's own semantics (`present=`) or from a `class=` it joins. | <!-- fence-check: skip -->
 
 > **`band` left this table (`BAND-LABEL-STATUS`).** It was listed here as
 > refusing `color=`, with the reason *"a zone band carries no label"* — a
@@ -2147,7 +2146,7 @@ SUPPRESSES every message a later stage would have produced for that line.
 
 | stage | scope | on a fault |
 |---|---|---|
-| **source scan** | the whole document, before it is split | reports **every** illegal character (§15.3, `XML-CHARACTER-LEGALITY`); suppresses nothing — its findings JOIN the pass |
+| **source scan** | the whole document, before it is split | reports **every** illegal character (§15.5, `XML-CHARACTER-LEGALITY`); suppresses nothing — its findings JOIN the pass |
 | **section split** | the whole document | purely lexical — a section starts at any line whose first token is `figdown`, valid or not. **It cannot fail, and no error can move a boundary** |
 | **pre-dispatch refusal** | one line | **one** error, line abandoned, **an open region stays open** (§8.3.5). Four members: a lexical fault (an unterminated string, a bad escape), the reserved `;` (`SEMICOLON-STATUS`), a pipe row outside a `table` region, and a RETIRED or WITHDRAWN top-level spelling |
 | **dispatch** | one line | **one** error, line abandoned. Closes any open region *first* (§8.3.5). The reserved dynamic words (§6), the genre allowlist (`GENRE-KEYWORD-ALLOWLIST`), the connector-word rules (`GENRE-CONNECTOR-SPELLING`/`GENRE-NODE-SPELLING`) and typed-block-child placement are decided here |
@@ -2289,7 +2288,7 @@ Repairing any of them moves existing goldens, which §13 makes a
 MIGRATIONS-entry change rather than a bug fix; they are filed as
 **engine-backlog item 79** so
 the cost is on a list rather than in this paragraph. What this section
-guarantees is that both are now PREDICTABLE, which is what a second
+guarantees is that all three are now PREDICTABLE, which is what a second
 implementation actually needed.
 
 #### 8.3.7 Conformance compares SORTED LISTS, and order is not promised
@@ -3743,6 +3742,45 @@ per-line guarantee is not mistaken for a per-document one.
   image population is not currently reachable, so the production frequency of
   fan-out figures is uncounted and no rate is asserted here. **What would close
   it:** that count, and a source verdict under the condition above. All v0.2.
+- `FLOWCHART-CONNECTOR-READING`: **`flowchart` never states what its connector MEANS, and it is the
+  one experimental genre whose connector does not mean what the generic rule
+  says** (2026-09-02, found while assessing an external need filing).
+  The generic contract is explicit: *edges are relationships between
+  participants* (`read/<v>/reading.md`, **What you MAY conclude**). Its
+  **Genre-specific readings** section then overrides that for the genres whose
+  connector means something else — `bitfield`, `table`, `timing`, and
+  `statechart`, which gets a whole sentence: *edges are **transitions** on an
+  event*. **`flowchart` has no entry there at all**; it appears in that section
+  only inside `statechart`'s paragraph, as the thing `statechart` must not be
+  confused with.
+  The genre document does not close the gap either. It says `flowline` is
+  `edge` with *same operators, same labels, same option keys, same model; only
+  the word changed*, so by the letter a flowchart connector inherits
+  **relationship**. The genre's actual reading is stated only in passing, in
+  prose about direction — *a step follows another step in one direction* — and
+  in the opening line's *order, with branches*. **A reader following the
+  contract as written gets the wrong answer; a reader following the prose gets
+  the right one and cannot cite a rule for it.**
+  **Why this is an entry and not a wording nit.** Sequence is the whole
+  interpretation method of the genre, and it is the one reading the drawing
+  cannot supply — the identical picture is a `statechart` or a `flowchart`
+  depending on line 1, which is exactly why `statechart` was given a sentence.
+  The genre that got the sentence is the one that needed it least: it is
+  *named* after its reading. `flowchart`'s reading is the unstated one.
+  **This blocks work that is queued behind it.** The external filing above asks
+  whether a store-to-store connector can carry *this named value is handed on*.
+  That question is unanswerable while the default it would depart from is not
+  written down: a proposal cannot state its delta against an unstated baseline,
+  and any answer would silently mint the baseline as a side effect of settling
+  something else.
+  **What would close it:** a `flowchart` entry in the genre-specific readings
+  saying what an unlabeled connector asserts and what it does not — in
+  particular that it does **not** assert the generic *relationship*, and does
+  not assert that the step is reached (a branch not taken is drawn the same).
+  No construct, no keyword, no golden moves: this is a reading the goldens have
+  always had and the contract has never stated, the same shape as the error
+  recovery rule that turned out to be frozen by the multi-error goldens all
+  along.
 - **A presence condition cannot reference a field** — `present="C = 1"`
   names `C`, and the language cannot resolve that to the `field "C"` three
   lines up: a bitfield field name is a **label**, not an id, and `class=` /
@@ -4107,10 +4145,10 @@ no children, which is why it is its own row rather than a fourth line of
 
 | Keyword | Status | Role |
 |---|---|---|
-| `chart` | EXPERIMENTAL | `chart <table-id>` — draws a `table` already in the document as a chart. Legal at the top level of `block`, `topology`, `flowchart` and `table` (`GENRE-KEYWORD-ALLOWLIST`, below). **Outside the v0.1 conformance surface**; defined in §4.4, vocabulary row in [genres/table.md](genres/table.md) |
+| `chart` | EXPERIMENTAL | `chart <table-id>` — draws a `table` already in the document as a chart. Legal at the top level of `block`, `topology`, `flowchart`, `statechart` and `table` (`GENRE-KEYWORD-ALLOWLIST`, below). **Outside the v0.1 conformance surface**; defined in §4.4, vocabulary row in [genres/table.md](genres/table.md) |
 
-Its status is its own, not a genre's: `chart` is accepted under three
-NORMATIVE genres and is still EXPERIMENTAL, because what has not converged is
+Its status is its own, not a genre's: `chart` is accepted under two
+NORMATIVE genres (`block`, `table`) and is still EXPERIMENTAL, because what has not converged is
 the construct — one option key, one legal value, and a data binding
 (rows→X, columns→Y) that no other keyword in the language uses. An agent
 writing a portable v0.1 figure leaves it alone.
@@ -4456,7 +4494,7 @@ diagnostic) and `present` (`PRESENCE-CONDITION-EXPRESSION`) without recounting: 
 44 until 0.1**, which registered `index` (`BITFIELD-REPETITION-CONSTRUCT`, the `bitfield`
 repetition key): 44 + 1 = 45. The
 figure above is re-derived row by row from the key table below, which has
-46 rows for 45 distinct keys — the two NORMATIVE rows spelled `fill` are ONE key
+47 rows for 46 distinct keys — the two NORMATIVE rows spelled `fill` are ONE key
 with two registrations. The set
 is closed: a `key=`
 token whose key is not listed here is the line error
@@ -5136,6 +5174,9 @@ before-label` and `304-presentation-on-every-element` carry a non-empty
 `thresholds`, `bands` AND `bundles`; `214-label-absent-vs-id` and
 `215-label-empty-string` carry a non-empty `bundles`. Four normative model
 goldens, and an implementation that emits `[]` for all three fails them.
+Re-measured at 0.5: seven — `245-block-subject-vocabulary`,
+`810-threshold-in-region-target` and `811-threshold-in-region-ungated`
+carry a non-empty `thresholds` and `bands` too.
 
 What is true, and is what the clause was reaching for: **no document an
 author is TAUGHT to write puts anything in these arrays**, because the
@@ -5152,8 +5193,8 @@ exceptions rather than unconditionally.
 
 | key | type | present | meaning |
 |---|---|---|---|
-| `version` | string | always | the wire-grammar version **as the document declared it** — `"0.1"`, `"0.2"`, `"0.3"` or `"0.4"` (§1; `"0.3"` since 0.3 and `"0.4"` since 0.4, §13.7). It stopped being a constant at `STATECHART-GENRE-SCOPE`: while exactly one version existed, "emit the literal `\"0.1\"`" and "copy the source token" were the same instruction, and they are not any more. **An engine MUST emit the token the header declared**, never the newest version it implements and never the one it would have preferred — the declared version is the contract the author wrote against, and §13.7 forbids a reader inferring it from anything else. It is NOT the dev increment (0.1), which appears in a rendered artifact's `data-engine-version` and never in the model (§12.6). Stated normatively at 0.1; it was a hard-coded constant in `conformance/normalize.js` until `STATECHART-GENRE-SCOPE` |
-| `genre` | string | always | one of the genre tokens legal at `version` (§1) — the six of `figdown 0.1`, those plus `statechart` at `figdown 0.2` and `figdown 0.3` (0.3 added an option key, no genre), or those plus `sequence` at `figdown 0.4` (`SEQUENCE-GENRE-VOCABULARY`). REQUIRED in the source since 0.1, so it can be absent only from a document that failed to parse. Since `GENRE-NAMESPACE` it also names the NAMESPACE the document's top-level keywords belong to — a consumer resolves every non-core keyword against it (§1 `GENRE-NAMESPACE`, §12.7) |
+| `version` | string | always | the wire-grammar version **as the document declared it** — `"0.1"`, `"0.2"`, `"0.3"`, `"0.4"` or `"0.5"` (§1; `"0.3"` since 0.3, `"0.4"` since 0.4 and `"0.5"` since 0.5, §13.7). It stopped being a constant at `STATECHART-GENRE-SCOPE`: while exactly one version existed, "emit the literal `\"0.1\"`" and "copy the source token" were the same instruction, and they are not any more. **An engine MUST emit the token the header declared**, never the newest version it implements and never the one it would have preferred — the declared version is the contract the author wrote against, and §13.7 forbids a reader inferring it from anything else. It is NOT the dev increment (0.1), which appears in a rendered artifact's `data-engine-version` and never in the model (§12.6). Stated normatively at 0.1; it was a hard-coded constant in `conformance/normalize.js` until `STATECHART-GENRE-SCOPE` |
+| `genre` | string | always | one of the genre tokens legal at `version` (§1) — the six of `figdown 0.1`, those plus `statechart` at `figdown 0.2` and `figdown 0.3` (0.3 added an option key, no genre), or those plus `sequence` at `figdown 0.4` (`SEQUENCE-GENRE-VOCABULARY`) and `figdown 0.5` (0.5 added an option key, no genre). REQUIRED in the source since 0.1, so it can be absent only from a document that failed to parse. Since `GENRE-NAMESPACE` it also names the NAMESPACE the document's top-level keywords belong to — a consumer resolves every non-core keyword against it (§1 `GENRE-NAMESPACE`, §12.7) |
 
 **Class** — `class` (§2.7).
 
@@ -5290,7 +5331,7 @@ conformance surface writes none of them and omits all five arrays.
 
 | key | type | present | meaning |
 |---|---|---|---|
-| `id` | string | always | the participant's id; shares the document-wide id namespace |
+| `id` | string | always | the participant's id; shares the section's id namespace (§1) |
 | `label` | string | when written | the participant's name. Absent is ABSENT, never the id (§12.3) |
 | `in` | string | when `in=` is written | the `fragment` or `operand` id this participant exists inside (sense 1) |
 | `fill` `stroke` `style` | string | when written | §5 |
@@ -5330,7 +5371,7 @@ It is NOT the `statechart` `state`, which is a *Node* with an id.
 
 | key | type | present | meaning |
 |---|---|---|---|
-| `id` | string | always | shares the document-wide id namespace with `lifeline` and `operand` |
+| `id` | string | always | shares the section's id namespace (§1) with `lifeline` and `operand` |
 | `label` | string | when written | the frame's caption |
 | `type` | string | **always** | one of `alt` `opt` `loop` `par` `strict` `seq` `critical` `neg` `assert` `ignore` `consider` `break` — UML `InteractionOperatorKind` (§17.12.15.3) taken whole. MANDATORY in the source: UML defaults the attribute to `seq` and FigDown declines the default, a declared divergence |
 | `in` | string | when `in=` is written | the enclosing `fragment` or `operand`. **Nesting is capped at ONE level**: a fragment may sit inside an operand of one enclosing fragment and no deeper |
@@ -5343,7 +5384,7 @@ It is NOT the `statechart` `state`, which is a *Node* with an id.
 
 | key | type | present | meaning |
 |---|---|---|---|
-| `id` | string | always | shares the document-wide id namespace |
+| `id` | string | always | shares the section's id namespace (§1) |
 | `label` | string | when written | the compartment's guard |
 | `in` | string | **always** | the `fragment` this compartment belongs to. MANDATORY, and it MUST resolve to a `fragment` — never to another operand, and never to a lifeline |
 | `stroke` `style` | string | when written | §5 |
@@ -5730,8 +5771,10 @@ The list is exhaustive for v0.1.
    `#0d9488`, `teal` and `transparent` are stored verbatim, because §5
    accepts all four spellings and a consumer that needs a canonical form
    can compute one. Percentages lose only their `%` sign
-   (`threshold offset=15%` → `15`); `at=` and `cell`
-   coordinates keep their sign and any fraction. Each of those two is a
+   (`threshold offset=15%` → `15`); `at=` coordinates keep their sign
+   and any fraction; `cell` coordinates are 1-based unsigned integers (a
+   sign or a fraction is a line error), and a header address `h<n>` adds
+   `header: true`. Each of those two is a
    PAREN point in the source (`at=(x,y)`, `cell (r,c)`) and a pair of
    numbers in the model — the parens are the surface's way of saying "one
    composite value", and the model has no punctuation to carry.
@@ -5773,7 +5816,7 @@ integrity** either — that `a`/`b`/`in`/`group`/`class` name something the
 document declares, that ids are unique, that a genre admits the keywords
 used — because those are PARSE-time rules (§8) whose violation produces
 an error set and no model at all. `npm run gate:schema`
-([tools/schema-check.js](../tools/schema-check.js), the 30th gate) checks
+([tools/schema-check.js](../tools/schema-check.js)) checks
 the schema against every `.model.json` golden in `conformance/cases/` and
 `conformance/experimental/`, against every published figure in
 `examples/` and `figures/` projected through the same `normalize.js`, and
@@ -5846,8 +5889,8 @@ COUNT — not the presence of a second `figdown` line, not the genre —
 decides which:
 
 - **One section**: the top level IS the §12.2 *Document* object. `header`
-  is its first key. There is no wrapper. This is the shape of 62 of the
-  65 valid normative fixtures.
+  is its first key. There is no wrapper. This is the shape of 78 of the
+  88 valid normative fixtures.
 - **Two or more sections**: the top level is an object with **exactly one
   key**, `sections`, whose value is an array of §12.2 *Document* objects,
   one per section. Nothing else appears at the top level — there is no
@@ -6959,6 +7002,15 @@ should not be.
   old document goes to the migration log, finds the release, and
   follows the link.
 
+**Where each release's page lives (`RELEASE-ARCHIVE-GRANULARITY`).** `archive/<X.Y>/figdown.html`
+is the page of the language version's first release, `vX.Y.0`. A `Z` release adds no page under `archive/`: its immutable
+engine page is the engine file its own tag carries, `editor/figdown.html`
+at `vX.Y.Z`, which the tag freezes as this section requires and which the
+release's archival deposit also holds. So a reader who needs the
+byte-identical output of a `Z` release runs that tag's
+`editor/figdown.html`, not `archive/<X.Y>/figdown.html`, which is
+`vX.Y.0`'s.
+
 During the `figdown 0.1` draft period the log records dated dev
 increments (0.1) which are **not** releases: they will be
 squashed into `figdown 0.1` at freeze (MIGRATIONS, header). No tag or
@@ -7349,6 +7401,17 @@ increment, one genre later.
   claim nobody can make retroactively. The correct discharge is a publish-time
   act, and the record here is what keeps `0.4` from adding a fourth
   unhashed tree without anyone noticing.
+- **Corrected 2026-10-14: that debt was a fact about the source tree only.**
+  The published `archive/MANIFEST.tsv` is accumulated by the publish, not copied
+  from the source, and it received each release's rows at that release's own
+  publish — `0.2` at `v0.2.0`, `0.3` at `v0.3.0`, `0.4` at `v0.4.0`, `0.5` at
+  `v0.5.0` — hashed over the bytes that shipped, so in the published tree
+  `gate:archive` holds every release byte-frozen. The source tree hashes its
+  own bytes, which the publish transform rewrites, so its rows can never be the
+  published ones; it carries `0.2`–`0.4` rows for `read/0.2/`–`read/0.4/`,
+  written on 2026-10-14 after git showed each tree identical to its release's
+  source commit. The engine pages `archive/0.2/`–`archive/0.4/` exist only in
+  the published tree.
 
 #### 13.7.5 The fourth `Y`, and the first key gated under the restated rule
 
@@ -7389,7 +7452,9 @@ increment, one genre later.
 - **It owes an `archive/0.5/figdown.html` at publish, not here**, on
   §13.5's rule unchanged; and it inherits §13.7.4's recorded manifest
   debt without adding to it silently — `read/0.5/` is the fifth tree the
-  freeze covers and the fourth that nothing hashes.
+  freeze covers and the fourth that nothing hashes. *(Corrected 2026-10-14:
+  `read/0.5/` is hashed in both trees, as are `read/0.2/`–`read/0.4/`; see
+  the correction under §13.7.4.)*
 
 ### 13.8 What tier 2 costs, stated honestly
 
@@ -7942,7 +8007,7 @@ evidence is not in this table because it is not in this section.
 
 | # | Claim (§) | Evidence |
 |---|---|---|
-| 1 | No `script` element in any artifact (§15.2.1) | `gate:safesvg` B, over every committed `.svg` in the tree (86: 73 renderer-output artifacts judged, 9 hand-edited counter-examples named and skipped, 4 fork-written files pinned as PENDING — `RESERVED-PREFIX-ENFORCEMENT`) + 3 fixtures × 3 render modes every run; negative control: a doctored artifact with `<script>` fails B |
+| 1 | No `script` element in any artifact (§15.2.1) | `gate:safesvg` B, over every committed `.svg` in the tree (87: 73 renderer-output artifacts judged, 10 hand-edited counter-examples named and skipped, 4 fork-written files excluded as ruled derived files — `RESERVED-PREFIX-ENFORCEMENT`, `UNREPRODUCIBLE-ARTIFACT-DISPOSITION`) + 3 fixtures × 3 render modes every run; negative control: a doctored artifact with `<script>` fails B |
 | 2 | No attribute beginning `on` (§15.2.2) | `gate:safesvg` C (absolute rule, independent of the allowlist); negative control: `<svg onload=…>` fails C |
 | 3 | No `foreignObject` (§15.2.3) | `gate:safesvg` B; negative control fails B |
 | 4 | No `href`/`xlink:href`/`src`, no external `url(…)`, no `@import` (§15.2.4) | `gate:safesvg` C and D; negative controls (`<image href=https://…>`, `style="fill:url(https://…)"`, `@import`) each fail |

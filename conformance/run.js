@@ -30,8 +30,8 @@
 // The subprocess path covers the PARSER class only — model goldens and error
 // goldens. Geometry goldens are the RENDERER's (core §8's geometry-time
 // errors, raised by render(), not parse()), and the determinism self-check and
-// the three engine property tests below all need in-process access to the
-// reference engine, so all three are skipped and the skip is REPORTED rather
+// the five engine property tests below all need in-process access to the
+// reference engine, so all of them are skipped and the skip is REPORTED rather
 // than absorbed. `--update` is refused in subprocess mode: goldens are minted
 // by the reference engine and by nothing else.
 //
@@ -246,7 +246,7 @@ function assertGroupCrossingEdge(engine) {
     'pin lf at=(60,60) width=120 height=50',
     'pin tor at=(60,180) width=120 height=50',
   ].join('\n');
-  const { doc, errors } = engine.parse(SRC);
+  const { doc, errs: errors } = engine.parse(SRC);
   const bad = [];
   if (errors && errors.length) {
     bad.push('the property figure no longer parses: ' + errors.join('; '));
@@ -272,6 +272,145 @@ function assertGroupCrossingEdge(engine) {
   if (bad.length) {
     console.error('GROUP-CROSSING EDGE PROPERTY FAILED (GROUP-BOUNDARY-OBSTACLE): a group');
     console.error('boundary is crossed, not terminated on — ' + bad.length + ' violation(s):');
+    for (const b of bad) console.error('  ' + b);
+    process.exit(1);
+  }
+}
+
+// GROUP-SEPARATION-PLACEMENT — the group-separation push never moves a node out of
+// the figure or onto another node.
+//
+// THE DEFECT THIS PINS. The pass that keeps a non-member out of a `group`
+// band pushes the intruder clear, and carries along whatever it would be
+// pushed onto. It tested only the MOVER against the layout's starting edge,
+// so a node it carried could land past that edge, where the viewBox clipped
+// it away: figure 1 below drew `b` at y=-58 on a 248-px canvas, exit 0, no
+// error — the drawing said `b` is not there. And a node lying between the
+// mover and the band edge was neither carried nor avoided, so the mover could
+// land on it: figure 2 drew two nodes in the same box. On 1500 random group
+// figures (the seed figure 2 comes from) the fix takes 76 off-canvas and 6
+// overlapping drawings to 0 and 0; no tracked `.fd` changed a byte.
+//
+// WHY IT IS HERE AND NOT IN cases/: the same reason as GROUP-BOUNDARY-OBSTACLE's test. Both
+// figures render clean, so a `.geometry.txt` golden would be absent, and a
+// model golden cannot see a coordinate.
+//
+// THE PROPERTY. Every drawn node box lies inside the viewBox, and no two
+// drawn node boxes overlap.
+function assertGroupPushStaysOnCanvas(engine) {
+  const FIGS = [
+    ['carried node pushed off the canvas', [
+      'figdown 0.5 block',
+      'group g "G"',
+      'node a "A" in=g',
+      'node b "B"',
+      'node c "C"',
+      'node d "D" in=g',
+      'edge c -> a',
+    ]],
+    ['mover lands on a node it left behind', [
+      'figdown 0.5 block',
+      'flow right',
+      'group g0 "G0"',
+      'group g1 "G1"',
+      'group g2 "G2"',
+      'node n0 "N0" in=g1',
+      'node n1 "N1x"',
+      'node n2 "N2x"',
+      'node n3 "N3x" in=g2',
+      'node n4 "N4xxxxxxxxxxx"',
+      'node n5 "N5xxxxxxxxxx" in=g1',
+      'node n6 "N6xxxx"',
+      'node n7 "N7xxxx" in=g2',
+      'node n8 "N8xxxxx"',
+      'node n9 "N9x" in=g2',
+      'edge n6 -> n0',
+      'edge n5 -> n8',
+      'edge n1 -> n9',
+      'edge n7 -> n9',
+      'edge n3 -> n8',
+      'edge n7 -> n1',
+      'edge n1 -> n2',
+      'edge n2 -> n1',
+    ]],
+  ];
+  const bad = [];
+  for (const [name, lines] of FIGS) {
+    const { doc, errs: errors } = engine.parse(lines.join('\n'));
+    if (errors && errors.length) { bad.push(name + ': no longer parses: ' + errors.join('; ')); continue; }
+    const out = engine.render(doc, {});
+    if (out.errs && out.errs.length) { bad.push(name + ': refused: ' + out.errs[0]); continue; }
+    const svg = out.svg || '';
+    const vb = svg.match(/viewBox="([^"]+)"/)[1].split(' ').map(Number);
+    const tr = svg.match(/<g transform="translate\(([-\d.]+),([-\d.]+)\)">/);
+    const ox = tr ? +tr[1] : 0, oy = tr ? +tr[2] : 0;
+    const boxes = [];
+    const re = /<g data-node="([^"]+)" data-x="([-\d.e]+)" data-y="([-\d.e]+)"[^>]*>(.*?)<\/g>/g;
+    let m;
+    while ((m = re.exec(svg))) {
+      const r = m[4].match(/<rect[^>]*width="([\d.]+)" height="([\d.]+)"/);
+      if (r) boxes.push({ id: m[1], x: +m[2] + ox, y: +m[3] + oy, w: +r[1], h: +r[2] });
+    }
+    if (!boxes.length) { bad.push(name + ': no node box found in the render'); continue; }
+    for (const b of boxes) {
+      if (b.x < vb[0] - 0.5 || b.y < vb[1] - 0.5 || b.x + b.w > vb[0] + vb[2] + 0.5 || b.y + b.h > vb[1] + vb[3] + 0.5)
+        bad.push(name + ': node "' + b.id + '" at (' + b.x + ',' + b.y + ') lies outside viewBox ' + vb.join(' '));
+    }
+    for (let i = 0; i < boxes.length; i++) for (let j = i + 1; j < boxes.length; j++) {
+      const a = boxes[i], b = boxes[j];
+      if (a.x < b.x + b.w - 0.5 && b.x < a.x + a.w - 0.5 && a.y < b.y + b.h - 0.5 && b.y < a.y + a.h - 0.5)
+        bad.push(name + ': nodes "' + a.id + '" and "' + b.id + '" overlap');
+    }
+  }
+  if (bad.length) {
+    console.error('GROUP-PUSH PROPERTY FAILED (GROUP-SEPARATION-PLACEMENT): the group-separation');
+    console.error('push must keep every node on the canvas and off every other node — ' + bad.length + ' violation(s):');
+    for (const b of bad) console.error('  ' + b);
+    process.exit(1);
+  }
+}
+
+// 0.5 — an input-sized list never becomes a call's argument
+// list.
+//
+// THE DEFECT THIS PINS. The renderer measured a label, a table cell, a note or
+// a timing figure by spreading one array element per input line into
+// `Math.max(...)`/`Math.min(...)`. A call's arguments live on the stack, so
+// about 130k lines in ONE label overflowed it: render() threw `RangeError:
+// Maximum call stack size exceeded` instead of drawing or refusing. Twelve
+// sites now fold the list instead; the output of every input that rendered
+// before is unchanged.
+//
+// WHY IT IS HERE AND NOT IN cases/. A fixture would have to BE the large
+// input — a quarter of a megabyte of source and a model golden of 200k lines,
+// committed to pin one property. Both figures render clean, so a
+// `.geometry.txt` golden would be absent too. The property is a statement
+// about render() not throwing, which this file's in-process tests already
+// make, so the input is generated here instead: 200k lines in a node label
+// (the measured-label sites) and 200k `<br>` breaks in a table cell (the
+// typed-block sites). Under a second each.
+//
+// THE PROPERTY. Both figures render without throwing and without a refusal.
+function assertInputSizedArrays(engine) {
+  const N = 200000;
+  const FIGS = [
+    ['a node label of ' + N + ' lines',
+      'figdown 0.5 block\nnode a "' + 'x\\n'.repeat(N) + 'x"\n'],
+    ['a table cell of ' + N + ' line breaks',
+      'figdown 0.5 table\ntable t "T"\n| A |\n|---|\n| ' + 'x<br>'.repeat(N) + 'x |\n'],
+  ];
+  const bad = [];
+  for (const [name, src] of FIGS) {
+    const { doc, errs: errors } = engine.parse(src);
+    if (errors && errors.length) { bad.push(name + ': no longer parses: ' + errors[0]); continue; }
+    let out;
+    try { out = engine.render(doc, {}); }
+    catch (e) { bad.push(name + ': render threw ' + e.constructor.name + ': ' + e.message); continue; }
+    if (out.errs && out.errs.length) bad.push(name + ': refused: ' + out.errs[0]);
+  }
+  if (bad.length) {
+    console.error('INPUT-SIZED ARRAY PROPERTY FAILED: render() must');
+    console.error('not spread an input-sized list into a call — ' + bad.length + ' violation(s):');
     for (const b of bad) console.error('  ' + b);
     process.exit(1);
   }
@@ -415,6 +554,22 @@ const corpora = experimental
   ? [{ dir: EXPERIMENTAL_DIR, exp: true }]
   : [{ dir: NORMATIVE_DIR, exp: false }, { dir: EXPERIMENTAL_DIR, exp: true }];
 
+// A golden with no sibling `.fd` is never enumerated, so it would sit in the
+// corpus checking nothing — a deleted case would leave its expectation behind
+// and the run would not notice. Every corpus is checked, whatever the filter.
+{
+  const GOLDEN = /\.(model\.json|errors\.txt|geometry\.txt)$/;
+  const orphans = [];
+  for (const dir of [NORMATIVE_DIR, EXPERIMENTAL_DIR]) {
+    for (const f of fs.readdirSync(dir).filter(f => GOLDEN.test(f)).sort()) {
+      if (!fs.existsSync(path.join(dir, f.replace(GOLDEN, '.fd')))) {
+        orphans.push(path.basename(dir) + '/' + f + ': golden with no ' + f.replace(GOLDEN, '.fd') + ' beside it');
+      }
+    }
+  }
+  if (orphans.length) { orphans.forEach(o => console.error(o)); process.exit(1); }
+}
+
 let files = [];
 for (const c of corpora) {
   for (const f of fs.readdirSync(c.dir).filter(f => f.endsWith('.fd')).sort()) {
@@ -430,7 +585,7 @@ const reasonOf = base => STATUS.get(base) || [];
 
 // In subprocess mode the reference engine is never loaded — that is the whole
 // point: the harness must run in a tree that has no figdown.html at all. The
-// three property tests below take the reference engine's PRIVATE symbols
+// five property tests below take the reference engine's PRIVATE symbols
 // (`OPT_KEYS`, `LANE_RE`, `findComment`, `tokenize`, `render`), so they are in-process
 // only and their absence is stated in the summary, not hidden.
 const engine = ENGINE_CMD ? null : loadEngine();
@@ -438,6 +593,8 @@ if (engine) {
   assertLaneKeyNamespace(engine);
   assertCommentScanner(engine);
   assertGroupCrossingEdge(engine);
+  assertGroupPushStaysOnCanvas(engine);
+  assertInputSizedArrays(engine);
 }
 let geometrySkipped = 0;
 const tally = {
@@ -500,10 +657,12 @@ for (const entry of files) {
     if (update) {
       fs.writeFileSync(errPath, actual);
       if (fs.existsSync(modelPath)) fs.unlinkSync(modelPath);
+      if (fs.existsSync(geoPath)) fs.unlinkSync(geoPath);
       updated++; console.log('UPDT  ' + base + '  (' + errs.length + ' error line' + (errs.length > 1 ? 's' : '') + ')');
       continue;
     }
     if (fs.existsSync(modelPath)) { report(base, false, 'stale golden: case now errors but ' + base + '.model.json exists'); continue; }
+    if (fs.existsSync(geoPath)) { report(base, false, 'stale golden: case now errors but ' + base + '.geometry.txt exists'); continue; }
     if (!fs.existsSync(errPath)) { report(base, false, 'missing golden ' + base + '.errors.txt — actual errors:\n' + actual); continue; }
     const expected = fs.readFileSync(errPath, 'utf8');
     if (expected !== actual) { report(base, false, 'error mismatch\n--- expected\n' + expected + '--- actual\n' + actual); continue; }
@@ -588,8 +747,8 @@ if (ENGINE_CMD) {
   console.log('compared against the external command\'s stdout, by the same code and');
   console.log('against the same files the in-process path uses. Renderer-class checks');
   console.log('were NOT run: ' + geometrySkipped + ' geometry golden(s) unchecked, no determinism');
-  console.log('self-check, and the three reference-engine property tests skipped — all');
-  console.log('three need in-process access to the engine. Contract: conformance/README.md.');
+  console.log('self-check, and the five reference-engine property tests skipped — all');
+  console.log('of them need in-process access to the engine. Contract: conformance/README.md.');
   console.log('');
 }
 if (update) {

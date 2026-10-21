@@ -94,6 +94,53 @@ gap is real; this file is the only bridge across it.
 
 ---
 
+## E2 — `statechart`'s default shape, stated as `box`
+
+- **Superseding ruling:** `STATECHART-GENRE-SCOPE` — the genre is the only place "this is a state
+  machine" is written, which is why its `SHAPE-ENUM-VOCABULARY` rule says not to encode state-ness
+  in a shape. The direct cause is the repair that shipped in `v0.4.1`,
+  which made `state` derive `rounded` so that obeying `SHAPE-ENUM-VOCABULARY` no longer drew a
+  process box.
+- **Affected language versions:** `figdown` 0.5
+- **Frozen files carrying the wrong wording:**
+  - `read/0.5/experimental/statechart.md`
+
+  and, transitively, `skill/figdown/reference/experimental/statechart.md`,
+  which `gate:skill-coverage` holds byte-identical to the live read tree, so
+  every agent that loads the skill is told the wrong default.
+
+- **Wrong wording** (verbatim):
+
+  > `shape=` is pure geometry and changes only the drawing — `shape=box` (the
+  > default), `shape=rounded`, `shape=circle`, `shape=ellipse`, `shape=diamond`,
+
+- **Why it is wrong.** A `state` with no `shape=` is drawn `rounded`, not
+  `box`, and has been since `v0.4.1` — before `read/0.5/` was written, so
+  the text was wrong on the day it shipped. Probed on the public tags: a
+  `state` with no `shape=` derives `box` at `v0.4.0` and `rounded` at
+  `v0.4.1` and every later release.
+
+- **Correct wording:**
+
+  > `shape=` is pure geometry and changes only the drawing — `shape=rounded`
+  > (the default for a `state`), `shape=box`, `shape=circle`, `shape=ellipse`,
+  > `shape=diamond`,
+
+- **`read/0.4/` is not an erratum.** `read/0.4/experimental/statechart.md`
+  carries the same sentence, and it was right when `v0.4.0` shipped it: that
+  engine draws a `state` as `box`. The default changed in `v0.4.1`, which
+  reused `read/0.4/` byte for byte, so it is a change, and it is recorded where
+  changes are recorded: the `v0.4.1` changelog entry ("`state` derives its
+  rounded geometry from the word").
+
+- **Bytes deliberately unchanged**, for the reasons E1 gives: the frozen file
+  keeps what `figdown 0.5` shipped, and the correction lives here.
+
+- **Apply to the next read tree.** Whoever writes the next `read/<X.Y>/`
+  MUST write the corrected wording rather than copying this sentence forward.
+
+---
+
 ## The next read tree — is the fix reachable soon, or only at the next `Y`?
 
 A read tree is indexed by **language version `figdown X.Y`**, not by release

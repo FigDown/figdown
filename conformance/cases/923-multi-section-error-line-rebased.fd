@@ -1,0 +1,20 @@
+# 0.5: in a multi-section document every error line
+# is re-based from its section-local number to the FILE line number — including
+# a message that carries a newline.
+#
+# The re-basing pattern matched the message with `.`, which stops at a newline,
+# so such a message failed the match and kept its section-local number: the
+# line below was reported as Line 2 (its position inside section 2) instead of
+# Line 20. The newline comes from the author: `"x\ny"` is a quoted value with
+# the newline escape, and the RULE 2.4 diagnostic echoes the value verbatim.
+#
+# NOTE FOR IMPLEMENTERS. Because the message echoes a raw newline, this one
+# diagnostic occupies TWO physical lines of the golden. The golden is the
+# engine's error list sorted and joined with LF, so the bytes are exact; a
+# subprocess harness that splits stdout on LF sees two lines, and they sort
+# back into the same order because only one error is reported.
+figdown 0.5 block
+node a "A"
+
+figdown 0.5 block
+node b "B" shape="x\ny"

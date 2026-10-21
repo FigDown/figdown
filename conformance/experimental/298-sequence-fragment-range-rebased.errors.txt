@@ -1,0 +1,1 @@
+Line 21: this message line splits operand "o" (lines 20–22) — members must be CONTIGUOUS in declaration order. An operand denotes the ordered run of the occurrences it contains, so an occurrence that is not in it cannot happen between two that are (UML 2.5.1 §17.6; draft §28.1). Write in=o on it, or move it outside the run

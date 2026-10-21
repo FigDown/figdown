@@ -190,10 +190,9 @@ function readManifest() {
 function walk(dir, out) {
   if (!fs.existsSync(dir)) return out;
   for (const e of fs.readdirSync(dir, { withFileTypes: true })) {
-    if (e.name.startsWith('.')) continue;
     const p = path.join(dir, e.name);
     if (e.isDirectory()) walk(p, out);
-    else if (e.isFile()) out.push(path.relative(ROOT, p).split(path.sep).join('/'));
+    else out.push(path.relative(ROOT, p).split(path.sep).join('/'));
   }
   return out;
 }
@@ -292,7 +291,15 @@ for (const rel of releases) {
     && fs.existsSync(path.join(ROOT, r.file)));
   const archived = rows.filter(r => r.release === rel && r.file.startsWith('archive/'));
   const partitionsOnly = archived.length > 0 && archived.every(r => PARTITION_RE.test(r.file));
-  if (!pages.length && partitionsOnly) {
+  // A release with no archive/ row at all and its read/ tree hashed is the
+  // same case one step earlier: the source holds the reading contract it
+  // froze, and the engine page exists only in the published tree, where T16
+  // wrote it and that tree's own rows list it (0.2-0.4 here).
+  const readOnly = !archived.length && rows.some(r => r.release === rel && r.file.startsWith('read/'));
+  if (!pages.length && readOnly) {
+    ok('release ' + rel + ': reading contract only (read/' + rel + '/), no engine page in this tree —\n' +
+       '        the page lives in the published tree, written at PUBLISH (postfix.py T16).');
+  } else if (!pages.length && partitionsOnly) {
     ok('release ' + rel + ': ' + archived.length + ' frozen partition file(s), no engine page yet —\n' +
        '        the page is written at PUBLISH from the published engine (postfix.py T16);\n' +
        '        publish/release-identity.py `archive-page` is what asks the published tree for it.');
@@ -313,10 +320,11 @@ for (const rel of releases) {
 // version was archived, and that claim must have at least one manifest row
 // backing it, independent of whether the manifest currently agrees. read/ is
 // checked on the same terms, but only for a version that already has an
-// archive/ directory — read/0.2, read/0.3 and read/0.4 legitimately live on
-// disk with no rows yet in this tree, because §13.5's archive act (and the
-// manifest rows that record it) happens at PUBLISH, and only 0.1 was ever
-// carried into this repository by hand (see core.md §13.5, migrations.md).
+// archive/ directory, because §13.5's archive act (and the manifest rows that
+// record it) happens at PUBLISH. read/0.2, read/0.3 and read/0.4 have no
+// archive/ sibling in this tree; their rows were written here on 2026-10-14,
+// after git showed each tree byte-identical to its release's source commit,
+// so this tree's own gate now guards those freezes too.
 // A directory with an archive/ sibling has no such excuse: it was archived.
 const archiveDirs = [...dirsOf('archive')].sort();
 const uncovered = [];

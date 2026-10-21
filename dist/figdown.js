@@ -1,4 +1,4 @@
-// figdown.js — FigDown embeddable library (0.5.1)
+// figdown.js — FigDown embeddable library (0.5.2)
 // GENERATED FILE, DO NOT EDIT. Built from editor/figdown.html.
 // Regenerate with: node tools/make-lib.js
 (function (root, factory) {
@@ -10,7 +10,7 @@
   }
 }(typeof globalThis !== 'undefined' ? globalThis : this, function () {
   'use strict';
-var VERSION = "0.5.1";
+var VERSION = "0.5.2";
 
 // ---- engine (extracted verbatim from editor/figdown.html) ----
 var __engine = (function () {
@@ -24,7 +24,7 @@ const SHAPES = ['box','rounded','circle','ellipse','diamond','cylinder'];
 // input to that promise, and under core §13 a 0.x renderer may differ from
 // the next — which makes the recorded version the only thing that can
 // explain a diff between two renderings of one source.
-const FIGDOWN_VERSION = '0.5.1';
+const FIGDOWN_VERSION = '0.5.2';
 // `TYPED-BLOCK-TITLE-CANVAS`: a `Z`-only dev bump — RENDERER ONLY, no keyword, no
 // option key, no model field, so `figdown 0.5` still names one language. A
 // typed block's own title (bitfield/table/timing/chart) now joins the
@@ -1557,7 +1557,7 @@ function seqModel(doc){
   }
   const extent={};
   for(const id in cont)
-    extent[id]=owned[id].length?{lo:Math.min(...owned[id]),hi:Math.max(...owned[id])}:null;
+    extent[id]=owned[id].length?{lo:minOf(owned[id]),hi:maxOf(owned[id])}:null;
   return {rows,cont,owned,extent,chain,cycles};
 }
 
@@ -1656,14 +1656,14 @@ function parse(text){
   }
   const docs=[]; const errs=xmlErrs.slice();
   for(const sec of secs){
-    const r=parseOne(sec.text);
+    const r=parseOne(sec.text,sec.startLine-1);
     // A section's element `.line` values are section-local, and a GEOMETRY-time
     // error (one only `render` can raise) is built long after this loop has
     // finished re-basing the parse messages. Record the offset on the doc so
     // that error can quote the same full-file line the author is looking at.
     r.doc.lineOffset=sec.startLine-1;
     for(const e of r.errs){
-      const m=/^Line (\d+): (.*)$/.exec(e);
+      const m=/^Line (\d+): ([\s\S]*)$/.exec(e);
       if(m) errs.push('Line '+(+m[1]+sec.startLine-1)+': '+m[2]);
       else errs.push(e);
     }
@@ -1863,7 +1863,7 @@ function scanConnectorLine(code, genre, version){
   return r;
 }
 
-function parseOne(text){
+function parseOne(text,lineBase=0){
   const errs=[];
   // `EMPTY-LABEL-STATE`: `title` and a plane label start ABSENT (null), never as an empty
   // string — an author who writes `title ""` has made a distinction the model
@@ -1909,7 +1909,10 @@ function parseOne(text){
   // `edge`/`pin`/`chart` can never be ambiguous. `plane`, `class` and
   // `bundle` keep their own namespaces: each is referenced through a dedicated
   // option or keyword, never as a bare id.
-  const dupId=id=>nodeIds.has(id)||groupIds.has(id)||boundaryIds.has(id)||blockIds.has(id)||edgeIds.has(id);
+  // fragment and operand ids share the section's id namespace too (§1), so a
+  // later declaration of any kind collides with them, not only the reverse.
+  const dupId=id=>nodeIds.has(id)||groupIds.has(id)||boundaryIds.has(id)||blockIds.has(id)||edgeIds.has(id)||
+    doc.fragments.some(f=>f.id===id)||doc.operands.some(o=>o.id===id);
   let cur=null;             // current typed block (bitfield/table/timing)
   // `REPEATED-DIRECTIVE-HANDLING`: `title`, `flow`, `layout` and a per-id `pin` are SINGLE-VALUED — a
   // repetition is a line error on the second occurrence, never a silent
@@ -2107,7 +2110,7 @@ function parseOne(text){
   function parseSeqDirective(kw,n,pos,posq,opts,optT){
     if(kw==='lifeline'){
       // `lifeline <id> ["label"]` — the participant column. It DECLARES an id
-      // and joins the document-wide id namespace, so a lifeline cannot share
+      // and joins the section's id namespace, so a lifeline cannot share
       // a spelling with a fragment or an operand.
       const id=pos[1];
       const e=idErr(id,!!posq[1],'lifeline needs <id> ["label"]');
@@ -2290,7 +2293,7 @@ function parseOne(text){
     if(tk.error){ err(n,tk.error); continue; }
     const lead=(tk.toks.length&&!tk.toks[0].q)?tk.toks[0].v:'';
     const {pos,posq,posT,opts,optT,unk,dup}=splitOpts(tk.toks, lead==='signal');
-    const kw=pos[0];
+    const kw=pos.length?pos[0]:tk.toks[0].v;
     // `INAPPLICABLE-OPTION-KEYS`/`UNKNOWN-OPTION-DEGRADATION`/`COLOUR-VALUE-VALIDATION`: uniform per-directive option checks —
     // unknown keys, registered-but-inapplicable keys, invalid colors.
     // Directives not in DIRECTIVE_OPTS (title's single quoted string, unknown
@@ -2974,8 +2977,8 @@ function parseOne(text){
         if(RETIRED_SHAPES[shape]){ err(n,RETIRED_SHAPES[shape]); break; }
         if(!SHAPES.includes(shape)){ err(n,'unknown shape "'+shape+'" ('+SHAPES.join('|')+')'); break; }
         if(pos[2]!==undefined&&!posq[2]){ err(n,kw+' label must be quoted: '+kw+' '+id+' "'+pos[2]+'" — '+Q_WHY); break; }
-        nodeIds.add(id);
         if(pos.length>3){ err(n,'unexpected argument "'+pos[3]+'"'); break; }
+        nodeIds.add(id);
         // `OMITTED-LABEL-RECORDING`: an omitted label is recorded as ABSENT (null), never silently
         // replaced by the id — a reading agent must be able to tell "the author
         // wrote no label" from "the author's label happens to equal the id".
@@ -3556,7 +3559,7 @@ function parseOne(text){
       for(const [s,id] of [...split.entries()].sort((a,b)=>a[0]-b[0])){
         const r=SM.rows[s], e=SM.extent[id];
         errs.push('Line '+r.line+': this '+r.kind+' line splits '+SM.cont[id].kind+' "'+id+
-          '" (lines '+SM.rows[e.lo].line+'–'+SM.rows[e.hi].line+') — members must be CONTIGUOUS in declaration order. An operand denotes the ordered run of the occurrences it contains, so an occurrence that is not in it cannot happen between two that are (UML 2.5.1 §17.6; draft §28.1). Write in='+id+' on it, or move it outside the run');
+          '" (lines '+(SM.rows[e.lo].line+lineBase)+'–'+(SM.rows[e.hi].line+lineBase)+') — members must be CONTIGUOUS in declaration order. An operand denotes the ordered run of the occurrences it contains, so an occurrence that is not in it cannot happen between two that are (UML 2.5.1 §17.6; draft §28.1). Write in='+id+' on it, or move it outside the run');
       }
     }
   }
@@ -4285,7 +4288,9 @@ function cw(s){
   return w;
 }
 // the widest line of a multi-line string, in Latin units
-function cwMax(s){ return Math.max(...String(s).split('\n').map(cw)); }
+function maxOf(a){ let m=-Infinity; for(const v of a) m=Math.max(m,v); return m; }
+function minOf(a){ let m=Infinity; for(const v of a) m=Math.min(m,v); return m; }
+function cwMax(s){ return maxOf(String(s).split('\n').map(cw)); }
 
 // §5 style= → SVG dash pattern. `def` is the construct's conventional
 // default (the bundle ring and the threshold line are dashed by convention);
@@ -4379,7 +4384,7 @@ function noteWrap(text,prefix){
 function noteBox(text,prefix){
   const lines=noteWrap(text,prefix);
   const lh=NOTE_FS*1.35;
-  const w=Math.max(28, Math.max.apply(null,lines.map(noteLineW))+NOTE_PAD*2+NOTE_FOLD);
+  const w=Math.max(28, maxOf(lines.map(noteLineW))+NOTE_PAD*2+NOTE_FOLD);
   const h=lines.length*lh+NOTE_PAD*2-lh*0.15;
   return {w:Math.round(w*100)/100, h:Math.round(h*100)/100, lines, lh};
 }
@@ -4596,7 +4601,7 @@ function inscribedHalfW(g,v){
 const LBLPADX=6, LBLPADY=4;
 function labelBox(label){
   const ls=String(label).split('\n');
-  return [Math.max(...ls.map(cw))*CH+2*LBLPADX,
+  return [maxOf(ls.map(cw))*CH+2*LBLPADX,
           ((ls.length-1)*1.3+1.2)*FONT+2*LBLPADY];
 }
 // fitOutline: grow the box by the smallest factor that pulls an iw x ih box,
@@ -5904,8 +5909,6 @@ function renderScene(doc,y0){
       // constraint is applied HERE, to the choice: the negative direction is
       // taken only when the unit still lands inside the envelope the layout
       // had before this pass ran. Nothing outside the mover ever moves.
-      const dNegOK=uLo+dNeg>=cross0;
-      const d=(Math.abs(dNeg)<=Math.abs(dPos)&&dNegOK)?dNeg:dPos;
       const ranks=new Set(unit.map(n=>n.rank));
       // Everything the mover would be pushed ONTO travels with it: same rank,
       // same side, clear of the obstacle. Relative order and spacing inside a
@@ -5913,12 +5916,30 @@ function renderScene(doc,y0){
       // A node that BELONGS to a group never travels this way — a group moves
       // whole or not at all, and dragging half of one along would reshape its
       // band, which is the same defect one group further on.
-      for(const m of lay){
-        if(keep.has(m)||!ranks.has(m.rank)) continue;
-        if(!m.virtual&&m.group) continue;
-        const mLo=cLo(m), mHi=mLo+cSz(m);
-        if(d<0 ? (mHi<=uHi&&mHi<=obst.lo) : (mLo>=uLo&&mLo>=obst.hi)) mv(m,d);
-      }
+      const carried=d=>lay.filter(m=>!keep.has(m)&&ranks.has(m.rank)&&(m.virtual||!m.group)
+        &&(d<0 ? (cLo(m)+cSz(m)<=uHi&&cLo(m)+cSz(m)<=obst.lo) : (cLo(m)>=uLo&&cLo(m)>=obst.hi)));
+      // THE ENVELOPE TEST COVERS WHAT IS CARRIED, NOT ONLY THE MOVER (`GROUP-SEPARATION-PLACEMENT`,
+      // 0.5). Testing the mover alone let a node it carried land past
+      // the starting edge, where the viewBox clipped it out of the figure with
+      // no error — a drawing that says a node is not there. Virtual (edge)
+      // points are not tested: they are not drawn, and no measured case needed
+      // them.
+      const dNegOK=Math.min(uLo,...carried(dNeg).filter(m=>!m.virtual).map(cLo))+dNeg>=cross0;
+      // AND NOTHING THAT MOVES LANDS ON A NODE THAT STAYS (`GROUP-SEPARATION-PLACEMENT`). A drawn node
+      // lying between the mover and the obstacle's edge is not carried —
+      // carrying it was measured and moves too many figures that were already
+      // right — and a group member is never carried; so a direction in which
+      // the mover or anything it carries would overlap a same-rank drawn node
+      // that does not move is refused in favour of the other, when the other
+      // is clear and allowed. When neither is clear the nearer side is kept,
+      // as before: declining the move instead was measured and refuses about
+      // 1.5% of figures this pass used to draw correctly.
+      const lands=d=>{ const mov=unit.concat(carried(d)).filter(m=>!m.virtual), ms=new Set(mov);
+        return mov.some(a=>lay.some(m=>!m.virtual&&!ms.has(m)&&m.rank===a.rank
+          &&cLo(m)<cLo(a)+cSz(a)+d&&cLo(m)+cSz(m)>cLo(a)+d)); };
+      const pref=(Math.abs(dNeg)<=Math.abs(dPos)&&dNegOK)?dNeg:dPos, alt=pref===dNeg?dPos:dNeg;
+      const d=(lands(pref)&&!lands(alt)&&(alt===dPos||dNegOK))?alt:pref;
+      for(const m of carried(d)) mv(m,d);
       for(const n of unit) mv(n,d);
     };
     let left=[];
@@ -6067,10 +6088,11 @@ function renderScene(doc,y0){
       covered.add(a.id+' '+b.id);
       const who=pinned(b.id)?b.id:(pinned(a.id)?a.id:null);
       const ln=who!==null?srcLine(doc.pins[who].line):srcLine(a.line);
+      const other=who===a.id?b.id:a.id;           // the node the author did NOT pin
       gErrs.push('Line '+ln+': '+(who!==null?'pin puts':'the layout puts')+' "'+b.id+'" completely over "'
         +a.id+'" — a node drawn entirely inside another is invisible, so the figure states that "'
         +a.id+'" is not there. '+(who!==null
-          ? 'Move the pin off "'+a.id+'", or pin "'+a.id+'" too if the cover is deliberate — '
+          ? 'Move the pin off "'+other+'", or pin "'+other+'" too if the cover is deliberate — '
             +'document order is paint order (`PAINT-ORDER-CONSTRUCT`), so two author-placed boxes may overlap however '
             +'the author says.'
           : 'Pin one of them clear of the other.')
@@ -7280,7 +7302,6 @@ function renderScene(doc,y0){
     const lcol=col, ecol=col;
     const dash=e.style==='dashed'?' stroke-dasharray="6 4"':(e.style==='dotted'?' stroke-dasharray="2 4"':'');
     const wantsStart=e.op==='<->'||e.op==='<-', wantsEnd=e.op==='<->'||e.op==='->';
-    const m1='', m2='';   // markers removed — arrowTri() paints triangles above nodes in lblsvg
     const halo=' paint-order="stroke" stroke="#fff" stroke-width="3"';
     // ENDPOINT LABELS ANCHOR BY DISTANCE, NOT BY FRACTION (R? 0.4,
     // engine-backlog item 42). A `[tail]`/`[head]` label exists to say WHICH
@@ -7919,7 +7940,6 @@ function renderScene(doc,y0){
     // not simply placed further out — it takes a LEADER (below), so the
     // association is drawn rather than left to proximity.
     const STANDOFF_CAP=18;
-    const CLAMP=t=>Math.max(0.06,Math.min(0.94,t));
     // Endpoint-label anchor distance (item 42). See the `kind==='end'` branch.
     const END_D=16;
     // SLOPE CLEARANCE (`cl`): "3 px above the line" clears the line only where
@@ -7935,7 +7955,7 @@ function renderScene(doc,y0){
     // decides which case it is holding.
     const cand=(r,t,side,cl,ep)=>{
       const lines=String(r.text).split('\n'), n=lines.length;
-      const w=Math.max(...lines.map(cw))*6.5*r.fs/11;
+      const w=maxOf(lines.map(cw))*6.5*r.fs/11;
       const lh=r.fs*1.3, h=(n-1)*lh+r.fs*1.1;
       const up=(n-1)*lh/2+r.fs*0.85;          // baseline y = box top + up
       const mx=r.p[0]+(r.q[0]-r.p[0])*t, my=r.p[1]+(r.q[1]-r.p[1])*t;
@@ -8045,7 +8065,7 @@ function renderScene(doc,y0){
     const nodeInk=n=>{
       if(!n||!n.label) return null;
       const nl=String(n.label).split('\n');
-      const need=Math.max(...nl.map(cw))*CH;
+      const need=maxOf(nl.map(cw))*CH;
       const avail=2*inscribedHalfW(shapeAxes(n),nl.length*8)-16;
       const fs=(n.rigid&&need>avail)?Math.max(8,FONT*avail/need):FONT;
       const lw=need*fs/FONT, lh=nl.length*fs*1.15;
@@ -8060,7 +8080,7 @@ function renderScene(doc,y0){
     // is or the fan below spaces names by a width nobody draws.
     const lblDims=r=>{
       const lines=String(r.text).split('\n'), nL=lines.length;
-      const w=Math.max(...lines.map(cw))*6.5*r.fs/11;
+      const w=maxOf(lines.map(cw))*6.5*r.fs/11;
       const lh=r.fs*1.3;
       return {w, h:(nL-1)*lh+r.fs*1.1, up:(nL-1)*lh/2+r.fs*0.85};
     };
@@ -8690,7 +8710,7 @@ function renderScene(doc,y0){
       const R=rings.get(t);
       if(!R||t.label===null||t.label===undefined||t.label==='') continue;
       const lines=String(t.label).split('\n'), nL=lines.length;
-      const w=Math.max(...lines.map(cw))*6.5*11.5/11, lh=11.5*1.3;
+      const w=maxOf(lines.map(cw))*6.5*11.5/11, lh=11.5*1.3;
       const h=(nL-1)*lh+11.5*1.1, up=(nL-1)*lh/2+11.5*0.85;
       let best=null, bestS=Infinity;
       for(const tier of [0,1]){
@@ -8836,17 +8856,6 @@ function renderScene(doc,y0){
     for(const n of nodes) if(!n.boundary) annot.push({k:'node',id:n.id,rect:{x:n.x,y:n.y,w:n.w,h:n.h}});
     for(const g of doc.groups){ const B=gBox[g.id];
       if(B) annot.push({k:'group',id:g.id,rect:{x:B.x0,y:B.yA,w:B.x1-B.x0,h:B.yB-B.yA}}); }
-    const rdist=(px,py,r)=>Math.hypot(Math.max(r.x-px,0,px-(r.x+r.w)),Math.max(r.y-py,0,py-(r.y+r.h)));
-    const ptSegD=(px,py,p,q)=>{
-      const vx=q[0]-p[0], vy=q[1]-p[1], L2=vx*vx+vy*vy;
-      const t=L2?Math.max(0,Math.min(1,((px-p[0])*vx+(py-p[1])*vy)/L2)):0;
-      return Math.hypot(px-(p[0]+t*vx), py-(p[1]+t*vy));
-    };
-    // A connector is annotatable too, and it is measured as the polyline it is.
-    const edgeDist=(px,py,e)=>{ let d=Infinity;
-      for(const g of edgeSegs) if(g.e===e)
-        d=Math.min(d,ptSegD(px,py,g.p,g.q));
-      return d; };
     const noteEdges=[];
     for(const e of doc.edges) if(edgeSegs.some(g=>g.e===e)) noteEdges.push(e);
     // Does this candidate box read as belonging to THIS carrier and no other?
@@ -9242,7 +9251,7 @@ function renderScene(doc,y0){
     // label with shrink-to-fit when size is rigid (`UNDECLARED-ATTRIBUTE-BEHAVIOUR`); multi-line via "\n"
     let fs=FONT;
     const nl=String(n.label).split('\n');
-    const need=Math.max(...nl.map(cw))*CH;
+    const need=maxOf(nl.map(cw))*CH;
     // budget = the width the OUTLINE offers at the label's own height, minus
     // 8 px clearance each side. For a box that is n.w-16, exactly as before;
     // for a rhombus or an ellipse it is the inscribed width, so a rigid
@@ -10554,7 +10563,7 @@ function renderChart(b,y0,doc){
   const rows=t.rows.map(r=>r.cells.slice(1).map(c=>parseFloat(c.v)||0));
   const rLab=t.rows.map(r=>r.cells[0].v), cLab=t.cols.slice(1);
   const R=rows.length, C=cLab.length;
-  const zmax=Math.max(...rows.flat(), 1);
+  const zmax=Math.max(maxOf(rows.flat()), 1);
   const W2=20,H2=10,ZS=130/zmax,BAR=0.72;
   // LEFT GUTTER for the row labels. They are anchored `end` at the floor's
   // left corner and hang LEFTWARD from it, and nothing reserved room for them:
@@ -10692,10 +10701,10 @@ function renderChart(b,y0,doc){
 
 // ---- timing ----
 function renderTiming(w,y0){
-  const cycleW=26, laneH=30, laneGap=12, nameW=Math.max(...w.signals.map(s=>tw(s.name)),60);
+  const cycleW=26, laneH=30, laneGap=12, nameW=Math.max(maxOf(w.signals.map(s=>tw(s.name))),60);
   const svg=[]; let y=y0+18;
   svg.push('<text x="0" y="'+(y-4)+'" font-size="13" font-weight="600">'+esc(w.label)+'</text>');
-  const cycles=Math.max(...w.signals.map(s=>s.lane.length));
+  const cycles=maxOf(w.signals.map(s=>s.lane.length));
   w.signals.forEach((s,si)=>{
     const top=y+8+si*(laneH+laneGap), bot=top+laneH-8;
     // §5 per signal: fill= data-box fill, stroke= the waveform colour,
@@ -10704,7 +10713,7 @@ function renderTiming(w,y0){
     // labels sit on `sbox` and derive from it.
     const sbox=s.fill||w.fill||'#eef6ff', spath=s.stroke||w.stroke||'#1d4ed8';
     svg.push('<text x="'+(nameW-10)+'" y="'+(top+(laneH-8)/2+4)+'" font-size="11.5" text-anchor="end" font-family="monospace">'+esc(s.name)+'</text>');
-    let d='', prev=null, li=0, dataIdx=0;
+    let d='', prev=null, dataIdx=0;
     for(let i=0;i<s.lane.length;i++){
       let ch=s.lane[i];
       if(ch==='.') ch=prev||'0';
@@ -10813,13 +10822,6 @@ function parse(text) {
   var docs = p.docs && p.docs.length ? p.docs : (p.doc ? [p.doc] : []);
   return { doc: p.doc, errors: p.errs, docs: docs };
 }
-// Stack multi-section SVGs (MULTI-FIGURE-DOCUMENTS): one .fd → one .svg, sections top-to-bottom.
-function __stackSectionSvgs(results) {
-  if (typeof __engine.stackSectionSvgs === 'function')
-    return __engine.stackSectionSvgs(results);
-  // fallback if engine build is older
-  return results[0] && results[0].svg;
-}
 // render(text, opts) -> { svg, errors }  svg is null when there are errors
 // (determinism over convenience: no partial renders of invalid input).
 // opts (presentation, renderer tier): { title: true } draws the title;
@@ -10891,7 +10893,7 @@ function artifact(text, opts) {
   var meta = '<metadata id="figdown-source" data-sha256="' + __sha256hex(src) + '"'
     + ' data-engine-version="' + VERSION + '"' + optAttr + '><![CDATA[\n'
     + src.replace(/]]>/g, ']]]]><![CDATA[>') + '\n]]></metadata>';
-  return { svg: p.svg.replace(/<\/svg>$/, meta + '</svg>'), errors: [] };
+  return { svg: p.svg.replace(/<\/svg>$/, function () { return meta + '</svg>'; }), errors: [] };
 }
 
   return { parse: parse, render: render, renderDoc: renderDoc, renderDocs: renderDocs, artifact: artifact, version: VERSION };

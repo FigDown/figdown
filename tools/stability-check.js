@@ -100,6 +100,12 @@ function extractNodePositions(svgText) {
   while ((m = re.exec(svgText)) !== null) {
     nodes.push({ id: m[1], x: parseFloat(m[2]), y: parseFloat(m[3]) });
   }
+  // Every node group must be read: a reader that matches fewer groups than the
+  // engine drew measures less without saying so.
+  const groups = (svgText.match(/<g\b[^>]*\sdata-node="/g) || []).length;   // any attribute order
+  if (groups !== nodes.length)
+    throw new Error('stability-check: ' + groups + ' <g data-node> group(s) drawn, ' +
+      nodes.length + ' read — the node markup changed; update this reader');
   return nodes;
 }
 
@@ -155,7 +161,7 @@ function parseNodes(src, doc) {
   // `pin` IS genre-independent — it is the layout namespace (LAYOUT-ZONE-NAMESPACE), spelled the
   // same in every genre — so reading it off the source stays correct.
   for (const ln of lines) {
-    const pm = ln.match(/^pin\s+(\S+)\b/);
+    const pm = ln.match(/^\s*pin\s+(\S+)\b/);
     if (!pm) continue;
     pins.add(pm[1]);
     if (/\bat=/.test(ln)) pinnedAt.add(pm[1]);
@@ -372,7 +378,10 @@ function editAddConnectedNode(src, nodes, doc) {
 
   const newId  = '_stab_newB';
   const anchor = e0.a;
-  const edgeLine = raw.slice(0, i) + newId + raw.slice(i + e0.b.length);
+  // A connector `id=` is unique within its section, so the clone
+  // must not carry the original's.
+  const edgeLine = (raw.slice(0, i) + newId + raw.slice(i + e0.b.length))
+    .replace(/(\s)id=\S+/, '$1id=_stab_eB');
   // Both lines must land in THE CLONED EDGE'S OWN SECTION — its endpoint ids
   // exist only there. Anchor on the later of {the edge, the last node
   // declaration in that same section}, so the pair sits in the semantic zone

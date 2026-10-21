@@ -143,7 +143,7 @@ Verified: `pin a at=50,145` is the line error *"pin at= now takes a paren
 point"* (figdown.html:1738-1745), and `cell h1,2` is *"cell address is now
 a paren point"* (:1284); `at=(50,145)` and `cell (h1,2)` parse.
 
-### 1.2 Where the language breaks RULE 1.1a today
+### 1.2 Where the language broke RULE 1.1a (corrected)
 
 Four constructs wrote a point as a bare comma pair. All four were
 corrected; each old form is now a line error naming its
@@ -173,7 +173,7 @@ rejection was originally argued on `via=(x,y)` versus `src=u,v`, both of
 which were withdrawn; it is restated on the surviving pair
 because the argument was never about those two keys.)
 
-### 1.3 `;` is reserved and is not enforced
+### 1.3 `;` is reserved, and enforced
 
 **RULE 1.3 — `;` is reserved for a future statement separator and MUST NOT
 be given any other meaning.** It was taken back from `via=`
@@ -538,7 +538,7 @@ this shape.
 2. **Show the primary source cannot express the need.** `TABLE-ROW-SYNTAX`:
    *"Since core GFM has no spans…"* (requirements-notes.md:4475). This is
    the load-bearing sentence. Inconvenience would not have sufficed —
-   PROCESS §2.1 requires semantic impossibility.
+   PROCESS §2 requires semantic impossibility.
 3. **Choose the second source by the same rule that chose the first.**
    Merging follows **markdown-it-multimd-table**, *"the most-adopted MD
    span extension"* (`:4476`) — `PRIOR-ART-BORROWING` applied a second time, not a taste
@@ -970,7 +970,7 @@ set, one is a spelling variant and MUST be retired.**
 
 *Reason.* `PRIOR-ART-BORROWING`'s primary rationale is hallucination resistance: two
 spellings of one meaning give a generating model two attractors and no
-signal about which is intended. `NEW-CONSTRUCT-EVIDENCE-GATE`/PROCESS §2.1 add that "more convenient"
+signal about which is intended. `NEW-CONSTRUCT-EVIDENCE-GATE`/PROCESS §2 add that "more convenient"
 never clears the gate. A form that adds no input adds only ambiguity.
 
 **The test is the ACCEPTED-INPUT SET, not the model.** Two forms that
@@ -1093,15 +1093,15 @@ parser. The maintainer-ruling item codes cited in the table (`OMITTED-LABEL-RECO
 | **Case-sensitivity.** Keywords, option keys, enum values and ids are case-sensitive; every standard spelling is lowercase ASCII. | `Node a` → `"Node" is not allowed in genre block`; `shape=Box` → `unknown shape "Box"`; `Fill=red` → `unknown option "Fill="`; `fill=Red` → `unknown color "Red"`. figdown.html:143, 281, 1014 |
 | **Enum values are a single lowercase word.** No enum member is hyphenated, abbreviated or multi-word. | `SHAPES` (figdown.html:114), `STYLES` (:421), `flow` (:1532), `extend` (:1717), `numbering` (:1814). The sixth instance, `routing`'s `orthogonal\|straight`, was **withdrawn at 0.1 (`EDGE-GEOMETRY-CONSTRUCTS`)**; the citation is replaced rather than left pointing at deleted code, and the invariant loses no support — five live enums keep it. |
 | **One colour shape everywhere.** `#rgb` / `#rrggbb` / one of the 147 lowercase CSS names / `transparent`, on every key that takes a colour. | `isColor` (figdown.html:143), applied uniformly at :679-681 and :553-554 |
-| **Option position is free (`OPTION-POSITION-PARSING`).** Any `key=` token is extracted by shape from anywhere on the line; positionals close up behind it. | `node fill=red a "L"`, `bundle t1 fill=red "LAG" a--b`, `threshold in=a "Thr" offset=50%` all parse. figdown.html:347-368 |
+| **Option position is free (`OPTION-POSITION-PARSING`).** Any `key=` token is extracted by shape from anywhere on the line; positionals close up behind it. | `node fill=red a "L"`, `bundle t1 stroke=red "LAG" a--b`, `threshold in=a "Thr" offset=50%` all parse. figdown.html:347-368 |
 | **A repeated option key on one line is an error.** Never last-wins. | `node a fill=red fill=blue` → `duplicate option "fill=" on one line`. figdown.html:662 |
 | **An unknown option key is an error.** | `node a foo=bar` → `unknown option "foo="`. figdown.html:663 |
 | **Absent, `""` and `"x"` are three distinct label states (`OMITTED-LABEL-RECORDING`/`EMPTY-LABEL-STATE`).** | `node a` → `"label": null`; `node a ""` → `"label": ""`. figdown.html:1021, 1039, 1060, 1003 |
 | **Every retired spelling carries a named diagnostic naming its migration.** | `color=` :329; `w=`/`h=`/`dir=` :342-346; `kind=` :1010; `label=` family :551; `from=`/`to=` :1169; `shape=cloud` :123; `colw` :727; `line`/`fill`/`route`/`render` :750-753 |
-| **One id namespace for nodes, groups, boundaries and typed blocks.** `class`, `layer` and `bundle` keep their own. | `node a` + `group a` → `duplicate id "a"`; `node a` + `bitfield a …` → `duplicate id "a"`; `class c "x"` + `layer c` → parses. figdown.html:508 |
+| **One id namespace for nodes, groups, boundaries and typed blocks.** `class` and `bundle` keep their own. | `node a` + `group a` → `duplicate id "a"`; `node a` + `bitfield a …` → `duplicate id "a"`; `class c "x"` + `node c` → parses. figdown.html:508 |
 | **Repeating a single-valued directive is an error on the second occurrence (`REPEATED-DIRECTIVE-HANDLING`).** | `duplicate title line`, `duplicate flow directive`, `duplicate pin for "a"`, `duplicate layout line` — all verified. figdown.html:1385, 1531, 1774, 1779. (`duplicate size for "a"` was one instance until 0.1 retired the keyword; `duplicate pin for "a"` now covers the merged geometry line. `duplicate routing line` was another until 0.1 **withdrew** `routing`, `EDGE-GEOMETRY-CONSTRUCTS` — the citation is removed rather than left pointing at deleted code, and the "at most one `path` per edge" duplicate check went with it. Four live instances still carry the invariant.) |
-| **The grammar is closed.** Every non-blank non-comment line must begin with a registered token. Under a DECLARED genre the message names the genre (`"zzz" is not allowed in genre block`); `unrecognized line` is what an implementation must produce when no valid genre is in force. core §0.1 states both from 0.1. | the genre allowlist, and `unrecognized line` in the switch default |
-| **Comma within a value, whitespace between positionals.** No construct uses whitespace as an intra-value delimiter, and no construct uses a comma as a positional separator. Since 0.1 (`COMMA-LIST-WHITESPACE`) this is exact rather than nearly-true: a comma list is ONE whitespace-free token everywhere. | The comma appears only inside `at=`, `class=`, `labels=`, `rank`, `width`, `bundle`, `field` compact and `cell` — always within one value. Verified across all eight. (It was ten until 0.1: `via=` and the `src=`/`dst=` pair, counted as one carrier each, went with the `path` directive under `EDGE-GEOMETRY-CONSTRUCTS`. 10 − 2 = 8.) |
+| **The grammar is closed.** Every non-blank non-comment line must begin with a registered token. Under a DECLARED genre the message names the genre (`"zzz" is not allowed in genre block`); `unrecognized line` is what an implementation must produce when no valid genre is in force. core §0 item 1 states both from 0.1. | the genre allowlist, and `unrecognized line` in the switch default |
+| **Comma within a value, whitespace between positionals.** No construct uses whitespace as an intra-value delimiter, and no construct uses a comma as a positional separator. Since 0.1 (`COMMA-LIST-WHITESPACE`) this is exact rather than nearly-true: a comma list is ONE whitespace-free token everywhere. | The comma appears only inside `at=`, `class=`, `data=`, `rank`, `width`, `bundle`, `field` compact and `cell` — always within one value. Verified across all eight. (It was ten until 0.1: `via=` and the `src=`/`dst=` pair, counted as one carrier each, went with the `path` directive under `EDGE-GEOMETRY-CONSTRUCTS`. 10 − 2 = 8.) |
 
 **Numeric value grammars are uniform — now an invariant.** The one exception was `chart level=` (spelled `plot level=` until 0.1), which used bare `parseFloat` and therefore accepted `1e3`
 where every other numeric key rejects scientific notation by exact regex. It was **deleted** (`CHART-LEVEL-KEY`), not fixed: zero uses

@@ -349,7 +349,7 @@ const KEYWORD_RE = new RegExp('\\b(' + EXPERIMENTAL_KEYWORDS.join('|') + ')\\b',
 
 // ── Line-level scanning primitives ───────────────────────────────────────────
 
-const FENCE_RE = /^\s*(`{3,}|~{3,})\s*(\S*)/;
+const FENCE_RE = /^\s*(`{3,}(?!.*`)|~{3,})\s*(\S*)/;
 
 /**
  * Classifies every line of a markdown file as inside or outside a fenced code
@@ -407,12 +407,17 @@ function codeSpans(line) {
   return out;
 }
 
-/** `[text](target)` links, with an optional `"title"`. Reference links are not used in this repo. */
-function links(line) {
+/**
+ * `[text](target)` links, with an optional `"title"`. Reference links are not
+ * used in this repo. The link text may wrap onto `next` (the following prose
+ * line); only links that START on `line` are returned.
+ */
+function links(line, next) {
   const out = [];
-  const re = /\[([^\]\n]*)\]\(\s*<?([^)<>\s]+)>?(?:\s+"[^"\n]*")?\s*\)/g;
+  const text = next == null ? line : line + '\n' + next;
+  const re = /\[([^\]\n]*(?:\n[^\]\n]*)?)\]\(\s*<?([^)<>\s]+)>?(?:\s+"[^"\n]*")?\s*\)/g;
   let m;
-  while ((m = re.exec(line))) out.push({ text: m[1], target: m[2] });
+  while ((m = re.exec(text))) if (m.index < line.length) out.push({ text: m[1].replace(/\n/, ' '), target: m[2] });
   return out;
 }
 
@@ -453,7 +458,7 @@ function checkFile(absFile, tier2) {
       const line = lines[i];
       if (/EXPERIMENTAL/.test(line) || /experimental/i.test(line)) { carries[b] = true; break; }
       let hit = false;
-      for (const l of links(line)) {
+      for (const l of links(line, fenced[i + 1] ? null : lines[i + 1])) {
         const abs = resolveTarget(l.target, absFile);
         if (abs && isExperimentalPath(path.relative(ROOT, abs).split(path.sep).join('/'))) {
           hit = true; break;
@@ -486,7 +491,7 @@ function checkFile(absFile, tier2) {
 
     // ── 1 & 2 — links (prose only; a link inside a fence is a sample) ────────
     if (!fenced[i]) {
-      for (const l of links(line)) {
+      for (const l of links(line, fenced[i + 1] ? null : lines[i + 1])) {
         const abs = resolveTarget(l.target, absFile);
         if (!abs) continue;
         const rel = path.relative(ROOT, abs).split(path.sep).join('/');

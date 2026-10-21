@@ -28,7 +28,7 @@
 // Usage:
 //   node tools/legend-check.js [--strict] [--verbose] [<file.fd | dir> ...]
 //   default paths: examples/, figures/   (recursive — §3.1(d))
-//   --strict   exit 1 on any failure
+//   --strict   exit 1 on any failure; exit 2 when no figure was checked at all
 //   --verbose  list every legend entry with its resolved swatch
 //
 // Engine lookup order matches build-svg.js: $FIGDOWN_HTML, a co-located
@@ -215,6 +215,15 @@ function main(argv) {
   console.log('checked ' + checkedFiles + ' figure(s), ' + entryCount + ' legend entr(ies)'
     + '   skipped ' + skipped + ' (parse errors / error fixtures)'
     + '   of ' + files.length + ' .fd file(s) found');
+  // An empty denominator is not a pass. A missing or renamed corpus root used
+  // to print "checked 0 figure(s)" and OK, because the default roots are
+  // filtered by existence and nothing asked whether anything was read.
+  if (args.strict && checkedFiles === 0) {
+    console.error('legend-check: checked 0 figures (' + files.length + ' .fd file(s) found under '
+      + (args.paths.length ? args.paths.map(p => path.relative(ROOT, p) || '.').join(' ') : 'no existing root')
+      + '). Nothing was verified, so this is not a pass.');
+    return 2;
+  }
   console.log(failed
     ? 'FAIL  ' + failed + ' figure(s) with an indistinguishable or unreachable legend entry'
     : 'OK  every legend entry is distinguishable and every declared channel reaches a member');

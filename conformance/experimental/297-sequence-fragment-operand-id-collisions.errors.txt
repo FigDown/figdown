@@ -1,0 +1,4 @@
+Line 21: duplicate id "f"
+Line 22: duplicate id "o"
+Line 23: duplicate id "f"
+Line 24: duplicate id "o"

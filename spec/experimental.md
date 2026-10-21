@@ -512,9 +512,9 @@ The top-level keys, as core §12.2 lists them:
 | key | present | note |
 |---|---|---|
 | `planes` | always, exactly one entry | wholly NORMATIVE since 0.3: `planes[0]` is the implicit `base` and `PAINT-ORDER-CONSTRUCT` withdrew the only directive that could add a second |
-| `thresholds` | always (MAY be empty) | the array is empty in every document on the normative surface |
-| `bands` | always (MAY be empty) | same |
-| `bundles` | always (MAY be empty) | same |
+| `thresholds` | always (MAY be empty) | non-empty in five normative fixtures (115, 245, 304, 810, 811; core §12.2, the 0.1 correction) |
+| `bands` | always (MAY be empty) | non-empty in the same five |
+| `bundles` | always (MAY be empty) | non-empty in four normative fixtures (115, 214, 215, 304) |
 
 **Threshold** — `threshold` (§E3). The directive and the model array were
 spelled `guide` / `guides` until 0.1 (`THRESHOLD-KEYWORD-SPELLING`); `NORMATIVE-SEMANTIC-MODEL` makes the model
@@ -526,9 +526,9 @@ removed from the model entirely, `COLOUR-KEY-STATUS`).
 | key | type | present | meaning |
 |---|---|---|---|
 | `label` | string | always | MANDATORY on the directive, so never absent. Core §12.7 licenses exactly one reading of it: the value it names is a reference value on the `in=` target |
-| `in` | string | always | the target: a node id OR a group id |
+| `in` | string | always | the target: a node, group or region (`bitfield`/`table`/`timing` block) id (§E3.1, `MARKER-TARGET-KINDS`) |
 | `offset` | number | always | a fraction of the target's rendered extent, `0`–`100`, **without** the `%` sign; MAY be fractional. It is **not a value of any quantity** — the target declares no scale (core §12.7). The model key follows the source key, renamed from `at` at 0.1. The relative ORDER of two thresholds on one target, by this key, IS knowledge (core §12.7) |
-| `fill` `stroke` `style` | string | when written | core §5 |
+| `stroke` `style` | string | when written | core §5 |
 | `line` | number | always | 1-based source line |
 
 **Band** — `band` (§E3).
@@ -536,7 +536,7 @@ removed from the model entirely, `COLOUR-KEY-STATUS`).
 | key | type | present | meaning |
 |---|---|---|---|
 | `label` | string | always | MANDATORY since 0.1 (`BAND-LABEL-STATUS`), so never absent. Before that a band had NO label key, and with `fill=` discarded it asserted nothing at all (core §5) |
-| `in` | string | always | the target: a node id OR a group id |
+| `in` | string | always | the target: a node, group or region (`bitfield`/`table`/`timing` block) id (§E3.1, `MARKER-TARGET-KINDS`) |
 | `from` `to` | number | always | the range as percentages without the `%` sign; `band "R" 15%` yields `from: 0`, `to: 15` |
 | `extend` | `"up"`\|`"down"`\|`"left"`\|`"right"` | always | materialized default `"up"`. Spelled `dir` in both the source and the model until 0.1 |
 | `fill` | string | always | materialized (see the caveat in core §12.4) |
@@ -552,7 +552,7 @@ declares none.
 | `id` | string | always | unique in the bundle namespace |
 | `label` | string | when written | core §12.3 |
 | `members` | array of string | always | one string per member, **in the order the member was written**, in one of TWO shapes (`CONNECTOR-IDENTITY-KEY`, `figdown 0.5`): an endpoint PAIR, `"a--b"`, with the endpoints in the order they were written; or a CONNECTOR ID, `"lag1a"`, naming a connector declared with `id=` in this section. The schema does not change — it was already "array of string" and the string DOMAIN widens — and the two shapes are told apart by lexis rather than by a flag: `--` cannot occur inside an id (`LINK-OPERATOR-IN-IDS`), so a member either contains it and is a pair or does not and is an id. A mixed list is legal; every member resolves independently |
-| `fill` `stroke` `style` | string | when written | core §5 |
+| `stroke` `style` | string | when written | core §5 |
 | `line` | number | always | 1-based source line |
 
 **No `plane` row anywhere above (`PAINT-ORDER-CONSTRUCT`).** All three

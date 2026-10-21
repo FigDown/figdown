@@ -133,23 +133,24 @@ const IDENTITY_ATTRS = ['data-node', 'data-edge', 'data-group', 'data-cell', 'da
 //
 // The renderer rewrites each `]]>` in the source as `]]]]><![CDATA[>`, which
 // splits the section INSIDE the terminator (core §15.4), so concatenating the
-// CDATA payloads in order is the exact inverse.
+// CDATA payloads in order is the exact inverse. The sections are walked from
+// the open tag, one directly after the other, and `</metadata>` is required
+// only where the last one ends: a source whose text mentions `</metadata>`
+// keeps that text inside a section, so searching for the close tag first cut
+// the body short and called a valid artifact sourceless.
 function recoverSource(svg) {
   const open = svg.indexOf('<metadata id="figdown-source"');
   if (open < 0) return null;
   const gt = svg.indexOf('>', open);
-  const close = svg.indexOf('</metadata>', gt);
-  if (gt < 0 || close < 0) return null;
-  const body = svg.slice(gt + 1, close);
-  let out = '', i = 0;
-  for (;;) {
-    const s = body.indexOf('<![CDATA[', i);
-    if (s < 0) break;
-    const e = body.indexOf(']]>', s + 9);
+  if (gt < 0) return null;
+  let out = '', i = gt + 1;
+  while (svg.startsWith('<![CDATA[', i)) {
+    const e = svg.indexOf(']]>', i + 9);
     if (e < 0) return null;
-    out += body.slice(s + 9, e);
+    out += svg.slice(i + 9, e);
     i = e + 3;
   }
+  if (i === gt + 1 || !svg.startsWith('</metadata>', i)) return null;
   return out.replace(/^\n/, '').replace(/\n$/, '');
 }
 
@@ -163,14 +164,23 @@ function drawnTags(svg) {
   const cut = svg.indexOf('<metadata');
   const region = cut < 0 ? svg : svg.slice(0, cut);
   const out = [];
-  const re = /<([a-zA-Z][\w:-]*)((?:"[^"]*"|'[^']*'|[^>"'])*)>/g;
+  // End tags are matched too, only to keep a stack of open elements: each
+  // start tag records the nearest open ancestor (root included) that carries
+  // aria-hidden="true", because hiding an element hides its whole subtree.
+  const re = /<(\/?)([a-zA-Z][\w:-]*)((?:"[^"]*"|'[^']*'|[^>"'])*)>/g;
+  const open = [];
   let m;
   while ((m = re.exec(region))) {
+    if (m[1]) { open.pop(); continue; }
     const attrs = {};
     const ra = /([a-zA-Z_:][\w:.-]*)\s*=\s*"([^"]*)"/g;
     let a;
-    while ((a = ra.exec(m[2]))) attrs[a[1]] = a[2];
-    out.push({ name: m[1], attrs, at: m.index });
+    while ((a = ra.exec(m[3]))) attrs[a[1]] = a[2];
+    const hiddenBy = open.length ? open[open.length - 1].hiddenBy : null;
+    const t = { name: m[2], attrs, at: m.index, hiddenBy };
+    out.push(t);
+    if (!/\/\s*$/.test(m[3]))
+      open.push({ hiddenBy: hiddenBy || (attrs['aria-hidden'] === 'true' ? t : null) });
   }
   return out;
 }
@@ -323,12 +333,15 @@ function checkArtifact(svg, fdPath, manifestPath, noTitleIsAuthors) {
 
   // ---- Assertion F (fatal) — no identity element is hidden ----
   for (const t of drawnTags(svg)) {
-    if (!('aria-hidden' in t.attrs)) continue;
     const ident = IDENTITY_ATTRS.filter(a => a in t.attrs);
-    if (ident.length)
-      errors.push('F: <' + t.name + ' ' + ident.map(a => a + '="' + t.attrs[a] + '"').join(' ') +
-        '> carries aria-hidden="' + t.attrs['aria-hidden'] + '". An element carrying a `data-*` identity ' +
+    if (!ident.length) continue;
+    const who = '<' + t.name + ' ' + ident.map(a => a + '="' + t.attrs[a] + '"').join(' ') + '>';
+    if ('aria-hidden' in t.attrs)
+      errors.push('F: ' + who + ' carries aria-hidden="' + t.attrs['aria-hidden'] + '". An element carrying a `data-*` identity ' +
         'is never decorative and MUST NOT be hidden (§5)');
+    else if (t.hiddenBy)
+      errors.push('F: ' + who + ' sits inside <' + t.hiddenBy.name + '> carrying aria-hidden="true", which hides its ' +
+        'whole subtree. An element carrying a `data-*` identity is never decorative and MUST NOT be hidden (§5)');
   }
 
   return { errors, warns, notices };
@@ -483,6 +496,7 @@ if (!fs.existsSync(FIXTURES)) {
     if (!fs.existsSync(whyPath)) { fail(relf + ' has no .why.txt — a control must record WHAT it is a control for'); continue; }
     const why = fs.readFileSync(whyPath, 'utf8').trim().split('\n');
     const wanted = why[why.length - 1].trim();
+    if (!wanted) { fail(relf + ' — its .why.txt records no reason — its last line is the substring the rejection must contain, and an empty one matches any rejection'); continue; }
     const { errors, warns } = checkArtifact(fs.readFileSync(path.join(FIXTURES, n), 'utf8'), null, null);
     // A fixture pinning assertion D pins a WARNING, which is D's ruled
     // severity; it is still a finding and is checked the same way.

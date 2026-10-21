@@ -59,7 +59,7 @@ Configure an MCP client with either the published executable or the path:
 ```json
 {
   "mcpServers": {
-    "figdown": { "command": "npx", "args": ["-y", "figdown", "figdown-mcp"] }
+    "figdown": { "command": "npx", "args": ["-y", "-p", "figdown", "figdown-mcp"] }
   }
 }
 ```
@@ -136,7 +136,7 @@ the caller intact. Three channels are kept distinct:
 |---|---|
 | JSON-RPC `error` | Protocol faults only: unparseable JSON, unknown method. |
 | `isError: true` | The tool could not run at all — no such file, `source` *and* `path` given, an SVG with no FigDown metadata. The request was malformed; there was nothing to read. |
-| a normal result | **Including a parse failure.** The tool did exactly its job: it reported why the document does not parse. The first line reads `PARSE FAILED — N diagnostic(s)`, the engine's text follows verbatim, and no client can hide it as an error string. |
+| a normal result | **Including a parse failure.** The tool did exactly its job: it reported why the document does not parse. From `figdown_build` and `figdown_read` the first line reads `PARSE FAILED — N diagnostic(s)` (a geometry-time refusal reads `FIGURE REFUSED — N geometry-time diagnostic(s)`); from `figdown_check` it reads `ok: false  checked N document(s), …`. The engine's text follows verbatim, and no client can hide it as an error string. |
 
 No partial render is ever emitted: `svg` is null whenever there are errors —
 determinism over convenience.

@@ -12,7 +12,7 @@ below binds by virtue of appearing on this page.
 
 ## Where the language is
 
-`figdown 0.5.0` — a preview, and it says so in normative text (core §13.1).
+`figdown 0.5` — a preview, and it says so in normative text (core §13.1).
 Three genres are **NORMATIVE**, inside the v0.1 conformance surface and the
 compatibility promise: `block`, `bitfield`, `table`. Five are **EXPERIMENTAL**
 and may still change or be withdrawn: `topology`, `flowchart`, `timing`,

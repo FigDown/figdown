@@ -112,7 +112,7 @@ carrying the same construct into `block`.
 | `group` | `group <id> ["label"]` | T | NORMATIVE | `fill` `stroke` `style` `class` `gap` `note` (requires `figdown 0.3`) | one nesting level — see the declaration below, where this genre's own default is the open question |
 | `external` | `external <id> ["label"]` | T | NORMATIVE | **none** | never drawn (`EXTERNAL-EDGE-ENDPOINTS`); since 0.1 it took no paint key — `color=` was its only one and it is retired (`COLOUR-KEY-STATUS`) — and since 0.3 (`PAINT-ORDER-CONSTRUCT`) it takes **no option key at all**: `plane=` was its last one. No `note=` — it puts nothing on the page, so there is nothing for a note to stand beside |
 | `edge` | `edge <a> [tail] <op> [head] <b>` | T | NORMATIVE | `stroke` `style` `class` `note` (requires `figdown 0.3`) `id` (requires `figdown 0.5`) | op is written form; `[mid]` splits the operator; all three labels take the line's colour (`LABEL-COLOUR-SOURCE`); an edge is a LINK, physical or logical |
-| `bundle` | `bundle <id> ["label"] <member>,<member>` | T | **EXPERIMENTAL** | `stroke` `style` | a LAG, an ECMP set, an EVPN Ethernet Segment — see the declaration below. Ring drawn dashed; a member is an endpoint pair `a--b` **or**, from `figdown 0.5`, a connector `id` (`CONNECTOR-IDENTITY-KEY`); member list is ONE whitespace-free comma-delimited token (the space form was RETIRED at 0.1); no `fill=` — a ring has no interior (§8.4) |
+| `bundle` | `bundle <id> ["label"] <member>,<member>` | T | **EXPERIMENTAL** | `stroke` `style` | a LAG, an ECMP set, an EVPN Ethernet Segment — see the declaration below. Ring drawn dashed; a member is an endpoint pair `a--b` **or**, from `figdown 0.5`, a connector `id` (`CONNECTOR-IDENTITY-KEY`); member list is ONE whitespace-free comma-delimited token (the space form was RETIRED at 0.1); no `fill=` — a ring has no interior (SYNTAX-STYLE §8.4) |
 | `class` | `class <id> "<meaning>"` | H | NORMATIVE | `fill` `stroke` `style` | the meaning FIELD is REQUIRED, its VALUE may be `""` (= no meaning claimed, no legend entry — `CLASS-EMPTY-MEANING`); a class an `edge` joins must not declare `fill=` without `stroke=` — an edge has no interior, so the two name ONE channel (`INTERIOR-LESS-ELEMENT-PAINT`). Declaring NO paint is legal: the class claims a meaning and the edge keeps its default line (`CLASS-PAINT-REQUIREMENT`'s second half RETIRED at 0.4, `CLASS-CHANNEL-REACH`) |
 | `flow` | `flow right\|down\|left\|up` | H | NORMATIVE | — | **`right`** |
 | `rank` | `rank <id>,<id>[,<id>…]` | H | NORMATIVE | — | two or more ids in ONE whitespace-free comma-delimited token; the space form was RETIRED at 0.1; the rest of the line is reserved for future options |
@@ -221,7 +221,7 @@ operated as one logical link — a **LAG** (IEEE 802.1AX), an **ECMP set**, an
 **EVPN Ethernet Segment**. Drawn as a dashed ring enclosing its member links;
 members are named as one whitespace-free comma-delimited token, recorded in
 written order, and each resolves against a declared `edge`. No `fill=`: a
-ring has no interior (§8.4).
+ring has no interior (SYNTAX-STYLE §8.4).
 
 **A member names its link in one of two ways, and the second is what makes
 the construct's own defining case expressible (`CONNECTOR-IDENTITY-KEY`).**
@@ -288,7 +288,7 @@ Where no coordinate is the author's, the layout moves the bystander out
 before the ring is drawn, at no cost to the author; where it cannot, the
 message says *the layout pass could not separate them* and the figure is
 still not written. This is the rule `group` has always had for its band
-(§2.6: a band is the bounding box of its members, and a non-member inside it
+(core §2.2: a band is the bounding box of its members, and a non-member inside it
 is refused), asked of the other shape derived from a declared membership —
 and it inherits that rule's principle whole: **whoever chose the position
 bears the responsibility**. A **one-member** bundle draws no ring at all, claims no extent, and is never subject to this rule.

@@ -478,6 +478,17 @@ function main() {
     console.log('  skip (no artifact — ' + s.why + '): ' + s.rel);
 
   console.log('');
+  // Same-basename pairing is normative (core §7): an artifact whose source is
+  // gone, or a drawable source with no artifact, is a broken pair, not a skip.
+  // A refused figure's absent artifact is the correct state and is counted
+  // above; a source that does not parse is still left to the corpus gates.
+  const unpaired = skipped.noSource.length +
+    skipped.noArtifact.filter(s => s.why.startsWith('the source renders')).length;
+  if (strict && unpaired) {
+    console.log('FAIL  ' + unpaired + ' broken X.svg <-> X.fd pair(s) — restore the source, ' +
+      'build the artifact, or delete the orphan');
+    process.exit(1);
+  }
   if (refusedRows.length) {
     console.log('FAIL  ' + refusedRows.length +
       ' artifact(s) belong to a figure the engine refuses to draw — delete them');

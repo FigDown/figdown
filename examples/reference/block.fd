@@ -101,8 +101,9 @@ flow right   # right|down|left|up — one per document; `right` is block's defau
 # `rank` states that these elements are PEERS — same position along the flow
 # axis (same column under `flow right`, same row under `flow down`). It is
 # CONTENT, not layout: "these are peers" survives the `GUI-WRITEBACK-STRUCTURE` strip test, `pin`
-# does not. The comma form is canonical; `rank cache tsdb`
-# still parses. Do NOT rank a chain that edges already order (rx -> dec ->
+# does not. The comma form is canonical; the space form is
+# a line error (MIGRATIONS 0.1). Do NOT rank a chain
+# that edges already order (rx -> dec ->
 # dedup): that flattens the mainline sideways. See guide/layout.md §8.
 rank cache,tsdb
 

@@ -25,7 +25,9 @@ let bad = 0;
 for (const p of pages) {
   if (!fs.existsSync(p)) { console.log(`${p}  MISSING`); bad++; continue; }
   const html = fs.readFileSync(p, 'utf8');
-  const blocks = [...html.matchAll(/<script\b[^>]*>([\s\S]*?)<\/script>/g)];
+  // A browser ends a script at `</script` (any case) followed by whitespace,
+  // `/` or `>`, wherever it falls in the JS: match the same end tag here.
+  const blocks = [...html.matchAll(/<script\b[^>]*>([\s\S]*?)<\/script[\t\n\f\r \/>]/gi)];
   if (!blocks.length) { console.log(`${p}  no <script> block`); bad++; continue; }
   let ok = true;
   blocks.forEach((m, i) => {

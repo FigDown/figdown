@@ -226,6 +226,22 @@ function checkCorpus() {
         + '        dist:      ' + JSON.stringify(gotR));
       continue;
     }
+    // DRAWING CHANNEL. Equal error sets say nothing about the picture: a
+    // wrapper that drew only the first section of a multi-section source
+    // (MULTI-FIGURE-DOCUMENTS stacking dropped) kept every error list equal and every other gate
+    // green. A clean figure must draw byte-identically through dist/.
+    if (!wantR.length) {
+      const p = ref.parse(src);
+      const docs = p.docs && p.docs.length ? p.docs : (p.doc ? [p.doc] : []);
+      const rs = docs.map(d => ref.render(d));
+      const want = rs.length > 1 ? ref.stackSectionSvgs(rs) : (rs[0] ? rs[0].svg : null);
+      if (r.svg !== want) {
+        diverged++;
+        fail(path.relative(ROOT, f) + ' — dist/ render() draws a different SVG from the reference engine ('
+          + (r.svg === null ? 'null' : r.svg.length + ' bytes') + ' vs ' + (want === null ? 'null' : want.length + ' bytes') + ')');
+      }
+      continue;
+    }
     if (wantR.length) {
       geometryPinned++;
       // The contract build-svg.js establishes and core §8 states: a non-empty
@@ -241,11 +257,41 @@ function checkCorpus() {
     }
   }
   if (!diverged) ok(files.length + ' published .fd: dist/ and the reference engine agree on every '
-    + 'error set, parse AND geometry (' + geometryPinned + ' with a non-empty geometry channel, refused by both)');
+    + 'error set, parse AND geometry, and on every clean drawing (' + geometryPinned + ' with a non-empty geometry channel, refused by both)');
+}
+
+// The metadata splice once passed the artifact text as a REPLACEMENT
+// STRING, so a source containing `$&`, `` $` `` or `$'` embedded a corrupted
+// copy of itself. Every build agreed with every other, so only a round trip
+// through the shipped entry points can see it: dist/ `artifact()` (the
+// template both dist builds come from) and the CLI `tools/build-svg.js`
+// (which skill/figdown/ ships byte-identical).
+const DOLLAR_SRC = 'figdown 0.5 block\ntitle "Dollar $& and $` and $\'"\n# keep $& $` $\' $$ verbatim\nnode a "A $&"\n';
+function embeddedSource(svg) {
+  const m = /<metadata id="figdown-source"[^>]*><!\[CDATA\[\n([\s\S]*)\n\]\]><\/metadata>/.exec(svg || '');
+  return m ? m[1].split(']]]]><![CDATA[>').join(']]>') : null;
+}
+function checkEmbedRoundTrip() {
+  const lib = require(path.join(DIST, 'figdown.js'));
+  const art = lib.artifact(DOLLAR_SRC);
+  if (embeddedSource(art.svg) === DOLLAR_SRC) ok('dist/ artifact() embeds a source containing $& $` $\' byte for byte');
+  else fail('dist/ artifact() corrupted the embedded source of a document containing $& / $` / $\'');
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'figdown-dollar-'));
+  const fd = path.join(dir, 'dollar.fd');
+  fs.writeFileSync(fd, DOLLAR_SRC);
+  let svg = null;
+  try {
+    execFileSync(process.execPath, [path.join(ROOT, 'tools', 'build-svg.js'), fd], { stdio: 'ignore' });
+    svg = fs.readFileSync(path.join(dir, 'dollar.svg'), 'utf8');
+  } catch (e) { fail('tools/build-svg.js refused the $& round-trip source: ' + e.message); return; }
+  finally { fs.rmSync(dir, { recursive: true, force: true }); }
+  if (embeddedSource(svg) === DOLLAR_SRC) ok('tools/build-svg.js embeds a source containing $& $` $\' byte for byte');
+  else fail('tools/build-svg.js corrupted the embedded source of a document containing $& / $` / $\'');
 }
 
 checkBuilds().then(() => {
   checkCorpus();
+  checkEmbedRoundTrip();
   console.log('');
   if (failures) {
     console.log('dist-check: ' + failures + ' failure(s)');

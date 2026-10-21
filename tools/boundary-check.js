@@ -62,8 +62,15 @@ function loadEngine(enginePath) {
     throw new Error('Cannot locate engine boundaries in ' + enginePath);
   const ANCHOR = 'let W=0,Hh=0;';
   let body = h.slice(start, end);
-  if (body.indexOf(ANCHOR) < 0)
+  // Exactly once: `replace` instruments the FIRST occurrence, so a second
+  // `let W=0,Hh=0;` above renderScene would take the probe, it would never
+  // fire, and every scene would be skipped as `no-scene`.
+  const at = body.indexOf(ANCHOR);
+  if (at < 0)
     throw new Error('Cannot locate probe anchor in ' + enginePath);
+  if (body.indexOf(ANCHOR, at + 1) >= 0)
+    throw new Error('Probe anchor occurs more than once in ' + enginePath +
+      ' — the probe must sit in renderScene and nowhere else');
   body = body.replace(ANCHOR, ANCHOR +
     '\n  if(globalThis.__boundaryProbe)globalThis.__boundaryProbe(' +
     'nodes.map(n=>({id:n.id,boundary:!!n.boundary,group:n.group,' +
@@ -163,7 +170,9 @@ function checkOne(engine, fdPath) {
 // matters — the old code expressed all three as the same bare `continue`.
 const EXTRA_REASONS = [
   ['no-boundary', 'scene declares no `external` endpoint — nothing to place', false],
-  ['no-scene',    'document renders no scene (bitfield/table/timing)',        false],
+  // Fails --strict: only a scene declares `external`, so a document that
+  // reaches this point and leaves the probe unfired means the probe is lost.
+  ['no-scene',    'declares `external` but the probe saw no scene render',    true],
   ['unpinned',    'scene is auto-laid-out, so adjacency is not promised',     false],
 ];
 

@@ -140,9 +140,9 @@ function walk(dir, out) {
 
 // Strip fenced blocks and inline code spans, preserving line numbers.
 function prose(src) {
-  let fenced = false;
+  let fenced = false, fenceRun = null;   // ``` or ~~~; closes only on the same run
   return src.split('\n').map(l => {
-    if (/^\s*(```|~~~)/.test(l)) { fenced = !fenced; return ''; }
+    { const d = /^\s*(`{3,}(?!.*`)|~{3,})(.*)$/.exec(l); if (d && (!fenceRun || (d[1][0] === fenceRun[0] && d[1].length >= fenceRun.length && !d[2].trim()))) { fenceRun = fenceRun ? null : d[1]; fenced = !!fenceRun; return ''; } }
     if (fenced) return '';
     return l.replace(/`[^`]*`/g, m => ' '.repeat(m.length));
   });
@@ -154,7 +154,7 @@ const files = walk(SPEC, []).filter(f => !/\.zh-tw\.md$/.test(f));
 if (!files.length) die('the walk found no English .md under spec/. The scope moved.');
 
 // -------------------------------------------- CHECK 2 — the claim spellings
-const CLAIM_RE = /\b(conforming|conformant)\s+([A-Za-z][A-Za-z-]*)/g;
+const CLAIM_RE = /\b(conforming|conformant)\s+[*_]*([A-Za-z][A-Za-z-]*)/gi;
 const tally = { class: Object.create(null), label: 0, nonparty: 0 };
 const unknown = [];
 let harvested = 0;
@@ -167,7 +167,10 @@ for (const f of files) {
   // Join for wrap-crossing phrases, but keep a line number for each finding
   // by scanning line-joined PAIRS as well as single lines.
   lines.forEach((line, i) => {
-    const unit = (line + ' ' + (lines[i + 1] || '')).replace(/\s+/g, ' ');
+    // A blockquote's next line opens with `>`, which is not a word: drop the
+    // marker so "conforming" at a quoted line's end still meets its noun.
+    const unit = (line + ' ' + (lines[i + 1] || '').replace(/^\s*(?:>\s*)+/, ''))
+      .replace(/\s+/g, ' ');
     let m;
     CLAIM_RE.lastIndex = 0;
     while ((m = CLAIM_RE.exec(unit))) {

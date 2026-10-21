@@ -55,7 +55,7 @@ function loadEngine() {
   const end = html.indexOf('// 3. UI');
   if (start < 0 || end < 0) throw new Error('cannot locate engine in ' + ENGINE);
   return new Function(html.slice(start, end) +
-    '\nreturn {parse,render,findComment,scanConnectorLine,connectorKwAt,GENRE_NODE_KW,GENRE_NODE_COLL,GENRE_KW,directiveOpts,docNodes,isId,tokenize,splitOpts,belowOptVersion,FIGDOWN_VERSION};')();
+    '\nreturn {parse,render,findComment,scanConnectorLine,connectorKwAt,GENRE_NODE_KW,GENRE_NODE_COLL,GENRE_KW,CHILD_KW,directiveOpts,docNodes,isId,tokenize,splitOpts,belowOptVersion,FIGDOWN_VERSION};')();
 }
 const engine = loadEngine();
 
@@ -82,22 +82,24 @@ function loadEditorCore() {
     'deleteClassDeclaration','insertExternalDeclaration','rewriteExternalLabel','rewriteBundleWithoutEndpoint','deleteExternalDeclaration',
     'stripExactOptionValue','ungroupDeclaration','buildLabelEdit','labelEditMatches','optionSpanOutsideLabel','rewriteOption',
     'declarationOptionAbsent',
+    'docForSection','ensureFlowDirective',
     'ensureLayoutMarker','upsertLayoutDirective','mergePinKeys','upsertPin',
     'splitPipeSource','buildPipeSource','delimiterParts','tableSourceInfo','tableRowsInfo','tableCellId','parseTableCellId',
     'firstTypedBlock','tableActionTarget','tableSelectionModel','tableMark','dropLinePreserveComment','rewriteTableCellOption','tableCellOptionAbsent','setTableCellText',
-    'rewriteTableCellRefsRange','rewriteTableCellRefs','tableWidthValues','setTableWidths','setTableRowHighlight',
+    'rewriteTableCellRefsRange','tableWidthValues','setTableWidths','setTableRowHighlight',
     'insertTableRow','insertTableColumn','deleteTableRow','deleteTableColumn',
     'sourceTokenSpans','commaElementSpans','classicFieldParts','bitfieldSourceInfo','bitfieldItems','bitfieldSelectionId',
     'parseBitfieldSelectionId','bitfieldSelectionModel','encodeCompactName','compactItemParts','rewriteClassicFieldName',
     'rewriteClassicFieldWidth','rewriteCompactFieldItem','rewriteFieldOption','fieldOptionAbsent','fieldOptionWritten','setBitfieldOption',
     'addBitfieldField','addBitfieldBreak','deleteBitfieldItem','moveBitfieldLine','moveBitfieldLineBefore','bitfieldBudget',
     'moveNodeLineSource','moveNodeOrderMatches',
-    'sourceLineContexts','sourceHighlightLine','inspectorHtml'];
-  const src = names.map(uiFunction).join('\n');
-  return new Function('parse','render','findComment','scanConnectorLine','connectorKwAt','GENRE_NODE_KW','GENRE_KW',
+    'sourceLineContexts','sourceHighlightLine','inspectorHtml','rewriteThresholdOffset','nodeLineIdx','groupNodesSource'];
+  // ensureFlowDirective reads the parsed sections through docForSection.
+  const src = 'const lastDocs=[];\n'+names.map(uiFunction).join('\n');
+  return new Function('parse','render','findComment','scanConnectorLine','connectorKwAt','GENRE_NODE_KW','GENRE_KW','CHILD_KW',
     'directiveOpts','docNodes','isId','tokenize','splitOpts','belowOptVersion',
     src+
-    '\nreturn {buildLabelEdit,labelEditMatches,validateGuiEdit,prepareGuiEdit,sectionRanges,nextFreeId,rewriteOption,upsertPin,'+
+    '\nreturn {buildLabelEdit,labelEditMatches,validateGuiEdit,prepareGuiEdit,sectionRanges,nextFreeId,rewriteOption,upsertPin,ensureFlowDirective,'+
     'rewriteConnectorLabel,rewriteConnectorOperator,rewriteConnectorEndpoint,rewriteConnectorOption,flipConnector,deleteConnector,'+
     'rewriteTitle,rewriteFlow,upsertClassDeclaration,deleteClassDeclaration,insertExternalDeclaration,rewriteExternalLabel,'+
     'deleteExternalDeclaration,ungroupDeclaration,declarationOptionAbsent,connectorOptionAbsent,connectorSelectionId,'+
@@ -106,9 +108,9 @@ function loadEditorCore() {
     'rewriteClassicFieldName,rewriteClassicFieldWidth,rewriteCompactFieldItem,rewriteFieldOption,fieldOptionAbsent,fieldOptionWritten,setBitfieldOption,'+
     'escapeFdString,'+
     'addBitfieldField,addBitfieldBreak,deleteBitfieldItem,moveBitfieldLine,moveBitfieldLineBefore,bitfieldBudget,'+
-    'moveNodeLineSource,moveNodeOrderMatches,sourceLineContexts,sourceHighlightLine};')(
+    'moveNodeLineSource,moveNodeOrderMatches,sourceLineContexts,sourceHighlightLine,rewriteThresholdOffset,groupNodesSource};')(
       engine.parse,engine.render,engine.findComment,engine.scanConnectorLine,engine.connectorKwAt,engine.GENRE_NODE_KW,
-      engine.GENRE_KW,engine.directiveOpts,engine.docNodes,engine.isId,engine.tokenize,engine.splitOpts,engine.belowOptVersion);
+      engine.GENRE_KW,engine.CHILD_KW,engine.directiveOpts,engine.docNodes,engine.isId,engine.tokenize,engine.splitOpts,engine.belowOptVersion);
 }
 const editorCore = loadEditorCore();
 // `svgArtifact` is hoisted VERBATIM out of the browser file, so it reaches for
@@ -346,7 +348,7 @@ const EMITTERS = [
   },
   {
     what: 'threshold drag — offset rewritten in place',
-    emits: "lines[i]=lines[i].replace(/offset=\\d+(?:\\.\\d+)?%?/,'offset='+pct+'%');",
+    emits: "lines[i]=joinCodeComment(sp.code.slice(0,span.start)+' offset='+pct+'%'+sp.code.slice(span.end),sp.comment);",
     sample: 'threshold "cap" in=a offset=60%',
     doc: ['figdown 0.1 block', 'node a "A"', '@'],
   },
@@ -461,7 +463,7 @@ check('group locator is section-aware and comment-safe',groupBuilt&&groupBuilt.l
   groupBuilt.lines[1]==='group g "新群組 # CJK" # group tail',groupBuilt&&groupBuilt.error||String(groupBuilt&&groupBuilt.lines));
 const missing = editorCore.buildLabelEdit(before,{sectionIndex:0,kind:'node',id:'missing'},'X');
 check('invalid target returns a concrete error', missing && missing.ok === false && /not found/.test(missing.error), JSON.stringify(missing));
-check('invalid target leaves source byte-identical', before === String(before));
+check('invalid target leaves source byte-identical', missing && missing.lines === undefined, JSON.stringify(missing));
 const cross = after.replace('table t "Second"','table t "Changed"');
 const crossCheck = editorCore.validateGuiEdit(before,cross,0,null,null,{});
 check('cross-section mutation is refused', !crossCheck.ok && /section 1 changed/.test(crossCheck.error), crossCheck.error);
@@ -486,6 +488,11 @@ const clearMissing=editorCore.rewriteOption(m1src.split('\n'),0,'node','a','clas
 check('clear absent option names the option and refuses',clearMissing&&clearMissing.ok===false&&/option class= is not set/.test(clearMissing.error),JSON.stringify(clearMissing));
 const badIds=editorCore.nextFreeId(['figdown 0.1 block','node'], 'n', 0);
 check('nextFreeId refuses a parse-error section',badIds&&badIds.ok===false&&/section has errors/.test(badIds.error),JSON.stringify(badIds));
+const leadComment=['# c','figdown 0.5 block','node a "A"','node b "B"'];
+const leadFlow=editorCore.ensureFlowDirective(leadComment.slice(),0);
+const leadPin=editorCore.upsertPin(leadFlow.slice(),0,'a',{at:'(10,20)'});
+passBuilt('a drag in a document that opens with a comment adds flow and pin, not a second header',leadComment,leadPin,(d,ls)=>
+  ls.filter(l=>/^figdown\b/.test(l)).length===1&&ls[0]==='# c'&&ls[2]==='flow right'&&/pin a at=\(10,20\)/.test(ls.join('\n')));
 const multiPin=['figdown 0.1 block','node a "A"','flow right','','figdown 0.1 block','node b "B"','flow right'];
 const pinBefore=multiPin.slice(0,4).join('\n');
 const pinR=editorCore.upsertPin(multiPin,1,'b',{at:'(70,80)'});
@@ -561,14 +568,50 @@ const extRename=['figdown 0.1 block','external x # ext tail','node a "A"','edge 
 passBuilt('external label insert preserves comment and connector',extRename,editorCore.rewriteExternalLabel(extRename.slice(),0,'x','外部 #1',false),(d,ls)=>d.boundaries[0].label==='外部 #1'&&d.edges[0].a==='x'&&ls[1].endsWith('# ext tail'));
 const extInsert=['figdown 0.1 block','node a "A"','layout','pin a at=(1,2)'];
 passBuilt('external add stays before the layout zone',extInsert,editorCore.insertExternalDeclaration(extInsert.slice(),0),(d,ls)=>d.boundaries.length===1&&ls.indexOf('external x1')<ls.indexOf('layout'));
+// A document that ends in a typed region: the insert goes after the region's
+// children, not between the block header and its first child.
+const extRegion=['figdown 0.5 block','node a "A"','timing t ""','signal s 01'];
+passBuilt('external add after a trailing timing region keeps the signal in its block',extRegion,editorCore.insertExternalDeclaration(extRegion.slice(),0),(d,ls)=>
+  d.boundaries.length===1&&ls[ls.length-1]==='external x1');
 const extBundle=['figdown 0.1 topology','external x "WAN"','node a "A"','node b "B"','edge a -- x','edge b -- x','edge a -- b','bundle uplinks a--x,b--x,a--b stroke=#111 # keep','layout','pin x at=(10,20)'];
 passBuilt('external deletion rewrites topology bundle members before validation',extBundle,editorCore.deleteExternalDeclaration(extBundle.slice(),0,'x'),(d,ls)=>!d.boundaries.length&&d.edges.length===1&&d.edges[0].a==='a'&&d.edges[0].b==='b'&&d.trunks.length===1&&JSON.stringify(d.trunks[0].pairs)==='[["a","b"]]'&&ls.some(x=>x.includes('bundle uplinks a--b')&&x.endsWith('# keep')));
+// Since 0.5 a bundle member may be a connector id; the rewrite must keep the
+// spelling it found and drop the members whose connector touched the deleted
+// endpoint, or the delete is refused for a member list it cannot locate.
+const idBundle=['figdown 0.5 topology','external x "WAN"','node a "A"','node b "B"','edge a -- x id=m1','edge b -- x id=m2','edge a -- b id=m3','edge a -- b','bundle up a--x,m2,m3 # keep'];
+passBuilt('external deletion keeps a bundle\'s connector-id members spelled as ids',idBundle,editorCore.deleteExternalDeclaration(idBundle.slice(),0,'x'),(d,ls)=>
+  !d.boundaries.length&&d.trunks.length===1&&ls.some(x=>x==='bundle up m3 # keep'));
 const groupBase=['figdown 0.1 block','group g "G" fill=#eee # group tail','group g2 "G2"','node a "in=g prose" in=g fill=#fff # node tail','node b "B" in=g2','layout','pin g at=(1,2) # group pin'];
 passBuilt('ungroup preserves members/options/comments and exact non-member ids',groupBase,editorCore.ungroupDeclaration(groupBase.slice(),0,'g'),(d,ls)=>!d.groups.some(x=>x.id==='g')&&d.groups.some(x=>x.id==='g2')&&d.nodes.find(n=>n.id==='a').group===null&&d.nodes.find(n=>n.id==='b').group==='g2'&&ls.some(x=>x.includes('"in=g prose"')&&x.includes('fill=#fff')&&x.endsWith('# node tail'))&&!d.pins.g);
 const groupDependent=['figdown 0.1 block','group g "G"','node a "A" in=g','threshold "Cap" in=g offset=50%'];
 const dependentUngroup=editorCore.ungroupDeclaration(groupDependent.slice(),0,'g');
 check('ungroup refuses a group still referenced by threshold/band with a concrete reason',
   dependentUngroup&&dependentUngroup.ok===false&&/threshold\/band/.test(dependentUngroup.error),JSON.stringify(dependentUngroup));
+// Design record §3.4: an emitter that DROPS a line keeps its trailing comment
+// as a line of its own. Each delete below drops the line the comment sits on.
+const dropKeep=['figdown 0.5 topology','title "T" # t-note','class c "C" # c-note','group g "G" # g-note','node a "A" in=g class=c',
+  'node b "B"','external x "X" # x-note','edge a -> b # e-note','edge b -> x # ex-note','layout','pin g at=(10,10) # gp-note','pin x at=(5,5) # xp-note'];
+const keepsNotes=(ls,...notes)=>notes.every(n=>ls.includes('# '+n));
+passBuilt('title remove keeps the title line\'s comment',dropKeep,editorCore.rewriteTitle(dropKeep.slice(),0,'remove',''),(d,ls)=>d.title===null&&keepsNotes(ls,'t-note'));
+passBuilt('connector delete keeps the connector line\'s comment',dropKeep,editorCore.deleteConnector(dropKeep.slice(),0,'8'),(d,ls)=>d.edges.length===1&&keepsNotes(ls,'e-note'));
+passBuilt('class delete keeps the declaration\'s comment',dropKeep,editorCore.deleteClassDeclaration(dropKeep.slice(),0,'c'),(d,ls)=>!d.classes.length&&keepsNotes(ls,'c-note'));
+passBuilt('ungroup keeps the group declaration\'s and its pin\'s comments',dropKeep,editorCore.ungroupDeclaration(dropKeep.slice(),0,'g'),(d,ls)=>!d.groups.length&&keepsNotes(ls,'g-note','gp-note'));
+passBuilt('external delete keeps the declaration\'s, connector\'s and pin\'s comments',dropKeep,editorCore.deleteExternalDeclaration(dropKeep.slice(),0,'x'),(d,ls)=>!d.boundaries.length&&keepsNotes(ls,'x-note','ex-note','xp-note'));
+const groupNew=['figdown 0.5 block','node a "log in=yes" # a tail','node b "B" note="sits in=rack"','node c "C"'];
+passBuilt('group creation writes every selected member, and "in=" inside a label or note= is not membership',groupNew,editorCore.groupNodesSource(groupNew.slice(),0,['a','b','c']),(d,ls)=>
+  d.groups.length===1&&['a','b','c'].every(id=>d.nodes.find(n=>n.id===id).group===d.groups[0].id)&&ls[2].endsWith('# a tail'));
+// The threshold drag sets the model's `pct`; "offset=" inside the label or the
+// trailing comment is prose and must not be the token it rewrites.
+const thrBase=['figdown 0.5 block','node q "Queue"','threshold "drain at offset=80%" in=q offset=50% # was offset=40%'];
+passBuilt('threshold drag rewrites the offset= option, not label or comment text',thrBase,editorCore.rewriteThresholdOffset(thrBase.slice(),0,3,65),(d,ls)=>
+  d.thresholds[0].pct===65&&d.thresholds[0].label==='drain at offset=80%'&&ls[2].endsWith('# was offset=40%'));
+check('threshold drag postcondition reads the model field the parser writes',html.includes('+x.pct===pct)')&&!html.includes('+x.offset===pct'),'');
+// `layout # note` is the layout marker (core §3's own example carries a
+// comment on it); a second marker is "duplicate layout line", so a drag that
+// failed to see it was refused.
+const layoutNote=['figdown 0.1 block','node a "A"','node b "B"','layout   # opens the layout zone','pin a at=(10,10) # a-pin'];
+passBuilt('a pin goes under a commented layout marker, not under a second one',layoutNote,editorCore.upsertPin(layoutNote.slice(),0,'b',{at:'(50,60)'}),(d,ls)=>
+  ls.filter(l=>/^\s*layout\b/.test(l)).length===1&&d.pins.b.fx===50&&d.pins.a.fx===10&&ls[3].endsWith('# opens the layout zone'));
 const idEnd=['figdown 0.1 block','node a_ "A"','node a_b "AB"','layout','pin a_ at=(1,2)','pin a_b at=(9,9)'];
 passBuilt('id token-end matcher handles legal trailing underscore ids',idEnd,editorCore.upsertPin(idEnd.slice(),0,'a_',{at:'(3,4)'}),(d,ls)=>d.pins.a_.fx===3&&d.pins.a_b.fx===9&&ls.includes('pin a_b at=(9,9)'));
 const inherited=['figdown 0.1 block','class hot "Hot" fill=#fee2e2 stroke=#111 style=dashed','node a "A" fill=#ffffff stroke=#222 style=dotted class=hot','flow right'].join('\n');
@@ -616,6 +659,12 @@ passBuilt('table text edit supports CJK, escaped pipe and <br> while preserving 
   const t=d.blocks[0];
   return t.heads[1][1].v==='中|文\n次行'&&ls[5].includes('中\\|文<br>次行')&&ls.join('\n').endsWith(tableSuffix);
 });
+for(const lit of ['^^','^^b']){
+  const tl=editorCore.setTableCellText(tableBase.slice(),0,'t','1',2,lit);
+  passBuilt('table text edit writes a leading caret pair as literal text ('+lit+')',tableBase,tl,d=>{
+    const t=d.blocks[0];return t.rows.length===2&&t.rows[0].cells[1].v===lit&&t.rows[0].cells[1].m===null;
+  });
+}
 const mergedText=editorCore.setTableCellText(tableBase.slice(),0,'t','2',2,'not allowed');
 check('merged continuation cell refuses direct text editing',mergedText&&mergedText.ok===false&&/merged continuation/.test(mergedText.error),JSON.stringify(mergedText));
 let tc=editorCore.rewriteTableCellOption(tableBase.slice(),0,'t','h2',2,'class','warm,border');
@@ -684,6 +733,14 @@ passBuilt('table row delete drops that row\'s own marks and renumbers the rows a
 const delRowMissing=editorCore.deleteTableRow(tableBase.slice(),0,'t',9);
 check('deleting a row that does not exist is refused concretely',
   delRowMissing&&delRowMissing.ok===false&&/data row 9/.test(delRowMissing.error),JSON.stringify(delRowMissing));
+// Deleting the head of a rowspan must not let the `^^` below continue the
+// cell above instead: the head's text moves down into it, the row twin of
+// the column delete's rightward move.
+const spanRow=['figdown 0.1 table','table t "T"','| A | B |','|---|---|','|w|o|','|x|p|','|^^|q|'];
+passBuilt('table row delete on a rowspan head moves its text to the continuation below',spanRow,editorCore.deleteTableRow(spanRow.slice(),0,'t',2),d=>{
+  const r=d.blocks[0].rows;
+  return r.length===2&&r[0].cells[0].v==='w'&&r[1].cells[0].v==='x'&&r[1].cells[0].m===null&&r[1].cells[1].v==='q';
+});
 // A dropped line takes its code and leaves its comment: the comment is the
 // author's prose, and no structural edit is licensed to delete it.
 const dropBase=['figdown 0.1 table','table t "T"','| A |','|---|','| 1 |','width 40 # keep me'];
@@ -1084,12 +1141,26 @@ check('the genre/version connector word is spelled once',
   occurrences(html, 'const connectorWordError=(surf,genre,version)=>{') === 1 &&
   occurrences(html, 'connectorWordError(') === 2);
 
+// The editor's artifact splice must embed a source containing `$&`,
+// `` $` `` or `$'` byte for byte (a replacement STRING expands them).
+const DOLLAR_SRC='figdown 0.5 block\ntitle "Dollar $& and $` and $\'"\n# keep $& $` $\' $$ verbatim\nnode a "A $&"';
+function dollarRoundTrip(){
+  const p=engine.parse(DOLLAR_SRC); const r=engine.render(p.doc,{title:true});
+  return svgArtifact(DOLLAR_SRC,r.svg).then(a=>{
+    const m=/<metadata id="figdown-source"[^>]*><!\[CDATA\[\n([\s\S]*)\n\]\]><\/metadata>/.exec(a||'');
+    check('artifact embeds a source containing $& $` $\' byte for byte',
+      !p.errs.length&&!!m&&m[1].split(']]]]><![CDATA[>').join(']]>')===DOLLAR_SRC, m?m[1]:'no metadata');
+  });
+}
 const ap = engine.parse(after);
 const ar = ap.errs.length ? null : engine.render(ap.doc,{title:true});
 Promise.all(ar && ar.svg ? [svgArtifact(after,ar.svg),svgArtifact(after,ar.svg)] : [null,null])
   .then(([a1,a2])=>{
     check('artifact parses/renders', !!a1 && !(ar.errs&&ar.errs.length), (ar&&ar.errs||[]).join('; '));
     check('artifact is byte-deterministic across two calls', a1 === a2);
+    return dollarRoundTrip();
+  })
+  .then(()=>{
     const uiStart = html.indexOf('// 3. UI');
     check('UI suffix contains no prompt(', !html.slice(uiStart).includes('prompt('));
     check('section-aware selection shape is present', html.includes("{sectionIndex:0,kind:'node',id}"));

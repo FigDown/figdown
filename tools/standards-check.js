@@ -143,7 +143,7 @@ const EXCLUSIONS = [
   [/^archive\//,                    'frozen release trees — same rule'],
   [/^CHANGELOG\.md$/,               'the release narrative — written in this repository, which the register is not, and every standards claim it summarises is registered at the spec site that makes it'],
   [/^dist\//,                       'GENERATED from editor/figdown.html by tools/make-lib.js'],
-  [/^skill\//,                      'GENERATED from read/0.5/ and the engine by tools/make-skill.js — the engine claim is registered once, at editor/figdown.html'],
+  [/^skill\/figdown\/(reference\/|figdown\.html$|build-svg\.js$)/, 'GENERATED from read/0.5/ and the engine by tools/make-skill.js — the engine claim is registered once, at editor/figdown.html (SKILL.md is hand-maintained source and IS checked)'],
   [/^tools\/comprehension\//,       'model transcripts and question fixtures — other agents\' words, not this project\'s assertions'],
   [/^tools\/migrate-fixtures\//,    'migration inputs, pre-migration by design'],
   [/^spec\/standards-claims\.tsv$/, 'THE REGISTER ITSELF'],
@@ -208,7 +208,7 @@ const PATTERNS = [
   // `ISO 19505` written without the IEC half is the SAME standard, and must
   // normalise to the same key or the register would owe it a second row.
   [/\bISO\s+(\d{3,5})/g,                              m => m[1] === '19505' ? 'ISO/IEC 19505' : 'ISO ' + m[1]],
-  [/\bIEEE\s+(\d{3,4}(?:\.\d+)?(?:[A-Za-z]{1,3})?)/g, m => 'IEEE ' + m[1]],
+  [/\bIEEE\s+(?:Std\.?\s+)?(\d{3,4}(?:\.\d+)?(?:[A-Za-z]{1,3})?)/g, m => 'IEEE ' + m[1]],
   [/(?:ITU-T\s+)?\bZ\.120\b/g,                        () => 'ITU-T Z.120'],
   [/(?:ITU-T\s+)?\bX\.680\b/g,                        () => 'ITU-T X.680'],
   [/\bASN\.1\b/g,                                     () => 'ITU-T X.680'],

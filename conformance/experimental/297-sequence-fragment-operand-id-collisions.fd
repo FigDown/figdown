@@ -1,0 +1,29 @@
+# 0.5 (`SEQUENCE-ID-COLLISION-ORDER`): fragment and operand ids collide with
+# declarations written AFTER them, not only before. A section has one id
+# namespace (core §1, sequence.md `lifeline` row), so the verdict cannot depend
+# on line order.
+#
+# The engine's duplicate test did not consult fragment or operand ids, so only
+# a fragment or operand declared after a clashing id was refused. `lifeline f`
+# below was accepted, and an `in=f` written after it then resolved to the
+# lifeline. Lines 21-22 are that case; lines 23-24 reuse each id on a later
+# `message id=`, which the old engine also accepted unless a lifeline held it.
+#
+# Section 2 is the per-section half: the same two ids in a NEIGHBOURING section
+# are a different namespace and produce no error.
+figdown 0.5 sequence
+title "Fragment and operand ids collide with later declarations"
+lifeline c "Client"
+lifeline s "Server"
+fragment f "retry?" type=alt
+operand o "first try" in=f
+message c -> s "request" in=o
+lifeline f "a lifeline reusing the fragment id"
+lifeline o "a lifeline reusing the operand id"
+message c -> s "reply" id=f
+message c -> s "ack" id=o
+
+figdown 0.5 sequence
+lifeline f "the same id in a neighbouring section"
+lifeline o "is a different namespace"
+message f -> o "fine"

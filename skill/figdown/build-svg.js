@@ -73,7 +73,7 @@ function buildOne(engine, fdPath) {
   const meta = '<metadata id="figdown-source" data-sha256="' + hash + '"'
     + ' data-engine-version="' + engine.FIGDOWN_VERSION + '"' + optAttr + '><![CDATA[\n'
     + src.replace(/]]>/g, ']]]]><![CDATA[>') + '\n]]></metadata>';
-  const artifact = svg.replace(/<\/svg>$/, meta + '</svg>');
+  const artifact = svg.replace(/<\/svg>$/, () => meta + '</svg>');
   const out = fdPath.replace(/\.fd$/, '') + '.svg';
   fs.writeFileSync(out, artifact);
   console.log('OK  ' + out);

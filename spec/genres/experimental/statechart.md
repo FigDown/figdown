@@ -133,7 +133,7 @@ which is what an author needs when carrying it into `block`.
 |---|---|---|---|---|---|
 | `figdown` | `figdown 0.2 statechart` | C | NORMATIVE | — | required, first significant line; **`figdown 0.1 statechart` is a line error** (`STATECHART-GENRE-SCOPE`) |
 | `title` | `title "<text>"` | C | NORMATIVE | `note` (requires `figdown 0.3`) | absent |
-| `state` | `state <id> ["label"]` | **S** | **EXPERIMENTAL** | `shape` `fill` `stroke` `style` `class` `note` (requires `figdown 0.3`) | `shape=box`, label absent; `role` is recorded ABSENT, exactly as a bare `node` records it. OMG UML 2.5.1 §14 |
+| `state` | `state <id> ["label"]` | **S** | **EXPERIMENTAL** | `shape` `fill` `stroke` `style` `class` `note` (requires `figdown 0.3`) | `shape=rounded` (derived from the directive), label absent; `role` is recorded ABSENT, exactly as a bare `node` records it. OMG UML 2.5.1 §14 |
 | `transition` | `transition <a> [tail] <op> [head] <b>` | **S** | **EXPERIMENTAL** | `stroke` `style` `class` `note` (requires `figdown 0.3`) `id` (requires `figdown 0.5`) | op is written form; `[mid]` splits the operator and carries the inscription; all three labels take the line's colour (`LABEL-COLOUR-SOURCE`). OMG UML 2.5.1 §14 |
 | `class` | `class <id> "<meaning>"` | H | NORMATIVE | `fill` `stroke` `style` | the meaning FIELD is REQUIRED, its VALUE may be `""` (`CLASS-EMPTY-MEANING`); a class a `transition` joins must not declare `fill=` without `stroke=` — a transition has no interior, so the two name ONE channel (`INTERIOR-LESS-ELEMENT-PAINT`). Declaring NO paint is legal: the class claims a meaning and the transition keeps its default line (`CLASS-PAINT-REQUIREMENT`'s second half RETIRED at 0.4, `CLASS-CHANNEL-REACH`) |
 | `flow` | `flow right\|down\|left\|up` | H | NORMATIVE | — | **`right`** |
@@ -539,10 +539,10 @@ the core profile, plus four that follow from the version and the allowlist:
   ```
   "edge" is not the word genre statechart uses for this — write "transition":
   the connecting line in a statechart is a TRANSITION — the term UML 2.5.1 §14
-  uses for it. Each scene genre takes the term its own domain uses
+  uses for it. Each genre takes the term its own domain uses
   (block/topology `node` `edge`, flowchart `node` `flowline`, statechart
-  `state` `transition`) — run tools/migrate-figdown.js to rewrite it
-  (MIGRATIONS 0.2)
+  `state` `transition`, sequence `lifeline` `message`) — run
+  tools/migrate-figdown.js to rewrite it (MIGRATIONS 0.2)
   ```
 
 - **0.3 (`SCENE-KEYWORD-MEMBERSHIP`):** `group`, `external`, `threshold`, `band` or `bundle`

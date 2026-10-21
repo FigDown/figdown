@@ -1658,17 +1658,24 @@ function realPair(c) {
   return { problems };
 }
 
+// `history` marks a case that reads this repository's own revisions and so
+// runs only where they are reachable. It is what separates a count that is a
+// property of the SUITE from one that is a property of the CHECKOUT — see the
+// SELFTEST-CORE line below.
 const EXTRA = [
   { name: 'audit: every presentation attribute site is visible to the walk',
     run: auditSites },
 ].concat(REAL_PAIRS.map(c => ({
   name: c.name,
+  history: true,
   run: () => {
     const out = realPair(c);
     if (out.skip) return { skip: out.skip };
     return out.problems;
   },
 })));
+
+const HISTORY_CASES = EXTRA.filter(x => x.history).length;
 
 function selftest(log) {
   let pass = 0, fail = 0, skip = 0;
@@ -1728,6 +1735,14 @@ function selftest(log) {
     }
   }
 
+  // Everything above this line runs from the files in the tree alone, and so
+  // does one of the EXTRA cases — the audit. Only the ones flagged `history`
+  // may or may not run. The two populations are counted separately because a
+  // single total mixes a property of the SUITE with a property of the
+  // CHECKOUT, and anything that quotes that total inherits the confusion:
+  // `PROOF.md` did, and went unreproducible in CI for eleven days.
+  let corePass = pass, coreFail = fail;
+
   for (const x of EXTRA) {
     const out = x.run();
     if (out && out.skip) {
@@ -1739,15 +1754,23 @@ function selftest(log) {
     const problems = out || [];
     if (problems.length) {
       fail++;
+      if (!x.history) coreFail++;
       log('FAIL  ' + x.name);
       problems.forEach(p => log('        ' + p));
     } else {
       pass++;
+      if (!x.history) corePass++;
       log('pass  ' + x.name);
     }
   }
 
   log('');
+  // The stable line: same bytes in a full clone, a shallow CI checkout and a
+  // `git archive` export, because the population it counts is exactly the one
+  // that does not depend on reachable history. Quote THIS one anywhere a
+  // committed artifact states the figure.
+  log('SELFTEST-CORE: ' + corePass + '/' + (corePass + coreFail) +
+      ' passed, ' + HISTORY_CASES + ' history-dependent case(s) declared');
   log('SELFTEST: ' + pass + '/' + (pass + fail) + ' passed' +
       (skip ? '  (' + skip + ' skipped — stated above)' : ''));
   return fail === 0;

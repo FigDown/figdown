@@ -1,0 +1,17 @@
+# 0.5: the complete-cover advice names the node the
+# author did NOT pin. 369 pins the case where the pinned box is the OUTER one;
+# this file pins the other half — the author pins a 20x20 box on `b` and the
+# engine-placed `a` is larger, so `a` covers `b` completely.
+#
+# The diagnostic is geometry-time, from render(), and the source parses clean
+# (golden `.geometry.txt`, the 369 precedent). Before the fix the advice always
+# named the first node of the pair, so here it said `Move the pin off "b", or
+# pin "b" too` — but `b` IS the pinned node, and pinning it again is a
+# `duplicate pin` error. The node whose position the engine chose is `a`, and
+# the advice now names it.
+figdown 0.5 block
+title "A pin that shrinks a node under one the engine placed"
+node a "A"
+node b "B"
+pin b at=(0,0) width=20 height=20
+edge a -> b

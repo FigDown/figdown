@@ -236,6 +236,18 @@ record is what keeps `0.4` from adding a fourth unhashed tree unnoticed. The
 `0.4` rows are written at the `0.4` publish, on time, for the first time since
 `0.1`.
 
+**Corrected 2026-10-14: that debt was a fact about the source tree only.**
+The published `archive/MANIFEST.tsv` is accumulated by the publish, not copied
+from the source, and it received each release's rows at that release's own
+publish — `0.2` at `v0.2.0`, `0.3` at `v0.3.0`, `0.4` at `v0.4.0`, `0.5` at
+`v0.5.0` — hashed over the bytes that shipped, so in the published tree
+`gate:archive` holds every release byte-frozen. The source tree hashes its
+own bytes, which the publish transform rewrites, so its rows can never be the
+published ones; it carries `0.2`–`0.4` rows for `read/0.2/`–`read/0.4/`,
+written on 2026-10-14 after git showed each tree identical to its release's
+source commit. The engine pages `archive/0.2/`–`archive/0.4/` exist only in
+the published tree.
+
 **An engine that accepts only `figdown 0.1`** — including
 [`archive/0.1/figdown.html`](../archive/0.1/figdown.html) — rejects a `figdown
 0.4` document by name (`unsupported version "0.4" (expected 0.1)`) rather than
@@ -313,7 +325,9 @@ under `read/0.5/` — to
 [`archive/MANIFEST.tsv`](../archive/MANIFEST.tsv), after which `gate:archive`
 holds them byte-frozen forever on the same terms as `0.1`. `archive/MANIFEST.tsv`
 still holds `0.1` rows only, for the reason `0.4`'s entry above recorded: the
-debt is inherited, not settled, by this release too.
+debt is inherited, not settled, by this release too. *(Corrected 2026-10-14:
+see the correction under `0.4` — the published manifest has held every
+release's rows since its own publish.)*
 
 **An engine that accepts only `figdown 0.1`** — including
 [`archive/0.1/figdown.html`](../archive/0.1/figdown.html) — rejects a
@@ -325,6 +339,77 @@ and is unchanged here: `CLASS-CHANNEL-COLLISION`'s channel-collision check and `
 check are **not** version-gated, so a newer engine reading an older header
 applies both, and an archived engine is the only place the older, silent
 behaviour still runs.
+
+**`v0.5.1` — a `Z` release under this language version (2026-08-29),
+recorded here late.** The language did not move and no document needed a
+rewrite. It shipped every table header tier carrying `data-cell`, the named
+diagnostic for the reserved `x-` prefix (`RESERVED-PREFIX-ENFORCEMENT`), the legend swatch that draws
+the channel a class paints (`LEGEND-SWATCH-SHAPE`), and the group band an edge
+crosses rather than terminates on (`GROUP-BOUNDARY-OBSTACLE`). It also shipped the
+host, manifest and accessibility profiles and ten gates. Nineteen published
+figures changed their drawing.
+
+**`v0.5.2` — a `Z` release under this language version (2026-10-21).** The
+language does not move: `figdown` stays `0.5`, no `.fd` gains or loses a
+spelling, no existing conformance golden changes (six are added), and `read/0.5/` is reused
+byte-for-byte (core §13.7.3). What ships is a repair line: the
+group-separation repair, eight further engine fixes, nine editor repairs and
+corrections to the specification text. **Three of its changes act on
+documents that do not move their header.** They are the sentences to read
+first, because none is version-gated.
+
+1. **In the experimental `sequence` genre, a `lifeline`, or a `message`'s
+   `id=`, that reuses the id of an EARLIER `fragment` or `operand` is now
+   refused** (`duplicate id`). Before, only the opposite order was refused.
+   Such a document already broke core §1 (ids are unique per section), but
+   `v0.5.1` drew it, and it now needs one of the two renamed. This is the
+   one change in this release that makes an accepted document need a
+   rewrite. A `Z` may carry it for two reasons: the genre is experimental, so
+   experimental §E7 owes it no migration, and the `v0.4.1` paragraph above
+   is the precedent for shipping a refusal that is not version-gated and
+   disclosing it. The shipped corpus has no instance.
+2. **The group-separation push no longer moves a node off the canvas or
+   onto another drawn node** (`GROUP-SEPARATION-PLACEMENT`). Figures with groups may
+   re-render. No shipped figure changes a drawing byte. On random group
+   figures the repair removes every off-canvas drawing, halves the
+   refusals and newly refuses none. **Its residue:** of 6,000 random
+   figures (four seeds of 1,500), 2 that `v0.5.1` refused and 1 it drew off
+   the canvas are now drawn with one partial node overlap. The two that were
+   refused are the case where neither push direction is clear.
+3. **An artifact whose source contains `$$`, `$&`, `` $` `` or `$'` now
+   embeds that source exactly.** `v0.5.1` expanded those pairs as
+   replacement patterns, so the embedded source did not match its own
+   `data-sha256`. Rebuild any such artifact. The shipped corpus has none.
+
+Everything else moves no accepted document. Some documents that were
+already refused get a more accurate error set: a `node` line refused for its
+arity no longer claims its id, so the corrected line loses a false
+`duplicate id`, and an edge to it reports `unknown endpoint`. Diagnostics
+name the right token, file line and node. An input of about 130,000 lines
+that overflowed the stack now renders. The editor's repairs change no
+engine byte.
+
+**Specification text corrected.** Core §12.4 rule 7 said that `cell`
+coordinates keep their sign and any fraction. The engine refused both at
+`v0.5.1` and still does, and the rule now says they are 1-based unsigned
+integers. Further corrections fix citations, counts, table rows and
+quoted diagnostics; none of them changes a rule. One open question is
+added, `FLOWCHART-CONNECTOR-READING`: `flowchart` never states what its connector means. It ships
+open, and no rule moves. [`ERRATA.md`](ERRATA.md) gains **E2**:
+`read/0.5/experimental/statechart.md` lines 79–80 give `box` as `state`'s
+default shape, while the engine derives `rounded`. The text was wrong on the
+day it shipped, and frozen bytes are corrected only there.
+
+**A `Z` adds no page under `archive/`** (`RELEASE-ARCHIVE-GRANULARITY`). That is now ruled; it
+replaces this log's unruled "a `Z` adds no second page" in the `v0.4.1`
+paragraph. `archive/0.5/figdown.html` is `v0.5.0`'s page. `v0.5.2`'s
+immutable page is the `editor/figdown.html` that its own tag carries, which
+the release's archival deposit also holds. A reader who needs `v0.5.1`'s
+exact output for a figure that `GROUP-SEPARATION-PLACEMENT` redraws runs `v0.5.1`'s tagged page.
+Each engine and editor change above is entered in full, with its
+measurements, in the source
+repository's development entries dated 2026-10-15 and 2026-10-21. This
+paragraph is the summary that ships.
 
 ## Entry format
 

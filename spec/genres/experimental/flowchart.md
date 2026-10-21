@@ -591,7 +591,6 @@ waiting on, and they are two constructs, not one** (§*What is excluded*).
 |---|---|---|---|
 | `shape` | `box` `rounded` `circle` `ellipse` `diamond` `cylinder` | NORMATIVE | `box` |
 | `style` | `solid` `dashed` `dotted` | NORMATIVE | per directive — `solid` on `node`, a role line and `flowline` |
-
 | `fill` | `#rgb` · `#rrggbb` · one of the 147 CSS colour names · `transparent` | NORMATIVE | absent |
 | `stroke` | same value set as `fill` — the OUTLINE of anything with an interior, and the WHOLE of a line (`flowline`), which is SVG's own asymmetry | NORMATIVE | absent |
 | `class` | one or more comma-separated ids of declared classes — `class=`'s value is multi-valued (core §12.5); a channel two carried classes both bind is a line error (`CLASS-CHANNEL-COLLISION`) | NORMATIVE | absent |
@@ -843,8 +842,9 @@ the key itself is not this genre's, so every `in=` here is the
 named withdrawal error rather than the dangling reference it was for one
 release.)
 
-The genre-scoped errors. The first two come from the header genre's allowlist
-(core §1, `GENRE-NAMESPACE`) and need no per-keyword code; the third is named per cell:
+The genre-scoped errors. The first comes from the header genre's allowlist
+(core §1, `GENRE-NAMESPACE`) and needs no per-keyword code; the second is named per word and
+the third per cell:
 
 1. `process` / `decision` / `terminator` written under a genre other than
    `flowchart` is `"<keyword>" is not allowed in genre <g>`.

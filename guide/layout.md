@@ -172,7 +172,7 @@ Each sketch is minimal and verified against `build-svg.js`. Keywords used:
 `flow`, `rank`, `pin` — all from spec §3, all NORMATIVE. That is the whole
 arranging vocabulary; no sketch below reaches outside it.
 
-### Sequential pipeline — `flow` + `rank`
+### Sequential pipeline — `flow`
 
 ```figdown
 figdown 0.1 block
@@ -185,10 +185,12 @@ edge rx -> par
 edge par -> pol
 edge pol -> tx
 flow right
-rank rx,par,pol,tx
 ```
 
-Wrap long chains: one `rank` per stage row, let auto-layout stack the rows.
+Do not `rank` the chain: `rank` puts its members at the same position ALONG the
+flow axis, so under `flow right` it stacks them into one column. `flow right`
+alone lays the chain out left to right; keep `rank` for peers that sit side by
+side.
 
 ### Decision flowchart — main path on one axis
 
@@ -204,10 +206,11 @@ flowline check -[yes]-> proc
 flowline check -[no]->  drop
 flowline proc  -> done
 flow down
-rank start,check,proc,done
+rank check,drop
 ```
 
-`rank` the mainline; side-exit branches fall perpendicular under auto-layout.
+`rank` the side exit onto its decision's row (`rank check,drop`), never the
+mainline — ranking the chain lays it out sideways (§8).
 
 ### Hierarchy / layers — one `rank` per layer
 
@@ -362,7 +365,7 @@ The first two entries are pairs, byte-identical in the content zone. The third i
 
 **Lint scores are a smoke alarm, not a judge.** The srl-evpn-irb entry below shows lint getting *worse* (ink/e 109→117) while the figure becomes dramatically more readable — and its auto arm has since stopped rendering at all, which no lint score would ever have told you — because the metrics do not measure group containment, overlap, or reading order. Always look at the render; the ladder ends when a human can read it. One variant of that example scored better on lint but had lost its column alignment — and the alignment was the peer signal; only looking at the render caught it.
 
-### Leaf-spine fabric — `+flow down +rank sp1 sp2 +rank lf1 lf2 lf3`
+### Leaf-spine fabric — `+flow down +rank sp1,sp2 +rank lf1,lf2,lf3`
 
 Eight-node VXLAN/EVPN topology. Auto-layout scatters spines and leaves; three semantic directives align them into clear tiers. Lint score is the same; edge length halves (144→77 ink/e).
 
@@ -373,7 +376,7 @@ Eight-node VXLAN/EVPN topology. Auto-layout scatters spines and leaves; three se
 
 [auto .fd](../examples/layout-compare/evpn-fabric-auto.fd) · [auto .svg](../examples/layout-compare/evpn-fabric-auto.svg) · [tuned .fd](../examples/evpn-fabric.fd) · [tuned .svg](../examples/evpn-fabric.svg)
 
-### srl-evpn-irb — two-level pins + groups (20 layout lines), and an auto arm that does not render
+### srl-evpn-irb — two-level pins + groups (19 layout lines), and an auto arm that does not render
 
 Sixteen-node EVPN-VXLAN IRB figure with three leaf groups. The tuned version pins each group as a layout module (spec §3 `PIN-COORDINATE-SCOPE`: a pinned group anchors its local origin in canvas px; members are group-local), giving three clean leaf boxes under the fabric overlay (1228×656 px).
 
@@ -395,7 +398,7 @@ The measurements below are the last ones taken before the refusal, and they are 
 | variant | cross | novlp | ink/e | score |
 |---------|-------|-------|-------|-------|
 | auto (no longer renders) | 0 | 1 | 109 | 3 |
-| `+pin` ×20 | 0 | 1 | 117 | 3 |
+| `+pin` ×19 | 0 | 1 | 117 | 3 |
 
 [auto .fd](../examples/layout-compare/srl-evpn-irb-auto.fd) (refused — no artifact) · [tuned .fd](../examples/srl-evpn-irb.fd) · [tuned .svg](../examples/srl-evpn-irb.svg)
 

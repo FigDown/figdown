@@ -127,7 +127,7 @@ the run aborts with a named error instead.
   note; a safety net compares each model key and fires on any collection whose
   own routine reported nothing; and a 55-site audit asserts that every
   (element, presentation attribute) pair in the language is visible to the
-  walk. `--selftest` runs 40 checks — 36 authored pairs, the audit, and 3 real
+  walk. `--selftest` runs 45 checks — 41 authored pairs, the audit, and 3 real
   revision pairs read with `git show` that skip rather than fail when the
   revisions are not there.
   Stage 1 of ADV-1: no canonical serialization, no semantic hash, no
@@ -155,7 +155,8 @@ the run aborts with a named error instead.
   of an experimental construct in an unmarked block, and a *definition* of an
   experimental construct inside a frozen file (a ` ```figdown ` fence whose
   directives use one, or an unmarked heading naming one). `--strict` exits 1
-  on any finding. Membership of the experimental set is a path convention and
+  on the first, second and fourth; the third is counted and reported,
+  never failed (see below). Membership of the experimental set is a path convention and
   not a manifest — any path segment named `experimental`, plus
   `spec/experimental.md` and its twin — so a new experimental file joins by
   being put in the right place. No engine is loaded; this is a documentation
@@ -265,7 +266,7 @@ the run aborts with a named error instead.
   repository with **no gate at all** — `conformance/run.js` loads the engine
   from `conformance/figdown.html` or `../editor/figdown.html` and never reads
   `dist/`, and `make-lib` appeared nowhere in `package.json`. It is also the
-  copy a user installs (`main`, `module`, both `integrations/` projects), and
+  copy a user installs (`main`, `module`, all three `integrations/` projects), and
   the published tarball shipped a build of an older engine that rejected
   `index=` — a FROZEN key — and refused `examples/srh.fd` outright. Seventh
   occurrence of four-copy drift, first one in the copy that ships.
@@ -460,7 +461,8 @@ the run aborts with a named error instead.
   says "draws what the author declared, and nothing the author did not":
   `node tools/legend-check.js [--strict] [--verbose] [<file.fd | dir> ...]`
   (default paths: `examples/`, `figures/`; **recursive**, and it states its
-  file count). Two rules, one per direction the §2.7 sentence can be broken.
+  file count; under `--strict` it exits 2 when it checked no figure at all,
+  because an empty denominator verifies nothing). Two rules, one per direction the §2.7 sentence can be broken.
   **(1) duplicate swatch** — within one figure, every legend entry must be
   visually distinguishable from every other: the resolved `(fill, stroke,
   style)` tuple is compared across classes and identical tuples fail. A legend
@@ -559,7 +561,7 @@ the run aborts with a named error instead.
 
 ## migrate-check.js
 
-The engine has 205 conformance fixtures. Until 0.1 the migration
+The engine has 290 conformance fixtures. Until 0.1 the migration
 tool had **one manual end-to-end run** — and it had already failed in
 exactly the way a suite catches: it carried the rewrite
 `optional` → `conditional` for a **full release** after `PRESENCE-FLAG-SPELLING` reversed that
@@ -595,7 +597,7 @@ node tools/artifact-check.js [--strict] [--verbose] [<file.svg | file.fd | dir> 
 
 Default paths when none are given: `examples/`, `figures/` (resolved from the
 project root). **Recursive**, and it walks **both sides of the pair** — the
-header prints `files=` (artifacts) and `sources=` (`.fd`), against 28 for the
+header prints `files=` (artifacts) and `sources=` (`.fd`), against 24 for the
 top level of those two directories alone. A `.fd` named on the command line is
 resolved to its paired artifact and vice versa. Engine lookup order:
 `$FIGDOWN_HTML`, co-located `figdown.html`, `../editor/figdown.html`; the
@@ -719,7 +721,7 @@ and never looks at a single character of what the comment above it or the label
 inside it actually says. This tool owns both.
 
 Rule 1 is the comments. That is where the reference figures do their teaching —
-`examples/reference/block.fd` is 90 lines carrying 39 comment lines — so a
+`examples/reference/block.fd` is 120 lines carrying 61 comment lines — so a
 stale comment there teaches a spelling that is now a line error, with the
 authority of the standard's own example. Rule 2 is the strings that render, and
 has [its own section](#rule-2--no-internal-reference-in-a-string-that-renders)
@@ -743,7 +745,7 @@ It lives in this tool rather than a nineteenth one because this tool is
 already the gate over `.fd` prose the engine never reads, over precisely the
 corpus the rule applies to. Test fixtures are deliberately outside that
 corpus: `conformance/cases/`, `conformance/experimental/` and
-`tools/migrate-fixtures/` are minimal inputs, and 105 of the
+`tools/migrate-fixtures/` are minimal inputs, and 118 of the
 `conformance/cases/*.errors.txt` goldens carry 1-based `Line N:` prefixes
 that an inserted line shifts by one.
 
@@ -855,7 +857,8 @@ node tools/fence-check.js [--strict] [<file.md | dir> ...]
 ```
 
 Default paths when none are given: repo root `*.md` files (non-recursive),
-`spec/`, `skill/` (recursive). Archival
+`spec/`, `guide/`, `skill/`, `conformance/`, `examples/`, `tools/`,
+`figures/`, `integrations/` (recursive). Archival
 subdirectories are excluded from the defaults.
 
 **Three verdict states:**
@@ -1048,6 +1051,7 @@ multi-line labels at all).
 considered 56  scored 36  skipped 20
   parse-error                 0   the engine rejected the source  [fails --strict]
   render-error                0   render() threw  [fails --strict]
+  geometry-refused            0   render() refused the figure — no drawing to measure
   geometry-error              0   the SVG reader failed on the output  [fails --strict]
   no-scene-in-scene-genre     0   scene genre rendered 0 nodes and 0 edges  [fails --strict]
   unreadable                  0   file could not be read  [fails --strict]
@@ -1106,8 +1110,8 @@ removed.
 node tools/strip-check.js [--strict] [<file.fd | dir> ...]
 ```
 
-Default paths when none are given: `examples/`, `examples/patterns/`,
-`figures/` (resolved from the project root).
+Default paths when none are given: `examples/`, `figures/`, walked
+recursively (resolved from the project root).
 
 **The heuristic checks:**
 

@@ -412,7 +412,7 @@ function specVocab(engine) {
   const kw = new Set(), opt = new Set();
   for (const g of RC.GENRES) {
     const p = RC.genreDocFor(g);
-    if (!fs.existsSync(p)) continue;
+    if (!fs.existsSync(p)) throw new Error('spec drift: no genre document for `' + g + '` at ' + path.relative(ROOT, p) + ' — update this tool');
     const v = RC.extractVocab(g, fs.readFileSync(p, 'utf8'), false, facts);
     for (const k of v.keywords.keys()) kw.add(k);
     for (const k of v.optionKeys.keys()) opt.add(k);
@@ -469,7 +469,8 @@ function main() {
       doc = { blocks: ds.reduce((a, d) => a.concat(d.blocks || []), []) };
     } catch (e) { doc = null; }
 
-    for (const line of text.split('\n')) {
+    const bare = text.replace(/"(?:[^"\\\n]|\\.)*"/g, '""');
+    for (const line of bare.split('\n')) {
       const t = line.trim();
       if (!t) continue;
       if (t.startsWith('|')) note('keyword `|`', f);
@@ -482,7 +483,7 @@ function main() {
       const re = e.kind === 'opt'
         ? new RegExp('(?:^|\\s)' + e.key + '=' + e.val + '(?:\\s|$)')
         : new RegExp('^\\s*' + e.key + '\\s+' + e.val + '\\s*$', 'm');
-      if (re.test(text))
+      if (re.test(bare))
         note(e.kind === 'opt' ? 'enum value `' + e.key + '=' + e.val + '`'
                               : 'enum value `' + e.key + ' ' + e.val + '`', f);
     }
@@ -521,10 +522,14 @@ function main() {
   const xkw = [...sv.kw].filter(k =>
     !kw.has(k) && k !== 'figdown' && !(RC.GENRES.includes(k) && !composable.has(k)));
   const xopt = [...sv.opt].filter(k => !opt.has(k) && !RC.EXP_OPTION_KEYS.has(k));
-  if (xkw.length || xopt.length) {
-    console.log('\nSPEC/ENGINE DIVERGENCE — documented but not in the derived space:');
-    if (xkw.length) console.log('  keywords: ' + xkw.join(', '));
-    if (xopt.length) console.log('  option keys: ' + xopt.map(k => k + '=').join(', '));
+  const rkw = [...kw].filter(k => !sv.kw.has(k));
+  const ropt = [...opt].filter(k => !sv.opt.has(k));
+  if (xkw.length || xopt.length || rkw.length || ropt.length) {
+    console.log('\nSPEC/ENGINE DIVERGENCE:');
+    if (xkw.length) console.log('  documented, not derived — keywords: ' + xkw.join(', '));
+    if (xopt.length) console.log('  documented, not derived — option keys: ' + xopt.map(k => k + '=').join(', '));
+    if (rkw.length) console.log('  derived, not documented — keywords: ' + rkw.join(', '));
+    if (ropt.length) console.log('  derived, not documented — option keys: ' + ropt.map(k => k + '=').join(', '));
     console.log('  (one of the two sources is wrong; this tool cannot say which)');
     fail++;
   } else {

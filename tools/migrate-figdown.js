@@ -191,7 +191,7 @@
  *   kind=cloud      same reason: its 0.1 target no longer exists
  *   bitfield without numbering=
  *   node / edge under pure bitfield|table|wave (`GENRE-KEYWORD-ALLOWLIST`)
- *   experimental genre headers (topology|flowchart|wave) when --flag-experimental
+ *   experimental genre headers (topology|flowchart|timing|statechart|sequence) when --flag-experimental
  *   duplicate * fields in one bitfield (needs author choice)
  *   present= condition  a field that WAS `optional` and carries prose next to
  *                   it. The flag is rewritten to `present=""` mechanically;
@@ -1185,7 +1185,7 @@ function migrateText(text, colorMeans) {
       }
       if (!genre) {
         reports.push({ line: n, code: 'missing-genre', msg: 'header has no genre token' });
-      } else if (/^(topology|flowchart|timing)$/.test(genre)) {
+      } else if (/^(topology|flowchart|timing|statechart|sequence)$/.test(genre)) {
         reports.push({
           line: n,
           code: 'experimental-genre',

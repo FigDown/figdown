@@ -408,8 +408,9 @@ namespace has no other member to consider: `path` and `routing` were kept off
 this list as a **status** fact rather than a namespace one (`LAYOUT-ZONE-NAMESPACE` fixes what a
 zone member means wherever it is legal, not which genres admit it), and `EDGE-GEOMETRY-CONSTRUCTS`
 withdrew them from the language. Scene keywords
-(`node` `group` `external` `edge` `bundle` `plane` `threshold` `band`
-`flow` `rank`) are line errors: `"<kw>" is not allowed in genre table`.
+(`node` `group` `external` `edge` `bundle` `threshold` `band`
+`flow` `rank`) are line errors: `"<kw>" is not allowed in genre table` (`plane` is answered ahead of this list by its language-wide withdrawal —
+core §2.4, `PAINT-ORDER-CONSTRUCT`).
 That is deliberate narrowing of `GENRE-NAMESPACE`: corpus measurement already showed ten of the
 eleven scene keywords appear **zero** times in pure `bitfield`/`table`/`timing`
 documents; `class` is the exception and stays on the allowlist. Hybrid
@@ -472,7 +473,7 @@ for.
 
 **Two keys for one channel resolved by an undocumented precedence is a defect
 this language has met before** — `color=` (`COLOUR-KEY-STATUS`) and `fill=`/`stroke=` on
-interior-less constructs (§8.4, `INTERIOR-LESS-ELEMENT-PAINT`) — and the answer has always been a named
+interior-less constructs (SYNTAX-STYLE §8.4, `INTERIOR-LESS-ELEMENT-PAINT`) — and the answer has always been a named
 line error, never a precedence rule. A precedence rule is exactly what `STYLE-KEY-SCOPE`
 had just finished removing.
 
@@ -511,7 +512,7 @@ top-left cell.
 | `cell` with an unknown row/column address | line error |
 | `table` with a BARE label (`table t Caption`) | line error naming the quote, `table label must be quoted` (`RULE-POSITION-ENUMERATION`). It parsed until then, at 3 of the language's 15 labelled positions, while this document already wrote the form `table <id> ["label"]` |  <!-- fence-check: skip -->
 | `highlight` written QUOTED (`cell 1 "highlight"`) | line error, RULE 2.4 (`RULE-POSITION-ENUMERATION`) — a bare keyword flag is a closed set of spellings, of size one |
-| `width` element written QUOTED (`width "auto",90`) | **legal, and inert** — a table `width` element is `auto\|<n>\|<n>%`, an open value space (SYNTAX-STYLE RULE 2.3b), and `auto` is a declared exception, §8.6 |
+| `width` element written QUOTED (`width "auto",90`) | **legal, and inert** — a table `width` element is `auto\|<n>\|<n>%`, an open value space (SYNTAX-STYLE RULE 2.3b), and `auto` is a declared exception, SYNTAX-STYLE §8.6 |
 | `highlight` on a two-part cell address (`cell (1,1) fill=… highlight`) | line error (`ROW-HIGHLIGHT-CELL-FILL-COLLISION`) |
 | A cell mark resolving to a `fill` on a row that carries `highlight` | line error (`ROW-HIGHLIGHT-CELL-FILL-COLLISION`) |
 | Unknown option on `table`, `width`, or `cell` | line error |

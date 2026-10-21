@@ -372,9 +372,10 @@ opener. The layout namespace has no other member to consider: `path` and
 `routing` were kept off this list as a **status** fact rather than a namespace
 one (`LAYOUT-ZONE-NAMESPACE` fixes what a zone member means wherever it is legal, not which genres
 admit it), and `EDGE-GEOMETRY-CONSTRUCTS` withdrew them from the language.
-Scene keywords (`node` `group` `external` `edge` `bundle` `plane`
+Scene keywords (`node` `group` `external` `edge` `bundle`
 `threshold` `band` `flow` `rank`) are line errors: `"<kw>" is not allowed
-in genre timing`. That is deliberate narrowing of `GENRE-NAMESPACE`: corpus measurement already
+in genre timing` (`plane` is answered ahead of this list by its language-wide withdrawal —
+core §2.4, `PAINT-ORDER-CONSTRUCT`). That is deliberate narrowing of `GENRE-NAMESPACE`: corpus measurement already
 showed ten of the eleven scene keywords appear **zero** times in pure
 `bitfield`/`table`/`timing` documents; `class` is the exception and stays on
 the allowlist. Hybrid figures that need both a scene and a timing panel use

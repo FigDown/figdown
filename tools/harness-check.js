@@ -207,7 +207,17 @@ console.log('4b. an unrecognized --flag is refused, not ignored');
 // four load-bearing terms — not that its prose is any particular prose.
 console.log('5. the contract is documented in conformance/README.md');
 {
-  const md = fs.existsSync(README) ? fs.readFileSync(README, 'utf8') : '';
+  const doc = fs.existsSync(README) ? fs.readFileSync(README, 'utf8') : '';
+  // The terms are looked for INSIDE the contract section (its heading to the
+  // next heading of the same or a higher level), not anywhere in the README:
+  // "Exit code 0" in the runner's usage notes is not the contract's exit rule.
+  const head = /^(#+) The harness contract.*$/m.exec(doc);
+  let md = '';
+  if (head) {
+    const rest = doc.slice(head.index + head[0].length);
+    const end = new RegExp('^#{1,' + head[1].length + '} ', 'm').exec(rest);
+    md = head[0] + (end ? rest.slice(0, end.index) : rest);
+  }
   const want = [
     ['a section heading', /^#+ The harness contract/m],
     ['stdin as the input channel', /stdin/],

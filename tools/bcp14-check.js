@@ -112,7 +112,7 @@ const HEADS = ['MUST', 'SHALL', 'SHOULD', 'MAY', 'NOT'];
 const B = '(?<![A-Za-z0-9_-])';
 const A = '(?![A-Za-z0-9_-])';
 const KW_RE   = new RegExp(B + '(' + ORDER.join('|') + ')' + A, 'g');
-const HEAD_RE = new RegExp(B + '(' + HEADS.join('|') + ')[  ]+([A-Z]{2,})' + A, 'g');
+const HEAD_RE = new RegExp(B + '(' + HEADS.join('|') + ')[*_]*[  ]+[*_]*([A-Z]{2,})' + A, 'g');
 
 // ------------------------------------------------------------------ the walk
 function walk(dir, out) {
@@ -130,9 +130,9 @@ function walk(dir, out) {
 // Strip fenced blocks and inline code spans, preserving line count.
 function prose(src) {
   const lines = src.split('\n');
-  let fenced = false;
+  let fenced = false, fenceRun = null;   // ``` or ~~~; closes only on the same run
   return lines.map(l => {
-    if (/^\s*(```|~~~)/.test(l)) { fenced = !fenced; return ''; }
+    { const d = /^\s*(`{3,}(?!.*`)|~{3,})(.*)$/.exec(l); if (d && (!fenceRun || (d[1][0] === fenceRun[0] && d[1].length >= fenceRun.length && !d[2].trim()))) { fenceRun = fenceRun ? null : d[1]; fenced = !!fenceRun; return ''; } }
     if (fenced) return '';
     return l.replace(/`[^`]*`/g, m => ' '.repeat(m.length));
   });
@@ -156,15 +156,31 @@ for (const f of files) {
   const isZh = /\.zh-tw\.md$/.test(f);
   const lines = prose(src);
 
+  // A construction can wrap: `MUST` ends one line and `NOT` (or `NEVER`)
+  // starts the next. Each line is matched with the next line's first word
+  // appended; a match counts on the line its head starts on, and the words a
+  // match carried over from the next line are not counted there again.
+  let skip = 0;
   lines.forEach((line, i) => {
+    // A blockquote continues on a line opening with `>`; the marker is not a
+    // word, so it is stepped over before the next line's first word is taken.
+    const next = /^\s*(?:>\s*)*(\S+)/.exec(lines[i + 1] || '');
+    const text = next ? line + ' ' + next[1] : line;
+    const from = skip, carry = next ? lines[i + 1].indexOf(next[1]) + next[1].length : 0;
+    skip = 0;
     // CHECK 2a — the eleven, counted.
     let m;
     KW_RE.lastIndex = 0;
-    while ((m = KW_RE.exec(line))) { tally[m[1]][isZh ? 'zh' : 'en']++; occurrences++; }
+    while ((m = KW_RE.exec(text))) {
+      if (m.index < from || m.index >= line.length) continue;
+      if (m.index + m[0].length > line.length) skip = carry;
+      tally[m[1]][isZh ? 'zh' : 'en']++; occurrences++;
+    }
 
     // CHECK 2b — an all-caps modal construction that is not one of the eleven.
     HEAD_RE.lastIndex = 0;
-    while ((m = HEAD_RE.exec(line))) {
+    while ((m = HEAD_RE.exec(text))) {
+      if (m.index < from || m.index >= line.length) continue;
       const whole = m[1] + ' ' + m[2];
       if (KEYWORDS.includes(whole)) continue;
       // `MUST` / `SHOULD` / `MAY` followed by an unrelated all-caps token —

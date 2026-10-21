@@ -162,7 +162,7 @@ Two more files answer a **task** rather than a genre:
   about **position**. Ignore the layout **namespace** — its one member is `pin`
   — **wherever a member appears**, because a `pin` may legally sit *before* the
   `layout` line, and about half of them do. Membership decides, not position.
-  It is the same rule stated above under "layout and pin".
+  It is the same rule stated below under "layout and pin".
 - **Transcribing an existing figure** — a drawing, a screenshot, another
   format → `reference/transcribe.md`.
 
@@ -223,7 +223,7 @@ figdown 0.1 block           # REQUIRED first significant line; comments and
                             # A later `figdown 0.1 <genre>` starts a new
                             # section with its own genre; one file still
                             # renders to one SVG.
-                            # The VERSION is `0.1`, `0.2` or `0.4`. Write the
+                            # The VERSION is `0.1` to `0.5`. Write the
                             # LOWEST one that carries what the figure needs.
                             # `0.1` carries every other genre. `0.2` is the
                             # floor for `statechart` and `0.4` the floor for

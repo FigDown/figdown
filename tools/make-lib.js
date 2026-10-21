@@ -119,13 +119,6 @@ function parse(text) {
   var docs = p.docs && p.docs.length ? p.docs : (p.doc ? [p.doc] : []);
   return { doc: p.doc, errors: p.errs, docs: docs };
 }
-// Stack multi-section SVGs (MULTI-FIGURE-DOCUMENTS): one .fd → one .svg, sections top-to-bottom.
-function __stackSectionSvgs(results) {
-  if (typeof __engine.stackSectionSvgs === 'function')
-    return __engine.stackSectionSvgs(results);
-  // fallback if engine build is older
-  return results[0] && results[0].svg;
-}
 // render(text, opts) -> { svg, errors }  svg is null when there are errors
 // (determinism over convenience: no partial renders of invalid input).
 // opts (presentation, renderer tier): { title: true } draws the title;
@@ -197,7 +190,7 @@ function artifact(text, opts) {
   var meta = '<metadata id="figdown-source" data-sha256="' + __sha256hex(src) + '"'
     + ' data-engine-version="' + VERSION + '"' + optAttr + '><![CDATA[\\n'
     + src.replace(/]]>/g, ']]]]><![CDATA[>') + '\\n]]></metadata>';
-  return { svg: p.svg.replace(/<\\/svg>$/, meta + '</svg>'), errors: [] };
+  return { svg: p.svg.replace(/<\\/svg>$/, function () { return meta + '</svg>'; }), errors: [] };
 }
 `;
 

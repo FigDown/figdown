@@ -636,7 +636,13 @@ function sectionDiff() {
     console.error('make-proof: `node tools/figdown-diff.js --selftest` exited non-zero — regenerate once it is green.');
     process.exit(2);
   }
-  const m = /SELFTEST:\s*(\d+)\/(\d+)\s+passed/.exec(out);
+  // Read the CORE line, never the total. The total counts three cases that
+  // run only where git history is reachable, so it reads 45 in a full clone
+  // and 42 in a shallow CI checkout or a `git archive` export — and a page
+  // that commits that number can never be regenerated identically in both.
+  // That is what made `gate:proof` unpassable in CI: not a stale page, a
+  // figure that was a property of the CHECKOUT rather than of the repository.
+  const m = /SELFTEST-CORE:\s*(\d+)\/(\d+)\s+passed,\s*(\d+)\s+history-dependent/.exec(out);
   if (!m) { warn('cannot parse the diff selftest summary — semantic-diff section omitted'); return null; }
   const doc = has('design/semantic-diff-classification.md');
   return [
@@ -651,7 +657,12 @@ function sectionDiff() {
     'node tools/figdown-diff.js --selftest',
     '```',
     '',
-    '**' + m[1] + '/' + m[2] + ' selftest cases pass.** This is a tool with a selftest, not a gate: it is not',
+    '**' + m[1] + '/' + m[2] + ' selftest cases pass** from the files in the tree alone. A further ' + m[3],
+    'case(s) diff real revision pairs out of this repository\'s own history: they run',
+    'where that history is reachable and are **skipped, never failed,** where it is not —',
+    'a shallow CI checkout, or an export. They are excluded from the figure above so that',
+    'this page states a property of the repository rather than one of the checkout it was',
+    'generated in. This is a tool with a selftest, not a gate: it is not',
     'in the `gate:*` list above, so `npm test` does not run it and you should run it',
     'yourself.' + (doc ? ' The classification it implements is written up in [design/semantic-diff-classification.md](design/semantic-diff-classification.md).' : ''),
   ].join('\n');

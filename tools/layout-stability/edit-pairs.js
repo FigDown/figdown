@@ -456,7 +456,7 @@ function genPinMove(src, doc, ctx) {
   const lines = src.split('\n');
   for (let i = 0; i < lines.length; i++) {
     if (i > ctx.end) break;
-    const m = lines[i].match(/^pin\s+(\S+)\b.*?\bat=\((-?\d+(?:\.\d+)?)\s*,\s*(-?\d+(?:\.\d+)?)\)/);
+    const m = lines[i].match(/^\s*pin\s+(\S+)\b.*?\bat=\((-?\d+(?:\.\d+)?)\s*,\s*(-?\d+(?:\.\d+)?)\)/);
     if (!m) continue;
     const nx = (parseFloat(m[2]) + 24);
     const r = replaceLine(src, i,

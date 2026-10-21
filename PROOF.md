@@ -89,16 +89,16 @@ node conformance/run.js                  # the normative surface
 node conformance/run.js --experimental   # the corpus outside it
 ```
 
-- **206 normative fixtures**, 206 passing, 0 failing. This is the number that may
+- **210 normative fixtures**, 210 passing, 0 failing. This is the number that may
   be quoted as "the conformance suite" — `conformance/cases/`.
-- **84 experimental fixtures**, 84 passing, 0 failing (69 by genre, 48 by demoted construct, 33 both). They pin
+- **86 experimental fixtures**, 86 passing, 0 failing (71 by genre, 48 by demoted construct, 33 both). They pin
   reference-engine behaviour and are required to pass, but their subject is
   outside the v0.1 surface, so a second implementation may skip the whole
   directory and still conform. The reason for each is recorded in
   `conformance/STATUS.txt`.
-- **290 fixtures run in total**, 290 passing, 0 failing.
+- **296 fixtures run in total**, 296 passing, 0 failing.
 
-The corpus on disk is **206** `.fd` files under `conformance/cases/` and **84**
+The corpus on disk is **210** `.fd` files under `conformance/cases/` and **86**
 under `conformance/experimental/` — the same counts the runner reports, so no fixture is present and unrun.
 
 Every audited engine-vs-spec deviation is written down in
@@ -163,8 +163,8 @@ The engine is one hand-edited file, `editor/figdown.html`; the other copies are
 generated from it and byte-gated against it. It stamps its own version into every
 artifact it builds, because the reproducibility promise is per-renderer-version.
 
-- `FIGDOWN_VERSION` — **`0.5.1`** (read from `editor/figdown.html`).
-- package version — **`0.5.1`**.
+- `FIGDOWN_VERSION` — **`0.5.2`** (read from `editor/figdown.html`).
+- package version — **`0.5.2`**.
 - engine copies present, each gated against that source copy — **4**: `editor/figdown.html`, `skill/figdown/figdown.html`, `dist/figdown.js`, `dist/figdown.mjs`.
 
 ## 4. What was measured rather than asserted
@@ -349,7 +349,12 @@ visible to the walk.
 node tools/figdown-diff.js --selftest
 ```
 
-**42/42 selftest cases pass.** This is a tool with a selftest, not a gate: it is not
+**42/42 selftest cases pass** from the files in the tree alone. A further 3
+case(s) diff real revision pairs out of this repository's own history: they run
+where that history is reachable and are **skipped, never failed,** where it is not —
+a shallow CI checkout, or an export. They are excluded from the figure above so that
+this page states a property of the repository rather than one of the checkout it was
+generated in. This is a tool with a selftest, not a gate: it is not
 in the `gate:*` list above, so `npm test` does not run it and you should run it
 yourself.
 

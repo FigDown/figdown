@@ -1,0 +1,2 @@
+Line 20: this position takes a BARE value: write shape=x
+y — quoting a value drawn from a closed set suggests the position accepts arbitrary text, when it accepts only the listed spellings (SYNTAX-STYLE RULE 2.4)

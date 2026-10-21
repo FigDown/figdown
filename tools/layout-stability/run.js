@@ -81,7 +81,14 @@ function nodesOf(svg) {
   const out = new Map();
   const re = /<g data-node="([^"]*)" data-x="([^"]*)" data-y="([^"]*)"/g;
   let m;
-  while ((m = re.exec(svg)) !== null) out.set(m[1], { x: parseFloat(m[2]), y: parseFloat(m[3]) });
+  let n = 0;
+  while ((m = re.exec(svg)) !== null) { n++; out.set(m[1], { x: parseFloat(m[2]), y: parseFloat(m[3]) }); }
+  // Every node group must be read: a reader that matches fewer groups than the
+  // engine drew measures less without saying so.
+  const groups = (svg.match(/<g\b[^>]*\sdata-node="/g) || []).length;   // any attribute order
+  if (groups !== n)
+    throw new Error('layout-stability: ' + groups + ' <g data-node> group(s) drawn, ' +
+      n + ' read — the node markup changed; update nodesOf()');
   return out;
 }
 
@@ -430,7 +437,7 @@ function main() {
     // language never made.
     const pinned = new Set();
     for (const ln of src.split('\n')) {
-      const pm = ln.match(/^pin\s+(\S+)\b/);
+      const pm = ln.match(/^\s*pin\s+(\S+)\b/);
       if (pm && /\bat=/.test(ln)) pinned.add(pm[1]);
     }
     // BOUNDED-GROWTH-ACCOMMODATION's rank approximation (see rankAxisOf above), read once per figure
@@ -666,7 +673,7 @@ function main() {
     for (const [key, rec] of Object.entries(pairs)) {
       const b = baseline.pairs[key];
       if (!b) {
-        if (rec.verdict === 'VIOLATION') fresh.push(key + ' — ' + rec.reasons.join('; '));
+        if (rec.verdict === 'VIOLATION' || rec.verdict === 'refused') fresh.push(key + ' — ' + rec.reasons.join('; '));
         continue;
       }
       // A count is `null` on a refused pair, and `null > 0` is false while

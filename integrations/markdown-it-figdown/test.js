@@ -55,7 +55,8 @@ assert(html.includes('<pre class="figdown-error">'), 'broken fence renders error
 assert(/Line 2: [^<]*bogus/.test(html), 'error block carries the Line N message');
 assert(html.includes('console.log(&quot;untouched&quot;)') || html.includes('console.log("untouched")'),
   'non-figdown fences fall through to the default renderer');
-assert(!html.includes('<svg') || html.indexOf('<svg') < html.indexOf('figdown-error'),
+const errHtml = md.render(['```figdown', 'figdown 0.1 topology', 'bogus line here', '```', ''].join('\n'));
+assert(errHtml.includes('figdown-error') && !errHtml.includes('<svg'),
   'error fence did not produce an SVG');
 
 console.log('OK  markdown-it-figdown: svg present, error block present, other fences untouched');

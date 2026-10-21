@@ -1,0 +1,9 @@
+Assertion F (fatal), spec/figdown-a11y.md §5.
+
+`aria-hidden="true"` on the wrapping <g transform="translate(18,6)">, not on
+any element that carries a `data-*` identity. Hiding an element hides its
+whole subtree, so every node and connector inside it is removed from the
+figure for one class of reader exactly as if each carried the attribute
+itself — the case fixture 08 does not reach.
+
+which hides its whole subtree

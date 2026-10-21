@@ -58,7 +58,7 @@ any agent, in any framework, can read them straight out of the repository.
 **If you are only READING a `.fd`, you do not need the skill at all.** The
 per-genre reading files live at [`read/0.5/`](../read/0.5/reading.md) — the source
 of truth, versioned by language version, so a future `read/<X.Y>/` will be
-added beside it rather than over it (the frozen `read/0.1/`–`0.3/` trees are
+added beside it rather than over it (the frozen `read/0.1/`–`0.4/` trees are
 exactly that history). Open `read/0.5/reading.md` and the one file for the
 genre on line 1 and stop. The copy under `skill/figdown/reference/` is
 generated from `read/0.5/` by `tools/make-skill.js` and exists only so the

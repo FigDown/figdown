@@ -144,7 +144,9 @@ function validate(schema, inst, root, at) {
   const errs = [];
   const push = (m) => errs.push((at || '(root)') + ': ' + m);
 
-  if ('$ref' in schema) return validate(resolve(root, schema.$ref), inst, root, at);
+  // 2020-12: keywords beside a `$ref` still apply — validate the target, then
+  // fall through to the siblings rather than returning early
+  if ('$ref' in schema) errs.push(...validate(resolve(root, schema.$ref), inst, root, at));
 
   if ('type' in schema) {
     const types = Array.isArray(schema.type) ? schema.type : [schema.type];
@@ -294,6 +296,7 @@ if (!fs.existsSync(FIXTURES)) {
     if (!fs.existsSync(whyPath)) { fail(rel + ' has no .why.txt — a control must record WHAT it is a control for'); continue; }
     const why = fs.readFileSync(whyPath, 'utf8').trim().split('\n');
     const wanted = why[why.length - 1].trim();          // last line: the expected substring
+    if (!wanted) { fail(rel + ' — its .why.txt records no reason — its last line is the substring the rejection must contain, and an empty one matches any rejection'); continue; }
     let model;
     try { model = JSON.parse(fs.readFileSync(path.join(FIXTURES, n), 'utf8')); }
     catch (e) { fail(rel + ' — not JSON: ' + e.message); continue; }

@@ -1,0 +1,21 @@
+# 0.5: a line made ONLY of options names the token the
+# author wrote. Every token on such a line is an option, so the positional list
+# is empty and the keyword slot used to read `undefined`: the diagnostic said
+# `"undefined" is not allowed in genre block`, naming nothing in the source.
+# The keyword now falls back to the line's first token.
+#
+# Four paths, each of which printed `undefined` before: the genre allowlist in
+# the content zone (line 15), the same allowlist after `layout` (line 18), the
+# reserved `x-` prefix (line 16 — the first token is now seen, so the rule it
+# actually breaks answers), and the no-genre path, where a header without a
+# genre leaves no allowlist and the line falls through to `unrecognized line`
+# (lines 20-21).
+figdown 0.5 block
+node a "A"
+fill=red
+x-foo=1
+layout
+stroke=blue
+
+figdown 0.5
+fill=red

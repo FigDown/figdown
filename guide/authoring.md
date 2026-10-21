@@ -12,7 +12,7 @@ pitfalls in [read/0.5/scene.md](../read/0.5/scene.md), bit-numbering in
 [read/0.5/bitfield.md](../read/0.5/bitfield.md), arrangement in
 [read/0.5/layout.md](../read/0.5/layout.md), ladders in
 [read/0.5/experimental/sequence.md](../read/0.5/experimental/sequence.md).
-(`read/` is versioned by **language** version and `0.4` is the live set;
+(`read/` is versioned by **language** version and `0.5` is the live set;
 the older directories stay frozen beside it.)
 
 | Symptom | Correct spelling |
@@ -61,7 +61,7 @@ in the provenance comment. The full check is
 | devices and the links between them | `topology` | EXPERIMENTAL — EXPERIMENTAL **status** only: it is dispatchable under `figdown 0.1`, so choosing it costs **no version movement** |
 | steps, decisions, and control flow | `flowchart` (defaults `flow down`; owns `process` / `decision` / `terminator`) | EXPERIMENTAL — EXPERIMENTAL **status** only, same as `topology`: dispatchable under `figdown 0.1`, **no version movement** |
 | states a machine is IN, and transitions between them | `statechart` (**needs `figdown 0.2`**; a node is a `state`, a connector a `transition`) | EXPERIMENTAL — and it charges **both** prices: EXPERIMENTAL status **and** a declared version off `0.1`. Choose it only when a node is a **mode endured**, not a step performed: a retry loop is a `flowchart` however its title reads |
-| participants and the messages they exchange, **in time order** | `sequence` (**needs `figdown 0.4`**; participants are `lifeline` columns, time runs down the page, and `flow`/`rank`/`pin` do nothing here) | EXPERIMENTAL — and its withdrawal price is **not** `statechart`'s: that genre added no syntax, this one adds five keywords, an enum and a whole layout. Choose it when many lines run between the SAME pair of blocks **and** those lines are a time-ordered exchange; if they are distinct transitions of one machine, that is a `statechart` with a layout problem |
+| participants and the messages they exchange, **in time order** | `sequence` (**needs `figdown 0.4`**; participants are `lifeline` columns, time runs down the page, and `flow`/`rank` are line errors here while a `pin` parses and moves nothing) | EXPERIMENTAL — and its withdrawal price is **not** `statechart`'s: that genre added no syntax, this one adds five keywords, an enum and a whole layout. Choose it when many lines run between the SAME pair of blocks **and** those lines are a time-ordered exchange; if they are distinct transitions of one machine, that is a `statechart` with a layout problem |
 | signals changing over time cycles | `timing` | EXPERIMENTAL |
 
 ### The gate: three questions, in this order (`GENRE-SELECTION-PRECEDENCE`)
@@ -188,8 +188,9 @@ badly, the edit is to the **source order**, not to a layout line.
    use the workaround and add your sample to that discussion: corpus
    evidence is exactly what moves an OQ through the gate.
 3. **Never block on the gap.** State the missing meaning in plain
-   text meanwhile (a label, a `description=`, a `#` comment marking the
-   spot) so no knowledge is lost while the language catches up — and
+   text meanwhile (a label, a `description=` on a bitfield `field` or a
+   `sequence` element (the only directives that take it), a `#` comment
+   marking the spot) so no knowledge is lost while the language catches up — and
    never invent syntax: unknown lines are errors by design.
 4. **File a syntax-proposal issue** (the issue form mirrors the
    [PROCESS](../.github/CONTRIBUTING.md) gate): the meaning you cannot express ·

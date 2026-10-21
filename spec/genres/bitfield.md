@@ -177,9 +177,14 @@ consequences:
   the option text landed inside the last item and failed the item grammar.
 - **A name containing SPACES must be quoted**: `field "Long Name":16`. The
   list can only terminate at a whitespace boundary, so an unquoted spaced
-  name is indistinguishable from the next item. Unquoted, it is the line
-  error `bad item "<first word>" (expected name:width; quote a name that
-  contains spaces: "Long Name":16)`. A name containing a COMMA cannot be
+  name is indistinguishable from the next item. Unquoted, the space splits
+  the list into a second argument, and the line error is `field: the item
+  list is ONE comma-delimited token — unexpected argument "<second token>"
+  (write field a:1,b:2 with no space after the comma; quote a name that
+  contains whitespace: "Long Name":16) (MIGRATIONS 0.1)`; an element
+  with no `:` at all is `bad item "<element>" (expected name:width; quote a
+  name that contains spaces: "Long Name":16)` (fixture
+  `417-bitfield-compact-unquoted-space`). A name containing a COMMA cannot be
   written in the compact form at all — use the classic form.
 
 **A field wider than the remaining row space spans the following rows
@@ -699,7 +704,7 @@ a clause number):
   IP-XACT has this exact construct and calls the ordinal the *index*.
 - `subscript` appears **zero** times in the schema set.
 
-This makes **three of `field`'s five option keys single-sourced from
+This makes **three of `field`'s six option keys single-sourced from
 IP-XACT** — `description=` (`DESCRIPTION-KEY-SPELLING`), `present=` (`PRESENCE-CONDITION-EXPRESSION`, one of its four sources)
 and `index=`.
 
@@ -774,8 +779,9 @@ namespace has no other member to consider: `path` and `routing` were kept off
 this list as a **status** fact rather than a namespace one (`LAYOUT-ZONE-NAMESPACE` fixes what a
 zone member means wherever it is legal, not which genres admit it), and `EDGE-GEOMETRY-CONSTRUCTS`
 withdrew them from the language. Scene keywords
-(`node` `group` `external` `edge` `bundle` `plane` `threshold` `band`
-`flow` `rank`) are line errors: `"<kw>" is not allowed in genre bitfield`.
+(`node` `group` `external` `edge` `bundle` `threshold` `band`
+`flow` `rank`) are line errors: `"<kw>" is not allowed in genre bitfield` (`plane` is answered ahead of this list by its language-wide withdrawal —
+core §2.4, `PAINT-ORDER-CONSTRUCT`).
 That is deliberate narrowing of `GENRE-NAMESPACE`: corpus measurement already showed ten of the
 eleven scene keywords appear **zero** times in pure `bitfield`/`table`/`timing`
 documents; `class` is the exception and stays on the allowlist. Hybrid
@@ -791,8 +797,8 @@ legal (legacy); multi-section is the taught main-standard path.
 other genre, and `word=`/`numbering=`/`description=`/`present=`/`index=` are
 its own option keys. The
 overlaps are deliberate and are the same thing under every genre: the core
-of three (NS = C), the layout namespace (`LAYOUT-ZONE-NAMESPACE`), and the four cross-namespace
-keys `fill` `stroke` `style`
+of three (NS = C), the layout namespace (`LAYOUT-ZONE-NAMESPACE`), and the cross-namespace
+keys `fill` `stroke`
 `class` (§10), all NORMATIVE (`STROKE-KEY-STATUS`/`COLOUR-KEY-STATUS`). One genre-level requirement is unique to `bitfield`:
 `numbering=` has no default and is REQUIRED, where every other genre's
 options are all optional. Under `GENRE-NAMESPACE` `GENRE-VOCABULARY-OBLIGATION` a future genre MAY spell a keyword the
@@ -960,7 +966,7 @@ fields **MSB-first**: the first-declared field is the leftmost, and under
 | `index=` whose prose `<last>` contains a bare lowercase `step` token | line error naming the RESERVATION (`RULE-POSITION-ENUMERATION`, §9 `INDEX-RANGE-STEP`) |
 | `bitfield` with a BARE label (`bitfield b Hdr`) | line error naming the quote, `bitfield label must be quoted` (`RULE-POSITION-ENUMERATION`). It parsed until then, while this document already wrote the form `bitfield <id> ["label"]` |  <!-- fence-check: skip -->
 | `numbering=` written QUOTED (`numbering="msb0"`) | line error, RULE 2.4 (`RULE-POSITION-ENUMERATION`) |
-| `field` width written QUOTED (`field "A" "32"`, `field "A" "*"`) | **legal, and inert** — a width is `<n>\|*`, an open value space (SYNTAX-STYLE RULE 2.3b), and `*` is a declared exception, §8.6 |
+| `field` width written QUOTED (`field "A" "32"`, `field "A" "*"`) | **legal, and inert** — a width is `<n>\|*`, an open value space (SYNTAX-STYLE RULE 2.3b), and `*` is a declared exception, SYNTAX-STYLE §8.6 |
 
 The compact-overflow and `break` conditions, stated exactly:
 

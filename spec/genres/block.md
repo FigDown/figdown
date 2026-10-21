@@ -895,8 +895,8 @@ edge pp1 <-> cp1 class=vidc
 `class <id> "<meaning>" [fill=] [stroke=] [style=]` declares a
 **semantic class** once: a machine-readable meaning plus presentation
 defaults (Mermaid `classDef` heritage; `PRESENTATION-CONTROL-TIERS`'s HTML+CSS analogy made
-literal). Any `node`, `group`, `edge`, `field`, `cell` mark, or typed-
-block opener (`bitfield`/`table`/`timing`) joins it via `class=<id>` —
+literal). Any `node`, `group`, `edge`, `field` or `cell` mark joins it via
+`class=<id>` (the typed-block openers lost `class=`) —
 or **multiple** classes via `class=hot,deprecated` (comma-separated,
 same convention as `pin at=` / `data=`; 0.1). The model field
 is an array of ids. Same-line repeated `class=` is a line error.

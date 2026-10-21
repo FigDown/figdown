@@ -9,7 +9,7 @@ live in [`examples/`](../examples/index.md) instead.)
 | Figure | Serves |
 |---|---|
 | `one-source-two-readers.{fd,svg}` | [README.md](../README.md) — the project tagline, drawn |
-| `ingress.{fd,svg}` | [README.md](../README.md) / skill embed example — the block-architecture specimen |
+| `ingress.{fd,svg}` | [README.md](../README.md) — the block-architecture specimen |
 
 Regenerate with `node tools/build-svg.js figures` after editing any `.fd`;
 never hand-edit an `.svg`.

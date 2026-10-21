@@ -182,7 +182,7 @@ const flat = s => s.replace(/&[a-z]+;/g, 'x').replace(/\s+/g, ' ').trim();
 // emitted twice (halo pass then fill pass) at identical coordinates, so the
 // duplicates are folded by position+text rather than counted twice.
 function looseLabels(svg) {
-  const loose = svg.replace(/<g data-node="[^"]+"[^>]*>[\s\S]*?<\/g>/g, '');
+  const loose = svg.replace(/<g\b[^>]*?\sdata-node="[^"]+"[^>]*>[\s\S]*?<\/g>/g, '');
   const box = {};
   for (const m of loose.matchAll(/<text[^>]*>[\s\S]*?<\/text>/g)) {
     const open = m[0].match(/<text[^>]*>/)[0];
@@ -217,7 +217,7 @@ function checkOne(engine, fdPath) {
   const svg = out.svg;
 
   const nodes = {};                          // id -> {outline, label}
-  for (const m of svg.matchAll(/<g data-node="([^"]+)"[^>]*>([\s\S]*?)<\/g>/g)) {
+  for (const m of svg.matchAll(/<g\b[^>]*?\sdata-node="([^"]+)"[^>]*>([\s\S]*?)<\/g>/g)) {
     const o = outlineOf(m[2]);
     if (o) nodes[m[1]] = { id: m[1], o, lbl: labelBoxOf(m[2]) };
   }
@@ -257,7 +257,7 @@ function checkOne(engine, fdPath) {
   const pk = e => (e.a < e.b ? e.a + '\t' + e.b : e.b + '\t' + e.a);
   const refOf = e => (e.id !== undefined && e.id !== null ? String(e.id) : String(e.line));
   for (const e of doc.edges) { edgeByRef[refOf(e)] = e; pairN[pk(e)] = (pairN[pk(e)] || 0) + 1; }
-  for (const m of svg.matchAll(/<(line|path) data-edge="([^"]*)"[^>]*\/>/g)) {
+  for (const m of svg.matchAll(/<(line|path)\b[^>]*?\sdata-edge="([^"]*)"[^>]*\/>/g)) {
     const tag = m[0], e = edgeByRef[m[2]];
     if (!e || e.a === e.b) continue;                 // self-loops draw their own arc
     // co-located edges on the same node pair are deliberately fanned out
@@ -292,7 +292,7 @@ function checkOne(engine, fdPath) {
   // asserted for auto-placed loops as well, which is the invariant.
   const loose = looseLabels(svg);
   let loops = 0;
-  for (const m of svg.matchAll(/<(line|path) data-edge="([^"]*)"[^>]*\/>/g)) {
+  for (const m of svg.matchAll(/<(line|path)\b[^>]*?\sdata-edge="([^"]*)"[^>]*\/>/g)) {
     const tag = m[0], e = edgeByRef[m[2]];
     if (!e || e.a !== e.b) continue;
     const n = nodes[e.a];

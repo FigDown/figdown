@@ -63,7 +63,7 @@
  *
  * A TREE WITH ZERO MANIFESTS IS NOT A FAILURE. Unlike `tools/alt-check.js`
  * (which refuses to pass on zero embeds, because embeds are known to exist
- * today), a manifest is OPTIONAL by the profile's own §2.3 absence rule — its
+ * today), a manifest is OPTIONAL by the profile's own §1.3 absence rule — its
  * absence asserts nothing. So this gate reports "0 manifests found" and exits
  * 0 when that is true, rather than treating an empty corpus as a broken scan.
  * The fixture suite still runs regardless, so the gate is never vacuous.
@@ -122,6 +122,13 @@ function deepEqual(a, b) {
 }
 
 const DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
+// full-date: the shape AND a real calendar day (no 2026-02-31).
+function isFullDate(s) {
+  if (!DATE_RE.test(s)) return false;
+  const [y, m, d] = s.split('-').map(Number);
+  const t = new Date(0); t.setUTCFullYear(y, m - 1, d);
+  return t.getUTCFullYear() === y && t.getUTCMonth() === m - 1 && t.getUTCDate() === d;
+}
 
 function auditKeywords(node, where, out) {
   if (!node || typeof node !== 'object' || Array.isArray(node)) return out;
@@ -154,7 +161,9 @@ function validate(schema, inst, root, at) {
   const errs = [];
   const push = (m) => errs.push((at || '(root)') + ': ' + m);
 
-  if ('$ref' in schema) return validate(resolve(root, schema.$ref), inst, root, at);
+  // 2020-12: keywords beside a `$ref` still apply — validate the target, then
+  // fall through to the siblings rather than returning early
+  if ('$ref' in schema) errs.push(...validate(resolve(root, schema.$ref), inst, root, at));
 
   if ('type' in schema) {
     const types = Array.isArray(schema.type) ? schema.type : [schema.type];
@@ -167,7 +176,7 @@ function validate(schema, inst, root, at) {
     push('value ' + JSON.stringify(inst) + ' is not one of ' + JSON.stringify(schema.enum));
   if ('pattern' in schema && typeof inst === 'string' && !new RegExp(schema.pattern).test(inst))
     push('string ' + JSON.stringify(inst) + ' does not match ' + schema.pattern);
-  if ('format' in schema && typeof inst === 'string' && schema.format === 'date' && !DATE_RE.test(inst))
+  if ('format' in schema && typeof inst === 'string' && schema.format === 'date' && !isFullDate(inst))
     push('string ' + JSON.stringify(inst) + ' is not a valid date (format: date, expected YYYY-MM-DD)');
 
   if (typeof inst === 'string') {
@@ -378,7 +387,7 @@ found.sort();
 console.log('');
 console.log('MANIFESTS  ' + found.length + ' found under the tree (excluding tools/manifest-fixtures/)');
 if (!found.length) {
-  console.log('  0 manifests found — the profile is optional (figdown-manifest.md §2.3: absence asserts');
+  console.log('  0 manifests found — the profile is optional (figdown-manifest.md §1.3: absence asserts');
   console.log('  nothing), so an empty corpus is not a gate failure.');
 } else {
   for (const f of found) {
@@ -426,6 +435,7 @@ if (!fs.existsSync(FIXTURES)) {
     if (!fs.existsSync(whyPath)) { fail(rel + ' has no .why.txt — a control must record WHAT it is a control for'); continue; }
     const why = fs.readFileSync(whyPath, 'utf8').trim().split('\n');
     const wanted = why[why.length - 1].trim();
+    if (!wanted) { fail(rel + ' — its .why.txt records no reason — its last line is the substring the rejection must contain, and an empty one matches any rejection'); continue; }
     let json;
     try { json = JSON.parse(fs.readFileSync(path.join(FIXTURES, n), 'utf8')); }
     catch (e) { fail(rel + ' — not JSON: ' + e.message); continue; }

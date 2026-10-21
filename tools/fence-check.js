@@ -264,8 +264,10 @@ function extractFences(mdSrc) {
   let i = 0;
   while (i < lines.length) {
     const line = lines[i];
-    // Look for ```figdown (with optional trailing whitespace)
-    if (/^```figdown\s*$/.test(line)) {
+    // Look for a figdown fence: ``` or ~~~ (three or more), the info string's
+    // first word `figdown` — the markdown-it plugin renders exactly these
+    const open = /^(`{3,}|~{3,})[ \t]*figdown(\s|$)/.exec(line);
+    if (open) {
       // Check for skip marker immediately before this line (i-1, no blank lines).
       let skip = false;
       if (i > 0) {
@@ -275,7 +277,9 @@ function extractFences(mdSrc) {
       const openLineNo = i + 1; // 1-based
       i++;
       const bodyLines = [];
-      while (i < lines.length && !/^```\s*$/.test(lines[i])) {
+      // closed by the same character, at least as many, and nothing after
+      const closer = new RegExp('^' + (open[1][0] === '`' ? '`' : '~') + '{' + open[1].length + ',}\\s*$');
+      while (i < lines.length && !closer.test(lines[i])) {
         bodyLines.push(lines[i]);
         i++;
       }
@@ -668,7 +672,7 @@ function scanInlineSpans(engine, isKeyword, mdSrc) {
   const cand = [];
   let masked = mdSrc;
   let offset = 0;
-  let inFence = false;
+  let inFence = false, fenceRun = null;   // same open/close rule as extractFences
   let suspended = false;
 
   for (let i = 0; i < lines.length; i++) {
@@ -676,7 +680,7 @@ function scanInlineSpans(engine, isKeyword, mdSrc) {
     const lineStart = offset;
     offset += line.length + 1;
 
-    if (/^\s*```/.test(line)) { inFence = !inFence; continue; }
+    { const d = /^\s*(`{3,}|~{3,})(.*)$/.exec(line); if (d && (!fenceRun || (d[1][0] === fenceRun[0] && d[1].length >= fenceRun.length && !d[2].trim()))) { fenceRun = fenceRun ? null : d[1]; inFence = !!fenceRun; continue; } }
     if (inFence) { masked = maskRange(masked, lineStart, lineStart + line.length); continue; }
 
     const trimmed = line.trim();
@@ -1034,8 +1038,10 @@ function main() {
     let src;
     try { src = fs.readFileSync(mdPath, 'utf8'); }
     catch (e) {
+      // A file the walk found and could not read is a check not performed,
+      // never a smaller pass: exit 2, the tool-error code.
       process.stderr.write('Cannot read ' + mdPath + ': ' + e.message + '\n');
-      continue;
+      process.exit(2);
     }
 
     const rel = path.relative(process.cwd(), mdPath);

@@ -133,7 +133,7 @@ transition bound -["give up / lost lease\nRELEASE → INIT"]-> init
 # Hand layout: three bands — the cold-acquire row, the reboot row beneath
 # it, and the renew/rebind column under BOUND. Presentation only (`GUI-WRITEBACK-STRUCTURE`):
 # delete every `pin` below and all eight states and all fifteen labelled
-# transitions are still here, in the `node`/`edge` lines above.
+# transitions are still here, in the `state`/`transition` lines above.
 #
 # RE-AUTHORED (`EDGE-GEOMETRY-CONSTRUCTS`), AND THIS FIGURE IS WHY THE MEASUREMENT
 # MATTERED. It used to open the zone with `routing orthogonal` and carry

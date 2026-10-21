@@ -960,3 +960,51 @@ below; each carries its resolution note.
   both places (the ladder now marks rungs 0–2 as content and the layout
   zone as starting at rung 3). All documents still pass the strip test
   with the stricter rule.
+
+## `REFUSED-DECLARATION-ID` — a `node` line refused for its arity still declared its id
+
+- Case: `921-errors-refused-node-declares-nothing` (new).
+- Core §8.3.3 item 1 lists **declaring an id** among the state effects a
+  failing line skips, and §8.3.4 makes the consequence normative: a failed
+  declaration contributes nothing, so a later line naming it is a SECOND
+  error (the reference cascade), and a second implementation that keeps the
+  failed declaration "reports FEWER errors and fails fixtures".
+- The ENGINE recorded a `node`'s id before its surplus-argument check, so
+  `node a "A" extra` was refused AND declared `a`. Two symptoms:
+  `node a "A" extra` then `edge a -> b` reported one error where §8.3.4
+  requires two (no `unknown endpoint "a"`), and repairing the line by
+  writing `node a "A"` below it drew a false `duplicate id "a"`. Every other
+  declaring directive already added its id after its arity check; `920`
+  pinned the cascade only for a VALUE fault (`shape=hexagon`), which took
+  a different path, so no golden saw this one.
+- Severity: diagnostic. A refused document renders nothing either way;
+  what changed is which errors the author is shown.
+- **Resolved:** ENGINE. The id is added
+  after the arity check, as on every other declaring directive; a `state`
+  line behaves the same. No spec text changed — the engine now does what
+  §8.3.3–8.3.4 already said. No tracked `.svg` changed.
+
+## `SEQUENCE-ID-COLLISION-ORDER` — a fragment or operand id did not collide with a LATER declaration
+
+- Case: `experimental/297-sequence-fragment-operand-id-collisions` (new).
+- Core §1 gives each section ONE id namespace, and
+  `spec/genres/experimental/sequence.md` (the `lifeline` row) and core's
+  sequence model tables put `lifeline`, `message` and `operand` ids in it —
+  the section's namespace, not a document-wide one, as the genre document
+  now says. A duplicate is a duplicate whichever line comes first.
+- The ENGINE's duplicate test did not consult fragment or operand ids. A
+  `fragment` or `operand` declared AFTER a clashing id was refused, but the
+  reverse was not: `fragment f …` then `lifeline f` parsed clean, and a
+  later `in=f` resolved to the lifeline. Only line order decided the verdict.
+  The same held for a later `message id=` reusing either id: it parsed
+  clean too.
+- Severity: ACTIVE for authors of the experimental genre — a document with
+  two elements under one id was accepted, and `in=` could silently bind to
+  the wrong one.
+- **Resolved:** ENGINE. The duplicate test
+  also tests the section's fragment and operand ids, so `lifeline f`
+  after `fragment f` and `lifeline o` after `operand o` are each
+  `duplicate id`. The fixture's second section pins the scope: the same ids
+  in a neighbouring section are no error. No spec text changed. Parse
+  errors of every tracked `.fd` were identical before and after, and no
+  `.svg` changed.

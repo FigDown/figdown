@@ -61,8 +61,8 @@ for a leader line only when adjacency fails.
 ## Topology (with semantic annotations)
 
 ### VXLAN/EVPN Leaf-Spine Fabric  — [source](evpn-fabric.fd)
-One source file, **multi-section `MULTI-FIGURE-DOCUMENTS`**: a topology scene section plus later
-`figdown 0.1 table` sections for the VNI mapping and fabric-plane tables
+One source file, **multi-section `MULTI-FIGURE-DOCUMENTS`**: a topology scene section plus a later
+`figdown 0.1 table` section holding the VNI mapping and fabric-plane tables
 that real design docs put next to it (one stacked SVG; `GENRE-KEYWORD-ALLOWLIST` per section).
 
 ![EVPN fabric](evpn-fabric.svg)
@@ -106,7 +106,7 @@ two together; a missing edge is never the argument.
 
 ## Protocol headers (bitfield, census #2)
 
-> **This set was cut from sixteen headers to nine.** Seven of
+> **This set was cut from seventeen headers to nine.** Eight of
 > them (ARP, BGP, DHCP, Ethernet II, ICMP, ICMPv6, VXLAN, and a second TCP)
 > exercised no construct that another header in this list did not already
 > exercise; a gallery is a demonstration of CAPABILITY, and a ninth
@@ -269,7 +269,7 @@ live here; read them beside that document.
 | L2 switch forwarding decision — protocol logic as a readable decision flow | `flowchart` | [l2-forwarding-logic.fd](showcase/l2-forwarding-logic.fd) · [.svg](showcase/l2-forwarding-logic.svg) | [guide/showcase.md §3](../guide/showcase.md#3-l2-switch-forwarding-decision--protocol-logic-readable-flowchart) |
 | Ethernet II frame — byte order carried by syntax, not by geometry | `table` | [ethernet-frame.fd](showcase/ethernet-frame.fd) · [.svg](showcase/ethernet-frame.svg) | [guide/showcase.md §4](../guide/showcase.md#4-ethernet-ii-frame--byte-order-carried-by-syntax-table) |
 | ARP resolution — `external` and `class` discipline, plus a cache-transition `table` | `topology` | [arp-resolution.fd](showcase/arp-resolution.fd) · [.svg](showcase/arp-resolution.svg) | [guide/showcase.md §5](../guide/showcase.md#5-arp-resolution--external--class-discipline-topology) |
-| TCP connection state machine — 11 states, 21 transitions, all of RFC 9293 Figure 5 | `flowchart` | [tcp-state-machine.fd](showcase/tcp-state-machine.fd) · [.svg](showcase/tcp-state-machine.svg) | [guide/showcase.md §6](../guide/showcase.md#6-tcp-connection-state-machine--every-state-every-transition-flowchart) |
+| TCP connection state machine — 11 states, 21 transitions, all of RFC 9293 Figure 5 | `statechart` | [tcp-state-machine.fd](showcase/tcp-state-machine.fd) · [.svg](showcase/tcp-state-machine.svg) | [guide/showcase.md §6](../guide/showcase.md#6-tcp-connection-state-machine--every-state-every-transition-statechart) |
 
 ## Layout before / after set (`layout-compare/`)
 
@@ -287,7 +287,7 @@ land on different ranks with the other groups' members and five hosts between
 them, so a band would have to span the canvas — and the engine
 refuses to draw a `group` band around a non-member rather than state a
 membership the source never wrote. `node tools/build-svg.js
-layout-compare/srl-evpn-irb-auto.fd` reports `Line 25: group "leaf4" would
+examples/layout-compare/srl-evpn-irb-auto.fd` reports `Line 25: group "leaf4" would
 enclose non-member "h2" and the layout pass could not separate them; the figure
 is not drawn rather than drawn wrongly.` (the named node may differ between
 runs) and writes nothing. The source stays: **the refusal is what the auto arm
@@ -297,7 +297,7 @@ group-aware rank assignment (engine-backlog item 32).
 | Pair | auto | tuned | What the tuning adds |
 |---|---|---|---|
 | VXLAN/EVPN leaf-spine fabric | [.fd](layout-compare/evpn-fabric-auto.fd) · [.svg](layout-compare/evpn-fabric-auto.svg) | [.fd](evpn-fabric.fd) · [.svg](evpn-fabric.svg) | `flow down` + two `rank` lines — three semantic lines, no `pin`; edge length halves |
-| EVPN-VXLAN IRB (16 nodes, three leaf groups) | [.fd](layout-compare/srl-evpn-irb-auto.fd) — **refused, no artifact** | [.fd](srl-evpn-irb.fd) · [.svg](srl-evpn-irb.svg) | 20 layout lines using groups as layout modules (two-level `pin`); they are what makes the figure renderable at all, not a polish pass |
+| EVPN-VXLAN IRB (16 nodes, three leaf groups) | [.fd](layout-compare/srl-evpn-irb-auto.fd) — **refused, no artifact** | [.fd](srl-evpn-irb.fd) · [.svg](srl-evpn-irb.svg) | 19 layout lines using groups as layout modules (two-level `pin`); they are what makes the figure renderable at all, not a polish pass |
 
 ---
 

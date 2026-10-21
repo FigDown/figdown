@@ -32,7 +32,7 @@ node tools/migrate-figdown.js path/to/corpus
 # apply mechanical rewrites in place
 node tools/migrate-figdown.js --write path/to/corpus
 
-# also list experimental-genre headers (topology / flowchart / timing)
+# also list experimental-genre headers (topology / flowchart / timing / statechart / sequence)
 node tools/migrate-figdown.js --flag-experimental path/to/corpus
 ```
 
@@ -53,11 +53,11 @@ mechanical fixes were suggested).
 | option `text=` | DELETED (0.1 renamed it `color=`, and 0.1 retired that too — v0.1 has no label-colour key) |
 | `kind=<known>` | `shape=<geom>` (see map in the script) |
 | *(none — NON-MECHANICAL since 0.1)* | the legacy keyword `fill <pct>% in=` (band). It was a rewrite to `band …` — but 0.1 (`BAND-LABEL-STATUS`) gave `band` a MANDATORY quoted label written first, and this form has no label slot to carry over, so the rewrite's output has been a hard error ever since and was refused every time. It is now **reported** with the exact line to paste — see the report table |
-| `via=x,y` / `via=x,y;x,y;…` | `via=(x,y)` / `via=(x,y),(x,y),…` |
+| ~~`via=x,y` / `via=x,y;x,y;…`~~ | **MOOT since 0.1 (`EDGE-GEOMETRY-CONSTRUCTS`).** The rewrite was `via=(x,y)` / `via=(x,y),(x,y),…`. **`via=` has since been WITHDRAWN**, so the key is now REPORTED and there is no mechanical rewrite — see the report table |
 | *(none — NON-MECHANICAL)* | the optional docks added on `path` at 0.1 as `src=`/`dst=`, renamed `tailport=`/`headport=` at 0.1 (`ENDPOINT-DOCKING-KEYS`): all four spellings, and the `path` line that hosted them, are **WITHDRAWN at 0.1 (`EDGE-GEOMETRY-CONSTRUCTS`)**. No rewrite, because there is nothing to rewrite to — see below |
 | option `w=` / `h=` | `width=` / `height=` (`SIZE-AND-DIRECTION-KEY-NAMING`) |
 | option `dir=` (on `band`) | `extend=` (`SIZE-AND-DIRECTION-KEY-NAMING`) |
-| option `note=` | `description=` (`DESCRIPTION-KEY-SPELLING` — IEEE 1685's spelling; the name `note` is reserved for the v0.2 DRAWN annotation keyword) |
+| option `note=` on a `field` line | `description=` (`DESCRIPTION-KEY-SPELLING` — IEEE 1685's spelling). Scoped to `field`: since 0.3 (`DRAWN-ANNOTATION-FORM`) `note=` is the live drawn annotation on its other acceptors (core §2.9), and the tool leaves it there |
 | the `field` flag `optional` (or `conditional`) | `present=""` (`PRESENCE-CONDITION-EXPRESSION`). MECHANICAL only to the empty form; **lifting a condition out of the neighbouring `description=` is NOT mechanical** — see the report table |
 | header genre `wave` and line-initial `wave` | `timing` (`TIMING-GENRE-NAMING`) |
 | a `band` range written with a HYPHEN — `band "X" 15-35%` | `band "X" 15..35%` (`RANGE-SPELLING`). FigDown has ONE range grammar, `..`, single-sourced from Ada (ISO/IEC 8652) and Pascal (ISO 7185); between two numbers a hyphen reads as subtraction. `band` is EXPERIMENTAL, so nothing was promised — the rewrite is offered anyway because a mechanical one costs nothing |
@@ -67,7 +67,7 @@ mechanical fixes were suggested).
 | a BARE typed-block label — `bitfield b Hdr`, `table t Caption`, `timing w Lane` | `bitfield b "Hdr"` (`RULE-POSITION-ENUMERATION`). RULE 2.1 always required a positional string to be quoted; three of the fifteen labelled positions never enforced it, while both genre documents already wrote the form quoted. Mechanical for a SINGLE-word bare label; a multi-word one is **reported** — see the report table |  <!-- fence-check: skip -->
 | a QUOTED enum value — `shape="box"` `style="dashed"` `numbering="msb0"` `extend="up"` `type="bar3d"`, `figdown "0.1" block`, `figdown 0.1 "block"`, `flow "down"`, `cell 1 "highlight"` | the same value, BARE: `shape=box` (`RULE-POSITION-ENUMERATION`). RULE 2.4's enum half, enforced at last. Pure spelling: the value inside the quotes was already the value the engine used, so the model and the drawing are unchanged |
 | ~~a QUOTED `plane=` on an `edge` — `edge a -> b plane="over"`~~ | **MOOT since 0.3 (`PAINT-ORDER-CONSTRUCT`).** The rewrite was `plane="over"` → `plane=over` (`RULE-POSITION-ENUMERATION`), `plane=` being an id position whose quoting check `edge`'s scanner lacked. **`plane=` has since been WITHDRAWN with the `plane` keyword**, so there is no unquoted form to reach: quoted or bare, the key is now REPORTED and the fix is deletion — see the report table |
-| *(none — additive, OPTIONAL)* | the comma forms `rank a,b,c`, `width auto,90,25%`, `bundle … a--b,c--d`. The space forms are **not** deprecated; rewrite only where it improves the document, and never half-convert — mixing the two on one `rank` or `width` line is a line error |
+| the SPACE forms `rank a b c`, `width auto 90 25%`, `bundle … a--b c--d` | the comma forms `rank a,b,c`, `width auto,90,25%`, `bundle … a--b,c--d` (comma forms added 0.1; the space forms RETIRED at 0.1, `POSITIONAL-LIST-SPELLING` — each is a line error naming MIGRATIONS 0.1) |
 
 Running twice is a no-op for these rules.
 
@@ -168,16 +168,17 @@ reproduces it exactly. This is the single largest item in a downstream pass:
 | `index=` whose prose end contains a bare lowercase `step` — `index="0..7 step 2"` | **0.1 (`RULE-POSITION-ENUMERATION`).** `step` is RESERVED inside an `index=` range so that shipping the stepped range in v0.2 cannot change what a document already written means (core §9 `INDEX-RANGE-STEP`). The tool cannot tell prose that happens to read like a step clause from an author who meant "every other element" — which is the entire reason the spelling was reserved — so it reports both fixes: respell the prose (`"0..7 stepping by 2"`, `"0..7 in steps of 2"`), or, if you meant a stepped range, write the run you can state and put the rest in `description=`. Only the exact lowercase token is caught: `"0..7 Step 2"` and `"0..7 in steps of 2"` stay legal |
 | a `plane` or `layer` line, and every spelling that resolved to one (`plane=`, `layer=`, `z=`, `z-index=`) | **WITHDRAWN 0.3 (`PAINT-ORDER-CONSTRUCT`).** The second withdrawal with no replacement spelling, and the same shape as `path`/`routing` above. **DELETE the line and every `plane=` that referenced it.** Paint order is document order — a later line paints on top — so the drawing is unchanged unless the planes were written out of document order; check the result. If the layer was a claim about the SUBJECT (an overlay, a control plane), that meaning belongs in a `class=` whose LABEL states it (core §5, `PRESENTATION-AS-MEANING-CARRIER`), which is what the corpus was already doing alongside the keyword: stripping `plane` from `examples/evpn-fabric.fd` left the drawn markup byte-identical but for one `data-edge` index. The `layer` → `plane` and `z=` → `z-index=` rewrites (0.1 `PLANE-KEYWORD-SPELLING`, 0.1 `Z-ORDER-KEY-NAMING`) are **report-only from 0.3** for the same reason `route` is: their target no longer exists, and a rewrite whose output does not parse is worse than none. Why the construct went: MIGRATIONS 0.3 |
 | a line whose keyword this section's GENRE no longer declares — `threshold`/`band` under `topology`, `group`/`threshold`/`band`/`bundle` under `flowchart`, any of the six under `statechart`, `bundle` under `block` | **WITHDRAWN per genre at 0.3 (`SCENE-KEYWORD-MEMBERSHIP`).** Subject vocabulary is per genre: a spelling accepted by several genres is several independent declarations, and these genres withdrew their own. The word is usually not gone from the language, only from that genre, so the fix is a **decision about the figure** — change the section header, or move the line into a section whose genre declares the word (`block` for `threshold`/`band`, `topology` for `bundle`) — which no tool may make unattended. The engine's message names the genre that still declares the word and the ground for the withdrawal. Every affected genre or keyword was EXPERIMENTAL, so nothing was owed: MIGRATIONS 0.3 |
-| (with `--flag-experimental`) `topology` / `flowchart` / `timing` headers | Experimental genres: **do not bulk-rewrite** their domain vocabulary yet — it will move again |
+| (with `--flag-experimental`) `topology` / `flowchart` / `timing` / `statechart` / `sequence` headers | Experimental genres: **do not bulk-rewrite** their domain vocabulary yet — it will move again |
 
 ## Recommended split for large corpora
 
 1. **Main standard now:** files that are (or can be) `block` / `bitfield` /
    `table` — run `--write`, fix reports, prefer multi-section hybrids
    (`figdown 0.1 block` … then `figdown 0.1 table`).
-2. **Experimental later:** `topology` / `flowchart` / `timing` — list with
-   `--flag-experimental`, leave vocabulary alone until those genres
-   converge; only apply the mechanical spelling table above if needed.
+2. **Experimental later:** `topology` / `flowchart` / `timing` /
+   `statechart` / `sequence` — list with `--flag-experimental`, leave
+   vocabulary alone until those genres converge; only apply the mechanical
+   spelling table above if needed.
 
 ## Related
 

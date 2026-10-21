@@ -140,6 +140,21 @@ by `907-errors-edge-form` (stem matching can miss special characters).
   it could be an `SCENE-KEYWORD-MEMBERSHIP` per-cell withdrawal and the message is provably
   arriving from the `PAINT-ORDER-CONSTRUCT` language-wide sweep. The two-hop chains are `334`
 
+### Diagnostics changed (regression fixtures)
+
+Six engine fixes changed which diagnostic a document gets, or its text. No
+message is new; each fixture pins the corrected output and fails on the
+v0.5.1 engine.
+
+| change | pinned by |
+|---|---|
+| a `node` refused for its arity declares nothing, so `unknown endpoint` follows it and the repaired line is not a `duplicate id` (`REFUSED-DECLARATION-ID`) | `921-errors-refused-node-declares-nothing` |
+| a line made only of options names its first token (`"fill=red" is not allowed …`, `unknown keyword "fill=red"`, the `x-` reserved message) instead of `undefined` | `922-errors-options-only-line` |
+| a multi-section error line whose message carries a newline is re-based to its file line | `923-multi-section-error-line-rebased` |
+| the complete-cover advice names the node the author did not pin (geometry-time) | `924-pin-cover-names-unpinned-node` (`.geometry.txt`) |
+| `duplicate id` for a lifeline declared after a fragment or operand of the same id (`SEQUENCE-ID-COLLISION-ORDER`) | `experimental/297-sequence-fragment-operand-id-collisions` |
+| the operand-contiguity message's `(lines A–B)` range in file line numbers | `experimental/298-sequence-fragment-range-rebased` |
+
 ### Diagnostics added or changed (`CLASS-CHANNEL-REACH`, `INTERIOR-LESS-ELEMENT-PAINT`)
 
 The class-channel check moved from `doc.edges` alone to **all ten collections

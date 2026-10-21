@@ -46,27 +46,30 @@ notes under §2 and §5 say exactly what they buy.
 figdown 0.1 bitfield
 title "TCP Header"
 
+class varword "Width is VARIABLE on the wire; the declared width is one representative word, not the field's length"
+
 bitfield tcp "TCP Header (RFC 9293)" word=32 numbering=msb0
 
 field "Source Port" 16
 field "Destination Port" 16
+
 field "Sequence Number" 32
+
 field "Acknowledgment Number" 32
+
 field "Data Offset" 4 description="header length in 32-bit words; min 5 (=20 bytes), max 15 (=60 bytes)"
 field "Reserved" 4 description="must be zero"
-field "CWR" 1
-field "ECE" 1
-field "URG" 1
-field "ACK" 1
-field "PSH" 1
-field "RST" 1
+field CWR:1,ECE:1,URG:1,ACK:1,PSH:1,RST:1
 field "SYN" 1 fill=#fee2e2
 field "FIN" 1 fill=#fee2e2
 field "Window" 16 description="receive window size in bytes (subject to window scaling option)"
+
 field "Checksum" 16
 field "Urgent Pointer" 16
-field "Options" 32 present="Data Offset > 5" description="padded to a 32-bit boundary"
-field "Data" * description="variable-length payload; length from the IP datagram, not the TCP header"
+
+field "Options" 32 present="Data Offset > 5" class=varword description="0-320 bits (0-40 octets), always a multiple of 32, padded to a 32-bit boundary — RFC 9293 §3.1"
+
+field "Data" * description="variable-length payload; length derived from the IP datagram, not carried in the TCP header"
 ```
 
 **Human sees:** the RFC-style header — a 32-bit ruler, every field to width,
@@ -174,13 +177,13 @@ class filter  "Filter — discard; destination is out the same port it arrived o
 
 external wire "from ingress port"
 
-node learn  "Learn source MAC:\nupdate MAC table\n(SA -> ingress port)"
-node lookup "Look up destination MAC\nin MAC table"
-node hit    "Entry found?"                                 shape=diamond
-node same   "Egress port ==\ningress port?"                shape=diamond
-node fwd    "Forward out\nlearned port"                    shape=rounded class=forward
-node fld    "Flood to all ports\nin VLAN except ingress"   shape=rounded class=flood
-node flt    "Filter (drop):\nsame-port destination"        shape=rounded class=filter
+process learn  "Learn source MAC:\nupdate MAC table\n(SA -> ingress port)"
+process lookup "Look up destination MAC\nin MAC table"
+decision hit   "Entry found?"
+decision same  "Egress port ==\ningress port?"
+terminator fwd "Forward out\nlearned port"                    class=forward
+terminator fld "Flood to all ports\nin VLAN except ingress"   class=flood
+terminator flt "Filter (drop):\nsame-port destination"        class=filter
 
 flow down
 
@@ -375,15 +378,15 @@ transition closewait -[CLOSE / snd FIN]-> lastack class=server
 transition lastack -[rcv ACK of FIN / x]-> closed2 class=server
 
 layout
-pin closed    at=(394,20)
-pin listen    at=(394,170)
+pin closed    at=(500,20)
+pin listen    at=(394,220)
 pin synrcvd   at=(120,290)
 pin synsent   at=(700,290)
 pin estab     at=(376,410)
 pin fw1       at=(159,540)
 pin closewait at=(690,540)
 pin fw2       at=(159,670)
-pin closing   at=(311,670)
+pin closing   at=(400,620)
 pin lastack   at=(690,670)
 pin timewait  at=(304,800)
 pin closed2   at=(697,800)
@@ -476,8 +479,8 @@ something more specific about the two CLOSED nodes. The genre is EXPERIMENTAL
 and may be withdrawn. What remains is that CLOSED is drawn **twice** because
 FigDown has
 no **node-identity/alias** construct (**`IDENTITY-ASSERTION`**) to declare two nodes the same
-entity; the shared class label asserts it instead. So those two are the *only*
-facts the figure
+entity; the shared class label asserts it instead. So that is the *only*
+fact the figure
 cannot carry that the canonical drawing implies. All are documented in
 [expressing.md](expressing.md)'s "Known limits".
 That a figure format states its own limits — and that a reading agent recovers

@@ -1,6 +1,6 @@
 # FigDown — figures as text. Spec: https://github.com/FigDown/figdown
 
-# Reference figure for genre `flowchart` — EXPERIMENTAL GENRE (spec/genres/flowchart.md).
+# Reference figure for genre `flowchart` — EXPERIMENTAL GENRE (spec/genres/experimental/flowchart.md).
 # Read that status first: `flowchart` is OUTSIDE the v0.1 conformance surface
 # and outside the compatibility promise (`CONSTRUCT-STATUS-TIERS`), so unlike block.fd there is no
 # normative/experimental split to make here — EVERY line below is outside the

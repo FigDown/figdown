@@ -50,7 +50,7 @@ edge enc -> coll
 # stage above it is further from the wire. Twelve figures in this corpus flow
 # `right` and twelve flow `down`; `up` and `left` had no demonstrator at all
 # before 0.1, so half of a four-value enum went into the freeze
-# untested by any figure. (`left` is in examples/rpf-check.fd.)
+# untested by any figure. (`left` is in examples/patterns/block-c.fd.)
 flow up
 rank ring,enc
 

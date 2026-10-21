@@ -252,21 +252,34 @@ function renderedStrings(text) {
     if (raw.trimStart().startsWith('#')) continue;
     const c = commentOf(raw);
     const body = c === null ? raw : raw.slice(0, raw.length - c.length);
-    const re = /"([^"]*)"/g;
+    // Quoted strings honour the tokenizer's escapes (`\"`), and an
+    // `[edge label]` or `[port]` outside quotes is drawn text too.
+    const re = /"((?:[^"\\]|\\.)*)"/g;
     let m;
     while ((m = re.exec(body))) out.push({ n: i + 1, s: m[1] });
+    const bare = body.replace(re, '""');
+    const br = /\[([^\]]*)\]/g;
+    while ((m = br.exec(bare))) out.push({ n: i + 1, s: m[1] });
+    // Drawn text that is neither quoted nor bracketed: a compact bitfield
+    // field list (`field A:4,B:8`) and a timing lane's `data=` labels reach
+    // the SVG as bare tokens. So the rest of the line is read as well; a
+    // keyword, id or option that is not drawn matches a fail pattern only by
+    // being one.
+    const rest = bare.replace(br, '[]');
+    if (rest.trim()) out.push({ n: i + 1, s: rest, bare: true });
   }
   return out;
 }
 
 function checkRendered(text) {
   const fails = [], reviews = [];
-  for (const { n, s } of renderedStrings(text)) {
+  for (const { n, s, bare } of renderedStrings(text)) {
     for (const [re, why] of RENDERED_FAIL) {
       re.lastIndex = 0;
       let m;
       while ((m = re.exec(s))) fails.push({ n, why, tok: m[0], s: s.trim() });
     }
+    if (bare) continue;            // the review tier reads labels, not tokens
     for (const [re, why] of RENDERED_REVIEW) {
       re.lastIndex = 0;
       let m;
@@ -276,12 +289,17 @@ function checkRendered(text) {
   return { fails, reviews };
 }
 
-/** Engine findComment: '#' opens a comment at line start or after whitespace, never inside quotes. */
+/** Engine findComment: '#' opens a comment at line start or after whitespace,
+ *  never inside quotes (escapes honoured) or an `[edge label]`. */
 function commentOf(s) {
-  let inq = false;
+  let inq = false, depth = 0;
   for (let i = 0; i < s.length; i++) {
+    if (inq && s[i] === '\\' && i + 1 < s.length) { i++; continue; }
     if (s[i] === '"') inq = !inq;
-    else if (s[i] === '#' && !inq && (i === 0 || /\s/.test(s[i - 1]))) return s.slice(i);
+    else if (inq) continue;
+    else if (s[i] === '[') depth++;
+    else if (s[i] === ']') { if (depth) depth--; }
+    else if (s[i] === '#' && !depth && (i === 0 || /\s/.test(s[i - 1]))) return s.slice(i);
   }
   return null;
 }

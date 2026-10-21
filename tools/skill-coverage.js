@@ -208,7 +208,7 @@ function scanDoc(text, flags) {
   const ops = new Set();         // edge operators taught
   const hits = [];               // {line, kind, token} for the retirement check
 
-  let inFence = false;
+  let inFence = false, fence = null;   // `fence` = the open delimiter run
   const noteKeyVal = (raw, i) => {
     // `key=v1|v2|v3` teaches three values; `key=#hex` teaches none.
     const re = /\b([a-z][\w-]*)=([A-Za-z0-9_|-]*)/g;
@@ -228,9 +228,13 @@ function scanDoc(text, flags) {
 
   for (let i = 0; i < lines.length; i++) {
     const raw = lines[i];
-    if (/^\s*```/.test(raw)) {
-      if (!inFence) inFence = /^\s*```figdown\b/.test(raw);
-      else inFence = false;
+    // ``` or ~~~ of any length opens; only the same character, at least as
+    // many, with nothing after, closes. A figdown fence is one whose info
+    // string's first word is `figdown`.
+    const d = /^\s*(`{3,}(?!.*`)|~{3,})(.*)$/.exec(raw);
+    if (d && (!fence || (d[1][0] === fence[0] && d[1].length >= fence.length && !d[2].trim()))) {
+      if (!fence) { fence = d[1]; inFence = /^figdown(\s|$)/.test(d[2]); }
+      else { fence = null; inFence = false; }
       continue;
     }
     if (inFence) {
@@ -389,19 +393,19 @@ function main() {
   // engine's generated copies.
   console.log('\n[vendor]');
   {
-    const listMd = (dir, base) => {
+    const listMd = (dir, base, all) => {
       const out = [];
       if (!fs.existsSync(dir)) return out;
       for (const name of fs.readdirSync(dir).sort()) {
         const p = path.join(dir, name);
         const r = base ? base + '/' + name : name;
-        if (fs.statSync(p).isDirectory()) out.push(...listMd(p, r));
-        else if (name.endsWith('.md')) out.push(r);
+        if (fs.statSync(p).isDirectory()) out.push(...listMd(p, r, all));
+        else if (all || name.endsWith('.md')) out.push(r);
       }
       return out;
     };
     const src = listMd(READ_SRC, '');
-    const dst = listMd(path.join(BUNDLE, 'reference'), '');
+    const dst = listMd(path.join(BUNDLE, 'reference'), '', true);
     if (!src.length)
       fail('VENDOR SOURCE MISSING — ' + rel(READ_SRC) + ' has no .md files; ' +
         'the bundle\'s reference/ has nothing to be generated from');
@@ -423,9 +427,19 @@ function main() {
           'never be hand-edited. Edit ' + rel(READ_SRC) + '/' + r +
           ' and run `node tools/make-skill.js`.');
     }
+    // The engine and the CLI are copied verbatim by make-skill.js too; the
+    // installed skill renders and hashes with THESE copies, not the sources.
+    for (const [s, d] of [['editor/figdown.html', 'figdown.html'], ['tools/build-svg.js', 'build-svg.js']]) {
+      const sp = path.join(ROOT, s), dp = path.join(BUNDLE, d);
+      if (!fs.existsSync(dp))
+        fail('VENDOR MISSING  skill/figdown/' + d + ' — run `node tools/make-skill.js`');
+      else if (!fs.readFileSync(sp).equals(fs.readFileSync(dp)))
+        fail('VENDOR DRIFT  skill/figdown/' + d + ' differs from ' + s + ' — the bundle copy ' +
+          'is GENERATED and must never be hand-edited. Edit ' + s + ' and run `node tools/make-skill.js`.');
+    }
     if (!failed)
       console.log('  reference/ is byte-identical to ' + rel(READ_SRC) +
-        ' (' + src.length + ' files)');
+        ' (' + src.length + ' files); figdown.html and build-svg.js match their sources');
   }
 
   // ── 1. ROUTE ───────────────────────────────────────────────────────────────
@@ -763,7 +777,7 @@ function main() {
         if (m) declared.add(m[1].toLowerCase());
       }
     }
-    let inFence = false;
+    let inFence = false, fenceRun = null;   // same rule as scanDoc
     for (let i = 0; i < lines.length; i++) {
       const raw = lines[i];
       let scan;
@@ -780,7 +794,7 @@ function main() {
           if (words.length >= 3 && !VOCAB.has(words[0].toLowerCase())) scan += ' ' + body;
         }
       } else {
-        if (/^\s*```/.test(raw)) { inFence = !inFence; continue; }
+        { const d = /^\s*(`{3,}(?!.*`)|~{3,})(.*)$/.exec(raw); if (d && (!fenceRun || (d[1][0] === fenceRun[0] && d[1].length >= fenceRun.length && !d[2].trim()))) { fenceRun = fenceRun ? null : d[1]; inFence = !!fenceRun; continue; } }
         // RENDERING-DETERMINISM — IN A FIGDOWN FENCE, COMMENTS ONLY. The directives are the
         // figure; only what follows `#` is the author talking to a reader.
         scan = inFence ? (raw.indexOf('#') >= 0 ? raw.slice(raw.indexOf('#')) : '') : raw;
@@ -868,18 +882,26 @@ function main() {
   console.log('\n[links]');
   {
     const linkRe = /\[([^\]\n]*)\]\(\s*<?([^)<>\s]+)>?(?:\s+"[^"\n]*")?\s*\)/g;
+    const refDefRe = /^ {0,3}\[([^\]\n]+)\]:\s*<?([^\s<>]+)>?/g;
+    const attrRe = /\b(href|src)\s*=\s*["']([^"']+)["']/gi;
     let checked = 0;
     for (const f of bundleFiles()) {
       const lines = fs.readFileSync(f, 'utf8').split(/\r?\n/);
-      let inFence = false;
+      let inFence = false, fenceRun = null;   // same rule as scanDoc
       for (let i = 0; i < lines.length; i++) {
         const raw = lines[i];
-        if (/^\s*```/.test(raw)) { inFence = !inFence; continue; }
+        { const d = /^\s*(`{3,}(?!.*`)|~{3,})(.*)$/.exec(raw); if (d && (!fenceRun || (d[1][0] === fenceRun[0] && d[1].length >= fenceRun.length && !d[2].trim()))) { fenceRun = fenceRun ? null : d[1]; inFence = !!fenceRun; continue; } }
         if (inFence) continue;
+        // inline links, reference definitions (`[x]: target`) and raw
+        // `href=`/`src=` attributes all resolve the same way
+        const targets = [];
         let m;
-        linkRe.lastIndex = 0;
-        while ((m = linkRe.exec(raw))) {
-          let t = m[2].trim();
+        for (const re of [linkRe, refDefRe, attrRe]) {
+          re.lastIndex = 0;
+          while ((m = re.exec(raw))) targets.push(m[2]);
+        }
+        for (const written of targets) {
+          let t = written.trim();
           if (!t || t.startsWith('#')) continue;
           if (/^[a-z][a-z0-9+.\-]*:/i.test(t)) continue;   // http:, mailto:, …
           const hash = t.indexOf('#');
@@ -895,12 +917,12 @@ function main() {
           checked++;
           if (!inside)
             fail('LINK ESCAPES THE BUNDLE  ' + path.relative(BUNDLE, f) + ':' +
-              (i + 1) + '  `' + m[2] + '` resolves outside skill/figdown/ — an ' +
+              (i + 1) + '  `' + written + '` resolves outside skill/figdown/ — an ' +
               'installed copy has no repository above it, so this link dangles ' +
               'for every user who followed skill/README.md');
           else if (!fs.existsSync(abs))
             fail('DANGLING LINK IN THE BUNDLE  ' + path.relative(BUNDLE, f) + ':' +
-              (i + 1) + '  `' + m[2] + '` does not exist relative to the bundle ' +
+              (i + 1) + '  `' + written + '` does not exist relative to the bundle ' +
               'root — either ship the file inside skill/figdown/ or write the ' +
               'reference as an example rather than a link');
         }

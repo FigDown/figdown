@@ -288,6 +288,15 @@ function illegalChars(src) {
 }
 
 // ── the assertions ───────────────────────────────────────────────────────────
+const ENT = { lt: '<', gt: '>', amp: '&', quot: '"', apos: "'" };
+function decodeRefs(v) {
+  return v.replace(/&(?:#(\d+)|#x([0-9a-fA-F]+)|(lt|gt|amp|quot|apos));/g, (m, d, h, n) => {
+    if (n) return ENT[n];
+    const c = d !== undefined ? parseInt(d, 10) : parseInt(h, 16);
+    return c <= 0x10FFFF ? String.fromCodePoint(c) : m;
+  });
+}
+
 function judge(label, src) {
   const out = [];
   const bad = illegalChars(src);
@@ -304,7 +313,10 @@ function judge(label, src) {
   for (const t of s.tags) {
     if (t.close) continue;
     if (!ELEMENTS.has(t.name)) out.push('B element not in the profile: <' + t.name + '>');
-    for (const [k, v] of t.attrs) {
+    for (const [k, raw] of t.attrs) {
+      // an XML reader decodes character and entity references before the
+      // value means anything, so every test below reads the decoded value
+      const v = decodeRefs(raw);
       if (/^on/i.test(k))              out.push('C event handler attribute: ' + k + '=');
       if (/^(xlink:)?href$|^src$/i.test(k)) out.push('C fetching attribute: ' + k + '=' + v.slice(0, 60));
       if (/javascript:/i.test(v))      out.push('C javascript: URI in ' + k + '=');
@@ -325,6 +337,15 @@ function judge(label, src) {
     }
   }
   if (/@import/i.test(markup)) out.push('D @import in a markup region');
+  // E — a processing instruction (`xml-stylesheet`) or a declaration (DOCTYPE
+  // with an external entity) makes the viewer fetch without any attribute;
+  // the renderer emits neither, so only the XML declaration and the CDATA
+  // opener may begin a non-tag markup span (comments are not spans)
+  for (const [a, b] of s.markupSpans) {
+    const m = src.slice(a, b);
+    if (m.startsWith('<?') && !m.startsWith('<?xml ')) out.push('E processing instruction: ' + m.slice(0, 60));
+    if (m.startsWith('<!') && m !== '<![CDATA[') out.push('E markup declaration: ' + m.slice(0, 60));
+  }
   return out;
 }
 

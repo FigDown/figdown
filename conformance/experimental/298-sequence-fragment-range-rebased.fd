@@ -1,0 +1,22 @@
+# 0.5: the `(lines A–B)` range inside the operand-contiguity
+# diagnostic is re-based to FILE line numbers, like the `Line N:` prefix it
+# sits behind.
+#
+# The prefix was always re-based per section; the range quoted inside the
+# message was computed from section-local rows and was not, so in a document
+# whose sequence section is not the first the two numbers disagreed. Here the
+# message reported `Line 21` with `(lines 6–8)`, a range that points into this
+# comment. The operand's members are on lines 20 and 22, and the split run is
+# 20–22.
+figdown 0.5 block
+node a "A"
+node b "B"
+
+figdown 0.5 sequence
+lifeline c "Client"
+lifeline s "Server"
+fragment f "optional" type=opt
+operand o "guard" in=f
+message c -> s "one" in=o
+message c -> s "splits the run"
+message c -> s "two" in=o

@@ -603,7 +603,7 @@ function handle(msg) {
 
     case 'tools/call': {
       const name = params && params.name;
-      const fn = HANDLERS[name];
+      const fn = Object.prototype.hasOwnProperty.call(HANDLERS, name) ? HANDLERS[name] : undefined;
       if (!fn) return err(-32602, 'unknown tool: ' + name);
       try {
         return ok(fn((params && params.arguments) || {}));

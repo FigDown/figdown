@@ -46,12 +46,11 @@ is the host that already holds the address, which takes part in nothing outside
 the address check. The model records that; the drawing does not shorten the
 column, and the source says so.
 
-The source states its limits rather than leaving them to be noticed, and four
+The source states its limits rather than leaving them to be noticed, and three
 of them are worth reading beside the picture. A message is **one instant** —
 no separate send and receive, so no propagation delay and no two messages
 crossing on the wire. There is no way to re-order one chosen pair inside a
-`par`. A lifeline's state occurrences are **one sequence**, so the DHCPNAK and
-DHCPDECLINE paths cannot both end in a drawn INIT. And a **meaning-only class**
+`par`. And a **meaning-only class**
 — the idiom for a message that was sent and never delivered — puts no ink on
 the page: the legend prints the meaning, the source and the message's
 `description=` carry the reason, and the picture alone cannot say which arrow
