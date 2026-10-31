@@ -277,6 +277,115 @@ function assertGroupCrossingEdge(engine) {
   }
 }
 
+// 0.5 — a labelled edge between two same-rank nodes is drawn
+// across the gap between them, and the gap holds its label.
+//
+// THE DEFECT THIS PINS. The seam pass budgeted a link label on the MAIN axis
+// only. Two nodes in one `rank` sit side by side under vertical flow, the
+// edge between them runs along the cross axis, and its label is centred on
+// that run: `rank a,b` with a 35-character label drew a 56 px gap under a
+// ~185 px label, written over both boxes, exit 0. `examples/evpn-fabric`'s
+// leaf-to-leaf VXLAN label overprinted both leaves by about 12 px.
+//
+// WHY IT IS HERE AND NOT IN cases/: GROUP-BOUNDARY-OBSTACLE's reason. The figure renders clean,
+// so a `.geometry.txt` golden would be absent, and the model is unchanged.
+//
+// THE PROPERTY. Under `flow down`, in topology, flowchart and statechart, the
+// gap between the two boxes is at least the label's drawn width (5.5 px per
+// character at 11 px is below any width the engine draws) and the label's
+// centre lies inside the gap. One control: the same figure with no label
+// keeps its old 56 px gap, so the room is asked for by the label alone.
+function assertSameRankLabelClear(engine) {
+  const LBL = 'a rather long link description label';
+  const fig = (genre, label) => {
+    const [nd, ln] = genre === 'statechart' ? ['state', 'transition']
+                   : genre === 'flowchart' ? ['node', 'flowline'] : ['node', 'edge'];
+    const arrow = genre === 'topology' ? (label ? ' -[' + label + ']- ' : ' -- ')
+                                       : (label ? ' -[' + label + ']-> ' : ' -> ');
+    return ['figdown 0.5 ' + genre, 'flow down', nd + ' a "Alpha"', nd + ' b "Beta"',
+            'rank a,b', ln + ' a' + arrow + 'b'].join('\n');
+  };
+  const gapOf = (src) => {
+    const { doc, errs } = engine.parse(src);
+    if (errs && errs.length) return { err: errs.join('; ') };
+    const out = engine.render(doc, {});
+    const svg = (out && typeof out === 'object') ? (out.svg || '') : String(out || '');
+    const r = [...svg.matchAll(/<rect x="([-\d.]+)" y="[-\d.]+" width="([\d.]+)" height="[\d.]+"[^>]*stroke="#8a8880"/g)]
+      .map(m => [+m[1], +m[1] + +m[2]]).sort((p, q) => p[0] - q[0]);
+    const t = svg.match(new RegExp('<text x="([-\\d.]+)"[^>]*fill="#555">' + LBL));
+    return { lo: r[0] && r[0][1], hi: r[1] && r[1][0], lx: t ? +t[1] : null };
+  };
+  const bad = [];
+  for (const g of ['topology', 'flowchart', 'statechart']) {
+    const w = gapOf(fig(g, LBL)), c = gapOf(fig(g, null));
+    if (w.err || c.err) { bad.push(g + ': the property figure no longer parses: ' + (w.err || c.err)); continue; }
+    const need = LBL.length * 5.5;
+    if (!(w.hi - w.lo >= need)) bad.push(g + ': gap ' + (w.hi - w.lo).toFixed(1) + ' px under a label of at least ' + need + ' px');
+    if (w.lx === null || !(w.lx > w.lo && w.lx < w.hi)) bad.push(g + ': the label is not centred in the gap (x ' + w.lx + ')');
+    if (Math.abs((c.hi - c.lo) - 56) > 0.01) bad.push(g + ': the unlabelled control moved, gap ' + (c.hi - c.lo).toFixed(1) + ' px (want 56)');
+  }
+  if (bad.length) {
+    console.error('SAME-RANK LABEL PROPERTY FAILED: a labelled edge');
+    console.error('between same-rank nodes overprints them — ' + bad.length + ' violation(s):');
+    for (const b of bad) console.error('  ' + b);
+    process.exit(1);
+  }
+}
+
+// 0.5 — three or more labelled links between one pair of nodes
+// under vertical flow draw their labels apart.
+//
+// THE DEFECT THIS PINS. The seam between two ranks budgeted no label room for
+// a pair's parallel links, and every mid label chose among the same five
+// parameters in the middle 44 % of the run. Five `a -[member i link]- b`
+// under `flow down` drew five labels 0 to 10 px apart in a 44 px seam, two of
+// them on one baseline. The seam now holds a line per label, and each label
+// takes its own slot along the run.
+//
+// THE PROPERTY. With three and with five such links, no two label boxes
+// overlap (5.5 px per character, 11 px line box: smaller than drawn), and
+// every label lies between the two node boxes. One or two links keep the
+// default placement and are not asserted here.
+function assertParallelLabelsApart(engine) {
+  const bad = [];
+  for (const n of [3, 5]) {
+    const src = ['figdown 0.5 topology', 'flow down', 'node a "Alpha"', 'node b "Beta"']
+      .concat(Array.from({ length: n }, (_, i) => 'edge a -[member ' + (i + 1) + ' link]- b')).join('\n');
+    const { doc, errs } = engine.parse(src);
+    if (errs && errs.length) { bad.push(n + ' links: the property figure no longer parses: ' + errs.join('; ')); continue; }
+    const out = engine.render(doc, {});
+    const svg = (out && typeof out === 'object') ? (out.svg || '') : String(out || '');
+    const L = [...svg.matchAll(/<text x="([-\d.]+)" y="([-\d.]+)" font-size="11" text-anchor="(\w+)" fill="(?!#fff")[^"]*">(member \d link)/g)]
+      .map(m => { const w = m[4].length * 5.5, x = +m[1];
+        const x0 = m[3] === 'start' ? x : m[3] === 'end' ? x - w : x - w / 2;
+        return { t: m[4], x0, x1: x0 + w, y0: +m[2] - 9, y1: +m[2] + 2 }; });
+    const R = [...svg.matchAll(/<rect x="[-\d.]+" y="([-\d.]+)" width="[\d.]+" height="([\d.]+)"[^>]*stroke="#8a8880"/g)]
+      .map(m => [+m[1], +m[1] + +m[2]]).sort((p, q) => p[0] - q[0]);
+    if (L.length !== n) { bad.push(n + ' links: found ' + L.length + ' labels'); continue; }
+    for (let i = 0; i < L.length; i++) {
+      const a = L[i];
+      if (!(a.y0 >= R[0][1] && a.y1 <= R[1][0])) bad.push(n + ' links: "' + a.t + '" is not between the boxes');
+      for (let j = i + 1; j < L.length; j++) { const b = L[j];
+        if (Math.min(a.x1, b.x1) > Math.max(a.x0, b.x0) && Math.min(a.y1, b.y1) > Math.max(a.y0, b.y0))
+          bad.push(n + ' links: "' + a.t + '" overlaps "' + b.t + '"'); }
+    }
+  }
+  // 0.5: 99 or more such links once left no label position, and
+  // render threw. Across the flow (`rank a,b`) the links take no slots.
+  for (const lay of [['flow down'], ['flow up'], ['flow down', 'rank a,b']]) {
+    const src = ['figdown 0.5 topology'].concat(lay, ['node a "Alpha"', 'node b "Beta"'])
+      .concat(Array.from({ length: 99 }, (_, i) => 'edge a -[l' + (i + 1) + ']- b')).join('\n');
+    try { engine.render(engine.parse(src).doc, {}); }
+    catch (e) { bad.push('99 links, ' + lay.join(' + ') + ': render threw: ' + e.message); }
+  }
+  if (bad.length) {
+    console.error('PARALLEL LABEL PROPERTY FAILED: labelled parallel');
+    console.error('links stack their labels — ' + bad.length + ' violation(s):');
+    for (const b of bad) console.error('  ' + b);
+    process.exit(1);
+  }
+}
+
 // GROUP-SEPARATION-PLACEMENT — the group-separation push never moves a node out of
 // the figure or onto another node.
 //
@@ -595,6 +704,8 @@ if (engine) {
   assertGroupCrossingEdge(engine);
   assertGroupPushStaysOnCanvas(engine);
   assertInputSizedArrays(engine);
+  assertSameRankLabelClear(engine);
+  assertParallelLabelsApart(engine);
 }
 let geometrySkipped = 0;
 const tally = {

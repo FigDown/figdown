@@ -1,0 +1,100 @@
+{
+  "header": {
+    "version": "0.5",
+    "genre": "sequence"
+  },
+  "flow": "right",
+  "classes": [
+    {
+      "id": "__proto__",
+      "meaning": "retry path",
+      "line": 13
+    }
+  ],
+  "planes": [
+    {
+      "id": "base",
+      "z": 0
+    }
+  ],
+  "nodes": [],
+  "groups": [],
+  "edges": [],
+  "ranks": [],
+  "pins": [],
+  "thresholds": [],
+  "bands": [],
+  "bundles": [],
+  "regions": [],
+  "lifelines": [
+    {
+      "id": "constructor",
+      "label": "Client",
+      "line": 14
+    },
+    {
+      "id": "toString",
+      "label": "Server",
+      "line": 15
+    }
+  ],
+  "messages": [
+    {
+      "a": "constructor",
+      "op": "->",
+      "b": "toString",
+      "label": "request",
+      "in": "valueOf",
+      "class": [
+        "__proto__"
+      ],
+      "line": 18
+    },
+    {
+      "a": "toString",
+      "op": "->",
+      "b": "constructor",
+      "label": "ack",
+      "in": "valueOf",
+      "line": 20
+    },
+    {
+      "a": "constructor",
+      "op": "->",
+      "b": "toString",
+      "label": "close",
+      "in": "hasOwnProperty",
+      "line": 22
+    }
+  ],
+  "states": [
+    {
+      "lifeline": "toString",
+      "name": "WAIT",
+      "in": "valueOf",
+      "line": 19
+    }
+  ],
+  "fragments": [
+    {
+      "id": "__proto__",
+      "label": "retry",
+      "type": "loop",
+      "line": 16
+    },
+    {
+      "id": "hasOwnProperty",
+      "label": "maybe",
+      "type": "opt",
+      "line": 21
+    }
+  ],
+  "operands": [
+    {
+      "id": "valueOf",
+      "label": "until acknowledged",
+      "in": "__proto__",
+      "line": 17
+    }
+  ]
+}

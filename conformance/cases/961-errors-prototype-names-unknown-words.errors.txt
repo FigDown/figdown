@@ -1,0 +1,8 @@
+Line 12: unknown shape "constructor" (box|rounded|circle|ellipse|diamond|cylinder)
+Line 13: unknown shape "__proto__" (box|rounded|circle|ellipse|diamond|cylinder)
+Line 14: "constructor" is not allowed in genre block
+Line 15: "toString" is not allowed in genre block
+Line 16: "__proto__" is not allowed in genre block
+Line 17: style must be solid|dashed|dotted
+Line 18: unknown option "hasOwnProperty="
+Line 19: flow needs right|down|left|up

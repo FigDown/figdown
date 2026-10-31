@@ -93,6 +93,8 @@ const TSV_REL = 'spec/vocabulary-sources.tsv';
 const CORE_REL = 'spec/core.md';
 
 const args = process.argv.slice(2);
+const badOpt = args.find(a => a.startsWith('-') && !['--strict', '--verbose'].includes(a));
+if (badOpt) { console.error('vocab-check: unknown option ' + badOpt + '\nusage: node tools/vocab-check.js [--strict] [--verbose]'); process.exit(2); }
 const strict = args.includes('--strict');
 const verbose = args.includes('--verbose');
 

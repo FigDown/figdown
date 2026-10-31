@@ -36,8 +36,10 @@ node tools/migrate-figdown.js --write path/to/corpus
 node tools/migrate-figdown.js --flag-experimental path/to/corpus
 ```
 
-Exit code `1` means at least one **report** item remains (not only that
-mechanical fixes were suggested).
+Exit code `1` means at least one **report** item remains, or at least one
+rewrite was **refused** because its output does not parse (not only that
+mechanical fixes were suggested). Exit code `2` means the tool did not run:
+an unknown flag, a refused path, or an internal error.
 
 ## What the tool rewrites (mechanical, idempotent)
 

@@ -92,10 +92,16 @@ const args = argv.filter(a => {
   if (a === '--with-a11y') { RENDER_OPTS.a11y = true; return false; }
   return true;
 });
+const USAGE = 'usage: node tools/build-svg.js [--with-title] [--with-a11y] <file.fd | dir> ...';
+if (args.some(a => a === '--help' || a === '-h')) { console.log(USAGE); process.exit(0); }
+const badOpt = args.find(a => a.startsWith('-'));
+if (badOpt) { console.error('build-svg: unknown option ' + badOpt + '\n' + USAGE); process.exit(2); }
 if (!args.length) {
-  console.error('usage: node tools/build-svg.js [--with-title] [--with-a11y] <file.fd | dir> ...');
+  console.error(USAGE);
   process.exit(2);
 }
+const missing = args.find(a => !fs.existsSync(a));
+if (missing) { console.error('build-svg: no such file or directory: ' + missing); process.exit(2); }
 // RECURSIVE. "A gate that does not recurse is a gate that lies" was written
 // for the read-only CHECKS, which read only the top level of a directory.
 // The GENERATOR had the same defect and was missed:
@@ -110,7 +116,11 @@ function collect(a, acc) {
   for (const name of fs.readdirSync(a).sort()) {
     if (name === 'node_modules' || name === '.git') continue;
     const p = path.join(a, name);
-    if (fs.statSync(p).isDirectory()) collect(p, acc);
+    // A dangling symlink (an editor lock file such as `.#a.fd`) has no stat:
+    // it is not a document, so it is skipped rather than aborting the walk.
+    let st;
+    try { st = fs.statSync(p); } catch (e) { continue; }
+    if (st.isDirectory()) collect(p, acc);
     else if (name.endsWith('.fd')) acc.push(p);
   }
   return acc;

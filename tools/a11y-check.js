@@ -90,6 +90,8 @@ const ARTIFACT_ROOTS = ['examples', 'figures'];
 const args = process.argv.slice(2);
 const strict = args.includes('--strict');
 const verbose = args.includes('--verbose');
+const badOpt = args.find(a => a.startsWith('-') && !['--strict', '--verbose'].includes(a));
+if (badOpt) { console.error('a11y-check: unknown option ' + badOpt + '\nusage: node tools/a11y-check.js [--strict] [--verbose]'); process.exit(2); }
 
 let failures = 0;
 const fail = (m) => { failures++; console.log('FAIL  ' + m); };
@@ -473,6 +475,11 @@ if (!fs.existsSync(FIXTURES)) {
   const names = fs.readdirSync(FIXTURES).sort();
   const validNames = names.filter(f => f.endsWith('.valid.svg'));
   const invalidNames = names.filter(f => f.endsWith('.invalid.svg'));
+  // A .why.txt whose control is gone (deleted, or renamed off the `.invalid.svg`
+  // suffix) is a negative control that silently stopped running.
+  for (const w of fs.readdirSync(FIXTURES).filter(f => f.endsWith('.why.txt')).sort())
+    if (!fs.existsSync(path.join(FIXTURES, w.replace(/\.why\.txt$/, '.invalid.svg'))))
+      fail('tools/a11y-fixtures/' + w + ' has no ' + w.replace(/\.why\.txt$/, '.invalid.svg') + ' beside it — the control it records is not run');
   if (validNames.length < 1)
     fail('tools/a11y-fixtures/ holds no *.valid.svg — at least one artifact that satisfies the profile is required');
   if (invalidNames.length < 6)

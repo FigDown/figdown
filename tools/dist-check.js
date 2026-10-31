@@ -64,6 +64,8 @@
 // `--strict` is accepted for symmetry with the other gates; every finding
 // here is already fatal, so it changes nothing.
 const fs = require('fs');
+const badOpt = process.argv.slice(2).find(a => a.startsWith('-') && !['--strict'].includes(a));
+if (badOpt) { console.error('dist-check: unknown option ' + badOpt + '\nusage: node tools/dist-check.js [--strict]'); process.exit(2); }
 const os = require('os');
 const path = require('path');
 const { execFileSync } = require('child_process');
@@ -289,9 +291,43 @@ function checkEmbedRoundTrip() {
   else fail('tools/build-svg.js corrupted the embedded source of a document containing $& / $` / $\'');
 }
 
+// ── D. the package's entry points point at the builds above ─────────────────
+// `dist/` is what `require('figdown')` / `import 'figdown'` return, but the
+// route to it is four package.json fields nothing else reads. A renamed build,
+// a swapped require/import pair, a `bin` or `files` entry naming a path that
+// no longer exists all leave A-C green and ship a package that cannot load.
+function checkPackageEntryPoints() {
+  const pkg = JSON.parse(fs.readFileSync(path.join(ROOT, 'package.json'), 'utf8'));
+  const norm = (s) => String(s || '').replace(/^\.\//, '');
+  const dot = (pkg.exports && pkg.exports['.']) || {};
+  for (const [what, want, got] of [
+    ['main', 'dist/figdown.js', pkg.main], ['module', 'dist/figdown.mjs', pkg.module],
+    ['exports["."].require', 'dist/figdown.js', dot.require], ['exports["."].import', 'dist/figdown.mjs', dot.import]]) {
+    if (norm(got) === want && fs.existsSync(path.join(ROOT, want))) ok('package.json ' + what + ' -> ' + want);
+    else fail('package.json ' + what + ' is ' + JSON.stringify(got) + ', expected ' + want + ' (and the file must exist)');
+  }
+  for (const [name, target] of Object.entries(pkg.bin || {})) {
+    if (fs.existsSync(path.join(ROOT, norm(target)))) ok('package.json bin ' + name + ' -> ' + target);
+    else fail('package.json bin ' + name + ' names ' + target + ', which does not exist');
+  }
+  let missing = 0;
+  for (const entry of pkg.files || []) {
+    const rel = norm(entry);
+    let found;
+    if (rel.includes('*')) {
+      const dir = path.dirname(rel);
+      const re = new RegExp('^' + path.basename(rel).replace(/[.+^${}()|[\]\\]/g, '\\$&').replace(/\*/g, '.*') + '$');
+      found = fs.existsSync(path.join(ROOT, dir)) && fs.readdirSync(path.join(ROOT, dir)).some(n => re.test(n));
+    } else found = fs.existsSync(path.join(ROOT, rel));
+    if (!found) { missing++; fail('package.json files entry ' + JSON.stringify(entry) + ' matches nothing in the tree'); }
+  }
+  if (!missing) ok('package.json files: ' + (pkg.files || []).length + ' entries all resolve');
+}
+
 checkBuilds().then(() => {
   checkCorpus();
   checkEmbedRoundTrip();
+  checkPackageEntryPoints();
   console.log('');
   if (failures) {
     console.log('dist-check: ' + failures + ' failure(s)');

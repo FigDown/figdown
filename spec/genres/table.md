@@ -196,7 +196,7 @@ never in the layout zone.
 | `class` | one or more comma-separated ids of declared classes — `class=`'s value is multi-valued (core §12.5); a channel two carried classes both bind is a line error (`CLASS-CHANNEL-COLLISION`) | NORMATIVE | absent |
 | `fill` | `#rgb` · `#rrggbb` · one of the 147 CSS colour names · `transparent` | NORMATIVE | absent |
 | `stroke` | same value set as `fill` — the OUTLINE of anything with an interior, and the WHOLE of a line, which is SVG's own asymmetry | NORMATIVE | absent |
-| *width value* (positional) | `auto` \| `<N>` \| `<N>%` | NORMATIVE | `auto`; count MUST match the column count. The value is a bare number — a `px` SUFFIX was REJECTED at 0.1 so that this keyword and the `width=` option share ONE unit grammar; `90px` is the line error `bad width "90px" — write the number without a unit: 90 (auto \| <px> \| <n>%)`. The form is ONE comma-delimited token, `width auto,90,25%`; the space form was RETIRED at 0.1 (`POSITIONAL-LIST-SPELLING`) — a positional list must terminate at whitespace for the rest of the line to be reservable for future `key=` options |
+| *width value* (positional) | `auto` \| `<N>` \| `<N>%` | NORMATIVE | `auto`; count MUST match the column count. The value is a bare number — a `px` SUFFIX was REJECTED at 0.1 so that this keyword and the `width=` option share ONE unit grammar; `90px` is the line error `bad width "90px" — write the number without a unit: 90 (auto \| <px> \| <n>%)`. A number MUST be positive: any zero (`0`, `0.0`, `0%`, `0px`, …) is the line error `bad width "0" — a column needs a positive width (auto \| <px> \| <n>%)` (and `0px` from 0.5; a zero drew a zero-width column, while `pin width=0` was already refused). The form is ONE comma-delimited token, `width auto,90,25%`; the space form was RETIRED at 0.1 (`POSITIONAL-LIST-SPELLING`) — a positional list must terminate at whitespace for the rest of the line to be reservable for future `key=` options |
 | *cell address* (positional) | `h1..hN` header tiers top-down · `1..` data rows | NORMATIVE | required |
 | `highlight` (positional flag) | present / absent | NORMATIVE | absent; data rows only. **Never on a two-part address, and never on a row that also carries a cell `fill=` — 0.1, `ROW-HIGHLIGHT-CELL-FILL-COLLISION`** |
 | span markers (in cell text) | `\|\|` colspan-left · `^^` rowspan-up · `\\\|` literal pipe · `\\^^` literal caret pair | NORMATIVE | — |
@@ -483,6 +483,13 @@ knowledge, put it in a `class` whose meaning states it. A `stroke=`-only or
 `style`-free `class=` mark on a highlighted row paints a **different** channel
 and stays legal.
 
+**The row form takes no presentation keys.** `cell 1 highlight
+fill=#ff0000` used to parse, and its `fill=`, `stroke=` and `class=` never
+reached the model: the row drew in the fixed tint and nothing said so. That is
+the same defect, a key silently discarded, so it gets the same answer, a line
+error. Tint the row with `cell <r> highlight` alone, or paint a cell with
+`cell (<r>,<c>) fill=…` / `class=`.
+
 ## Semantic model (normative — reading rule, `MEANING-RECOVERY-SOURCE`)
 
 A table's meaning is its **logical grid**: header tiers (rows above the
@@ -506,6 +513,7 @@ top-left cell.
 | `width` column count does not match table column count | line error |
 | `width` written in the retired SPACE form (`width auto 90 25%`) | line error naming MIGRATIONS 0.1 |  <!-- fence-check: skip -->
 | `width` value with a `px` suffix (`90px`) | line error naming the unit-free spelling |
+| `width` value of any zero (`0`, `0.0`, `0%`, `0px`, …) | line error |
 | `^^` in the first data or header row | line error |
 | `\|\|` in the first column | line error |
 | `cell` targeting a merged-away cell (not the anchor) | line error |
@@ -515,6 +523,7 @@ top-left cell.
 | `width` element written QUOTED (`width "auto",90`) | **legal, and inert** — a table `width` element is `auto\|<n>\|<n>%`, an open value space (SYNTAX-STYLE RULE 2.3b), and `auto` is a declared exception, SYNTAX-STYLE §8.6 |
 | `highlight` on a two-part cell address (`cell (1,1) fill=… highlight`) | line error (`ROW-HIGHLIGHT-CELL-FILL-COLLISION`) |
 | A cell mark resolving to a `fill` on a row that carries `highlight` | line error (`ROW-HIGHLIGHT-CELL-FILL-COLLISION`) |
+| `fill=`, `stroke=` or `class=` on the row form (`cell 1 highlight fill=…`) | line error |
 | Unknown option on `table`, `width`, or `cell` | line error |
 
 **The two `duplicate …` rows were golden-pinned but MISSING from this

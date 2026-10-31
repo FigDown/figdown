@@ -1,0 +1,16 @@
+# Core §10 (`LANGUAGE-EXTENSION-POLICY`/`RESERVED-PREFIX-ENFORCEMENT`) — THE RESERVED `x-` PREFIX IN A TIMING `signal` LINE.
+#
+# The lane-mode half of `909-errors-reserved-x-prefix`. A `signal` line is
+# split in lane mode, because a lane may hold `=`, so an unregistered `k=v`
+# stays positional. Until this release an `x-` option key there therefore got
+# `unexpected argument "x-k=1"`, the text a stray word gets, instead of the
+# RESERVED diagnostic every other option-key position gives. Lines 14 and 15
+# pin that diagnostic; line 16 pins that an ordinary unknown key keeps the
+# surplus-argument text.
+figdown 0.5 block
+timing w "W"
+signal clk p...
+signal a 01
+signal b 01 x-vendor-key=1
+signal c 0=1 data=q x-vendor-key=2
+signal d 01 bogus=1

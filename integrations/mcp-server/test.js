@@ -96,6 +96,19 @@ async function testWire() {
   const bad = handle(JSON.parse('{"jsonrpc":"2.0","id":9,"method":"no_such_method"}'));
   assert.strictEqual(bad.error.code, -32601);
   ok('unknown method -> JSON-RPC -32601, not a crash');
+
+  // An unknown tool is -32602 -- including names that exist on every object
+  // (a plain property lookup would dispatch them as handlers).
+  for (const nm of ['no_such_tool', 'constructor', 'toString', 'hasOwnProperty', '__proto__']) {
+    const r = handle({ jsonrpc: '2.0', id: 10, method: 'tools/call', params: { name: nm, arguments: {} } });
+    assert.ok(r && r.error && r.error.code === -32602, 'tools/call ' + nm + ' must be -32602, got ' + JSON.stringify(r));
+  }
+  ok('unknown tool names, Object.prototype members included -> -32602');
+
+  // ping answers an empty result; a notification (no id) gets no reply at all.
+  assert.deepStrictEqual(handle({ jsonrpc: '2.0', id: 11, method: 'ping' }).result, {});
+  assert.strictEqual(handle({ jsonrpc: '2.0', method: 'ping' }), null);
+  ok('ping -> {}; a notification gets no reply');
 }
 
 // ---------------------------------------------------------------------------
@@ -372,6 +385,14 @@ function testReference() {
   assert.strictEqual(bad.isError, true);
   assert.ok(joined(bad).includes('Genres:'), 'an unknown name is told what does exist');
   ok('reference for a genre that does not exist -> isError naming the ones that do');
+
+  // Names every object carries: a plain lookup in the task table found the
+  // prototype member and served a function as a file path.
+  for (const nm of ['constructor', '__proto__', 'toString']) {
+    const r = call('figdown_reference', { name: nm });
+    assert.ok(r.isError && joined(r).includes('unknown reference'), nm + ' must be an unknown reference, got ' + joined(r).slice(0, 120));
+  }
+  ok('reference names that are Object.prototype members -> the ordinary unknown-reference answer');
 }
 
 function testHygiene() {

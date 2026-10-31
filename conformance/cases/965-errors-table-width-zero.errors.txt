@@ -1,0 +1,4 @@
+Line 14: bad width "0" — a column needs a positive width (auto | <px> | <n>%)
+Line 19: bad width "0%" — a column needs a positive width (auto | <px> | <n>%)
+Line 24: bad width "0.0" — a column needs a positive width (auto | <px> | <n>%)
+Line 29: bad width "0px" — a column needs a positive width (auto | <px> | <n>%)

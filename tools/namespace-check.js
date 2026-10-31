@@ -62,6 +62,8 @@ const path = require('path');
 
 const ROOT = path.join(__dirname, '..');
 const args = process.argv.slice(2);
+const badOpt = args.find(a => a.startsWith('-') && !['--strict', '--verbose'].includes(a));
+if (badOpt) { console.error('namespace-check: unknown option ' + badOpt + '\nusage: node tools/namespace-check.js [--strict] [--verbose]'); process.exit(2); }
 const VERBOSE = args.includes('--verbose');
 
 const rel = p => path.relative(ROOT, p);

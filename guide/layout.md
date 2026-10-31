@@ -100,7 +100,7 @@ the ladder below, which now ends at `pin`.
 
 ## 2. The escalation ladder
 
-Try each rung, rebuild (`node tools/build-svg.js X.fd`), and **stop as soon
+Try each rung, rebuild (`node tools/build-svg.js X.fd`, or `figdown-svg X.fd` from an npm install), and **stop as soon
 as the figure reads clearly.** The lowest rung that works is the right choice.
 
 | Rung | Directive | When |

@@ -41,8 +41,13 @@ const path = require('path');
 
 const ROOT = path.join(__dirname, '..');
 const strict = process.argv.includes('--strict');
+const badOpt = process.argv.slice(2).find(a => a.startsWith('-') && !['--strict'].includes(a));
+if (badOpt) { console.error('plugin-check: unknown option ' + badOpt + '\nusage: node tools/plugin-check.js [--strict]'); process.exit(2); }
 const fail = [];
 let found = 0;
+// Declared here, not at its assignment: report() reads it, and an unreadable
+// manifest calls report() before the assignment is reached (TDZ throw).
+let DESCRIPTIONS;
 const note = (m) => fail.push(m);
 
 function readJSON(rel) {
@@ -121,7 +126,7 @@ function skillDescription() {
   return v.trim();
 }
 
-const DESCRIPTIONS = [
+DESCRIPTIONS = [
   ['package.json',       pkg.description],
   ['plugin.json',        plug.description],
   ['marketplace entry',  entry && entry.description],
@@ -166,6 +171,25 @@ for (const [what, o] of [['plugin.json author', plug.author], ['marketplace owne
     note(what + ' email ' + JSON.stringify(o.email) + ' is neither a figdown.org nor a noreply address');
 }
 
+// Every URL the manifests (and package.json) publish must be the project's own:
+// the name and email checks above leave author.url, homepage and repository
+// free to name a personal site or a personal repository.
+const HOME = 'https://figdown.org';
+const REPO = 'https://github.com/FigDown/figdown';
+const urlFields = [
+  ['plugin.json homepage', plug.homepage, HOME],
+  ['plugin.json author.url', plug.author && plug.author.url, HOME],
+  ['plugin.json repository', plug.repository, REPO],
+  ['marketplace owner.url', mkt.owner && mkt.owner.url, HOME],
+  ['marketplace entry homepage', entry && entry.homepage, HOME],
+  ['marketplace entry author.url', entry && entry.author && entry.author.url, HOME],
+  ['package.json homepage', pkg.homepage, HOME],
+  ['package.json repository.url', pkg.repository && pkg.repository.url, 'git+' + REPO + '.git'],
+];
+for (const [what, v, want] of urlFields)
+  if (v !== undefined && v !== want)
+    note(what + ' is ' + JSON.stringify(v) + ', expected ' + JSON.stringify(want));
+
 report();
 
 function report() {
@@ -177,7 +201,7 @@ function report() {
   // DESCRIPTIONS, PRINTED UNCONDITIONALLY. Three of these four are different
   // genres of prose and cannot be asserted equal, so the only way drift among
   // them stops being invisible is to put them on the screen every run.
-  if (typeof DESCRIPTIONS !== 'undefined') {
+  if (DESCRIPTIONS !== undefined) {
     console.log('');
     console.log('  description text (plugin.json and the marketplace entry must match exactly):');
     for (const [what, v] of DESCRIPTIONS) {

@@ -1337,7 +1337,9 @@ const NOT_JUDGED = [
 // that gains its first F5 defect — fails the gate immediately, in --strict and
 // out of it, so a NEW ambiguity in a clean figure is caught the moment it lands
 // while the filed residue is not masked as clean. When items 26/27 clear a
-// figure, lower its entry (to 0, then delete it); when all reach 0, F5 becomes a
+// figure, lower its entry (to 0, then delete it) IN THAT COMMIT: a figure
+// measured below its baseline fails too, so a stale-high entry cannot absorb a
+// later regression; when all reach 0, F5 becomes a
 // hard --strict 0 and the ratchet is retired. Keys are paths relative to the
 // project root, so the match is CWD-independent.
 //
@@ -1900,6 +1902,19 @@ function main() {
     for (const x of cleared)
       console.log('  cleared   ' + pad(x.file, 46) + 'F5 0/' + x.base
                   + '  — baseline may be lowered');
+    // A ratchet that only trips on a RISE lets a stale-high baseline absorb a
+    // later regression back up to it (measured 1, baseline 5: a rise 1 -> 4
+    // stays green). Tighten it in the commit that improved the figure.
+    const slack = cleared.map(x => ({ file: x.file, now: 0, base: x.base }))
+      .concat(residue.filter(x => x.now < x.base));
+    if (slack.length) {
+      console.log('');
+      console.log('F5 STALE BASELINE — the figure is better than its ratchet baseline allows:');
+      for (const x of slack)
+        console.log('  ' + pad(x.file, 46) + 'F5 ' + x.now + ' < baseline ' + x.base
+                    + '   lower F5_BASELINE to ' + x.now + ' in this commit');
+      anyFail = true;
+    }
     console.log('  baseline residue is the item-26/27 layout-repair set; it is TOLERATED,');
     console.log('  never masked as clean. F5 becomes a hard --strict 0 when it reaches 0.');
     if (regressed.length) {

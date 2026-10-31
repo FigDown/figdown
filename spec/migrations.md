@@ -411,6 +411,49 @@ measurements, in the source
 repository's development entries dated 2026-10-15 and 2026-10-21. This
 paragraph is the summary that ships.
 
+**`v0.5.3` — a `Z` release under this language version (2026-10-31).** The
+language does not move: `figdown` stays `0.5`, no `.fd` gains or loses a
+spelling, no existing conformance golden changes (six are added), and
+`read/0.5/` is reused byte-for-byte (core §13.7.3). What ships is layout
+room for labelled links, two table inputs that were silently wrong and are
+now refused, engine robustness fixes, three editor repairs and hardened
+tools. **Three of its changes act on documents that do not move their
+header**, and none is version-gated.
+
+1. **A table `cell <r> highlight` line that carries `fill=`, `stroke=` or
+   `class=` is now refused.** The keys were accepted and dropped: they never
+   reached the model and nothing drew them. Drop the key, or paint a cell
+   (`cell (r,c) fill=…`). The shipped corpus has no instance.
+2. **A table `width` of zero (`0`, `0.0`, `0%`, `0px`) is now refused.** It
+   drew a zero-width column, while `pin width=0` was already refused. Give
+   a positive width. The shipped corpus has no instance.
+3. **Labelled links get room for their labels, so some figures re-render.**
+   Two nodes in one `rank` joined by a labelled edge get a gap that holds
+   the label, instead of a label written over both boxes. Under vertical
+   flow, the seam between two ranks holds the labels of a pair's parallel
+   labelled links, and three or more such links each get their own slot
+   along the run. Two shipped figures change their drawing:
+   `examples/evpn-fabric` and `examples/statechart/bfd-session`. The fix
+   trades a little edit locality, as `BOUNDED-GROWTH-ACCOMMODATION` allows: removing the labelled
+   leaf-to-leaf edge from `examples/evpn-fabric.fd` moves one node back
+   53.5 px, because the gap it widened is no longer needed.
+
+Everything else moves no accepted document. An id, class name, option value
+or keyword spelled `constructor`, `toString`, `valueOf`, `hasOwnProperty`
+or `__proto__` crashed the engine or drew garbage, and now behaves like any
+other word. Edge routing is about 13× faster on large figures, with the same
+bytes. An `x-` option key on a timing `signal` line gets the RESERVED
+diagnostic. The editor's repairs change no engine byte. Every gate tool now
+refuses an unknown option instead of ignoring it.
+
+**Specification text corrected.** `syntax-style.md` rule 2.2 states what the
+engine accepts unquoted; `block`'s single-percent band is stated as
+shorthand for `0..<pct>%`; `migrate.md` states the migrator's exit codes;
+counts and rows in core §15.7 and experimental E0.1 are recounted. None of
+these changes a rule. Each engine and editor change is entered in full,
+with its measurements, in the development entries 0.5 to
+0.5 below. This paragraph is the summary that ships.
+
 ## Entry format
 
 ```

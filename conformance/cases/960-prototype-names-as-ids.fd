@@ -1,0 +1,32 @@
+# Core §15 — A HOST-LANGUAGE NAME IS AN ORDINARY ID.
+#
+# `constructor`, `toString`, `valueOf`, `hasOwnProperty` and `__proto__` are
+# legal ids by the id rule (core §1): nothing in the grammar reserves them.
+# A JavaScript engine that keys an id, a class name or an option value into a
+# plain object reads them as the object's inherited members instead. The
+# reference engine did, until this release: `node constructor` plus any edge
+# threw, a lone one drew `viewBox="0 0 NaN NaN"`, and a `__proto__` key
+# reached the prototype every later render in the process shares.
+#
+# So this file uses each of them where an author's word is a key: node ids,
+# a group id with `in=`, a class id with `class=`, both ends of an edge, a
+# `rank` list and a `pin`. It must parse, render, and render the same bytes
+# twice, exactly as it would with any other five words. The refusal half
+# (the same words where they are NOT a keyword or an enum value) is
+# `961-errors-prototype-names-unknown-words`.
+figdown 0.5 block
+title "Prototype names are ordinary ids"
+class valueOf "hot"
+group hasOwnProperty "G"
+node constructor "C" class=valueOf in=hasOwnProperty
+node toString "T"
+node __proto__ "P" in=hasOwnProperty
+node b "B"
+edge constructor -> toString
+edge toString -> __proto__
+edge __proto__ -> b
+edge b -> constructor
+rank toString,b
+layout
+pin b at=(700,40)
+pin __proto__ at=(400,160)

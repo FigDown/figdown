@@ -179,7 +179,7 @@ fixtures it emits an empty array where the golden carries members.
 
 | fixture | kind | experimental keywords it writes |
 |---|---|---|
-| `112-lex-extra-args-every-directive` | errors | `band`, `signal`, `threshold`, `timing` |
+| `112-lex-extra-args-every-directive` | errors | `band`, `gap`, `signal`, `threshold`, `timing` |
 | `115-lex-option-before-label` | model | `band`, `bundle`, `threshold` |
 | `118-id-quoted-positions` | errors | `bundle`, `timing` |
 | `119-id-double-dash` | errors | `bundle` |
@@ -261,10 +261,10 @@ files exist to provide, so it was not done.
   and they are absent from the skill's frozen genre reference, which
   `tools/isolation-check.js` and `tools/skill-coverage.js` gate.
   **This is a claim about what is TAUGHT, not about what exists on disk.**
-  Eight in-repo figures outside `examples/reference/experimental/` use one
-  of the three — `partition-map` and `evpn-fabric` and `srl-evpn-irb` and
-  `patterns/topology-b`, plus the four `layout-compare` variants of the
-  last two — so an implementation that skips the experimental surface
+  Five in-repo figures outside `examples/reference/experimental/` use one
+  of the three — `partition-map`, `srl-evpn-irb`, `link-bundle-lag`,
+  `patterns/topology-b` and `layout-compare/srl-evpn-irb-auto` — so an
+  implementation that skips the experimental surface
   cannot render this repository's own `examples/` directory in full. That
   is the honest measure of "portable surface": it is the surface an author
   is taught, and the project's own showcase reaches past it.

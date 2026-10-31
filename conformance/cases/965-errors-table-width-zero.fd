@@ -1,0 +1,29 @@
+# Table §width — A COLUMN NEEDS A POSITIVE WIDTH.
+#
+# `width 0,auto` and `width auto,0%` drew a zero-width column, while
+# `pin width=0` was already refused. RULE 4.4: a spelling shared on purpose
+# shares its value grammar. Each of the four tables below has one zero
+# width (`0`, `0%`, `0.0`, `0px`) and must be refused on its `width` line.
+# A zero with a unit gets the same error, not the `px` hint: rewriting
+# `0px` as the hint said (`0`) was refused in turn.
+figdown 0.5 table
+table t1 "T1"
+| A | B |
+|---|---|
+| a | b |
+width 0,auto
+table t2 "T2"
+| A | B |
+|---|---|
+| a | b |
+width auto,0%
+table t3 "T3"
+| A | B |
+|---|---|
+| a | b |
+width 0.0,10
+table t4 "T4"
+| A | B |
+|---|---|
+| a | b |
+width 0px,auto

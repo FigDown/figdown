@@ -261,7 +261,9 @@ the run aborts with a named error instead.
   both report the engine's own `FIGDOWN_VERSION`; loads each build, renders
   a sample through it and requires the two to agree byte-for-byte; and
   reparses every published `.fd` under `examples/` and `figures/` through
-  `dist/figdown.js`, requiring the same error set as the reference engine.
+  `dist/figdown.js`, requiring the same error set as the reference engine;
+  and checks that `package.json`'s `main`, `module` and `exports["."]` name
+  those two builds, and that every `bin` target and `files` entry exists.
   *The failure:* `dist/` was the only generated artifact class in the
   repository with **no gate at all** — `conformance/run.js` loads the engine
   from `conformance/figdown.html` or `../editor/figdown.html` and never reads
@@ -613,7 +615,7 @@ out of the engine, never restated here.
 | `geometry-refused` | the source parses and `render` then **refuses** it (core §8): the drawing would state something the source does not. `build-svg` writes nothing for it and `layout-lint` skips it under this same name. A **missing** artifact is the correct state — counted, listed with the engine's own diagnostics, and clean |
 | `REFUSED-ARTIFACT` | the engine refuses the figure and an `.svg` is on disk anyway. The remedy is `rm`, not a rebuild |
 | `no-engine-version` | built before 0.1, so the attribute does not exist. **No version is inferred** — the absence is itself the information (MIGRATIONS 0.1). Counted on its own line, neither warned nor failed |
-| `skip` | `no-metadata` (an `.svg` with no `figdown-source` element), `no-source` (metadata, but the paired `.fd` is absent), or `no-artifact` (a `.fd` the engine **will** draw with no `.svg` built from it). All are **counted and listed**, never silently omitted |
+| `skip` | `no-metadata` (an `.svg` with no `figdown-source` element; one beside a paired `.fd` fails `--strict`, since its source was stripped), `no-source` (metadata, but the paired `.fd` is absent), or `no-artifact` (a `.fd` the engine **will** draw with no `.svg` built from it). All are **counted and listed**, never silently omitted |
 
 **A stale artifact exits 1 with or without `--strict`.** That is deliberate,
 and it is the one place these tools depart from "`--strict` is what makes it
@@ -721,7 +723,7 @@ and never looks at a single character of what the comment above it or the label
 inside it actually says. This tool owns both.
 
 Rule 1 is the comments. That is where the reference figures do their teaching —
-`examples/reference/block.fd` is 120 lines carrying 61 comment lines — so a
+`examples/reference/block.fd` is 121 lines carrying 62 comment lines — so a
 stale comment there teaches a spelling that is now a line error, with the
 authority of the standard's own example. Rule 2 is the strings that render, and
 has [its own section](#rule-2--no-internal-reference-in-a-string-that-renders)
@@ -745,7 +747,7 @@ It lives in this tool rather than a nineteenth one because this tool is
 already the gate over `.fd` prose the engine never reads, over precisely the
 corpus the rule applies to. Test fixtures are deliberately outside that
 corpus: `conformance/cases/`, `conformance/experimental/` and
-`tools/migrate-fixtures/` are minimal inputs, and 118 of the
+`tools/migrate-fixtures/` are minimal inputs, and all of the
 `conformance/cases/*.errors.txt` goldens carry 1-based `Line N:` prefixes
 that an inserted line shifts by one.
 
@@ -853,7 +855,7 @@ documentation snippet that does not parse is caught before it teaches a
 spelling that does not exist.
 
 ```
-node tools/fence-check.js [--strict] [<file.md | dir> ...]
+node tools/fence-check.js [--strict] [--help] [<file.md | dir> ...]
 ```
 
 Default paths when none are given: repo root `*.md` files (non-recursive),
@@ -1227,6 +1229,10 @@ Four assertions, all on every run:
 - **A. the schema itself** — 2020-12, and it may use **no keyword this file's
   validator does not implement**. An unimplemented keyword asserts nothing, so
   it is refused rather than ignored (the `LANE-ALPHABET-KEY-RESERVATION` guard discipline).
+- **A2. closedness** — in the model schema and in
+  `spec/figdown-manifest.schema.json`, every subschema that declares
+  `properties` carries `additionalProperties: false`, the CLOSED promise both
+  headers make.
 - **B. the goldens** — every `.model.json` in `conformance/cases/` and
   `conformance/experimental/`.
 - **C. the published corpus** — every `.fd` under `examples/` and `figures/`,

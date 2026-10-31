@@ -1,0 +1,22 @@
+# Core §15 — A HOST-LANGUAGE NAME IS AN ORDINARY ID, under `sequence`.
+#
+# The sequence half of `960-prototype-names-as-ids`, experimental because the
+# genre is. The sequence model keys its containers, their owned rows, its
+# columns, its classes and its last-state table by author ids. Until
+# 0.5 the reference engine kept those in plain objects:
+# `fragment __proto__` with a member message threw, and `class=__proto__` on
+# a message set a property on the prototype every later render in the
+# process shares. Here each name is a fragment, an operand, a lifeline, a
+# class and a state scope, and the document must parse and render like any
+# other.
+figdown 0.5 sequence
+class __proto__ "retry path"
+lifeline constructor "Client"
+lifeline toString "Server"
+fragment __proto__ "retry" type=loop
+operand valueOf "until acknowledged" in=__proto__
+message constructor -> toString "request" in=valueOf class=__proto__
+state toString "WAIT" in=valueOf
+message toString -> constructor "ack" in=valueOf
+fragment hasOwnProperty "maybe" type=opt
+message constructor -> toString "close" in=hasOwnProperty

@@ -71,6 +71,8 @@ const ROOT = path.join(__dirname, '..');
 const args = process.argv.slice(2);
 const STRICT = args.includes('--strict');
 const VERBOSE = args.includes('--verbose');
+const badOpt = args.find(a => a.startsWith('-') && !['--strict', '--verbose'].includes(a));
+if (badOpt) { console.error('alt-check: unknown option ' + badOpt + '\nusage: node tools/alt-check.js [--strict] [--verbose] [<file.md | dir> ...]'); process.exit(2); }
 const roots = args.filter(a => !a.startsWith('-'));
 
 const rel = p => path.relative(ROOT, path.resolve(p)) || '.';

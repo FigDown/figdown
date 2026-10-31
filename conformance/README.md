@@ -9,6 +9,12 @@ without consulting the reference PoC" (§11), made checkable. **Three
 named exceptions**, measured and stated rather than hidden, are in the
 box below; read it before you rely on the sentence above.
 
+**Requirement keywords.** The key words of BCP 14
+([RFC 2119](https://www.rfc-editor.org/rfc/rfc2119),
+[RFC 8174](https://www.rfc-editor.org/rfc/rfc8174)) are used in this document
+as core **§0.1** declares them, and only when they appear in all capitals; a
+keyword inside a quotation of the spec is the spec's, not a second requirement.
+
 > **What "without reading the reference engine" does and does not claim
 > (rewritten, after three reviewers measured the old
 > wording and it did not hold).**
@@ -452,7 +458,7 @@ each size.
 
 | Set | Size — read it from | Which |
 |---|---|---|
-| **A** — header genre is EXPERIMENTAL | `run.js`, the `… by genre` figure | `topology` (240, 241, 249, 251, 258, 259, 271, 390–394, 909, 955–959), `timing` (600–606, 916, 919 — the genre was spelled `wave` until 0.1, `TIMING-GENRE-NAMING`), `flowchart` (011, 210, 213, 220–223, 225, 226, 235–238, 242, 243, 247, 919), `statechart` (230–235, 244, 245, 248, 919), `sequence` (280–296 — the whole band, since every fixture that can declare the genre is by definition experimental) |
+| **A** — header genre is EXPERIMENTAL | `run.js`, the `… by genre` figure | `topology` (240, 241, 249, 251, 258, 259, 271, 390–394, 909, 955–959), `timing` (600–606, 916, 919 — the genre was spelled `wave` until 0.1, `TIMING-GENRE-NAMING`), `flowchart` (011, 210, 213, 220–223, 225, 226, 235–238, 242, 243, 247, 919), `statechart` (230–235, 244, 245, 248, 919), `sequence` (280–298, 962 — the whole band, since every fixture that can declare the genre is by definition experimental) |
 | **B** — dedicated test of a demoted keyword, or of an experimental genre-owned keyword | `run.js`, the `… by demoted construct` figure | `threshold`/`band` (241, 243, 244, 265, 370–376, 914) + `bundle` (240, 243, 244, 271, 390–394, 955–959) + `chart` (265, 700, 701, 909, 915) + `role` (220–224, the flowchart role vocabulary) + `connector` (225–227, 233–238, 245, 283, 284, 290). **No** `path`/`routing`: there were 11 until `EDGE-GEOMETRY-CONSTRUCTS` withdrew both keywords at 0.1, and a withdrawn construct is not a demoted one. **`plane` likewise since 0.3** (`PAINT-ORDER-CONSTRUCT`): five of its six fixtures were deleted and `334-layer-retired` is the one record left, kept for its retirement diagnostic, not for the construct |
 | A ∩ B | `run.js`, the `… both` figure | every `STATUS.txt` record carrying two reasons — the definition, and the only form that cannot drift. It is no longer worth enumerating by hand: 0.3 alone added five members and removed six, and the 0.1 cleanup exists because an enumeration here named three fixtures that had been deleted twenty lines above |
 | **A ∪ B** — EXPERIMENTAL | `run.js`, the EXPERIMENTAL total | the whole of `conformance/experimental/` |
@@ -603,6 +609,7 @@ carries a `.geometry.txt` (four today: `369`, `924`, `958`, `959`). Case numberi
 | `7xx` | `chart` (spelled `plot` until 0.1) — in `experimental/`, outside the conformance surface. Until 0.1 these two fixtures were the ONLY residents of that directory and no default run executed them |
 | `955` | **the bundle duplicate-member fix** (`MEMBER-LIST-DUPLICATION` — identity-model-proposal probe 5) — one **EXPERIMENTAL** fixture in `experimental/`, `955-bundle-duplicate-member`: the same resolved edge named twice in one `bundle`'s member list, once by identical spelling (`a--b,a--b`) and once by a reversed spelling of an undirected pair (`a--c,c--a`), both caught because the check is on the resolved *Edge*, not the string. It is not in `39x` — the `bundle` band, and thematically where it belongs — because that band is exhausted: `390`–`396` are in use and `397`–`399` were deleted with `routing`/`path` at `EDGE-GEOMETRY-CONSTRUCTS` and are not reused (the band's own rule, README above) |
 | `95x` | **adversarial input** (core §15) — five **NORMATIVE** fixtures in `cases/`, and the only `9xx` run that carries BOTH kinds of golden. The split is the claim: §15 says the language does **not** refuse hostile-looking text (it carries it as data) but **does** refuse input that could not produce a well-formed artifact, and one fixture kind alone would pin the wrong half. **`950`–`952` are VALID documents with `.model.json` goldens** — their STRINGS spell markup, and what the golden pins is that hostile text arrives in the model byte for byte, unescaped and unstripped: `950` puts `<script>`, an event handler, a `javascript:` URL, a `foreignObject` and an `@import` into the title, a class meaning, group and node labels, all three edge-label positions and six `note=` strings; `951` does the same to `description=`, the one string written FOR a machine reader; `952` is the CDATA attack on §7's embedded source — `]]>`, the pre-spliced `]]]]><![CDATA[>`, a closing `</metadata>` and a `<script>` behind it. **`953`–`954` are REFUSALS with `.errors.txt` goldens** — `953` is `XML-CHARACTER-LEGALITY`'s XML-illegal characters (eleven lines over two diagnostics, plus a same-file node carrying tab, `U+007F`, C1 and an astral character that must produce NONE; it contains raw bytes no editor will show you, and it cannot cover the unpaired-surrogate half, which has no UTF-8 encoding — the gate probes that one through `parse()` instead), and `954` is the extreme-numeric class inside `pin at=(…)`. For `950`–`952` the complement — that the same strings reach the ARTIFACT as escaped text and never as markup — has no golden and cannot have one (spec §3 gives no byte-identity across renderer versions); it is `gate:safesvg`'s, which renders all three fresh in both render modes and reads the output structurally |
+| `96x` | **host-language names as author words** (core §15) — `constructor`, `toString`, `valueOf`, `hasOwnProperty`, `__proto__`. `960` (NORMATIVE, `.model.json`) uses them as node, group, class, edge-end, `rank` and `pin` ids and must render like any other ids; `961` (NORMATIVE, `.errors.txt`) writes them where a keyword, an enum value or an option key is wanted and pins that each gets the ordinary unknown-word diagnostic; `962` (EXPERIMENTAL, in `experimental/`) is the `sequence` half — lifeline, fragment, operand, class and state-scope ids; `963` (NORMATIVE, `.errors.txt`) is the reserved `x-` option key on a timing `signal` line, split in lane mode, which must get the same RESERVED diagnostic as `909`; `964` (NORMATIVE, `.errors.txt`) is `fill=`, `stroke=` and `class=` on the table row form `cell <r> highlight`, each a line error, with the bare row form still legal; `965` (NORMATIVE, `.errors.txt`) is a table `width` value of `0`, `0%`, `0.0` or `0px`, each a line error |
 
 Each case isolates one behavior (error
 cases may carry several lines of the *same* behavior family, since the
@@ -785,7 +792,7 @@ nothing about.
 ## The harness contract — how an implementation this project did not write runs this suite
 
 **The problem this closes, said plainly.** Core §0.2 tells an outside
-claimant that `conformance/cases/`'s 206 normative fixtures **are** the
+claimant that `conformance/cases/`'s normative fixtures **are** the
 **Parser** class's conformance suite, and `INDEPENDENT-IMPLEMENTATION-CRITERION`'s adversarial exercise
 hands a reader the frozen partitions and asks for a parser that passes
 them. Until this contract landed, the fixture DATA was portable and the
@@ -873,7 +880,7 @@ node conformance/run.js                                                   # in-p
 node conformance/run.js --engine-cmd='node conformance/adapters/reference-engine.js'
 ```
 
-Both print **206 normative / 84 experimental / 290 total, 0 failed**,
+Both print **the same normative / experimental / total counts, 0 failed**,
 and the per-fixture `PASS` lines are identical. **In subprocess mode the
 reference engine is never loaded** — `run.js` does not look for
 `figdown.html` at all, so a tree containing only `conformance/` and your
@@ -883,7 +890,7 @@ about 33 s against the in-process run's 0.6 s — a process start per
 fixture — so it is a reproduction command rather than a gate.
 `npm run gate:harness` ([tools/harness-check.js](../tools/harness-check.js))
 is the gate: ~3 s over a five-fixture slice plus the refusal branches
-above, which the 290-fixture run never exercises because a well-behaved
+above, which the full run never exercises because a well-behaved
 adapter never hits one.
 
 ## Update policy

@@ -92,8 +92,8 @@ function loadEditorCore() {
     'parseBitfieldSelectionId','bitfieldSelectionModel','encodeCompactName','compactItemParts','rewriteClassicFieldName',
     'rewriteClassicFieldWidth','rewriteCompactFieldItem','rewriteFieldOption','fieldOptionAbsent','fieldOptionWritten','setBitfieldOption',
     'addBitfieldField','addBitfieldBreak','deleteBitfieldItem','moveBitfieldLine','moveBitfieldLineBefore','bitfieldBudget',
-    'moveNodeLineSource','moveNodeOrderMatches',
-    'sourceLineContexts','sourceHighlightLine','inspectorHtml','rewriteThresholdOffset','nodeLineIdx','groupNodesSource'];
+    'moveNodeLineSource','moveNodeOrderMatches','linkAddedOne','dropEmptyContainers',
+    'sourceLineContexts','sourceHighlightLine','inspectorHtml','rewriteThresholdOffset','nodeLineIdx','groupNodesSource','emitPins'];
   // ensureFlowDirective reads the parsed sections through docForSection.
   const src = 'const lastDocs=[];\n'+names.map(uiFunction).join('\n');
   return new Function('parse','render','findComment','scanConnectorLine','connectorKwAt','GENRE_NODE_KW','GENRE_KW','CHILD_KW',
@@ -108,7 +108,7 @@ function loadEditorCore() {
     'rewriteClassicFieldName,rewriteClassicFieldWidth,rewriteCompactFieldItem,rewriteFieldOption,fieldOptionAbsent,fieldOptionWritten,setBitfieldOption,'+
     'escapeFdString,'+
     'addBitfieldField,addBitfieldBreak,deleteBitfieldItem,moveBitfieldLine,moveBitfieldLineBefore,bitfieldBudget,'+
-    'moveNodeLineSource,moveNodeOrderMatches,sourceLineContexts,sourceHighlightLine,rewriteThresholdOffset,groupNodesSource};')(
+    'moveNodeLineSource,moveNodeOrderMatches,linkAddedOne,dropEmptyContainers,sourceLineContexts,sourceHighlightLine,rewriteThresholdOffset,groupNodesSource,emitPins};')(
       engine.parse,engine.render,engine.findComment,engine.scanConnectorLine,engine.connectorKwAt,engine.GENRE_NODE_KW,
       engine.GENRE_KW,engine.CHILD_KW,engine.directiveOpts,engine.docNodes,engine.isId,engine.tokenize,engine.splitOpts,engine.belowOptVersion);
 }
@@ -367,6 +367,8 @@ const EMITTERS = [
 ];
 
 const strict = process.argv.includes('--strict');
+const badOpt = process.argv.slice(2).find(a => a.startsWith('-') && !['--strict'].includes(a));
+if (badOpt) { console.error('editor-check: unknown option ' + badOpt + '\nusage: node tools/editor-check.js [--strict]'); process.exit(2); }
 let fails = 0;
 const fail = (m) => { console.log('FAIL  ' + m); fails++; };
 
@@ -606,6 +608,15 @@ const thrBase=['figdown 0.5 block','node q "Queue"','threshold "drain at offset=
 passBuilt('threshold drag rewrites the offset= option, not label or comment text',thrBase,editorCore.rewriteThresholdOffset(thrBase.slice(),0,3,65),(d,ls)=>
   d.thresholds[0].pct===65&&d.thresholds[0].label==='drain at offset=80%'&&ls[2].endsWith('# was offset=40%'));
 check('threshold drag postcondition reads the model field the parser writes',html.includes('+x.pct===pct)')&&!html.includes('+x.offset===pct'),'');
+// emitPins is the number-producing half of every node/group drag: frame
+// origin subtraction, group-relative offsets, and the three-decimal fixed
+// point (a rounded integer moves the element the gesture just placed). The
+// format-string checks above never execute it.
+const emitSnap={groups:{g:{x:110,y:70.0004}},nodes:{a:{x:130.12345,y:90},b:{x:50,y:60}}};
+const emitDoc={nodes:[{id:'a',group:'g'},{id:'b'}]};
+check('emitPins subtracts the frame, nests group members, keeps three decimals',
+  JSON.stringify(editorCore.emitPins(emitSnap,{left:10,top:20},emitDoc))===JSON.stringify([['g',100,50],['a',20.123,20],['b',40,40]]),
+  JSON.stringify(editorCore.emitPins(emitSnap,{left:10,top:20},emitDoc)));
 // `layout # note` is the layout marker (core §3's own example carries a
 // comment on it); a second marker is "duplicate layout line", so a drag that
 // failed to see it was refused.
@@ -864,6 +875,61 @@ check('both toolbar table actions consult the selection and verify by block id',
   occurrences(html,"const nt=(parsed.docs[0].blocks||[]).find(x=>x.type==='table'&&x.id===t.id);")===2&&
   !/const nt=firstTypedBlock\(parsed\.docs\[0\],'table'\)/.test(html));
 
+// The inspector's postconditions must re-find the block the edit WROTE, by
+// id. Re-finding `firstTypedBlock` verified a row highlight on table 2, or a
+// word/numbering/break/delete on bitfield 2, against block 1: the legal edit
+// was refused ("semantic postcondition failed"), or passed vacuously when
+// block 1 happened to agree. The emitter itself was always right:
+const twoBits=['figdown 0.1 bitfield','bitfield b1 "One" numbering=msb0','field "A" 8','field "B" 8',
+  '','bitfield b2 "Two" word=16 numbering=msb0','field "C" 4','field "D" 4'];
+const wordB2=editorCore.setBitfieldOption(twoBits.slice(),0,'b2','word','8');
+passBuilt('word= on the SECOND bitfield changes that block and leaves the first alone',
+  twoBits,wordB2,d=>d.blocks.find(x=>x.id==='b1').word===32&&d.blocks.find(x=>x.id==='b2').word===8);
+check('no GUI postcondition re-finds a typed block by position',
+  !/firstTypedBlock\(parsed\./.test(html)&&
+  occurrences(uiFunction('buildBitfieldInspector'),"(parsed.docs[sectionIndex].blocks||[]).find(x=>x.type==='bitfield'&&x.id===block.id)")===4&&
+  uiFunction('buildTableInspector').includes("const nt=(parsed.docs[sectionIndex].blocks||[]).find(x=>x.type==='table'&&x.id===t.id);return !!nt&&((nt.rowmarks||[]).some(x=>x.r===row)===on);"),
+  '');
+// A numeric option is read back as a NUMBER: `gap=8.0`, `word=08` and
+// `width auto,70.0` are legal and parse to 8, 8 and 70, so a postcondition
+// comparing the typed spelling with String(model) refused each legal edit.
+check('numeric postconditions compare values, not spellings',
+  engine.parse('figdown 0.1 table\ntable t "T"\n| A |\n|---|\n| 1 |\nwidth 70.0').doc.blocks[0].width.vals[0].v===70&&
+  uiFunction('buildInspector').includes("key==='gap'?Number(x.gap)===Number(val)")&&
+  uiFunction('buildBitfieldInspector').includes('return !!b&&b.word===Number(value);')&&
+  uiFunction('buildTableInspector').includes("String(Number(v.replace(/%$/,'')))+(v.endsWith('%')?'%':'')"),'');
+check('the inspector break postcondition counts breaks rather than asking whether any exists',
+  uiFunction('buildBitfieldInspector').includes("(b.fields||[]).filter(f=>f.wrap).length===breaks+1")&&
+  !uiFunction('buildBitfieldInspector').includes("(b.fields||[]).some(f=>f.wrap)"),'');
+
+// Link mode adds a connector; a parallel `a -> b` is legal, so the
+// postcondition has to COUNT. Asking whether one exists passed vacuously
+// when the document already held one, whatever the edit wrote.
+{
+  const linked=['figdown 0.1 block','node a "A"','node b "B"','edge a -> b'].join('\n');
+  const add=(extra)=>({lines})=>{lines.splice(lines.length,0,...extra);return {lines,connector:'edge'};};
+  const post=({before,parsed,built})=>editorCore.linkAddedOne(before,parsed,built,'a','b');
+  const good=editorCore.prepareGuiEdit(linked,0,add(['edge a -> b']),post,{},1);
+  const vacuous=editorCore.prepareGuiEdit(linked,0,add(['edge b -> a']),post,{},1);
+  check('link mode postcondition counts a -> b instead of asking whether one exists',
+    good.ok===true&&vacuous.ok===false&&/semantic postcondition failed/.test(vacuous.error||'')&&
+    html.includes("({before,parsed,built})=>linkAddedOne(before,parsed,built,a,b)"),
+    JSON.stringify({good:good.ok,vacuous}));
+}
+
+// A delete keeps a removed line's trailing comment as a line of its own.
+// Membership (`in=<id>`) is read from code only, so a kept comment that
+// spells `in=o1` does not keep an emptied operand (and its fragment) alive.
+{
+  const before=['figdown 0.4 sequence','lifeline c "C"','lifeline s "S"','lifeline p "P"','fragment f "F" type=opt',
+    'operand o1 "if" in=f','message c -> p "x" in=o1 # was in=o1 before','message c -> s "y"'];
+  const after=before.slice(0,3).concat(before.slice(4,6),['# was in=o1 before'],before.slice(7));
+  const out=editorCore.dropEmptyContainers(after.slice(),before,0);
+  check('an emptied container is dropped although a kept comment spells in=<id>',
+    !out.some(l=>/^(fragment|operand)\b/.test(l))&&out.includes('# was in=o1 before')&&!engine.parse(out.join('\n')).errs.length,
+    out.join(' | '));
+}
+
 const budget=editorCore.bitfieldBudget(engine.parse(bitBase.slice(0,8).join('\n')).doc.blocks[0]);
 check('bitfield budget reports declared bits, word, rows and last-row usage',
   JSON.stringify(budget)===JSON.stringify({declared:20,remainder:false,rows:2,last:8,word:16,rowFields:true}),JSON.stringify(budget));
@@ -890,6 +956,21 @@ check('source highlight leaves 0.4 id= unhighlighted',!/tok-key[^>]*>id=/.test(e
 check('source highlight escapes CJK/HTML and leaves pipe rows verbatim',
   editorCore.sourceHighlightLine('node a "<中文&>"',ctx05[0]).includes('&lt;中文&amp;&gt;')&&
   !/tok-/.test(editorCore.sourceHighlightLine('| <b> |',ctx05[0])));
+// 0.5: a word that names an Object.prototype member is an ordinary
+// unknown word to the highlighter too — at keyword position, at genre
+// position, and as an option key. Before, `directiveOpts` returned a native
+// function and `new Set(...)` threw, so typing `constructor` broke paintSource.
+{
+  let painted;
+  try{
+    const ctxP=editorCore.sourceLineContexts(['figdown 0.1 constructor','node a "A"']);
+    painted=['constructor a b','__proto__ x','toString=1','node hasOwnProperty "H" valueOf=1'].map(l=>editorCore.sourceHighlightLine(l,ctx05[0]))
+      .concat([editorCore.sourceHighlightLine('node a "A"',ctxP[1])]);
+  }catch(e){ painted=['THROW '+e.message]; }
+  check('source highlight treats Object.prototype names as ordinary unknown words',
+    painted.length===5&&painted.slice(0,3).every(h=>!/tok-kw|tok-key/.test(h))&&
+    /tok-kw[^>]*>node</.test(painted[3])&&!/tok-key/.test(painted[3])&&!/tok-kw/.test(painted[4]),painted.join(' | '));
+}
 check('source gutter/highlight shell and paint hook cover success and both error exits',
   html.includes('id="sourceGutter"')&&html.includes('id="sourceHighlight"')&&occurrences(uiFunction('refresh'),'paintSource(')===3);
 check('table/bitfield GUI, multi-select, Ctrl+D and smart-guide entry points are wired',

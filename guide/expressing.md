@@ -3,7 +3,7 @@
 > **Non-normative index.** Spec is normative: [spec/core.md](../spec/core.md).
 > Full authoring workflow: [authoring.md](authoring.md) (pick a genre first, then come back here).
 > Layout hints: [layout.md](layout.md).
-> Build and validate: `node tools/build-svg.js X.fd` — errors are `Line N: message`.
+> Build and validate: `node tools/build-svg.js X.fd` (from an npm install: `figdown-svg X.fd`) — errors are `Line N: message`.
 
 Purpose: one-line lookup — "I need to show X → use Y." One row per intent. Notes column = a caveat or scope limit, not a tutorial.
 

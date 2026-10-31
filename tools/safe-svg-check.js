@@ -92,6 +92,8 @@ const crypto = require('crypto');
 const ROOT = path.join(__dirname, '..');
 const STRICT = process.argv.includes('--strict');
 const VERBOSE = process.argv.includes('--verbose');
+const badOpt = process.argv.slice(2).find(a => a.startsWith('-') && !['--strict', '--verbose'].includes(a));
+if (badOpt) { console.error('safe-svg-check: unknown option ' + badOpt + '\nusage: node tools/safe-svg-check.js [--strict] [--verbose]'); process.exit(2); }
 
 // ── the closed output vocabulary ─────────────────────────────────────────────
 // THIS IS THE MEASURED SET, NOT A WISH LIST — but the two halves of the

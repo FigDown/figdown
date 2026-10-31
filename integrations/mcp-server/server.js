@@ -252,7 +252,11 @@ function collect(dir, acc) {
   for (const name of fs.readdirSync(dir).sort()) {
     if (name === 'node_modules' || name === '.git') continue;
     const p = path.join(dir, name);
-    if (fs.statSync(p).isDirectory()) collect(p, acc);
+    // A dangling symlink (an editor lock file such as `.#a.fd`) has no stat:
+    // it is not a document, so it is skipped rather than aborting the walk.
+    let st;
+    try { st = fs.statSync(p); } catch (e) { continue; }
+    if (st.isDirectory()) collect(p, acc);
     else if (name.endsWith('.fd')) acc.push(p);
   }
   return acc;
@@ -444,7 +448,7 @@ function toolReference(args) {
       + 'Load the genre file BEFORE writing line 2, not only when something fails.');
   }
 
-  if (TASKS[name]) {
+  if (Object.prototype.hasOwnProperty.call(TASKS, name)) {
     return serveFiles([TASKS[name]], 'FigDown reference: ' + name + '.');
   }
 

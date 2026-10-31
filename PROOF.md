@@ -89,16 +89,16 @@ node conformance/run.js                  # the normative surface
 node conformance/run.js --experimental   # the corpus outside it
 ```
 
-- **210 normative fixtures**, 210 passing, 0 failing. This is the number that may
+- **215 normative fixtures**, 215 passing, 0 failing. This is the number that may
   be quoted as "the conformance suite" — `conformance/cases/`.
-- **86 experimental fixtures**, 86 passing, 0 failing (71 by genre, 48 by demoted construct, 33 both). They pin
+- **87 experimental fixtures**, 87 passing, 0 failing (72 by genre, 48 by demoted construct, 33 both). They pin
   reference-engine behaviour and are required to pass, but their subject is
   outside the v0.1 surface, so a second implementation may skip the whole
   directory and still conform. The reason for each is recorded in
   `conformance/STATUS.txt`.
-- **296 fixtures run in total**, 296 passing, 0 failing.
+- **302 fixtures run in total**, 302 passing, 0 failing.
 
-The corpus on disk is **210** `.fd` files under `conformance/cases/` and **86**
+The corpus on disk is **215** `.fd` files under `conformance/cases/` and **87**
 under `conformance/experimental/` — the same counts the runner reports, so no fixture is present and unrun.
 
 Every audited engine-vs-spec deviation is written down in
@@ -163,8 +163,8 @@ The engine is one hand-edited file, `editor/figdown.html`; the other copies are
 generated from it and byte-gated against it. It stamps its own version into every
 artifact it builds, because the reproducibility promise is per-renderer-version.
 
-- `FIGDOWN_VERSION` — **`0.5.2`** (read from `editor/figdown.html`).
-- package version — **`0.5.2`**.
+- `FIGDOWN_VERSION` — **`0.5.3`** (read from `editor/figdown.html`).
+- package version — **`0.5.3`**.
 - engine copies present, each gated against that source copy — **4**: `editor/figdown.html`, `skill/figdown/figdown.html`, `dist/figdown.js`, `dist/figdown.mjs`.
 
 ## 4. What was measured rather than asserted

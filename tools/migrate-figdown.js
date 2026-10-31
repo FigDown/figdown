@@ -375,7 +375,13 @@ function walk(p, acc) {
         '  (retired spellings are the coverage). Use `node conformance/run.js --update`.'
       );
     }
-    for (const name of fs.readdirSync(p)) walk(path.join(p, name), acc);
+    for (const name of fs.readdirSync(p)) {
+      const c = path.join(p, name);
+      // A dangling symlink (an editor lock file such as `.#a.fd`) has no stat:
+      // it is not a document, so it is skipped rather than aborting the walk.
+      try { fs.statSync(c); } catch (e) { continue; }
+      walk(c, acc);
+    }
   } else if (p.endsWith('.fd')) acc.push(p);
 }
 
@@ -1137,6 +1143,15 @@ function migrateText(text, colorMeans) {
     if (hm) {
       genre = hm[3] || null;
       inBitfield = false;
+      // `RULE-POSITION-ENUMERATION`: a QUOTED genre token, `figdown 0.1 "block"`. The
+      // header branch returns early, so bareEnumValues() below never sees
+      // this line; strip the quotes here, before the genre is used.
+      if (genre && /^"[^"\s]*"$/.test(genre)) {
+        const after = line.replace(/^(\s*figdown\s+0\.\d+\s+)"([^"\s]*)"/, '$1$2');
+        changes.push({ line: n, rule: 'enum value written bare (RULE 2.4)', before: trim, after: stripComment(after).trim() });
+        line = after;
+        genre = genre.slice(1, -1);
+      }
       // `TIMING-GENRE-NAMING`: the EXPERIMENTAL genre token `wave` → `timing`.
       // It has to be rewritten HERE: the header branch returns early, so the
       // line-initial rename table below never sees this line — and the genre
@@ -1413,17 +1428,20 @@ function migrateText(text, colorMeans) {
     // and must never assume a description IS a condition (most are not).
     {
       const c = stripComment(next);
-      const FLAG = /^(\s*field\s+(?:"(?:[^"\\]|\\.)*"|\S+)\s+(?:\d+|\*))\s+optional\b/;
-      if (FLAG.test(c)) {
+      // `conditional` is the same flag under the spelling `PRESENCE-FLAG-SPELLING` gave it
+      // until `PRESENCE-FLAG-SPELLING` reverted it; it also becomes `present=""`.
+      const FLAG = /^(\s*field\s+(?:"(?:[^"\\]|\\.)*"|\S+)\s+(?:\d+|\*))\s+(optional|conditional)\b/;
+      const fm = FLAG.exec(c);
+      if (fm) {
         const after = next.replace(FLAG, '$1 present=""');
-        changes.push({ line: n, rule: 'field optional→present=""', before: trim, after: stripComment(after).trim() });
+        changes.push({ line: n, rule: 'field ' + fm[2] + '→present=""', before: trim, after: stripComment(after).trim() });
         next = after;
         const dm = /\b(?:description|note)=("(?:[^"\\]|\\.)*")/.exec(c);
         if (dm) {
           reports.push({
             line: n,
             code: 'present-condition-lift',
-            msg: 'this field was `optional` and carries prose alongside it: ' + dm[1] +
+            msg: 'this field was `' + fm[2] + '` and carries prose alongside it: ' + dm[1] +
                  '. NON-MECHANICAL: if that prose states the PRESENCE CONDITION, move it into present="…" ' +
                  '(and shorten or drop the description=); if it says anything else, leave both alone. ' +
                  'The tool never lifts it and never invents one (MIGRATIONS 0.1)',

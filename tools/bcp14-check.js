@@ -88,6 +88,8 @@ const path = require('path');
 const ROOT = path.join(__dirname, '..');
 const args = process.argv.slice(2);
 const VERBOSE = args.includes('--verbose');
+const badOpt = args.find(a => a.startsWith('-') && !['--strict', '--verbose'].includes(a));
+if (badOpt) { console.error('bcp14-check: unknown option ' + badOpt + '\nusage: node tools/bcp14-check.js [--strict] [--verbose]'); process.exit(2); }
 
 const rel = p => path.relative(ROOT, path.resolve(p));
 
@@ -140,7 +142,10 @@ function prose(src) {
 
 const SPEC = path.join(ROOT, 'spec');
 if (!fs.existsSync(SPEC)) die('spec/ not found — the scan scope moved.');
-const files = walk(SPEC, []);
+// conformance/README.md is the harness contract a third-party Parser is held
+// to and carries its own MUSTs; it is outside spec/, so it carries a pointer
+// sentence to core §0.1 (CHECK 3) like the three profiles.
+const files = walk(SPEC, []).concat(path.join(ROOT, 'conformance', 'README.md'));
 if (!files.length) die('the walk found no .md under spec/. The scope moved.');
 
 let fail = 0;
@@ -244,7 +249,7 @@ for (const f of POINTERS) {
 }
 
 // ------------------------------------------------------------- the report
-console.log('=== BCP 14 DENOMINATOR — spec/**/*.md, prose only ===');
+console.log('=== BCP 14 DENOMINATOR — spec/**/*.md + conformance/README.md, prose only ===');
 let en = 0, zh = 0;
 for (const k of KEYWORDS) {
   en += tally[k].en; zh += tally[k].zh;

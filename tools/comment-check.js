@@ -447,6 +447,8 @@ function main() {
   const args = process.argv.slice(2);
   const strict = args.includes('--strict');
   const verbose = args.includes('--verbose');
+  const badOpt = args.find(a => a.startsWith('-') && !['--strict', '--verbose'].includes(a));
+  if (badOpt) { console.error('comment-check: unknown option ' + badOpt + '\nusage: node tools/comment-check.js [--strict] [--verbose] [<file.fd | dir> ...]'); process.exit(2); }
   const paths = args.filter(a => !a.startsWith('-'));
   const engine = loadEngine();
   const vocab = retiredVocab(engine);

@@ -1,0 +1,120 @@
+{
+  "header": {
+    "version": "0.5",
+    "genre": "block"
+  },
+  "title": "Prototype names are ordinary ids",
+  "flow": "right",
+  "classes": [
+    {
+      "id": "valueOf",
+      "meaning": "hot",
+      "line": 19
+    }
+  ],
+  "planes": [
+    {
+      "id": "base",
+      "z": 0
+    }
+  ],
+  "nodes": [
+    {
+      "id": "constructor",
+      "label": "C",
+      "shape": "box",
+      "group": "hasOwnProperty",
+      "plane": "base",
+      "class": [
+        "valueOf"
+      ],
+      "line": 21
+    },
+    {
+      "id": "toString",
+      "label": "T",
+      "shape": "box",
+      "plane": "base",
+      "line": 22
+    },
+    {
+      "id": "__proto__",
+      "label": "P",
+      "shape": "box",
+      "group": "hasOwnProperty",
+      "plane": "base",
+      "line": 23
+    },
+    {
+      "id": "b",
+      "label": "B",
+      "shape": "box",
+      "plane": "base",
+      "line": 24
+    }
+  ],
+  "groups": [
+    {
+      "id": "hasOwnProperty",
+      "label": "G",
+      "line": 20
+    }
+  ],
+  "edges": [
+    {
+      "a": "constructor",
+      "op": "->",
+      "b": "toString",
+      "plane": "base",
+      "line": 25
+    },
+    {
+      "a": "toString",
+      "op": "->",
+      "b": "__proto__",
+      "plane": "base",
+      "line": 26
+    },
+    {
+      "a": "__proto__",
+      "op": "->",
+      "b": "b",
+      "plane": "base",
+      "line": 27
+    },
+    {
+      "a": "b",
+      "op": "->",
+      "b": "constructor",
+      "plane": "base",
+      "line": 28
+    }
+  ],
+  "ranks": [
+    {
+      "ids": [
+        "toString",
+        "b"
+      ],
+      "line": 29
+    }
+  ],
+  "pins": [
+    {
+      "id": "b",
+      "x": 700,
+      "y": 40,
+      "line": 31
+    },
+    {
+      "id": "__proto__",
+      "x": 400,
+      "y": 160,
+      "line": 32
+    }
+  ],
+  "thresholds": [],
+  "bands": [],
+  "bundles": [],
+  "regions": []
+}

@@ -217,7 +217,7 @@ REQUIRED depends only on what delimits it:
 | Delimiter | Positions | Rule |
 |---|---|---|
 | whitespace | `title`, `node`/`group`/`external`/`plane` labels, `class` meaning, classic `field` name, and the two string-typed option values `description=` and `present=` | quotes **MANDATORY** |
-| comma | `labels=` elements, compact `field` names | quotes required only when the element contains whitespace, a comma, a quote, a paren or `#`; redundant quotes stay **legal** |
+| comma | `labels=` elements, compact `field` names | quotes required only when the element contains whitespace, a comma or a quote, or opens a compact `field` list with `#`; redundant quotes stay **legal** |
 | `[ ]` | edge tail/mid/head labels | quotes required only to enable escape processing |
 
 All three rows are enforced. The sections below give
@@ -278,8 +278,15 @@ emptiness.
 
 **RULE 2.2 — an element of a comma-delimited list MAY be written bare when
 it matches the identifier pattern `[A-Za-z_][A-Za-z0-9_-]*`. Quotes are
-REQUIRED when the element contains whitespace, a comma, a quote, a paren
-or `#`.**
+REQUIRED when the element contains whitespace, a comma or a quote.**
+
+*As the engine reads it (corrected 2026-10-23).* A paren or a `#` inside an
+element is accepted bare: `data=a#b,c`, `data=a(b),c` and `field a#b:4,c:4`
+parse with those characters in the element. The one exception is a `#`
+after whitespace, which begins a comment: `field #b:4,c:4` leaves `field`
+with no list, so a first compact `field` element starting with `#` must be
+quoted (`field "#b":4,c:4`). Earlier text listed the paren and `#` as
+requiring quotes; the engine never enforced that.
 
 *Reason.* The comma already bounds the element, so there is no conflict
 with the separator. The whitespace conflict returns only when the element

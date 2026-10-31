@@ -716,6 +716,9 @@ function main() {
     if (improvements.length) {
       console.log('  IMPROVED — ' + improvements.length + ' (refresh with --write-baseline in the same commit):');
       for (const r of improvements) console.log('    ' + r);
+      // Not advisory: a baseline looser than the measurement lets the pair
+      // regress back up to the stale number and stay green.
+      exit = 1;
     }
     if (goneKeys.length) {
       console.log('  NOT MEASURED THIS RUN — ' + goneKeys.length + ' pair(s) in the baseline that produced no row:');

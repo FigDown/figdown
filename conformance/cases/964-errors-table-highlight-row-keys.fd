@@ -1,0 +1,20 @@
+# Table §cell — THE ROW FORM TAKES NO PRESENTATION KEYS.
+#
+# `cell <r> highlight` tints a data row in the fixed highlight colour. Until
+# 0.5 a `fill=`, `stroke=` or `class=` written on that line parsed,
+# never reached the model, and drew nothing: a key silently discarded, the
+# `ROW-HIGHLIGHT-CELL-FILL-COLLISION` defect class. Lines 17-19 pin the line error; line 20 pins that the
+# bare row form is still legal.
+figdown 0.5 table
+class warn "a value outside its range"
+table t "T"
+| A | B |
+|---|---|
+| a1 | b1 |
+| a2 | b2 |
+| a3 | b3 |
+| a4 | b4 |
+cell 1 highlight fill=#ff0000
+cell 2 highlight stroke=#ff0000
+cell 3 highlight class=warn
+cell 4 highlight

@@ -1,0 +1,19 @@
+# Core §15 — A HOST-LANGUAGE NAME IS AN ORDINARY UNKNOWN WORD.
+#
+# The refusal half of `960-prototype-names-as-ids`. Where the grammar wants a
+# keyword, an enum value or an option key, `constructor`, `toString`,
+# `valueOf`, `hasOwnProperty` and `__proto__` are words the language does not
+# have, and each must get the SAME diagnostic any other unknown word gets
+# there. Until this release the reference engine looked them up in plain
+# objects: `shape=constructor` was refused with the text of a native function
+# as its message, and `constructor a b` was called a keyword WITHDRAWN from
+# this genre, with the same native text as the reason.
+figdown 0.5 block
+node a "A" shape=constructor
+node b "B" shape=__proto__
+constructor a b
+toString a
+__proto__ a
+edge a -> b style=valueOf
+edge b -> a hasOwnProperty=1
+flow constructor

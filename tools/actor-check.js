@@ -81,6 +81,8 @@ const path = require('path');
 const ROOT = path.join(__dirname, '..');
 const args = process.argv.slice(2);
 const VERBOSE = args.includes('--verbose');
+const badOpt = args.find(a => a.startsWith('-') && !['--strict', '--verbose'].includes(a));
+if (badOpt) { console.error('actor-check: unknown option ' + badOpt + '\nusage: node tools/actor-check.js [--strict] [--verbose]'); process.exit(2); }
 
 const rel = p => path.relative(ROOT, path.resolve(p));
 
@@ -150,11 +152,11 @@ function prose(src) {
 
 const SPEC = path.join(ROOT, 'spec');
 if (!fs.existsSync(SPEC)) die('spec/ not found — the scan scope moved.');
-const files = walk(SPEC, []).filter(f => !/\.zh-tw\.md$/.test(f));
+const files = walk(SPEC, []).concat(path.join(ROOT, 'conformance', 'README.md')).filter(f => !/\.zh-tw\.md$/.test(f));
 if (!files.length) die('the walk found no English .md under spec/. The scope moved.');
 
 // -------------------------------------------- CHECK 2 — the claim spellings
-const CLAIM_RE = /\b(conforming|conformant)\s+[*_]*([A-Za-z][A-Za-z-]*)/gi;
+const CLAIM_RE = /(?<![A-Za-z0-9])(conforming|conformant)[*_]*\s+[*_]*([A-Za-z][A-Za-z-]*)/gi;
 const tally = { class: Object.create(null), label: 0, nonparty: 0 };
 const unknown = [];
 let harvested = 0;

@@ -116,6 +116,8 @@ const argv = process.argv.slice(2);
 const STRICT = argv.includes('--strict');
 const VERBOSE = argv.includes('--verbose');
 const DUMP = argv.includes('--unregistered');
+const badOpt = argv.find(a => a.startsWith('-') && !['--strict', '--verbose', '--unregistered'].includes(a));
+if (badOpt) { console.error('standards-check: unknown option ' + badOpt + '\nusage: node tools/standards-check.js [--strict] [--verbose] [--unregistered]'); process.exit(2); }
 
 let failures = 0;
 const fail = m => { console.log('  FAIL  ' + m); failures++; };

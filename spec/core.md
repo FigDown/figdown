@@ -257,7 +257,7 @@ each instrument is printed here rather than implied:
 | Class | What a claimant runs | State |
 |---|---|---|
 | **Parser** | `conformance/cases/` — one `.fd` per fixture, each paired with a `.model.json` or a `.errors.txt` golden, plus the suite's single `.geometry.txt` golden (`369-pin-complete-cover-refused`); **no `.svg` goldens at all**, so nothing in this class is judged on rendered bytes. `PROOF.md` reports the suite's size; no count of it is typed here | **These fixtures ARE this class's conformance test suite**, said out loud (`CONFORMANCE-CLASS-OBLIGATIONS`): `conformance/README.md`'s first line already calls it *"the parser-conformance suite"* and `INDEPENDENT-IMPLEMENTATION-CRITERION`'s exercise already asks for *"a parser and model producer"* that passes them |
-| **Renderer** | §15.2's Safe SVG list and §14's F1–F6, both stated as decidable from the emitted SVG alone; `gate:safesvg`, `gate:legend`, `gate:layout` | **Partly checkable, and honestly so.** `RENDERING-DETERMINISM` determinism is checkable only against the *same* renderer, and this repository's `gate:artifact` re-renders with the reference engine, which is self-reference |
+| **Renderer** | §15.2's Safe SVG list and §14's F5, both stated as decidable from the emitted SVG alone; `gate:safesvg`, `gate:legend`, `gate:layout` | **Partly checkable, and honestly so.** `RENDERING-DETERMINISM` determinism is checkable only against the *same* renderer, and this repository's `gate:artifact` re-renders with the reference engine, which is self-reference |
 | **Reading agent** | nothing | **NOT CHECKABLE TODAY.** No instrument exists. `tools/comprehension-check.js` scores a *model reading a picture*, not an implementation reading a model, and it is not re-pointed here to make this table look complete |
 | **Host** | [`host-profile.md`](host-profile.md) §6's resolution table | Checkable, with the two holes that profile prints itself |
 | **Publisher** | `gate:manifest`, `gate:a11y`, `gate:alt`, `figdown-manifest.schema.json` | Checkable |
@@ -8007,7 +8007,7 @@ evidence is not in this table because it is not in this section.
 
 | # | Claim (§) | Evidence |
 |---|---|---|
-| 1 | No `script` element in any artifact (§15.2.1) | `gate:safesvg` B, over every committed `.svg` in the tree (87: 73 renderer-output artifacts judged, 10 hand-edited counter-examples named and skipped, 4 fork-written files excluded as ruled derived files — `RESERVED-PREFIX-ENFORCEMENT`, `UNREPRODUCIBLE-ARTIFACT-DISPOSITION`) + 3 fixtures × 3 render modes every run; negative control: a doctored artifact with `<script>` fails B |
+| 1 | No `script` element in any artifact (§15.2.1) | `gate:safesvg` B, over every committed `.svg` in the tree (88: 74 renderer-output artifacts judged, 10 hand-edited counter-examples named and skipped, 4 fork-written files excluded as ruled derived files — `RESERVED-PREFIX-ENFORCEMENT`, `UNREPRODUCIBLE-ARTIFACT-DISPOSITION`) + 3 fixtures × 3 render modes every run; negative control: a doctored artifact with `<script>` fails B |
 | 2 | No attribute beginning `on` (§15.2.2) | `gate:safesvg` C (absolute rule, independent of the allowlist); negative control: `<svg onload=…>` fails C |
 | 3 | No `foreignObject` (§15.2.3) | `gate:safesvg` B; negative control fails B |
 | 4 | No `href`/`xlink:href`/`src`, no external `url(…)`, no `@import` (§15.2.4) | `gate:safesvg` C and D; negative controls (`<image href=https://…>`, `style="fill:url(https://…)"`, `@import`) each fail |

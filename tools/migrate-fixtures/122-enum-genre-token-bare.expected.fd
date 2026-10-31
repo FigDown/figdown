@@ -1,0 +1,4 @@
+# 0.1 (`RULE-POSITION-ENUMERATION`): a QUOTED genre token is the same enum position as a
+# quoted version; the header branch must strip it too.
+figdown 0.1 block
+node a "A"

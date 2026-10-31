@@ -1,0 +1,7 @@
+figdown 0.1 bitfield
+# The field flag `conditional` was live in an earlier release (`PRESENCE-FLAG-SPELLING`)
+# until `PRESENCE-FLAG-SPELLING` reverted it. It becomes present="", the same target as the flag
+# it replaced (`PRESENCE-CONDITION-EXPRESSION`).
+bitfield h "H" word=32 numbering=lsb0
+field "A" 16 conditional
+field "B" 16

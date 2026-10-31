@@ -1,12 +1,28 @@
-// figdown.mjs — FigDown embeddable library (0.5.2)
+// figdown.mjs — FigDown embeddable library (0.5.3)
 // GENERATED FILE, DO NOT EDIT. Built from editor/figdown.html.
 // Regenerate with: node tools/make-lib.js
 'use strict';
-var VERSION = "0.5.2";
+var VERSION = "0.5.3";
 
 // ---- engine (extracted verbatim from editor/figdown.html) ----
 var __engine = (function () {
 const SHAPES = ['box','rounded','circle','ellipse','diamond','cylinder'];
+// 0.5: AUTHOR WORDS NEVER REACH Object.prototype. Ids, class
+// names, option values and keywords index the tables below and the per-render
+// dictionaries; on a plain object `constructor`, `toString`, `valueOf`,
+// `hasOwnProperty` and `__proto__` resolved to prototype members, so a legal id
+// threw or drew NaN, a word that is not a keyword got a native function as its
+// diagnostic, and `__proto__` as a key reached the prototype itself. Every such
+// table is made prototype-less (`protoless`, nested tables included) and every
+// such dictionary starts as `Object.create(null)`, so each of those words is an
+// ordinary id or an ordinary unknown word.
+function protoless(o){
+  if(o&&typeof o==='object'&&Object.getPrototypeOf(o)===Object.prototype){
+    Object.setPrototypeOf(o,null);
+    for(const k of Object.keys(o)) protoless(o[k]);
+  }
+  return o;
+}
 // The engine's own version string, and the SINGLE source of it: it sits
 // INSIDE the extracted engine region, so tools/make-lib.js (dist/) and
 // tools/build-svg.js (the CLI) both read this line rather than each keeping
@@ -16,7 +32,7 @@ const SHAPES = ['box','rounded','circle','ellipse','diamond','cylinder'];
 // input to that promise, and under core §13 a 0.x renderer may differ from
 // the next — which makes the recorded version the only thing that can
 // explain a diff between two renderings of one source.
-const FIGDOWN_VERSION = '0.5.2';
+const FIGDOWN_VERSION = '0.5.3';
 // `TYPED-BLOCK-TITLE-CANVAS`: a `Z`-only dev bump — RENDERER ONLY, no keyword, no
 // option key, no model field, so `figdown 0.5` still names one language. A
 // typed block's own title (bitfield/table/timing/chart) now joins the
@@ -104,6 +120,7 @@ const GENRES_BY_VERSION = {
   // not a dispatch point. The version moved for `id=`, and `id=` is genre-free.
   '0.5': ['block','topology','flowchart','bitfield','table','timing','statechart','sequence']
 };
+protoless(GENRES_BY_VERSION);
 // The version an OPTION KEY first becomes legal in — the `CONNECTOR_MIN_VERSION`
 // device, applied to the option namespace. `DRAWN-ANNOTATION-FORM`: `note=` is gated on the
 // declared version, and the gate's reason is specific to THIS key rather than
@@ -130,6 +147,7 @@ const GENRES_BY_VERSION = {
 // `CONNECTOR-IDENTITY-KEY`: `id=` — the connector's optional handle. It has no prior
 // meaning of any kind; it is gated because it is a new spelling.
 const OPT_MIN_VERSION={note:'0.3',id:'0.5'};
+protoless(OPT_MIN_VERSION);
 // True when the document's declared version is older than the key's own.
 // A document with no parsable header has already been diagnosed on line 1, so
 // an absent version never gates a second time.
@@ -146,6 +164,7 @@ const belowOptVersion=(key,ver)=>{
 const RETIRED_SHAPES = {
   cloud: 'shape=cloud has been retired: use shape=ellipse and put the meaning in the label or a class= (shapes are pure geometry, `SHAPE-ENUM-VOCABULARY`) (MIGRATIONS 0.1)'
 };
+protoless(RETIRED_SHAPES);
 // Colors are CSS hex (#rgb / #rrggbb) or CSS named colors (spec §1) — the
 // 147 CSS/SVG color keywords (lowercase) plus `transparent`. Anything else
 // is a line error (closed grammar).
@@ -155,7 +174,7 @@ const RETIRED_SHAPES = {
 // written as a CSS name has to reach the same arithmetic a `#rrggbb` fill does.
 // Values are CSS Color Module Level 4 §6.1 "Named Colors".
 const CSS_COLOR_HEX=(function(){
-  const m={};
+  const m=Object.create(null);
   ('aliceblue:f0f8ff antiquewhite:faebd7 aqua:00ffff aquamarine:7fffd4 azure:f0ffff beige:f5f5dc '+
    'bisque:ffe4c4 black:000000 blanchedalmond:ffebcd blue:0000ff blueviolet:8a2be2 brown:a52a2a '+
    'burlywood:deb887 cadetblue:5f9ea0 chartreuse:7fff00 chocolate:d2691e coral:ff7f50 cornflowerblue:6495ed '+
@@ -508,6 +527,7 @@ const DIRECTIVE_OPTS={
   cell:['fill','stroke','class'], width:[],
   signal:['data','fill','stroke'], gap:[]
 };
+protoless(DIRECTIVE_OPTS);
 // `SEQUENCE-GENRE-VOCABULARY`: the FIRST genre-conditional option row, and it
 // exists because `DIRECTIVE_OPTS` is keyed by the SURFACE WORD an author
 // wrote, while `GENRE-VOCABULARY-OBLIGATION` makes a surface word a per-genre declaration. Every other
@@ -530,6 +550,7 @@ const GENRE_DIRECTIVE_OPTS={
     state:['class','fill','stroke','style','in','note','description']
   }
 };
+protoless(GENRE_DIRECTIVE_OPTS);
 const directiveOpts=(kw,genre)=>
   (genre && GENRE_DIRECTIVE_OPTS[genre] && GENRE_DIRECTIVE_OPTS[genre][kw])
     || DIRECTIVE_OPTS[kw];
@@ -642,6 +663,7 @@ const RETIRED_OPT_KEYS={
   // the one directive that keeps refusing it. See OPT_MIN_VERSION above.
   level:'level= has been DELETED, not renamed: it drew a reference plane through a 3-D bar chart, has zero uses in either downstream corpus and zero 3-D bar charts to draw it on, was the only construct whose caption the ENGINE wrote rather than the author, and its parseFloat grammar uniquely accepted 1e3 where every other number in the language is \\d+(\\.\\d+)? — delete the key (MIGRATIONS 0.1)'
 };
+protoless(RETIRED_OPT_KEYS);
 // `DRAWN-ANNOTATION-FORM`. The two messages that REPLACE the `note=` retirement
 // diagnostic. SYNTAX-STYLE RULE 4.9 obligation 3 requires the retirement
 // message to be reversed in the same release that revives the spelling, and
@@ -789,6 +811,11 @@ const FILL_NO_INTERIOR=k=>k+' has no interior, so fill= and stroke= name the sam
 // language was closed — a named line error, not a precedence rule. A
 // precedence rule is what `STYLE-KEY-SCOPE` had just finished removing from `field`.
 const CELL_HL_ON_CELL='highlight is a ROW mark and takes the single-valued row form (cell <row> highlight) — on a cell address it was SILENTLY DISCARDED and never reached the model, while the cell fill drew. A row tint and a cell fill paint the same channel, so writing both for one cell has no honest resolution: tint the row (cell <row> highlight) or paint the cell (cell (<row>,<col>) fill=…/class=…), not both (MIGRATIONS 0.1)';
+// 0.5: the ROW form takes no presentation keys. `cell 1
+// highlight fill=#f00` parsed, and the keys never reached the model: the row
+// drew in the fixed tint and nothing said so. Same defect class as `ROW-HIGHLIGHT-CELL-FILL-COLLISION` (a key
+// silently discarded), closed the same way, with a named line error.
+const CELL_HL_ROW_OPTS='cell <row> highlight takes no fill=, stroke= or class= — the row tint is fixed, and these keys were SILENTLY DROPPED: they never reached the model and nothing drew them. Tint the row (cell <row> highlight), or paint a cell instead (cell (<row>,<col>) fill=…/class=…) (MIGRATIONS 0.5)';
 const CELL_HL_ROW_CONFLICT=(r,c)=>'cell ('+r+','+c+') resolves to a fill on row '+r+', which is highlighted — the cell fill overrides the row tint, so the model says "row '+r+' is highlighted" while the drawing shows only part of the row tinted (`PRESENTATION-AS-MEANING-CARRIER`: presentation may render meaning, never delete it). Drop the row highlight, or move the cell fill to a row that carries none (MIGRATIONS 0.1)';
 const NO_ITEM_STYLE=new Set(['field','cell','signal']);
 const STYLE_NO_ITEM=k=>k+' does not take style= — '+(k==='field'
@@ -1153,6 +1180,7 @@ const FLOWCHART_ROLE_KW=['process','decision','terminator'];
 // only its default drawing, and `shape=` on the same line overrides the
 // drawing without touching the role (§12.7).
 const ROLE_SHAPE={process:'box',decision:'diamond',terminator:'rounded'};
+protoless(ROLE_SHAPE);
 // Geometry DERIVED from the NODE DIRECTIVE ITSELF, for a genre whose node has
 // exactly one kind and therefore no role to map (backlog 52).
 // `statechart`'s own §Defaults rules "do not encode state-ness in a shape (`SHAPE-ENUM-VOCABULARY`)
@@ -1170,6 +1198,7 @@ const ROLE_SHAPE={process:'box',decision:'diamond',terminator:'rounded'};
 // legal and still overrides the DRAWING ONLY (§12.7), exactly as on a
 // `decision` — a `state x "S" shape=box` is still a state in the model.
 const KW_SHAPE={state:'rounded'};
+protoless(KW_SHAPE);
 
 // `GENRE-CONNECTOR-SPELLING`/`GENRE-NODE-SPELLING`: PER-GENRE NODE AND CONNECTOR SPELLINGS.
 // Each scene genre takes the word its own domain uses for the line between
@@ -1194,7 +1223,9 @@ const KW_SHAPE={state:'rounded'};
 // the project’s working record for the coverage ledger.
 //   sequence          lifeline  message     (OMG UML 2.5.1 §17)
 const GENRE_NODE_KW={block:'node',topology:'node',flowchart:'node',statechart:'state',sequence:'lifeline'};
+protoless(GENRE_NODE_KW);
 const GENRE_CONNECTOR_KW={block:'edge',topology:'edge',flowchart:'flowline',statechart:'transition',sequence:'message'};
+protoless(GENRE_CONNECTOR_KW);
 const NODE_SPELLINGS=new Set(['node','state','lifeline']);
 const CONNECTOR_SPELLINGS=new Set(['edge','flowline','transition','message']);
 // `SEQUENCE-GENRE-VOCABULARY`: WHERE EACH GENRE'S NODE ROWS LIVE IN THE PARSED DOC.
@@ -1209,6 +1240,7 @@ const CONNECTOR_SPELLINGS=new Set(['edge','flowline','transition','message']);
 // `sequence`, greying out four buttons whose edits (`SEQUENCE-GENRE-VOCABULARY`) already worked.
 const GENRE_NODE_COLL={block:'nodes',topology:'nodes',flowchart:'nodes',
                        statechart:'nodes',sequence:'lifelines'};
+protoless(GENRE_NODE_COLL);
 const docNodes=(doc)=>(doc&&doc[GENRE_NODE_COLL[doc.genre]||'nodes'])||[];
 // `SEQUENCE-GENRE-VOCABULARY`: the four `sequence` directives that have their own
 // parser (`message` rides the connector scanner). The set is what dispatches
@@ -1259,11 +1291,13 @@ const GENRE_CONNECTOR_KW_AT={
   '0.1':{block:'edge',topology:'edge',flowchart:'edge'},
   '0.2':GENRE_CONNECTOR_KW
 };
+protoless(GENRE_CONNECTOR_KW_AT);
 const connectorKwAt=(genre,ver)=>
   ((GENRE_CONNECTOR_KW_AT[ver]||GENRE_CONNECTOR_KW)[genre])||undefined;
 // The version a connector spelling FIRST becomes legal in, so the diagnostic
 // can name it the way the genre gate already names `figdown 0.2`.
 const CONNECTOR_MIN_VERSION={flowline:'0.2',transition:'0.2'};
+protoless(CONNECTOR_MIN_VERSION);
 const WRONG_VERSION_WORD=(surf,want,genre,need,have)=>
   '"'+surf+'" requires figdown '+need+' (this document declares '+have+'): '+
   'under figdown '+have+' genre '+genre+' spells this "'+want+'". The rename is '+
@@ -1284,6 +1318,7 @@ const WORD_WHY={
   lifeline:'a sequence figure has exactly ONE kind of participant column and it is a LIFELINE — the term UML 2.5.1 §17.3.3.1 defines and §17.3.4.1 draws',
   message:'the line between two participants in a sequence figure is a MESSAGE — the term UML 2.5.1 §17.4.4.1 uses for its notation'
 };
+protoless(WORD_WHY);
 // The named diagnostic `GENRE-CONNECTOR-SPELLING`/`GENRE-NODE-SPELLING` owe: it says WHICH word this genre uses and
 // WHY, and it names the migration, because every connector line in a
 // reclassified document has to be rewritten (the cost `GENRE-CONNECTOR-SPELLING` accepted).
@@ -1351,6 +1386,7 @@ const GENRE_WITHDRAWN={
     bundle:'`statechart` declares NO subject vocabulary at all, and here `bundle` is an ANTI-FEATURE: two transitions between the same pair of states are two different TRIGGERS, and the trigger is the whole content of the arc. Bundling them draws away exactly what the figure is for.'
   }
 };
+protoless(GENRE_WITHDRAWN);
 const WITHDRAWN_FROM_GENRE=(kw,genre)=>
   '"'+kw+'" is not allowed in genre '+genre+' — it was WITHDRAWN from this genre, not misspelled: '+
   GENRE_WITHDRAWN[genre][kw]+
@@ -1377,6 +1413,7 @@ const REFUSED_IN={
     group:'`sequence` does not declare `group` (`SEQUENCE-PARTICIPANT-GROUPING`), on three grounds. ZERO measured need: the row was admitted as Mermaid `box` parity and the genre was then re-scoped to real-figure coverage without the row being re-tested. NOTHING TO BORROW: UML clause 17 has no lifeline-grouping construct — `PartDecomposition` (§17.7.3.2) decomposes ONE lifeline into a sub-interaction, and gates and the frame bound an interaction rather than a subset of its lifelines. And the GEOMETRY IS ALREADY TAKEN: `band` = membership is locked into the scene genres (the band contains every member and nothing else, core §2.6), while a `group` here would span min..max COLUMNS with no contiguity rule, so a band over two non-adjacent lifelines silently encloses a third that is not a member — one word carrying two different geometric promises, which `GENRE-VOCABULARY-OBLIGATION` forbids opening without evidence. WRITE INSTEAD: `class` naming what the participants have in common, plus `class=` on each `lifeline` — it earns a legend entry and asserts membership without asserting adjacency. Reopens on a count of real figures whose lifelines are drawn in labelled bands, and the re-proposal owes a contiguity check either way.'
   }
 };
+protoless(REFUSED_IN);
 const REFUSED_AT=' (refused; MIGRATIONS 0.4)';
 const REFUSED_IN_GENRE=(kw,genre)=>
   '"'+kw+'" is not allowed in genre '+genre+' — this genre REFUSED it, it is not a typo and not a withdrawal: '+
@@ -1412,6 +1449,7 @@ const GENRE_WITHDRAWN_OPT={
     in:'`statechart` no longer accepts `in=`, and the spelling is RESERVED rather than merely dropped. This genre declares NO subject vocabulary (`SUBJECT-VOCABULARY-SCOPE`), so the `group` id that was `in=`\'s only value domain cannot exist here and every value was a dead end. The reason for withdrawing rather than leaving it is the RESERVATION: `in=`\'s future domain in this genre is a STATE id — UML 2.5.1 §14.2.3.4 composite states would arrive as nesting on `state`, through this exact key — so a live key with a group-id domain taught the WRONG model using the very spelling reserved for the right one. Delete the key: a category shared by several states is a `class=` meaning. `in=` is expected back with a state-id domain when composite-state nesting is earned (`MEMBERSHIP-KEY-ACCEPTANCE`).'
   }
 };
+protoless(GENRE_WITHDRAWN_OPT);
 const WITHDRAWN_OPT_FROM_GENRE=(key,genre)=>
   key+'= is not allowed in genre '+genre+' — it was WITHDRAWN from this genre, not misspelled: '+
   GENRE_WITHDRAWN_OPT[genre][key]+
@@ -1432,6 +1470,7 @@ const REFUSED_OPT_IN={
     lost:'`sequence` does not accept `lost=`; it was proposed and REFUSED (`UNDELIVERED-MESSAGE-MARKING`), and NO option key was added to the language for this genre. The model it wanted is not UML\'s: UML 2.5.1 §17.4.3.1\'s lost Message is one whose "destination ... is outside the scope of the description" — the recipient is NOT MODELLED — while the proposed key meant the recipient is modelled, named and drawn AND DELIVERY FAILED, which is ITU-T Z.120 §4.3\'s model ("a message is sent but not consumed") under UML\'s spelling. Carrying one standard\'s word with another standard\'s meaning is the cross-source mix RULE 4.1 calls a last resort, and it was undeclared. WRITE INSTEAD: declare the meaning once and reference it — `class dropped "Sent, never delivered"` then `message c -> s "DHCPREQUEST" class=dropped description="renewal unicast never reaches the issuing server"`. The class carries the fact and earns a legend entry; `description=` carries the per-message reason. The NEED stays on the record: reopens on a measured rate of readers taking a dropped message for a delivered one, at 22%, and any re-proposal must be grounded on Z.120 §4.3 rather than on UML §17.4.3.1.'
   }
 };
+protoless(REFUSED_OPT_IN);
 const REFUSED_OPT_IN_GENRE=(key,genre)=>
   key+'= is not allowed in genre '+genre+' — this genre REFUSED the key, it is not a typo and not a withdrawal: '+
   REFUSED_OPT_IN[genre][key]+
@@ -1478,6 +1517,7 @@ const GENRE_KW={
   sequence:new Set(GENRE_FREE_KW.concat(['class'], SEQUENCE_SUBJECT_KW,
                                         ['lifeline','message']))
 };
+protoless(GENRE_KW);
 const CHILD_KW=new Set(['field','break','cell','width','signal','gap']);
 
 // Multi-section files (`MULTI-FIGURE-DOCUMENTS`): each `figdown 0.1 <genre>` starts a section.
@@ -1524,7 +1564,7 @@ function seqModel(doc){
   for(const s of doc.states||[])   rows.push({kind:'state',  el:s,line:s.line});
   rows.sort((a,b)=>a.line-b.line);
   rows.forEach((r,i)=>{ r.slot=i; });
-  const cont={};
+  const cont=Object.create(null);
   for(const f of doc.fragments||[]) cont[f.id]={kind:'fragment',el:f,parent:f['in']||null};
   for(const o of doc.operands||[])  cont[o.id]={kind:'operand', el:o,parent:o['in']||null};
   const cycles=[];
@@ -1541,13 +1581,13 @@ function seqModel(doc){
     const seen=new Set(); let c=cont[id].parent;
     while(c && cont[c] && !seen.has(c)){ if(c===id){ cycles.push(id); break; } seen.add(c); c=cont[c].parent; }
   }
-  const owned={}; for(const id in cont) owned[id]=[];
+  const owned=Object.create(null); for(const id in cont) owned[id]=[];
   for(const r of rows){
     const inId=r.el['in']||null;
     r.chain=inId?chain(inId):[];
     for(const id of r.chain) if(owned[id]) owned[id].push(r.slot);
   }
-  const extent={};
+  const extent=Object.create(null);
   for(const id in cont)
     extent[id]=owned[id].length?{lo:minOf(owned[id]),hi:maxOf(owned[id])}:null;
   return {rows,cont,owned,extent,chain,cycles};
@@ -1864,7 +1904,7 @@ function parseOne(text,lineBase=0){
   // `EMPTY-LABEL-STATE`'s rule for `title` itself — an author who writes `note=""` has made
   // a distinction the model must keep.
   const doc={title:null,note:null,nodes:[],groups:[],edges:[],planes:[{id:'base',label:null,z:0}],
-             flow:'right',ranks:[],pins:{},blocks:[],trunks:[],thresholds:[],bands:[],
+             flow:'right',ranks:[],pins:Object.create(null),blocks:[],trunks:[],thresholds:[],bands:[],
              classes:[],boundaries:[],
              // `SEQUENCE-GENRE-VOCABULARY`: the `sequence` model. FIVE collections,
              // one per keyword, and they are separate arrays rather than
@@ -2710,7 +2750,12 @@ function parseOne(text,lineBase=0){
           // 0.1: a `px` SUFFIX is rejected. `pin width=90px` was
           // already an error, and RULE 4.4 says two constructs that share a
           // spelling on purpose must share the value grammar too.
-          let m=/^(\d+(?:\.\d+)?)$/.exec(v);
+          // 0.5: `0` and `0%` drew a zero-width column, while
+          // `pin width=0` is refused. RULE 4.4: one spelling, one value grammar.
+          // A zero with a unit (`0px`) gets this error too, not the unit hint.
+          let m=/^(\d+(?:\.\d+)?)(?:%|px)?$/.exec(v);
+          if(m && !(+m[1]>0)){ badw='bad width "'+v+'" — a column needs a positive width (auto | <px> | <n>%)'; return null; }
+          m=/^(\d+(?:\.\d+)?)$/.exec(v);
           if(m) return {t:'px',v:+m[1]};
           m=/^(\d+(?:\.\d+)?)%$/.exec(v);
           if(m) return {t:'pct',v:+m[1]};
@@ -2756,6 +2801,7 @@ function parseOne(text,lineBase=0){
         if(hl&&rc[3]!==undefined){ err(n,CELL_HL_ON_CELL); continue; }
         if(hl&&rc[3]===undefined){
           if(rc[1]){ err(n,'highlight applies to data rows only'); continue; }
+          if(cpres||opts['class']!==undefined){ err(n,CELL_HL_ROW_OPTS); continue; }
           cur.rowmarks=cur.rowmarks||[];
           cur.rowmarks.push({r:+rc[2],line:n});
         } else if(rc[3]!==undefined&&(cpres||opts['class'])){
@@ -2766,7 +2812,16 @@ function parseOne(text,lineBase=0){
       } else if(cur.type==='timing' && kw==='signal'){
         const name=pos[1], lane=pos[2];
         if(!name||!lane){ err(n,'signal needs <name> <lane>'); continue; }
-        if(pos.length>3){ err(n,'unexpected argument "'+pos[3]+'"'); continue; }
+        if(pos.length>3){
+          // 0.5: option-key position in LANE mode. `splitOpts`
+          // keeps an unregistered `k=v` positional here (a lane may hold `=`),
+          // so an `x-` key never reached `badOpts` and earned the surplus-
+          // argument text. It is still option-key position (`RESERVED-PREFIX-ENFORCEMENT`'s second
+          // call site, reached by a third path), and gets the same answer.
+          const xk=/^([^=]+)=/.exec(pos[3]);
+          if(xk && isXReserved(xk[1])) err(n,X_RESERVED_OPT(xk[1]));
+          else err(n,'unexpected argument "'+pos[3]+'"');
+          continue; }
         // `TIMING-LANE-ALPHABET`: `2`-`9` LEFT the alphabet. WaveDrom's schema gives
         // them "value with color 2".."value with color 9" and `=` "value
         // (default color 2)", so `=` and `2` are the same brick and a
@@ -3478,7 +3533,7 @@ function parseOne(text,lineBase=0){
     // last one outside it, because which branch ran is exactly what the
     // figure does not say. Outside operands nothing changes: the linear
     // sequence is compared as before.
-    const scopeOwner={};
+    const scopeOwner=Object.create(null);
     for(const o of doc.operands) scopeOwner[o.id]=o['in']||'';
     for(const f of doc.fragments) scopeOwner[f.id]=f['in']||'';
     const chainOf=id=>{
@@ -3488,10 +3543,10 @@ function parseOne(text,lineBase=0){
       out.push('');
       return out;
     };
-    const lastState={};
+    const lastState=Object.create(null);
     for(const st of doc.states.slice().sort((a,b)=>a.line-b.line)){
       const chain=chainOf(st['in']);
-      const seen=lastState[st.ref]||(lastState[st.ref]={});
+      const seen=lastState[st.ref]||(lastState[st.ref]=Object.create(null));
       let prev=null;
       for(const sc of chain){ const r=seen[sc]; if(r&&(!prev||r.line>prev.line)) prev=r; }
       if(prev&&prev.name===st.name)
@@ -4652,7 +4707,7 @@ function render(doc,ropts){
   // resolve class defaults (explicit element attributes win — rigidity, `LAYOUT-STABILITY`).
   // class= is multi-valued: ids apply left-to-right, later wins per channel
   // (same cascade as CSS multi-class). Single-id documents are unchanged.
-  const C={}; for(const c of doc.classes||[]) C[c.id]=c;
+  const C=Object.create(null); for(const c of doc.classes||[]) C[c.id]=c;
   const classIdsOf=(x)=>{
     if(x.cls===undefined||x.cls===null) return [];
     return Array.isArray(x.cls)?x.cls:[x.cls];
@@ -4719,7 +4774,7 @@ function render(doc,ropts){
   // sees. The mark therefore travels with its target: each block reports its
   // box, and the marks that name it are painted over that box in the same
   // coordinate shape (`x0`/`x1`/`yA`/`yB`) the scene uses for a group.
-  const regionBox={};
+  const regionBox=Object.create(null);
   for(const b of doc.blocks){
     let s;
     if(b.type==='bitfield') s=renderBitfield(b,y);
@@ -4801,7 +4856,7 @@ function render(doc,ropts){
     // model — every other collection that carries `class=` is a box, a frame
     // or a cell, i.e. something with an area. This adds no model field, no
     // option key and no spelling; it is a byte-moving RENDER change.
-    const clsUse={};
+    const clsUse=Object.create(null);
     { const use=(x,conn)=>{
         const ids=(x.cls===undefined||x.cls===null)?[]:(Array.isArray(x.cls)?x.cls:[x.cls]);
         for(const id of ids){ const u=clsUse[id]||(clsUse[id]={conn:false,box:false});
@@ -4923,7 +4978,7 @@ function renderScene(doc,y0){
   for(const b of doc.boundaries||[])
     nodes.push({id:b.id,label:b.label!==null&&b.label!==undefined?b.label:'',boundary:true,plane:b.plane||'base',group:null,
                 line:b.line});
-  const byId={}; nodes.forEach(n=>byId[n.id]=n);
+  const byId=Object.create(null); nodes.forEach(n=>byId[n.id]=n);
   // sizes
   for(const n of nodes){
     if(n.boundary){ n.w=n.h=12; continue; }
@@ -4953,13 +5008,13 @@ function renderScene(doc,y0){
   // the test is on the point, not on the entry's existence.
   const pinned=id=>doc.pins[id]!==undefined&&doc.pins[id].fx!==null;
   nodes.forEach((n,i)=>n.di=i);            // document order (sort tiebreak)
-  const rep={}; nodes.forEach(n=>rep[n.id]=n.id);   // rank-group union-find
+  const rep=Object.create(null); nodes.forEach(n=>rep[n.id]=n.id);   // rank-group union-find
   const find=u=>{ while(rep[u]!==u) u=rep[u]=rep[rep[u]]; return u; };
   for(const r of doc.ranks){
     const ids=r.ids.filter(id=>byId[id]);
     for(let i=1;i<ids.length;i++){ const a=find(ids[0]),b=find(ids[i]); if(a!==b) rep[b]=a; }
   }
-  const adj={}; nodes.forEach(n=>{ adj[find(n.id)]=adj[find(n.id)]||[]; });
+  const adj=Object.create(null); nodes.forEach(n=>{ adj[find(n.id)]=adj[find(n.id)]||[]; });
   const isBack=new Set();                  // edges that close a cycle
   for(const e of doc.edges){
     // undirected/bidirectional edges still order ranks by document direction
@@ -4968,7 +5023,7 @@ function renderScene(doc,y0){
     const u=find(e.a), v=find(e.b);
     if(u!==v) adj[u].push({v,e});
   }
-  const state={};
+  const state=Object.create(null);
   const classify=u=>{
     state[u]=1;
     for(const {v,e} of adj[u]){
@@ -4978,12 +5033,12 @@ function renderScene(doc,y0){
     state[u]=2;
   };
   for(const n of nodes){ const u=find(n.id); if(!state[u]) classify(u); }
-  const radj={}; nodes.forEach(n=>{ radj[find(n.id)]=radj[find(n.id)]||[]; });
+  const radj=Object.create(null); nodes.forEach(n=>{ radj[find(n.id)]=radj[find(n.id)]||[]; });
   for(const e of doc.edges){
     if(!byId[e.a]||!byId[e.b]||isBack.has(e)) continue;
     const u=find(e.a), v=find(e.b); if(u!==v) radj[v].push(u);
   }
-  const rk={};
+  const rk=Object.create(null);
   const rankOf=u=>{
     if(rk[u]!==undefined) return rk[u];
     rk[u]=0;                               // DAG: placeholder is never read
@@ -5147,7 +5202,7 @@ function renderScene(doc,y0){
     const ch=chains.get(e)||[A,B];
     for(let i=1;i<ch.length;i++) link(ch[i-1],ch[i]);
   }
-  const midW={};        // widest mid label on a one-layer edge, per node
+  const midW=Object.create(null);        // widest mid label on a one-layer edge, per node
   for(const e of doc.edges){
     if(!e.mid) continue;
     const A=byId[e.a], B=byId[e.b];
@@ -5415,7 +5470,7 @@ function renderScene(doc,y0){
   // violating `RENDERING-DETERMINISM` stability; task #47). The pin now wins and the group BOX grows
   // to CONTAIN the member wherever it lands (box is measured from final member
   // positions below), rather than the member being repositioned to fit the box.
-  const gOrigin={};
+  const gOrigin=Object.create(null);
   // Pass 1: a pinned group anchors its origin in canvas px (`ELEMENT-GEOMETRY-DIRECTIVE`: only a pin
   // carrying `at=` anchors one). An unpinned group gets no origin here, so its
   // members fall to the canvas-px branch below.
@@ -5512,7 +5567,7 @@ function renderScene(doc,y0){
     const rMid=r=>{ const a=byRank.get(r); return a.reduce((s,n)=>s+mLo(n)+mSz(n)/2,0)/a.length; };
     const rks=[...byRank.keys()].sort((a,b)=>rMid(a)-rMid(b));
     // A group's rank span, so a band that runs THROUGH a seam asks for nothing.
-    const gSpan={};
+    const gSpan=Object.create(null);
     for(const g of doc.groups){
       const m=ranked.filter(n=>n.group===g.id); if(!m.length) continue;
       gSpan[g.id]={lo:Math.min(...m.map(n=>n.rank)), hi:Math.max(...m.map(n=>n.rank))};
@@ -5552,7 +5607,19 @@ function renderScene(doc,y0){
       for(const e of doc.edges){ if(!spans(e.a,e.b)) continue;
         const c=(e.tail?1:0)+(e.head?1:0); if(!c) continue;
         epl=Math.max(epl, c*EPL_H+(c+1)*EPL_PAD); }
-      const d=Math.max(bandGap, Math.max(lasso,epl)+guard)-actual;
+      // 0.5: PARALLEL labelled links between one pair of nodes
+      // fan side by side across this seam, and under vertical flow their
+      // labels can only be told apart by stacking down it. So the seam holds
+      // every label line of the pair plus a gutter between them. One or two
+      // single-line labels fit the default seam and ask for nothing new (the
+      // default placement handles those); three or more were drawn on top of each other.
+      let par=0;
+      if(!horiz){ const per=Object.create(null);
+        for(const e of doc.edges){ if(!e.mid||!spans(e.a,e.b)) continue;
+          const k=e.a<e.b?e.a+'\u0000'+e.b:e.b+'\u0000'+e.a;
+          const o=per[k]||(per[k]={l:0,n:0}); o.l+=String(e.mid).split('\n').length; o.n++; }
+        for(const k in per){ const o=per[k]; if(o.n>1) par=Math.max(par, o.l*EPL_H+(o.n+1)*EPL_PAD); } }
+      const d=Math.max(bandGap, Math.max(lasso,epl,par)+guard)-actual;
       if(d<=0) continue;
       // Everything at or beyond the far lip travels; a pinned node holds its
       // ground. The movers are selected by POSITION, not by rank membership:
@@ -5582,7 +5649,17 @@ function renderScene(doc,y0){
           if((a===A.id&&b===B.id)||(a===B.id&&b===A.id))
             lasso=Math.max(lasso, 2*(horiz?RY_MIN:RX_MIN)+2*LASSO_CLEAR,
                                   horiz?0:lblW(t.label)+2*LASSO_CLEAR);
-        const d=Math.max(bandGap, lasso?lasso+guard:0)-actual;
+        // 0.5: a LABELLED edge between the two neighbours is
+        // drawn across this very gap, and its label is centred on it. Under
+        // vertical flow the label runs ALONG the gap, so the gap must hold its
+        // width; under horizontal flow it sits beside a vertical stroke and
+        // the gap must hold its lines. Without this a long label was written
+        // over both boxes (a 56 px gap under a 185 px label).
+        let elbl=0;
+        for(const e of doc.edges) if(e.mid&&((e.a===A.id&&e.b===B.id)||(e.a===B.id&&e.b===A.id)))
+          elbl=Math.max(elbl, horiz?String(e.mid).split('\n').length*EPL_H+2*EPL_PAD
+                                   :lblW(e.mid)+2*LASSO_CLEAR);
+        const d=Math.max(bandGap, lasso?lasso+guard:0, elbl)-actual;
         if(d<=0) continue;
         const from=cLo(B);
         for(const n of lay) if(n.rank===r&&cLo(n)>=from&&!(n.id&&pinned(n.id))) mvC(n,d);
@@ -6074,8 +6151,7 @@ function renderScene(doc,y0){
                      &&a.x+a.w<=b.x+b.w+0.01&&a.y+a.h<=b.y+b.h+0.01;
     const covered=new Set();
     for(const a of real) for(const b of real){
-      if(a===b||covered.has(a.id+' '+b.id)) continue;
-      if(!inside(a,b)) continue;
+      if(a===b||!inside(a,b)||covered.has(a.id+' '+b.id)) continue;
       if(pinned(a.id)&&pinned(b.id)) continue;      // both coordinates are the author's
       covered.add(a.id+' '+b.id);
       const who=pinned(b.id)?b.id:(pinned(a.id)?a.id:null);
@@ -6254,7 +6330,7 @@ function renderScene(doc,y0){
     });
     // rings are all-or-nothing per target: a hub whose loops are part ring,
     // part legacy would reintroduce crossings between the two styles
-    const byT={};
+    const byT=Object.create(null);
     order.forEach(({e})=>{ (byT[e.b]=byT[e.b]||[]).push(e); });
     for(const t in byT)
       if(!byT[t].every(e=>chPlan.get(e).ringOK))
@@ -6349,7 +6425,7 @@ function renderScene(doc,y0){
   {
     const straight=e=>byId[e.a]&&byId[e.b]&&!(chBack(e)&&!pinned(e.a)&&!pinned(e.b))&&!chains.get(e);
     const pk=e=>e.a<e.b?e.a+'\t'+e.b:e.b+'\t'+e.a;
-    const pairN={}, seen={};
+    const pairN=Object.create(null), seen=Object.create(null);
     for(const e of doc.edges) if(straight(e)){ const k=pk(e); pairN[k]=(pairN[k]||0)+1; }
     for(const e of doc.edges){
       if(!straight(e)) continue;
@@ -6751,7 +6827,7 @@ function renderScene(doc,y0){
   for(const n of lay){ W=Math.max(W,n.x+n.w); Hh=Math.max(Hh,n.y+n.h-y0-20); }
   if(W===0){W=480;} if(Hh===0){Hh=280;}
   // groups
-  const gsvg=[]; const gBox={};
+  const gsvg=[]; const gBox=Object.create(null);
   for(const g of doc.groups){
     const mem=nodes.filter(n=>n.group===g.id);
     if(!mem.length) continue;
@@ -7832,6 +7908,26 @@ function renderScene(doc,y0){
     if(wantsStart) arrowTri([x1,yy1],[x2,yy2],col);
     if(wantsEnd)   arrowTri([x2,yy2],[x1,yy1],col);
   }
+  // 0.5: THREE OR MORE labelled links between one pair of nodes
+  // each get a SLOT along the run, (k+1)/(n+1) in document order, measured
+  // from the pair's first id so `a--b` and `b--a` share one ordering. The
+  // default parameters (0.5, 0.38, 0.62, 0.28, 0.72) span only the middle 44 %
+  // of the run, so five labels were stacked 4 to 10 px apart in it; the seam
+  // pass above makes the run long enough to hold one line per slot. One or two
+  // labels keep the default set of positions. Vertical flow only,
+  // as the seam demand is: under horizontal flow the labels sit side by side
+  // across the run, and slotting them there scored worse on conformance 252.
+  const parSlot=new Map();
+  if(!horiz){ const per=Object.create(null);
+    for(const e of doc.edges){ if(!e.mid||e.a===e.b) continue;
+      // Only a pair on two ranks: a same-rank run is across the flow, the
+      // seam pass gave it no room, and slots there stacked the labels.
+      const A=byId[e.a],B=byId[e.b];
+      if(!A||!B||A.rank===undefined||B.rank===undefined||A.rank===B.rank) continue;
+      const k=e.a<e.b?e.a+'\u0000'+e.b:e.b+'\u0000'+e.a; (per[k]||(per[k]=[])).push(e); }
+    for(const k in per){ const g=per[k]; if(g.length<3) continue;
+      const lo=k.split('\u0000')[0];
+      g.forEach((e,i)=>{ const t=(i+1)/(g.length+1); parSlot.set(e,{t:e.a===lo?t:1-t,h:1/(g.length+1)}); }); } }
   // ── edge-label placement: candidates + greedy collision-aware choice ─────
   // For each registered label the carrying segment is sampled at several
   // parameters t and on both sides of the line, giving a small candidate set.
@@ -8354,6 +8450,14 @@ function renderScene(doc,y0){
                      String(r.text).length<=3 && !String(r.text).includes('\n');
         tPref=branch?0.22:0.5;
         ts=r.ts?r.ts:(branch?[0.22,0.3,0.16,0.4,0.5,0.62]:[0.5,0.38,0.62,0.28,0.72]);
+        const ps=!r.ts&&!branch&&parSlot.get(r.e);
+        if(ps){ const f=Math.hypot(r.p[0]-r.A.x-r.A.w/2,r.p[1]-r.A.y-r.A.h/2)
+                       <=Math.hypot(r.q[0]-r.A.x-r.A.w/2,r.q[1]-r.A.y-r.A.h/2);
+          const t=f?ps.t:1-ps.t;   // the segment may run B to A
+          // Clamp the slot before the filter: at 99+ links the outer slot
+          // fell within 0.02 of an end, no candidate survived, render threw.
+          const tc=Math.min(0.97,Math.max(0.03,t));
+          tPref=tc; ts=[tc,tc-ps.h/2,tc+ps.h/2,tc-ps.h,tc+ps.h].filter(x=>x>0.02&&x<0.98); }
       }
       // The perpendicular escape (item 42). When every in-line position is
       // blocked, an endpoint label must still be able to say which end it
@@ -9413,7 +9517,9 @@ function borderPoint(n,tx,ty){
 // p->q lies inside the box, or null when it misses entirely.
 function clipSegRect(p,q,x0,y0,x1,y1){
   let t0=0,t1=1; const dx=q[0]-p[0], dy=q[1]-p[1];
-  for(const [den,num] of [[-dx,p[0]-x0],[dx,x1-p[0]],[-dy,p[1]-y0],[dy,y1-p[1]]]){
+  for(let k=0;k<4;k++){
+    const den=k===0?-dx:k===1?dx:k===2?-dy:dy;
+    const num=k===0?p[0]-x0:k===1?x1-p[0]:k===2?p[1]-y0:y1-p[1];
     if(den===0){ if(num<0) return null; continue; }
     const t=num/den;
     if(den<0){ if(t>t1) return null; if(t>t0) t0=t; }
@@ -9455,9 +9561,9 @@ function routeAround(p,q,obs){
     if(u<0||u===1||dist[u]===Infinity) break;
     done[u]=true;
     for(let v=0;v<n;v++){
-      if(done[v]||blocked(V[u],V[v])) continue;
+      if(done[v]) continue;
       const d=dist[u]+Math.hypot(V[v][0]-V[u][0],V[v][1]-V[u][1]);
-      if(d<dist[v]-1e-9){ dist[v]=d; from[v]=u; }
+      if(d<dist[v]-1e-9&&!blocked(V[u],V[v])){ dist[v]=d; from[v]=u; }
     }
   }
   if(dist[1]===Infinity) return null;    // boxed in: keep the straight line
@@ -9589,7 +9695,7 @@ function renderSequence(doc,y0){
   const M=seqModel(doc);
   const lls=doc.lifelines;
   if(!lls.length) return {svg:'',y:y0,w:0};
-  const col={}; lls.forEach((l,i)=>{ col[l.id]=i; });
+  const col=Object.create(null); lls.forEach((l,i)=>{ col[l.id]=i; });
   // `OMITTED-LABEL-RECORDING`/`EMPTY-LABEL-STATE` display fallback, applied here rather than in `render`: the model
   // records an omitted label as absent (null) and the RENDERER substitutes the
   // id, so `lifeline c` draws "c". An explicitly empty label draws nothing.
@@ -9597,7 +9703,7 @@ function renderSequence(doc,y0){
   // class cascade — the same rule `render` applies to nodes and edges, applied
   // to this genre's elements (a `class` on a `message` is what `lost=` was
   // refused in favour of, `UNDELIVERED-MESSAGE-MARKING`). Read-only: the element is never patched.
-  const C={}; for(const c of doc.classes||[]) C[c.id]=c;
+  const C=Object.create(null); for(const c of doc.classes||[]) C[c.id]=c;
   const clsIds=(x)=>x.cls===undefined||x.cls===null?[]:(Array.isArray(x.cls)?x.cls:[x.cls]);
   const chan=(x,k)=>{ if(x[k]!==undefined) return x[k];
     let v; for(const id of clsIds(x)) if(C[id]&&C[id][k]!==undefined) v=C[id][k]; return v; };
@@ -9632,7 +9738,7 @@ function renderSequence(doc,y0){
   // ── PASS 1 — container column spans (needed BEFORE the column axis,
   //    because a fragment's operator tab and label have to fit inside its
   //    own box) ────────────────────────────────────────────────────────────
-  const cspan={};
+  const cspan=Object.create(null);
   for(const id in M.cont){
     const slots=M.owned[id];
     let cmin=Infinity,cmax=-Infinity;
@@ -9715,7 +9821,7 @@ function renderSequence(doc,y0){
   // fragment and the operand that opens with it get DIFFERENT tops and their
   // captions cannot land on each other. (Deriving both from the member row
   // overlapped them — visible in the rendered pixels, not in any metric.)
-  const boxTop={}, boxBot={};
+  const boxTop=Object.create(null), boxBot=Object.create(null);
   for(const r of M.rows){
     for(const id of sortDeep(opensAt[r.slot]||[])){
       // a top-level fragment gets clear air above it, or two consecutive
@@ -9750,7 +9856,7 @@ function renderSequence(doc,y0){
   const bottom=y+10;
 
   // ── PASS 4 — containers: box geometry ───────────────────────────────────
-  const fbox={};
+  const fbox=Object.create(null);
   for(const id in M.cont){
     const e=M.extent[id]; if(!e) continue;
     const cs=cspan[id]||{cmin:0,cmax:nc-1};

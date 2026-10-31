@@ -84,6 +84,8 @@ const SCHEMA_REL = 'spec/figdown-manifest.schema.json';
 const FIXTURES = path.join(__dirname, 'manifest-fixtures');
 
 const args = process.argv.slice(2);
+const badOpt = args.find(a => a.startsWith('-') && !['--strict', '--verbose'].includes(a));
+if (badOpt) { console.error('manifest-check: unknown option ' + badOpt + '\nusage: node tools/manifest-check.js [--strict] [--verbose]'); process.exit(2); }
 const strict = args.includes('--strict');
 const verbose = args.includes('--verbose');
 
@@ -413,6 +415,11 @@ if (!fs.existsSync(FIXTURES)) {
 } else {
   const validNames = fs.readdirSync(FIXTURES).filter(f => f.endsWith('.valid.json')).sort();
   const invalidNames = fs.readdirSync(FIXTURES).filter(f => f.endsWith('.invalid.json')).sort();
+  // A .why.txt whose control is gone (deleted, or renamed off the `.invalid.json`
+  // suffix) is a negative control that silently stopped running.
+  for (const w of fs.readdirSync(FIXTURES).filter(f => f.endsWith('.why.txt')).sort())
+    if (!fs.existsSync(path.join(FIXTURES, w.replace(/\.why\.txt$/, '.invalid.json'))))
+      fail('tools/manifest-fixtures/' + w + ' has no ' + w.replace(/\.why\.txt$/, '.invalid.json') + ' beside it — the control it records is not run');
   if (validNames.length < 1) fail('tools/manifest-fixtures/ holds no *.valid.json — at least one fully-populated valid manifest is required');
   if (invalidNames.length < 8) fail('tools/manifest-fixtures/ holds ' + invalidNames.length + ' invalid fixture(s); at least 8 are required '
     + '(unknown key, elements block, bad relation, no locator, malformed hash, STALE binding, bad version, bbox without page/unit)');

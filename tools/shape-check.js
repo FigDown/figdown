@@ -267,7 +267,13 @@ function checkOne(engine, fdPath) {
     // routed <path> on the same pair is still asserted.
     const fanned = m[1] === 'line' && pairN[pk(e)] > 1;
     const pts = pointsOfEdge(tag, attr(tag, 'd'));
-    if (pts.length < 2 || pts.some(p => p.some(isNaN))) continue;
+    // A drawn edge whose coordinates do not read as numbers is a defect in the
+    // drawing (NaN/Infinity draws nothing), never a reason to look away.
+    if (pts.length < 2 || pts.some(p => p.some(v => !Number.isFinite(v)))) {
+      endFails.push('edge line ' + e.line + ' (' + e.a + ' -> ' + e.b + '): drawn with '
+        + (pts.length < 2 ? 'fewer than two points' : 'a non-finite coordinate') + ' — nothing to assert, nothing drawn');
+      continue;
+    }
     for (const [id, pt] of [[e.a, pts[0]], [e.b, pts[pts.length - 1]]]) {
       const n = nodes[id];
       if (!n) continue;                              // boundary anchor: not drawn
@@ -298,7 +304,11 @@ function checkOne(engine, fdPath) {
     const n = nodes[e.a];
     if (!n) continue;                                // boundary anchor: not drawn
     const pts = pointsOfEdge(tag, attr(tag, 'd'));
-    if (pts.length < 2 || pts.some(p => p.some(isNaN))) continue;
+    if (pts.length < 2 || pts.some(p => p.some(v => !Number.isFinite(v)))) {
+      loopFails.push('self-loop line ' + e.line + ' at node "' + e.a + '": drawn with '
+        + (pts.length < 2 ? 'fewer than two points' : 'a non-finite coordinate'));
+      continue;
+    }
     loops++;
     const L = runLen(pts);
     if (L < LOOP_MIN)

@@ -69,6 +69,8 @@ const SCHEMA_REL = 'spec/figdown-model.schema.json';
 const FIXTURES = path.join(__dirname, 'schema-fixtures');
 
 const args = process.argv.slice(2);
+const badOpt = args.find(a => a.startsWith('-') && !['--strict', '--verbose'].includes(a));
+if (badOpt) { console.error('schema-check: unknown option ' + badOpt + '\nusage: node tools/schema-check.js [--strict] [--verbose]'); process.exit(2); }
 const strict = args.includes('--strict');
 const verbose = args.includes('--verbose');
 
@@ -221,6 +223,34 @@ if (unknown.length) {
   ok(SCHEMA_REL + ' — 2020-12, ' + Object.keys(schema.$defs).length + ' definitions, every keyword implemented');
 }
 
+// A2. CLOSEDNESS — both published schemas promise `additionalProperties: false`
+// on every object ("CLOSED, like the language"). B and C only prove the
+// engine's models validate (an unknown ENGINE field fails); nothing proved the
+// schema still REJECTS an unknown key in a consumer's document, so loosening
+// any one of the object definitions passed the gate. Every subschema that
+// declares `properties` must close — the model schema and the manifest schema.
+for (const rel of [SCHEMA_REL, 'spec/figdown-manifest.schema.json']) {
+  let sch;
+  try { sch = rel === SCHEMA_REL ? schema : JSON.parse(fs.readFileSync(path.join(ROOT, rel), 'utf8')); }
+  catch (e) { fail(rel + ' — cannot read for the closedness check: ' + e.message); continue; }
+  const open = [];
+  (function walk(n, at) {
+    if (Array.isArray(n)) { n.forEach((x, i) => walk(x, at + '/' + i)); return; }
+    if (!n || typeof n !== 'object') return;
+    if (n.properties && typeof n.properties === 'object' && !Array.isArray(n.properties) && n.additionalProperties !== false)
+      open.push(at);
+    for (const k of Object.keys(n)) {
+      if (k === 'enum' || k === 'const' || k === 'examples' || k === 'required') continue;
+      if (k === 'properties') { for (const q of Object.keys(n[k])) walk(n[k][q], at + '/properties/' + q); }
+      else walk(n[k], at + '/' + k);
+    }
+  })(sch, '#');
+  if (open.length) fail(rel + ' declares `properties` without `additionalProperties: false` at ' + open.length
+    + ' place(s) — the contract is CLOSED: an unknown key must be rejected, not accepted.\n'
+    + open.slice(0, 8).map(o => '        ' + o).join('\n'));
+  else ok(rel + ' — every object definition with `properties` is closed');
+}
+
 // ── B. the goldens ──────────────────────────────────────────────────────────
 function modelsIn(dir) {
   if (!fs.existsSync(dir)) return [];
@@ -288,6 +318,11 @@ if (!fs.existsSync(FIXTURES)) {
   fail('missing tools/schema-fixtures/ — without the negative controls, B and C prove nothing');
 } else {
   const names = fs.readdirSync(FIXTURES).filter(f => f.endsWith('.invalid.json')).sort();
+  // A .why.txt whose control is gone (deleted, or renamed off the `.invalid.json`
+  // suffix) is a negative control that silently stopped running.
+  for (const w of fs.readdirSync(FIXTURES).filter(f => f.endsWith('.why.txt')).sort())
+    if (!fs.existsSync(path.join(FIXTURES, w.replace(/\.why\.txt$/, '.invalid.json'))))
+      fail('tools/schema-fixtures/' + w + ' has no ' + w.replace(/\.why\.txt$/, '.invalid.json') + ' beside it — the control it records is not run');
   if (names.length < 5) fail('tools/schema-fixtures/ holds ' + names.length + ' control(s); at least 5 are required '
     + '(wrong type, missing required, unknown field, bad enum, malformed id)');
   for (const n of names) {

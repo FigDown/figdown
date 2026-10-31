@@ -156,6 +156,8 @@ function dirsOf(base) {
 }
 
 const strict = process.argv.includes('--strict');
+const badOpt = process.argv.slice(2).find(a => a.startsWith('-') && !['--strict', '--write'].includes(a));
+if (badOpt) { console.error('archive-check: unknown option ' + badOpt + '\nusage: node tools/archive-check.js [--strict] | --write <release>'); process.exit(2); }
 let failures = 0;
 function fail(msg) { console.log('  FAIL  ' + msg); failures++; }
 function ok(msg) { console.log('  ok    ' + msg); }

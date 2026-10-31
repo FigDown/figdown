@@ -80,7 +80,8 @@
 //                on its own line so the number is visible.
 //   skip         reported with counts, never silently omitted:
 //                  no-metadata — an `.svg` with no `figdown-source` element
-//                                (hand-drawn, or from another tool)
+//                                (hand-drawn, or from another tool); one
+//                                beside a paired `.fd` FAILS --strict
 //                  no-source   — an artifact with metadata whose paired
 //                                `.fd` is absent
 //                  no-artifact — a `.fd` the engine WILL draw that has no
@@ -340,7 +341,10 @@ function main() {
     // correct state.
     if (!fs.existsSync(svg)) continue;
     const meta = readMeta(svg);
-    if (!meta) { skipped.noMeta.push({ rel: relSvg }); continue; }
+    if (!meta) {
+      skipped.noMeta.push({ rel: relSvg, paired: fs.existsSync(svg.replace(/\.svg$/, '.fd')) });
+      continue;
+    }
 
     const fd = svg.replace(/\.svg$/, '.fd');
     if (!fs.existsSync(fd)) {
@@ -484,6 +488,17 @@ function main() {
   // above; a source that does not parse is still left to the corpus gates.
   const unpaired = skipped.noSource.length +
     skipped.noArtifact.filter(s => s.why.startsWith('the source renders')).length;
+  // An X.svg beside its X.fd with no figdown-source metadata is not
+  // hand-drawn: its embedded source and data-sha256 were stripped, which
+  // turned a checked artifact into an exempt skip. Hand-drawn or foreign
+  // .svg files have no paired .fd and stay a skip.
+  const stripped = skipped.noMeta.filter(s => s.paired);
+  if (strict && stripped.length) {
+    console.log('FAIL  ' + stripped.length + ' artifact(s) beside a paired .fd carry no ' +
+      'figdown-source metadata -- rebuild: node tools/build-svg.js ' +
+      stripped.map(s => s.rel.replace(/\.svg$/, '.fd')).join(' '));
+    process.exit(1);
+  }
   if (strict && unpaired) {
     console.log('FAIL  ' + unpaired + ' broken X.svg <-> X.fd pair(s) — restore the source, ' +
       'build the artifact, or delete the orphan');

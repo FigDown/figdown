@@ -304,7 +304,7 @@ scalar-marker genre lands, the move is a **one-genre** operation.
     band "<label>" <a>..<b>% in=<id>         [fill=] [stroke=] [style=] [extend=]
 
 A **labelled zone across the target's rendered extent**: either a range
-`<a>..<b>%` or a single `<pct>%` edge that `extend=` grows from. Defaults
+`<a>..<b>%` or a single `<pct>%`, shorthand for `0..<pct>%`. Defaults
 `extend=up` and `fill=#e5e7eb`. The quoted label is MANDATORY and written
 FIRST (`BAND-LABEL-STATUS`): without a label slot, a band whose `fill=` a reader
 correctly discards as presentation (§5, `PRESENTATION-AS-MEANING-CARRIER`) asserted **nothing whatsoever**.

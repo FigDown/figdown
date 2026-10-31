@@ -84,13 +84,13 @@ repository.
 **Copy the directory (no plugin mechanism, every project):**
 
 ```sh
-cp -r skill/figdown ~/.claude/skills/figdown
+mkdir -p ~/.claude/skills && cp -r skill/figdown ~/.claude/skills/figdown
 ```
 
 **Copy the directory (no plugin mechanism, one project only):**
 
 ```sh
-cp -r skill/figdown <your-repo>/.claude/skills/figdown
+mkdir -p <your-repo>/.claude/skills && cp -r skill/figdown <your-repo>/.claude/skills/figdown
 ```
 
 The copy paths remain fully supported: the bundle is self-contained, so a

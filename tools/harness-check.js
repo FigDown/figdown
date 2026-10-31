@@ -47,6 +47,8 @@ const REF_CMD = JSON.stringify(process.execPath) + ' ' + JSON.stringify(ADAPTER)
 
 const argv = process.argv.slice(2);
 const STRICT = argv.includes('--strict');
+const badOpt = argv.find(a => a.startsWith('-') && !['--strict', '--help', '-h'].includes(a));
+if (badOpt) { console.error('harness-check: unknown option ' + badOpt + '\nusage: node tools/harness-check.js [--strict] [--help]'); process.exit(2); }
 if (argv.includes('--help') || argv.includes('-h')) {
   console.log('usage: node tools/harness-check.js [--strict] [--help]');
   console.log('');
