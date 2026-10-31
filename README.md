@@ -321,7 +321,7 @@ Or copy the self-contained bundle into any skills directory, with no plugin
 mechanism involved:
 
 ```sh
-cp -r skill/figdown ~/.claude/skills/figdown
+mkdir -p ~/.claude/skills && cp -r skill/figdown ~/.claude/skills/figdown
 ```
 
 Both paths install the same directory — the plugin manifest points at

@@ -65,6 +65,128 @@ Statuses referred to above are defined in [`spec/README.md`](spec/README.md).
 
 Nothing yet.
 
+## v0.5.3 — 2026-10-31
+
+**Release `v0.5.3`, language version `figdown 0.5`.** A `Z`: **the language did
+not move.** No keyword, option key, enum value or genre changed, every
+existing conformance golden passes unmodified, and `read/0.5/` is reused
+byte-for-byte. What ships is layout room for labelled links, two table inputs
+that were silently wrong and are now refused, engine robustness fixes, three
+editor repairs and stricter tools. **Three changes act on documents without
+touching their headers.** They are listed first under *Upgrading*.
+
+Two published figures change their drawing: `examples/evpn-fabric` and
+`examples/statechart/bfd-session`. Every published artifact changes its
+version stamp.
+
+### Changed — layout
+
+- **A labelled edge between two nodes in one `rank` gets a gap that holds its
+  label.** The gap was the default one, and a long label was written over both
+  boxes. This applies in `topology`, `flowchart` and `statechart`.
+- **Parallel labelled links get room under vertical flow.** The seam between
+  two ranks now holds the labels of every labelled link between one pair of
+  nodes. With three or more such links, each label takes its own slot along
+  the run instead of competing for the middle. Five links went from 6
+  overlapping label pairs to 0. One or two links, links between two nodes of
+  the same rank, and horizontal flow keep their placement.
+- **The fix trades a little edit locality**
+  (`BOUNDED-GROWTH-ACCOMMODATION`). Room that a label asks for leaves with the
+  label: removing the labelled leaf-to-leaf edge from
+  `examples/evpn-fabric.fd` moves one node back 53.5 px.
+
+### Fixed — engine
+
+- **Words that name JavaScript object members are ordinary words.** An id,
+  class name, option value or keyword spelled `constructor`, `toString`,
+  `valueOf`, `hasOwnProperty` or `__proto__` could crash the engine, draw a
+  `NaN` canvas, or print a native function in a diagnostic. Each now behaves
+  like any other word: a legal id renders, and an unknown value or keyword
+  gets the ordinary diagnostic.
+- **Edge routing is about 13× faster** on large figures. A 100-node
+  `topology` tree went from about 8.7 s to 0.65 s, with byte-identical output.
+- **Two table inputs that did nothing are refused.** `fill=`, `stroke=` and
+  `class=` on the row form `cell <r> highlight` were accepted and dropped. A
+  `width` of zero drew a zero-width column. Both are now line errors. See
+  *Upgrading*.
+- **Diagnostics.** An `x-` option key on a timing `signal` line, read in lane
+  mode, gets the RESERVED diagnostic every other directive gives, instead of
+  `unexpected argument`.
+
+### Fixed — editor
+
+- Inspector edits re-find the table or bitfield they edited by its id, not
+  the section's first one, and compare numbers by value (`gap=8.0`,
+  `word=032` and `width auto,70.0` are no longer refused).
+- Link mode requires exactly one new connector, so an existing identical
+  connector no longer lets a failed link pass.
+- Removing an empty container ignores a kept comment that spells `in=<id>`.
+
+### Fixed — tools and integrations
+
+- The migrator rewrites the retired `field` flag `conditional` to
+  `present=""`, and writes a quoted genre token in the header bare.
+- The MCP server treats reference names such as `constructor` as unknown.
+- `build-svg` answers `--help`, refuses unknown options and reports missing
+  paths. A dangling symbolic link no longer aborts a directory walk.
+
+### Changed — gates
+
+No gate was added or removed. Several now fail where they used to pass
+silently.
+
+- Every gate tool refuses an unknown command-line option instead of
+  ignoring it, so a mistyped flag cannot turn a check off.
+- The F5 and locality ratchets fail on a baseline that is higher than the
+  measured value, so a stale baseline cannot hide a later regression.
+- The shape check fails an edge drawn with a non-finite coordinate. The
+  accessibility, manifest and schema checks fail a negative control whose
+  invalid file is missing. The artifact check under `--strict` fails a
+  paired `.svg` stripped of its source metadata.
+- The schema check requires both schemas to stay closed. The dist check
+  requires `package.json`'s entry points to name the builds and exist. The
+  editor check executes pin emission on a synthetic snapshot. The plugin and
+  MCP checks pin their manifests, and the plugin check reports an unreadable
+  manifest instead of crashing.
+- The conformance-actor check reads an emphasised conformance claim, and
+  the errata check fails a newer reading tree that copies an erratum forward.
+- Six conformance cases (296 → 302) and two property tests pin the engine
+  changes above.
+- Continuous integration runs on pushes to `dev`, `main` and tags only, with a
+  timeout on every job.
+
+### Fixed — documentation and specification
+
+- [`spec/syntax-style.md`](spec/syntax-style.md) rule 2.2 states what the engine accepts unquoted.
+- `block`: a single-percent band is stated as shorthand for `0..<pct>%`.
+- [`spec/genres/table.md`](spec/genres/table.md) states that any zero width
+  is refused and that the row highlight takes no presentation keys.
+- `MIGRATE.md` states the migrator's exit codes for a refused rewrite.
+- The shipped guides name the installed command-line tool. The skill install
+  command creates its parent directory. `CONTRIBUTING` names the retired
+  colour keys precisely.
+- Counts in core §15.7, experimental E0.1, `conformance/README.md` and
+  `tools/README.md` are recounted against the tree.
+
+### Upgrading
+
+**Three changes act on documents without a header change.** None is
+version-gated.
+
+1. **`cell <r> highlight` with `fill=`, `stroke=` or `class=`** is now a line
+   error. Drop the key, or paint a cell (`cell (r,c) fill=…`). No shipped
+   document has one.
+2. **A table `width` of zero** (`0`, `0.0`, `0%`, `0px`) is now a line error.
+   Give a positive width. No shipped document has one.
+3. **Figures with labelled links** may re-render: a same-rank pair joined by
+   a labelled edge, or, under vertical flow, a pair with two or more labelled
+   links whose labels did not fit. Two shipped figures change.
+
+No frozen-surface document needs a mechanical rewrite. If you keep rendered
+`.svg` files under version control, expect a stamp-only change on every
+rebuilt artifact whose source did not change, apart from the cases above.
+Full details: [`spec/migrations.md`](spec/migrations.md).
+
 ## v0.5.2 — 2026-10-21
 
 **Release `v0.5.2`, language version `figdown 0.5`.** A `Z`: **the language did
