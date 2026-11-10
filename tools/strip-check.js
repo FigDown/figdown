@@ -86,6 +86,8 @@ function findEngine() {
   return ENGINE_CANDIDATES.find(p => fs.existsSync(p)) || null;
 }
 
+const normalize = require('../conformance/normalize.js');
+
 function loadEngine(enginePath) {
   const h = fs.readFileSync(enginePath, 'utf8');
   const start = h.indexOf('const SHAPES');
@@ -262,6 +264,8 @@ function main() {
   const rows    = [];     // { rel, nodeCount, orphans, pinnedOrphans, verdict }
   let anyFail   = false;
 
+  const refusedStripped = [];
+  const refusedAsWritten = new Set();
   for (const fdPath of files) {
     const rel = corpus.rel(fdPath);
 
@@ -332,6 +336,38 @@ function main() {
       continue;
     }
 
+    // ── Step 2b: identical structure, and it still renders ───────────────
+    // The header promises both. The normalised model of the stripped copy must
+    // equal the original's once the layout namespace itself (`pins`) and
+    // source line numbers are set aside; and the stripped copy must render
+    // without a geometry-time refusal.
+    {
+      const canon = d => JSON.stringify(normalize(d), (k, v) => (k === 'pins' || k === 'line' ? undefined : v));
+      let why = null;
+      if (canon(doc) !== canon(strippedResult.doc)) why = 'stripping the layout namespace changed the model';
+      else {
+        // A geometry-time REFUSAL of the stripped copy FAILS:
+        // a figure that draws with its pins must draw without them, and the fix
+        // is content intent (`rank`, `flow`), which this test keeps. A figure
+        // the engine refuses AS WRITTEN has no drawing to preserve: it is
+        // reported, not failed (the layout-compare auto arm teaches exactly that).
+        try {
+          const g = engine.render(strippedResult.doc).errs || [];
+          if (g.length) {
+            const own = engine.render(doc).errs || [];
+            if (own.length) { refusedStripped.push(rel + ': ' + g[0].slice(0, 140)); refusedAsWritten.add(rel); }
+            else why = 'the stripped copy is refused at geometry time: ' + g[0].slice(0, 160);
+          }
+        } catch (e) { why = 'rendering the stripped copy threw: ' + e.message; }
+      }
+      if (why) {
+        cov.score();
+        rows.push({ rel, nodeCount: doc.nodes.length, orphans: 0, pinnedOrphans: 0, verdict: 'fail', stripError: why });
+        anyFail = true;
+        continue;
+      }
+    }
+
     // ── Step 3: relationship coverage heuristics ──────────────────────────────
     // Run analysis on ORIGINAL doc so we know which nodes had pins.
     const analysis = analyzeDoc(doc);
@@ -362,12 +398,16 @@ function main() {
       lpad(r.nodeCount,           C.nodes),
       lpad(r.orphans,             C.orphans),
       lpad(r.pinnedOrphans,       C.pinOrph),
-      pad(r.verdict,              C.verdict),
+      pad(refusedAsWritten.has(r.rel) ? 'refused*' : r.verdict, C.verdict),
     ].join('  ');
     console.log(line);
   }
 
   console.log(SEP);
+  if (refusedStripped.length) {
+    console.log('NOTE  * ' + refusedStripped.length + ' figure(s) are refused at geometry time as written, so there is no drawing to preserve (not failed):');
+    for (const r of refusedStripped) console.log('        ' + r);
+  }
 
   // ── COVERAGE. Printed on EVERY run, every reason, zero or not. ────────────
   // The old tail printed one collapsed number, and only `if (skipped)` — so a

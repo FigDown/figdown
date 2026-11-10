@@ -73,6 +73,20 @@ for (const [what, v] of [['plugin.json', plug.version], ['marketplace entry', en
       JSON.stringify(pkg.version) + ' — the release is one number in three files');
 }
 
+// ---- 1b. the landing page names the same release ---------------
+// `index.html` prints "Current release vX.Y.Z" and nothing compared it with
+// package.json: the one release-number carrier outside the three files above.
+{
+  const ip = path.join(ROOT, 'index.html');
+  if (!fs.existsSync(ip)) note('index.html is missing');
+  else {
+    const m = /Current release\s*<strong>v([0-9][^<\s]*)<\/strong>/.exec(fs.readFileSync(ip, 'utf8'));
+    if (!m) note('index.html no longer carries "Current release <strong>vX.Y.Z</strong>" — update this check or restore the line');
+    else if (m[1] !== pkg.version)
+      note('index.html names release v' + m[1] + ' but package.json is ' + pkg.version);
+  }
+}
+
 // ---- 2. the skills path must resolve to the ONE bundle -------------------
 const declared = [].concat(plug.skills || []);
 if (!declared.length) note('plugin.json has no "skills" field; the wrapper would ship no skill');
@@ -189,6 +203,13 @@ const urlFields = [
 for (const [what, v, want] of urlFields)
   if (v !== undefined && v !== want)
     note(what + ' is ' + JSON.stringify(v) + ', expected ' + JSON.stringify(want));
+
+// the licence is a claim too. package.json is the one source; every
+// manifest that states a licence must state the same one (a plugin.json
+// saying GPL-3.0 over an MIT package passed before).
+for (const [what, v] of [['plugin.json license', plug.license], ['marketplace entry license', entry && entry.license]])
+  if (v !== undefined && v !== pkg.license)
+    note(what + ' is ' + JSON.stringify(v) + ', expected package.json\'s ' + JSON.stringify(pkg.license));
 
 report();
 

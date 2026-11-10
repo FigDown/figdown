@@ -177,7 +177,7 @@ because the argument was never about those two keys.)
 
 **RULE 1.3 — `;` is reserved for a future statement separator and MUST NOT
 be given any other meaning.** It was taken back from `via=`
-for exactly this reason (migrations.md:1328-1338; core.md:329-331).
+for exactly this reason (MIGRATIONS 0.1; core §1).
 
 **The reservation was not enforced until 0.1.** Before that,
 verified: `node a ;` **parsed**, and `;` became the node's *label*;
@@ -276,9 +276,13 @@ emptiness.
 
 ### 2.2 List elements MAY be bare
 
-**RULE 2.2 — an element of a comma-delimited list MAY be written bare when
-it matches the identifier pattern `[A-Za-z_][A-Za-z0-9_-]*`. Quotes are
-REQUIRED when the element contains whitespace, a comma or a quote.**
+**RULE 2.2 — an element of a comma-delimited list MAY be written bare
+unless it contains whitespace, a comma or a quote, or begins with `#`
+after whitespace. Then quotes are REQUIRED.** The identifier pattern
+`[A-Za-z_][A-Za-z0-9_-]*` is the preferred style for a bare element, not
+a condition for writing one bare (corrected 2026-10-31: the bold rule had
+made the pattern the condition, which the paragraph below and the engine
+contradict).
 
 *As the engine reads it (corrected 2026-10-23).* A paren or a `#` inside an
 element is accepted bare: `data=a#b,c`, `data=a(b),c` and `field a#b:4,c:4`
@@ -666,7 +670,7 @@ own spelling.**
 
 The normative sentence this rule restates: *"one lowercase word, borrowed
 standard terminology, scope-precise, mutually disambiguating — no invented
-abbreviations"* (core.md:1168-1170).
+abbreviations"* (core §10).
 
 **Corollary — frequency buys brevity, but only within one source.** `SPELLING-LENGTH-VS-FREQUENCY`'s
 gradient (requirements-notes.md:941-957) says the common case spells short.
@@ -704,7 +708,7 @@ Three sub-rules, each with shipped evidence:
 they denote the same concept, they MUST share the value grammar too.**
 
 The `table` child keyword `width` and the `width=` option on `pin` share a
-spelling on purpose (`SIZE-AND-DIRECTION-KEY-NAMING`; core.md:1173-1178) — both are a horizontal
+spelling on purpose (`SIZE-AND-DIRECTION-KEY-NAMING`; core §10) — both are a horizontal
 extent. (The option was carried by `size` until 0.1, when `ELEMENT-GEOMETRY-DIRECTIVE`
 merged that keyword into `pin`; the key, its grammar and this rule are
 unchanged by the move, only the directive that carries it.) But verified,
@@ -788,7 +792,7 @@ that promise and kept the naming ban, so `x-` now means *"not FigDown's"*
 family-wide (core §10; the sidecar's delegated `^x-` keys,
 `figdown-manifest.md` §2 rule 2). It too produces a named diagnostic since
 `RESERVED-PREFIX-ENFORCEMENT`, which is what makes it pass this section's own test. `step` was reserved until 0.1 and **released**: a word reserved against nothing costs authors
-a name for nothing (core.md:1137-1140). Reviewers should apply that test to
+a name for nothing (core §10). Reviewers should apply that test to
 every reservation they propose.
 
 ### 4.7 A spelling spent in one namespace is spent everywhere
@@ -905,7 +909,7 @@ published document ever carried the retired meaning. The permission expires
 at `figdown 1.0`.**
 
 **Why RULE 4.3's exception does not reach it.** 4.3's retired-spelling
-exception is **directional**, and core.md:2548 says so in as many words:
+exception is **directional**, and core §10 says so in as many words:
 *"a retired spelling MAY be reused in **the other namespace**, a live one
 may not."* `fill` is the worked precedent (§8.2) — a retired KEYWORD
 returning as a live OPTION KEY, where the two can never meet because a
@@ -929,7 +933,7 @@ project's own intermediate states.
 **And in this instance the revival is not a reversal at all.** `DESCRIPTION-KEY-SPELLING` retired
 `note=` **in order to** reserve the name for the drawn construct, and said
 so twice on the record — in the retirement's own diagnostic and in
-core.md:2865, *"the name is reserved for the … DRAWN annotation"*. **Cashing
+core §10's `note` row, which says it was retired *"in order to reserve the name"*. **Cashing
 a stated reservation is the opposite of contradicting a decision.** A
 proposal that meets this rule's three obligations but reverses a decision
 the retirement made on the merits is a different act and is not licensed
@@ -1028,7 +1032,7 @@ the whitespace policy.
 
 **RULE 6.1 — unknown lines, unknown option keys, and registered keys on
 directives that do not accept them are ERRORS. Nothing is ever silently
-ignored.** (core.md:24-27, :1254-1260, :528-529; .github/CONTRIBUTING.md:40-41.)
+ignored.** (core §0, §1, §8; .github/CONTRIBUTING.md.)
 
 A closed set that is not written down is not closed, it is merely
 unimplementable (`HEADER-GENRE-REQUIREMENT` §5). Every closed set — keywords, option keys, shape
@@ -1169,7 +1173,7 @@ and this exception is neither deepened nor discharged by the widening.
 
 ### 8.2 `fill` is a retired keyword and a live option key
 
-Recorded already in core.md:1187-1205 and restated here so this document is
+Recorded already in core §10 and restated here so this document is
 complete: `fill` at line start is *always* the error
 `fill has been renamed: use band`, and `fill=` is *always* the option key.
 They can never meet in a document that parses. The exception is
@@ -1566,7 +1570,11 @@ list (the unenforced `;`, quoting not protecting a comma, the `bundle`
 `--` ambiguity, the `edge`/`bundle` whitespace disagreement, and `via=`
 documented in its retired form) are all fixed and are no longer
 deviations. Item 4 was resolved by correcting core §0.1 rather than the
-engine.
+engine. And the third open item this list once carried — `tools/layout-lint.js`
+mis-measuring every non-rectangular node (`extractNodes` tested `<rect>` before
+`<polygon>`/`<ellipse>` within a fixed window and could pick up the next
+node's rect) — was fixed in the tool (a comment in `layout-lint.js`'s `extractNodes`
+records it), and `gate:layout` runs the tool.
 
 **Open:**
 
@@ -1589,13 +1597,6 @@ engine.
    stated until 0.1. Now stated in core §12.3 and `genres/table.md`,
    and filed as core §9 **`COLSPAN-EMPTY-CELL-SPELLING`**: changing the spelling is a language
    change in a frozen genre, so this release owes the record, not a fix.
-3. **`tools/layout-lint.js` mis-measures every non-rectangular node.**
-   `extractNodes` tests `<rect>` before `<polygon>`/`<ellipse>` within a
-   fixed character window, so for a diamond, circle or ellipse it can pick
-   up the *next* node's rect. Any `novlp`/`thru`/`cross` number for a
-   figure containing one of those shapes is unreliable. This is a TOOL
-   defect, not a language one, and the tool's numbers must not be treated
-   as a gate until it is fixed.
 
 ## 11. The machine-readable companion
 

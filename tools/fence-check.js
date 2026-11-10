@@ -292,6 +292,25 @@ function extractFences(mdSrc) {
   return fences;
 }
 
+// ── Legend rules on a complete fence (gate:legend's checkDoc, required) ────
+// A complete fence is a figure a reader is shown, so core §2.7 (the legend draws
+// what the author declared, and nothing else) holds here exactly as it does for
+// examples/ and figures/ — one implementation, required, never restated.
+// A skeleton fence that declares a class and draws nothing (SKILL.md's document
+// skeleton) teaches the line form, not a figure: it has no member to reach, so
+// only a fence that draws something is held to the rules.
+const { checkDoc: legendCheckDoc } = require('./legend-check.js');
+const DRAWN = ['nodes', 'groups', 'edges', 'blocks', 'trunks', 'thresholds', 'bands',
+               'boundaries', 'lifelines', 'messages', 'states', 'fragments', 'operands'];
+function legendFindings(engine, docs) {
+  const findings = [];
+  docs.forEach((d, i) => {
+    if (!DRAWN.some(k => Array.isArray(d[k]) && d[k].length)) return;
+    legendCheckDoc(engine, d, i + 1, findings, []);
+  });
+  return findings.map(f => 'Line ' + (f.line === undefined ? '?' : f.line) + ': [legend ' + f.kind + '] ' + f.msg);
+}
+
 // ── Single-fence check ────────────────────────────────────────────────────────
 // Returns { verdict: 'ok'|'fail'|'unverified'|'skip', errors: string[] }
 
@@ -301,9 +320,19 @@ function checkFence(engine, src, skip) {
   const complete = isCompleteDoc(src);
 
   if (complete) {
-    const { errs } = engine.parse(src);
-    if (!errs.length) return { verdict: 'ok', errors: [] };
-    return { verdict: 'fail', errors: errs };
+    const p = engine.parse(src);
+    if (p.errs.length) return { verdict: 'fail', errors: p.errs };
+    // a complete document that parses is also RENDERED, because the
+    // engine reports geometry-time refusals (a pin covering a node, a band
+    // enclosing a non-member) from render and not from parse; a README
+    // fence the engine refuses to draw is as broken as one it cannot parse.
+    const ds = p.docs && p.docs.length ? p.docs : [p.doc];
+    // The legend probe re-renders JSON clones of the parsed doc, and a doc that
+    // has already been rendered once no longer clones faithfully, so it runs first.
+    const lf = legendFindings(engine, ds);
+    const gerrs = ds.reduce((acc, d) => acc.concat(engine.render(d).errs || []), []);
+    if (gerrs.length) return { verdict: 'fail', errors: gerrs };
+    return lf.length ? { verdict: 'fail', errors: lf } : { verdict: 'ok', errors: [] };
   }
 
   // Fragment mode: wrap and parse.

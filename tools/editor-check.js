@@ -83,10 +83,10 @@ function loadEditorCore() {
     'stripExactOptionValue','ungroupDeclaration','buildLabelEdit','labelEditMatches','optionSpanOutsideLabel','rewriteOption',
     'declarationOptionAbsent',
     'docForSection','ensureFlowDirective',
-    'ensureLayoutMarker','upsertLayoutDirective','mergePinKeys','upsertPin',
+    'afterLastCodeLine','ensureLayoutMarker','upsertLayoutDirective','mergePinKeys','upsertPin',
     'splitPipeSource','buildPipeSource','delimiterParts','tableSourceInfo','tableRowsInfo','tableCellId','parseTableCellId',
     'firstTypedBlock','tableActionTarget','tableSelectionModel','tableMark','dropLinePreserveComment','rewriteTableCellOption','tableCellOptionAbsent','setTableCellText',
-    'rewriteTableCellRefsRange','tableWidthValues','setTableWidths','setTableRowHighlight',
+    'cellLineAddress','rewriteTableCellRefsRange','tableWidthValues','setTableWidths','setTableRowHighlight',
     'insertTableRow','insertTableColumn','deleteTableRow','deleteTableColumn',
     'sourceTokenSpans','commaElementSpans','classicFieldParts','bitfieldSourceInfo','bitfieldItems','bitfieldSelectionId',
     'parseBitfieldSelectionId','bitfieldSelectionModel','encodeCompactName','compactItemParts','rewriteClassicFieldName',
@@ -108,7 +108,7 @@ function loadEditorCore() {
     'rewriteClassicFieldName,rewriteClassicFieldWidth,rewriteCompactFieldItem,rewriteFieldOption,fieldOptionAbsent,fieldOptionWritten,setBitfieldOption,'+
     'escapeFdString,'+
     'addBitfieldField,addBitfieldBreak,deleteBitfieldItem,moveBitfieldLine,moveBitfieldLineBefore,bitfieldBudget,'+
-    'moveNodeLineSource,moveNodeOrderMatches,linkAddedOne,dropEmptyContainers,sourceLineContexts,sourceHighlightLine,rewriteThresholdOffset,groupNodesSource,emitPins};')(
+    'moveNodeLineSource,moveNodeOrderMatches,linkAddedOne,dropEmptyContainers,sourceLineContexts,sourceHighlightLine,rewriteThresholdOffset,groupNodesSource,emitPins,declarationLineIdx};')(
       engine.parse,engine.render,engine.findComment,engine.scanConnectorLine,engine.connectorKwAt,engine.GENRE_NODE_KW,
       engine.GENRE_KW,engine.CHILD_KW,engine.directiveOpts,engine.docNodes,engine.isId,engine.tokenize,engine.splitOpts,engine.belowOptVersion);
 }
@@ -500,6 +500,22 @@ const pinBefore=multiPin.slice(0,4).join('\n');
 const pinR=editorCore.upsertPin(multiPin,1,'b',{at:'(70,80)'});
 check('layout emitter accepts explicit second-section bounds',pinR&&pinR.ok&&/pin b at=\(70,80\)/.test(pinR.lines.join('\n')),pinR&&pinR.error);
 check('second-section pin leaves section 0 byte-identical',pinR.lines.slice(0,4).join('\n')===pinBefore,pinR.lines.join('\n'));
+// a pin added to section 0 lands after section 0's last code line, not
+// under the comment that heads section 1, and the blank separator stays.
+const headedTwo=['figdown 0.1 block','node a "A"','flow right','','# ---- figure 2 ----','figdown 0.1 block','node b "B"'];
+const pinIA=editorCore.upsertPin(headedTwo.slice(),0,'a',{at:'(10,20)'});
+check('a pin for section 0 stays above the comment that heads section 1',pinIA&&pinIA.ok&&
+  JSON.stringify(pinIA.lines.slice(3))===JSON.stringify(['layout','pin a at=(10,20)','','# ---- figure 2 ----','figdown 0.1 block','node b "B"']),
+  pinIA&&JSON.stringify(pinIA.lines));
+// option-first declarations (OPTION-POSITION-PARSING, fixture 115) are found through the
+// model, not by spelling; a drag on an option-first pin patches that line.
+const optFirst=['figdown 0.5 topology','class fill=#eeeeee c "C"','group fill=#f1f5f9 g "Pod"','node a "A" in=g class=c','layout','pin width=200 a'];
+check('option-first group, class and pin declarations are found',
+  editorCore.declarationLineIdx(optFirst,0,'group','g')===2&&editorCore.declarationLineIdx(optFirst,0,'class','c')===1&&
+  editorCore.declarationLineIdx(optFirst,0,'pin','a')===5,'');
+const pinOF=editorCore.upsertPin(optFirst.slice(),0,'a',{at:'(5,6)'});
+passBuilt('a drag on an option-first pin patches it instead of adding a second',optFirst,pinOF,(d,ls)=>
+  ls.filter(l=>/^pin\b/.test(l)).length===1&&d.pins.a.fx===5&&d.pins.a.w===200);
 check('upsertPin escapes and scopes its id matcher',
   html.includes("new RegExp('^\\\\s*pin\\\\s+'+regexEscape(id)+idTokenEnd)") &&
   html.includes("const idTokenEnd='(?![A-Za-z0-9_-])';"));
@@ -701,6 +717,15 @@ passBuilt('table row insert reindexes downstream row marks and preserves header 
   return t.rows.length===3&&t.rowmarks.some(x=>x.r===3)&&
     t.marks.some(x=>!x.hdr&&x.r===1&&x.c===2)&&ls.join('\n').endsWith(tableSuffix);
 });
+// a row inserted INSIDE a rowspan continues the span (the row twin of the
+// column rule); before, the new row's empty cell took the span over and cut
+// it in two, with no error anywhere.
+const spanBase=['figdown 0.1 table','table t "T"','| H | K |','|---|---|','| a | x |','| ^^ | y |'];
+let trSpan=editorCore.insertTableRow(spanBase.slice(),0,'t',1);
+passBuilt('table row insert inside a rowspan widens the span',spanBase,trSpan,(d,ls)=>{
+  const t=d.blocks[0];
+  return t.rows.length===3&&t.rows[1].cells[0].m==='up'&&t.rows[2].cells[0].m==='up'&&t.rows[1].cells[1].v==='';
+});
 let tic=editorCore.insertTableColumn(tableBase.slice(),0,'t',2);
 passBuilt('table column insert reindexes marks, extends widths and preserves zero colspan segments',tableBase,tic,(d,ls)=>{
   const t=d.blocks[0],rows=ls.filter(x=>/^\|/.test(x));
@@ -752,6 +777,53 @@ passBuilt('table row delete on a rowspan head moves its text to the continuation
   const r=d.blocks[0].rows;
   return r.length===2&&r[0].cells[0].v==='w'&&r[1].cells[0].v==='x'&&r[1].cells[0].m===null&&r[1].cells[1].v==='q';
 });
+// the head's `cell (r,c)` mark follows its text to the new head instead
+// of being dropped (both twins). The mark is read back from the parsed model.
+const spanMark=['figdown 0.1 table','table t "T"','| A | B |','|---|---|','|w|o|','|x|p|','|^^|q|','cell (2,1) fill=#fecaca'];
+passBuilt('row delete on a marked rowspan head keeps the mark on the new head',spanMark,editorCore.deleteTableRow(spanMark.slice(),0,'t',2),(d,ls)=>{
+  const mk=d.blocks[0].marks||[];
+  return mk.length===1&&mk[0].r===2&&mk[0].c===1&&ls.some(x=>/^cell \(2,1\) fill=/.test(x));
+});
+const spanMarkCol=['figdown 0.1 table','table t "T"','| A | B | C |','|---|---|---|','|w||o|','|x|y|p|','cell (1,1) fill=#fecaca'];
+passBuilt('column delete on a marked colspan head keeps the mark on the new head',spanMarkCol,editorCore.deleteTableColumn(spanMarkCol.slice(),0,'t',1),(d,ls)=>{
+  const mk=d.blocks[0].marks||[];
+  return mk.length===1&&mk[0].r===1&&mk[0].c===1&&ls.some(x=>/^cell \(1,1\) fill=/.test(x));
+});
+// the address of a `cell` line is found, not assumed. Option-first
+// (`cell fill=#fecaca (2,1)`) and redundantly quoted (`cell "(2,1)" ...`) marks
+// follow insert/delete exactly like the address-first spelling.
+const gsBase=['figdown 0.1 table','table t "T"','| A | B |','|---|---|','|w|o|','|x|p|','|y|q|','cell fill=#fecaca (2,2)','cell "(3,1)" fill=#bfdbfe','cell "1" highlight'];
+passBuilt('column insert moves an option-first and a quoted cell mark with their cells',gsBase,editorCore.insertTableColumn(gsBase.slice(),0,'t',0),(d,ls)=>{
+  const mk=(d.blocks[0].marks||[]).map(m=>m.r+','+m.c).sort().join(' ');
+  return mk==='2,3 3,2'&&ls.some(x=>/^cell fill=#fecaca \(2,3\)$/.test(x))&&ls.some(x=>/^cell "\(3,2\)" fill=/.test(x));
+});
+// a column cannot be inserted through a span that runs over rows AND
+// columns (`^^|^^` below its head): refused with the way out, not written as a
+// table the engine rejects. Two independent rowspans side by side are not one.
+const ijBase=['figdown 0.1 table','table t "T"','| A | B | C |','|---|---|---|','|x|w||','|y|^^|^^|','|z|1|2|'];
+const ijIn=editorCore.insertTableColumn(ijBase.slice(),0,'t',2);
+check('a column inserted inside a 2-D merged cell is refused and says how to proceed',
+  ijIn&&ijIn.ok===false&&/split the merge first/.test(ijIn.error),JSON.stringify(ijIn));
+passBuilt('a column inserted beside a 2-D merged cell is still accepted',ijBase,editorCore.insertTableColumn(ijBase.slice(),0,'t',3),()=>true);
+const ijTwo=['figdown 0.1 table','table t "T"','| A | B | C |','|---|---|---|','|x|a|b|','|y|^^|^^|','|z|1|2|'];
+passBuilt('a column inserted between two independent rowspans is still accepted',ijTwo,editorCore.insertTableColumn(ijTwo.slice(),0,'t',2),()=>true);
+// Deleting the head row of a span over rows AND columns moves the whole head
+// (its `''` continuations too), or the row below keeps stray `^^` cells.
+const tdA=['figdown 0.1 table','table t "T"','| H0 | H1 | H2 | H3 |','|---|---|---|---|','| T0 | T1 | T2 | T3 |','| T4 || T5 | T6 |','| T7 || T8 | T9 |','|^^|^^| T10 ||'];
+passBuilt('row delete on a 2-D span head moves the colspan continuations with it',tdA,editorCore.deleteTableRow(tdA.slice(),0,'t',3),(d,ls)=>ls.some(x=>x==='| T7 || T10 ||'));
+const tdB=['figdown 0.1 table','table t "T"','|  | H0 | H1 | H2 |','|---|---|---|---|','|  | T0 | T1 ||','|  | T2 |^^|^^|'];
+passBuilt('row delete on a 2-D span head in the first data row leaves a valid table',tdB,editorCore.deleteTableRow(tdB.slice(),0,'t',1),(d,ls)=>ls[ls.length-1]==='|  | T2 | T1 ||');
+const gsDelRow=editorCore.deleteTableRow(gsBase.slice(),0,'t',1);
+passBuilt('row delete re-addresses option-first and quoted cell marks and the quoted highlight',gsBase,gsDelRow,(d,ls)=>{
+  const mk=(d.blocks[0].marks||[]).map(m=>m.r+','+m.c).sort().join(' ');
+  return mk==='1,2 2,1'&&ls.some(x=>/^cell fill=#fecaca \(1,2\)$/.test(x))&&!ls.some(x=>/highlight/.test(x));
+});
+const gsField=['figdown 0.1 bitfield','bitfield bf "H" numbering=msb0','field "A" "8"','field "B" 8'];
+const gsW=editorCore.rewriteClassicFieldWidth(gsField.slice(),0,'bf',3,16);
+check('a classic field whose width is written quoted can be resized, and stays quoted',
+  gsW&&gsW.ok&&gsW.lines[2]==='field "A" "16"',JSON.stringify(gsW));
+const gsN=editorCore.rewriteClassicFieldName(gsField.slice(),0,'bf',3,'Alpha');
+check('a classic field with a quoted width can be renamed',gsN&&gsN.ok&&gsN.lines[2]==='field "Alpha" "8"',JSON.stringify(gsN));
 // A dropped line takes its code and leaves its comment: the comment is the
 // author's prose, and no structural edit is licensed to delete it.
 const dropBase=['figdown 0.1 table','table t "T"','| A |','|---|','| 1 |','width 40 # keep me'];
@@ -930,6 +1002,18 @@ check('the inspector break postcondition counts breaks rather than asking whethe
     out.join(' | '));
 }
 
+// A typed block's insert point is its own last line. The comment run that
+// heads the NEXT block (or section) is not part of this one: a new `cell`,
+// `width`, highlight, `field` or `break` used to land under that heading.
+const headed=['figdown 0.1 table','table t1 "One"','| A | B |','|---|---|','| 1 | 2 |','','# heading for t2','table t2 "Two"','| C |','|---|','| 3 |'];
+passBuilt('a table row highlight goes after the table, above the next block heading',
+  headed,editorCore.setTableRowHighlight(headed.slice(),0,'t1',1,true),
+  (d,ls)=>ls[5]==='cell 1 highlight'&&ls[6]===''&&ls[7]==='# heading for t2'&&d.blocks[0].rowmarks.length===1);
+const headedBits=['figdown 0.1 bitfield','bitfield b1 "One" numbering=msb0','field "A" 8','','# heading for b2','bitfield b2 "Two" numbering=msb0','field "C" 4'];
+passBuilt('a new bitfield field goes after the block, above the next block heading',
+  headedBits,editorCore.addBitfieldField(headedBits.slice(),0,'b1'),
+  (d,ls)=>ls[3]==='field "Field" 8'&&ls[5]==='# heading for b2'&&d.blocks[0].fields.length===2);
+
 const budget=editorCore.bitfieldBudget(engine.parse(bitBase.slice(0,8).join('\n')).doc.blocks[0]);
 check('bitfield budget reports declared bits, word, rows and last-row usage',
   JSON.stringify(budget)===JSON.stringify({declared:20,remainder:false,rows:2,last:8,word:16,rowFields:true}),JSON.stringify(budget));
@@ -1092,8 +1176,14 @@ const SCANS = [
   { what: 'message under sequence 0.4, trailing label lives in the option span',
     code: 'message a -> b "Hello"', genre: 'sequence', ver: '0.4', doc: B_SEQ,
     expect: { a:'a', b:'b', op:'->', tail:null, mid:null, head:null } },
-  { what: 'message with endpoint labels and an inline mid label',
-    code: 'message a [t] -[SYN]-> [h] b', genre: 'sequence', ver: '0.4', doc: B_SEQ,
+  { what: 'message with an inline mid label',
+    code: 'message a -[SYN]-> b', genre: 'sequence', ver: '0.4', doc: B_SEQ,
+    expect: { a:'a', b:'b', op:'->', tail:null, mid:'SYN', head:null } },
+  // The scanner is the shared SYNTAX and still reads end labels on a message;
+  // the parser refuses them under sequence, so this line
+  // has no model to compare with (doc: null).
+  { what: 'message with endpoint labels scans, though the parser refuses them',
+    code: 'message a [t] -[SYN]-> [h] b', genre: 'sequence', ver: '0.4', doc: null,
     expect: { a:'a', b:'b', op:'->', tail:'t', mid:'SYN', head:'h' } },
   { what: 'no genre named — any of the four spellings scans',
     code: 'transition s1 -> s2', genre: undefined, ver: undefined, doc: null,
@@ -1178,8 +1268,11 @@ for (const t of SCANS) {
       const m = (p.doc.edges[0] || p.doc.messages[0]);
       if (!m) bad = bad || 'the parser recorded no connector for the line';
       else {
+        // A message has no tail/head fields (refused), so an
+        // accepted message line must scan with none.
+        const isMsg = !p.doc.edges[0];
         for (const k of ['a', 'b', 'op', 'tail', 'head'])
-          if (m[k] !== r[k]) bad = bad || 'model.' + k + ' is ' + JSON.stringify(m[k]) + ', scan says ' + JSON.stringify(r[k]);
+          if ((isMsg && (k === 'tail' || k === 'head') ? (m[k] === undefined ? null : m[k]) : m[k]) !== r[k]) bad = bad || 'model.' + k + ' is ' + JSON.stringify(m[k]) + ', scan says ' + JSON.stringify(r[k]);
         // An `edge` records `mid`. A `message` records ONE `label` fed by
         // either spelling: the inline `-[x]->`, which the scanner
         // reads, or a trailing quoted positional, which lives in the option
@@ -1233,6 +1326,62 @@ function dollarRoundTrip(){
       !p.errs.length&&!!m&&m[1].split(']]]]><![CDATA[>').join(']]>')===DOLLAR_SRC, m?m[1]:'no metadata');
   });
 }
+// One document owns one undo history and one baseline (editor file
+// handling): `startDoc`, `loadText` and `isDirty` run VERBATIM against a
+// stub textarea that turns CRLF into LF the way a browser's does. Checked:
+// a CRLF file loads clean, an undo cannot cross a load into another
+// file's name, an edited example counts as changed, a recovered SVG source
+// does not, and a drop asks before it discards. `saveFile` runs verbatim
+// against a stub file handle: a CRLF file is written back as CRLF, an LF
+// file and a new document as LF, a mixed one as LF with a status note.
+function docHistory(){
+  const ta={_v:'',get value(){return this._v;},set value(v){this._v=String(v).replace(/\r\n?/g,'\n');}};
+  const dirtyAt=html.indexOf('const isDirty=');
+  const dirtyLine=html.slice(dirtyAt,html.indexOf('\n',dirtyAt));
+  const env=new Function('ta','crypto',
+    "const status={textContent:''}, $=id=>id==='src'?ta:id==='status'?status:{textContent:''};\n"+
+    "let selection=[], selectedId=null, written=null;\n"+
+    "let fdHandle=null, fileName='untitled.fd', savedText=null, baseText=null, fileEol='\\n', eolMixed=false;\n"+
+    "let undoStack=[], redoStack=[], lastText=null, lastPush=0, restoring=false;\n"+
+    "function cancelInlineEdit(){} function updateFileUI(){}\n"+
+    "const window={showSaveFilePicker:async()=>({name:'w.fd',createWritable:async()=>({write:async t=>{written=t;},close:async()=>{}})})};\n"+
+    // the real refresh's history rule, without the render
+    "function refresh(){ const t=ta.value; if(!restoring&&lastText!==null&&t!==lastText){ undoStack.push(lastText); redoStack.length=0; } lastText=t; }\n"+
+    dirtyLine+'\n'+uiFunction('eolOf')+'\n'+uiFunction('startDoc')+'\n'+uiFunction('loadText')+'\n'+(f=>f.slice(0,f.indexOf('\n}\n')+3))(uiFunction('saveFile'))+
+    "\nreturn {startDoc,loadText,isDirty,saveFile,written:()=>written,status:()=>status.textContent,st:()=>({fileName,undo:undoStack.length,redo:redoStack.length,savedText})};")(ta,webcrypto);
+  env.startDoc('a.fd','figdown 0.5 block\r\nnode a\r\n',true);
+  check('a CRLF file is unchanged right after loading', !env.isDirty(), JSON.stringify(ta.value));
+  ta.value='figdown 0.5 block\nnode a\nnode b\n';
+  return env.loadText('b.fd','figdown 0.5 block\nnode z\n').then(()=>{
+    const st=env.st();
+    check('a load starts a fresh undo history', st.undo===0&&st.redo===0&&st.fileName==='b.fd'&&!env.isDirty(), JSON.stringify(st));
+    env.startDoc('untitled.fd','figdown 0.5 block\nnode e\n',false);
+    check('an unsaved example is unchanged until edited', !env.isDirty());
+    ta.value='figdown 0.5 block\nnode e\nnode f\n';
+    check('an edited unsaved example counts as changed', env.isDirty());
+    const src='figdown 0.5 block\nnode s\n';
+    const svg='<svg><metadata id="figdown-source" data-sha256="'+'0'.repeat(64)+'"><![CDATA[\n'+src+'\n]]></metadata></svg>';
+    return env.loadText('s.svg',svg);
+  }).then(()=>{
+    const st=env.st();
+    check('a recovered SVG source is a new unsaved document, unchanged', st.fileName==='s.fd'&&st.undo===0&&st.savedText===null&&!env.isDirty(), JSON.stringify(st));
+    const dropAt=html.indexOf("document.addEventListener('drop'");
+    check('a drop asks before it discards unsaved changes', dropAt>0&&html.slice(dropAt,html.indexOf('});',dropAt)).includes('isDirty()'));
+    const saved=(text)=>env.loadText('e.fd',text).then(()=>{ ta.value+='node x\n'; return env.saveFile(true); })
+      .then(()=>({w:env.written(),s:env.status(),dirty:env.isDirty()}));
+    return saved('figdown 0.5 block\r\nnode a\r\n').then(r=>{
+      check('a CRLF file is saved back as CRLF', r.w==='figdown 0.5 block\r\nnode a\r\nnode x\r\n'&&!r.dirty, JSON.stringify(r));
+      return saved('figdown 0.5 block\nnode a\n');
+    }).then(r=>{
+      check('an LF file is saved as LF', r.w==='figdown 0.5 block\nnode a\nnode x\n'&&!/mixed/.test(r.s), JSON.stringify(r));
+      return saved('figdown 0.5 block\r\nnode a\n');
+    }).then(r=>{
+      check('a mixed-ending file is saved as LF and the status says so', r.w==='figdown 0.5 block\nnode a\nnode x\n'&&/mixed line endings written as LF/.test(r.s), JSON.stringify(r));
+      env.startDoc('untitled.fd','figdown 0.5 block\nnode n\n',false);
+      return env.saveFile(true);
+    }).then(()=>check('a new document is saved as LF', env.written()==='figdown 0.5 block\nnode n\n', JSON.stringify(env.written())));
+  });
+}
 const ap = engine.parse(after);
 const ar = ap.errs.length ? null : engine.render(ap.doc,{title:true});
 Promise.all(ar && ar.svg ? [svgArtifact(after,ar.svg),svgArtifact(after,ar.svg)] : [null,null])
@@ -1241,6 +1390,7 @@ Promise.all(ar && ar.svg ? [svgArtifact(after,ar.svg),svgArtifact(after,ar.svg)]
     check('artifact is byte-deterministic across two calls', a1 === a2);
     return dollarRoundTrip();
   })
+  .then(()=>docHistory())
   .then(()=>{
     const uiStart = html.indexOf('// 3. UI');
     check('UI suffix contains no prompt(', !html.slice(uiStart).includes('prompt('));

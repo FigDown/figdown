@@ -884,14 +884,14 @@ function main() {
     const linkRe = /\[([^\]\n]*)\]\(\s*<?([^)<>\s]+)>?(?:\s+"[^"\n]*")?\s*\)/g;
     const refDefRe = /^ {0,3}\[([^\]\n]+)\]:\s*<?([^\s<>]+)>?/g;
     const attrRe = /\b(href|src)\s*=\s*["']([^"']+)["']/gi;
-    let checked = 0;
+    let checked = 0, sampled = 0;
     for (const f of bundleFiles()) {
       const lines = fs.readFileSync(f, 'utf8').split(/\r?\n/);
       let inFence = false, fenceRun = null;   // same rule as scanDoc
       for (let i = 0; i < lines.length; i++) {
         const raw = lines[i];
         { const d = /^\s*(`{3,}(?!.*`)|~{3,})(.*)$/.exec(raw); if (d && (!fenceRun || (d[1][0] === fenceRun[0] && d[1].length >= fenceRun.length && !d[2].trim()))) { fenceRun = fenceRun ? null : d[1]; inFence = !!fenceRun; continue; } }
-        if (inFence) continue;
+        if (inFence) { linkRe.lastIndex = 0; while (linkRe.exec(raw)) sampled++; continue; }
         // inline links, reference definitions (`[x]: target`) and raw
         // `href=`/`src=` attributes all resolve the same way
         const targets = [];
@@ -928,9 +928,17 @@ function main() {
         }
       }
     }
-    if (!failed)
+    // a link check that SAW nothing has proved nothing — a moved bundle or
+    // a broken scanner would otherwise pass as "0 checked". Today every link
+    // the bundle carries is a sample inside a fence (SKILL.md's figures/X.*),
+    // so the floor is links seen, sampled ones included, not links resolved.
+    if (!checked && !sampled) {
+      failed++;
+      console.log('  FAIL  the link check found 0 links in the bundle — the bundle or the ' +
+        'link scanner is not what this check assumes');
+    } else if (!failed)
       console.log('  every link in the bundle resolves inside the bundle (' +
-        checked + ' checked)');
+        checked + ' checked, ' + sampled + ' sample(s) in fences skipped)');
   }
 
   console.log('\n' + (failed ? 'FAIL  ' + failed + ' finding(s)' : 'OK  the skill teaches the whole registry'));

@@ -11,7 +11,7 @@ the key `x-status`, and a consumer merging two trees now holds one key with
 two meanings and no way to tell which it has. Owner-prefixing makes that
 collision impossible WITHOUT a registry, which is the whole point — the
 namespace is delegated to the owner rather than administered by this project
-(figdown-manifest.md §3.1(a)).
+(figdown-manifest.md §2.1(a)).
 
 So this fixture is not a well-formed extension key that the verifier reports;
 it is an unknown key with a misleading prefix, and it FAILS. Its sibling

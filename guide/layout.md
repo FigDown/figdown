@@ -94,8 +94,9 @@ errors, and the engine's diagnostic names **no replacement**, because there is
 none. What was withdrawn was the ability to state edge geometry by hand — not
 the need for it. Where a figure genuinely needs elbow routing with per-edge
 control, the requirement is on file as core §9 **`EDGE-IDENTITY-AND-GEOMETRY`**, with its known
-shape (two modes, two scopes) and its blocker (a per-edge override needs an
-edge-identity construct FigDown does not have). What an author does *today* is
+shape (two modes, two scopes). Its original blocker, edge identity, is gone —
+since `figdown 0.5` a connector carries `id=` — and what stays open is the
+per-edge override grammar itself. What an author does *today* is
 the ladder below, which now ends at `pin`.
 
 ## 2. The escalation ladder
@@ -307,7 +308,7 @@ pin tx      at=(120,0)
 ```
 author semantics
   → build:  node tools/build-svg.js X.fd
-  → judge:  eyeball + node tools/layout-lint.js X.fd   (6 metrics; --max-score gate)
+  → judge:  eyeball + node tools/layout-lint.js X.fd   (9 scored terms; --max-score=N gate)
   → if not clear: add ONE rung (§2) and repeat
   → stop when it reads well
 ```
@@ -336,7 +337,7 @@ only reflecting it. Half of that still stands and half of it was an excuse. A
 lint score is not the goal — that part is true, and §7 shows a pair where lint
 gets *worse* while the figure gets far better. But "the metric is not the goal"
 is not a licence to ship a figure a reader cannot follow, and that is what the
-old advice amounted to. Measured on a production corpus of 91 documents, the
+old advice amounted to. Measured on a production corpus of 91 documents (2026-08-07), the
 flowcharts containing a cycle needed manual layout **18 times more often** than
 the acyclic ones (§8) — which is what "the ladder does not help here" looks
 like at scale. When the graph has a cycle, go to §9 and arrange it: explicit
@@ -361,7 +362,7 @@ the two answers can be compared on one subject.
 
 ## 7. Before / after: the same semantics, different layout zones
 
-The first two entries are pairs, byte-identical in the content zone. The third is the counter-case: no pair, because the fix was not in the layout zone at all. In both pairs the **tuned** side is the top-level example itself (`examples/evpn-fabric.fd`, `examples/srl-evpn-irb.fd`) — only the *auto* variant needs its own file, since the tuned figure is the one the corpus already ships. 0.1 removed the duplicate copies that used to sit under `layout-compare/`; they were byte-identical to the originals and taught nothing a second time. Score = `cross×2 + thru×3 + novlp×3 + lblcol×2 + coinc×2`.
+The first two entries are pairs, identical except for the lines the tuned side adds — `flow down` and two `rank` lines for evpn-fabric (content-zone intent, rungs 0–2), `pin` lines plus `flow down` and three `rank` lines for srl-evpn-irb (the content-zone lines are why the tuned figure still draws with its pins stripped; the auto arm leaves them out). The third is the counter-case: no pair, because the fix was not in the layout zone at all. In both pairs the **tuned** side is the top-level example itself (`examples/evpn-fabric.fd`, `examples/srl-evpn-irb.fd`) — only the *auto* variant needs its own file, since the tuned figure is the one the corpus already ships. 0.1 removed the duplicate copies that used to sit under `layout-compare/`; they were byte-identical to the originals and taught nothing a second time. Score = `cross×2 + thru×3 + novlp×3 + lblcol×2 + coinc×2 + offcv×4 + sqlbl×2 + sqedge×2 + lasso×4`.
 
 **Lint scores are a smoke alarm, not a judge.** The srl-evpn-irb entry below shows lint getting *worse* (ink/e 109→117) while the figure becomes dramatically more readable — and its auto arm has since stopped rendering at all, which no lint score would ever have told you — because the metrics do not measure group containment, overlap, or reading order. Always look at the render; the ladder ends when a human can read it. One variant of that example scored better on lint but had lost its column alignment — and the alignment was the peer signal; only looking at the render caught it.
 
@@ -376,7 +377,7 @@ Eight-node VXLAN/EVPN topology. Auto-layout scatters spines and leaves; three se
 
 [auto .fd](../examples/layout-compare/evpn-fabric-auto.fd) · [auto .svg](../examples/layout-compare/evpn-fabric-auto.svg) · [tuned .fd](../examples/evpn-fabric.fd) · [tuned .svg](../examples/evpn-fabric.svg)
 
-### srl-evpn-irb — two-level pins + groups (19 layout lines), and an auto arm that does not render
+### srl-evpn-irb — two-level pins + groups (19 pins, `flow down` and three `rank` lines), and an auto arm that does not render
 
 Sixteen-node EVPN-VXLAN IRB figure with three leaf groups. The tuned version pins each group as a layout module (spec §3 `PIN-COORDINATE-SCOPE`: a pinned group anchors its local origin in canvas px; members are group-local), giving three clean leaf boxes under the fabric overlay (1228×656 px).
 
@@ -385,13 +386,13 @@ Sixteen-node EVPN-VXLAN IRB figure with three leaf groups. The tuned version pin
 ```
 $ node tools/build-svg.js examples/layout-compare/srl-evpn-irb-auto.fd
 examples/layout-compare/srl-evpn-irb-auto.fd:
-  Line 25: group "leaf4" would enclose non-member "h2" and the layout pass could not separate them; the figure is not drawn rather than drawn wrongly. Give "h2" a pin outside the group, or add it with in=leaf4.
+  Line 27: group "leaf4" would enclose non-member "h2" and the layout pass could not separate them; the figure is not drawn rather than drawn wrongly. Give "h2" a pin outside the group, add it with in=leaf4, or hold the group's members in one rank: rank vrf4,bd24b,bd4.
 built 0 artifact(s) from 1 path argument(s)  —  1 of 1 .fd file(s) FAILED and wrote nothing
 ```
 
 (Which non-member gets named can differ between runs — several are enclosed, and the message reports the ones the pass gave up on. The refusal itself is the stable part.)
 
-So the pair no longer compares two pictures. **It compares a picture with a refusal, and that is the sharper lesson:** for this topology the pinned arm is not a polish pass over a working auto layout, it is the only layout that exists. `pin` is what makes the figure renderable at all, and it stays that way until auto-layout learns **group-aware rank assignment** — placing a group's members in adjacent ranks so contiguous clustering can succeed (engine-backlog item 32). The `.fd` stays in the corpus as the one figure the containment guarantee cannot place; `node tools/artifact-check.js` reports it as `geometry-refused` and treats its *missing* `.svg` as the correct state.
+So the pair no longer compares two pictures. **It compares a picture with a refusal, and that is the sharper lesson:** for this topology the pinned arm is not a polish pass over a working auto layout, it is the only good layout that exists. The refusal also names a `rank` line holding the group's members; following it twice (`leaf4`, then `leaf2`) makes the auto arm render, but as a tall column (about 800×1400) with the three leaves stacked — drawn, not usable. `pin` is what makes the figure readable, and it stays that way until auto-layout learns **group-aware rank assignment** — placing a group's members in adjacent ranks so contiguous clustering can succeed (engine-backlog item 32). The `.fd` stays in the corpus as the one figure the containment guarantee cannot place; `node tools/artifact-check.js` reports it as `geometry-refused` and treats its *missing* `.svg` as the correct state.
 
 The measurements below are the last ones taken before the refusal, and they are why the ratio mattered: lint ink/e got *worse* (109→117) while the figure became unambiguous, because the metrics never measured group containment or overlap — the very property the engine now enforces outright.
 
@@ -457,7 +458,7 @@ shared alignment carry peerhood without any syntax.
 ## 8. Cautions from a production corpus
 
 A five-way review rendered and inspected all 78 documents of a production
-corpus; below is what authors had to discover by trial and error, most-hit
+corpus as it stood on 2026-07-30 (it held 91 by 2026-08-07); below is what authors had to discover by trial and error, most-hit
 first. Expressing-side findings are in [expressing.md](expressing.md).
 
 **Group captions must be short.** Group rect and canvas are sized from member
@@ -475,7 +476,7 @@ pushes the canvas past a usable aspect ratio; wrap the label with `\n`
 (860×173 → 284×205 px) or move the detail into a companion `table`.
 
 **A cycle costs about eighteen times more layout work — budget for it.**
-Measured over a production corpus of 91 documents: `flowchart` is the largest
+Measured over a production corpus of 91 documents (2026-08-07): `flowchart` is the largest
 genre in it (43 documents; then block 21, table 8, bitfield 8, timing 6, topology
 5). Splitting those 43 by whether the graph contains a cycle gives 32 acyclic
 and 11 cyclic — and the two behave nothing alike. Documents needing manual

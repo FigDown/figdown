@@ -63,7 +63,10 @@ function buildOne(engine, fdPath) {
   // artifact rendered before the option existed byte-identical — core §7
   // makes an artifact a pure function of (source, recorded options).
   if (RENDER_OPTS.a11y === true) svg = engine.a11yApply(svg, docs[0]);
-  const hash = crypto.createHash('sha256').update(src, 'utf8').digest('hex');
+  // CRLF is embedded and hashed as LF (core §15.4): every XML
+  // reader returns LF there, and CRLF and LF spell the same document (§1).
+  const emb = src.replace(/\r\n/g, '\n');
+  const hash = crypto.createHash('sha256').update(emb, 'utf8').digest('hex');
   // The artifact records three things (spec core §7): the SHA-256 OF THE
   // SOURCE, the ENGINE VERSION that rendered it, and any non-default render
   // option — so a third-party rebuild (same source + same engine version +
@@ -72,7 +75,7 @@ function buildOne(engine, fdPath) {
   const optAttr = engine.renderOptionsAttr(RENDER_OPTS);
   const meta = '<metadata id="figdown-source" data-sha256="' + hash + '"'
     + ' data-engine-version="' + engine.FIGDOWN_VERSION + '"' + optAttr + '><![CDATA[\n'
-    + src.replace(/]]>/g, ']]]]><![CDATA[>') + '\n]]></metadata>';
+    + emb.replace(/]]>/g, ']]]]><![CDATA[>') + '\n]]></metadata>';
   const artifact = svg.replace(/<\/svg>$/, () => meta + '</svg>');
   const out = fdPath.replace(/\.fd$/, '') + '.svg';
   fs.writeFileSync(out, artifact);

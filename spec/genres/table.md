@@ -292,8 +292,8 @@ directive that would take the key.
 
 **`note=` and `description=` divide by AUDIENCE, and `table` accepts neither.**
 `description=` reaches the **machine** — no ink beyond an SVG `<title>`
-tooltip — and belongs to `bitfield`'s `field`
-([bitfield.md](bitfield.md)); `note=` reaches the **human** and always draws.
+tooltip — and is accepted on `bitfield`'s `field`
+([bitfield.md](bitfield.md)) and, since 0.4, on `sequence`'s elements; `note=` reaches the **human** and always draws.
 Neither is a fallback for the other, and neither is a `table` key. A hybrid
 figure that genuinely needs a drawn note puts the table in a scene section
 (§4, `GENRE-COMPOSITION`, below) and writes the `note=` on the scene element or on `title`,
@@ -490,6 +490,15 @@ the same defect, a key silently discarded, so it gets the same answer, a line
 error. Tint the row with `cell <r> highlight` alone, or paint a cell with
 `cell (<r>,<c>) fill=…` / `class=`.
 
+**One cell, one mark line.** A second `cell (<r>,<c>)` line
+for the same cell used to parse, and only the first line's options were
+drawn: `cell (1,1) fill=#ff0000` then `cell (1,1) stroke=#0000ff` drew no
+blue border and said nothing. The second line is now a line error,
+`duplicate mark for cell (1,1) — first on line N; write all its options on
+that one line`, as a second `width` line is. Write every option of a cell
+on one line: `cell (1,1) fill=#ff0000 stroke=#0000ff`. Repeating
+`cell <r> highlight` stays legal: it loses nothing.
+
 ## Semantic model (normative — reading rule, `MEANING-RECOVERY-SOURCE`)
 
 A table's meaning is its **logical grid**: header tiers (rows above the
@@ -524,6 +533,7 @@ top-left cell.
 | `highlight` on a two-part cell address (`cell (1,1) fill=… highlight`) | line error (`ROW-HIGHLIGHT-CELL-FILL-COLLISION`) |
 | A cell mark resolving to a `fill` on a row that carries `highlight` | line error (`ROW-HIGHLIGHT-CELL-FILL-COLLISION`) |
 | `fill=`, `stroke=` or `class=` on the row form (`cell 1 highlight fill=…`) | line error |
+| A SECOND `cell (<r>,<c>)` line for the same cell | line error at the second line, `duplicate mark for cell (r,c)` |
 | Unknown option on `table`, `width`, or `cell` | line error |
 
 **The two `duplicate …` rows were golden-pinned but MISSING from this
@@ -536,11 +546,12 @@ section.
 
 **Precedence, and it is not what the sibling construct does.** When a
 second `width` line ALSO carries a bad value, only `duplicate width` is
-reported — the value error is swallowed. `pin`, the other single-valued
-per-id construct, resolves this the OPPOSITE way: it reports the value
-error and never fires `duplicate pin`. Neither order is specified; both
-are frozen in goldens and filed as core §9 `ERROR-RECOVERY-MODEL`. Do not infer one from
-the other.
+reported — the value error is swallowed (the first `width` spent the slot,
+so the second is a duplicate before its value is read). `pin`, the other
+single-valued per-id construct, resolves this the OPPOSITE way: it reports
+the value error and never fires `duplicate pin`. Both orders are specified
+in core §8.3.6 (which closed `ERROR-RECOVERY-MODEL`) and frozen in goldens. Do not infer one
+from the other.
 
 ## Example
 

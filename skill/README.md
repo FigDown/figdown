@@ -12,7 +12,7 @@ it extracts at runtime — also the editor: open it in any browser).
 **It is built for progressive disclosure.** `SKILL.md` is the only file
 always loaded, and it holds the workflow, the genre-independent
 language, and a **router**. Everything else is pulled on demand, and
-the routing rule is mechanical: line 1 of a `.fd` names its genre, so
+the routing rule is mechanical: the header line of a `.fd` (its first line that is not blank or a comment) names its genre, so
 the agent knows which file it needs before it needs it.
 
 ```
@@ -30,11 +30,12 @@ reference/experimental/topology.md       the five EXPERIMENTAL genres, each
 reference/experimental/flowchart.md      declaring its OWN vocabulary in
 reference/experimental/statechart.md     its own file, so an agent can
 reference/experimental/timing.md         ignore the ones it is not using
-reference/experimental/sequence.md       — the ladder genre, and the one
-                                         whose load set has no layout file
+reference/experimental/sequence.md       — the ladder genre: unlike the four
+                                         scene genres, its load set has no
+                                         layout file
 ```
 
-`sequence` is the exception to the "genre file + layout file" pairing above:
+`sequence` is the exception to the scene genres' "genre file + layout file" pairing:
 both of its axes are declaration order, so nothing in the layout namespace
 moves a mark there and its own file is the whole of what an author needs.
 

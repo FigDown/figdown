@@ -1,0 +1,9 @@
+# 0.5: the "needs an operator" advice lists only the operators
+# the genre accepts. Under sequence `--` is a line error, so the advice names
+# -> <- <-> and not the four the other connector spellings take.
+figdown 0.5 sequence
+lifeline c "Client"
+lifeline s "Server"
+message c s "request"
+message c - s
+message c -> s "the clean line still parses"

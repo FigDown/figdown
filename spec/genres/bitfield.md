@@ -794,8 +794,9 @@ legal (legacy); multi-section is the taught main-standard path.
 ### How this differs from the other genres
 
 `bitfield`'s own words — `bitfield`, `field`, `break` — are spelled by no
-other genre, and `word=`/`numbering=`/`description=`/`present=`/`index=` are
-its own option keys. The
+other genre, and `word=`/`numbering=`/`present=`/`index=` are its own option
+keys; `description=` is shared with `sequence`, which has accepted it on all
+five of its elements since 0.4. The
 overlaps are deliberate and are the same thing under every genre: the core
 of three (NS = C), the layout namespace (`LAYOUT-ZONE-NAMESPACE`), and the cross-namespace
 keys `fill` `stroke`

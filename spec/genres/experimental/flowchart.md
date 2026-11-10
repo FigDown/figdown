@@ -143,7 +143,7 @@ A role line declares a **node bearing a `role`**:
 |---|---|---|---|
 | `process` | `"process"` | §9.2.1 | a processing function: an operation, or a group of operations, that changes the value, form or location of information |
 | `decision` | `"decision"` | §9.2.2.4 | a decision or switching function: **one entry**, and a number of alternative exits **of which exactly one** is taken after the conditions are evaluated |
-| `terminator` | `"terminator"` | §9.4.2 | an exit to, or an entry from, the outside of the procedure — a start, an end, or a halt |
+| `terminator` | `"terminator"` | §9.4.2 | an exit to, or an entry from, the outside world — a start, an end, or a halt (secondary sourcing; §9.4.2 is PENDING VERIFICATION, register S048) |
 
 `decision` is the one role that carries a **semantic constraint beyond
 naming**: its exits are mutually exclusive. A `process` with several outgoing
@@ -515,8 +515,9 @@ NOT ISO's — stated here rather than left silent.** Everywhere else this
 document exercises single-source vocabulary: `process`, `decision` and
 `terminator` come whole from ISO 5807 (§Roles, *Source*), and `flowline` is the
 flowchart domain's common term for the symbol §9.3.1 names *Line* (`VOCABULARY-SOURCE-ATTRIBUTION`). This
-one does not. ISO 5807 §9.4.2's **Terminator** is *"an exit to, or an entry
-from, the outside of the procedure"* — an entry or exit at the boundary,
+one does not. ISO 5807 §9.4.2's **Terminator** is, by secondary sourcing,
+*"an exit to, or an entry from, the outside world"* (§9.4.2 is PENDING
+VERIFICATION, register S048) — an entry or exit at the boundary,
 which is the same concept — and §9.4 additionally names the **off-page
 connector** for the case where the chart continues on another page.
 
@@ -565,8 +566,9 @@ error that names the reason beats a dangling reference no author can satisfy,
 so the key is withdrawn from this genre rather than left accepted.
 
 **What was checked before withdrawing the key wholesale**, because a key
-stranded on one directive need not be stranded on another. `in=` has exactly
-six acceptors in the language: `node`, `process`, `decision`, `terminator`,
+stranded on one directive need not be stranded on another. When this was
+checked, `in=` had exactly six acceptors in the language (`sequence`
+added its own): `node`, `process`, `decision`, `terminator`,
 `state`, and the pair `threshold` / `band`. The first four are this genre's,
 and all four resolve `in=` against declared GROUP ids and nothing else.
 `threshold` and `band` are the only acceptors with a wider domain — 0.3
@@ -849,7 +851,8 @@ the third per cell:
 1. `process` / `decision` / `terminator` written under a genre other than
    `flowchart` is `"<keyword>" is not allowed in genre <g>`.
 2. **0.2 (`GENRE-CONNECTOR-SPELLING`):** `edge` written under `flowchart` — and `state`,
-   `flowline` or `transition` written under a genre that does not use them —
+   `flowline` or `transition` (and `lifeline` or
+   `message`) written under a genre that does not use them —
    is a **NAMED** line error, not `unrecognized line` and not the bare
    allowlist message:
 

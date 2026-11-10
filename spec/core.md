@@ -289,7 +289,13 @@ A FigDown document is a UTF-8 text, one directive per line.
 line ends at **LF (`%x0A`) or CRLF (`%x0D %x0A`)**; both are accepted and a
 document written either way yields the **same model**. A **bare CR** is
 **not** a line terminator — a CR-only file is one line, and the reference
-engine reports a line error on it rather than parsing it. The §11 ABNF
+engine reports a line error on it rather than parsing it. **A bare CR is an illegal character anywhere** — in a label, a
+comment, or at the end of the text — reported by the source scan as
+`illegal character U+000D — a CR not followed by LF …`, one per line. It
+ends no line, and XML 1.0 §2.11 turns it into LF inside the artifact's CDATA,
+so the embedded source (§15.4) could not be recovered; the same reason `XML-CHARACTER-LEGALITY`
+refuses the characters XML cannot carry. Until this release it was accepted
+inside a label or a comment. Only the CR of a CRLF is a line end. The §11 ABNF
 declared `CR` as a third form until 0.1; no implementation ever
 provided it and no fixture pinned it, so the grammar was corrected to the
 two forms that work. A **U+FEFF byte order mark at the very start of the
@@ -317,6 +323,14 @@ that is neither. A provenance block above the header — source document,
 image hash, reconstruction method — is common in production corpora and
 is legal. Every line after the header is a directive, a table row, a
 comment, or blank.
+
+**A text with no significant line has no header, and is refused.** An empty document, one of blank lines only, and one of
+comments only get the line error `missing header — first line must be
+"figdown 0.5 <genre>" (comment and blank lines may precede it)` on line 1.
+Until this release they drew an empty figure with no error, because the
+header check ran only when a significant line arrived. A CR-only file that
+opens with a comment is one comment line (a bare CR ends no line, above)
+and gets the same error.
 
 **The spec provenance line (`SPEC-PROVENANCE-LINE`) — a CONVENTION, not a
 directive.** A `.fd` file travels away from the repository that produced
@@ -354,9 +368,11 @@ point, which is §13.0's `Y` doing what it says — added surface of any kind
 moves `Y`, and only removal waits for `X`. A header with no genre is a line error. `bitfield`,
 `table` and `timing` documents also declare their kind in their content
 (they contain the typed block), but `block`, `topology` and `flowchart`
-share the SAME vocabulary — `node`, `edge`, `group` — and differ only in
-default flow, so the header is the only place such a document states
-which kind of figure it is. Omitting it destroys that distinction with
+are all scene genres built from nodes and connectors — `block` and
+`topology` even share the spellings `node`, `edge`, `group`, while
+`flowchart` writes `flowline` and has no `group` — so a document of one
+can read as a document of another, and the header is the only place it
+states which kind of figure it is. Omitting it destroys that distinction with
 no recoverable fallback.
 
 **The genre set is indexed by the LANGUAGE VERSION (`STATECHART-GENRE-SCOPE`).** The
@@ -696,6 +712,15 @@ Lexical rules:
     inertness is load-bearing (§12.7). Two word-shaped spellings sit inside
     otherwise-numeric grammars and are inert with them: table `width auto`
     and `field … *` (SYNTAX-STYLE §8.6).
+- **BARE means no quote ANYWHERE in the token.** The
+  directive keyword at the start of a line is bare as well. Until this release only a WHOLLY quoted token was rejected in a bare position;
+  a token that was quoted in part was taken with its quotes silently
+  removed — `node a"b"` declared the id `ab`, `node "c"d` the id `cd`,
+  `"node" a` was `node a`, and `figdown 0".5" block` was a header. Each is
+  now the same line error a wholly quoted token gets (`no"de" a` and
+  `"node" a` report `a keyword is written bare: node`). A quoted word that
+  is not a keyword at all keeps its own not-allowed or unknown-keyword
+  diagnostic. Pinned by `967-errors-quote-in-bare-token`.
 - IDs are `[A-Za-z_][A-Za-z0-9_-]*`, unique **per section** — which in a
   single-section file (the overwhelming majority) is the same thing as per
   document. **Resolved**: this clause read "unique per
@@ -1065,8 +1090,13 @@ the figure has failed. Responsibility follows **whoever chose the
 position**:
 
 - **The engine chose it** — auto-layout had freedom. The engine MUST place
-  the members contiguously so the band encloses exactly them. This is
-  silent: no author action, no diagnostic, no syntax.
+  the members contiguously so the band encloses exactly them where its
+  layout can, silently: no author action, no diagnostic, no syntax. The
+  reference engine keeps members together within a rank only; when they
+  land on different ranks with a non-member between them, it reports a
+  geometry-time error naming the enclosed node and a
+  `rank` line holding the group's members, and renders nothing — it never
+  draws the false statement instead.
 - **The author chose it** — a `pin` fixed the intruder, or fixed the
   members whose extent *is* the band, and no freedom is left. The engine
   then reports a geometry-time error naming the pin line and the enclosed
@@ -1807,19 +1837,22 @@ arrowheads) belongs to the renderer/theme, not the language.
 
 **Where they apply, and the deliberate carve-outs.** "Any element" means
 every construct that can actually *draw* the thing the attribute names.
-The four attributes are accepted on `node`, `group`, `edge`, `class`,
+The three attributes are accepted on `node`, `group`, `edge`, `class`,
 `bundle`, `threshold`, `band`, `external`, the typed blocks
-(`bitfield`/`table`/`timing`) and their items (`field`, `cell`, `signal`)
-— with exactly the exceptions below. Each exception is a line error
+(`bitfield`/`table`/`timing`) and their items (`field`, `cell`, `signal`),
+and on the genre-owned spellings — `process`/`decision`/`terminator` and
+`flowline` (`flowchart`), `state` and `transition` (`statechart`),
+`lifeline`, `message`, `state`, `fragment` and `operand` (`sequence`) — with
+exactly the exceptions below. Each exception is a line error
 (`<directive> does not take <key>=`), never a silent no-op, because the
 grammar is closed (§10):
 
 | element | NOT supported | why |
 |---|---|---|
-| `edge`, `bundle`, `threshold` | `fill=` | none of the three has an **interior**: the construct IS a line, so `fill=` and `stroke=` would name one channel and `fill=` was the one that lost silently. Retired at 0.1 (`INTERIOR-LESS-ELEMENT-PAINT`, and the paragraph above); the message names `stroke=`. `stroke=` and `style=` stay live on all three — a line has ink and a dash. |
+| `edge`, `bundle`, `threshold`, and the connector spellings `flowline`, `transition`, `message`; `fragment` and `operand` | `fill=` | none of these has an **interior** (a `fragment` is an outlined frame and an `operand` a compartment rule and guard): the construct IS a line, so `fill=` and `stroke=` would name one channel and `fill=` was the one that lost silently. Retired at 0.1 (`INTERIOR-LESS-ELEMENT-PAINT`, and the paragraph above); the message names `stroke=`. `stroke=` and `style=` stay live on all three — a line has ink and a dash. |
 | `external` | `fill=`, `stroke=`, `style=` | an external endpoint is **never drawn** (`EXTERNAL-EDGE-ENDPOINTS`, §2.8): there is no fill, no border and no dash for the attribute to act on. Since 0.1 (`COLOUR-KEY-STATUS`) it takes `plane=` and nothing else: its label was the one thing it drew and `color=` was the one key it kept, so retiring that key leaves it with no paint at all; and since 0.3 (`PAINT-ORDER-CONSTRUCT` withdrew `plane=`) it takes no option key at all. The label is still drawn, in the canvas ink (`LABEL-COLOUR-SOURCE`). |
 | `bitfield`, `table`, `timing` | `style=` (`plane=` too, until `PAINT-ORDER-CONSTRUCT` withdrew the key) | typed blocks stack in document order **outside** the scene, so there is nothing to layer them against; and a block-wide `style=` would collide with the per-item dash convention (a field carrying `present=` is drawn dashed). |
-| `field`, `cell`, `signal` | **`style=` (since 0.1, `STYLE-KEY-SCOPE`)** (`plane=` too, until `PAINT-ORDER-CONSTRUCT` withdrew the key) | a block item lives inside its block, which is not part of the plane stack. `style=` was accepted per item until 0.1 and was removed for a reason stronger than tidiness: on a `field` the dash is conditional presence's ONLY visual carrier, so `field "B" 8 present="" style=solid` erased it while the model still recorded the field as conditionally present — a reading agent and a human got different figures from one line, which is exactly what `MEANINGFUL-ARRANGEMENT` forbids. (The construct was the bare flag `optional` when `STYLE-KEY-SCOPE` was written; `PRESENCE-CONDITION-EXPRESSION` replaced it with `present=` at 0.1.) The three were removed together as one minimum set (11 in-repo uses, **0 downstream**); a per-item dash now comes only from the item's own semantics (`present=`) or from a `class=` it joins. | <!-- fence-check: skip -->
+| `field`, `cell`, `signal` | **`style=` (since 0.1, `STYLE-KEY-SCOPE`)** (`plane=` too, until `PAINT-ORDER-CONSTRUCT` withdrew the key) | a block item lives inside its block, which is not part of the plane stack. `style=` was accepted per item until 0.1 and was removed for a reason stronger than tidiness: on a `field` the dash is conditional presence's ONLY visual carrier, so `field "B" 8 present="" style=solid` erased it while the model still recorded the field as conditionally present — a reading agent and a human got different figures from one line, which is exactly what `MEANINGFUL-ARRANGEMENT` forbids. (The construct was the bare flag `optional` when `STYLE-KEY-SCOPE` was written; `PRESENCE-CONDITION-EXPRESSION` replaced it with `present=` at 0.1.) The three were removed together as one minimum set (11 in-repo uses, **0 downstream**); a per-item dash now comes only from the item's own semantics (`present=`); a dashed `class=` the item joins does not reach it (`CLASS-PAINT-REQUIREMENT`; [ERRATA](ERRATA.md) E6). | <!-- fence-check: skip -->
 
 > **`band` left this table (`BAND-LABEL-STATUS`).** It was listed here as
 > refusing `color=`, with the reason *"a zone band carries no label"* — a
@@ -2028,8 +2061,8 @@ exactly one:
 
 | behaviour | meaning | constructs |
 |---|---|---|
-| **line error on the second** | single-valued (`REPEATED-DIRECTIVE-HANDLING`) | `title`, `flow`, `layout` (per section), `pin` (per id per section), `width` (per table), the `\|---\|` delimiter row (per table), a duplicate id in the node/group/`external`/typed-block namespace (per section) |
-| **accepted, both kept** | the construct is a set member, and two identical members are two members | `edge`, `rank` |
+| **line error on the second** | single-valued (`REPEATED-DIRECTIVE-HANDLING`), or an identity that must be unique | `title`, `flow`, `layout` (per section), `pin` (per id per section), `width` (per table), the `\|---\|` delimiter row (per table), a `cell` mark on an address already marked (per table), `gap` at a cycle already gapped (per timing block), a `sequence` `state` restating the lifeline's current state, a duplicate `class` or `bundle` id, and a duplicate id in the section's id namespace — node, group, `external`, typed block, connector `id=`, `lifeline`, `fragment`, `operand` (per section) |
+| **accepted, both kept** | the construct is a set member, and two identical members are two members | `edge` (with no `id=`, or distinct ones), `rank`, `band`, `field`, `signal`, `message` (with no `id=`, or distinct ones), `chart` |
 | **accepted, merged** | two writings would combine into one object | *(none — no v0.1 construct merges)* |
 
 The two accepted cases are the ones an implementer is most likely to guess
@@ -2090,7 +2123,8 @@ project implied a catalogue existed somewhere in `spec/`, and none did.
   pass, output sorted for comparison (`conformance/run.js` sorts before
   it compares, so an implementation's own emission order is free).
 - **What is NOT specified, stated plainly.** The reference engine has
-  ~195 `err()` call sites; the suite pins the messages of a subset. **For
+  over two hundred `err()` call sites (a number that drifts; count them
+  with `grep -c 'err(' editor/figdown.html`); the suite pins the messages of a subset. **For
   an error case that no normative fixture covers, a second implementation
   has no way to learn the required message text.** It can know the input
   must be rejected, and it can match the `Line N:` frame, but the words
@@ -2167,7 +2201,7 @@ because the header has no single fault to abandon on.
 The state effects a line can perform, all of which a failing line skips:
 
 1. **declaring an id** into the node/group/`external`/typed-block namespace
-   (or into the `class`, `plane` or `bundle` namespace);
+   (or into the `class` or `bundle` namespace);
 2. **contributing an element** to the model — a node, an edge, a field, a row,
    a `pin`, a `rank`;
 3. **opening a region** — `bitfield`, `table`, `timing` (§8.3.5);
@@ -3192,7 +3226,9 @@ per-line guarantee is not mistaken for a per-document one.
   §8.
   **The blocker is edge identity, and it is why this is an open question
   rather than a pending re-add.** A per-edge override has to *address* an
-  edge, and FigDown has **no edge-identity construct**. The mechanism it
+  edge, and when this was filed FigDown had **no edge-identity construct**
+  (since `figdown 0.5` a connector carries `id=`, `CONNECTOR-IDENTITY-KEY`, so identity is no
+  longer the blocker — the override grammar is what stays open). The mechanism it
   used instead — **restating the edge to refer to it**, `path a -> b` <!-- fence-check: skip -->
   matching the edge as written — is the one identity option that
   **cannot grow**: it cannot address parallel edges (which the language
@@ -3884,7 +3920,8 @@ per-line guarantee is not mistaken for a per-document one.
 
 ## 10. Keyword registry, conformance modes, extensions
 
-**Keyword registry (v0.1).** 22 top-level keywords, 6 typed-block child
+**Keyword registry.** 28 top-level keywords today (the partition sum
+below; 22 at v0.1, whose history follows), 6 typed-block child
 keywords, plus the table-row line-start token `|`. (22 until 0.1,
 when the three `flowchart` role keywords landed — the first genre-owned set
 under `GENRE-VOCABULARY-OBLIGATION`, taking the count to 25; 0.1 removed one again by merging
@@ -4036,11 +4073,11 @@ debt.
 
 | Status | Keyword | Genre | Replaces |
 |---|---|---|---|
-| EXPERIMENTAL | `flowline` | `flowchart` only, and `figdown 0.2` only (`KEYWORD-RENAME-SCOPE`) | `edge` |
+| EXPERIMENTAL | `flowline` | `flowchart` only, from `figdown 0.2` on (`KEYWORD-RENAME-SCOPE`) | `edge` |
 | EXPERIMENTAL | `transition` | `statechart` only | `edge` |
 | EXPERIMENTAL | `state` | `statechart` only | `node` |
-| EXPERIMENTAL | `message` | `sequence` only, and `figdown 0.4` only | `edge` |
-| EXPERIMENTAL | `lifeline` | `sequence` only, and `figdown 0.4` only | `node` |
+| EXPERIMENTAL | `message` | `sequence` only, from `figdown 0.4` on | `edge` |
+| EXPERIMENTAL | `lifeline` | `sequence` only, from `figdown 0.4` on | `node` |
 
 `message` and `lifeline` need no version gate of their own, unlike
 `flowline`: the GENRE requires `figdown 0.4`, so neither spelling is
@@ -4713,8 +4750,8 @@ and only its error text remains.
 |---|---|---|---|
 | `at` | `(x,y)` canvas px — a PAREN point (RULE 1.1a) | `pin` · `threshold` (diagnostic only) | NORMATIVE |
 | `offset` | `0..100%`, the `%` mandatory | `threshold` | EXPERIMENTAL |
-| `class` | id of a declared `class` | `node` (incl. `process`/`decision`/`terminator`) `group` `edge` `field` `cell` | NORMATIVE |
-| `fill` | `#rgb`/`#rrggbb`/CSS name/`transparent` | `node` (incl. `process`/`decision`/`terminator`) `group` `band` `class` `bitfield` `table` `timing` `field` `cell` `signal` | NORMATIVE |
+| `class` | id of a declared `class` | `node` (incl. `process`/`decision`/`terminator`) `group` `edge` `flowline` `field` `cell` · under `statechart`: `state`, `transition` · under `sequence`: `lifeline`, `message`, `state`, `fragment`, `operand` | NORMATIVE |
+| `fill` | `#rgb`/`#rrggbb`/CSS name/`transparent` | `node` (incl. `process`/`decision`/`terminator`) `group` `band` `class` `bitfield` `table` `timing` `field` `cell` `signal` · under `statechart`: `state` · under `sequence`: `lifeline`, `state` | NORMATIVE |
 | `fill` on `edge` `threshold` `bundle` | RETIRED 0.1 — no interior, so it named the same channel as `stroke=` (§5, `INTERIOR-LESS-ELEMENT-PAINT`) | those three (all reject, naming `stroke=`) | NORMATIVE (diagnostic) |
 | `color` | RETIRED language-wide at 0.1 (`COLOUR-KEY-STATUS`) — and it is the one retirement that is NOT a rename in either direction. In one era it set the FILL; in another it set the LABEL; v0.1 has no label-colour key at all. The message names BOTH eras and refuses to choose, which no live key could do | *(no acceptor; every directive rejects)* | NORMATIVE (diagnostic) |
 | `data` | comma-separated names for the lane's `=` data cells (WaveDrom's own key) | `signal` | EXPERIMENTAL |
@@ -4722,23 +4759,23 @@ and only its error text remains.
 | `dir` | RETIRED language-wide at 0.1 — see below | *(no acceptor; every directive rejects)* | NORMATIVE (diagnostic) |
 | `gap` | px | `group` | NORMATIVE |
 | `from` | `0..100%` — RETIRED, see below | `band` (rejects) | NORMATIVE (diagnostic) |
-| `in` | id of the containing/target element | `node` (incl. `process`/`decision`/`terminator`) `threshold` `band` | NORMATIVE (on `node`) |
+| `in` | id of the containing/target element | `node` (`block`, `topology`) `threshold` `band` · under `sequence`: `lifeline`, `message`, `state`, `fragment`, `operand` · `flowchart` and `statechart` WITHDREW it (`MEMBERSHIP-KEY-ACCEPTANCE`) | NORMATIVE (on `node`) |
 | `index` | the field's repetition RANGE, `<first>..<last>`, separator EXACTLY two dots and whitespace around it not significant (§12.2). `<first>` is ALWAYS a literal integer; `<last>` is a literal integer or opaque prose; a literal end above 9007199254740991 is a line error (§12.2, §12.5). Tri-state (§12.3): key absent = no repetition claim; `index=""` = repeats, indices not stated; a fully-literal range = determinate. **Determinacy is decided by parsing both ends as integers, NEVER by quoting** — RULE 2.3 makes quotes inert here, so `index="0..7"` is determinate too. Classic `field` form only (`BITFIELD-REPETITION-CONSTRUCT`) | `field` | NORMATIVE |
 | `labels` | RETIRED language-wide at 0.1 — renamed `data=` (WaveDrom's own key is `data`, "an array of signal labels", one per value cell) | *(no acceptor; every directive rejects)* | NORMATIVE (diagnostic) |
 | `layer` | RETIRED language-wide at 0.1 — renamed `plane=` (`PLANE-KEYWORD-SPELLING`) — and `plane=` was itself **WITHDRAWN** at 0.3 (`PAINT-ORDER-CONSTRUCT`), so the message states the whole chain `layer=` → `plane=` → withdrawn and names NO live replacement. Naming `plane=` alone would send an author to a spelling that is itself a line error; the precedent for the repair is `route` → `path` at 0.1 | *(no acceptor; every directive rejects)* | NORMATIVE (diagnostic) |
-| `description` | authored documentation prose, quoted (`QUOTING-RULES`). Draws NO ink beyond an SVG `<title>` tooltip — a fact a human must SEE belongs in the label or a `class` meaning | `field` | NORMATIVE |
+| `description` | authored documentation prose, quoted (`QUOTING-RULES`). Draws NO ink beyond an SVG `<title>` tooltip — a fact a human must SEE belongs in the label or a `class` meaning | `field` · under `sequence`: `lifeline`, `message`, `state`, `fragment`, `operand` | NORMATIVE |
 | `id` | the connector's HANDLE: a bare id (`LINK-OPERATOR-IN-IDS`/`QUOTED-IDS`), unique within the section and joining the section's node/group/`external`/region namespace, so a repeat is `duplicate id` and not a new diagnostic. **Requires `figdown 0.5`** — the key does not exist under `0.1`–`0.4` and writing it there is a line error naming the version (§13.7.2a: the gate engages on ADDING A SPELLING, and this key is the first gated under that rule rather than on a prior meaning; it has none). OPTIONAL everywhere: an anonymous connector is the language's default and asserts nothing less (§12.7). The spelling carries NO meaning — not a category, not an ordinal, not a relation to a similarly-spelled id (`CLASS-EMPTY-MEANING`'s rule for `class`, applied here). What consumes it: a `bundle` member ([experimental.md](experimental.md) §E5), `data-edge` in the artifact (§7), and a diff's pairing key | `edge` `flowline` `transition` `message` | NORMATIVE |
-| `note` | the DRAWN annotation: authored prose the human reader must SEE, quoted (`QUOTING-RULES`) and rendered as a UML-style folded-corner box beside its carrier. **Requires `figdown 0.3`** — under `0.1`/`0.2` the spelling is still the retired one that meant `description=`, and writing it there is a line error naming the version. Retired at 0.1 (`DESCRIPTION-KEY-SPELLING`) *in order to reserve the name*, revived at 0.3 (`DRAWN-ANNOTATION-FORM`) under SYNTAX-STYLE RULE 4.9, which is why this is a reservation cashed and not a decision reversed. The author does not place the box (`DOMAIN-CONVENTION-DIRECTIVES`, §2.9); on `field` it is refused at every version, naming the audience division below | `node` (incl. `process`/`decision`/`terminator`) `state` `group` `edge` `flowline` `transition` `title` | NORMATIVE |
+| `note` | the DRAWN annotation: authored prose the human reader must SEE, quoted (`QUOTING-RULES`) and rendered as a UML-style folded-corner box beside its carrier. **Requires `figdown 0.3`** — under `0.1`/`0.2` the spelling is still the retired one that meant `description=`, and writing it there is a line error naming the version. Retired at 0.1 (`DESCRIPTION-KEY-SPELLING`) *in order to reserve the name*, revived at 0.3 (`DRAWN-ANNOTATION-FORM`) under SYNTAX-STYLE RULE 4.9, which is why this is a reservation cashed and not a decision reversed. The author does not place the box (`DOMAIN-CONVENTION-DIRECTIVES`, §2.9); on `field` it is refused at every version, naming the audience division below | `node` (incl. `process`/`decision`/`terminator`) `state` `group` `edge` `flowline` `transition` `title` · under `sequence`: `lifeline`, `message`, `state`, `fragment`, `operand` | NORMATIVE |
 | `present` | the field's presence CONDITION as authored prose, quoted and MANDATORY. Tri-state (§12.3): key absent = no presence claim; `present=""` = conditional, condition not stated; `present="C = 1"` = conditional, condition stated. Quotable, never parsable (§12.7) | `field` | NORMATIVE |
 | `numbering` | `lsb0`\|`msb0` (REQUIRED, §4.1) | `bitfield` | NORMATIVE |
 | `plane` | **WITHDRAWN from the language at 0.3 (`PAINT-ORDER-CONSTRUCT`)** with the `plane` keyword that declared its only legal values (b′). Was the id of a declared plane, on `node` `group` `external` `edge` `bundle` `threshold` `band` `class`. NO replacement: the correct action is to delete the key, and doing so does not change the rendered output — paint order is document order (§2.4). `external` took this key and no other, so it now takes none | *(no acceptor; every directive rejects)* | NORMATIVE (diagnostic) |
 | `points` | WITHDRAWN language-wide at 0.1 (`EDGE-GEOMETRY-CONSTRUCTS`) — removed with the `path` directive, **not renamed**, so there is no spelling to migrate to. Author waypoints are outside the stable prior-art intersection (§9, `EDGE-IDENTITY-AND-GEOMETRY`) | *(no acceptor; every directive rejects)* | NORMATIVE (diagnostic) |
 | `routing` | WITHDRAWN language-wide at 0.1 (`EDGE-GEOMETRY-CONSTRUCTS`) — the mode set (`orthogonal`\|`straight`) and its two scopes ARE inside the intersection, and the key goes anyway on evidence and implementation, with **no replacement** (§9, `EDGE-IDENTITY-AND-GEOMETRY`) | *(no acceptor; every directive rejects)* | NORMATIVE (diagnostic) |
-| `shape` | §2.1 shape enum (6 values; `cloud` RETIRED at 0.1 — see below) | `node` (incl. `process`/`decision`/`terminator`, where it overrides the DERIVED geometry and never the role — `FLOWCHART-ROLE-KEYWORDS`) | NORMATIVE |
+| `shape` | §2.1 shape enum (6 values; `cloud` RETIRED at 0.1 — see below) | `node` (incl. `process`/`decision`/`terminator`, where it overrides the DERIVED geometry and never the role — `FLOWCHART-ROLE-KEYWORDS`) · `statechart`'s `state` | NORMATIVE |
 | `src` | RETIRED language-wide at 0.1 — renamed `tailport=` (`ENDPOINT-DOCKING-KEYS`), and `tailport=` was itself **WITHDRAWN at 0.1 (`EDGE-GEOMETRY-CONSTRUCTS`)**. There is **no replacement**: delete the line | *(no acceptor; every directive rejects)* | NORMATIVE (diagnostic) |
 | `dst` | RETIRED language-wide at 0.1 — renamed `headport=` (`ENDPOINT-DOCKING-KEYS`), and `headport=` was itself **WITHDRAWN at 0.1 (`EDGE-GEOMETRY-CONSTRUCTS`)**. There is **no replacement**: delete the line | *(no acceptor; every directive rejects)* | NORMATIVE (diagnostic) |
-| `stroke` | colour — the OUTLINE of a shape and the WHOLE of a line (§5) | `node` (incl. `process`/`decision`/`terminator`) `group` `edge` `bundle` `threshold` `band` `class` `bitfield` `table` `timing` `field` `cell` `signal` | NORMATIVE |
-| `style` | `solid`\|`dashed`\|`dotted` | `node` (incl. `process`/`decision`/`terminator`) `group` `edge` `bundle` `threshold` `band` `class` — **`field` `cell` `signal` LEFT this list at 0.1** (`STYLE-KEY-SCOPE`): on a `field` it could erase the dash that is conditional presence's only carrier while the model kept it (`PRESENTATION-AS-MEANING-CARRIER`), and the three moved as one minimum set | NORMATIVE |
+| `stroke` | colour — the OUTLINE of a shape and the WHOLE of a line (§5) | `node` (incl. `process`/`decision`/`terminator`) `group` `edge` `flowline` `bundle` `threshold` `band` `class` `bitfield` `table` `timing` `field` `cell` `signal` · under `statechart`: `state`, `transition` · under `sequence`: `lifeline`, `message`, `state`, `fragment`, `operand` | NORMATIVE |
+| `style` | `solid`\|`dashed`\|`dotted` | `node` (incl. `process`/`decision`/`terminator`) `group` `edge` `flowline` `bundle` `threshold` `band` `class` · under `statechart`: `state`, `transition` · under `sequence`: `lifeline`, `message`, `state`, `fragment`, `operand` — **`field` `cell` `signal` LEFT this list at 0.1** (`STYLE-KEY-SCOPE`): on a `field` it could erase the dash that is conditional presence's only carrier while the model kept it (`PRESENTATION-AS-MEANING-CARRIER`), and the three moved as one minimum set | NORMATIVE |
 | `tailport` | WITHDRAWN language-wide at 0.1 (`EDGE-GEOMETRY-CONSTRUCTS`) — removed with the `path` directive, **not renamed**. Role-addressed attachment is inside the stable intersection; this realisation (a fraction on the EDGE, two attested axes collapsed into one key, attachment by written order) was not, and restoring it needs an edge-identity construct first (§9, `EDGE-IDENTITY-AND-GEOMETRY`) | *(no acceptor; every directive rejects)* | NORMATIVE (diagnostic) |
 | `headport` | WITHDRAWN language-wide at 0.1 (`EDGE-GEOMETRY-CONSTRUCTS`) — same reasoning as `tailport` | *(no acceptor; every directive rejects)* | NORMATIVE (diagnostic) |
 | `text` | RETIRED 0.1 — was renamed `color=`, which 0.1 then retired too (`COLOUR-KEY-STATUS`); v0.1 has no label-colour key | *(no acceptor; every directive rejects)* | NORMATIVE (diagnostic) |
@@ -4768,7 +4805,7 @@ it will try to merge them. They are not two spellings of one thing:
 | key | audience | draws | acceptor |
 |---|---|---|---|
 | `description=` | **the machine** | no — an SVG `<title>` tooltip and nothing else | `field` — unchanged |
-| `note=` | **the human** | **yes** | the ten directives listed above |
+| `note=` | **the human** | **yes** | the directives listed above |
 
 Writing **both on one element is legal and meaningful** — a long
 machine-facing description beside a short drawn aside is the case the
@@ -4971,7 +5008,8 @@ addition and to the hundredth alike.
 > Completeness note (`GRAMMAR-SKETCH-COMPLETENESS`=(b), freeze prep): every nonterminal used below is
 > defined here or imported from RFC 5234 core rules (`SP` `WSP` `ALPHA`
 > `DIGIT` `DQUOTE` `VCHAR` `CRLF`); the `UTF8-*` productions are RFC 3629
-> §4's, copied verbatim. Complete means DERIVABLE, so 0.1 corrected
+> §4's, copied verbatim except that `UTF8-char` omits the one-octet form
+> (ASCII is covered by `VCHAR` and `SP`). Complete means DERIVABLE, so 0.1 corrected
 > the grammar in two respects: `comment`/`comment-line` excluded `SP`
 > (RFC 5234's `VCHAR` is `%x21-7E`), which made every commented line in
 > this document underivable; and `qchar`, `cell-content`, `option-value`
@@ -5308,9 +5346,10 @@ rule covering the position and the extent together.
 directives are EXPERIMENTAL (§10). Their per-key tables moved to
 [experimental.md](experimental.md), with the rest of
 those constructs' definitions. Their top-level arrays stay in the Document
-table above, because a closed model has to say what exists; a document that
-stays inside the v0.1 conformance surface writes none of the three, so
-`thresholds`, `bands` and `bundles` are `[]`.
+table above, because a closed model has to say what exists; a document
+written only in the normative vocabulary declares none of the three, so
+`thresholds`, `bands` and `bundles` are `[]` there (the normative suite's
+own goldens are not such documents; see the correction below).
 
 **Two Document keys LEFT the model (`EDGE-GEOMETRY-CONSTRUCTS`)**, and they are
 the first to do so: the `paths` array and the top-level scalar `routing`,
@@ -5662,15 +5701,15 @@ implicit `base` plane writes no label and therefore carries none.
 ### 12.4 Normalization rules
 
 Everything a parser decides that is not literally in the source text.
-The list is exhaustive for v0.1.
+The list is exhaustive for the current language version.
 
 1. **Materialized defaults.** The parser resolves these before the model
    is visible, so they are ALWAYS present:
 
    | field | value | ruled by |
    |---|---|---|
-   | `flow` | the genre default — `"down"` for `flowchart`, `"right"` for the other five — unless a `flow` line overrides it | §1, `GENRE-NAMESPACE` `PER-GENRE-DEFAULTS` |
-   | `node.shape` | `"box"` | §2.1 |
+   | `flow` | the genre default — `"down"` for `flowchart`, `"right"` for the other seven — unless a `flow` line overrides it | §1, `GENRE-NAMESPACE` `PER-GENRE-DEFAULTS` |
+   | `node.shape` | `"box"`; a `statechart` `state` derives `"rounded"` | §2.1 |
    | `node.plane`, `edge.plane` | `"base"` | §2.4 |
    | `planes[0]` | the implicit base plane `{id: "base", z: 0}`, always first, never declared, and since 0.3 the only entry (§2.4, `PAINT-ORDER-CONSTRUCT`) | §2.4, `PLANE-Z-INDEX-DEFAULT` |
    | `band.extend` | `"up"` | §2.6 |
@@ -5974,11 +6013,16 @@ no BOM, LF line endings, with:
    `2e1`); a fractional value uses ordinary JSON number syntax (source
    `1.10` is the number 1.1 and serializes as `1.1`, so trailing zeros and
    the source token's spelling are not preserved); negative zero
-   serializes as `0`. The exponent forms of that production
-   (`1e+21`, `1e-7`) are unreachable from this language's value grammars
-   but are part of the rule, not an exception to it. `NaN` and the
-   infinities cannot occur: a value that is not a finite number is an
-   engine defect (§12.3).
+   serializes as `0`. The exponent forms of that production ARE
+   reachable, because the value grammars bound neither magnitude nor
+   precision (§15.5): `pin at=(1000000000000000000000,0)` gives
+   `"x": 1e+21` and `at=(0.0000001,20)` gives `"x": 1e-7` (fixture
+   `968-pin-exponent-serialization`; until this release this rule called
+   them unreachable). `NaN` and the infinities cannot occur. A plain
+   decimal too long to be a finite double (about 309 integer digits) is a
+   line error, `number too large: … is not a finite number`, at every
+   numeric position (`969-errors-number-not-finite`); a
+   non-finite value in a model is an engine defect (§12.3).
 7. **Terminate the file with exactly one LF** after the closing brace.
 
 Two edge cases are named so an implementer does not have to guess whether
@@ -7051,7 +7095,7 @@ guarantees is there and unrewritten.
 
 ### 13.6 One migration at `figdown 1.0`, none after
 
-**`figdown 0.1` → `figdown 1.0` MAY require a migration**, and that is
+**`figdown 0.x` → `figdown 1.0` MAY require a migration**, and that is
 **the last time one may be required.** From `v1.0.0` onward, a document
 declaring a released language version keeps working as declared: within
 `figdown 1.y`, old documents are honoured under their declared semantics
@@ -7063,7 +7107,7 @@ Downstream can plan on exactly that shape: **expect one migration at
 migration.
 
 If the `figdown 1.0` migration is needed, it arrives under tier 2's MUST
-— mechanical, with a named diagnostic, and with the `v0.1.z` archive
+— mechanical, with a named diagnostic, and with every `0.Y` archive (§13.5)
 still runnable for anyone who chooses not to move.
 
 ### 13.7 What a conforming engine MUST do about versions
@@ -7370,7 +7414,8 @@ increment, one genre later.
   A `sequence` document parses to a complete model, reports zero errors, and
   draws an EMPTY CANVAS. Until the ladder layout lands, this genre states a
   reading and draws nothing — which is why its reference figure ships with no
-  `.svg` beside it.
+  `.svg` beside it. **CLOSED**, when `render()` began branching
+  to `renderSequence` (MIGRATIONS 0.4).
 - **It DID owe a new `read/<X.Y>/`**, on §13.7.1's rule unchanged: the reading
   contract is indexed by language version, `read/0.1/`–`read/0.3/` are frozen,
   and `figdown 0.4` is a version a reader may now meet. `read/0.4/` is written
@@ -7654,11 +7699,13 @@ false-positive filters, each of which excludes a case the eye reads cleanly:
    where an intended coincidence carries a marker the engine emits from the
    author's meaning rather than a heuristic guess.
 
-On the current corpus F5 flags **9 labels across 6 figures** out of 201 edge
+When F5 landed it flagged **9 labels across 6 figures** out of 201 edge
 labels considered; every figure the eye reads cleanly, `turnstile` included,
-scores 0.
+scored 0. The count today is the ratchet baseline below (`F5_BASELINE` in
+`tools/layout-lint.js`, printed by every run) — one label in one figure as of
+0.5.
 
-**F5 is enforced as a RATCHET, not yet a hard zero.** The 9 flagged labels are
+**F5 is enforced as a RATCHET, not yet a hard zero.** The flagged labels are
 real defects, and they sit in figures still under layout repair (the ordering
 and label-aware-placement work, `decisions/registry.md` items 26/27). F5 is
 therefore **advisory now**: the reference gate (`tools/layout-lint.js`) prints
@@ -7862,7 +7909,14 @@ has exactly one terminator, `]]>`. So:
   adjacent sections concatenate back to the original, so the rewrite is
   exactly reversible and no other byte is touched.
 - The recovered source MUST equal the source byte for byte, and `data-sha256`
-  MUST be the hash of those same bytes. Fixture 952 is a document whose title,
+  MUST be the hash of those same bytes. **The source embedded is the source
+  with each CRLF written as LF.** XML 1.0 §2.11 makes every
+  XML reader return LF for a CRLF, CDATA included, so a kept CR could never
+  be recovered and the hash would never verify; CRLF and LF spell the same
+  document (§1), and a bare CR is refused (§1). A consumer comparing an
+  artifact against a CRLF `.fd` on disk normalizes CRLF to LF first.
+  `tools/dist-check.js` round-trips a CRLF source through `artifact()` and
+  `tools/build-svg.js`. Fixture 952 is a document whose title,
   labels and comments contain `]]>`, the pre-spliced form `]]]]><![CDATA[>`, a
   closing `</metadata>` tag and a `<script>` element positioned to run if any
   of them landed; `gate:safesvg` renders it, recovers the source and requires
@@ -7899,7 +7953,10 @@ production `NaN` could match, and that is what makes the refusals durable.
 matters.** A large *plain decimal* is accepted: `pin at=(999999999999999999999,0)`
 renders, to a document whose `viewBox` is `0 0 1e+21 76`. That is the
 unbounded-canvas case below, and a reader who mistook the refusals above for a
-bound on magnitude would be trusting a limit that does not exist. (Also
+bound on magnitude would be trusting a limit that does not exist. The one
+numeric refusal past the grammar is FINITENESS, not size: a plain decimal too
+long to be a finite double (about 309 integer digits) is a line error at every
+numeric position (§12.5.1 rule 6, `969-errors-number-not-finite`). (Also
 measured, not pinned: an unterminated string is rejected at any length, a 1 MB
 one included; group nesting is refused beyond one level.)
 
@@ -7936,8 +7993,10 @@ drawing the engine cannot stand behind is worse than no drawing.
 
 The refused set is XML's, not a taste for printability:
 
-- **U+0000–U+0008, U+000B, U+000C, U+000E–U+001F.** U+0009 (tab), U+000A
-  (newline) and U+000D (carriage return) are **legal and stay legal**.
+- **U+0000–U+0008, U+000B, U+000C, U+000E–U+001F.** U+0009 (tab) and
+  U+000A (newline) are **legal and stay legal**. U+000D (carriage return)
+  is legal as the CR of a CRLF line end only: a bare CR is refused (§1), not because XML forbids it but because XML turns it into
+  LF inside the CDATA, so the embedded source could not be recovered (§15.4).
 - **U+FFFE and U+FFFF.**
 - **An unpaired surrogate.** A correctly paired astral character is a
   character and is accepted.
@@ -8016,7 +8075,7 @@ evidence is not in this table because it is not in this section.
 | 7 | Hostile text reaches the model unescaped and unstripped (§15.3) | `conformance/cases/950-adversarial-label-markup.model.json` (title, class meaning, group/node labels, three edge-label positions, six `note=` strings); `951-adversarial-description-markup.model.json` (four `description=` strings) |
 | 8 | Hostile text reaches the artifact as text, never markup (§15.3) | `gate:safesvg`, fixtures 950–952 rendered fresh in **all three** render modes (default, `with-title`, `with-a11y`): every byte classified, hostile tokens present in the document and in no markup region. The third mode is the one that carries a hostile `title` into a root `<title>` and a derived `<desc>` |
 | 9 | The embedded source cannot terminate its own CDATA container (§15.4) | `conformance/cases/952-adversarial-metadata-breakout.fd` + `gate:safesvg` F: source recovered byte-identical, `data-sha256` equal to the hash of those bytes, no `script` element among the scanned tags |
-| 10 | Extreme numerics are refused by the grammar (§15.5) | `conformance/cases/954-pin-extreme-numeric-refusals` (`1e12`, `NaN`, `Infinity`, `-1e12`, `1e400` inside `at=(…)` — five golden error lines), `367-pin-extent-strict-value` (five width values) and `361-pin-errors` (the paren-point rule) |
+| 10 | Extreme numerics are refused by the grammar (§15.5) | `conformance/cases/954-pin-extreme-numeric-refusals` (`1e12`, `NaN`, `Infinity`, `-1e12`, `1e400` inside `at=(…)` — five golden error lines), `367-pin-extent-strict-value` (five width values), `361-pin-errors` (the paren-point rule) and `969-errors-number-not-finite` (a plain decimal too long to be a finite double, at every numeric position) |
 | 11 | Resource limits are UNSPECIFIED (§15.5) | **No gate — by construction.** The measurements quoted are a record, not a bound; nothing asserts a ceiling because none is specified |
 | 12 | XML-illegal characters in a source are refused, and legal ones are not (§15.5) | `conformance/cases/953-source-illegal-xml-characters` — eleven golden error lines over both diagnostics, with a same-file node carrying tab, U+007F, C1 and an astral character that must produce none. Plus `gate:safesvg` A upstream: 12 forbidden code points must error and 5 legal ones plus a paired astral character must not, asserted against the live engine every run |
 | 13 | `data-sha256` detects staleness (§15.6) | `gate:artifact` — recorded hash vs the SHA-256 of the paired `.fd`, over every artifact it finds, every run |

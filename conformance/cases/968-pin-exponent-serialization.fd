@@ -1,0 +1,12 @@
+# core §12.5.1 rule 6 — THE EXPONENT FORMS ARE REACHABLE.
+#
+# The value grammar is a plain decimal with no magnitude limit (§15.5), so
+# a 22-digit coordinate is the double 1e21 and a seventh decimal place is
+# 1e-7. ECMA-262 Number::toString writes both with an exponent, and the
+# canonical model carries exactly that spelling: "x": 1e+21, "x": 1e-7.
+# Until this release rule 6 called these forms unreachable.
+figdown 0.5 block
+node far "Far"
+node near "Near"
+pin far at=(1000000000000000000000,0)
+pin near at=(0.0000001,20)

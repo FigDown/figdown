@@ -652,8 +652,6 @@
           "type": "string",
           "$comment": "The message text, from EITHER the trailing quoted string or the inline -[mid]-> form; writing both is a line error, so the model never holds two. There is no `mid` key — on a message the mid position IS the label."
         },
-        "tail": { "type": "string" },
-        "head": { "type": "string" },
         "in": { "$ref": "#/$defs/id" },
         "stroke": { "$ref": "#/$defs/color" },
         "style": { "$ref": "#/$defs/style" },

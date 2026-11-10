@@ -1,0 +1,2 @@
+Line 7: message needs an operator: -> <- <-> (a [mid] label splits it: -[x]->)
+Line 8: message needs an operator: -> <- <->

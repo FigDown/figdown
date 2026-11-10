@@ -1,0 +1,7 @@
+RESTATED SECTION COUNT — `document.sections` differs from the paired `.fd`.
+
+figdown-manifest.md §3.2 and §1.2 make `document.sections` a COUNT of the
+`figdown` headers in the file, and the restatement rule makes a disagreement
+with the pair an error in the manifest. The paired `.fd`
+(13-sections-mismatch.pair.fd) has two headers; this manifest says one.
+document.sections (1) does not match

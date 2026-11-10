@@ -1,1 +1,1 @@
-Line 1: first line must be "figdown 0.1 <genre>"
+Line 1: first line must be "figdown 0.5 <genre>"

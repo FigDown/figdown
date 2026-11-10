@@ -123,12 +123,12 @@ recorded uncertainty is still recorded.
 ## Load only what you need
 
 This file is the whole genre-independent language. **Everything else is one
-lookup away, and the lookup is mechanical:** line 1 of a `.fd` names its genre,
+lookup away, and the lookup is mechanical:** the header line of a `.fd` (its first line that is not blank or a comment) names its genre,
 so you know which file you need before you need it.
 
 <!-- skill-coverage: router -->
 
-| Genre on line 1 | Load | Add only for EXPERIMENTAL constructs |
+| Genre on the header line | Load | Add only for EXPERIMENTAL constructs |
 |---|---|---|
 | `block` — architecture, dataflow, hierarchy | `reference/scene.md`, `reference/layout.md` | `reference/experimental/block.md`, `reference/experimental/chart.md` |
 | `bitfield` — packet headers, register layouts | `reference/bitfield.md` | — |
@@ -205,10 +205,12 @@ semantic channel. Each genre file names its own ranking and its own fallback.
 
 ## The document skeleton
 
-The grammar is **CLOSED**: an unknown line is an error, never ignored. Five
-keywords — `figdown`, `title`, `class`, `layout`, `pin` — mean the same thing
-under every genre and no genre may redefine them. Everything else belongs to a
-genre.
+The grammar is **CLOSED**: an unknown line is an error, never ignored. Three
+keywords — `figdown`, `title`, `layout` — are the language core (core §10 (a))
+and mean the same thing under every genre; `pin` is genre-independent too, as
+the layout namespace's one member (§10 (a′)); and `class` is accepted by every
+genre but declared by each. No genre may redefine any of the five. Everything
+else belongs to a genre.
 
 ```figdown
 # FigDown — figures as text. Spec: https://github.com/FigDown/figdown
@@ -256,7 +258,7 @@ class meaning — never in a colour alone. A class with an empty meaning
 
 | Key | What it paints |
 |---|---|
-| `fill=` | the **interior** of a shape — `#rgb`, `#rrggbb`, a CSS colour name, or `transparent` |
+| `fill=` | the **interior** of a shape — `#rgb`, `#rrggbb`, a named colour from the engine's table (the classic CSS/SVG set: `tomato` yes, `rebeccapurple` no), or `transparent` |
 | `stroke=` | the **outline** of a shape, and the **whole** of a line |
 | `style=` | `solid` \| `dashed` \| `dotted` |
 | `class=` | one or more declared class ids, comma-separated: `class=hot,legacy` |
@@ -298,7 +300,7 @@ the error instead of guessing around it.
 
 ## Maintaining a document written against an older version
 
-Line 1 pins the version, so never mix syntax generations in one file. When the
+The header line pins the version, so never mix syntax generations in one file. When the
 language moves, a **NORMATIVE** construct ships a mechanical rewrite rule and
 you upgrade by applying the rules in order. An **EXPERIMENTAL** one carries no
 such promise: it may be withdrawn with nothing that does what it did, in which

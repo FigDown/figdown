@@ -1,9 +1,9 @@
 {
   "instrument": "layout-stability (ADV-9) — locality of a local edit",
   "axiom": "R8 (decisions/registry.md) / core §3 D1 \"a local edit must change only the corresponding local region\"",
-  "measured": "2026-08-21",
+  "measured": "2026-10-31",
   "engine": "editor/figdown.html",
-  "engine_sha256_12": "f0e2cb3587ca",
+  "engine_sha256_12": "4cba8bedeeeb",
   "epsilon_px": 0.5,
   "pairs": {
     "examples/showcase/arp-resolution.fd|comment-add": {
@@ -671,7 +671,7 @@
       "maxOverBoundId": null,
       "reroute": 0,
       "rerouteTotal": 10,
-      "canvasDw": 56,
+      "canvasDw": 13,
       "canvasDh": 0,
       "pinnedMoved": [],
       "verdict": "local",
@@ -685,7 +685,7 @@
       "unnamedTotal": 7,
       "moved": 7,
       "maxDisp": 188.4,
-      "maxMovedId": "lf1",
+      "maxMovedId": "lf3",
       "sameRankMoved": null,
       "crossRankMoved": null,
       "maxCrossRankDisp": null,
@@ -1535,7 +1535,7 @@
       "maxOverBoundId": null,
       "reroute": 2,
       "rerouteTotal": 2,
-      "canvasDw": 0,
+      "canvasDw": -21,
       "canvasDh": 24,
       "pinnedMoved": [],
       "verdict": "local",

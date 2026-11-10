@@ -88,9 +88,11 @@ the run aborts with a named error instead.
   mechanical edit classes over a written 12-figure subset, graded per class
   against the clause that promised stillness (see below).
 - `build-svg.js` — the sidecar generator: `node tools/build-svg.js
-  [--with-title] <file.fd | dir> ...` validates and renders deterministically
-  (titles are not drawn by default — the majority embedding case has a
-  caption; `--with-title` opts in and is recorded in the artifact metadata)
+  [--with-title] [--with-a11y] <file.fd | dir> ...` validates and renders
+  deterministically (titles are not drawn by default — the majority embedding
+  case has a caption; `--with-title` opts in; `--with-a11y` applies the
+  accessibility profile, `spec/figdown-a11y.md`; both are recorded in the
+  artifact metadata)
   (`X.fd → X.svg`, source + SHA-256 embedded). Engine lookup order:
   `$FIGDOWN_HTML`, a co-located `figdown.html`, `../editor/figdown.html`.
   **Recursive**, and it states its file count. PROCESS
@@ -501,6 +503,46 @@ the run aborts with a named error instead.
   every run: `decisions/registry.md` found thirteen false
   external-standard claims across ~50 sites where three were known, and the
   reason they survived is that nobody held the denominator.
+- The specification and publication gates, each with its own header comment
+  for the full contract:
+  - `a11y-check.js` (`gate:a11y`) — the accessibility profile's verifier
+    (`spec/figdown-a11y.md`): every artifact's root `<title>` equals its
+    source's first `title`, and the description carries a declared state;
+    the assertions `ACCESSIBLE-TEXT-EMISSION` pre-registered.
+  - `actor-check.js` (`gate:actor`) — the conformance-class declaration
+    (core §0.2) exists, and every party `spec/` calls CONFORMING is one of
+    the classes it declares.
+  - `alt-check.js` (`gate:alt`) — every Markdown embed of an `.svg` carries a
+    non-empty alt (every CommonMark inline-image form).
+  - `archive-check.js` (`gate:archive`) — the immutability gate: `archive/`
+    and `read/<X.Y>/` match the bytes recorded in `archive/MANIFEST.tsv`;
+    `--write <release>` appends a release.
+  - `bcp14-check.js` (`gate:bcp14`) — the BCP 14 declaration exists, and every
+    all-caps modal construction in `spec/` is one of the spellings it declares.
+  - `harness-check.js` (`gate:harness`) — the language-agnostic harness
+    contract is alive: the conformance runner's subprocess mode still feeds a
+    `.fd` on stdin and compares an external command's output to the goldens.
+  - `make-proof.js` (`gate:proof` with `--check`) — generates `PROOF.md`, the
+    page that lists every gate and what it proves; `--check` fails when the
+    committed page is stale.
+  - `manifest-check.js` (`gate:manifest`) — the publication-manifest profile's
+    verifier (`spec/figdown-manifest.md`): it parses, its restated fields match
+    the pair they restate, and the `PUBLICATION-MANIFEST-PROFILE` assertions hold.
+  - `plugin-check.js` (`gate:plugin`) — the Claude Code plugin wrapper stays a
+    wrapper over the one skill bundle, and its names, URLs and licence match
+    the project's.
+  - `safe-svg-check.js` (`gate:safesvg`) — every shipped artifact stays inside
+    the Safe SVG profile (core §15): no script, no event handler, no
+    `foreignObject`, and no reference that makes the viewer fetch anything.
+  - `vocab-check.js` (`gate:vocab`) — `spec/vocabulary-sources.tsv` (the
+    machine-readable half of SYNTAX-STYLE, and the SCOPE×STAGE classification)
+    covers every registered keyword and option key.
+- `comprehension-check.js` — the cold-reader comprehension suite (not a gate):
+  does a reader who has never opened the spec read a `.fd` correctly? Its
+  results are `PROOF.md` §4.1.
+- `snapshot-release.js` — the release-day act that freezes a language
+  version's conformance suite and normative spec text into `archive/<X.Y>/`
+  (`node tools/snapshot-release.js <X.Y> [--rev <rev>] [--dry-run]`).
 - `migrate-figdown.js` — detection-based, idempotent spelling migration
   toward the freeze candidate (`render`→`layout`, `via=` paren points,
   `w=`/`h=`→`width=`/`height=` and `dir=`→`extend=`,
@@ -637,7 +679,7 @@ figure that has none. The other half matters just as much — an artifact left
 behind by an older engine keeps shipping the picture the current engine declines
 to draw, and looks perfectly consistent doing it, because its recorded hash
 still matches its own embedded source. Every `.fd` in scope is classified, not a
-sample: one parse plus one render each, about 1.2 s for the 57-source corpus.
+sample: one parse plus one render each, about a second for the whole corpus.
 
 **Why it exists.** The same failure shipped twice, and neither time could any
 other gate see it:
@@ -743,7 +785,7 @@ files carried 13 URLs between them and not one resolvable locator. It is a
 CONVENTION, not language surface — the parser does not read it and its
 absence is not a line error — which is exactly why it needs a gate.
 
-It lives in this tool rather than a nineteenth one because this tool is
+It lives in this tool rather than a gate of its own because this tool is
 already the gate over `.fd` prose the engine never reads, over precisely the
 corpus the rule applies to. Test fixtures are deliberately outside that
 corpus: `conformance/cases/`, `conformance/experimental/` and
@@ -978,7 +1020,9 @@ node tools/layout-stability/run.js --figure <path>  # one figure, no ratchet
 - `results.json` is the committed baseline. The run is deterministic (same tree →
   byte-identical file), so it is a ratchet in the `gate:layout` F5/F6 sense: the
   recorded residue is tolerated, a **regression** (a pair that was local and is
-  not, or a count that rose) exits 1.
+  not, a count that rose, or a maximum displacement or canvas-width change that
+  grew by more than the 0.5 px epsilon) exits 1. A measurement better than the
+  baseline also exits 1 until the baseline is refreshed in the same commit.
 
 Exit codes: `0` clean or matching the baseline, `1` regression (or `--strict`
 harness defect), `2` the tool could not do its job — engine missing, a corpus
@@ -986,12 +1030,12 @@ file moved, `results.json` unreadable. A corpus file that has moved is a hard
 error, never a silent skip: the denominator is written down, so it must be
 defended like a walked one.
 
-**It is an `audit:`, not a `gate:`, and that is a measured decision rather than
-a preference** — the 2026-08-21 baseline carries 6 contractual violations and 2
-refusals, so `npm test` would inherit a red instrument on its first day. The
-promotion condition and the one-line diff that performs it are in
-`decisions/registry.md`. It is deterministic and takes ~2 s, so
-nothing but the residue is keeping it out.
+**It is a gate: `gate:locality`.** It began as an `audit:` — the 2026-08-21
+baseline carried 6 contractual violations and 2 refusals, so `npm test` would
+have inherited a red instrument on its first day — and `BOUNDED-GROWTH-ACCOMMODATION` promoted it once
+the residue was cleared. The promotion condition and the diff that performed
+it are in `decisions/registry.md`. It is deterministic and
+takes ~2 s.
 
 ## layout-lint.js
 
@@ -1033,8 +1077,13 @@ that was never FigDown source.
 | `novlp` | peer node-node rectangle overlaps (group containers excluded) |
 | `lblcol` | a label that has stopped saying which line it belongs to: one count per overlapping label PAIR, plus one count per label an edge STRIKES (however many edges cross it). Boxes are rebuilt with the engine's own `cand()` geometry — widest line × 6.5 px × `fs`/11, line height 1.3 `fs` — honouring `text-anchor` and joining `<tspan>` lines; the strike test is against the box's centre band (middle 40 % of height, inset 2 px), so a corner graze is not a strike |
 | `coinc` | distinct edge pairs whose segments overlap collinearly for > 10 px — **except between two members of the same merge bus**, which are not charged. A bus draws one trunk stroked once per member (every member still emits its own full path), so shared ink there is the convention rather than a defect, and the junction dots are what tell a reader how many lines the trunk carries. Members are recognised by the `data-bus="<target-id>"` attribute the engine writes on each bus path. Coincidence with anything else — including between members of **two different** buses — is charged exactly as before (`EDGE-MERGE-BUS`) |
+| `offcv` | text drawn off the canvas, across every section (measured before the scene-genre skip, so a `bitfield` or `chart` figure is charged too) |
+| `sqlbl` | a FOREIGN name overlapping a port square (a pair count, like the label half of `lblcol`; a link's own name is exempt) |
+| `sqedge` | a FOREIGN shaft through a port square, charged at most once per square (like the strike half of `lblcol`) |
+| `lasso` | a non-member device inside a bundle's lasso — a false statement of membership, not a readability defect (item 69) |
+| `f5` / `f6` / `align` | axes printed beside the score and not in it: F5 and F6 are ratchets (a figure past its baseline fails; core §14), `align` never gates |
 | `ink/e` | total edge path length ÷ edge count |
-| `score` | weighted sum: cross×2 + thru×3 + novlp×3 + lblcol×2 + coinc×2 |
+| `score` | weighted sum: cross×2 + thru×3 + novlp×3 + lblcol×2 + coinc×2 + offcv×4 + sqlbl×2 + sqedge×2 + lasso×4 (`score()` in `layout-lint.js`) |
 
 The table is sorted worst-first by `score`.
 
@@ -1069,10 +1118,12 @@ with no defects.* Every reason now prints its count at zero as well, because a
 reason that appears only when non-zero is a reason nobody knows the tool has.
 
 `--strict` exits 1 if any figure was considered and **not scored** for a
-reason that means the tool could not read it. The single reason excluded from
-that set is `no-scene-genre`: a `bitfield`, `table`, `timing` or `chart`
+reason that means the tool could not read it. Two reasons are excluded from
+that set. `no-scene-genre`: a `bitfield`, `table`, `timing` or `chart`
 figure has no scene geometry to measure, so an empty render is the correct
-answer rather than a failure to answer. The same empty render from a **scene**
+answer rather than a failure to answer. And `geometry-refused`: the engine
+declined to draw the figure on purpose (core §8), so there is no drawing to
+score, and `gate:artifact` owns that verdict. The same empty render from a **scene**
 genre (`block`, `topology`, `flowchart`, `statechart`, `sequence`) is counted
 separately as `no-scene-in-scene-genre` and does fail. `sequence` is in that
 set even though a ladder is **not** the scene renderer, because what the set

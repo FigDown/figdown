@@ -1,6 +1,6 @@
 STALE BINDING — `review.of_source_sha256` differs from `source.sha256`.
 
-figdown-manifest.md §4.6 (`MANIFEST-REVIEW-STATE`) binds a review state to the hash it is
+figdown-manifest.md §3.6 (`MANIFEST-REVIEW-STATE`) binds a review state to the hash it is
 ABOUT. This is the field the ruling adopted whole from a measured production
 pipeline failure: an audit statement still read "verified" on a figure that
 had silently regressed after the review was recorded. A verifier MUST report

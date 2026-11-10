@@ -291,6 +291,29 @@ function checkEmbedRoundTrip() {
   else fail('tools/build-svg.js corrupted the embedded source of a document containing $& / $` / $\'');
 }
 
+// CRLF is embedded and hashed as LF (core §15.4). Every XML
+// reader returns LF for a CRLF inside CDATA (XML 1.0 §2.11), so an artifact
+// that kept the CR could not be recovered byte for byte by any of them.
+const CRLF_SRC = 'figdown 0.5 block\r\nnode a "A"\r\nnode b "B"\r\nedge a -- b\r\n';
+function checkCrlfEmbed() {
+  const want = CRLF_SRC.replace(/\r\n/g, '\n');
+  const sha = s => require('crypto').createHash('sha256').update(s, 'utf8').digest('hex');
+  const judge = (who, svg) => {
+    const got = embeddedSource(svg), h = (/data-sha256="([0-9a-f]{64})"/.exec(svg || '') || [])[1];
+    if (got === want && h === sha(want)) ok(who + ' embeds a CRLF source as LF, with the hash of those bytes');
+    else fail(who + ' embedded a CRLF source that an XML reader cannot recover (CR kept, or hash of other bytes)');
+  };
+  judge('dist/ artifact()', require(path.join(DIST, 'figdown.js')).artifact(CRLF_SRC).svg);
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'figdown-crlf-'));
+  const fd = path.join(dir, 'crlf.fd');
+  fs.writeFileSync(fd, CRLF_SRC);
+  try {
+    execFileSync(process.execPath, [path.join(ROOT, 'tools', 'build-svg.js'), fd], { stdio: 'ignore' });
+    judge('tools/build-svg.js', fs.readFileSync(path.join(dir, 'crlf.svg'), 'utf8'));
+  } catch (e) { fail('tools/build-svg.js refused the CRLF source: ' + e.message); }
+  finally { fs.rmSync(dir, { recursive: true, force: true }); }
+}
+
 // ── D. the package's entry points point at the builds above ─────────────────
 // `dist/` is what `require('figdown')` / `import 'figdown'` return, but the
 // route to it is four package.json fields nothing else reads. A renamed build,
@@ -327,6 +350,7 @@ function checkPackageEntryPoints() {
 checkBuilds().then(() => {
   checkCorpus();
   checkEmbedRoundTrip();
+  checkCrlfEmbed();
   checkPackageEntryPoints();
   console.log('');
   if (failures) {

@@ -1,0 +1,5 @@
+Line 10: ids are bare and match [A-Za-z_][A-Za-z0-9_-]* — text with spaces or punctuation belongs in the label: node <id> "your text"
+Line 11: a keyword is written bare: node
+Line 12: a keyword is written bare: node
+Line 13: this position takes a BARE value: write flow right — quoting a value drawn from a closed set suggests the position accepts arbitrary text, when it accepts only the listed spellings (SYNTAX-STYLE RULE 2.4)
+Line 9: ids are bare and match [A-Za-z_][A-Za-z0-9_-]* — text with spaces or punctuation belongs in the label: node <id> "your text"

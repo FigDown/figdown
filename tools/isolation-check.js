@@ -408,16 +408,23 @@ function codeSpans(line) {
 }
 
 /**
- * `[text](target)` links, with an optional `"title"`. Reference links are not
- * used in this repo. The link text may wrap onto `next` (the following prose
- * line); only links that START on `line` are returned.
+ * Link targets that START on `line`: inline `[text](target)` with an optional
+ * title in any of CommonMark's three forms (`"t"`, `'t'`, `(t)`), reference
+ * DEFINITIONS (`[label]: target`), and HTML `href="target"`. The text of an
+ * inline link may wrap onto `next` (the following prose line). The
+ * double-quoted title was the only form read, so the others were links the
+ * gate could not see (none in scope today).
  */
 function links(line, next) {
   const out = [];
   const text = next == null ? line : line + '\n' + next;
-  const re = /\[([^\]\n]*(?:\n[^\]\n]*)?)\]\(\s*<?([^)<>\s]+)>?(?:\s+"[^"\n]*")?\s*\)/g;
+  const re = /\[([^\]\n]*(?:\n[^\]\n]*)?)\]\(\s*<?([^)<>\s]+)>?(?:\s+(?:"[^"\n]*"|'[^'\n]*'|\([^)\n]*\)))?\s*\)/g;
   let m;
   while ((m = re.exec(text))) if (m.index < line.length) out.push({ text: m[1].replace(/\n/, ' '), target: m[2] });
+  const def = /^\s{0,3}\[([^\]\n]+)\]:\s*<?([^\s<>]+)>?/.exec(line);
+  if (def) out.push({ text: def[1], target: def[2] });
+  const href = /\bhref\s*=\s*(?:"([^"\n]*)"|'([^'\n]*)')/gi;
+  while ((m = href.exec(line))) out.push({ text: 'href', target: m[1] !== undefined ? m[1] : m[2] });
   return out;
 }
 

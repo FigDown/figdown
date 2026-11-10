@@ -1,0 +1,8 @@
+figdown 0.1 block
+node a
+
+figdown 0.1 table
+table t
+| a |
+|---|
+| 1 |

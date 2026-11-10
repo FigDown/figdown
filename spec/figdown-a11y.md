@@ -60,7 +60,7 @@ recorded is the publication layer. An engine has no reviewer.
 ```
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="…" width="…" height="…"
      font-family="…" role="graphics-document">
-  <title>TCP Connection State Machine (RFC 9293, Figure 5)</title>
+  <title>VXLAN/EVPN Leaf-Spine Fabric — underlay and overlay told apart by class</title>
   <desc data-desc-state="derived">Topology figure "…". 8 nodes, …</desc>
   <defs>…</defs>
   …
@@ -432,7 +432,8 @@ tightening ruling starts with the list already made rather than re-deriving
 it: arrowhead markers (`arr`), the hatch `pattern`, group rectangles and
 their name strips, band fills, bundle lasso ellipses, port squares, bitfield
 ruler ticks and their numbers, the derived legend's swatches, and the drag
-affordance `style="cursor:move"` that ships in every published artifact.
+affordance `style="cursor:move"` that ships in every artifact with a draggable
+scene node (bitfield, timing and sequence artifacts carry none).
 **This inventory is not itself normative** — it names candidates, not
 decoration.
 

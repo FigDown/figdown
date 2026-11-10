@@ -1,0 +1,3 @@
+Line 10: message takes no [tail] or [head] label — a UML Message has one name and no end labels (UML 2.5.1 §17.4.4.1); write the text as the message label ("…") or as note="…"
+Line 8: message takes no [tail] or [head] label — a UML Message has one name and no end labels (UML 2.5.1 §17.4.4.1); write the text as the message label ("…") or as note="…"
+Line 9: message takes no [tail] or [head] label — a UML Message has one name and no end labels (UML 2.5.1 §17.4.4.1); write the text as the message label ("…") or as note="…"

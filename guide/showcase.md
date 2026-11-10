@@ -436,10 +436,7 @@ arrow carrying its `event / action`.
   `CLOSE-WAIT → LAST-ACK`, `LAST-ACK → CLOSED` — enumerated by querying the
   class, whose label spells the path out.
 
-> **Honest limit (stated in the source):** a node *is* a state is not yet a
-> machine-declarable fact — FigDown has no state genre (the `GENRE-EARNING-THRESHOLD` §6 candidate),
-> so "this node is a protocol state" rides on the `states` class label, interim.
-> And CLOSED is drawn **twice** (top origin, bottom terminus) because FigDown
+> **Honest limit (stated in the source):** CLOSED is drawn **twice** (top origin, bottom terminus) because FigDown
 > has no node-identity/alias construct (**`IDENTITY-ASSERTION`**): the two `closed`/`closed2`
 > nodes are declared one state only by the shared class label, not machine-
 > readably. Everything else — all 11 states, all 21 labelled transitions

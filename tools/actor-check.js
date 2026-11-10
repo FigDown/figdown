@@ -253,8 +253,11 @@ for (const p of POINTERS) {
   let src;
   try { src = fs.readFileSync(path.join(ROOT, p.file), 'utf8'); }
   catch (e) { die('cannot read ' + p.file + ': ' + e.message); }
-  const flat = src.replace(/\s+/g, ' ');
-  if (!/§0\.2/.test(flat) || !flat.includes(p.cls))
+  // The pointer is ONE statement: some paragraph must cite §0.2 and name the
+  // class in bold. Anywhere-in-file let any stray "Host" or "Publisher" stand
+  // in for it, so a profile that named the wrong class still passed.
+  const paras = src.split(/\n\s*\n/);
+  if (!paras.some(q => /§0\.2/.test(q) && q.includes('**' + p.cls + '**')))
     ptrFindings.push(p.file + ' — a normative document with its own status ' +
       'block must name core §0.2 and the class it binds (' + p.cls + '). ' +
       'A reader arriving here should not have to infer which party its ' +

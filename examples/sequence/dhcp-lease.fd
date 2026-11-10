@@ -28,13 +28,13 @@ title "DHCP lease acquisition, renewal and release (RFC 2131 §3.1, §4.4)"
 # modes and the lines between them are TRANSITIONS. This figure's
 # subject is three participants exchanging messages in time, and the
 # lines between them are MESSAGES. The many lines running between this
-# client and one server are the same pair exchanging DISCOVER / OFFER /
-# REQUEST / ACK / REQUEST / ACK / RELEASE over time, so a scene genre
-# would fan seven edges into one span; the statechart's many lines back
+# client and server B are the same pair exchanging DISCOVER / OFFER /
+# REQUEST / ACK / DECLINE / NAK / REQUEST / REQUEST over time, so a scene
+# genre would fan eight edges into one span; the statechart's many lines back
 # to INIT are DIFFERENT transitions of one machine and stay where they
 # are. It is not a `topology` either: `topology` reads a repeated node
-# pair as parallel LINKS, so a reading agent would answer "seven links
-# join the client and the server", which is wrong and carries nothing
+# pair as parallel LINKS, so a reading agent would answer "eight links
+# join the client and server B", which is wrong and carries nothing
 # to warn the reader.
 #
 # THE SOURCE FIGURE, AND WHERE THIS ONE GOES FURTHER. RFC 2131

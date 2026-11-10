@@ -136,6 +136,17 @@ keyword (§4).
 `0` and `1` are levels (Low / High), not data values. **A data cell is
 spelled `=`, and only `=`.**
 
+**Edges between cells: drawn where the level changes, and only there.** A cell has a START level and an END level: `0` is low and
+low, `1` high and high, `p` (one whole cycle, high half then low half) high
+then low, `n` low then high. At each cell boundary a vertical edge is drawn
+when the previous cell's end level differs from this cell's start level.
+So `pp`, `0p`, `p1` and `n0` draw one, and `pn`, `np`, `1p` and `0n` meet at
+one level and draw none, which is why alternating `p` and `n` is not a
+clock. `x` and `=` cells have no level; their box border marks the
+boundary, and no edge is drawn on either side of one. Until this release a
+`p` or `n` cell drew an edge after any cell, and a `0` or `1` cell drew
+none after `p` or `n`.
+
 **`2`–`9` were RETIRED (`TIMING-LANE-ALPHABET`).** WaveDrom's schema defines `2`
 as "value with color 2" … `9` as "value with color 9" and `=` as "value
 (default color 2)" — so `=` and `2` are the SAME brick differing only in a
@@ -432,6 +443,9 @@ contiguous and aligned across all signals in the block.
 | `gap` with no cycle argument | line error |
 | `signal` with no lane string | line error |
 | Unknown option on `timing` or `signal` | line error |
+| `data=` empty, with an empty member, or with a count other than the lane's `=` cells | line error (`data= must not be empty`, `… must not contain empty members`, `data= has N labels, expected M`) |
+| `gap` with more than one argument | line error (`unexpected argument`) |
+| `gap` cycle not a non-negative integer, or past the end of the longest lane | line error (`gap needs a non-negative integer cycle`, `gap cycle N is past the end of the timing lane`) |
 
 ## Example
 

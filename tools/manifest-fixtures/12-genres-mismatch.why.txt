@@ -1,0 +1,8 @@
+RESTATED GENRES — `language.genres` differs from the paired `.fd`'s headers.
+
+figdown-manifest.md §3.2 derives `language.genres` from the source's own
+`figdown <version> <genre>` headers, one per section in document order, and
+names it in the restatement rule: a restated field that disagrees with the
+pair is an error in the manifest. The paired `.fd` (12-genres-mismatch.pair.fd)
+declares `block` then `table`; this manifest says `block`, `block`.
+does not match the .fd's headers

@@ -333,7 +333,7 @@ function checkManifest(json, pair) {
       // by document order — the same "first section speaks for the whole
       // restated field" convention ACCESSIBILITY-PROFILE states for the non-visual <title>.
       const text = bytes.toString('utf8');
-      const headers = [...text.matchAll(/^figdown\s+(\d+\.\d+)\s+\S+/gm)];
+      const headers = [...text.matchAll(/^figdown\s+(\d+\.\d+)\s+(\S+)/gm)];
       if (headers.length && json.language && json.language.version) {
         if (headers.length > 1)
           notices.push('B: ' + path.relative(ROOT, pair.fd) + ' is multi-section (' + headers.length +
@@ -343,6 +343,16 @@ function checkManifest(json, pair) {
         if (json.language.version !== headers[0][1])
           errors.push('B: language.version (' + json.language.version + ') does not match the .fd\'s first declared header (' + headers[0][1] + ')');
       }
+      // The other two header-derived fields (figdown-manifest.md §3.2):
+      // the genres, one per section in document order, and the section COUNT.
+      if (headers.length && json.language && Array.isArray(json.language.genres)) {
+        const have = headers.map(h => h[2]).join(' '), said = json.language.genres.join(' ');
+        if (have !== said)
+          errors.push('B: language.genres [' + json.language.genres.join(', ') + '] does not match the .fd\'s headers [' + headers.map(h => h[2]).join(', ') + ']');
+      }
+      if (headers.length && json.document && typeof json.document.sections === 'number' &&
+          json.document.sections !== headers.length)
+        errors.push('B: document.sections (' + json.document.sections + ') does not match the .fd\'s ' + headers.length + ' header(s)');
     }
     if (!pair.svg) {
       errors.push('B: no paired .svg found beside the manifest — renderer fields cannot be verified');
@@ -422,7 +432,7 @@ if (!fs.existsSync(FIXTURES)) {
       fail('tools/manifest-fixtures/' + w + ' has no ' + w.replace(/\.why\.txt$/, '.invalid.json') + ' beside it — the control it records is not run');
   if (validNames.length < 1) fail('tools/manifest-fixtures/ holds no *.valid.json — at least one fully-populated valid manifest is required');
   if (invalidNames.length < 8) fail('tools/manifest-fixtures/ holds ' + invalidNames.length + ' invalid fixture(s); at least 8 are required '
-    + '(unknown key, elements block, bad relation, no locator, malformed hash, STALE binding, bad version, bbox without page/unit)');
+    + '(unknown key, elements block, bad relation, no locator, malformed hash, STALE binding, bad version, bbox without page/unit, genres and section count against a pair)');
 
   let validPassed = 0;
   for (const n of validNames) {
@@ -446,7 +456,12 @@ if (!fs.existsSync(FIXTURES)) {
     let json;
     try { json = JSON.parse(fs.readFileSync(path.join(FIXTURES, n), 'utf8')); }
     catch (e) { fail(rel + ' — not JSON: ' + e.message); continue; }
-    const { errors } = checkManifest(json, null);
+    // A control for a PAIR-level assertion (B) carries its pair beside it:
+    // `<name>.pair.fd` (and `<name>.pair.svg` when the control needs one).
+    const base = path.join(FIXTURES, n.replace(/\.invalid\.json$/, ''));
+    const pfd = fs.existsSync(base + '.pair.fd') ? base + '.pair.fd' : null;
+    const psvg = fs.existsSync(base + '.pair.svg') ? base + '.pair.svg' : null;
+    const { errors } = checkManifest(json, pfd || psvg ? { fd: pfd, svg: psvg } : null);
     if (!errors.length) { fail(rel + ' was ACCEPTED — the verifier does not catch ' + JSON.stringify(wanted)); continue; }
     const joined = errors.join('\n');
     if (!joined.includes(wanted)) {

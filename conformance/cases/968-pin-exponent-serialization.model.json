@@ -1,0 +1,51 @@
+{
+  "header": {
+    "version": "0.5",
+    "genre": "block"
+  },
+  "flow": "right",
+  "classes": [],
+  "planes": [
+    {
+      "id": "base",
+      "z": 0
+    }
+  ],
+  "nodes": [
+    {
+      "id": "far",
+      "label": "Far",
+      "shape": "box",
+      "plane": "base",
+      "line": 9
+    },
+    {
+      "id": "near",
+      "label": "Near",
+      "shape": "box",
+      "plane": "base",
+      "line": 10
+    }
+  ],
+  "groups": [],
+  "edges": [],
+  "ranks": [],
+  "pins": [
+    {
+      "id": "far",
+      "x": 1e+21,
+      "y": 0,
+      "line": 11
+    },
+    {
+      "id": "near",
+      "x": 1e-7,
+      "y": 20,
+      "line": 12
+    }
+  ],
+  "thresholds": [],
+  "bands": [],
+  "bundles": [],
+  "regions": []
+}

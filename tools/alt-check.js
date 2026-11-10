@@ -110,10 +110,12 @@ function mdFiles() {
   return out.sort();
 }
 
-// `![alt](path.svg)` or `![alt](path.svg "title")` — the one embed form this
-// repo's Markdown corpus uses (see WHAT THIS TOOL DOES NOT COVER). The alt
-// group allows escaped brackets (`\]`) since CommonMark link text does.
-const IMG_RE = /!\[((?:\\.|[^\]\\])*)\]\(\s*(\S+?\.svg)(?:\s+"[^"]*")?\s*\)/gi;
+// Every CommonMark inline-image form that can embed an .svg: a bare or a
+// `<…>` destination, an optional `?query` / `#fragment` after the extension,
+// and a title in "…", '…' or (…). Until AC only the bare + "title" form was
+// seen, so an empty alt written any other way passed. The alt group allows
+// escaped brackets (`\]`) since CommonMark link text does.
+const IMG_RE = /!\[((?:\\.|[^\]\\])*)\]\(\s*(?:<([^>\n]*?\.svg(?:[?#][^>\n]*)?)>|(\S+?\.svg(?:[?#][^\s)]*)?))(?:\s+(?:"[^"]*"|'[^']*'|\([^)]*\)))?\s*\)/gi;
 
 function scan(file) {
   const text = fs.readFileSync(file, 'utf8');
@@ -123,7 +125,7 @@ function scan(file) {
     let m;
     IMG_RE.lastIndex = 0;
     while ((m = IMG_RE.exec(line))) {
-      hits.push({ line: i + 1, alt: m[1], target: m[2] });
+      hits.push({ line: i + 1, alt: m[1], target: m[2] || m[3] });
     }
   });
   return hits;

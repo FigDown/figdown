@@ -1,20 +1,14 @@
 # FigDown — figures as text. Spec: https://github.com/FigDown/figdown
 
-# Reference figure for genre `sequence` — EXPERIMENTAL GENRE, and one step
-# further out than the others: this genre HAS NO RENDERER YET. The document
-# below parses to a complete model and reports zero errors, and drawing it
-# produces an empty canvas. That is why there is NO sequence.svg beside this
-# file: an artifact would record a drawing the language does not have.
-#
-# What the file is for today is therefore the MODEL, not the picture. It
-# demonstrates every form of every keyword the genre has, so a reader can see
-# the whole surface on one page and a coverage tool can count it.
+# Reference figure for genre `sequence` — EXPERIMENTAL GENRE. The drawing
+# beside this file is sequence.svg; the file demonstrates every form of every
+# keyword the genre has, so a reader can see the whole surface on one page and
+# a coverage tool can count it.
 #
 # EVERY line below is outside the compatibility promise: the genre is
-# experimental (`CONSTRUCT-STATUS-TIERS`'s rule, applied to `sequence`). Read
-# spec/genres/experimental/sequence.md first — when it exists; until then the
-# ruled surface is decisions/registry.md and the reading rule is
-# read/0.4/experimental/sequence.md.
+# experimental (`CONSTRUCT-STATUS-TIERS`'s rule, applied to `sequence`). The genre is specified in
+# spec/genres/experimental/sequence.md, and its reading rule is
+# read/0.5/experimental/sequence.md.
 figdown 0.4 sequence
 title "Address lease and renewal"
 

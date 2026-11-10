@@ -10,11 +10,21 @@ No dependencies, no DOM needed; works in Node and browsers.
 
 ## API
 
-- `parse(text)` → `{ doc, errors }` — `errors` is an array of
-  `"Line N: message"` strings (empty on success).
-- `render(text)` → `{ svg, errors }` — `svg` is `null` whenever there are
-  errors (determinism over convenience: no partial renders).
-- `renderDoc(doc)` → SVG string, for an already-validated `doc` from `parse`.
+- `parse(text)` → `{ doc, docs, errors }` — `errors` is an array of
+  `"Line N: message"` strings (empty on success); `docs` holds one model per
+  section (a file may stack several `figdown` sections) and `doc` is the
+  first of them.
+- `render(text, opts)` → `{ svg, errors }` — `svg` is `null` whenever there
+  are errors, parse-time or geometry-time (a figure the engine refuses to
+  draw), so there are no partial renders. Every section is drawn, stacked.
+  `opts`: `{ title: true }` draws the title (off by default — the host
+  document usually captions the figure); `{ a11y: true }` applies the
+  accessibility profile (`spec/figdown-a11y.md`).
+- `renderDocs(docs, opts)` → SVG string for the `docs` of a `parse` result,
+  all sections stacked.
+- `renderDoc(doc, opts)` → SVG string for ONE section's model. It does not
+  withhold the SVG on a geometry-time refusal; **prefer `render`**, which
+  does, and which draws every section.
 - `artifact(text)` → `{ svg, errors }` — the self-carrying artifact: the
   rendered SVG plus a
   `<metadata id="figdown-source" data-sha256="…" data-engine-version="…">`

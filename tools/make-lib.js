@@ -77,6 +77,9 @@ function __sha256hex(text) {
   var b = [], i, c;
   for (i = 0; i < text.length; i++) {           // UTF-8 encode
     c = text.codePointAt(i); if (c > 0xffff) i++;
+    // A lone surrogate is encoded as U+FFFD, as TextEncoder and Node's Buffer
+    // do, so this hash matches theirs for every JS string.
+    if (c >= 0xd800 && c <= 0xdfff) c = 0xfffd;
     if (c < 0x80) b.push(c);
     else if (c < 0x800) b.push(0xc0 | (c >> 6), 0x80 | (c & 63));
     else if (c < 0x10000) b.push(0xe0 | (c >> 12), 0x80 | ((c >> 6) & 63), 0x80 | (c & 63));
@@ -187,6 +190,8 @@ function artifact(text, opts) {
   // rendered it, and any non-default render option (core §7) — together they
   // keep third-party rebuilds bit-identical and give a diff somewhere to point
   var optAttr = __engine.renderOptionsAttr(opts);
+  // CRLF is embedded and hashed as LF (core §15.4).
+  src = src.replace(/\\r\\n/g, '\\n');
   var meta = '<metadata id="figdown-source" data-sha256="' + __sha256hex(src) + '"'
     + ' data-engine-version="' + VERSION + '"' + optAttr + '><![CDATA[\\n'
     + src.replace(/]]>/g, ']]]]><![CDATA[>') + '\\n]]></metadata>';

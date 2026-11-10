@@ -428,6 +428,16 @@ function main() {
       console.log('  ' + r.rel);
       console.log('    ' + r.fd + ' is refused at geometry time (core §8):');
       for (const e of r.refusal) console.log('      ' + e);
+      if (!r.stale && r.engineState === 'ok') {
+        // Same source bytes, same engine version, and the engine drew it then:
+        // the refusal is new ENGINE behaviour under an unchanged version, so
+        // deleting the artifact would hide a regression rather than repair it.
+        console.log('    The artifact matches its source and was drawn by THIS engine version (' +
+          r.engine + '), so the engine now refuses a figure the same version drew.');
+        console.log('    If the refusal is intended, increment FIGDOWN_VERSION, then delete: rm ' + r.rel);
+        console.log('    If it is not, the engine change is a regression: fix the engine.');
+        continue;
+      }
       console.log('    DELETE the artifact: rm ' + r.rel);
       console.log('    It cannot be rebuilt — build-svg writes nothing for a refused figure.');
     }

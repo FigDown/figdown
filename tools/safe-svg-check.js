@@ -696,7 +696,11 @@ const probe = c => fd.parse('figdown 0.4 block\nnode a "L' + String.fromCharCode
 // surrogate with no partner (unreachable from a UTF-8 file — see fixture 953)
 const MUST_REJECT = [0x00, 0x01, 0x08, 0x0B, 0x0C, 0x0E, 0x1B, 0x1F, 0xFFFE, 0xFFFF, 0xD800, 0xDFFF];
 // legal XML 1.0 characters that a careless "strip the weird bytes" rule eats
-const MUST_ACCEPT = [0x09, 0x0D, 0x7F, 0x85, 0xA0];
+// U+000D is XML-legal but not listed here: a BARE CR is
+// refused (core §1) because XML turns it into LF inside the CDATA and the
+// embedded source could not be recovered; it is legal as half of a CRLF,
+// which is probed directly below.
+const MUST_ACCEPT = [0x09, 0x7F, 0x85, 0xA0];
 for (const c of MUST_REJECT) {
   const errs = probe(c);
   if (!errs.some(e => e.indexOf('illegal character ' + cp(c)) >= 0)) {
@@ -709,6 +713,13 @@ for (const c of MUST_ACCEPT) {
     fail('the engine REFUSES ' + cp(c) + ', which XML allows — the rule enforces XML\'s list, ' +
          'not a taste for printability (core §15.5)');
   }
+}
+if (!probe(0x0D).some(e => e.indexOf('illegal character U+000D') >= 0)) {
+  fail('the engine ACCEPTS a bare CR, which ends no line and which XML would turn into LF ' +
+       'inside the artifact, so the embedded source could not be recovered (core §1, §15.4)');
+}
+if ((fd.parse('figdown 0.4 block\r\nnode a "L"\r\n').errors || []).length) {
+  fail('the engine REFUSES a CRLF document — CRLF is a line end (core §1)');
 }
 // A PAIRED astral character is two surrogate code units and must stay legal:
 // the naive "reject anything in D800–DFFF" rule would eat every emoji and

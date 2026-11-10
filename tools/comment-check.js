@@ -225,10 +225,16 @@ const MARKER = /\b(?:left|became|moved|gained|dropped)\s+`|\b(?:renamed|renames|
 //
 // An external standard's section is a REFERENCE A READER CAN FOLLOW and is
 // not touched: `RFC 9293 §3.3.2` is the whole point of citing it.
+// the repo-path pattern names EVERY top-level directory, read from the
+// tree, not a hand list — seven names let `read/…`, `editor/…`,
+// `integrations/…`, `dist/…`, `archive/…` and `publish/…` through.
+const TOP_DIRS = fs.readdirSync(ROOT, { withFileTypes: true })
+  .filter(d => d.isDirectory() && !d.name.startsWith('.') && d.name !== 'node_modules')
+  .map(d => d.name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).sort();
 const RENDERED_FAIL = [
   [/\bOQ-[A-Z]?\d+\b/g,                          'open-question code'],
   [/\b0\.\d+-dev\.\d+\b/g,                       'dev-increment provenance'],
-  [/\b(?:spec|design|tools|conformance|skill|examples|figures)\/[\w./-]+\.\w+/g,
+  [new RegExp('\\b(?:' + TOP_DIRS.join('|') + ')\\/[\\w./-]+\\.\\w+', 'g'),
                                                  'repo path'],
   [/\b(?:core|genres|SKILL)\s*§\s*[\w.]+/g,      'internal spec section'],
 ];

@@ -1,8 +1,8 @@
-// figdown.mjs — FigDown embeddable library (0.5.3)
+// figdown.mjs — FigDown embeddable library (0.5.4)
 // GENERATED FILE, DO NOT EDIT. Built from editor/figdown.html.
 // Regenerate with: node tools/make-lib.js
 'use strict';
-var VERSION = "0.5.3";
+var VERSION = "0.5.4";
 
 // ---- engine (extracted verbatim from editor/figdown.html) ----
 var __engine = (function () {
@@ -32,7 +32,7 @@ function protoless(o){
 // input to that promise, and under core §13 a 0.x renderer may differ from
 // the next — which makes the recorded version the only thing that can
 // explain a diff between two renderings of one source.
-const FIGDOWN_VERSION = '0.5.3';
+const FIGDOWN_VERSION = '0.5.4';
 // `TYPED-BLOCK-TITLE-CANVAS`: a `Z`-only dev bump — RENDERER ONLY, no keyword, no
 // option key, no model field, so `figdown 0.5` still names one language. A
 // typed block's own title (bitfield/table/timing/chart) now joins the
@@ -91,6 +91,10 @@ const FIGDOWN_VERSION = '0.5.3';
 // added option key a `Y` and never a `Z`, because `figdown 0.4` must not name
 // two languages — the one v0.4 published and the one with `id=`.
 const LANG_VERSIONS = ['0.1', '0.2', '0.3', '0.4', '0.5'];
+// The header diagnostic names the CURRENT language version: the example it
+// gives is the line an author should write today (it said `figdown 0.1`
+// through this release).
+const HEADER_FIRST='first line must be "figdown '+LANG_VERSIONS[LANG_VERSIONS.length-1]+' <genre>"';
 // Genres per declared language version. `Y` never removes (core §13.0), so
 // each row is a superset of the one above it, and `figdown 0.1 <anything>`
 // resolves against exactly the list it resolved against before `STATECHART-GENRE-SCOPE`.
@@ -157,7 +161,7 @@ const belowOptVersion=(key,ver)=>{
   const i=LANG_VERSIONS.indexOf(ver), j=LANG_VERSIONS.indexOf(need);
   return i>=0 && j>=0 && i<j;
 };
-// Retired shape VALUES keep a named diagnostic (PROCESS §5(d)), the same way
+// Retired shape VALUES keep a named diagnostic (PROCESS §5, "Deprecation"), the same way
 // retired option keys do: `cloud` was the one value that named a domain
 // (the internet cloud) in an enum the language keeps purely geometric
 // (`SHAPE-ENUM-VOCABULARY`/`EXTERNAL-EDGE-ENDPOINTS`), so it was removed rather than demoted.
@@ -845,7 +849,10 @@ function splitOpts(toks, laneMode){
   // splitting, id checks, string-typed option values) needs the same
   // information, and it needs it for option VALUES too. `optT[k]` is
   // {t, off}: the token and the offset in `t.v` at which the value starts.
-  const pos=[], posq=[], posT=[], opts={}, optT={}, unk=[]; let dup=null;
+  // `posh`: did the positional contain ANY quoting? `posq`
+  // is true only for a WHOLLY quoted token, so `a"b"` and `"c"d` read as
+  // bare there; every position that must be bare tests `posh`.
+  const pos=[], posq=[], posh=[], posT=[], opts={}, optT={}, unk=[]; let dup=null;
   for(const t of toks){
     const m = !t.q && /^([A-Za-z_][A-Za-z0-9_-]*)=([\s\S]*)$/.exec(t.v);
     if(m && OPT_KEYS.has(m[1])){
@@ -854,9 +861,9 @@ function splitOpts(toks, laneMode){
       optT[m[1]]={t, off:m[1].length+1};
     }
     else if(m && !laneMode) unk.push(m[1]);
-    else { pos.push(t.v); posq.push(!!t.q); posT.push(t); }
+    else { pos.push(t.v); posq.push(!!t.q); posh.push(t.qz.length>0); posT.push(t); }
   }
-  return {pos,posq,posT,opts,optT,unk,dup};
+  return {pos,posq,posh,posT,opts,optT,unk,dup};
 }
 // The comma form a retired space form should have been written as. Trailing
 // commas on the individual tokens are the half-converted spelling (`a, b`),
@@ -897,6 +904,12 @@ const DD_ID='"--" is not allowed inside an id — it is the link operator (edge 
 // old failure named the wrong thing (`node a Cache miss` reported
 // `unexpected argument "miss"` — a surplus argument, when the defect was a
 // missing quote).
+// 0.5: a decimal the value grammar accepts can still be too long to
+// be a finite double (~309 integer digits), and it then drew `Infinity`
+// coordinates, or never finished. There is no magnitude limit (core §15.5);
+// the one requirement is that a number IS a number (core §12.5.1).
+const notFinite=v=>!isFinite(parseFloat(v));
+const NOT_FINITE=v=>'number too large: "'+(v.length>24?v.slice(0,12)+'…" ('+v.length+' characters)':v+'"')+' is not a finite number (core §12.5.1)';
 const Q_WHY='whitespace also separates positionals, so a bare token cannot express a phrase (MIGRATIONS 0.1)';
 const ID_RULE='ids are bare and match [A-Za-z_][A-Za-z0-9_-]* — text with spaces or punctuation belongs in the label: node <id> "your text"';
 // isId: the whole id test, used at every id position in the language.
@@ -1390,7 +1403,7 @@ protoless(GENRE_WITHDRAWN);
 const WITHDRAWN_FROM_GENRE=(kw,genre)=>
   '"'+kw+'" is not allowed in genre '+genre+' — it was WITHDRAWN from this genre, not misspelled: '+
   GENRE_WITHDRAWN[genre][kw]+
-  ' Subject vocabulary is per genre (core §3, `GENRE-VOCABULARY-OBLIGATION`): a spelling accepted by several genres is several '+
+  ' Subject vocabulary is per genre (core §1, `GENRE-VOCABULARY-OBLIGATION`): a spelling accepted by several genres is several '+
   'independent declarations, and this genre\'s was withdrawn without touching any other\'s.'+WITHDREW_AT;
 // `SEQUENCE-TIME-GAP`/`SEQUENCE-PARTICIPANT-GROUPING`: THE OTHER HALF OF `SCENE-KEYWORD-MEMBERSHIP` — a spelling a genre REFUSED
 // AT BIRTH. It is a SEPARATE table from `GENRE_WITHDRAWN` and not a sixth row
@@ -1418,7 +1431,7 @@ const REFUSED_AT=' (refused; MIGRATIONS 0.4)';
 const REFUSED_IN_GENRE=(kw,genre)=>
   '"'+kw+'" is not allowed in genre '+genre+' — this genre REFUSED it, it is not a typo and not a withdrawal: '+
   REFUSED_IN[genre][kw]+
-  ' Subject vocabulary is per genre (core §3, `GENRE-VOCABULARY-OBLIGATION`), so a spelling another genre declares is that genre\'s '+
+  ' Subject vocabulary is per genre (core §1, `GENRE-VOCABULARY-OBLIGATION`), so a spelling another genre declares is that genre\'s '+
   'declaration and never this one\'s.'+REFUSED_AT;
 // `MEMBERSHIP-KEY-ACCEPTANCE`: THE OPTION-KEY HALF OF `SCENE-KEYWORD-MEMBERSHIP`. A per-genre withdrawal can
 // strand an option KEY as easily as it strands a keyword: `in=` states
@@ -1453,7 +1466,7 @@ protoless(GENRE_WITHDRAWN_OPT);
 const WITHDRAWN_OPT_FROM_GENRE=(key,genre)=>
   key+'= is not allowed in genre '+genre+' — it was WITHDRAWN from this genre, not misspelled: '+
   GENRE_WITHDRAWN_OPT[genre][key]+
-  ' An option key is per genre for the same reason a keyword is (core §3, `GENRE-VOCABULARY-OBLIGATION`): the key is accepted '+
+  ' An option key is per genre for the same reason a keyword is (core §1, `GENRE-VOCABULARY-OBLIGATION`): the key is accepted '+
   'by the directive AND by the genre, and this genre\'s acceptance was withdrawn without touching any other\'s.'+
   WITHDREW_OPT_AT;
 // `UNDELIVERED-MESSAGE-MARKING`: the OPTION-KEY half of the refusal table, and the one
@@ -1519,6 +1532,10 @@ const GENRE_KW={
 };
 protoless(GENRE_KW);
 const CHILD_KW=new Set(['field','break','cell','width','signal','gap']);
+// Every directive spelling in any genre, plus the header word: a quoted
+// token that spells one of these was meant AS the keyword.
+// Any other quoted word keeps its own not-allowed / unknown diagnostic.
+const ANY_KW=new Set(['figdown',...CHILD_KW,...Object.values(GENRE_KW).flatMap(s=>[...s])]);
 
 // Multi-section files (`MULTI-FIGURE-DOCUMENTS`): each `figdown 0.1 <genre>` starts a section.
 // Comments/blanks before the first header belong to section 0.
@@ -1615,7 +1632,8 @@ function seqModel(doc){
 //   U+0000–U+0008, U+000B, U+000C, U+000E–U+001F   C0 controls, EXCEPT
 //                                                  U+0009 tab, U+000A LF and
 //                                                  U+000D CR, which are legal
-//                                                  and stay legal
+//                                                  (CR only as the CR of a
+//                                                  CRLF; bare CR: 0.5)
 //   U+FFFE, U+FFFF                                 permanently unassigned
 //   an UNPAIRED surrogate (U+D800–U+DFFF)          not a character at all; a
 //                                                  correctly paired astral
@@ -1633,6 +1651,15 @@ function xmlIllegalErrors(text){
     for(let i=0;i<line.length;i++){
       const c=line.charCodeAt(i);
       let bad=false;
+      // A BARE CR ends no line (core §1), and XML turns it
+      // into LF inside the artifact's CDATA (XML 1.0 §2.11), so the embedded
+      // source could not be recovered. Only the CR of a CRLF is a line end.
+      if(c===0x0D){
+        if(i===line.length-1&&li<lines.length-1) continue;
+        const cp='U+000D'; if(seen.has(cp)) continue; seen.add(cp);
+        out.push('Line '+(li+1)+': illegal character U+000D — a CR not followed by LF ends no line (core §1), and XML would turn it into a line break inside the artifact, so the source could not be recovered; end lines with LF or CRLF');
+        continue;
+      }
       if(XML_ILLEGAL.test(line[i])) bad=true;
       else if(c>=0xD800&&c<=0xDBFF){            // high surrogate: needs a low one
         const n=line.charCodeAt(i+1);
@@ -1731,6 +1758,10 @@ function scanConnector(s,kw){
   kw=kw||'edge';
   let i=kw.length; // past the connector keyword
   const bad=(m)=>({ok:false,error:m});
+  // 0.5: the advice lists only operators the genre accepts;
+  // `--` is a line error under sequence (SEQ_OPERATORS), so naming it there
+  // sent the author from one error to the next.
+  const opList=()=>kw==='message'?'-> <- <->':'-> <- -- <->';
   const ws=()=>{ while(i<s.length&&/\s/.test(s[i])) i++; };
   // `LINK-OPERATOR-IN-IDS`: a hyphen is an id character only when it is NOT
   // followed by a second one, because `--` is the link operator. This is
@@ -1799,7 +1830,7 @@ function scanConnector(s,kw){
   let lh=null;
   if(s.startsWith('<-',i)){ lh='<-'; i+=2; }
   else if(s[i]==='-'){ lh='-'; i++; }
-  else return bad(kw+' needs an operator: -> <- -- <-> (a [mid] label splits it: -[x]->)');
+  else return bad(kw+' needs an operator: '+opList()+' (a [mid] label splits it: -[x]->)');
   let mid=null, op=null;
   if(s[i]==='['){
     const at=i; const r=readLbl(); if(r.error) return bad(r.error);
@@ -1812,7 +1843,7 @@ function scanConnector(s,kw){
   } else {
     if(s[i]==='-'){ op='--'; i++; }
     else if(s[i]==='>'){ op='->'; i++; }
-    else return bad(kw+' needs an operator: -> <- -- <->');
+    else return bad(kw+' needs an operator: '+opList());
   }
   sp.connector={start:opAt,end:i};
   ws(); let head=null;
@@ -1952,7 +1983,13 @@ function parseOne(text,lineBase=0){
   let sawHeader=false, firstContent=true, sawLayout=false, sawTitle=false, sawFlow=false;
   const LAYOUT_DIRECTIVES=new Set(['pin']);   // `EDGE-GEOMETRY-CONSTRUCTS`: `pin` is the whole layout namespace
   const lines=text.split('\n');
-  const err=(n,m)=>errs.push('Line '+n+': '+m);
+  // 0.5: a rejected `field` or `signal` line inside an open
+  // typed block marks the block, so its emptiness check below does not add a
+  // second, false diagnostic ("bitfield has no fields") about the very line
+  // that already failed. Only the line that would have FILLED the block
+  // counts: a stray `break` in an empty bitfield leaves "no fields" true.
+  const err=(n,m)=>{ errs.push('Line '+n+': '+m);
+    if(cur&&n>cur.line&&/^\s*(field|signal)\b/.test(lines[n-1]||'')) cur.childErr=true; };
   // `RULE-POSITION-ENUMERATION`: the typed-block openers' LABEL is a positional string
   // and takes RULE 2.1's mandatory quotes, exactly as `node`, `group`,
   // `external`, `plane`, `class` and `bundle` already do. Until now
@@ -2098,6 +2135,12 @@ function parseOne(text,lineBase=0){
       if(!SEQ_OPERATORS.has(op)){
         err(n,'message needs a direction: -> <- <-> — a Message has a sending event occurrence AND a receiving event occurrence (UML 2.5.1 §17.4.3.1 defines the LOST case as the one where the receiving occurrence is absent), so a message with unstated direction is not a thing this genre has. "--" is a line error under sequence; for a sustained two-way exchange whose individual messages are not enumerated write <->');
         return; }
+      // 0.5: the shared scanner's end positions are refused here.
+      // A UML Message has one name and no end labels (§17.4.4.1), and a
+      // message end sits on a lifeline, where a label has no room of its own.
+      if(tail!==null||head!==null){
+        err(n,'message takes no [tail] or [head] label — a UML Message has one name and no end labels (UML 2.5.1 §17.4.4.1); write the text as the message label ("…") or as note="…"');
+        return; }
       if(o2['in']!==undefined){
         const e=idErr(o2['in'], optHasQ(oT2,'in'), null);
         if(e){ err(n,e); return; }
@@ -2112,10 +2155,9 @@ function parseOne(text,lineBase=0){
       // spellings both reach this field at all is an ALIAS in `IDENTITY-ASSERTION`'s sense
       // and is a FINDING for the genre document (Batch 5) rather than a
       // ruling taken here: the draft settles the trailing form and says
-      // nothing about the brackets. `[tail]` and `[head]` are kept — they are
-      // different positions, not a second spelling of the same one.
+      // nothing about the brackets. `[tail]` and `[head]` are refused above.
       if(eid!==undefined) edgeIds.add(eid);
-      doc.messages.push({id:eid,a,b,op,tail,head,
+      doc.messages.push({id:eid,a,b,op,
                          label:seqLabel!==null?seqLabel:mid,
                          style:o2.style,cls:ecls,stroke:o2.stroke,note:o2.note,
                          desc:o2.description,in:o2['in']||null,line:n});
@@ -2139,13 +2181,13 @@ function parseOne(text,lineBase=0){
   // own enum.
   const seqCls=(opts,optT)=>opts['class']!==undefined
     ? parseClassList(opts['class'],optList(optT,'class')).ids : undefined;
-  function parseSeqDirective(kw,n,pos,posq,opts,optT){
+  function parseSeqDirective(kw,n,pos,posq,posh,opts,optT){
     if(kw==='lifeline'){
       // `lifeline <id> ["label"]` — the participant column. It DECLARES an id
       // and joins the section's id namespace, so a lifeline cannot share
       // a spelling with a fragment or an operand.
       const id=pos[1];
-      const e=idErr(id,!!posq[1],'lifeline needs <id> ["label"]');
+      const e=idErr(id,posh[1],'lifeline needs <id> ["label"]');
       if(e){ err(n,e); return; }
       if(dupId(id)||doc.lifelines.some(l=>l.id===id)){ err(n,'duplicate id "'+id+'"'); return; }
       if(BLK_LBL(n,'lifeline',id,pos,posq)) return;
@@ -2165,7 +2207,7 @@ function parseOne(text,lineBase=0){
       // else. Slot 2 is MANDATORY: a state occurrence with no name asserts
       // nothing at all.
       const ref=pos[1];
-      const e=idErr(ref,!!posq[1],'state needs <lifeline-id> "<state name>"');
+      const e=idErr(ref,posh[1],'state needs <lifeline-id> "<state name>"');
       if(e){ err(n,e); return; }
       if(pos[2]===undefined){ err(n,'state needs a quoted state name: state '+ref+' "LISTEN" — under sequence a state occurrence names the lifeline it is ON and the state it is IN, and a state with no name asserts nothing'); return; }
       if(!posq[2]){ err(n,'state name must be quoted: state '+ref+' "'+pos[2]+'" — '+Q_WHY); return; }
@@ -2181,7 +2223,7 @@ function parseOne(text,lineBase=0){
       // fragment with no interaction operator draws a box that asserts
       // nothing, and a default would make the box look like an assertion.
       const id=pos[1];
-      const e=idErr(id,!!posq[1],'fragment needs <id> ["label"] type=<operator>');
+      const e=idErr(id,posh[1],'fragment needs <id> ["label"] type=<operator>');
       if(e){ err(n,e); return; }
       if(dupId(id)||doc.fragments.some(f=>f.id===id)||doc.operands.some(o=>o.id===id)){
         err(n,'duplicate id "'+id+'"'); return; }
@@ -2203,7 +2245,7 @@ function parseOne(text,lineBase=0){
       // (§17.12.14). `in=` is MANDATORY: an operand is a COMPARTMENT OF a
       // fragment and has no meaning apart from one.
       const id=pos[1];
-      const e=idErr(id,!!posq[1],'operand needs <id> ["guard"] in=<fragment-id>');
+      const e=idErr(id,posh[1],'operand needs <id> ["guard"] in=<fragment-id>');
       if(e){ err(n,e); return; }
       if(dupId(id)||doc.fragments.some(f=>f.id===id)||doc.operands.some(o=>o.id===id)){
         err(n,'duplicate id "'+id+'"'); return; }
@@ -2299,7 +2341,7 @@ function parseOne(text,lineBase=0){
     const mConn=CONN_LINE_RE.exec(raw.trim());
     if(mConn){
       const ckw=mConn[1];
-      if(firstContent){ firstContent=false; err(n,'first line must be "figdown 0.1 <genre>"'); }
+      if(firstContent){ firstContent=false; err(n,HEADER_FIRST); }
       cur=null;
       // `CONTENT-LAYOUT-ZONE-SPLIT`: a connector is a semantic directive, and it is dispatched here —
       // before the generic layout-zone gate below — so it needs its own copy
@@ -2324,8 +2366,15 @@ function parseOne(text,lineBase=0){
     const tk=tokenize(raw.trim());
     if(tk.error){ err(n,tk.error); continue; }
     const lead=(tk.toks.length&&!tk.toks[0].q)?tk.toks[0].v:'';
-    const {pos,posq,posT,opts,optT,unk,dup}=splitOpts(tk.toks, lead==='signal');
+    const {pos,posq,posh,posT,opts,optT,unk,dup}=splitOpts(tk.toks, lead==='signal');
     const kw=pos.length?pos[0]:tk.toks[0].v;
+    // 0.5: the leading keyword is BARE (core §1). A quote anywhere in
+    // it (`"node" a`, `no"de" a`) used to be stripped silently.
+    // A quoted `figdown` on the first significant line is still read as the
+    // header (one error, below), so the genre holds and the next line is
+    // not also reported as `first line must be …`.
+    const kwQ=posT[0]===tk.toks[0]&&posh[0]&&ANY_KW.has(kw);
+    if(kwQ&&!(firstContent&&kw==='figdown')){ err(n,'a keyword is written bare: '+kw); continue; }
     // `INAPPLICABLE-OPTION-KEYS`/`UNKNOWN-OPTION-DEGRADATION`/`COLOUR-VALUE-VALIDATION`: uniform per-directive option checks —
     // unknown keys, registered-but-inapplicable keys, invalid colors.
     // Directives not in DIRECTIVE_OPTS (title's single quoted string, unknown
@@ -2464,6 +2513,7 @@ function parseOne(text,lineBase=0){
     if(firstContent){
       firstContent=false;
       if(kw==='figdown'){
+        if(kwQ) err(n,'a keyword is written bare: figdown');
         sawHeader=true;
         // `RULE-POSITION-ENUMERATION`: the version and the genre are both enum
         // positions (vocabulary-sources.tsv `figdown.version`,
@@ -2477,7 +2527,7 @@ function parseOne(text,lineBase=0){
         // wrong, once, rather than the spelling and `unknown genre` on one
         // line. So the quoting check runs first and suppresses the value
         // check for that token, exactly as `badOpts` does for `shape=`.
-        const hq1=!!posq[1], hq2=!!posq[2];
+        const hq1=!!posh[1], hq2=!!posh[2];
         // `STATECHART-GENRE-SCOPE`: the language version is now a SET, not a constant, so every
         // message that echoes a corrected header echoes the version the
         // author actually declared — an author on `0.2` must not be shown a
@@ -2531,7 +2581,7 @@ function parseOne(text,lineBase=0){
         if(pos.length>3) err(n,'unexpected argument "'+pos[3]+'"');
         badOpts('figdown');
         continue;
-      } else { err(n,'first line must be "figdown 0.1 <genre>"'); }
+      } else { err(n,HEADER_FIRST); }
     } else if(kw==='figdown'){ err(n,'duplicate version header'); continue; }
 
     // `RESERVED-PREFIX-ENFORCEMENT` (2026-08-23): CALL SITE 1 of 2 — the reserved `x-` prefix in
@@ -2627,6 +2677,7 @@ function parseOne(text,lineBase=0){
           // delimited string position, so it is quoted. The compact form's
           // names are comma-delimited and stay bare (see below).
           if(!posq[1]){ err(n,'field name must be quoted in the classic form: field "'+cname+'" '+cw+' — '+Q_WHY); continue; }
+          if(cw!=='*'&&notFinite(cw)){ err(n,NOT_FINITE(cw)); continue; }
           const fextra=pos[3];
           if(fextra==='optional'){ err(n,RETIRED_FIELD_OPTIONAL); continue; }
           if(fextra==='conditional'){ err(n,RETIRED_FIELD_CONDITIONAL); continue; }
@@ -2694,6 +2745,7 @@ function parseOne(text,lineBase=0){
           // and its options are LINE-wide, so no single item in the list can
           // say "this one is meant to span". So an over-word compact item is
           // the overflow.
+          if(m[2]!=='*' && notFinite(m[2])){ bad=NOT_FINITE(m[2]); break; }
           if(m[2]!=='*' && +m[2]>cur.word){
             // The suggestion spells the CLASSIC form, and the classic name is
             // QUOTED (`QUOTING-RULES`). Until 0.1 this string said
@@ -2754,6 +2806,7 @@ function parseOne(text,lineBase=0){
           // `pin width=0` is refused. RULE 4.4: one spelling, one value grammar.
           // A zero with a unit (`0px`) gets this error too, not the unit hint.
           let m=/^(\d+(?:\.\d+)?)(?:%|px)?$/.exec(v);
+          if(m && notFinite(m[1])){ badw=NOT_FINITE(m[1]); return null; }
           if(m && !(+m[1]>0)){ badw='bad width "'+v+'" — a column needs a positive width (auto | <px> | <n>%)'; return null; }
           m=/^(\d+(?:\.\d+)?)$/.exec(v);
           if(m) return {t:'px',v:+m[1]};
@@ -2781,15 +2834,16 @@ function parseOne(text,lineBase=0){
         // (vocabulary-sources.tsv `cell.highlight`), so RULE 2.4 governs it
         // exactly as it governs an enum value: `cell 1 "highlight"` used to
         // be accepted and set the row mark. The index is found first so the
-        // quotedness can be read off `posq` at the SAME index.
+        // quotedness can be read off `posh` at the SAME index.
         const hli=pos.indexOf('highlight');
-        if(hli>0&&posq[hli]){ err(n,ENUM_BARE('cell '+pos[1]+' highlight')); continue; }
+        if(hli>0&&posh[hli]){ err(n,ENUM_BARE('cell '+pos[1]+' highlight')); continue; }
         const hl=hli>0;
         const cextra=pos.slice(2).find(x=>x!=='highlight');
         if(cextra!==undefined){ err(n,'unexpected argument "'+cextra+'"'); continue; }
         // any §5 presentation attribute is annotation enough to address a cell
         const cpres=opts.fill!==undefined||opts.stroke!==undefined;
         if(!rc||(!cpres&&!opts['class']&&!hl)){ err(n,'cell needs [h]<row>[,<col>] with fill=…/class=… or highlight'); continue; }
+        { const big=[rc[2],rc[3]].find(x=>x!==undefined&&notFinite(x)); if(big){ err(n,NOT_FINITE(big)); continue; } }
         if(!rc[1]&&+rc[2]===0){ err(n,'row 0 is retired — address header tiers as h1..hN (top-down)'); continue; }
         // `ROW-HIGHLIGHT-CELL-FILL-COLLISION`: `highlight` is a ROW mark, `fill=` is a CELL
         // mark, and both paint the SAME channel — the cell interior. Written
@@ -2806,6 +2860,12 @@ function parseOne(text,lineBase=0){
           cur.rowmarks.push({r:+rc[2],line:n});
         } else if(rc[3]!==undefined&&(cpres||opts['class'])){
           cur.marks=cur.marks||[];
+          // One cell, one mark line: a second line for the
+          // same cell used to be dropped at paint time, where the first
+          // mark won and the second's options vanished without a word. As
+          // with `duplicate width`, the second line is the error.
+          const dupMk=cur.marks.find(m=>m.hdr===!!rc[1]&&m.r===+rc[2]&&m.c===+rc[3]);
+          if(dupMk){ err(n,'duplicate mark for cell ('+rc[1]+rc[2]+','+rc[3]+') — first on line '+dupMk.line+'; write all its options on that one line'); continue; }
           cur.marks.push({hdr:!!rc[1],r:+rc[2],c:+rc[3],fill:opts.fill,stroke:opts.stroke,
                           cls:parseClassList(opts['class'],optList(optT,'class')).ids,line:n});
         } else { err(n,'cell needs [h]<row>,<col> fill=…/class=… or <row> highlight'); }
@@ -2928,7 +2988,7 @@ function parseOne(text,lineBase=0){
     // keeps `state` reaching `statechart`'s node parser under `statechart` —
     // `GENRE-VOCABULARY-OBLIGATION` in the dispatcher, not only in the allowlist.
     if(doc.genre==='sequence' && SEQ_KW.has(kw)){
-      parseSeqDirective(kw,n,pos,posq,opts,optT); continue; }
+      parseSeqDirective(kw,n,pos,posq,posh,opts,optT); continue; }
 
     switch(kw){
       case 'title': {
@@ -2966,7 +3026,7 @@ function parseOne(text,lineBase=0){
         // semantic class (`CATEGORICAL-MEANING-MAPPING`): meaning + presentation defaults declared
         // once; elements join via class=<id>; the legend strip derives
         const id=pos[1];
-        { const e=idErr(id,posq[1],'class needs an id'); if(e){ err(n,e); break; } }
+        { const e=idErr(id,posh[1],'class needs an id'); if(e){ err(n,e); break; } }
         if(classIds.has(id)){ err(n,'duplicate class "'+id+'"'); break; }
         // 0.1 (`CLASS-EMPTY-MEANING`): the meaning field is syntactically MANDATORY and
         // its value may be EMPTY — the language's own absent/""/"text"
@@ -3013,7 +3073,7 @@ function parseOne(text,lineBase=0){
       case 'node': {
         const role=(kw==='node'||kw==='state')?null:kw;
         const id=pos[1];
-        { const e=idErr(id,posq[1],kw+' needs an id'); if(e){ err(n,e); break; } }
+        { const e=idErr(id,posh[1],kw+' needs an id'); if(e){ err(n,e); break; } }
         if(dupId(id)){ err(n,'duplicate id "'+id+'"'); break; }
         if(opts.width!==undefined||opts.height!==undefined){ err(n,kw+' does not take width=/height= — use a pin line'); break; }
         // Geometry is DERIVED from the role, and `shape=` overrides the
@@ -3038,7 +3098,7 @@ function parseOne(text,lineBase=0){
       }
       case 'group': {
         const id=pos[1];
-        { const e=idErr(id,posq[1],'group needs an id'); if(e){ err(n,e); break; } }
+        { const e=idErr(id,posh[1],'group needs an id'); if(e){ err(n,e); break; } }
         if(dupId(id)){ err(n,'duplicate id "'+id+'"'); break; }
         if(pos[2]!==undefined&&!posq[2]){ err(n,'group label must be quoted: group '+id+' "'+pos[2]+'" — '+Q_WHY); break; }
         if(pos.length>3){ err(n,'unexpected argument "'+pos[3]+'"'); break; }
@@ -3048,7 +3108,8 @@ function parseOne(text,lineBase=0){
           // the numeric-value rule: exact number grammar (non-negative, including 0 for flush)
           if(!/^\d+(\.\d+)?$/.test(opts.gap)){ err(n,'gap must be a non-negative number'); break; }
           ggap=parseFloat(opts.gap);
-          if(!isFinite(ggap)||ggap<0){ err(n,'gap must be a non-negative number'); break; }
+          if(!isFinite(ggap)){ err(n,NOT_FINITE(opts.gap)); break; }
+          if(ggap<0){ err(n,'gap must be a non-negative number'); break; }
         }
         doc.groups.push({id,label:pos[2]!==undefined?pos[2]:null,fill:opts.fill,stroke:opts.stroke,
                          style:opts.style,gap:ggap,cls:parseClassList(opts['class'],optList(optT,'class')).ids,
@@ -3070,7 +3131,7 @@ function parseOne(text,lineBase=0){
         // BPMN's is an event), and this spec's own prose had already stopped
         // using it — §2.8 says "declares an external I/O endpoint".
         const id=pos[1];
-        { const e=idErr(id,posq[1],'external needs an id'); if(e){ err(n,e); break; } }
+        { const e=idErr(id,posh[1],'external needs an id'); if(e){ err(n,e); break; } }
         if(dupId(id)){ err(n,'duplicate id "'+id+'"'); break; }
         if(pos[2]!==undefined&&!posq[2]){ err(n,'external label must be quoted: external '+id+' "'+pos[2]+'" — '+Q_WHY); break; }
         if(pos.length>3){ err(n,'unexpected argument "'+pos[3]+'"'); break; }
@@ -3084,7 +3145,7 @@ function parseOne(text,lineBase=0){
       case 'flow': {
         if(sawFlow){ err(n,'duplicate flow directive'); break; }
         // `RULE-POSITION-ENUMERATION`: `flow.direction` is an enum position — bare.
-        if(posq[1]){ err(n,ENUM_BARE('flow '+pos[1])); break; }
+        if(posh[1]){ err(n,ENUM_BARE('flow '+pos[1])); break; }
         if(!['right','down','left','up'].includes(pos[1])){ err(n,'flow needs right|down|left|up'); break; }
         if(pos.length>2){ err(n,'unexpected argument "'+pos[2]+'"'); break; }
         doc.flow=pos[1]; sawFlow=true; break;
@@ -3131,7 +3192,7 @@ function parseOne(text,lineBase=0){
         // semantic link bundle (LAG / Ethernet Segment): the renderer draws
         // the dashed ellipse around the member links automatically
         const id=pos[1];
-        { const e=idErr(id,posq[1],'bundle needs an id'); if(e){ err(n,e); break; } }
+        { const e=idErr(id,posh[1],'bundle needs an id'); if(e){ err(n,e); break; } }
         if(bundleIds.has(id)){ err(n,'duplicate bundle id "'+id+'"'); break; }
         // `OPTION-POSITION-PARSING`: quotedness is tested `pos`-aligned (posq), so an option may
         // precede the label exactly as it may on node/group/class/plane.
@@ -3174,7 +3235,11 @@ function parseOne(text,lineBase=0){
         outerB:
         for(const t of restT){
           for(const s of splitList(t,0)){
-            const mem=s.v.trim(); if(!mem) continue;
+            const mem=s.v.trim();
+            // 0.5: an empty member is an error, as in rank and
+            // class=; `e1,,e2` and a stray leading or trailing comma were
+            // dropped silently, the one comma list that forgave them.
+            if(!mem){ badp='bundle members must not be empty (write bundle '+id+(tlabel===null?'':' "'+tlabel+'"')+' a--b,c--d)'; break outerB; }
             if(s.h){ badp=ID_RULE; break outerB; }
             if(!mem.includes('--')){
               // A bare token. Under figdown 0.4 and below there is no id form,
@@ -3254,7 +3319,7 @@ function parseOne(text,lineBase=0){
         // breaking the otherwise-uniform \d+(\.\d+)? numeric grammar. The
         // retirement message lives in RETIRED_OPT_KEYS.
         const tid=pos[1];
-        { const e=idErr(tid,posq[1],'chart needs a table id'); if(e){ err(n,e); break; } }
+        { const e=idErr(tid,posh[1],'chart needs a table id'); if(e){ err(n,e); break; } }
         if(pos.length>2){ err(n,'unexpected argument "'+pos[2]+'"'); break; }
         const ptype=opts.type||'bar3d';
         if(ptype!=='bar3d'){ err(n,'unknown chart type "'+ptype+'" (bar3d)'); break; }
@@ -3327,7 +3392,7 @@ function parseOne(text,lineBase=0){
         // the numeric-value rule: value grammar is exactly -?\d+(\.\d+)? per component —
         // no scientific notation, no trailing junk, no multi-dot.
         // Negative values stay legal (canvas can place off-origin).
-        { const e=idErr(id,posq[1],null); if(e){ err(n,e); break; } }
+        { const e=idErr(id,posh[1],null); if(e){ err(n,e); break; } }
         if(!id){ err(n,PIN_SHAPE); break; }
         // 0.1 (RULE 1.1a): the pair is PARENTHESISED — at=(x,y).
         if(at!==undefined&&/^-?\d+(?:\.\d+)?,-?\d+(?:\.\d+)?$/.test(at)){
@@ -3337,6 +3402,7 @@ function parseOne(text,lineBase=0){
         // whole-line shape message: the author declared a point and got the
         // point wrong, and telling them the line "needs an id" hides that.
         if(at!==undefined&&!m){ err(n,'pin at= needs a paren point: at=(<x>,<y>)'); break; }
+        if(m&&(notFinite(m[1])||notFinite(m[2]))){ err(n,NOT_FINITE(notFinite(m[1])?m[1]:m[2])); break; }
         let badsz=false;
         const dim=(k)=>{                       // px only (`NON-NUMERIC-EXTENT`/`PERCENT-VALUES-LOST`)
           const v=opts[k]; if(v===undefined) return null;
@@ -3354,7 +3420,8 @@ function parseOne(text,lineBase=0){
           // keeps negatives; an extent is a box dimension and must be positive.
           if(!/^\d+(\.\d+)?$/.test(v)){ err(n,k+' must be a positive number (px)'); badsz=true; return null; }
           const f=parseFloat(v);
-          if(!isFinite(f)||f<=0){ err(n,k+' must be a positive number (px)'); badsz=true; return null; }
+          if(!isFinite(f)){ err(n,NOT_FINITE(v)); badsz=true; return null; }
+          if(f<=0){ err(n,k+' must be a positive number (px)'); badsz=true; return null; }
           return f;
         };
         const w=dim('width'), h=dim('height');
@@ -3376,7 +3443,7 @@ function parseOne(text,lineBase=0){
       }
       case 'bitfield': {
         const id=pos[1];
-        { const e=idErr(id,posq[1],'bitfield needs an id'); if(e){ err(n,e); break; } }
+        { const e=idErr(id,posh[1],'bitfield needs an id'); if(e){ err(n,e); break; } }
         if(dupId(id)){ err(n,'duplicate id "'+id+'"'); break; }
         if(BLK_LBL(n,kw,id,pos,posq)) break;
         if(pos.length>3){ err(n,'unexpected argument "'+pos[3]+'"'); break; }
@@ -3388,7 +3455,8 @@ function parseOne(text,lineBase=0){
         // Spelled `unit=` until 0.1 (`BITS-PER-ROW-KEY-NAMING`).
         let word=32;
         if(opts.word!==undefined){
-          if(opts.word===''||!/^\d+$/.test(opts.word)||+opts.word<1){
+          if(/^\d+$/.test(opts.word)&&notFinite(opts.word)){ err(n,NOT_FINITE(opts.word)); word=32; }
+          else if(opts.word===''||!/^\d+$/.test(opts.word)||+opts.word<1){
             err(n,'word must be a positive integer');
             word=32; // keep a usable value so field lines still check
           } else word=+opts.word;
@@ -3411,7 +3479,7 @@ function parseOne(text,lineBase=0){
       }
       case 'table': {
         const id=pos[1];
-        { const e=idErr(id,posq[1],'table needs an id'); if(e){ err(n,e); break; } }
+        { const e=idErr(id,posh[1],'table needs an id'); if(e){ err(n,e); break; } }
         if(dupId(id)){ err(n,'duplicate id "'+id+'"'); break; }
         if(BLK_LBL(n,kw,id,pos,posq)) break;
         if(pos.length>3){ err(n,'unexpected argument "'+pos[3]+'"'); break; }
@@ -3423,7 +3491,7 @@ function parseOne(text,lineBase=0){
       }
       case 'timing': {
         const id=pos[1];
-        { const e=idErr(id,posq[1],'timing needs an id'); if(e){ err(n,e); break; } }
+        { const e=idErr(id,posh[1],'timing needs an id'); if(e){ err(n,e); break; } }
         if(dupId(id)){ err(n,'duplicate id "'+id+'"'); break; }
         if(BLK_LBL(n,kw,id,pos,posq)) break;
         if(pos.length>3){ err(n,'unexpected argument "'+pos[3]+'"'); break; }
@@ -3481,7 +3549,7 @@ function parseOne(text,lineBase=0){
       errs.push('Line '+line+': unknown fragment or operand "'+val+'" — in= on a '+what+
         ' names the fragment or operand this '+what+' occurs inside'+
         (llIds.has(val)?', and "'+val+'" is a LIFELINE. A message already names its lifelines through its two endpoints; a state names its lifeline in slot 1. in= is containment, not participation':'')+
-        '. Under sequence in= is accepted on '+IN_ACCEPTORS+' — five acceptors, all sense 1 (UML 2.5.1 §17.12.13: a StateInvariant and a CombinedFragment are both InteractionFragments, so an InteractionOperand contains them both) — and its value is always a fragment or an operand id (draft §33.7)');
+        '. Under sequence in= is accepted on '+IN_ACCEPTORS+' — five acceptors, all sense 1 (UML 2.5.1 §17.12.13: a StateInvariant and a CombinedFragment are both InteractionFragments, so an InteractionOperand contains them both) — and its value is always a fragment or an operand id (sequence.md, "in= — five acceptors")');
     };
     for(const l of doc.lifelines) if(l['in']) inErr(l.line,l['in'],'lifeline');
     for(const m of doc.messages){
@@ -3551,7 +3619,7 @@ function parseOne(text,lineBase=0){
       for(const sc of chain){ const r=seen[sc]; if(r&&(!prev||r.line>prev.line)) prev=r; }
       if(prev&&prev.name===st.name)
         errs.push('Line '+st.line+': lifeline "'+st.ref+'" is already in state "'+st.name+
-          '" — a state that has not changed is never restated, and a transition is derived from the adjacent pair, so a restatement would assert a transition that did not happen (draft §23.2)'+
+          '" — a state that has not changed is never restated, and a transition is derived from the adjacent pair, so a restatement would assert a transition that did not happen (sequence.md, "state here is NOT statechart\'s state")'+
           (doc.operands.length?'. Occurrences in DIFFERENT operands of one fragment are exclusive and do not restate each other; this pair is not that':''));
       seen[chain[0]]={name:st.name,line:st.line};
     }
@@ -3572,7 +3640,7 @@ function parseOne(text,lineBase=0){
         const anc=SM.chain(f['in']).filter(id=>SM.cont[id].kind==='fragment');
         if(anc.length>1)
           errs.push('Line '+f.line+': fragment "'+f.id+'" nests '+anc.length+
-            ' levels deep (inside "'+anc[0]+'", inside "'+anc[anc.length-1]+'") — fragment nesting is capped at ONE level in v1: a fragment may sit in an operand of one enclosing fragment and no deeper. This is the v0.1 `group` precedent, where one level is the whole of the language\'s containment, and it is a scope decision rather than a principle — a second level lands on measured need (draft §33.7). Write the inner interaction as a sibling fragment, or state it in description=');
+            ' levels deep (inside "'+anc[0]+'", inside "'+anc[anc.length-1]+'") — fragment nesting is capped at ONE level in v1: a fragment may sit in an operand of one enclosing fragment and no deeper. This is the v0.1 `group` precedent, where one level is the whole of the language\'s containment, and it is a scope decision rather than a principle — a second level lands on measured need (sequence.md, "Nesting is capped at ONE level"). Write the inner interaction as a sibling fragment, or state it in description=');
       }
       // CONTIGUITY (draft §28.1). A fragment's or operand's members must be a
       // CONTIGUOUS run in declaration order, and the reason is the MODEL and
@@ -3606,7 +3674,7 @@ function parseOne(text,lineBase=0){
       for(const [s,id] of [...split.entries()].sort((a,b)=>a[0]-b[0])){
         const r=SM.rows[s], e=SM.extent[id];
         errs.push('Line '+r.line+': this '+r.kind+' line splits '+SM.cont[id].kind+' "'+id+
-          '" (lines '+(SM.rows[e.lo].line+lineBase)+'–'+(SM.rows[e.hi].line+lineBase)+') — members must be CONTIGUOUS in declaration order. An operand denotes the ordered run of the occurrences it contains, so an occurrence that is not in it cannot happen between two that are (UML 2.5.1 §17.6; draft §28.1). Write in='+id+' on it, or move it outside the run');
+          '" (lines '+(SM.rows[e.lo].line+lineBase)+'–'+(SM.rows[e.hi].line+lineBase)+') — members must be CONTIGUOUS in declaration order. An operand denotes the ordered run of the occurrences it contains, so an occurrence that is not in it cannot happen between two that are (UML 2.5.1 §17.6; sequence.md, "in= — five acceptors"). Write in='+id+' on it, or move it outside the run');
       }
     }
   }
@@ -3906,8 +3974,8 @@ function parseOne(text,lineBase=0){
   for(const b of doc.blocks){
     if(b.type==='table'&&!b.heads.length) errs.push('Line '+b.line+': table has no header row');
     if(b.type==='table'&&b.heads.length&&!b.sep) errs.push('Line '+b.line+': table has no |---| delimiter row');
-    if(b.type==='bitfield'&&!b.fields.some(f=>!f.wrap)) errs.push('Line '+b.line+': bitfield has no fields');
-    if(b.type==='timing'&&!b.signals.length) errs.push('Line '+b.line+': timing has no signals');
+    if(b.type==='bitfield'&&!b.childErr&&!b.fields.some(f=>!f.wrap)) errs.push('Line '+b.line+': bitfield has no fields');
+    if(b.type==='timing'&&!b.childErr&&!b.signals.length) errs.push('Line '+b.line+': timing has no signals');
     // `TYPED-BLOCK-SILENT-FALLBACK`: gap cycle must be an integer in [0, max lane length]; duplicates
     // already rejected at parse. Range needs all signals, so it runs here.
     if(b.type==='timing'&&b.gaps&&b.gaps.length){
@@ -3964,6 +4032,8 @@ function parseOne(text,lineBase=0){
         for(const r of t.rows) for(let c=1;c<r.cells.length;c++)
           if(!r.cells[c].m && !/^-?\d+(?:\.\d+)?$/.test(r.cells[c].v))
             { errs.push('Line '+b.line+': chart data must be numeric (row value "'+r.cells[c].v+'")'); break; }
+          else if(!r.cells[c].m && !isFinite(parseFloat(r.cells[c].v)))
+            { errs.push('Line '+b.line+': '+NOT_FINITE(r.cells[c].v)); break; }
       }
     }
     if(b.type==='table'&&b.width&&b.width.vals.length!==b.cols.length)
@@ -4004,6 +4074,12 @@ function parseOne(text,lineBase=0){
   for(const x of (doc.boundaries||[]).concat(doc.trunks||[], doc.thresholds||[],
                                              doc.bands||[], doc.classes||[]))
     if(x.plane && !planeIds.has(x.plane)) errs.push('Line '+x.line+': unknown plane "'+x.plane+'"');
+  // §1: the header is REQUIRED. Every other line answers the
+  // missing header the moment it is met, so the gap was a text with no
+  // significant line at all: empty, blank or comments only, which drew an
+  // empty figure with 0 errors. That includes a CR-only file that opens with
+  // a comment, which is one comment line (§1: a bare CR ends no line).
+  if(firstContent) errs.push('Line 1: missing header — '+HEADER_FIRST+' (comment and blank lines may precede it)');
   return {doc,errs};
 }
 
@@ -4021,8 +4097,13 @@ function stackSectionSvgs(results){
     maxW=Math.max(maxW,W);
     let inner=svg.replace(/^[\s\S]*?<svg[^>]*>/,'').replace(/<\/svg>\s*$/,'');
     const pfx='s'+i+'_';
+    // A reference is rewritten only where it IS one: the value of a
+    // presentation attribute that takes a url(). The old
+    // global replace rewrote author text too — a label "see url(#x) here"
+    // in a two-section document drew "see url(#s0_x) here".
     inner=inner.replace(/\bid="([^"]+)"/g,'id="'+pfx+'$1"')
-               .replace(/url\(#([^)]+)\)/g,'url(#'+pfx+'$1)');
+               .replace(/\b(fill|stroke|filter|clip-path|mask|marker-start|marker-mid|marker-end)="url\(#([^)"]+)\)"/g,
+                        '$1="url(#'+pfx+'$2)"');
     chunks.push('<g transform="translate(0,'+y+')">'+inner+'</g>');
     y+=H+(i+1<results.length?GAP:0);
   }
@@ -4943,8 +5024,7 @@ function render(doc,ropts){
   const PADL=18, PADT=6;
   const W=Math.ceil(maxW)+PADL+8, H=Math.ceil(y)+PADT+4;
   return {svg:'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 '+W+' '+H+'" width="'+W+'" height="'+H+'" font-family="system-ui,sans-serif">'
-    +'<defs><marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">'
-    +'<path d="M0,0 L10,5 L0,10 z" fill="#555"/></marker>'
+    +'<defs>'
     +'<pattern id="hatch" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">'
     +'<line x1="0" y1="0" x2="0" y2="6" stroke="#bbb" stroke-width="2"/></pattern></defs>'
     +'<g transform="translate('+PADL+','+PADT+')">'+parts.join('')+'</g></svg>', w:W, h:H,
@@ -4952,8 +5032,17 @@ function render(doc,ropts){
 }
 
 // ---- scene ----
-function renderScene(doc,y0){
+function renderScene(doc,y0,extra){
   const nodes=doc.nodes.map(n=>({...n}));
+  // THE LABEL MARGIN. The canvas grows right and down only, and
+  // the label pass runs last, so an edge label or bundle caption placed above
+  // the section or left of x=2 was clipped (a five-line label under `flow
+  // right` lost 41% of its box). Such a scene is drawn ONCE more with the
+  // whole scene shifted by the overshoot — the corridor margin's own
+  // uniform-shift mechanism (`lShift`/`tShift`, reported through
+  // `meta.left`/`meta.top`), so relative geometry and pins are preserved.
+  let lblMinX=Infinity, lblMinY=Infinity;
+  const lblSeen=(x,y)=>{ lblMinX=Math.min(lblMinX,x); lblMinY=Math.min(lblMinY,y); };
   // Band padding around a group's members — the ONE place it is written. The
   // contiguity pass and the drawn rect must agree to the pixel: a pass that
   // separates against a slightly different rectangle from the one painted is a
@@ -5655,10 +5744,16 @@ function renderScene(doc,y0){
         // width; under horizontal flow it sits beside a vertical stroke and
         // the gap must hold its lines. Without this a long label was written
         // over both boxes (a 56 px gap under a 185 px label).
-        let elbl=0;
-        for(const e of doc.edges) if(e.mid&&((e.a===A.id&&e.b===B.id)||(e.a===B.id&&e.b===A.id)))
+        let elbl=0, hl=0, hn=0;
+        for(const e of doc.edges) if(e.mid&&((e.a===A.id&&e.b===B.id)||(e.a===B.id&&e.b===A.id))){
+          if(horiz){ hl+=String(e.mid).split('\n').length; hn++; }
           elbl=Math.max(elbl, horiz?String(e.mid).split('\n').length*EPL_H+2*EPL_PAD
-                                   :lblW(e.mid)+2*LASSO_CLEAR);
+                                   :lblW(e.mid)+2*LASSO_CLEAR); }
+        // 0.5: under horizontal flow THREE or more labelled links
+        // between the pair take slots along this run (see parSlot), so the
+        // gap holds every label line of them. One or two sit on either side
+        // of their strokes and keep the one-label gap.
+        if(hn>=3) elbl=Math.max(elbl, hl*EPL_H+(hn+1)*EPL_PAD);
         const d=Math.max(bandGap, lasso?lasso+guard:0, elbl)-actual;
         if(d<=0) continue;
         const from=cLo(B);
@@ -5865,8 +5960,11 @@ function renderScene(doc,y0){
   // splits the fix in two:
   //
   //   the ENGINE chose it — auto-layout had freedom, so the engine MUST place
-  //     the members contiguously and the situation cannot arise. It is fixed
-  //     here, silently, at no cost to the author.
+  //     the members contiguously, and it is fixed here, silently, at no cost
+  //     to the author — WITHIN a rank. Members on different ranks with a
+  //     non-member between them can still be unseparable; that residue is
+  //     refused below with a `rank` line as the fix until
+  //     group-aware rank assignment lands (engine-backlog item 32).
   //   the AUTHOR chose it — a `pin` fixed the intruder (or fixed the members
   //     whose extent IS the band) and the engine has no freedom left. It then
   //     reports, naming the pin line, and the artifact is not written. The
@@ -6007,7 +6105,23 @@ function renderScene(doc,y0){
         return mov.some(a=>lay.some(m=>!m.virtual&&!ms.has(m)&&m.rank===a.rank
           &&cLo(m)<cLo(a)+cSz(a)+d&&cLo(m)+cSz(m)>cLo(a)+d)); };
       const pref=(Math.abs(dNeg)<=Math.abs(dPos)&&dNegOK)?dNeg:dPos, alt=pref===dNeg?dPos:dNeg;
-      const d=(lands(pref)&&!lands(alt)&&(alt===dPos||dNegOK))?alt:pref;
+      let d=(lands(pref)&&!lands(alt)&&(alt===dPos||dNegOK))?alt:pref;
+      // A POSITIVE PUSH THAT LANDS GOES FURTHER. The
+      // positive side has no edge — the canvas grows that way — so a mover
+      // that would land on a node that stays is pushed on past it instead of
+      // being left on top of it. Two intruders of one band were the measured
+      // case: the first landed on the second, the second then carried the
+      // first, and the figure was refused as "completely over" (flow
+      // down/up) or drawn overlapping (right/left).
+      if(d>0) for(let k=0;k<lay.length&&lands(d);k++){
+        const mov=unit.concat(carried(d)).filter(m=>!m.virtual), ms=new Set(mov);
+        let nd=d;
+        for(const a of mov) for(const m of lay)
+          if(!m.virtual&&!ms.has(m)&&m.rank===a.rank&&cLo(m)<cLo(a)+cSz(a)+d&&cLo(m)+cSz(m)>cLo(a)+d)
+            nd=Math.max(nd,cLo(m)+cSz(m)+SEP-cLo(a));
+        if(nd===d) break;
+        d=nd;
+      }
       for(const m of carried(d)) mv(m,d);
       for(const n of unit) mv(n,d);
     };
@@ -6103,10 +6217,19 @@ function renderScene(doc,y0){
       // figure gets refused for a ring that was never drawn.
       if(c.t) continue;
       if(said.has(c.g.id+' '+c.n.id)) continue;
+      // 0.5: auto-layout keeps a group's members together only
+      // WITHIN a rank, so members on different ranks can still enclose a
+      // non-member between them (engine-backlog item 32). Until that lands
+      // the refusal names the one-line fix that was measured to clear it
+      // (24/24 random refusals): hold the members in one rank. It is offered
+      // only when the members do span ranks and none is pinned.
+      const gm=memOf(c.g.id);
+      const rankFix=gm.length>1&&!gm.some(m=>pinned(m.id))&&new Set(gm.map(m=>m.rank)).size>1
+        ? ', or hold the group\'s members in one rank: rank '+gm.map(m=>m.id).join(',') : '';
       gErrs.push('Line '+srcLine(c.g.line)+': group "'+c.g.id+'" would enclose non-member "'
         +c.n.id+'" and the layout pass could not separate them; the figure is not drawn rather '
-        +'than drawn wrongly. Give "'+c.n.id+'" a pin outside the group, or add it with in='
-        +c.g.id+'.');
+        +'than drawn wrongly. Give "'+c.n.id+'" a pin outside the group, add it with in='
+        +c.g.id+rankFix+'.');
     }
   }
   // Pass 3: an unpinned group has no anchor of its own; its display origin
@@ -6796,6 +6919,7 @@ function renderScene(doc,y0){
       if(horiz) tShift=Math.max(0,(y0+26)-minC);
       else      lShift=Math.max(0,6-minC);
     }
+    if(extra){ lShift+=extra.x; tShift+=extra.y; }
     if(lShift||tShift){
       for(const n of lay){ n.x+=lShift; n.y+=tShift; }
       for(const k in gOrigin){ gOrigin[k].x+=lShift; gOrigin[k].y+=tShift; }
@@ -7027,7 +7151,7 @@ function renderScene(doc,y0){
   // arrowTri: explicit triangle painted in lblsvg (above nodes) instead of
   // SVG marker-end/marker-start which are occluded by the node fill.
   // tip=[x,y], from=[x,y] is the adjacent shaft point toward the interior
-  // (direction: from→tip). Geometry matches #arr marker (viewBox 0 0 10 10,
+  // (direction: from→tip). Geometry follows the former #arr marker (dropped 0.5; viewBox 0 0 10 10,
   // refX=9, refY=5, markerWidth=7, markerHeight=7, markerUnits=strokeWidth=1.6):
   //   arm = 9*(7/10)*1.6 ≈ 10.08 px, half-width = 5*(7/10)*1.6 ≈ 5.6 px.
   // Which edge is currently drawing, and which `lblsvg` slots its arrowheads
@@ -7914,16 +8038,19 @@ function renderScene(doc,y0){
   // default parameters (0.5, 0.38, 0.62, 0.28, 0.72) span only the middle 44 %
   // of the run, so five labels were stacked 4 to 10 px apart in it; the seam
   // pass above makes the run long enough to hold one line per slot. One or two
-  // labels keep the default set of positions. Vertical flow only,
-  // as the seam demand is: under horizontal flow the labels sit side by side
-  // across the run, and slotting them there scored worse on conformance 252.
+  // labels keep the default set of positions. Under horizontal flow a pair
+  // on two ranks is NOT slotted: its labels sit side by side across the run,
+  // and slotting them scored worse on conformance 252.
   const parSlot=new Map();
-  if(!horiz){ const per=Object.create(null);
+  { const per=Object.create(null);
     for(const e of doc.edges){ if(!e.mid||e.a===e.b) continue;
-      // Only a pair on two ranks: a same-rank run is across the flow, the
-      // seam pass gave it no room, and slots there stacked the labels.
+      // Slots go where the pass above made room along the run: under
+      // vertical flow a pair on two ranks (the seam), under horizontal flow
+      // a pair in one rank (the cross-axis gap). The other
+      // pairings run across the room, and slots there stacked the labels.
       const A=byId[e.a],B=byId[e.b];
-      if(!A||!B||A.rank===undefined||B.rank===undefined||A.rank===B.rank) continue;
+      if(!A||!B||A.rank===undefined||B.rank===undefined) continue;
+      if(horiz ? A.rank!==B.rank : A.rank===B.rank) continue;
       const k=e.a<e.b?e.a+'\u0000'+e.b:e.b+'\u0000'+e.a; (per[k]||(per[k]=[])).push(e); }
     for(const k in per){ const g=per[k]; if(g.length<3) continue;
       const lo=k.split('\u0000')[0];
@@ -8696,7 +8823,10 @@ function renderScene(doc,y0){
         // kept only as the last resort, behind every position that is on the
         // page at all, and behind the affinity filter for the same reason.
         // The LEFT margin only, which is the margin this pass has always
-        // judged. The top is left alone deliberately: the two corridor labels
+        // judged. (Whatever still lands past the left or the top is caught
+        // after the pass: renderScene draws the scene once more, shifted by
+        // the overshoot — 0.5, the label margin.) The top is left out
+        // of THIS filter deliberately: the two corridor labels
         // `statechart/dhcp-client` parks above its top rank sit at the canvas
         // origin BY DESIGN (the return rows run above the figure and the
         // scene is shifted down to make room), and filtering on `y` pushed
@@ -8775,6 +8905,7 @@ function renderScene(doc,y0){
         leadTo(best.sq.x+best.sq.w/2, best.sq.y+best.sq.h/2);
       }
       placed.push(Object.assign({text:r0.text},best.box));
+      lblSeen(best.box.x,best.box.y);
       W=Math.max(W, best.box.x+best.box.w+4);
       Hh=Math.max(Hh, best.box.y+best.box.h+4-y0-20);
     }
@@ -8860,6 +8991,7 @@ function renderScene(doc,y0){
         ringLeads.push([p,q,t]);
       }
       placed.push({text:t.label, x:best.cb.x, y:best.cb.y, w, h});
+      lblSeen(best.cb.x,best.cb.y);
       best.tx=best.cb.x+w/2; best.ty=best.cb.y+up;
       W=Math.max(W, best.cb.x+w+4);
       Hh=Math.max(Hh, best.cb.y+h+4-y0-20);
@@ -9314,9 +9446,12 @@ function renderScene(doc,y0){
                     W=Math.max(W,cx+12+lblPx(n.label)); }
         else lblsvg.push(textEl(cx-10,cy+3.5,10,'end',bcol,n.label,bhalo));
       } else if(bdy>=0){
+        // 0.5: a centred label widens the canvas too, as the
+        // right-pointing one above always did.
         lblsvg.push(textEl(cx,cy+17,10,'middle',bcol,n.label,bhalo));
-        Hh=Math.max(Hh,cy+21-y0-20);
-      } else lblsvg.push(textEl(cx,cy-10,10,'middle',bcol,n.label,bhalo));
+        Hh=Math.max(Hh,cy+21-y0-20); W=Math.max(W,cx+lblPx(n.label)/2+2);
+      } else { lblsvg.push(textEl(cx,cy-10,10,'middle',bcol,n.label,bhalo));
+        W=Math.max(W,cx+lblPx(n.label)/2+2); }
       continue;
     }
     nsvg.push('<g data-node="'+n.id+'" data-x="'+n.x+'" data-y="'+n.y+'"'
@@ -9491,6 +9626,10 @@ function renderScene(doc,y0){
     tsvg.push(textEl(tx, ty, 11, anchor, labelInk(f.fill,'#334155'), f.label,
                      ' paint-order="stroke" stroke="#fff" stroke-width="3"'));
   }
+  // Only a box actually past an edge moves the scene: one that merely sits
+  // near it is on the page, and shifting for it would move every connector.
+  if(!extra&&(lblMinX<0||lblMinY<y0))
+    return renderScene(doc,y0,{x:Math.max(0,Math.ceil(-lblMinX)),y:Math.max(0,Math.ceil(y0-lblMinY))});
   const yEnd=y0+20+Hh+10;
   return {svg:gsvg.join('')+esvg.join('')+nsvg.join('')+tsvg.join('')+sqsvg.join('')+lblsvg.join(''), y:yEnd, w:W+2,
           meta:{W:W, top:y0+20+chShift+tShift, Hh:Hh, left:bShift+lShift}, errs:gErrs};
@@ -9712,11 +9851,19 @@ function renderSequence(doc,y0){
   const depth=(id)=>M.chain(id).length-1;
 
   // ── geometry constants (CHOSEN, `DOMAIN-CONVENTION-DIRECTIVES`) ────────────────────────────────────
-  const HEAD_H=32, HEAD_PADX=13, HEAD_MINW=76;
+  // 0.5: every box that holds an author label is sized for its
+  // LINE COUNT, not for one line. A `\n` in a head, state, fragment caption,
+  // operand guard or message label used to overrun its box or the arrow above.
+  const nExtra=(s)=>Math.max(0,String(s===null||s===undefined?'':s).split('\n').length-1);
+  // A head is 32 for one line and its lines plus 4 px air above and below
+  // beyond that (a two-line head at 32 touched both borders).
+  const HEAD_H=Math.max(32,(1+Math.max(0,...lls.map(l=>nExtra(lblOf(l)))))*13*1.3+8), HEAD_PADX=13, HEAD_MINW=76;
   const ROW_H=34;              // base row pitch. See the F5 note below.
   const SELF_W=40, SELF_EXTRA=26, STATE_H=22;
+  const stateH=(el)=>STATE_H+nExtra(el.name)*11*1.3;   // LBL_FS, declared below
   const LBL_FS=11, LBL_LIFT=8; // label sits LBL_LIFT px above its own arrow
   const FRAG_TOP=26, FRAG_BOT=12, OPERAND_TOP=20, FRAG_PADX=22, FRAG_INSET=9;
+  const CAP_LH=10.5*1.3;       // a caption's or guard's extra lines grow the box top down
   const ENC_PAD=6;             // clearance a container's frame keeps off its members
   // F5 (spec/core.md §14.3) is a CONSTRAINT ON ROW_H, not an afterthought.
   // A message label's centre sits LBL_LIFT + fs*0.55 ≈ 14 px above its own
@@ -9734,6 +9881,7 @@ function renderSequence(doc,y0){
   // container's padding is exactly the case that made the enclosure pass
   // necessary (see PASS 4).
   const statePillW=(el)=>Math.max(46, cwMax(el.name)*6.6+18);
+  const STATE_CLEAR=10;                           // air between a pill and the lifeline beside it
 
   // ── PASS 1 — container column spans (needed BEFORE the column axis,
   //    because a fragment's operator tab and label have to fit inside its
@@ -9782,6 +9930,17 @@ function renderSequence(doc,y0){
       if(ci+1<nc) widen(ci,ci+1,need); else rightPad=Math.max(rightPad,need);
     } else widen(Math.min(ci,cj),Math.max(ci,cj),w);
   }
+  // 0.5: a `state` pill is centred on its lifeline and as wide as
+  // its name, so a long one reaches the NEIGHBOURING lifelines and paints over
+  // them. Each side of the pill therefore constrains the gap to the lifeline
+  // beside it, the same way a message label constrains the gap it spans.
+  for(const r of M.rows){
+    if(r.kind!=='state') continue;
+    const c=col[r.el.ref]; if(c===undefined) continue;
+    const half=statePillW(r.el)/2+STATE_CLEAR;
+    if(c>0) widen(c-1,c,half);
+    if(c+1<nc) widen(c,c+1,half);
+  }
   // the fragment caption is INSIDE the box, so it constrains the columns the
   // box spans — a caption that overflows its own box names nothing.
   for(const id in M.cont){
@@ -9827,13 +9986,17 @@ function renderSequence(doc,y0){
       // a top-level fragment gets clear air above it, or two consecutive
       // fragments share a border and read as one box.
       if(depth(id)===0&&M.cont[id].kind==='fragment') y+=8;
-      boxTop[id]=y; y+=(M.cont[id].kind==='fragment'?FRAG_TOP:OPERAND_TOP); }
+      boxTop[id]=y; y+=(M.cont[id].kind==='fragment'?FRAG_TOP:OPERAND_TOP)+nExtra(M.cont[id].el.label)*CAP_LH; }
     r.y0=y;
     let h=ROW_H;
     if(r.kind==='message'&&r.el.a===r.el.b) h+=SELF_EXTRA;
     // A label is drawn ABOVE its own arrow, so every extra line of it is
     // extra row pitch — otherwise line 2 lands ON the arrow.
-    if(r.kind==='message') h+=Math.max(0,String(r.el.label||'').split('\n').length-1)*LBL_FS*1.3;
+    // The extra lines go ABOVE the arrow (the label grows upward from it), so
+    // the arrow sits that much lower in its row, not at the row's centre.
+    let ext=0;
+    if(r.kind==='message'){ ext=nExtra(r.el.label)*LBL_FS*1.3; h+=ext; }
+    if(r.kind==='state') h+=stateH(r.el)-STATE_H;
     // NOTE what is NOT here: `description=` reserves no row height, because it
     // puts NO INK on the page (core §10, §12.7 — "description= addresses the
     // machine and draws nothing, note= addresses the human and always draws").
@@ -9841,7 +10004,7 @@ function renderSequence(doc,y0){
     // on the element it names and nothing else. (The prototype this was ported
     // from drew it as grey prose under the arrow, which is the one thing the
     // key is defined not to do.)
-    r.yMid=y+h/2;
+    r.yMid=(r.kind==='message'&&r.el.a!==r.el.b)?y+(h-ext)/2+ext:y+h/2;
     y+=h;
     r.y1=y;
     for(const id of sortDeep(closesAt[r.slot]||[]).reverse()){
@@ -9926,6 +10089,10 @@ function renderSequence(doc,y0){
   // readers still find it.
   const titleEl=(s)=>(s===undefined||s===null)?'':'<title>'+esc(s)+'</title>';
   const withTitle=(s,shape)=>s===undefined||s===null?shape:'<g>'+titleEl(s)+shape+'</g>';
+  // `note=` carriers, with the point a leader lands on (PASS 6).
+  const noteC=[];
+  const noteOn=(el,kind,ref,px,py)=>{ if(el.note!==undefined&&el.note!==null)
+    noteC.push({line:el.line,kind,ref,text:el.note,px,py}); };
 
   // lifelines: head box + descending dashed line.
   // The head is emitted as a `data-node` group — it IS the participant, and
@@ -9941,6 +10108,9 @@ function renderSequence(doc,y0){
       +'" rx="4" fill="'+f+'" stroke="'+st+'"'+dashOf(chan(l,'style'),'')+'/>'
       +textEl(x[i], yTop+8+HEAD_H/2+4.5, 13, 'middle', labelInk(f,'#1d1d1b'), lab, '')
       +'</g>');
+    // the leader lands on the lifeline just under its head: the band above
+    // the first row holds no label, so it crosses only other lifelines there
+    noteOn(l,'lifeline',l.id,x[i],yTop+HEAD_H+15);
   });
 
   // fragment / operand boxes, outermost first so nesting paints correctly
@@ -9951,6 +10121,7 @@ function renderSequence(doc,y0){
     // because a fragment's frame is a border and an operand's rule is a
     // divider inside one (CHOSEN, `DOMAIN-CONVENTION-DIRECTIVES`).
     const st=chan(c.el,'stroke')||(c.kind==='fragment'?'#64748b':'#94a3b8');
+    noteOn(c.el,c.kind,id,B.x1,B.y0+(c.kind==='fragment'?11:13));
     if(c.kind==='fragment'){
       mid.push(withTitle(c.el.desc,
         '<rect x="'+r2(B.x0)+'" y="'+r2(B.y0)+'" width="'+r2(B.x1-B.x0)+'" height="'+r2(B.y1-B.y0)
@@ -9962,7 +10133,7 @@ function renderSequence(doc,y0){
         +' h'+r2(-tw0-6)+' z" fill="#f8fafc" stroke="'+st+'" stroke-width="1"/>');
       mid.push(textEl(B.x0+7, B.y0+11, 10.5, 'start', '#334155', c.el.type, ''));
       if(c.el.label!==null&&c.el.label!==undefined)
-        mid.push(textEl(B.x0+tw0+14, B.y0+11, 10.5, 'start', '#475569', '['+c.el.label+']', HALO));
+        mid.push(textEl(B.x0+tw0+14, B.y0+11+nExtra(c.el.label)*CAP_LH/2, 10.5, 'start', '#475569', '['+c.el.label+']', HALO));
     } else {
       // an operand compartment: a dashed rule above it (except the first) and
       // its guard at the left. UML draws the guard in square brackets.
@@ -9972,7 +10143,7 @@ function renderSequence(doc,y0){
         :'<line x1="'+r2(B.x0)+'" y1="'+r2(B.y0+4)+'" x2="'+r2(B.x1)+'" y2="'+r2(B.y0+4)
          +'" stroke="'+st+'" stroke-width="1" stroke-dasharray="5 4"/>';
       const guard=(c.el.label!==null&&c.el.label!==undefined)
-        ? textEl(B.x0+8, B.y0+13, 10.5, 'start', '#475569', '['+c.el.label+']', HALO) : '';
+        ? textEl(B.x0+8, B.y0+13+nExtra(c.el.label)*CAP_LH/2, 10.5, 'start', '#475569', '['+c.el.label+']', HALO) : '';
       // An operand has no box of its own, so its <title> names the group
       // holding the two marks it DOES draw — the separator rule and the guard.
       if(rule||guard) mid.push(withTitle(c.el.desc, rule+guard));
@@ -9988,10 +10159,11 @@ function renderSequence(doc,y0){
       const f=chan(r.el,'fill')||'#fff7ed', st=chan(r.el,'stroke')||'#c2410c';
       const w=statePillW(r.el);
       mid.push(withTitle(r.el.desc,
-        '<rect x="'+r2(x[ci]-w/2)+'" y="'+r2(r.yMid-STATE_H/2)+'" width="'+r2(w)+'" height="'+STATE_H
+        '<rect x="'+r2(x[ci]-w/2)+'" y="'+r2(r.yMid-stateH(r.el)/2)+'" width="'+r2(w)+'" height="'+r2(stateH(r.el))
         +'" rx="9" fill="'+f+'" stroke="'+st+'" stroke-width="1"'+dashOf(chan(r.el,'style'),'')+'/>'));
       ink.push(textEl(x[ci], r.yMid+4, LBL_FS, 'middle', labelInk(f,'#7c2d12'), r.el.name, ''));
       inkExtent.push(x[ci]+w/2);
+      noteOn(r.el,'state',r.el.line,x[ci]+w/2,r.yMid);
       continue;
     }
     // message
@@ -9999,15 +10171,23 @@ function renderSequence(doc,y0){
     if(ci===undefined||cj===undefined) continue;
     const st=chan(e,'stroke')||'#334155';
     const dash=dashOf(chan(e,'style'),'');
+    // Every message shaft carries `data-edge` (core §7, §13.7.5), as edge,
+    // flowline and transition do; until this release none did, so no tool
+    // and no editor click could name a message.
     if(ci===cj){                                   // self-message
       // a rectangular loop off the column and back to it. The shaft is one
       // `path` at the same stroke-width as a straight message, so the axis
       // readers see one edge and not three.
-      const sx=x[ci], top=r.yMid-11, bot=r.yMid+11, ex=sx+SELF_W;
+      // `<->` is one shaft with two heads here too (reading rule 3): the
+      // loop then starts under its second head, as it ends under its first.
+      const sx=x[ci], top=r.yMid-11, bot=r.yMid+11, ex=sx+SELF_W, bi=e.op==='<->';
       mid.push(withTitle(e.desc,
-        '<path d="M'+r2(sx)+' '+r2(top)+' L'+r2(ex)+' '+r2(top)+' L'+r2(ex)+' '+r2(bot)
+        '<path data-edge="'+edgeRef(e)+'" d="M'+r2(bi?sx+11:sx)+' '+r2(top)+' L'+r2(ex)+' '+r2(top)+' L'+r2(ex)+' '+r2(bot)
         +' L'+r2(sx+11)+' '+r2(bot)+'" fill="none" stroke="'+st+'" stroke-width="1.6"'+dash+'/>'));
       arrowTri([sx+2,bot],[sx+12,bot],st);
+      if(bi) arrowTri([sx+2,top],[sx+12,top],st);
+      // the leader lands on the loop's top corner, clear of the label beside it
+      noteOn(e,'message',edgeRef(e),ex,top);
       if(e.label){ ink.push(textEl(ex+8, r.yMid+4, LBL_FS, 'start', '#1d1d1b', e.label, HALO));
                    inkExtent.push(ex+8+lblPx(e.label)); }
       continue;
@@ -10023,23 +10203,48 @@ function renderSequence(doc,y0){
     sx+=dir*1.5;
     const ex=tx0-dir*1.5;
     mid.push(withTitle(e.desc,
-      '<line x1="'+r2(sx)+'" y1="'+r2(r.yMid)+'" x2="'+r2(ex)+'" y2="'+r2(r.yMid)
+      '<line data-edge="'+edgeRef(e)+'" x1="'+r2(sx)+'" y1="'+r2(r.yMid)+'" x2="'+r2(ex)+'" y2="'+r2(r.yMid)
       +'" stroke="'+st+'" stroke-width="1.6"'+dash+'/>'));
     arrowTri([ex,r.yMid],[ex-dir*10,r.yMid],st);
     // `<->` is ONE shaft with TWO heads: the model says one occurrence, so
     // the drawing must not show two lines and invite a reader to count two.
     if(e.op==='<->') arrowTri([sx,r.yMid],[sx+dir*10,r.yMid],st);
+    noteOn(e,'message',edgeRef(e),Math.max(sx,ex),r.yMid);
     if(e.label){
       const nl=String(e.label).split('\n').length;
       ink.push(textEl((sx+ex)/2, r.yMid-LBL_LIFT-(nl-1)*LBL_FS*1.3/2, LBL_FS, 'middle', '#1d1d1b', e.label, HALO));
     }
   }
 
-  // ── PASS 6 — the canvas extent ──────────────────────────────────────────
-  const W=Math.max(x[nc-1]+headW[nc-1]/2, ...Object.keys(fbox).map(k=>fbox[k].x1),
-                   ...inkExtent)+rightPad+4;
-  return {svg:bg.join('')+mid.join('')+ink.join(''), y:bottom, w:W,
-          box:{x0:0,x1:W,yA:yTop,yB:bottom}};
+  // ── PASS 6 — notes (core §2.9), then the canvas extent ──────────────────
+  // A ladder has no free space between its rows — ROW_H is chosen so labels
+  // clear each other and nothing else (F5 above) — so the one candidate site
+  // a note has is a NOTE COLUMN right of all other ink, at its carrier's
+  // height. Notes register last and in document order, each below the one
+  // before; a note that is not level with its carrier, or not within a
+  // leader's length of it, takes a leader (rules 1-3). None is prefixed:
+  // rule 5 names only a labelled node or group.
+  const inkR=Math.max(x[nc-1]+headW[nc-1]/2, ...Object.keys(fbox).map(k=>fbox[k].x1), ...inkExtent);
+  // 0.5: rightPad reserved room for last-column ink (a self
+  // message label, a one-column fragment caption) that inkR already measures,
+  // so adding it again doubled the right margin.
+  let W=inkR+4, yEnd=bottom;
+  if(noteC.length){
+    noteC.sort((p,q)=>p.line-q.line);
+    const NX=r2(inkR+16); let lastB=-Infinity;
+    for(const c of noteC){
+      const box=noteBox(c.text,null);
+      const ny=r2(Math.max(yTop, lastB+6, c.py-box.h/2));
+      const best={x:NX, y:ny, side:'right',
+                  far:!(NX-c.px<=24 && ny<=c.py && c.py<=ny+box.h)};
+      const pt={x:c.px,y:c.py,w:0,h:0};
+      if(best.far) ink.push(noteLeader(best,box,pt));
+      ink.push(noteSvg(best.x,best.y,box,c));
+      lastB=ny+box.h; W=Math.max(W,NX+box.w+4); yEnd=Math.max(yEnd,ny+box.h+4);
+    }
+  }
+  return {svg:bg.join('')+mid.join('')+ink.join(''), y:yEnd, w:W,
+          box:{x0:0,x1:W,yA:yTop,yB:yEnd}};
 }
 // coordinates are emitted at 2 decimal places: the ladder's arithmetic divides
 // (`widen` spreads a shortfall over a run of columns), and an unrounded double
@@ -10780,7 +10985,12 @@ function renderChart(b,y0,doc){
   // z ruler at the right-back corner
   const zr=[PR(0,C,0)[0]+ox, PR(0,C,0)[1]];
   svg.push('<line x1="'+(zr[0]+14)+'" y1="'+zr[1]+'" x2="'+(zr[0]+14)+'" y2="'+(zr[1]-zmax*ZS)+'" stroke="#8a8880"/>');
-  for(const z of [0, Math.round(zmax/2), Math.round(zmax)]){
+  // 0.5: the tick labels are the section's ink, so the width
+  // counts them; and a tick never names a value above the data maximum
+  // (Math.round put "10" over a 9.6 ruler top).
+  const zTicks=[...new Set([0, Math.floor(zmax/2), Math.floor(zmax)])];
+  const zTickR=zr[0]+21+Math.max(...zTicks.map(z=>cwMax(String(z))*6.5*9.5/11))+4;
+  for(const z of zTicks){
     svg.push('<line x1="'+(zr[0]+11)+'" y1="'+(zr[1]-z*ZS)+'" x2="'+(zr[0]+17)+'" y2="'+(zr[1]-z*ZS)+'" stroke="#8a8880"/>');
     svg.push(textEl(zr[0]+21, zr[1]-z*ZS+3.5, 9.5, 'start', '#6f6e69', String(z)));
   }
@@ -10792,7 +11002,7 @@ function renderChart(b,y0,doc){
   // a `chart` whose table name is long enough still ran the caption off the
   // right edge under its own data floor. The caption is never shifted (it is
   // already the section's leftmost, topmost ink); only the canvas grows.
-  const w=Math.max(near[0]+70, farRight+ox+4, typedBlockTitleW(t.label+' — bar3d'));
+  const w=Math.max(near[0]+70, farRight+ox+4, zTickR, typedBlockTitleW(t.label+' — bar3d'));
   const hgt=Math.max(near[1]+24, farDown+6)-y0;
   return {svg:svg.join('')+lsvg.join(''), y:y0+hgt, w:w};
 }
@@ -10812,6 +11022,9 @@ function renderTiming(w,y0){
     const sbox=s.fill||w.fill||'#eef6ff', spath=s.stroke||w.stroke||'#1d4ed8';
     svg.push('<text x="'+(nameW-10)+'" y="'+(top+(laneH-8)/2+4)+'" font-size="11.5" text-anchor="end" font-family="monospace">'+esc(s.name)+'</text>');
     let d='', prev=null, dataIdx=0;
+    // The level a cell ENDS at: `p` is high then low, `n` low then high
+    // (0.5; `p1` and `n0` drew no edge before). `x`/`=` have none.
+    const END_LV=c=>(c==='1'||c==='n')?top:((c==='0'||c==='p')?bot:null);
     for(let i=0;i<s.lane.length;i++){
       let ch=s.lane[i];
       if(ch==='.') ch=prev||'0';
@@ -10820,11 +11033,13 @@ function renderTiming(w,y0){
         const hiFirst=(ch==='p');
         const a=hiFirst?top:bot, b=hiFirst?bot:top;
         d+='M'+x+','+a+' L'+(x+cycleW/2)+','+a+' L'+(x+cycleW/2)+','+b+' L'+(x+cycleW)+','+b+' ';
-        // draw transition edge at cycle start
-        if(prev) d+='M'+x+','+top+' L'+x+','+bot+' ';
+        // Transition edge at cycle start, only where the level CHANGES
+        // `pn`, `1p`, `np`, `0n` meet at one level and draw
+        // none. After `x`/`=` the box's own border already marks it.
+        { const pe=END_LV(prev); if(pe!==null&&pe!==a) d+='M'+x+','+top+' L'+x+','+bot+' '; }
       } else if(ch==='0'||ch==='1'){
         const yy=(ch==='1')?top:bot;
-        const pv=(prev==='1')?top:(prev==='0'?bot:null);
+        const pv=END_LV(prev);
         if(pv!==null&&pv!==yy) d+='M'+x+','+pv+' L'+x+','+yy+' ';
         d+='M'+x+','+yy+' L'+(x+cycleW)+','+yy+' ';
       } else if(ch==='x'){
@@ -10878,6 +11093,9 @@ function __sha256hex(text) {
   var b = [], i, c;
   for (i = 0; i < text.length; i++) {           // UTF-8 encode
     c = text.codePointAt(i); if (c > 0xffff) i++;
+    // A lone surrogate is encoded as U+FFFD, as TextEncoder and Node's Buffer
+    // do, so this hash matches theirs for every JS string.
+    if (c >= 0xd800 && c <= 0xdfff) c = 0xfffd;
     if (c < 0x80) b.push(c);
     else if (c < 0x800) b.push(0xc0 | (c >> 6), 0x80 | (c & 63));
     else if (c < 0x10000) b.push(0xe0 | (c >> 12), 0x80 | ((c >> 6) & 63), 0x80 | (c & 63));
@@ -10988,6 +11206,8 @@ function artifact(text, opts) {
   // rendered it, and any non-default render option (core §7) — together they
   // keep third-party rebuilds bit-identical and give a diff somewhere to point
   var optAttr = __engine.renderOptionsAttr(opts);
+  // CRLF is embedded and hashed as LF (core §15.4).
+  src = src.replace(/\r\n/g, '\n');
   var meta = '<metadata id="figdown-source" data-sha256="' + __sha256hex(src) + '"'
     + ' data-engine-version="' + VERSION + '"' + optAttr + '><![CDATA[\n'
     + src.replace(/]]>/g, ']]]]><![CDATA[>') + '\n]]></metadata>';

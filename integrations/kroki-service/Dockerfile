@@ -7,5 +7,8 @@ WORKDIR /app
 COPY dist/figdown.js ./figdown.js
 COPY integrations/kroki-service/server.js ./server.js
 ENV PORT=8006
+# Render limits (core §15.5); see README "Limits". Override with docker run -e.
+ENV FIGDOWN_MAX_SOURCE_BYTES=262144 FIGDOWN_MAX_OUTPUT_BYTES=8388608 \
+    FIGDOWN_RENDER_TIMEOUT_MS=10000 FIGDOWN_RENDER_HEAP_MB=512
 EXPOSE 8006
 CMD ["node", "server.js"]

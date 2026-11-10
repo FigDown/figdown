@@ -23,6 +23,12 @@ const md = require('markdown-it').use(require('markdown-it-figdown'));
 const html = md.render(markdownSource);
 ```
 
+Titles are not drawn by default (the surrounding Markdown supplies the
+caption), as with `build-svg.js`; pass `{ showTitle: true }` to draw them:
+`.use(require('markdown-it-figdown'), { showTitle: true })`. A rendered
+figure is wrapped in `<div class="figdown">`; a figure that does not parse
+becomes `<pre class="figdown-error">` holding its line errors.
+
 In this repository the plugin loads the engine from `../../dist/figdown.js`
 (regenerate it with `node tools/make-lib.js`); the published npm version
 will depend on the `figdown` package instead.
@@ -45,8 +51,11 @@ The output is plain inline SVG — no client-side JavaScript is shipped.
 ## Test
 
 ```sh
-node test.js
+node test.js                                  # from this directory
+node integrations/markdown-it-figdown/test.js # from the repository root
 ```
+
+`npm test` runs it too, as `gate:markdown-it`.
 
 Dependency-free: the test drives the plugin through a minimal shim
 implementing only the fence-rule surface markdown-it exposes.

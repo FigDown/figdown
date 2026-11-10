@@ -35,10 +35,11 @@ now the whole toolbox:
 
 | Action | Writes |
 |---|---|
-| Double-click empty canvas (or **+ Node**) | `node` + a `pin` for it; the shape dropdown picks `shape=` |
+| Double-click empty canvas | `state` (the genre's own node word) + a `pin` for it; the shape dropdown picks `shape=` |
+| **+ Node** | the `state` line alone — drag it to pin it |
 | Double-click a node | rename it |
-| **Link** → click two nodes | `edge a -> b` |
-| **⬚ Group** → drag a box | `group` (members follow by `in=`) — **not usable on a statechart document**: `group` is not this genre's keyword since 0.3 (`SCENE-KEYWORD-MEMBERSHIP`) and `in=` is not its option key since 0.3 (`MEMBERSHIP-KEY-ACCEPTANCE`), so the two lines the button writes are both line errors here. It works on a `block` or `topology` document |
+| **Link** → click two nodes | `transition a -> b` |
+| **⬚ Group** | **disabled on a statechart document**: `group` is not this genre's keyword since 0.3 (`SCENE-KEYWORD-MEMBERSHIP`) and `in=` is not its option key since 0.3 (`MEMBERSHIP-KEY-ACCEPTANCE`). On a `block` or `topology` document it writes `group` and moves the members by `in=` |
 | fill colour | `fill=` on the selected element |
 | **Raise ↑** / **Lower ↓** | move the element's line down/up in the text — paint order |
 | **Delete** (or Del) | removes the node with its `pin`s and edges |

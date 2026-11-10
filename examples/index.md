@@ -1,7 +1,9 @@
 # FigDown Example Gallery
 
 > Every figure below is an SVG generated deterministically from the
-> `.fd` text file next to it (`node tools/build-svg.js examples/`).
+> `.fd` text file next to it (`node tools/build-svg.js examples/` — it exits 1
+> on purpose, because one figure, `layout-compare/srl-evpn-irb-auto.fd`, is
+> refused by design; see [the layout before/after set](#layout-before--after-set-layout-compare)).
 > Each SVG embeds its own source and a SHA-256 of it — open one in a
 > text editor to see the "one source, two readers" idea in action.
 >
@@ -115,7 +117,7 @@ two together; a missing edge is never the argument.
 >
 > | Figure | What only it demonstrates |
 > |---|---|
-> | `udp` | the 9-line minimum — a complete, valid figure with nothing optional in it |
+> | `udp` | the smallest complete figure — seven lines carry it (header, `bitfield`, five fields); its two comments and two `description=` notes are the only optional parts |
 > | `ipv6` | a complete fixed-length header, and a 128-bit field spanning four rows as ONE box |
 > | `dns` | `word=16`, the compact `name:width` field form, and `break` |
 > | `ipv4` | `present=""` (written empty) beside `present="IHL > 5"` |
@@ -251,7 +253,7 @@ singly-linked entry chains — a static data-structure explainer.
 
 ### Rainbow rings — [source](rainbow.fd)
 Document order is paint order — (`PAINT-ORDER-CONSTRUCT`) the only paint order
-the language has. Seven concentric `ellipse` nodes; later lines paint on top.
+the language has. Seven concentric `ellipse` rings around an `ellipse` core; later lines paint on top.
 
 ![Rainbow rings](rainbow.svg)
 
@@ -274,7 +276,10 @@ live here; read them beside that document.
 ## Layout before / after set (`layout-compare/`)
 
 Two figures, each shown with an empty layout zone and with layout intent added.
-The content zones are byte-identical within each pair — that is the point. The
+Within each pair the sources are identical except for the lines the tuned side
+adds — `flow down` and two `rank` lines for evpn-fabric, `pin` lines plus `flow down` and three `rank` lines for
+srl-evpn-irb (the content-zone lines are why the tuned figure still draws with
+its pins stripped; the auto arm leaves them out) — and that is the point. The
 **tuned** side is the top-level example itself, not a
 copy: until 0.1 this directory held `*-tuned.fd` files that were
 md5-identical to `examples/evpn-fabric.fd` and `examples/srl-evpn-irb.fd`,
@@ -287,10 +292,11 @@ land on different ranks with the other groups' members and five hosts between
 them, so a band would have to span the canvas — and the engine
 refuses to draw a `group` band around a non-member rather than state a
 membership the source never wrote. `node tools/build-svg.js
-examples/layout-compare/srl-evpn-irb-auto.fd` reports `Line 25: group "leaf4" would
+examples/layout-compare/srl-evpn-irb-auto.fd` reports `Line 27: group "leaf4" would
 enclose non-member "h2" and the layout pass could not separate them; the figure
-is not drawn rather than drawn wrongly.` (the named node may differ between
-runs) and writes nothing. The source stays: **the refusal is what the auto arm
+is not drawn rather than drawn wrongly. …` (the named node may differ between
+runs; the message ends with a `rank` line holding the group's
+members, which makes the figure render, though not readably) and writes nothing. The source stays: **the refusal is what the auto arm
 now demonstrates** — this topology needs `pin` until auto-layout learns
 group-aware rank assignment (engine-backlog item 32).
 

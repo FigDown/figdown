@@ -1,0 +1,1 @@
+Line 12: group "g1" would enclose non-member "n6" and the layout pass could not separate them; the figure is not drawn rather than drawn wrongly. Give "n6" a pin outside the group, add it with in=g1, or hold the group's members in one rank: rank n2,n3.

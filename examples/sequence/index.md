@@ -27,9 +27,9 @@ The same protocol as [`../statechart/dhcp-client.fd`](../statechart/dhcp-client.
 and deliberately a different genre. That figure's subject is one machine's
 modes, and the lines between them are transitions; this one's subject is three
 participants exchanging messages in time, and the lines between them are
-messages. Drawn as a scene, the seven exchanges between this client and one
-server would fan into a single span and a reading agent would answer *seven
-links join the client and the server* — confidently, and wrongly.
+messages. Drawn as a scene, the eight messages between this client and
+server B would fan into a single span and a reading agent would answer *eight
+links join the client and server B* — confidently, and wrongly.
 
 What the rest of the corpus cannot say and this figure does: **when** each state
 change happens relative to the messages around it. `SELECTING` is drawn inside

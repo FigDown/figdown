@@ -1,0 +1,14 @@
+# core §1 — BARE MEANS NO QUOTE ANYWHERE IN THE TOKEN.
+#
+# Every line below parsed until this release: a token quoted only in part
+# had its quotes silently removed, so `node a"b"` declared the id `ab` and
+# `"node" x` was `node x`. Each is now the error a wholly quoted token in
+# the same position gets. The header's own case (`figdown 0".5" block`)
+# cannot share a file with these; the property test in run.js covers it.
+figdown 0.5 block
+node a"b"
+node "c"d
+"node" x
+no"de" y
+flow r"ight"
+node ok "OK"

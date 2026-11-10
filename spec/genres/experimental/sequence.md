@@ -120,7 +120,7 @@ because the genre is; the Status column records each construct's own status.
 | `figdown` | `figdown 0.4 sequence` | C | NORMATIVE | — | required, first significant line; **`figdown 0.3 sequence` is a line error** (`SEQUENCE-SOURCE-STANDARD`) |
 | `title` | `title "<text>"` | C | NORMATIVE | `note` | absent |
 | `lifeline` | `lifeline <id> ["label"]` | **S** | **EXPERIMENTAL** | `class` `fill` `stroke` `style` `in` `note` `description` | label absent (the id draws); declares an id and joins the section's id namespace (core §1). UML 2.5.1 §17.3.3.1 semantics, §17.3.4.1 notation; ISO/IEC 19505-2 §14.3.17 |
-| `message` | `message <a> [tail] <op> [head] <b> ["label"]` | **S** | **EXPERIMENTAL** | `class` `stroke` `style` `in` `note` `description` `id` (requires `figdown 0.5`) | `<op>` is `->`, `<-` or `<->`; **`--` is a line error here** and legal in every other genre; declared no id until `figdown 0.5`, where `id=` gives it an optional HANDLE (`CONNECTOR-IDENTITY-KEY`) that NAMES the occurrence and orders nothing — the total order is still declaration order, and two messages are two messages however they are named (reading rule 12). UML 2.5.1 §17.4.4.1; ISO §14.3.18 |
+| `message` | `message <a> <op> <b> ["label"]` | **S** | **EXPERIMENTAL** | `class` `stroke` `style` `in` `note` `description` `id` (requires `figdown 0.5`) | `<op>` is `->`, `<-` or `<->`; **`--` is a line error here** and legal in every other genre; declared no id until `figdown 0.5`, where `id=` gives it an optional HANDLE (`CONNECTOR-IDENTITY-KEY`) that NAMES the occurrence and orders nothing — the total order is still declaration order, and two messages are two messages however they are named (reading rule 12). UML 2.5.1 §17.4.4.1; ISO §14.3.18 |
 | `state` | `state <lifeline-id> "<state name>"` | **S** | **EXPERIMENTAL** | `class` `fill` `stroke` `style` `in` `note` `description` | slot 1 **references** a lifeline and declares nothing; slot 2 is MANDATORY. UML 2.5.1 §17.2.4.5 notation prose, metaclass `StateInvariant` §17.12.25; ISO §14.3.25 |
 | `fragment` | `fragment <id> ["label"] type=<operator>` | **S** | **EXPERIMENTAL** | `type` (MANDATORY) `class` `stroke` `style` `in` `note` `description` | no `fill=` — a fragment is a FRAME over the messages it holds, and painting its interior would hide them. UML 2.5.1 §17.6, `CombinedFragment` §17.12.3; ISO §14.3.3 |
 | `operand` | `operand <id> ["guard"] in=<fragment-id>` | **S** | **EXPERIMENTAL** | `in` (MANDATORY) `class` `stroke` `style` `note` `description` | the quoted string is the GUARD; no `fill=`, for the same reason as `fragment`. UML 2.5.1 §17.12.14, notation §17.6.4.1; ISO §14.3.14 |
@@ -421,8 +421,11 @@ keys.
 **The trailing form is the one to write**, and it is the one the ruled
 surface settles: every sequence source in the corpus puts the message text
 there, and the bracket position reads as an annotation *on* the line rather
-than as the message itself. `[tail]` and `[head]` are unaffected — they are
-different positions, not a second spelling of the same one.
+than as the message itself. `[tail]` and `[head]` are a different question
+and are settled: they are a **line error** under this genre. A UML Message has one name and no end labels (UML 2.5.1
+§17.4.4.1), and a message's ends sit on lifelines, where a label has no room
+of its own; until then they parsed and drew nothing. Their text belongs in
+the message label or in `note=`.
 
 **The concern, filed rather than settled.** That two spellings reach one
 model field at all is an **alias**, and the language's no-alias rule is
@@ -452,6 +455,34 @@ The evidence is unusually clean, and it is why nothing is owed here: **0 of
 all.** The construct that would have derived them — a request/reply
 distinction on the message — was itself refused for the same measured zero,
 and the bars fell with it. This is a limit stated, not a gap apologised for.
+
+### `note=` draws in a note column
+
+`note=` on a `lifeline`, `message`, `state`, `fragment` or `operand` draws,
+under core §2.9's contract; until this release only the `title` note did. A
+ladder has no free space between its rows — the row pitch is chosen so that
+labels clear each other and nothing more — so the one site a note has is a
+**note column** to the right of all other ink. The placement, normative
+because two engines must agree on it:
+
+1. Notes register **last**, in **document order**, after every other mark.
+2. Each note's box sits in the column at its carrier's height — centred on
+   the point its leader would land on — or directly below the previous
+   note (6 px apart) when that is lower. The column starts 16 px right of
+   the ladder's rightmost ink.
+3. That point is: a lifeline's line just under its head; a message's
+   right end (a self-message's: the loop's top corner, clear of its label);
+   a state pill's right edge; a fragment's or operand's right frame edge, at
+   the height of its operator tab or guard.
+4. A note takes **no leader** only when its box is level with that point and
+   the point is within 24 px of the column; otherwise a leader runs from the
+   box's left edge to the point.
+5. No note is prefixed with its target's label: §2.9 rule 5 names only a
+   labelled `node` or `group`.
+
+The canvas grows right and down to hold the column. The note's
+`data-note-on` is the element's keyword and `data-note-for` is its id — a
+message's `edgeRef` (its `id=` or source line), a state's source line.
 
 ## Semantic model (normative — reading rule, `MEANING-RECOVERY-SOURCE`)
 
@@ -669,6 +700,9 @@ own constructs. The profile is the core profile plus:
   ruling they have run into.
 - `message a -- b` → `message needs a direction: -> <- <->`, with the ground
   and the pointer to `<->`.
+- `message a [x] -> b` or `message a -> [y] b` → `message takes no [tail] or
+  [head] label`, with the UML ground and the pointer to the message label
+  and `note=`.
 - `fragment` with no `type=` → the missing-key message, which says why there
   is no default; `type=` with a value outside the twelve → the unknown-
   operator message, which lists them; `type="alt"` → the RULE 2.4 bare-value

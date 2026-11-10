@@ -12,7 +12,7 @@ table hm "Queue occupancy counters"
 | P3     | 68 | 14 | 40 | 29 | 51 |  7 |
 # heatmap marks: light red = over 40, strong red = over 80
 cell (1,3) fill=#fecaca
-cell (1,6) fill=#fca5a5
+cell (1,6) fill=#fecaca
 cell (2,2) fill=#fecaca
 cell (2,3) fill=#fca5a5
 cell (2,5) fill=#fecaca

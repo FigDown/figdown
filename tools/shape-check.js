@@ -352,6 +352,8 @@ const lpad = corpus.lpad;
 
 function main() {
   const args = process.argv.slice(2);
+  const badOpt = args.find(a => a.startsWith('-') && !['--strict', '--verbose'].includes(a));
+  if (badOpt) { console.error('shape-check: unknown option ' + badOpt + '\nusage: node tools/shape-check.js [--strict] [--verbose] [<file.fd | dir> ...]'); process.exit(2); }
   let strict = false, verbose = false;
   const paths = [];
   for (const a of args) {

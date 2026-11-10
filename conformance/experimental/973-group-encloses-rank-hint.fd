@@ -1,0 +1,24 @@
+# 0.5: a group whose members auto-layout puts on DIFFERENT ranks
+# can enclose a non-member between them — the engine keeps members together
+# within a rank only (group-aware rank assignment is engine-backlog item 32).
+# Nothing is pinned, so the engine chose every position, and the separation
+# pass finds no free room. The figure is refused, and the refusal now ends
+# with the one line measured to clear it: a `rank` holding the group's
+# members. Experimental because the hint is this engine's layout, not a
+# conformance requirement.
+figdown 0.5 block
+flow left
+group g0 "G0"
+group g1 "G1"
+node n0 "NNN" in=g0
+node n1 "NNN" in=g0
+node n2 "NNNNNNNNNNNNNN" in=g1
+node n3 "NNNNNNNNNNNNNNNN" in=g1
+node n4 "NNN" in=g0
+node n5 "NNNNNNNNNNN"
+node n6 "NNN"
+edge n6 -- n4
+edge n4 -- n3
+edge n1 -- n3
+edge n0 -- n4
+edge n0 -- n6

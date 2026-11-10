@@ -5,13 +5,14 @@ figdown 0.1 bitfield
 title "Multi-Word Descriptor Pattern"
 
 bitfield descriptor "Multi-Word Descriptor" word=32 numbering=lsb0
-# Word 0: identifier in upper half + flag cluster + small type code in low bits
+# Word 0, in declaration order — under lsb0 the FIRST field takes the HIGH bits:
+# small type code in the high bits + flag cluster + reserved + identifier in the lower half
 field "TYPE" 4
 field FB:1,FA:1  # FB=FLAG_B FA=FLAG_A
 field "Reserved" 10
 field "FIELD_A" 16
 break
-# Word 1: wide bitmap/trace field across upper bits + small reserved in lower bits
+# Word 1: small reserved in the upper bits + wide bitmap/trace field across the lower bits
 field "Reserved" 8
 field "FIELD_B" 24
 break

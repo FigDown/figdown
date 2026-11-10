@@ -1,4 +1,4 @@
-# FigDown Agent Guide (v0.1 draft)
+# FigDown Agent Guide
 
 > Audience: **AI agents** asked to create, maintain or read figures in
 > Markdown documentation using FigDown. This file is the **entry point**,
@@ -48,7 +48,8 @@ detail of those four sentences.
 **If you are doing the work, read
 [`skill/figdown/SKILL.md`](../skill/figdown/SKILL.md) and stop there until it
 routes you further.** It is short by design, and its router is mechanical:
-line 1 of a `.fd` names its genre, so you know which reference file you need
+the header line of a `.fd` (its first line that is not blank or a comment) names its
+genre, so you know which reference file you need
 before you need it. Reading a figure costs one extra file; authoring a
 `bitfield` costs one different extra file, and neither pays for the other.
 
@@ -60,13 +61,13 @@ per-genre reading files live at [`read/0.5/`](../read/0.5/reading.md) — the so
 of truth, versioned by language version, so a future `read/<X.Y>/` will be
 added beside it rather than over it (the frozen `read/0.1/`–`0.4/` trees are
 exactly that history). Open `read/0.5/reading.md` and the one file for the
-genre on line 1 and stop. The copy under `skill/figdown/reference/` is
+genre on the header line and stop. The copy under `skill/figdown/reference/` is
 generated from `read/0.5/` by `tools/make-skill.js` and exists only so the
 installed bundle works with no repository and no network.
 
 | Your question | Document |
 |---|---|
-| **I have a `.fd` in front of me and need to read it correctly** | [`read/0.5/reading.md`](../read/0.5/reading.md) plus the one file for the genre on line 1. **Nothing to install** — they are ordinary Markdown in this repository. |
+| **I have a `.fd` in front of me and need to read it correctly** | [`read/0.5/reading.md`](../read/0.5/reading.md) plus the one file for the genre on the header line (the first line that is not blank or a comment). **Nothing to install** — they are ordinary Markdown in this repository. |
 | How do I write, build and embed a figure? | [`skill/figdown/SKILL.md`](../skill/figdown/SKILL.md), then whatever its router names |
 | What may I conclude from a figure someone else wrote? | [`read/0.5/reading.md`](../read/0.5/reading.md) |
 | How do I turn an existing drawing into a `.fd`? | [`read/0.5/transcribe.md`](../read/0.5/transcribe.md) |

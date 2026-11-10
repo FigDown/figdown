@@ -8,6 +8,6 @@ node b "B" height=40
 node c "C" kind=router
 # 0.1: the OLD spellings `w=`/`h=` are retired language-wide, so they
 # get the rename diagnostic rather than this directive's message — a retired
-# spelling must name its migration entry (PROCESS §5(d)).
+# spelling must name its migration entry (PROCESS §5, "Deprecation").
 node d "D" w=100
 node e "E" h=40

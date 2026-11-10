@@ -76,3 +76,12 @@ edge bd24b [lag1.24] -- srv
 bundle es1 "ES-1 / LAG-1" bd24a--srv,bd24b--srv stroke=#0ea5e9
 edge bd4 [e1/13.4] -- h4
 edge bd3 [e1/2.3] -- h3
+
+# content-zone intent (strip test, ED): the fabric reads top-down, and each
+# leaf's VRF and bridge domains are peers on one rank, so the figure still
+# draws with every pin removed. The pins above place it; these lines are why
+# auto-layout can too.
+flow down
+rank vrf2,bd2,bd24a
+rank vrf4,bd24b,bd4
+rank vrf3,bd3

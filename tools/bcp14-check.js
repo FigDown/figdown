@@ -284,8 +284,8 @@ if (bad.length) {
   console.log('\nCHECK 2 — NON-BCP-14 ALL-CAPS MODAL CONSTRUCTIONS:');
   for (const b of bad)
     console.log('  ' + b.file + ':' + b.line + '  "' + b.text + '"  — ' + b.ctx);
-  console.log('\n  BCP 14 defines eleven spellings and this is not one of them, so');
-  console.log('  core §0.1 does not say what it means. Write the BCP 14 form: an');
+  console.log('\n  Core §0.1 declares eleven spellings and this is not one of them,');
+  console.log('  so the document gives it no meaning. Write the declared form: an');
   console.log('  absolute prohibition is MUST NOT, and "never" is carried by the');
   console.log('  scope clause beside it, not by the keyword.');
   fail += bad.length;

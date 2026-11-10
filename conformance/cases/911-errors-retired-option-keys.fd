@@ -4,7 +4,7 @@ figdown 0.1 block
 # message could be per-directive — these spellings left the language
 # altogether: no directive accepts them, so the diagnostic fires WHEREVER the
 # key appears (the `colw` → `width` precedent). A retired spelling must name
-# its migration entry (PROCESS §5(d)); this case pins all three messages, and
+# its migration entry (PROCESS §5, "Deprecation"); this case pins all three messages, and
 # pins that the named diagnostic beats both the generic `unknown option` and
 # the host directive's own "does not take" message.
 #

@@ -1,0 +1,16 @@
+figdown 0.5 topology
+# 0.5: an empty member is an error in every comma list. `rank`
+# and `class=` already refused one; `bundle` dropped it silently, so
+# `e1,,e2` and a stray leading or trailing comma drew the same ring as the
+# list without it. The last line is the clean list, and it still parses.
+node a "A"
+node b "B"
+node c "C"
+node d "D" class=x,
+edge a -- b
+edge a -- c
+rank a,,b
+bundle t1 "LAG" a--b,,a--c
+bundle t2 "LAG" a--b,a--c,
+bundle t3 ,a--b
+bundle t4 "LAG" a--b,a--c

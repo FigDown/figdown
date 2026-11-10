@@ -179,7 +179,7 @@ function drawnTags(svg) {
     let a;
     while ((a = ra.exec(m[3]))) attrs[a[1]] = a[2];
     const hiddenBy = open.length ? open[open.length - 1].hiddenBy : null;
-    const t = { name: m[2], attrs, at: m.index, hiddenBy };
+    const t = { name: m[2], attrs, at: m.index, hiddenBy, depth: open.length };
     out.push(t);
     if (!/\/\s*$/.test(m[3]))
       open.push({ hiddenBy: hiddenBy || (attrs['aria-hidden'] === 'true' ? t : null) });
@@ -331,6 +331,20 @@ function checkArtifact(svg, fdPath, manifestPath, noTitleIsAuthors) {
       errors.push('C: a `generated` description is published. It was produced by a model that was not ' +
         'constrained to the semantic model and is NEVER publishable on its own (§4.2)');
     }
+  }
+  // B and C hold for EVERY root-level <desc>, not only one among the root's
+  // first two children: an unmarked description further down is the same
+  // silent authority, and the two-child read above cannot see it.
+  const rootDescs = drawnTags(svg).filter(t => t.name === 'desc' && t.depth === 1);
+  for (const t of rootDescs.slice(descKid ? 1 : 0)) {
+    const st = t.attrs['data-desc-state'];
+    if (st === undefined || STATES.indexOf(st) < 0 || st === 'absent')
+      errors.push('B: a root <desc> that is not among the root\'s first two children carries ' +
+        (st === undefined ? 'no state' : 'data-desc-state="' + st + '"') + ' — every <desc> needs one of ' +
+        STATES.filter(x => x !== 'absent').join(' / ') + ' (§4.2, §4.3)');
+    else if (st === 'generated')
+      errors.push('C: a `generated` description is published, in a root <desc> that is not among the ' +
+        'root\'s first two children (§4.2)');
   }
 
   // ---- Assertion F (fatal) — no identity element is hidden ----

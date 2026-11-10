@@ -86,7 +86,7 @@ particular there is no layout-lint tool and no "render to PNG".
 | Tool | Why an agent needs it |
 |---|---|
 | `figdown_build` | Turn one `.fd` into the deterministic, self-carrying SVG. The artifact embeds its own source, that source's SHA-256 and the engine version (core §7), so it round-trips back to text. |
-| `figdown_check` | Parse one document *or walk a whole tree*, render nothing, write nothing. This is the write → validate → fix loop and the corpus sweep; it exists separately from `build` so that iterating on a broken file costs no render and puts no SVG in the agent's context. |
+| `figdown_check` | Check one document *or walk a whole tree* and return diagnostics only — parse-time and geometry-time (a figure the engine refuses to draw) — with no SVG returned and nothing written. This is the write → validate → fix loop and the corpus sweep; it exists separately from `build` so that iterating on a broken file puts no SVG in the agent's context. |
 | `figdown_read` | The semantic model — participants, relationships and direction, containment, and the **stated meaning** of every class — shipped with the reading contract. Accepts a `.svg` too, recovering the source from its metadata and reporting the artifact stale if the `.fd` has moved on. A `sequence` section reports its own collections (lifelines, messages, states, fragments, operands) and gets one extra contract line, because in that genre a message is **not** an edge and array order **is** the meaning. |
 | `figdown_reference` | The per-genre reference, so an agent knows what a genre may and may not say. The grammar is **closed** and the parser **never warns about portability**, so this is the only place the frozen / EXPERIMENTAL split is visible. |
 

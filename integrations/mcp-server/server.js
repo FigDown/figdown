@@ -506,10 +506,11 @@ const TOOLS = [
   },
   {
     name: 'figdown_check',
-    title: 'Validate FigDown without rendering',
+    title: 'Validate FigDown — diagnostics only',
     description:
       'Parse one document or a whole tree of .fd files and return the diagnostics — line number, '
-      + 'reason, and for a retired spelling the replacement. Renders nothing and writes nothing. '
+      + 'reason, and for a retired spelling the replacement. Returns diagnostics only — parse-time '
+      + 'and geometry-time (a figure the engine refuses to draw); no SVG is returned and nothing is written. '
       + 'This is the tool for the write -> validate -> fix loop and for sweeping a corpus; use '
       + 'figdown_build when you actually want the SVG.',
     inputSchema: {

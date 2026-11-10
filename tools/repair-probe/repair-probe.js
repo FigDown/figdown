@@ -3,11 +3,13 @@
 //
 // WHAT IT MEASURES
 // ----------------
-// A structured diagnostics envelope was added to the engine's public API
-// (dist's `parse()`/`render()` now return a `diagnostics` array alongside the
-// plain-string `errors` array — spec core §8.4: one entry per error string,
-// carrying a `code`, a `subject`, `evidence`, and engine-verified
-// `supportedFixes`). Whether that envelope is worth putting in front of an
+// A structured diagnostics envelope was once added to the engine's public API
+// (dist's `parse()`/`render()` returned a `diagnostics` array alongside the
+// plain-string `errors` array, then specified as a core §8.4 that no longer
+// exists: one entry per error string, carrying a `code`, a `subject`,
+// `evidence`, and engine-verified `supportedFixes`). This probe measured it,
+// the envelope failed its pre-registered bar and was RETRACTED — dist returns
+// no diagnostics today; the result is PROOF.md §4.3. Whether that envelope is worth putting in front of an
 // authoring agent — worth documenting, worth teaching, worth shipping as part
 // of the library surface — is a question with a measurable answer: does a
 // COLD agent repair a broken `.fd` faster and more reliably when it is shown

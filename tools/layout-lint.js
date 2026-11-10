@@ -1325,7 +1325,7 @@ const NOT_JUDGED = [
 ];
 
 // ── F5 RATCHET BASELINE (spec/core.md §14) ────────────────────────────────────
-// F5 lands ADVISORY. The 7 labels below are REAL defects, not false positives —
+// F5 lands ADVISORY. The labels below are REAL defects, not false positives —
 // the list is the honest state and no filter or M was weakened to shrink it.
 // They are TOLERATED here (a warning, never a failure) because every one sits in
 // a figure still under layout repair: the DEFECT is the placement, and only
@@ -1492,8 +1492,9 @@ const SKIP_REASONS = [
 ];
 
 // Reasons that mean "the tool could not read this figure". These fail --strict:
-// an unscored figure is otherwise indistinguishable from a clean one. The one
-// reason NOT in this set is `no-scene-genre`, which is a correct answer rather
+// an unscored figure is otherwise indistinguishable from a clean one. Two
+// reasons are NOT in this set: `geometry-refused` (the engine declined to draw
+// on purpose; gate:artifact owns that verdict) and `no-scene-genre`, which is a correct answer rather
 // than a failure to answer — a bitfield has no edges to cross. It is still
 // counted and named on every run, so it is no longer silent either.
 const STRICT_SKIPS = new Set([
@@ -1781,6 +1782,12 @@ function main() {
   console.log('considered ' + considered
             + '  scored ' + rows.length
             + '  skipped ' + skips.length);
+  // an empty corpus is not a clean run. The shared gate module exits 2
+  // here (tools/README.md "an empty corpus exits 2"), and so does this copy.
+  if (!considered) {
+    console.log('EMPTY  no .fd file was considered — a wrong root or an empty corpus, not a pass');
+    process.exit(2);
+  }
   for (const [reason, why] of SKIP_REASONS) {
     const hits = byReason.get(reason) || [];
     console.log('  ' + pad(reason, 26) + lpad(hits.length, 3)

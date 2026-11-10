@@ -62,12 +62,10 @@
       "line": 17
     },
     {
-      "a": "c",
-      "op": "->",
+      "a": "s",
+      "op": "<->",
       "b": "s",
-      "label": "labels at both ends",
-      "tail": "from",
-      "head": "to",
+      "label": "self exchange, one shaft with two heads",
       "line": 18
     },
     {

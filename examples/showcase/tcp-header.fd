@@ -28,9 +28,9 @@ field "Reserved" 4 description="must be zero"
 # can address each flag's exact bit position, not just the byte that holds them.
 # The first six use the COMPACT form: `name:width` pairs, comma-separated on one
 # `field` line, declare exactly the same six one-bit fields the long form would —
-# same model, same boxes, six lines saved. The compact form takes no option keys,
-# so SYN and FIN stay long-form: they carry a `fill=` that marks the two flags
-# this figure is highlighting.
+# same model, same boxes, six lines saved. Option keys on a compact line apply to
+# every field on it, so SYN and FIN stay long-form: each carries its own `fill=`
+# marking the two flags this figure is highlighting.
 field CWR:1,ECE:1,URG:1,ACK:1,PSH:1,RST:1
 field "SYN" 1 fill=#fee2e2
 field "FIN" 1 fill=#fee2e2

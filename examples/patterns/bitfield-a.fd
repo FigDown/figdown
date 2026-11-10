@@ -5,7 +5,8 @@ figdown 0.1 bitfield
 title "Control Register Pattern"
 
 bitfield ctrl_reg "Control Register" word=32 numbering=lsb0
-# Row 0: flag cluster at high bits + wide mode field + small type nibble + reserved low bits
+# Row 0, in declaration order — under lsb0 the FIRST field takes the HIGH bits:
+# reserved high nibble + type nibble + FIELD_A + mode field + reserved + flag cluster at the low bits
 field "Reserved" 4
 field "TYPE" 4
 field "FIELD_A" 8

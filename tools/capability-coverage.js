@@ -51,6 +51,9 @@
  *                      demands a demonstrator for the new alternative with
  *                      no edit here. Derived FROM THE SPEC TEXT.
  *   F. structural    — A DECLARED LIST. See the honesty section below.
+ *   G. option cells  — the `Option keys` cell of every genre-document keyword row,
+ *                      PROBED against the engine in both directions and compared with
+ *                      the zh-tw twin (tools/option-cells.js).
  *
  *   CROSS-CHECK (A, B): the derived keyword and option-key sets are compared
  *   against the Complete-vocabulary tables of the spec genre documents, read

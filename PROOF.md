@@ -31,7 +31,7 @@ npm test          # every gate, in order, with a pass/fail line each
 npm run gates:list # the enumeration alone, without running anything
 ```
 
-There are **36 gates**. Each note below is the tool's own
+There are **38 gates**. Each note below is the tool's own
 one-line description of itself, read out of its header comment, so a note cannot
 drift from the tool it describes; 10 are stated here instead, where the
 header's first line does not stand alone:
@@ -52,7 +52,7 @@ header's first line does not stand alone:
 | `gate:dist` | `node tools/dist-check.js --strict` | the gate `dist/` never had |
 | `gate:isolation` | `node tools/isolation-check.js --strict` | the FROZEN set must survive deletion of the EXPERIMENTAL set |
 | `gate:boundary` | `node tools/boundary-check.js --strict` | render-side check for boundary placement in pinned scenes |
-| `gate:stability` | `node tools/stability-check.js` | axiom-3 evidence harness for FigDown |
+| `gate:stability` | `node tools/stability-check.js --strict` | axiom-3 evidence harness for FigDown |
 | `gate:locality` | `node tools/layout-stability/run.js --strict` | THE LAYOUT-LOCALITY INSTRUMENT (ADV-9, axiom LAYOUT-STABILITY) |
 | `gate:migrate` | `node tools/migrate-check.js` | the fixture suite for tools/migrate-figdown.js |
 | `gate:skill-coverage` | `node tools/skill-coverage.js --strict` | the agent skill teaches the whole registry, and nothing retired |
@@ -63,6 +63,8 @@ header's first line does not stand alone:
 | `gate:standards` | `node tools/standards-check.js --strict` | the external-standard claims gate (gate:standards) |
 | `gate:plugin` | `node tools/plugin-check.js --strict` | the Claude Code plugin wrapper must stay a WRAPPER |
 | `gate:mcp` | `node integrations/mcp-server/test.js` | Test for the FigDown MCP server |
+| `gate:kroki` | `node integrations/kroki-service/test.js` | Test for the figdown Kroki-companion service: ephemeral port, POST valid and invalid docs, and the GET deflate+base64url path in both the Kroki (zlib) and the raw-deflate encodings |
+| `gate:markdown-it` | `node integrations/markdown-it-figdown/test.js` | Dependency-free test for markdown-it-figdown: drives the plugin through a minimal markdown-it shim implementing just the fence-rule surface the plugin touches (renderer.rules.fence, token {info, content}, self.renderToken) |
 | `gate:proof` | `node tools/make-proof.js --check` | this page is not stale — regenerating it from the tree must reproduce the committed bytes |
 | `gate:safesvg` | `node tools/safe-svg-check.js --strict` | the Safe SVG profile gate (gate:safesvg) |
 | `gate:schema` | `node tools/schema-check.js --strict` | the gate over `spec/figdown-model.schema.json`, the published SHAPE contract for the canonical semantic model (core §12) |
@@ -89,16 +91,16 @@ node conformance/run.js                  # the normative surface
 node conformance/run.js --experimental   # the corpus outside it
 ```
 
-- **215 normative fixtures**, 215 passing, 0 failing. This is the number that may
+- **219 normative fixtures**, 219 passing, 0 failing. This is the number that may
   be quoted as "the conformance suite" — `conformance/cases/`.
-- **87 experimental fixtures**, 87 passing, 0 failing (72 by genre, 48 by demoted construct, 33 both). They pin
+- **91 experimental fixtures**, 91 passing, 0 failing (76 by genre, 48 by demoted construct, 33 both). They pin
   reference-engine behaviour and are required to pass, but their subject is
   outside the v0.1 surface, so a second implementation may skip the whole
   directory and still conform. The reason for each is recorded in
   `conformance/STATUS.txt`.
-- **302 fixtures run in total**, 302 passing, 0 failing.
+- **310 fixtures run in total**, 310 passing, 0 failing.
 
-The corpus on disk is **215** `.fd` files under `conformance/cases/` and **87**
+The corpus on disk is **219** `.fd` files under `conformance/cases/` and **91**
 under `conformance/experimental/` — the same counts the runner reports, so no fixture is present and unrun.
 
 Every audited engine-vs-spec deviation is written down in
@@ -163,8 +165,8 @@ The engine is one hand-edited file, `editor/figdown.html`; the other copies are
 generated from it and byte-gated against it. It stamps its own version into every
 artifact it builds, because the reproducibility promise is per-renderer-version.
 
-- `FIGDOWN_VERSION` — **`0.5.3`** (read from `editor/figdown.html`).
-- package version — **`0.5.3`**.
+- `FIGDOWN_VERSION` — **`0.5.4`** (read from `editor/figdown.html`).
+- package version — **`0.5.4`**.
 - engine copies present, each gated against that source copy — **4**: `editor/figdown.html`, `skill/figdown/figdown.html`, `dist/figdown.js`, `dist/figdown.mjs`.
 
 ## 4. What was measured rather than asserted

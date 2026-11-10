@@ -112,7 +112,7 @@ carrying the same construct into `block`.
 | `group` | `group <id> ["label"]` | T | NORMATIVE | `fill` `stroke` `style` `class` `gap` `note` (requires `figdown 0.3`) | one nesting level — see the declaration below, where this genre's own default is the open question |
 | `external` | `external <id> ["label"]` | T | NORMATIVE | **none** | never drawn (`EXTERNAL-EDGE-ENDPOINTS`); since 0.1 it took no paint key — `color=` was its only one and it is retired (`COLOUR-KEY-STATUS`) — and since 0.3 (`PAINT-ORDER-CONSTRUCT`) it takes **no option key at all**: `plane=` was its last one. No `note=` — it puts nothing on the page, so there is nothing for a note to stand beside |
 | `edge` | `edge <a> [tail] <op> [head] <b>` | T | NORMATIVE | `stroke` `style` `class` `note` (requires `figdown 0.3`) `id` (requires `figdown 0.5`) | op is written form; `[mid]` splits the operator; all three labels take the line's colour (`LABEL-COLOUR-SOURCE`); an edge is a LINK, physical or logical |
-| `bundle` | `bundle <id> ["label"] <member>,<member>` | T | **EXPERIMENTAL** | `stroke` `style` | a LAG, an ECMP set, an EVPN Ethernet Segment — see the declaration below. Ring drawn dashed; a member is an endpoint pair `a--b` **or**, from `figdown 0.5`, a connector `id` (`CONNECTOR-IDENTITY-KEY`); member list is ONE whitespace-free comma-delimited token (the space form was RETIRED at 0.1); no `fill=` — a ring has no interior (SYNTAX-STYLE §8.4) |
+| `bundle` | `bundle <id> ["label"] <member>,<member>` | T | **EXPERIMENTAL** | `stroke` `style` | a LAG, an ECMP set, an EVPN Ethernet Segment — see the declaration below. Ring drawn dashed; a member is an endpoint pair `a--b` **or**, from `figdown 0.5`, a connector `id` (`CONNECTOR-IDENTITY-KEY`); member list is ONE whitespace-free comma-delimited token (the space form was RETIRED at 0.1) with no empty member (`a--b,,c--d` and a leading or trailing comma are a line error since 0.5, as in `rank` and `class=`); no `fill=` — a ring has no interior (SYNTAX-STYLE §8.4) |
 | `class` | `class <id> "<meaning>"` | H | NORMATIVE | `fill` `stroke` `style` | the meaning FIELD is REQUIRED, its VALUE may be `""` (= no meaning claimed, no legend entry — `CLASS-EMPTY-MEANING`); a class an `edge` joins must not declare `fill=` without `stroke=` — an edge has no interior, so the two name ONE channel (`INTERIOR-LESS-ELEMENT-PAINT`). Declaring NO paint is legal: the class claims a meaning and the edge keeps its default line (`CLASS-PAINT-REQUIREMENT`'s second half RETIRED at 0.4, `CLASS-CHANNEL-REACH`) |
 | `flow` | `flow right\|down\|left\|up` | H | NORMATIVE | — | **`right`** |
 | `rank` | `rank <id>,<id>[,<id>…]` | H | NORMATIVE | — | two or more ids in ONE whitespace-free comma-delimited token; the space form was RETIRED at 0.1; the rest of the line is reserved for future options |
@@ -646,7 +646,7 @@ already carries outside that table: "a repeated option key on ONE line is
 a line error" (the option-lexer bullet) is the precedent this follows, not
 a construct-repeat rule extended to cover it.
 
-**Five `bundle` member errors are new or reworded (`CONNECTOR-IDENTITY-KEY`),
+**Four `bundle` member errors are new or reworded (`CONNECTOR-IDENTITY-KEY`),
 because a member may now be a connector id.** Each names what the author
 wrote, in the form they wrote it:
 

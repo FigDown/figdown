@@ -3,7 +3,7 @@
   "$id": "https://figdown.org/spec/figdown-manifest.schema.json",
   "title": "FigDown publication manifest (profile 1)",
   "description": "The SHAPE contract for the non-core publication manifest of spec/figdown-manifest.md — a sidecar `X.manifest.json` beside a published `X.fd` ⇔ `X.svg` pair, carrying identity, hashes, provenance, review state and dependencies, and nothing else (decisions/registry.md; ruled whole 2026-08-22 as `PUBLICATION-MANIFEST-PROFILE`). `accessibility.role` (`MANIFEST-ACCESSIBILITY-ROLE`) landed the same day, closing a gap `ACCESSIBILITY-PROFILE` opened that morning against a block that had already shipped closed. It states what tools/manifest-check.js (gate:manifest) validates every manifest against. Like spec/figdown-model.schema.json it states SHAPE only: it cannot check that a restated field agrees with the artifact it restates (assertion B), that a review or accessibility state is bound to the CURRENT source hash rather than a stale one (assertion C's STALE/UNBOUND distinction), or that a well-formed `x-` key is reported rather than silently accepted (assertion E's second half) — those are the verifier's job, run alongside this schema, never instead of it.",
-  "$comment": "CLOSED, exactly as the language and the model schema are (figdown-manifest.md §3 rule 1; spec/figdown-model.schema.json's own $comment): `additionalProperties: false` at every object level, so an unknown key is an error, never ignored. The ONE extension door is `x-`-prefixed keys, and the extension policy is RULED (`LANGUAGE-EXTENSION-POLICY`/`MANIFEST-EXTENSION-NAMESPACE`, 2026-08-23; figdown-manifest.md §3 rule 2 and §3.1). WHAT THE PATTERN NOW MEANS: the RULED SPELLING is `x-<owner>-<key>`, where `<owner>` is a token the owner controls and can be traced to (a DNS label they hold, a GitHub org, a registered project name) — `x-acme-review-queue`, not `x-queue` — so the pattern `^x-[^-]+(-[^-]+)+$` enforces exactly that and nothing more: at least two non-empty hyphen-separated segments after `x-`, which is the minimum an owner-prefixed key can have. An UNOWNED `x-` key (`x-status`) matches neither `properties` nor this pattern and FAILS, which is the collision `MANIFEST-EXTENSION-NAMESPACE` rule (a) exists to prevent: two publishers, one spelling, two meanings, both files valid. THERE IS NO REGISTRY, no allocation and no application — the namespace is delegated to the owner rather than administered by this project, so nothing here enumerates owners and nothing ever will. A key matching the pattern validates against `{}` (anything): the ruling constrains the SPELLING and the CONSUMER's duties (never infer, always reportable, never revise — figdown-manifest.md §3.1(b)), and deliberately imposes no shape on the value, because the value is the owner's. PROMOTION IS NEVER BY RENAME (`MANIFEST-EXTENSION-NAMESPACE` rule (d), RFC 6648 Appendix B): an `x-` key never becomes a profile key by keeping or changing its spelling, so no future edit of this file will move a name out of `patternProperties` into `properties`. ENUM POLICY: `provenance[].relation`, `review.state`, `accessibility.state`, `accessibility.role` and `dependencies[].kind` are enumerated because a new member of any of them is a semantic event that changes what a consumer may conclude (figdown-manifest.md §4.5, §4.6, §4.7; `PUBLICATION-MANIFEST-PROFILE`, `MANIFEST-REVIEW-STATE`, `MANIFEST-ACCESSIBILITY-ROLE`; decisions/registry.md, `ACCESSIBILITY-PROFILE`/`ACCESSIBLE-DESCRIPTION-SOURCES`) — the same policy spec/figdown-model.schema.json states for the model's own enums. `renderer.name` is a free string with no enum, because its membership lives in the world of renderer implementations, not in this profile. NO `elements` KEY EXISTS ANYWHERE IN THIS SCHEMA: per-element provenance was RULED, REFUSED (`PER-ELEMENT-PROVENANCE`, decisions/registry.md) against its own three-condition bar, and `additionalProperties: false` makes reviving it under that name fail this gate loudly rather than pass unnoticed — the same discipline spec/figdown-model.schema.json states for its three deliberately-undeclared model slots. `semantic` is a designed, RESERVED slot with no producer: the shape lands (`MANIFEST-DEPENDENCY-AND-SEMANTIC-SLOTS`), the hash itself remains BLOCKED on the semantic-projection work, which is registered and not yet ruled, and a manifest shipped today simply omits the block — its absence is not `meaning unchanged` (figdown-manifest.md §7).",
+  "$comment": "CLOSED, exactly as the language and the model schema are (figdown-manifest.md §2 rule 1; spec/figdown-model.schema.json's own $comment): `additionalProperties: false` at every object level, so an unknown key is an error, never ignored. The ONE extension door is `x-`-prefixed keys, and the extension policy is RULED (`LANGUAGE-EXTENSION-POLICY`/`MANIFEST-EXTENSION-NAMESPACE`, 2026-08-23; figdown-manifest.md §2 rule 2 and §2.1). WHAT THE PATTERN NOW MEANS: the RULED SPELLING is `x-<owner>-<key>`, where `<owner>` is a token the owner controls and can be traced to (a DNS label they hold, a GitHub org, a registered project name) — `x-acme-review-queue`, not `x-queue` — so the pattern `^x-[^-]+(-[^-]+)+$` enforces exactly that and nothing more: at least two non-empty hyphen-separated segments after `x-`, which is the minimum an owner-prefixed key can have. An UNOWNED `x-` key (`x-status`) matches neither `properties` nor this pattern and FAILS, which is the collision `MANIFEST-EXTENSION-NAMESPACE` rule (a) exists to prevent: two publishers, one spelling, two meanings, both files valid. THERE IS NO REGISTRY, no allocation and no application — the namespace is delegated to the owner rather than administered by this project, so nothing here enumerates owners and nothing ever will. A key matching the pattern validates against `{}` (anything): the ruling constrains the SPELLING and the CONSUMER's duties (never infer, always reportable, never revise — figdown-manifest.md §2.1(b)), and deliberately imposes no shape on the value, because the value is the owner's. PROMOTION IS NEVER BY RENAME (`MANIFEST-EXTENSION-NAMESPACE` rule (d), RFC 6648 Appendix B): an `x-` key never becomes a profile key by keeping or changing its spelling, so no future edit of this file will move a name out of `patternProperties` into `properties`. ENUM POLICY: `provenance[].relation`, `review.state`, `accessibility.state`, `accessibility.role` and `dependencies[].kind` are enumerated because a new member of any of them is a semantic event that changes what a consumer may conclude (figdown-manifest.md §3.5, §3.6, §3.7; `PUBLICATION-MANIFEST-PROFILE`, `MANIFEST-REVIEW-STATE`, `MANIFEST-ACCESSIBILITY-ROLE`; decisions/registry.md, `ACCESSIBILITY-PROFILE`/`ACCESSIBLE-DESCRIPTION-SOURCES`) — the same policy spec/figdown-model.schema.json states for the model's own enums. `renderer.name` is a free string with no enum, because its membership lives in the world of renderer implementations, not in this profile. NO `elements` KEY EXISTS ANYWHERE IN THIS SCHEMA: per-element provenance was RULED, REFUSED (`PER-ELEMENT-PROVENANCE`, decisions/registry.md) against its own three-condition bar, and `additionalProperties: false` makes reviving it under that name fail this gate loudly rather than pass unnoticed — the same discipline spec/figdown-model.schema.json states for its three deliberately-undeclared model slots. `semantic` is a designed, RESERVED slot with no producer: the shape lands (`MANIFEST-DEPENDENCY-AND-SEMANTIC-SLOTS`), the hash itself remains BLOCKED on the semantic-projection work, which is registered and not yet ruled, and a manifest shipped today simply omits the block — its absence is not `meaning unchanged` (figdown-manifest.md §3.4).",
 
   "type": "object",
   "required": ["figdown_manifest", "document", "language", "source"],
@@ -12,11 +12,11 @@
   "properties": {
     "figdown_manifest": {
       "const": "1",
-      "$comment": "Versioned in its first key (figdown-manifest.md §3 rule 3, `PUBLICATION-MANIFEST-PROFILE`). A consumer that does not know the version stops; it does not guess — the same rule core §13.7 states for an engine reading a declared language version. There is only one profile version today, so `const` rather than `enum`: a second profile version is a version-gated event in this document, the same way a genre addition is a version-gated event in the language."
+      "$comment": "Versioned in its first key (figdown-manifest.md §2 rule 3, `PUBLICATION-MANIFEST-PROFILE`). A consumer that does not know the version stops; it does not guess — the same rule core §13.7 states for an engine reading a declared language version. There is only one profile version today, so `const` rather than `enum`: a second profile version is a version-gated event in this document, the same way a genre addition is a version-gated event in the language."
     },
     "document": {
       "type": "object",
-      "title": "Document identity (figdown-manifest.md §4.1, `PUBLICATION-MANIFEST-PROFILE`)",
+      "title": "Document identity (figdown-manifest.md §3.1, `PUBLICATION-MANIFEST-PROFILE`)",
       "required": ["id"],
       "additionalProperties": false,
       "patternProperties": { "^x-[^-]+(-[^-]+)+$": {} },
@@ -24,22 +24,22 @@
         "id": {
           "type": "string",
           "minLength": 1,
-          "$comment": "A publisher-scoped logical name, stable across renames of the file. NOT an element identity and NOT a cross-document identity — the identity model this project adopted deliberately left identity across documents closed, and this profile does not reopen it (figdown-manifest.md §4.1)."
+          "$comment": "A publisher-scoped logical name, stable across renames of the file. NOT an element identity and NOT a cross-document identity — the identity model this project adopted deliberately left identity across documents closed, and this profile does not reopen it (figdown-manifest.md §3.1)."
         },
         "path": {
           "type": "string",
-          "$comment": "Repository-relative and ADVISORY, never restated-with-error-on-mismatch: a manifest that travels without its tree still has `id` (figdown-manifest.md §4.1). Not part of the restatement rule (§1) because no artifact field carries a repository path to disagree with."
+          "$comment": "Repository-relative and ADVISORY, never restated-with-error-on-mismatch: a manifest that travels without its tree still has `id` (figdown-manifest.md §3.1). Not part of the restatement rule (§3.2) because no artifact field carries a repository path to disagree with."
         },
         "sections": {
           "type": "integer",
           "minimum": 1,
-          "$comment": "A COUNT, not a locator (figdown-manifest.md §2.2): a multi-section .fd has no syntax naming a section, and this key states how many there are, in document order, and nothing else about them."
+          "$comment": "A COUNT, not a locator (figdown-manifest.md §1.2): a multi-section .fd has no syntax naming a section, and this key states how many there are, in document order, and nothing else about them."
         }
       }
     },
     "language": {
       "type": "object",
-      "title": "Declared language version and genre(s) (figdown-manifest.md §4.2, `PUBLICATION-MANIFEST-PROFILE`)",
+      "title": "Declared language version and genre(s) (figdown-manifest.md §3.2, `PUBLICATION-MANIFEST-PROFILE`)",
       "required": ["version"],
       "additionalProperties": false,
       "patternProperties": { "^x-[^-]+(-[^-]+)+$": {} },
@@ -47,18 +47,18 @@
         "version": {
           "type": "string",
           "pattern": "^[0-9]+\\.[0-9]+$",
-          "$comment": "The wire-grammar version the FIRST section's `figdown X.Y genre` header declares (figdown-manifest.md §4.2, following the §4.7/`ACCESSIBILITY-PROFILE` convention that a multi-section file's single-valued restated field takes the first section's value and says so). A pattern, not an enum, for the same reason spec/figdown-model.schema.json's header.version is a pattern: the set gains one token per language release, which is bookkeeping, and the engine's own version gate is the authority, not this file."
+          "$comment": "The wire-grammar version the FIRST section's `figdown X.Y genre` header declares (figdown-manifest.md §3.2, following the §3.7/`ACCESSIBILITY-PROFILE` convention that a multi-section file's single-valued restated field takes the first section's value and says so). A pattern, not an enum, for the same reason spec/figdown-model.schema.json's header.version is a pattern: the set gains one token per language release, which is bookkeeping, and the engine's own version gate is the authority, not this file."
         },
         "genres": {
           "type": "array",
           "items": { "type": "string" },
-          "$comment": "One entry per section, IN DOCUMENT ORDER and by nothing else (figdown-manifest.md §2.2, §4.2) — the array position is not a locator and MUST NOT be read as one."
+          "$comment": "One entry per section, IN DOCUMENT ORDER and by nothing else (figdown-manifest.md §1.2, §3.2) — the array position is not a locator and MUST NOT be read as one."
         }
       }
     },
     "renderer": {
       "type": "object",
-      "title": "Renderer identity, restated from the artifact (figdown-manifest.md §4.2, `PUBLICATION-MANIFEST-PROFILE`)",
+      "title": "Renderer identity, restated from the artifact (figdown-manifest.md §3.2, `PUBLICATION-MANIFEST-PROFILE`)",
       "required": ["name", "engine_version"],
       "additionalProperties": false,
       "patternProperties": { "^x-[^-]+(-[^-]+)+$": {} },
@@ -71,17 +71,17 @@
         "engine_version": {
           "type": "string",
           "minLength": 1,
-          "$comment": "RESTATES the artifact's `data-engine-version` (core §7). A mismatch is an error IN THE MANIFEST, never a merge and never a vote (figdown-manifest.md §1, `PUBLICATION-MANIFEST-PROFILE`) — the `.fd`/`.svg` pair remains truth."
+          "$comment": "RESTATES the artifact's `data-engine-version` (core §7). A mismatch is an error IN THE MANIFEST, never a merge and never a vote (figdown-manifest.md §3.2, `PUBLICATION-MANIFEST-PROFILE`) — the `.fd`/`.svg` pair remains truth."
         },
         "render_options": {
           "type": "string",
-          "$comment": "RESTATES the artifact's `data-render-options`, present in the manifest ONLY when the artifact carries a non-default option (core §7: 'Any non-default option MUST be recorded'). Its absence restates the artifact's default exactly as the artifact's own absent attribute does — the two are symmetric, and a manifest asserting a render option the artifact does not carry is a restatement mismatch (figdown-manifest.md §4.2, §1)."
+          "$comment": "RESTATES the artifact's `data-render-options`, present in the manifest ONLY when the artifact carries a non-default option (core §7: 'Any non-default option MUST be recorded'). Its absence restates the artifact's default exactly as the artifact's own absent attribute does — the two are symmetric, and a manifest asserting a render option the artifact does not carry is a restatement mismatch (figdown-manifest.md §3.2)."
         }
       }
     },
     "source": {
       "type": "object",
-      "title": "Source hash — integrity, not provenance (figdown-manifest.md §4.3, `PUBLICATION-MANIFEST-PROFILE`)",
+      "title": "Source hash — integrity, not provenance (figdown-manifest.md §3.3, `PUBLICATION-MANIFEST-PROFILE`)",
       "required": ["sha256"],
       "additionalProperties": false,
       "patternProperties": { "^x-[^-]+(-[^-]+)+$": {} },
@@ -90,29 +90,29 @@
         "bytes": {
           "type": "integer",
           "minimum": 0,
-          "$comment": "A cheap second signal over the same bytes the hash covers — catches a truncated copy before the hash is even computed (figdown-manifest.md §4.3)."
+          "$comment": "A cheap second signal over the same bytes the hash covers — catches a truncated copy before the hash is even computed (figdown-manifest.md §3.3)."
         }
       }
     },
     "semantic": {
       "type": "object",
-      "title": "semantic_sha256 — a designed, RESERVED slot (figdown-manifest.md §4.4, `MANIFEST-DEPENDENCY-AND-SEMANTIC-SLOTS`) — no producer exists yet",
+      "title": "semantic_sha256 — a designed, RESERVED slot (figdown-manifest.md §3.4, `MANIFEST-DEPENDENCY-AND-SEMANTIC-SLOTS`) — no producer exists yet",
       "required": ["algorithm", "sha256"],
       "additionalProperties": false,
       "patternProperties": { "^x-[^-]+(-[^-]+)+$": {} },
-      "$comment": "BLOCKED on the semantic-projection work, which is registered and not yet ruled (core §12.5.2, `MANIFEST-DEPENDENCY-AND-SEMANTIC-SLOTS`). Every manifest shipped today OMITS this block; absence is NOT 'meaning unchanged' — it means no producer exists yet (figdown-manifest.md §4.4, §7's absence sentence). When that work lands a hash, a consumer that does not recognise `algorithm`'s value MUST treat the field as UNREADABLE (report `unknown-semantic-algorithm` and fall back to `source.sha256`), never as 'unchanged' and never as 'changed' — silent fallback would let a meaning change pass as a byte change.",
+      "$comment": "BLOCKED on the semantic-projection work, which is registered and not yet ruled (core §12.5.2, `MANIFEST-DEPENDENCY-AND-SEMANTIC-SLOTS`). Every manifest shipped today OMITS this block; absence is NOT 'meaning unchanged' — it means no producer exists yet (figdown-manifest.md §3.4, item 3). When that work lands a hash, a consumer that does not recognise `algorithm`'s value MUST treat the field as UNREADABLE (report `unknown-semantic-algorithm` and fall back to `source.sha256`), never as 'unchanged' and never as 'changed' — silent fallback would let a meaning change pass as a byte change.",
       "properties": {
         "algorithm": {
           "type": "string",
           "minLength": 1,
-          "$comment": "Names (semantic projection version, canonicalization) as ONE token — a bare hash is unusable the day a second algorithm exists (figdown-manifest.md §4.4)."
+          "$comment": "Names (semantic projection version, canonicalization) as ONE token — a bare hash is unusable the day a second algorithm exists (figdown-manifest.md §3.4)."
         },
         "sha256": { "$ref": "#/$defs/hash" }
       }
     },
     "review": {
       "type": "object",
-      "title": "Review state — at most one, the strongest claim actually made (figdown-manifest.md §4.6, `MANIFEST-REVIEW-STATE`)",
+      "title": "Review state — at most one, the strongest claim actually made (figdown-manifest.md §3.6, `MANIFEST-REVIEW-STATE`)",
       "required": ["state"],
       "additionalProperties": false,
       "patternProperties": { "^x-[^-]+(-[^-]+)+$": {} },
@@ -120,26 +120,26 @@
         "state": {
           "type": "string",
           "enum": ["authored", "transcribed", "reviewed", "source-verified"],
-          "$comment": "Four different claims, NOT a ladder (figdown-manifest.md §4.6, `MANIFEST-REVIEW-STATE`): `authored` claims nothing about an external source; `transcribed` claims the source was read, not checked; `reviewed` claims human judgement (`by` MUST name the party); `source-verified` claims correspondence against the cited source's own text. A figure may honestly carry `reviewed` or `source-verified` without the other."
+          "$comment": "Four different claims, NOT a ladder (figdown-manifest.md §3.6, `MANIFEST-REVIEW-STATE`): `authored` claims nothing about an external source; `transcribed` claims the source was read, not checked; `reviewed` claims human judgement (`by` MUST name the party); `source-verified` claims correspondence against the cited source's own text. A figure may honestly carry `reviewed` or `source-verified` without the other."
         },
         "by": { "type": "string" },
         "date": { "$ref": "#/$defs/date" },
         "of_source_sha256": {
           "$ref": "#/$defs/hash",
-          "$comment": "The hash the state is ABOUT (figdown-manifest.md §4.6, `MANIFEST-REVIEW-STATE`). Differs from `source.sha256` => STALE, fatal — the figure changed after review, so the claim has no subject left. Absent => UNBOUND, reported, not fatal — a backfill note, not a failure. This is a RUNTIME assertion (verifier assertion C), not a schema constraint: JSON Schema cannot compare two sibling string values, so `tools/manifest-check.js` performs the STALE/UNBOUND check the schema only supplies the well-formed hash for."
+          "$comment": "The hash the state is ABOUT (figdown-manifest.md §3.6, `MANIFEST-REVIEW-STATE`). Differs from `source.sha256` => STALE, fatal — the figure changed after review, so the claim has no subject left. Absent => UNBOUND, reported, not fatal — a backfill note, not a failure. This is a RUNTIME assertion (verifier assertion C), not a schema constraint: JSON Schema cannot compare two sibling string values, so `tools/manifest-check.js` performs the STALE/UNBOUND check the schema only supplies the well-formed hash for."
         },
         "note": { "type": "string" }
       }
     },
     "provenance": {
       "type": "array",
-      "title": "Source provenance — an array of the publisher's own claims (figdown-manifest.md §4.5, `PUBLICATION-MANIFEST-PROFILE`)",
+      "title": "Source provenance — an array of the publisher's own claims (figdown-manifest.md §3.5, `PUBLICATION-MANIFEST-PROFILE`)",
       "items": { "$ref": "#/$defs/provenanceEntry" },
-      "$comment": "One provenance object per source claim, because a transcribed figure routinely merges a drawing with the prose around it (figdown-manifest.md §4.5). Every entry MUST carry `relation` and at least one locator field (`section`, `figure`, `locator` or `bbox`) — verifier assertion D, checked by tools/manifest-check.js rather than by this schema, because the clean error message the design asks for ('no locator field present') is worth more than the generic 'matched none of N alternatives' a schema-level `anyOf` would produce."
+      "$comment": "One provenance object per source claim, because a transcribed figure routinely merges a drawing with the prose around it (figdown-manifest.md §3.5). Every entry MUST carry `relation` and at least one locator field (`section`, `figure`, `locator` or `bbox`) — verifier assertion D, checked by tools/manifest-check.js rather than by this schema, because the clean error message the design asks for ('no locator field present') is worth more than the generic 'matched none of N alternatives' a schema-level `anyOf` would produce."
     },
     "accessibility": {
       "type": "object",
-      "title": "Accessibility state — a POINTER, and only a pointer (figdown-manifest.md §4.7, `PUBLICATION-MANIFEST-PROFILE`/`ACCESSIBILITY-PROFILE`/`ACCESSIBLE-DESCRIPTION-SOURCES`)",
+      "title": "Accessibility state — a POINTER, and only a pointer (figdown-manifest.md §3.7, `PUBLICATION-MANIFEST-PROFILE`/`ACCESSIBILITY-PROFILE`/`ACCESSIBLE-DESCRIPTION-SOURCES`)",
       "required": ["state"],
       "additionalProperties": false,
       "patternProperties": { "^x-[^-]+(-[^-]+)+$": {} },
@@ -165,7 +165,7 @@
     },
     "dependencies": {
       "type": "array",
-      "title": "Build-cache invalidation inputs — a cache signal, never a correctness claim (figdown-manifest.md §4.8, `MANIFEST-DEPENDENCY-AND-SEMANTIC-SLOTS`)",
+      "title": "Build-cache invalidation inputs — a cache signal, never a correctness claim (figdown-manifest.md §3.8, `MANIFEST-DEPENDENCY-AND-SEMANTIC-SLOTS`)",
       "items": { "$ref": "#/$defs/dependency" },
       "$comment": "A changed dependency says 'recompute', never 'the figure is wrong' — only the `.fd` <=> `.svg` pair can say the latter (host-profile.md §2.3). A stale dependency never authorizes a rebuild the artifact policy forbids (host-profile.md §2.3, §4) — this profile does not grant that authority and no field here can be read as granting it."
     }
@@ -175,7 +175,7 @@
     "hash": {
       "type": "string",
       "pattern": "^[0-9a-f]{64}$",
-      "$comment": "Lower-case hex SHA-256, 64 characters — the same shape core §7's `data-sha256` uses. Every hash in this profile binds the FULL 64 hex, never truncated (figdown-manifest.md §4.6, `MANIFEST-REVIEW-STATE`: 'a machine-readable field has no reason to truncate')."
+      "$comment": "Lower-case hex SHA-256, 64 characters — the same shape core §7's `data-sha256` uses. Every hash in this profile binds the FULL 64 hex, never truncated (figdown-manifest.md §3.6, `MANIFEST-REVIEW-STATE`: 'a machine-readable field has no reason to truncate')."
     },
     "date": {
       "type": "string",
@@ -191,13 +191,13 @@
         "relation": {
           "type": "string",
           "enum": ["transcribed-from", "derived-from", "about"],
-          "$comment": "A small CLOSED vocabulary, three different claims (figdown-manifest.md §4.5, `PUBLICATION-MANIFEST-PROFILE`): `transcribed-from` (a re-drawing of that source figure), `derived-from` (built from that source's text, not from a picture), `about` (documents that thing but copies nothing). A reader who cannot tell them apart cannot use any of them."
+          "$comment": "A small CLOSED vocabulary, three different claims (figdown-manifest.md §3.5, `PUBLICATION-MANIFEST-PROFILE`): `transcribed-from` (a re-drawing of that source figure), `derived-from` (built from that source's text, not from a picture), `about` (documents that thing but copies nothing). A reader who cannot tell them apart cannot use any of them."
         },
         "document_id": { "type": "string" },
         "revision": { "type": "string" },
         "document_sha256": {
           "$ref": "#/$defs/hash",
-          "$comment": "The only field that turns a claim about a NAME into a claim about BYTES — and only for a consumer holding those bytes (figdown-manifest.md §4.5, `PUBLICATION-MANIFEST-PROFILE`)."
+          "$comment": "The only field that turns a claim about a NAME into a claim about BYTES — and only for a consumer holding those bytes (figdown-manifest.md §3.5, `PUBLICATION-MANIFEST-PROFILE`)."
         },
         "uri": { "type": "string" },
         "section": { "type": "string" },
@@ -211,7 +211,7 @@
           "required": ["page", "unit"],
           "additionalProperties": false,
           "patternProperties": { "^x-[^-]+(-[^-]+)+$": {} },
-          "$comment": "A bounding box with no coordinate system is four numbers, not a locator (figdown-manifest.md §4.5, `PUBLICATION-MANIFEST-PROFILE`): `page` and `unit` are both REQUIRED. The design text allows 'page (or another stated frame)' for a non-paginated source; no alternate frame key is ruled yet, so only `page` is implemented — a future ruling naming an alternate frame key extends this object, it does not replace `page`.",
+          "$comment": "A bounding box with no coordinate system is four numbers, not a locator (figdown-manifest.md §3.5, `PUBLICATION-MANIFEST-PROFILE`): `page` and `unit` are both REQUIRED. The design text allows 'page (or another stated frame)' for a non-paginated source; no alternate frame key is ruled yet, so only `page` is implemented — a future ruling naming an alternate frame key extends this object, it does not replace `page`.",
           "properties": {
             "page": { "type": "integer", "minimum": 1 },
             "unit": { "type": "string", "minLength": 1 },
@@ -225,7 +225,7 @@
     },
     "dependency": {
       "type": "object",
-      "title": "One build-cache input (figdown-manifest.md §4.8, `MANIFEST-DEPENDENCY-AND-SEMANTIC-SLOTS`)",
+      "title": "One build-cache input (figdown-manifest.md §3.8, `MANIFEST-DEPENDENCY-AND-SEMANTIC-SLOTS`)",
       "required": ["kind", "sha256"],
       "additionalProperties": false,
       "patternProperties": { "^x-[^-]+(-[^-]+)+$": {} },

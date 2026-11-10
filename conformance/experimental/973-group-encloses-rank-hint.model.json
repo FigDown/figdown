@@ -1,0 +1,125 @@
+{
+  "header": {
+    "version": "0.5",
+    "genre": "block"
+  },
+  "flow": "left",
+  "classes": [],
+  "planes": [
+    {
+      "id": "base",
+      "z": 0
+    }
+  ],
+  "nodes": [
+    {
+      "id": "n0",
+      "label": "NNN",
+      "shape": "box",
+      "group": "g0",
+      "plane": "base",
+      "line": 13
+    },
+    {
+      "id": "n1",
+      "label": "NNN",
+      "shape": "box",
+      "group": "g0",
+      "plane": "base",
+      "line": 14
+    },
+    {
+      "id": "n2",
+      "label": "NNNNNNNNNNNNNN",
+      "shape": "box",
+      "group": "g1",
+      "plane": "base",
+      "line": 15
+    },
+    {
+      "id": "n3",
+      "label": "NNNNNNNNNNNNNNNN",
+      "shape": "box",
+      "group": "g1",
+      "plane": "base",
+      "line": 16
+    },
+    {
+      "id": "n4",
+      "label": "NNN",
+      "shape": "box",
+      "group": "g0",
+      "plane": "base",
+      "line": 17
+    },
+    {
+      "id": "n5",
+      "label": "NNNNNNNNNNN",
+      "shape": "box",
+      "plane": "base",
+      "line": 18
+    },
+    {
+      "id": "n6",
+      "label": "NNN",
+      "shape": "box",
+      "plane": "base",
+      "line": 19
+    }
+  ],
+  "groups": [
+    {
+      "id": "g0",
+      "label": "G0",
+      "line": 11
+    },
+    {
+      "id": "g1",
+      "label": "G1",
+      "line": 12
+    }
+  ],
+  "edges": [
+    {
+      "a": "n6",
+      "op": "--",
+      "b": "n4",
+      "plane": "base",
+      "line": 20
+    },
+    {
+      "a": "n4",
+      "op": "--",
+      "b": "n3",
+      "plane": "base",
+      "line": 21
+    },
+    {
+      "a": "n1",
+      "op": "--",
+      "b": "n3",
+      "plane": "base",
+      "line": 22
+    },
+    {
+      "a": "n0",
+      "op": "--",
+      "b": "n4",
+      "plane": "base",
+      "line": 23
+    },
+    {
+      "a": "n0",
+      "op": "--",
+      "b": "n6",
+      "plane": "base",
+      "line": 24
+    }
+  ],
+  "ranks": [],
+  "pins": [],
+  "thresholds": [],
+  "bands": [],
+  "bundles": [],
+  "regions": []
+}

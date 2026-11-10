@@ -8,7 +8,7 @@
   "language": { "version": "0.2", "genres": ["statechart"] },
   "renderer": {
     "name": "figdown-svg",
-    "engine_version": "0.5.3"
+    "engine_version": "0.5.4"
   },
   "source": {
     "sha256": "57b42da67a86c0efb89d82ca6abe85c3fb27e364420cf2dbc7fbeb5682bc4522",

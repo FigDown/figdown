@@ -18,10 +18,12 @@
 > normative sentence in a frozen file needs it to be read. What remains is
 > the naming this table does — a closed language has to say what exists — and
 > every such row is marked EXPERIMENTAL and points at where the definition lives.
-> The same split runs through [../experimental.md](../experimental.md) (the
-> **four** experimental core constructs — `plane`, `bundle`, `threshold`,
-> `band`; this read *six* until 0.1, a figure `EDGE-GEOMETRY-CONSTRUCTS` made stale at
-> 0.1 when it WITHDREW `path` and `routing` outright),
+> The same split runs through [../experimental.md](../experimental.md) (which
+> declares nothing — `plane` was withdrawn, `PAINT-ORDER-CONSTRUCT`, and
+> `bundle`, `threshold`, `band` moved into the genres that keep them, `SUBJECT-VOCABULARY-SCOPE`;
+> before that it held **four** experimental core constructs, and *six* until
+> 0.1, a figure `EDGE-GEOMETRY-CONSTRUCTS` made stale when it WITHDREW `path`
+> and `routing` outright),
 > `conformance/experimental/` and
 > `examples/reference/experimental/`; `tools/isolation-check.js` is the gate.
 
@@ -93,7 +95,7 @@ doc's prose.
 
 | Genre | Weighted census | Family | Status (`CONSTRUCT-STATUS-TIERS`) | Own vocabulary | Vocabulary table | Document |
 |---|---:|---|---|---|---|---|
-| `block` | 24.3% | scene namespace | NORMATIVE | none — OPEN (`DOMAIN-VOCABULARY-PREFERENCE` §4) | [complete vocabulary](block.md#complete-vocabulary-normative) | [block.md](block.md) |
+| `block` | 24.3% | scene namespace | NORMATIVE | `threshold`, `band` (`SUBJECT-VOCABULARY-SCOPE`), each itself **EXPERIMENTAL** | [complete vocabulary](block.md#complete-vocabulary-normative) | [block.md](block.md) |
 | `topology` | 5.0% | scene namespace | **EXPERIMENTAL** | `bundle` only, itself **EXPERIMENTAL** — OPEN (`DOMAIN-VOCABULARY-PREFERENCE` §4) | [complete vocabulary](experimental/topology.md#complete-vocabulary-normative) | [experimental/topology.md](experimental/topology.md) |
 | `flowchart` | 8.3% | scene namespace | **EXPERIMENTAL** | `process`, `decision`, `terminator` (`FLOWCHART-ROLE-KEYWORDS`) — the **first exercise of `GENRE-VOCABULARY-OBLIGATION`** by any genre; plus `flowline` (`GENRE-CONNECTOR-SPELLING`), which **replaces** the scene `edge` here rather than adding to it; each itself **EXPERIMENTAL** | [complete vocabulary](experimental/flowchart.md#complete-vocabulary-normative) | [experimental/flowchart.md](experimental/flowchart.md) |
 | `bitfield` | 23.7% | nested genre | NORMATIVE | `bitfield`, `field`, `break` | [complete vocabulary](bitfield.md#complete-vocabulary-normative) | [bitfield.md](bitfield.md) |
@@ -133,6 +135,10 @@ project has weighed**, and unlike `statechart` its withdrawal would not cost
 one line per figure — it brought five keywords, an enum and a whole ladder
 layout with it, so EXPERIMENTAL does not price this bet the way it priced the
 last one. Each genre document states its own status at the top.
+
+*(Historical: this paragraph records 0.1 to 0.3. `plane` and `plane=` are WITHDRAWN (`PAINT-ORDER-CONSTRUCT`) — a line error, not a
+demoted construct — and `threshold`, `band` and `bundle` are declared by the
+genres that keep them (`SUBJECT-VOCABULARY-SCOPE`–`SCENE-KEYWORD-MEMBERSHIP`); `experimental.md` declares nothing.)*
 
 **The five demoted constructs — all EXPERIMENTAL, all DEFINED in
 [../experimental.md](../experimental.md).** Independently of genre status,
@@ -231,14 +237,16 @@ defect, but fixing it is not a promotion. The normative treatment is
 Three families, one language:
 
 - **Scene namespace** (`block`, `topology`, `flowchart`, `statechart`) share
-  one vocabulary — `group`, `class`, `flow`, `rank` and the rest of §2 — and
-  differ in defaults and in **what each calls the thing and the line**
+  the scene model and its core — `class`, `flow`, `rank`, `pin` — and differ
+  in defaults, in which containers they declare (`group` is `block`'s and
+  `topology`'s; `flowchart` and `statechart` withdrew it, `SCENE-KEYWORD-MEMBERSHIP`),
+  and in **what each calls the thing and the line**
   (`GENRE-CONNECTOR-SPELLING`/`GENRE-NODE-SPELLING`): `block`/`topology` write `node`/`edge`,
   `flowchart` writes `node`/`flowline`, `statechart` writes
   `state`/`transition`. Each takes the term its own domain uses; the
-  constructs, grammar and model are identical. `flowchart` defaults to
-  `flow down`; the others to `flow right`. Because the *constructs* are
-  identical, the header is still the ONLY place such a document states which
+  grammar and the model are shared. `flowchart` defaults to
+  `flow down`; the others to `flow right`. Because the *model* is
+  shared, the header is still the ONLY place such a document states which
   kind of figure it is; that is why the genre token is required.
 - **Nested genres** (`bitfield`, `table`, `timing`) each own a closed
   sub-grammar and declare their kind in their content as well as in the

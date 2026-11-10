@@ -3,9 +3,11 @@
 figdown 0.1 topology
 title "EVPN-VXLAN IRB — leaves with IP-VRF and bridge domains"
 
-# Complex vendor-style figure, fully hand-laid-out (tier 3, `PIN-COORDINATE-SCOPE` two-level
-# coordinates): each group is anchored once; members are group-local, so
-# moving a leaf = editing one pin line.
+# The AUTO arm of the layout comparison: ../srl-evpn-irb.fd with every pin AND
+# its `flow` / `rank` lines removed (those are content intent, kept by the
+# strip test; the tuned figure draws with its pins stripped because of them).
+# The engine refuses to draw this arm (a group would enclose non-members;
+# guide/layout.md §7), and that refusal is what this file demonstrates.
 
 # ── Semantic classes ─────────────────────────────────────────────────
 class bridge_domain "Bridge domain — logical L2 forwarding instance with VNI binding, VXLAN-terminated" style=dashed stroke=#1d4ed8

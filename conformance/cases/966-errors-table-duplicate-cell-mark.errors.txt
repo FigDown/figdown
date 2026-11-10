@@ -1,0 +1,2 @@
+Line 15: duplicate mark for cell (1,1) — first on line 14; write all its options on that one line
+Line 17: duplicate mark for cell (h1,2) — first on line 16; write all its options on that one line

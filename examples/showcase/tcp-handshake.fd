@@ -15,7 +15,8 @@ figdown 0.1 topology
 # STATE (LISTEN, SYN-SENT, …) on the lifelines; the topology genre has no
 # lifeline-state construct, so the companion `table` block below carries
 # those states machine-readably — composition (multiple typed blocks in one
-# document, in document order) is the ruled interim until sequence lands.
+# document, in document order) was the ruled interim before sequence
+# landed, and this figure keeps it because it stays figdown 0.1.
 title "TCP Three-Way Handshake"
 
 # Semantic classes: the label states the MEANING; colour merely renders it,

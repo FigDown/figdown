@@ -1,0 +1,5 @@
+Line 12: rank ids must not be empty (write rank a,b,c)
+Line 13: bundle members must not be empty (write bundle t1 "LAG" a--b,c--d)
+Line 14: bundle members must not be empty (write bundle t2 "LAG" a--b,c--d)
+Line 15: bundle members must not be empty (write bundle t3 a--b,c--d)
+Line 9: class= must not contain empty members

@@ -12,7 +12,8 @@
 > hole in the standard**. A fixture per `err()` site would make the
 > catalogue complete by construction and is the cheaper of the two routes
 > §8.2 names. Note the heuristic below counts only the ~61 STATIC
-> literals; the engine has roughly 195 `err()` sites in total, and the
+> literals; the engine has over two hundred `err()` sites in total
+> (`grep -c 'err(' editor/figdown.html`), and the
 > interpolated majority is not measured by anything here.
 
 **The counts are not written down here.** They were, and they were stale by

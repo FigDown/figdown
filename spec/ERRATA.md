@@ -141,6 +141,249 @@ gap is real; this file is the only bridge across it.
 
 ---
 
+## E3 — `layout.md` sends an installed agent to a tool it does not have
+
+- **Superseding ruling:** `SKILL-BUNDLE-LINK-ROOT` — the skill bundle is read from an installed
+  copy with no repository above it, so it may only point at what ships inside
+  it.
+- **Affected language versions:** `figdown` 0.1, 0.2, 0.3, 0.4 and 0.5
+- **Frozen files carrying the wrong wording:**
+  - `read/0.1/layout.md`
+  - `read/0.2/layout.md`
+  - `read/0.3/layout.md`
+  - `read/0.4/layout.md`
+  - `read/0.5/layout.md`
+
+  and, transitively, `skill/figdown/reference/layout.md`.
+
+- **Wrong wording** (verbatim):
+
+  > Iteration loop: build → look at the SVG → run `node tools/layout-lint.js` →
+
+- **Why it is wrong.** `tools/layout-lint.js` is in neither the skill bundle
+  nor the npm package; an agent working from an installed copy cannot run it.
+  The sentence is true only inside the source repository.
+
+- **Correct wording:**
+
+  > Iteration loop: build → look at the SVG → add **one** rung → repeat → stop
+  > when it is legible. (In the source repository, `node tools/layout-lint.js`
+  > also scores the drawing.)
+
+- **Apply to the next read tree.**
+
+---
+
+## E4 — `bundle` is said to take `fill=`, and (in 0.5) parallel links to be unspellable
+
+- **Superseding ruling:** `INTERIOR-LESS-ELEMENT-PAINT` — a key may not name a channel the element does
+  not have; a ring has no interior, so `fill=` on `bundle` was retired. For the second sentence, `EDGE-IDENTITY-CONSUMERS`: a `bundle` member may be a
+  connector id, which is exactly how one of two parallel links is named.
+- **Affected language versions:** `figdown` 0.3, 0.4 and 0.5 (the `fill=`
+  sentence); 0.5 only (the parallel-link sentence — before `figdown 0.5`
+  there was no connector id, and it was true)
+- **Frozen files carrying the wrong wording:**
+  - `read/0.3/experimental/topology.md`
+  - `read/0.4/experimental/topology.md`
+  - `read/0.5/experimental/topology.md`
+
+  and, transitively, `skill/figdown/reference/experimental/topology.md`.
+
+- **Wrong wording** (verbatim):
+
+  > - `bundle` takes `fill=`, `stroke=` and `style=`; the dashed ring is drawn
+
+  and, in `read/0.5/experimental/topology.md` only:
+
+  > pair, so a bundle over parallel links cannot be spelled — declare the
+
+- **Why it is wrong.** The engine refuses `fill=` on `bundle` under every
+  header from `figdown 0.1`; `topology.md`'s own vocabulary row lists
+  `stroke` and `style` only. And from `figdown 0.5` a parallel link is named
+  by its `id=`, and `bundle lag "LAG" e1,e2` is accepted — the same file
+  spells one a few paragraphs later.
+
+- **Correct wording:**
+
+  > - `bundle` takes `stroke=` and `style=`; the dashed ring is drawn for you.
+
+  > (0.5) Two parallel links between one pair are told apart by `id=`, and a
+  > bundle names them by id: `bundle lag "LAG" e1,e2`.
+
+- **Apply to the next read tree.**
+
+---
+
+## E5 — `transcribe.md` sends a condition to `description=`
+
+- **Superseding ruling:** `PRESENCE-CONDITION-EXPRESSION` — a condition is carried by the genre's own
+  condition key (`present=` on a field), not by a flag or a tooltip.
+- **Affected language versions:** `figdown` 0.1, 0.2, 0.3, 0.4 and 0.5
+- **Frozen files carrying the wrong wording:**
+  - `read/0.1/transcribe.md`
+  - `read/0.2/transcribe.md`
+  - `read/0.3/transcribe.md`
+  - `read/0.4/transcribe.md`
+  - `read/0.5/transcribe.md`
+
+  and, transitively, `skill/figdown/reference/transcribe.md`.
+
+- **Wrong wording** (verbatim):
+
+  > - **Conditional encodings** go in `description="valid when …"` — which draws
+
+- **Why it is wrong.** `node`, `edge`, `group`, `signal`, `table` and
+  `bitfield` all refuse `description=` (probed on the `figdown 0.1` archive
+  engine and on today's: `node does not take description=`); only `field`
+  and the `sequence` elements accept it. Following the advice gives a line
+  error.
+
+- **Correct wording:**
+
+  > - **Conditional encodings** go in the genre's condition key — `present=`
+  >   on a bitfield `field` — and, if a human must see the condition, in the
+  >   label too.
+
+- **Apply to the next read tree.**
+
+---
+
+## E6 — `bitfield.md` says a field's dash can come from a class
+
+- **Superseding ruling:** `CLASS-PAINT-REQUIREMENT` — a class must declare a channel the member it
+  joins actually has; a field has no dash channel of its own.
+- **Affected language versions:** `figdown` 0.1, 0.2, 0.3, 0.4 and 0.5
+- **Frozen files carrying the wrong wording:**
+  - `read/0.1/bitfield.md`
+  - `read/0.2/bitfield.md`
+  - `read/0.3/bitfield.md`
+  - `read/0.4/bitfield.md`
+  - `read/0.5/bitfield.md`
+
+  and, transitively, `skill/figdown/reference/bitfield.md`.
+
+- **Wrong wording** (verbatim):
+
+  > A per-field dash comes from `present=` or from a `class=` the field joins.
+
+- **Why it is wrong.** A field that joins a dashed class is drawn solid; only
+  the class's legend swatch is dashed (rendered on today's engine and on the
+  engine of `read/0.1`'s commit), and `gate:legend` reports that class as an
+  unreachable channel.
+
+- **Correct wording:**
+
+  > A per-field dash comes from `present=` only.
+
+- **Apply to the next read tree.**
+
+---
+
+## E7 — `statechart.md` prices a withdrawal at one line per figure
+
+- **Superseding ruling:** `GENRE-NODE-SPELLING` — `state` replaces `node` in `statechart`, so a rewrite back to `block` touches every `state` and `transition` line.
+- **Affected language versions:** `figdown` 0.2, 0.3, 0.4 and 0.5
+- **Frozen files carrying the wrong wording:**
+  - `read/0.2/experimental/statechart.md`
+  - `read/0.3/experimental/statechart.md`
+  - `read/0.4/experimental/statechart.md`
+  - `read/0.5/experimental/statechart.md`
+
+  and, transitively, the vendored copy under `skill/figdown/reference/` where one exists.
+
+- **Wrong wording** (verbatim):
+
+  > and the rewrite back is one line.
+
+- **Why it is wrong.** `state` and `transition` are `statechart`'s own words. Swapping a statechart's header to `block` is refused on each such line (probed on `turnstile.fd`: 8 errors); six shipped statechart figures hold about 100 such lines.
+
+- **Correct wording:**
+
+  > and the rewrite back is one line per `state` and `transition` line.
+
+- **Apply to the next read tree.**
+
+---
+
+## E8 — `reading.md` says only line 1 names the genre
+
+- **Superseding ruling:** `SPEC-PROVENANCE-LINE` — a `.fd` file's first line is a provenance comment; the header line is the first line that is not blank or a comment.
+- **Affected language versions:** `figdown` 0.2, 0.3, 0.4 and 0.5
+- **Frozen files carrying the wrong wording:**
+  - `read/0.2/reading.md`
+  - `read/0.3/reading.md`
+  - `read/0.4/reading.md`
+  - `read/0.5/reading.md`
+
+  and, transitively, the vendored copy under `skill/figdown/reference/` where one exists.
+
+- **Wrong wording** (verbatim):
+
+  > machine" in a `title` decides nothing. Only line 1 decides. What you may and
+
+- **Why it is wrong.** No shipped `.fd` starts with `figdown `; line 1 is the provenance comment `SPEC-PROVENANCE-LINE` requires, so a reader who looks only at line 1 finds no genre.
+
+- **Correct wording:**
+
+  > machine" in a `title` decides nothing. Only the header line decides (the first line that is not blank or a comment). What you may and
+
+- **Apply to the next read tree.**
+
+---
+
+## E9 — `scene.md` says the genre is on line 1
+
+- **Superseding ruling:** `SPEC-PROVENANCE-LINE` — a `.fd` file's first line is a provenance comment; the header line is the first line that is not blank or a comment.
+- **Affected language versions:** `figdown` 0.3, 0.4 and 0.5
+- **Frozen files carrying the wrong wording:**
+  - `read/0.3/scene.md`
+  - `read/0.4/scene.md`
+  - `read/0.5/scene.md`
+
+  and, transitively, the vendored copy under `skill/figdown/reference/` where one exists.
+
+- **Wrong wording** (verbatim):
+
+  > | genre on line 1 | where its vocabulary is declared |
+
+- **Why it is wrong.** Same fault as E8: the genre sits on the header line, not on line 1, in every shipped figure. The same file's other "line 1" mentions (line 6, line 25) carry the same correction.
+
+- **Correct wording:**
+
+  > | genre on the header line | where its vocabulary is declared |
+
+- **Apply to the next read tree.**
+
+---
+
+## E10 — `scene.md` says presentation attributes have no restriction by element kind
+
+- **Superseding ruling:** `INTERIOR-LESS-ELEMENT-PAINT` — a key may not name a channel the element does not have (`STYLE-KEY-SCOPE` applied it to `style=` on `field`, `cell` and `signal`); the engine likewise refuses `style=` on `external` and `fill=` on `fragment`/`operand`.
+- **Affected language versions:** `figdown` 0.1, 0.2, 0.3, 0.4 and 0.5
+- **Frozen files carrying the wrong wording:**
+  - `read/0.1/scene.md`
+  - `read/0.2/scene.md`
+  - `read/0.3/scene.md`
+  - `read/0.4/scene.md`
+  - `read/0.5/scene.md`
+
+  and, transitively, the vendored copy under `skill/figdown/reference/` where one exists.
+
+- **Wrong wording** (verbatim):
+
+  > `stroke=` are legal on any element, groups included. There is no restriction
+  > by element kind — only the two-channel rule: an `edge` has no
+
+- **Why it is wrong.** The engine refuses some channels on some elements (probed: `external` refuses `style=`; `fragment` and `operand` refuse `fill=`). The acceptor list is in core §5.
+
+- **Correct wording:**
+
+  > Presentation attributes work on most elements; which element takes which is listed in core §5. Beyond that, the two-channel rule: an `edge` has no interior.
+
+- **Apply to the next read tree.**
+
+---
+
 ## The next read tree — is the fix reachable soon, or only at the next `Y`?
 
 A read tree is indexed by **language version `figdown X.Y`**, not by release

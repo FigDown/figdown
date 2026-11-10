@@ -1,0 +1,20 @@
+# Table §Errors — ONE CELL, ONE MARK LINE.
+#
+# A second `cell (r,c)` line for the same cell used to parse, and only the
+# first line's options were drawn: the blue border below vanished with no
+# error. The second line is now the error, as a second `width` line is,
+# for a data cell and for a header cell alike. A repeated row highlight
+# loses nothing and stays legal.
+figdown 0.5 table
+table t "T"
+| A | B |
+|---|---|
+| a | b |
+| c | d |
+cell (1,1) fill=#ff0000
+cell (1,1) stroke=#0000ff
+cell (h1,2) fill=#eeeeee
+cell (h1,2) class=k
+cell 2 highlight
+cell 2 highlight
+class k "key"

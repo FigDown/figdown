@@ -6,9 +6,11 @@
 > **Genre status: EXPERIMENTAL (`STATECHART-GENRE-SCOPE`).**
 > `statechart` is outside the conformance surface and outside the
 > compatibility promise. It may change or be **withdrawn** in a later `0.x`
-> with no migration — `path` and `routing` are the precedent, and withdrawal
-> costs a corpus one line per figure because the genre adds no syntax to
-> unwind. It is experimental for a reason stated plainly rather than buried:
+> with no migration — `path` and `routing` are the precedent. Withdrawal
+> would cost a corpus more than its header line: the genre
+> spells its node `state` and its connector `transition`, so every such line
+> would need rewriting back to `node`/`edge` (the six in-repo figures hold
+> about a hundred). It is experimental for a reason stated plainly rather than buried:
 > **it landed ahead of its corpus evidence.** See §Status below.
 >
 > **It requires `figdown 0.2`.** `figdown 0.1 statechart` is a line error
@@ -22,7 +24,7 @@
 > states would arrive as nesting on `state` through this exact key. See
 > §*`in=` is reserved for composite states*.
 
-**Census**: 5 in-repo figures; **3 of 91 production documents**. Prior art:
+**Census**: 6 in-repo figures; **3 of 91 production documents**. Prior art:
 Harel *statecharts* (the diagram-type name); **OMG UML 2.5.1 §14
 (StateMachines)** as the semantic source family *and* as the source of this
 genre's two keywords; protocol RFC state diagrams (TCP RFC 9293 Figure 5,
@@ -202,8 +204,8 @@ are all flat today.
 does.** UML 2.5.1 **§14.2.3.2**'s `Region` is the ORTHOGONAL compartment — the
 construct that says a composite state is in two independent substates at once,
 drawn as a dashed division of the state's box. It answers a different question
-and needs its own evidence: **0 of this genre's 5 in-repo figures shows
-orthogonality**, every machine in all five being in exactly one state at a
+and needs its own evidence: **0 of this genre's 6 in-repo figures shows
+orthogonality**, every machine in all six being in exactly one state at a
 time. Tools ship nesting and orthogonality together; figures need them apart.
 *`region` reopens on its own evidence only:* a figure whose machine is
 genuinely in two states at once and whose reader gets it wrong drawn flat.
@@ -521,7 +523,7 @@ be read as a commitment to keep the genre.
 ## Errors
 
 `statechart` adds no error conditions of its own. Its validation profile is
-the core profile, plus four that follow from the version and the allowlist:
+the core profile, plus five that follow from the version and the allowlist:
 
 - `figdown 0.1 statechart` → `genre "statechart" requires figdown 0.2 (this
   document declares 0.1) — write: figdown 0.2 statechart`. The message names
@@ -531,7 +533,8 @@ the core profile, plus four that follow from the version and the allowlist:
 - `process` / `decision` / `terminator` at top level →
   `"<kw>" is not allowed in genre statechart`, from the allowlist, with no
   per-keyword code (the same device `FLOWCHART-ROLE-KEYWORDS` pinned for the other direction).
-- **0.2 (`GENRE-NODE-SPELLING`):** `node` or `edge` at top level → a **NAMED** line
+- **0.2 (`GENRE-NODE-SPELLING`):** `node` or `edge` at top level — and, since
+  `sequence` landed, `lifeline` or `message` — → a **NAMED** line
   error, because the author has written a real construct under the wrong
   spelling and `unrecognized line` would send them hunting a construct they
   already have:
@@ -545,6 +548,10 @@ the core profile, plus four that follow from the version and the allowlist:
   tools/migrate-figdown.js to rewrite it (MIGRATIONS 0.2)
   ```
 
+- **0.3 (`MEMBERSHIP-KEY-ACCEPTANCE`):** `in=` on any line → `in= is not allowed in genre
+  statechart — it was WITHDRAWN from this genre, not misspelled …`; the
+  key is reserved for composite states (*`in=` is reserved for composite
+  states*, above).
 - **0.3 (`SCENE-KEYWORD-MEMBERSHIP`):** `group`, `external`, `threshold`, `band` or `bundle`
   at top level → a **NAMED** line error carrying that cell's own ground, not
   `unrecognized line` and not the bare allowlist message. All five were legal
@@ -645,5 +652,6 @@ Every line above is `block` syntax with two words changed; what the genre adds
 is the reading, not the shape.
 
 Corpus figures: `examples/statechart/turnstile.fd`,
-`examples/statechart/dhcp-client.fd`, `examples/showcase/tcp-state-machine.fd`,
+`examples/statechart/dhcp-client.fd`, `examples/statechart/bfd-session.fd`,
+`examples/showcase/tcp-state-machine.fd`,
 `examples/patterns/state-a.fd`, `examples/patterns/state-b.fd`.

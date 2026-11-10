@@ -52,7 +52,7 @@ function loadEngine() {
   const end = h.indexOf('// 3. UI');
   if (start < 0 || end < 0) throw new Error('cannot locate engine in ' + ENGINE);
   return new Function(h.slice(start, end)
-    + '\nreturn {parse, render, stackSectionSvgs, FIGDOWN_VERSION};')();
+    + '\nreturn {parse, render, stackSectionSvgs, FIGDOWN_VERSION, CSS_COLOR_HEX};')();
 }
 
 // ---- the resolved swatch -------------------------------------------------
@@ -67,8 +67,22 @@ const CHANNELS = ['fill', 'stroke', 'style'];
 function declaresPaint(c) {
   return c.fill !== undefined || c.stroke !== undefined || c.style !== undefined;
 }
+// two swatches are the same when they DRAW the same, not when they are
+// spelled the same — `#fee2e2` and `#FEE2E2`, `white` and `#fff` are one
+// colour. Colours are compared as lowercase 6-digit hex through the engine's
+// own named-colour table; anything else (a dash style) compares as written.
+let COLOR_HEX = {};
+function canonColor(v) {
+  const s = String(v).trim().toLowerCase();
+  if (COLOR_HEX[s]) return COLOR_HEX[s];
+  const m = /^#([0-9a-f])([0-9a-f])([0-9a-f])$/.exec(s);
+  return m ? '#' + m[1] + m[1] + m[2] + m[2] + m[3] + m[3] : s;
+}
 function resolvedSwatch(c) {
-  return CHANNELS.map(k => (c[k] !== undefined ? String(c[k]) : SWATCH_DEFAULT[k])).join(' | ');
+  return CHANNELS.map(k => {
+    const v = c[k] !== undefined ? String(c[k]) : SWATCH_DEFAULT[k];
+    return k === 'style' ? v : canonColor(v);
+  }).join(' | ');
 }
 
 // Two distinct legal values per channel. The probe never asks what the value
@@ -171,6 +185,7 @@ function main(argv) {
   }
 
   const engine = loadEngine();
+  COLOR_HEX = engine.CSS_COLOR_HEX || {};
   const files = [];
   for (const p of args.paths) collect(p, files);
 
@@ -234,4 +249,4 @@ if (require.main === module) {
   try { process.exit(main(process.argv.slice(2))); }
   catch (e) { console.error(String(e && e.message || e)); process.exit(2); }
 }
-module.exports = { resolvedSwatch, channelReaches };
+module.exports = { resolvedSwatch, channelReaches, checkDoc };

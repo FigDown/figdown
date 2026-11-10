@@ -1,0 +1,6 @@
+{
+  "figdown_manifest": "1",
+  "document": { "id": "example-sections", "sections": 1 },
+  "language": { "version": "0.1", "genres": ["block", "table"] },
+  "source": { "sha256": "7eeaa2bb8b2456650e3d788d6063dbfbe9352f7758c5069aaa99e8e6b6046853", "bytes": 70 }
+}

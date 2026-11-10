@@ -1,0 +1,11 @@
+# 0.5: `[tail]` and `[head]` are a line error under sequence.
+# A UML Message has one name and no end labels (UML 2.5.1 §17.4.4.1). Until
+# this version they parsed, reached the model and drew nothing. Either
+# position alone is refused, and so are both; the other lines still parse.
+figdown 0.5 sequence
+lifeline c "Client"
+lifeline s "Server"
+message c [sent] -> s "request"
+message c -> [received] s "request"
+message c [a] <-> [b] s
+message c -> s "the message label is the one place for its text" note="and note= is the place for an aside"

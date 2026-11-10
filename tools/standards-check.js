@@ -236,6 +236,11 @@ const PATTERNS = [
   [/\b(?:ONF\s+|LF\s+ONMI\s+)?TAPI\b/g,               () => 'ONF TAPI'],
   [/\bCommonMark\b/g,                                   () => 'CommonMark'],
   [/\bRFC\s*(\d{3,4})/g,                              m => 'RFC ' + m[1]],
+  // A BCP number names RFCs, and the register keys them under the RFC: a claim
+  // that cites only `BCP 14` is a claim about RFC 2119 (and 8174, which has its
+  // own rows) and must not slip past the harvest for want of an `RFC` token.
+  [/\bBCP\s*14\b/g,                                    () => 'RFC 2119'],
+  [/\bBCP\s*178\b/g,                                   () => 'RFC 6648'],
   [/\bUML\b/g,                                        () => 'UML'],
   [/\bBPMN\b/g,                                       () => 'OMG BPMN'],
   [/\bW3C\b/g,                                        () => 'W3C'],

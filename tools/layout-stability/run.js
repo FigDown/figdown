@@ -688,12 +688,23 @@ function main() {
         regressions.push(key + ' — nodes moved ' + b.moved + ' -> ' + rec.moved);
       else if (num(rec.reroute, b.reroute) && rec.reroute > b.reroute)
         regressions.push(key + ' — foreign reroutes ' + b.reroute + ' -> ' + rec.reroute);
+      // The counts alone let a pair keep its node count and move it further:
+      // a baseline maxDisp of 1 passed a measured 53.5. Distance and canvas
+      // growth are ratcheted too, within EPS, in both directions.
+      else if (num(rec.maxDisp, b.maxDisp) && rec.maxDisp > b.maxDisp + EPS)
+        regressions.push(key + ' — max displacement ' + b.maxDisp + ' -> ' + rec.maxDisp + ' px');
+      else if (num(rec.canvasDw, b.canvasDw) && Math.abs(rec.canvasDw) > Math.abs(b.canvasDw) + EPS)
+        regressions.push(key + ' — canvas width change ' + b.canvasDw + ' -> ' + rec.canvasDw + ' px');
       else if (b.verdict !== 'local' && rec.verdict === 'local')
         improvements.push(key + ' — was ' + b.verdict + ', now local');
       else if (num(rec.moved, b.moved) && num(rec.reroute, b.reroute)
                && (rec.moved < b.moved || rec.reroute < b.reroute))
         improvements.push(key + ' — moved ' + b.moved + ' -> ' + rec.moved
                         + ', reroutes ' + b.reroute + ' -> ' + rec.reroute);
+      else if ((num(rec.maxDisp, b.maxDisp) && rec.maxDisp < b.maxDisp - EPS)
+               || (num(rec.canvasDw, b.canvasDw) && Math.abs(rec.canvasDw) < Math.abs(b.canvasDw) - EPS))
+        improvements.push(key + ' — max displacement ' + b.maxDisp + ' -> ' + rec.maxDisp
+                        + ' px, canvas width change ' + b.canvasDw + ' -> ' + rec.canvasDw + ' px');
     }
     const goneKeys = Object.keys(baseline.pairs).filter(k => !(k in pairs));
     console.log('');

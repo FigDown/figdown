@@ -289,7 +289,8 @@ carries a non-default option, symmetric with the artifact's own rule that
 
 **The restatement rule, because a restatement is a place two facts can
 disagree.** Where the manifest restates an artifact-carried fact —
-`renderer.engine_version`, `renderer.render_options`, `language.version`, and
+`renderer.engine_version`, `renderer.render_options`, `language.version`,
+`language.genres`, `document.sections` (the number of `figdown` headers), and
 `source.sha256` (§3.3) — **a mismatch is an error in the manifest, never a
 merge and never a vote**: the `.fd` and its `.svg` are the pair core §7
 defines, and a sidecar that disagrees with the pair is wrong by construction.
@@ -584,7 +585,7 @@ check it resolves to.
 | 23 | Promotion is never by rename and never by keeping the spelling: the `x-` corpus is evidence for the §2 gate, which adds a fresh unprefixed key (§2.1(d)) | `MANIFEST-EXTENSION-NAMESPACE`; `.github/CONTRIBUTING.md` §2 step 2 (corpus evidence with a frequency — the gate this routes to and does not duplicate); RFC 6648 Appendix B (`S240`, the migration failure this forbids) and §3 (`S239`, the recommendation knowingly traded) |
 | 5 | Versioned in its first key, `figdown_manifest: "1"` (§2) | `PUBLICATION-MANIFEST-PROFILE`; core §13.7 (the same rule for an engine's declared version) |
 | 6 | `document.id` is publisher-scoped, not an element or cross-document identity (§3.1) | `PUBLICATION-MANIFEST-PROFILE`; the identity model this project adopted, which left identity across documents closed |
-| 7 | Restated fields (`renderer.*`, `language.version`, `source.sha256`) — mismatch is an error in the manifest (§3.2) | `PUBLICATION-MANIFEST-PROFILE`; core §7 (the artifact fields restated); `tools/manifest-check.js` assertion B |
+| 7 | Restated fields (`renderer.*`, `language.version`, `language.genres`, `document.sections`, `source.sha256`) — mismatch is an error in the manifest (§3.2) | `PUBLICATION-MANIFEST-PROFILE`; core §7 (the artifact fields restated); `tools/manifest-check.js` assertion B |
 | 8 | `source.sha256`/`bytes` prove integrity, not provenance (§3.3) | `PUBLICATION-MANIFEST-PROFILE`; core §15.6 |
 | 9 | `semantic_sha256` lands as a RESERVED slot; unknown algorithm is UNREADABLE, not ignorable; absence is not "unchanged" (§3.4) | `MANIFEST-DEPENDENCY-AND-SEMANTIC-SLOTS`; core §12.5.2 (JCS reasoning, unextended) |
 | 10 | `provenance` is an array; `relation` is closed to three values; every entry needs a locator (§3.5) | `PUBLICATION-MANIFEST-PROFILE`; `tools/manifest-check.js` assertion D |

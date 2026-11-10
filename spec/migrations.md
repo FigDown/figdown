@@ -451,8 +451,38 @@ engine accepts unquoted; `block`'s single-percent band is stated as
 shorthand for `0..<pct>%`; `migrate.md` states the migrator's exit codes;
 counts and rows in core §15.7 and experimental E0.1 are recounted. None of
 these changes a rule. Each engine and editor change is entered in full,
-with its measurements, in the development entries 0.5 to
-0.5 below. This paragraph is the summary that ships.
+with its measurements, in the development entries below. This paragraph is the summary that ships.
+
+**`v0.5.4` — a `Z` release under this language version (2026-11-10).** The
+language does not move: `figdown` stays `0.5`, no `.fd` gains or loses a
+spelling, every existing conformance golden passes (eight cases are added),
+and `read/0.5/` is reused byte-for-byte (core §13.7.3). What ships is a set of
+refusals for inputs that were accepted and mis-drawn, drawing fixes for labels
+and groups, the `sequence` and `timing` profiles, editor repairs, and a larger,
+stricter gate set. **Four groups of changes act on documents that do not move
+their header**, and none is version-gated.
+
+1. **Refusals.** A second `cell (<r>,<c>)` line for one cell; a text with no
+   header line; a quote inside an id, a quoted keyword or a quote in an enum
+   position; a plain decimal too long to be a finite number (at any numeric
+   position, and so a chart over a cell that holds one); a bare carriage
+   return (a CRLF source is embedded as LF); `[tail]` and `[head]` on a
+   `sequence` message; an empty `bundle` member. The shipped corpus has no
+   instance of any of them.
+2. **A chart over a non-finite number is refused.** Fix the cell.
+3. **Some figures re-render.** Three or more labelled links between two nodes
+   of one rank under horizontal flow; a group push that used to land two nodes
+   on each other (some figures once refused for it now draw); a label that
+   used to be clipped at the top or left edge; a `sequence` with line-counted
+   boxes, a long `state`, a `note=` or a self `<->`, and a narrower canvas when
+   the last column ends in a self-message label; a `timing` cell edge; `bar3d`
+   ticks.
+4. **Every drawn `sequence` message shaft gains `data-edge`, every scene SVG
+   loses its unused arrow `<marker>`, and every artifact's version stamp
+   changes.** Nothing a figure draws moves for these three reasons.
+
+Everything else moves no accepted document. Each engine and editor change is
+entered in full, with its measurements, in the development entries below. This paragraph is the summary that ships.
 
 ## Entry format
 
