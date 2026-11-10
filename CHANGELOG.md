@@ -65,6 +65,130 @@ Statuses referred to above are defined in [`spec/README.md`](spec/README.md).
 
 Nothing yet.
 
+## v0.5.4 — 2026-11-10
+
+**Release `v0.5.4`, language version `figdown 0.5`.** **The language did
+not move.** No keyword, option key, enum value or genre was added or removed,
+every existing conformance golden passes, and `read/0.5/` is reused
+byte-for-byte. What ships is a set of refusals for inputs that used to be
+accepted and mis-drawn, drawing fixes for labels and groups, the sequence and
+timing profiles, editor repairs, two integration limits, and a larger, stricter
+gate set. **Four groups of changes act on documents without touching their headers.**
+They are listed first under *Upgrading*.
+
+**Every scene SVG changes its bytes:** the unused arrow `<marker>` is no longer
+written into `<defs>`. Nothing a figure draws moves for that reason. Every
+published artifact also changes its version stamp.
+
+### Changed — layout and drawing
+
+- **Three or more labelled links between two nodes of one rank under
+  horizontal flow get their own label slots** instead of sharing the middle.
+- **A group push no longer lands one node on another.** A band that covered two
+  non-members of one rank pushed the first onto the second; such figures now
+  draw without overlap.
+- **An edge label past the top or left edge moves the scene.** The canvas used
+  to grow right and down only, so the label was clipped; it is now drawn whole.
+- **Labels stay inside their box or canvas.** `sequence` boxes are sized by
+  their line count (a three-line lifeline head no longer spills out of its
+  box), a centred `external` label widens the canvas, and `bar3d` z-ruler ticks
+  are computed on the drawn scale.
+- **`sequence`:** a long `state` pill no longer paints over the lifelines beside
+  it; the right margin no longer counts a self-message label twice;
+  `note=` is drawn on the five elements that accept it; a self-message `<->`
+  has two heads; every message shaft carries `data-edge`.
+- **`timing`:** the vertical edge at a cell boundary is drawn where the level
+  changes, and only there.
+- **Stacked sections no longer rewrite author text.** A label containing
+  `url(#…)` in a multi-section document was changed to `url(#s0_…)`.
+
+### Changed — refusals
+
+Each of the following inputs was accepted and mis-drawn or silently altered.
+Each is now a line error.
+
+- A second `cell (<r>,<c>)` line for the same table cell.
+- A text with no header line (an empty or comment-only text).
+- A quote inside an id, a quoted keyword, or a quote inside an enum position.
+- A plain decimal too long to be a finite number, at any numeric position, and a
+  chart over a table cell that holds one.
+- A bare carriage return. A CRLF source is embedded as LF, so an XML reader can
+  recover the source and verify `data-sha256`.
+- `[tail]` and `[head]` on a `sequence` message; an empty `bundle` member.
+
+### Fixed — engine and integrations
+
+- A failed `field` or `signal` line no longer adds a false `bitfield has no
+  fields` / `timing has no signals` error.
+- The group-enclosure refusal names a `rank` fix. The same-version refusal
+  advice, three per-genre vocabulary citations and four `sequence` citations
+  point to text a reader can open.
+- `dist` content hashes agree with `TextEncoder` on lone surrogates.
+- `kroki-service` enforces source, output, time and heap limits (core §15.5)
+  and reads Kroki's zlib encoding as well as raw deflate.
+
+### Fixed — editor
+
+- One document owns one undo history and one baseline. A save keeps a CRLF
+  file's line ending.
+- Table row and column edits: a deleted merge head keeps its `cell` mark; a
+  `cell` mark is re-addressed wherever it writes its address; row insert is
+  rowspan-aware; deleting the head row of a span over rows and columns moves
+  the whole head; a column cannot be inserted through such a span, and the
+  refusal says to split the merge, insert, then merge again.
+- A classic `field` with a quoted width can be renamed and resized. Layout
+  lines stay in their section. Option-first declarations are found. The typed
+  block insert point is correct.
+
+### Changed — gates
+
+Two gates were added and one tightened: `gate:kroki` and `gate:markdown-it`
+run the integration tests, and `gate:stability` now runs `--strict`.
+
+- The locality gate ratchets displacement and canvas growth.
+- Wired into existing gates: embed forms in the alt check; a closed conformance
+  corpus; repository-relative paths in the comment check; Markdown fences in the
+  fence check; legend colours; model equality in the strip check; the
+  conformance-actor, accessibility and plugin checks; BCP numbers harvested as
+  their RFCs; empty-corpus and link floors; reference links and `href` in the
+  isolation check; the landing-page release in the plugin check.
+- The capability check probes the Option-keys cells of every genre table.
+- Conformance grows from 302 to 310 cases.
+
+### Fixed — documentation and specification
+
+- [`spec/ERRATA.md`](spec/ERRATA.md) gains **E3–E10**: frozen-tree statements
+  that were wrong as written, each with the ruling that corrects it. The frozen
+  trees are unchanged; the next reading tree carries the corrected wording.
+- Stale statements corrected against the engine in `core.md` (§5, §8.1, §10),
+  the genre specs, the guides, the tool docs, the gallery and the showcase.
+  `tools/README.md` lists the 16 tool scripts it omitted.
+- [`spec/syntax-style.md`](spec/syntax-style.md) rule 2.2 says when a list
+  element must be quoted. Core cites the style guide by section, not line
+  number.
+
+### Upgrading
+
+**Four groups of changes act on documents without a header change.** None is
+version-gated. No shipped document is affected by the refusals.
+
+1. **Refusals** (see *Changed — refusals*): drop the second `cell` line, add a
+   header, unquote the id or keyword, shorten the number, replace the bare
+   carriage return, drop `[tail]`/`[head]`, name the `bundle` member.
+2. **A chart over a non-finite number** is refused; fix the cell.
+3. **Figures may re-render**: three or more labelled same-rank links under
+   horizontal flow; a group push that used to land two nodes on each other; a
+   label that used to be clipped; a `sequence` with line-counted boxes, a long
+   `state`, a `note=` or a self `<->`; a `timing` cell edge; `bar3d` ticks; a `sequence` whose last column ends in a
+   self-message label (narrower canvas); every `sequence` message shaft gains
+   `data-edge`. Some figures once refused for a group push now draw.
+4. **Every scene SVG loses one `<marker>`** and every stamp changes. If you keep
+   rendered `.svg` files under version control, expect a change on every
+   rebuilt artifact whose source did not change.
+
+No frozen-surface document needs a mechanical rewrite.
+Full details: [`spec/migrations.md`](spec/migrations.md).
+
 ## v0.5.3 — 2026-10-31
 
 **Release `v0.5.3`, language version `figdown 0.5`.** A `Z`: **the language did
